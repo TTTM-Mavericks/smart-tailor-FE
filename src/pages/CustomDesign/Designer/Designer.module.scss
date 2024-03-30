@@ -1,0 +1,57 @@
+.container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+
+    &__options {
+        display: flex;
+        align-items: center;
+        min-height: 100vh;
+
+        &__editorTab {
+            display: flex; 
+            padding-top: 1rem;
+            padding-bottom: 1rem; 
+            margin-left: 0.25rem; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            border-radius: 0.5rem; 
+            width: 4rem; 
+            border-color: 2px;
+            transition: all 0.3s ease;
+        }
+    }
+}
+
+.customButtonContainer {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    z-index: 10;
+
+    &__switchScreenButton {
+        padding-top: 0.625rem;
+        padding-bottom: 0.625rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        width: fit-content;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        font-weight: 700;
+    }
+}
+
+.filterTabContainer {
+    display: flex; 
+    position: absolute; 
+    right: 0; 
+    left: 0; 
+    bottom: 1.25rem; 
+    z-index: 10; 
+    flex-wrap: wrap; 
+    justify-content: center; 
+    align-items: center; 
+    width: 100%; 
+}
