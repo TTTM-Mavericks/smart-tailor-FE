@@ -9,10 +9,7 @@ const EditorTabs = [
         name: "filepicker",
         icon: fileIcon
     },
-    {
-        name: "aipicker",
-        icon: ai
-    },
+
     {
         name: 'download',
         icon: download
@@ -37,6 +34,18 @@ const DecalTypes = {
     },
     full: {
         stateProperty: "fullDecal",
+        filterTab: "stylishShirt",
+    },
+    front: {
+        stateProperty: "frontClothDecal",
+        filterTab: "stylishShirt",
+    },
+    back: {
+        stateProperty: "backClothDecal",
+        filterTab: "stylishShirt",
+    },
+    sleeve: {
+        stateProperty: "sleeveClothDecal",
         filterTab: "stylishShirt",
     },
 };

@@ -1,0 +1,92 @@
+.customDesign__container {
+    width: 100%;
+
+    &__canvas {
+        overflow: hidden;
+        position: relative;
+        width: 30%;
+        height: 60vh;
+        float: right;
+        border-left: 1px solid black;
+        transition-property: all;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 300ms;
+        transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
+        border-bottom: 1px solid black
+    }
+
+    ;
+
+    &__editorArea {
+        width: 60%;
+        align-items: center;
+        text-align: center;
+        justify-content: center;
+        align-content: center;
+
+        &__partOfCloth {
+            position: absolute;
+            width: 10%;
+            height: 100vh;
+            border: 1px solid black;
+            z-index: 2;
+            background-color: black;
+            right: 30%;
+            justify-content: center;
+            align-items: center;
+            align-content: center;
+            overflow-y: auto;
+        }
+
+        &__partOfCloth::-webkit-scrollbar {
+            width: 5px;
+            /* Width of the scrollbar */
+        }
+
+        &__partOfCloth::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            /* Color of the scrollbar thumb */
+            border-radius: 10px;
+            /* Radius of the scrollbar thumb */
+        }
+
+        &__partOfCloth::-webkit-scrollbar-track {
+            background-color: transparent;
+            /* Background color of the scrollbar track */
+        }
+
+        &__menu {
+            position: absolute;
+            height: 100vh;
+            left: 0;
+            align-items: center;
+            justify-content: center;
+
+            &__tab {
+                padding-top: 40vh;
+            }
+        }
+
+    }
+}
+
+.partOfClothSellector {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    margin: 0 auto;
+    margin-top: 50px;
+
+    &__img {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        justify-content: center;
+        align-items: center;
+        align-content: center;
+        margin: 0 auto;
+    }
+}

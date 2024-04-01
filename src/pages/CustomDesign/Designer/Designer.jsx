@@ -21,6 +21,10 @@ const Designer = () => {
     stylishShirt: false
   })
 
+  useEffect(()=>{
+    console.log('file', file);
+  },[file])
+
   const generateTabContent = () => {
     switch (activeEditorTab) {
       case "colorpicker":
@@ -35,9 +39,11 @@ const Designer = () => {
   }
 
   const handleDecals = (type, result) => {
+    console.log('result: ', result);
     const decalType = DecalTypes[type];
 
     state[decalType.stateProperty] = result;
+    state.imageLogoUrl = result
 
     if (!activeFilterTab[decalType.filterTab]) {
       handleActiveFilterTab(decalType.filterTab)
@@ -113,7 +119,7 @@ const Designer = () => {
     <AnimatePresence>
       {snap.intro && (
         <>
-          <motion.div
+          {/* <motion.div
             key="custom"
             className={styles.container}
             {...slideAnimation('left')}
@@ -133,7 +139,7 @@ const Designer = () => {
                 {generateTabContent()}
               </div>
             </div>
-          </motion.div>
+          </motion.div> */}
 
           <motion.div
             className={styles.customButtonContainer}
