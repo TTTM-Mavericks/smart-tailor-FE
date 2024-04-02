@@ -11,8 +11,8 @@
 
         &__editorTab {
             display: flex; 
-            padding-top: 1rem;
-            padding-bottom: 1rem; 
+            // padding-top: 1rem;
+            // padding-bottom: 1rem; 
             margin-left: 0.25rem; 
             flex-direction: column; 
             justify-content: center; 
@@ -44,14 +44,14 @@
 }
 
 .filterTabContainer {
+    width: 30%;
     display: flex; 
     position: absolute; 
-    right: 0; 
-    left: 0; 
-    bottom: 1.25rem; 
     z-index: 10; 
     flex-wrap: wrap; 
-    justify-content: center; 
-    align-items: center; 
-    width: 100%; 
+    right: 0;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    
 }
