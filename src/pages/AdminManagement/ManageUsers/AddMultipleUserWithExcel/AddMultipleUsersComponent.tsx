@@ -2,7 +2,7 @@ import * as React from 'react';
 import DownloadIcon from '@mui/icons-material/CloudDownload';
 import { Box, Button, IconButton, Typography } from '@mui/material';
 import { AgricultureOutlined, Cancel, Close, ConfirmationNumber, ErrorOutline } from '@mui/icons-material';
-import * as XLSX from "xlsx";
+import * as XLSX from "xlsx-js-style";
 import "./AddMultipleUsersStyles.css";
 
 const ADDUSERWITHFILEEXCELS = 'http://localhost:5173/Add_New_Users_Sample_Files.xlsx';
@@ -12,14 +12,14 @@ interface AddUserWithMultipleExcelFormProps {
 }
 
 interface ExcelData {
-    registrarId: string | null | undefined;
-    name: string | null | undefined;
-    age: number | null | undefined;
-    phone: string | null | undefined;
-    email: string | null | undefined;
-    address: string | null | undefined;
-    city: string | null | undefined;
-    zipCode: string | null | undefined;
+    registrarId: string;
+    name: string;
+    age: number;
+    phone: string;
+    email: string;
+    address: string;
+    city: string;
+    zipCode: string;
 }
 
 const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps> = ({ closeMultipleCard }) => {
@@ -97,32 +97,69 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
 
         if (excelData.length > 0 && !hasErrors) {
             uploadData(excelData);
+            // window.location.reload();
         } else {
             setError('Please resolve errors before confirming');
         }
     };
 
     const handleDownloadFullData = () => {
-        // Modify the data to include error messages in the respective fields
-        const modifiedData = excelData.map(data => ({
-            registrarId: data.registrarId || 'Error Registrated ID',
-            name: data.name || 'Error Name',
-            age: data.age || 'Error Age',
-            phone: data.phone || 'Error Phone',
-            email: data.email || 'Error Email',
-            address: data.address || 'Error Address',
-            city: data.city || 'Error City',
-            zipCode: data.zipCode || 'Error Zip Code',
-            error: !data.registrarId || !data.name || !data.age || !data.phone || !data.email || !data.address || !data.city || !data.zipCode,
-        }));
-
         // Convert modified data to XLSX format
-        const ws = XLSX.utils.json_to_sheet(modifiedData);
+        const ws = XLSX.utils.json_to_sheet(excelData, { header: Object.keys(excelData[0] || {}) });
+
+        // Define the error cell style
+        const errorCellStyle = {
+            fill: { fgColor: { rgb: "FFFF00" } } // Yellow fill color
+        };
+
+        // Get the range of the worksheet
+        const range = XLSX.utils.decode_range(ws['!ref'] || "A1:A1");
+
+        // Iterate through the range and apply style to null cells
+        for (let row = range.s.r; row <= range.e.r; row++) {
+            for (let col = range.s.c; col <= range.e.c; col++) {
+                const cellRef = XLSX.utils.encode_cell({ r: row, c: col });
+                const cell = ws[cellRef];
+
+                // Check if cell is null
+                if (!cell || cell.v === null) {
+                    ws[cellRef] = {
+                        v: "", // Set cell value to empty string
+                        s: errorCellStyle // Apply error cell style
+                    };
+                }
+            }
+        }
+
+        // Create a new workbook and append the worksheet
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Error Data To Edit");
-        // Save the file
-        XLSX.writeFile(wb, "ErrorDataToEdit.xlsx");
+
+        // Convert the workbook to a binary string
+        const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+
+        // Trigger file download
+        function saveAs(blob: any, fileName: any) {
+            var url = window.URL.createObjectURL(blob);
+            var a = document.createElement("a");
+            a.style.display = "none";
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+        saveAs(blob, "ErrorDataToEdit.xlsx");
     };
+
+    function s2ab(s: any) {
+        var buf = new ArrayBuffer(s.length);
+        var view = new Uint8Array(buf);
+        for (var i = 0; i != s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+        return buf;
+    }
 
     return (
         <div>
@@ -227,3 +264,4 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
 };
 
 export default AddMultipleComponentWithExcel;
+
