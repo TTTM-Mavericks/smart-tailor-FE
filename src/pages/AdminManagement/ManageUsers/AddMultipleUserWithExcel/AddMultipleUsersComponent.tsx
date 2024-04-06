@@ -122,7 +122,7 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
                 const cell = ws[cellRef];
 
                 // Check if cell is null
-                if (!cell || cell.v === null) {
+                if (!cell || cell.v === null || cell.v === "") {
                     ws[cellRef] = {
                         v: "", // Set cell value to empty string
                         s: errorCellStyle // Apply error cell style
