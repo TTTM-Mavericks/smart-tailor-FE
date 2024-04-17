@@ -3,7 +3,7 @@ import DownloadIcon from '@mui/icons-material/CloudDownload';
 import { Box, Button, IconButton, Typography } from '@mui/material';
 import { AgricultureOutlined, Cancel, Close, ConfirmationNumber, ErrorOutline } from '@mui/icons-material';
 import * as XLSX from "xlsx-js-style";
-import "./AddMultipleUsersStyles.css";
+// import "./AddMultipleUsersStyles.module.scss";
 
 const ADDUSERWITHFILEEXCELS = 'http://localhost:5173/Add_New_Users_Sample_Files.xlsx';
 

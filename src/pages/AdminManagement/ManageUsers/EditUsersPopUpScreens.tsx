@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Box, Button, Grid, IconButton, TextField, Typography } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
-import "./EditUsersPopUpStyles.css";
+import styles from "./EditUsersPopUpStyles.module.scss";
 import Swal from "sweetalert2";
 
 interface EditUserPopUpScreenFormProps {

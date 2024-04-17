@@ -10,6 +10,7 @@ import EditUserPopUpScreens from "./EditUsersPopUpScreens";
 import { Add } from "@mui/icons-material";
 import AddEachUsersWithHand from "./AddEachWithHand/AddEachUsersWithHandScreens";
 import AddMultipleComponentWithExcel from "./AddMultipleUserWithExcel/AddMultipleUsersComponent";
+import styles from './ManageUsersStyle.module.scss'
 
 interface User {
     id: number;
@@ -309,7 +310,7 @@ const ManageUsers: React.FC = () => {
                             aria-labelledby="modal-modal-title"
                             aria-describedby="modal-modal-description"
                         >
-                            <Box sx={style}>
+                            <Box sx={style} className={styles.bebe2}>
                                 <AddMultipleComponentWithExcel closeMultipleCard={handleAddMultipleClose} />
                             </Box>
                         </Modal>

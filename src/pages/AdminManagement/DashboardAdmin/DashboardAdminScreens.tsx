@@ -4,7 +4,7 @@ import SideBarComponent from '../GlobalComponent/SideBar/SideBarComponent';
 import { Box, CssBaseline, useMediaQuery, useTheme } from "@mui/material";
 import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
 import theme from '../../../theme';
-import "./DashboardAdminStyle.css"
+import styles from "./DashboardAdminStyle.module.scss"
 import ManageUsers from '../ManageUsers/ManageUsersScreens';
 import LineChartComponent from '../LineChart/LineChartComponent';
 import BarChartComponent from '../BarChart/BarChartComponent';
@@ -18,9 +18,9 @@ export default function DashboardAdminScreens() {
 
         <CssVarsProvider theme={theme}>
             <CssBaseline />
-            <div className="dashboard">
+            <div className={`${styles.dashboard}`}>
                 <SideBarComponent />
-                <main className="content">
+                <main className={`${styles.content}`}>
                     <TopbarComponent />
                     <GeographyChartComponent />
                     <LineChartComponent />

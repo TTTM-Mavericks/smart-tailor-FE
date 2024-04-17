@@ -4,15 +4,15 @@ import SideBarComponent from '../GlobalComponent/SideBar/SideBarComponent';
 import { CssBaseline } from "@mui/material";
 import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
 import theme from '../../../theme';
-import "./AdminProfileStyles.css"
+import styles from "./AdminProfileStyles.module.scss"
 import AdminProfileScreens from './AdminProfileScreens';
 export default function DashboardAdminProfileScreens() {
     return (
         <CssVarsProvider theme={theme}>
             <CssBaseline />
-            <div className="dashboard">
+            <div className={`${styles.dashboard}`}>
                 <SideBarComponent />
-                <main className="content">
+                <main className={`${styles.content}`}>
                     <TopbarComponent />
                     <AdminProfileScreens />
                 </main>
