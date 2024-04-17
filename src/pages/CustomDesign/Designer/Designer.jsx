@@ -141,7 +141,7 @@ const Designer = () => {
             </div>
           </motion.div> */}
 
-          <motion.div
+          {/* <motion.div
             className={styles.customButtonContainer}
             {...fadeAnimation}
           >
@@ -151,7 +151,7 @@ const Designer = () => {
               handleClick={() => state.intro = false}
               customStyles={styles.customButtonContainer__switchScreenButton}
             />
-          </motion.div>
+          </motion.div> */}
 
           <motion.div className={styles.filterTabContainer} {...slideAnimation('up')}>
             {FilterTabs.map((tab) => (

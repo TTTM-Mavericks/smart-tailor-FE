@@ -4,7 +4,7 @@ import CanvasModel from '../../canvas/CanvasModel'
 import Designer from './Designer/Designer'
 import ImageEditor from './Designer/ImageEditor'
 import styles from './CustomDesign.module.scss';
-import { SRGBToLinear } from 'three';
+// import { SRGBToLinear } from 'three';
 import ImageDraggableComponent from '../../components/Draggable/ImageDraggableComponent';
 import { BACK_CLOTH_PART, FRONT_CLOTH_PART, LOGO_PART, SLEEVE_CLOTH_PART } from '../../models/ClothModel';
 import { downloadCanvasToImage, reader } from '../../utils/DesignerUtils';
@@ -13,6 +13,7 @@ import state from '../../store';
 import { ColorPicker, FilePicker, Tab } from '../../components';
 import { AnimatePresence, motion } from "framer-motion";
 import { slideAnimation } from '../../config/MotionSetting';
+import HeaderComponent from '../../components/Header/HeaderComponent';
 
 
 
@@ -140,6 +141,7 @@ function CustomDesignScreen() {
 
   return (
     <div className={styles.customDesign__container}>
+      <HeaderComponent></HeaderComponent>
       <div className={styles.customDesign__container__editorArea}>
         <motion.div
           key="custom"
