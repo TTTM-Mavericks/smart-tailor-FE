@@ -24,7 +24,6 @@ const Shirt = () => {
 
     const { nodes, materials } = useGLTF('/shirt_baked.glb');
 
-    console.log(nodes, materials)
 
     const logoTexture = useTexture(snap.logoDecal);
     const fullTexture = useTexture(snap.fullDecal);
@@ -156,6 +155,7 @@ const Shirt = () => {
         const scaleRatioX = deltaX / otherElementX;
         const scaleRatioY = deltaY / otherElementY;
 
+        console.log(nodes, materials)
 
 
 
@@ -191,8 +191,8 @@ const Shirt = () => {
 
                 {snap.isLogoTexture && (
                     <Decal
-                        position={[logoDecalPositionX ? logoDecalPositionX : 0, logoDecalPositionY ? logoDecalPositionY : 0, 0.15]}
-                        // position={[0, 0.04, 0.15]}
+                        // position={[logoDecalPositionX ? logoDecalPositionX : 0, logoDecalPositionY ? logoDecalPositionY : 0, 0.15]}
+                        position={[0, 0.04, 0.15]}
 
                         rotation={[0, 0, 0]}
                         scale={0.1}
@@ -231,11 +231,11 @@ const Shirt = () => {
 
                 {snap.isSleeveClothTexture && (
                     <Decal
-                        position={[sleeveDecalPositionX ? sleeveDecalPositionX : -9, sleeveDecalPositionY ? sleeveDecalPositionY : 0.04, 0.1]}
-                        // position={[-9, 0.04, 0.1]}
+                        // position={[sleeveDecalPositionX ? sleeveDecalPositionX/10 : 0, sleeveDecalPositionY ? sleeveDecalPositionY : 0, 0]}
+                        position={[-0.15, 0.15, 0]}
 
                         rotation={[0, 0, 0]}
-                        scale={0.3}
+                        scale={0.2}
                         map={sleeveTexture}
                         depthTest={false}
                         depthWrite={true}
