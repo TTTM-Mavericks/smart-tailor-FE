@@ -43,7 +43,7 @@ const partOfClothData: PartOfCloth[] = [
 function CustomDesignScreen() {
 
   // ---------------UseState Variable---------------//
-  const [selectedPartOfCloth, setSelectedPartOfCloth] = useState<PartOfCloth>();
+  const [selectedPartOfCloth, setSelectedPartOfCloth] = useState<PartOfCloth | undefined>();
   const [selectedItem, setSelectedItem] = useState('');
   const [file, setFile] = useState('');
   const [activeEditorTab, setActiveEditorTab] = useState('')
