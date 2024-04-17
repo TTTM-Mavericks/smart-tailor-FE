@@ -5,6 +5,10 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import CustomDesignScreen from './pages/CustomDesign/CustomDesignScreen';
 import SignInScreen from './pages/Authentication/SignIn/SignInScreens';
+import DashboardAdminScreens from './pages/AdminManagement/DashboardAdmin/DashboardAdminScreens';
+import DashboardAdminProfileScreens from './pages/AdminManagement/AdminProfile/AdminProfileComponent';
+import AboutUsScreens from './pages/AboutUs/AboutUsScreens';
+import AboutUsPage from './pages/AboutUs/TestAboutUs';
 
 const tokenIsValid = (token) => {
   // Implement your token validation logic here
@@ -46,9 +50,13 @@ function App() {
         <Routes>
           <Route path='/' element={<CustomDesignScreen></CustomDesignScreen>} />
           <Route path='/auth/signin' element={<SignInScreen></SignInScreen>} />
+          <Route path='/admin' element={<DashboardAdminScreens></DashboardAdminScreens>} />
+          <Route path='/admin_profile' element={<DashboardAdminProfileScreens></DashboardAdminProfileScreens>} />
+          <Route path='/about_us' element={<AboutUsScreens></AboutUsScreens>} />
+          <Route path='/about' element={<AboutUsPage></AboutUsPage>} />
 
 
-          
+
 
 
         </Routes>
