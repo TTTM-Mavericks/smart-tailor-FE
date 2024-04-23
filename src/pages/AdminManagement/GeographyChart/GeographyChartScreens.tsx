@@ -13,38 +13,38 @@ const GeographyChart = ({ isDashboard = false }) => {
                 axis: {
                     domain: {
                         line: {
-                            stroke: colors.grey[100],
+                            stroke: colors.primary[100],
                         },
                     },
                     legend: {
                         text: {
-                            fill: colors.grey[100],
+                            fill: colors.primary[100],
                         },
                     },
                     ticks: {
                         line: {
-                            stroke: colors.grey[100],
+                            stroke: colors.primary[100],
                             strokeWidth: 1,
                         },
                         text: {
-                            fill: colors.grey[100],
+                            fill: colors.primary[100],
                         },
                     },
                 },
                 legends: {
                     text: {
-                        fill: colors.grey[100],
+                        fill: colors.primary[100],
                     },
                 },
             }}
             features={geoFeatures.features}
             margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
-            domain={[0, 1000000]}
+            domain={[0, 300]}
             unknownColor="#666666"
             label="properties.name"
             valueFormat=".2s"
-            projectionScale={isDashboard ? 40 : 150}
-            projectionTranslation={isDashboard ? [0.49, 0.6] : [0.5, 0.5]}
+            projectionScale={isDashboard ? 80 : 1800}
+            projectionTranslation={isDashboard ? [0.3, 0.4] : [-2, 1.5]}
             projectionRotation={[0, 0, 0]}
             borderWidth={1.5}
             borderColor="#ffffff"
@@ -61,7 +61,7 @@ const GeographyChart = ({ isDashboard = false }) => {
                             itemWidth: 94,
                             itemHeight: 18,
                             itemDirection: "left-to-right",
-                            itemTextColor: colors.grey[100],
+                            itemTextColor: colors.primary[100],
                             itemOpacity: 0.85,
                             symbolSize: 18,
                             effects: [
@@ -75,7 +75,7 @@ const GeographyChart = ({ isDashboard = false }) => {
                             ],
                         },
                     ]
-                    : undefined
+                    : <div><h1>it not show</h1></div>
             }
         />
     );

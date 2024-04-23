@@ -49,12 +49,11 @@ function App() {
     <div>
       <BrowserRouter>
         <Routes>
-        <Route path='/' element={<HomeScreen></HomeScreen>} />
+          <Route path='/' element={<HomeScreen></HomeScreen>} />
           <Route path='/design' element={<CustomDesignScreen></CustomDesignScreen>} />
           <Route path='/auth/signin' element={<SignInScreen></SignInScreen>} />
           <Route path='/admin' element={<DashboardAdminScreens></DashboardAdminScreens>} />
           <Route path='/admin_profile' element={<DashboardAdminProfileScreens></DashboardAdminProfileScreens>} />
-          <Route path='/about_us' element={<AboutUsScreens></AboutUsScreens>} />
           <Route path='/about' element={<AboutUsPage></AboutUsPage>} />
 
 
