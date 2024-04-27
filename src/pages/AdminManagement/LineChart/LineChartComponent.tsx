@@ -3,7 +3,7 @@ import LineChart from "./LineChartScreens";
 
 const LineChartComponent = () => {
     return (
-        <Box m="20px">
+        <Box>
             <Box height="75vh">
                 <LineChart />
             </Box>
