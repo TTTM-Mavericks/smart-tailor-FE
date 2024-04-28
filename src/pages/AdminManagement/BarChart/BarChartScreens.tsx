@@ -34,7 +34,12 @@ const BarChart = ({ isDashboard = false }) => {
                 },
                 legends: {
                     text: {
-                        fill: colors.grey[100],
+                        fill: colors.grey[500],
+                    },
+                },
+                tooltip: {
+                    container: {
+                        color: colors.primary[500],
                     },
                 },
             }}

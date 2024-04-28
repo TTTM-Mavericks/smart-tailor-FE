@@ -3,10 +3,8 @@ import GeographyChart from "./GeographyChartScreens";
 
 const GeographyChartComponent = () => {
     return (
-        <Box m="20px">
-            <Box height="75vh">
-                <GeographyChart />
-            </Box>
+        <Box>
+            <GeographyChart />
         </Box>
     );
 };

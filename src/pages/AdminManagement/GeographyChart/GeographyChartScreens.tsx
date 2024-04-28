@@ -13,27 +13,32 @@ const GeographyChart = ({ isDashboard = false }) => {
                 axis: {
                     domain: {
                         line: {
-                            stroke: colors.primary[100],
+                            stroke: colors.grey[100],
                         },
                     },
                     legend: {
                         text: {
-                            fill: colors.primary[100],
+                            fill: colors.grey[100],
                         },
                     },
                     ticks: {
                         line: {
-                            stroke: colors.primary[100],
+                            stroke: colors.grey[100],
                             strokeWidth: 1,
                         },
                         text: {
-                            fill: colors.primary[100],
+                            fill: colors.grey[100],
                         },
                     },
                 },
                 legends: {
                     text: {
-                        fill: colors.primary[100],
+                        fill: colors.grey[500],
+                    },
+                },
+                tooltip: {
+                    container: {
+                        color: colors.primary[500],
                     },
                 },
             }}
@@ -44,39 +49,39 @@ const GeographyChart = ({ isDashboard = false }) => {
             label="properties.name"
             valueFormat=".2s"
             projectionScale={isDashboard ? 80 : 1800}
-            projectionTranslation={isDashboard ? [0.3, 0.4] : [-2, 1.5]}
-            projectionRotation={[0, 0, 0]}
+            projectionTranslation={isDashboard ? [0.3, 0.4] : [0.5, 1]}
+            projectionRotation={[260, 0, 0]}
             borderWidth={1.5}
             borderColor="#ffffff"
-            legends={
-                !isDashboard
-                    ? [
-                        {
-                            anchor: "bottom-left",
-                            direction: "column",
-                            justify: true,
-                            translateX: 20,
-                            translateY: -100,
-                            itemsSpacing: 0,
-                            itemWidth: 94,
-                            itemHeight: 18,
-                            itemDirection: "left-to-right",
-                            itemTextColor: colors.primary[100],
-                            itemOpacity: 0.85,
-                            symbolSize: 18,
-                            effects: [
-                                {
-                                    on: "hover",
-                                    style: {
-                                        itemTextColor: "#ffffff",
-                                        itemOpacity: 1,
-                                    },
-                                },
-                            ],
-                        },
-                    ]
-                    : <div><h1>it not show</h1></div>
-            }
+        // legends={
+        //     !isDashboard
+        //         ? [
+        //             {
+        //                 anchor: "bottom-left",
+        //                 direction: "column",
+        //                 justify: true,
+        //                 translateX: 20,
+        //                 translateY: -100,
+        //                 itemsSpacing: 0,
+        //                 itemWidth: 94,
+        //                 itemHeight: 18,
+        //                 itemDirection: "left-to-right",
+        //                 itemTextColor: colors.grey[100],
+        //                 itemOpacity: 0.85,
+        //                 symbolSize: 18,
+        //                 effects: [
+        //                     {
+        //                         on: "hover",
+        //                         style: {
+        //                             itemTextColor: "#ffffff",
+        //                             itemOpacity: 1,
+        //                         },
+        //                     },
+        //                 ],
+        //             },
+        //         ]
+        //         : <div><h1>it not show</h1></div>
+        // }
         />
     );
 };

@@ -10,6 +10,8 @@ import LineChartComponent from '../LineChart/LineChartComponent';
 import BarChartComponent from '../BarChart/BarChartComponent';
 import PieChartComponent from '../PieChart/PieChartComponent';
 import GeographyChartComponent from '../GeographyChart/GeographyChartComponent';
+import CardInformationDetailComponent from '../CardInformationDetail/CardInformationDetailComponent';
+import GeographyChart from '../GeographyChart/GeographyChartScreens';
 
 export default function DashboardAdminScreens() {
     const theme1 = useTheme();
@@ -27,12 +29,19 @@ export default function DashboardAdminScreens() {
                         gridAutoRows="140px"
                         gap="20px"
                     >
+                        <Box
+                            gridColumn="span 12"
+                            gridRow="span 2"
+                        >
+                            <CardInformationDetailComponent />
+
+                        </Box>
 
                         <Box
                             gridColumn="span 12"
                             gridRow="span 5"
                         >
-                            <GeographyChartComponent />
+                            <GeographyChart />
                         </Box>
                         <Box
                             gridColumn="span 12"
