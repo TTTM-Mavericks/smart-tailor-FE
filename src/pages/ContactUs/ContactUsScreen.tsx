@@ -1,7 +1,6 @@
-// ContactUs.tsx
-import React from 'react';
+import React, { useRef } from 'react';
 import { Container, Typography, Box, Button, Grid, TextField } from '@mui/material';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useInView } from 'framer-motion';
 import styles from './ContactUsStyles.module.scss';
 import brandImage from '../../assets/img/landing-img/slider-bird1.jpg';
 import { FaFacebook, FaTwitter, FaInstagram } from 'react-icons/fa';
@@ -23,8 +22,14 @@ const ContactUsPage: React.FC = () => {
         visible: {
             y: 0,
             opacity: 1,
+            transition: {
+                duration: 0.5,
+            },
         },
     };
+
+    const storyRef = useRef(null);
+    const isStoryVisible = useInView(storyRef, { once: true });
 
     return (
         <motion.div
@@ -36,7 +41,7 @@ const ContactUsPage: React.FC = () => {
             <Container maxWidth="md">
                 <Box textAlign="center" mb={4}>
                     <motion.div variants={itemVariants}>
-                        <Typography variant="h4" component="h1" gutterBottom>
+                        <Typography variant="h4" component="h1" gutterBottom color="black">
                             Contact Us
                         </Typography>
                     </motion.div>
@@ -66,7 +71,7 @@ const ContactUsPage: React.FC = () => {
                     <Grid item xs={12} md={6}>
                         <motion.div variants={itemVariants}>
                             <Box bgcolor="background.paper" p={4} borderRadius={4}>
-                                <Typography variant="h6" gutterBottom>
+                                <Typography variant="h6" gutterBottom color="black">
                                     Leave a Message
                                 </Typography>
                                 <Typography variant="body1" color="textSecondary" gutterBottom>
@@ -85,11 +90,23 @@ const ContactUsPage: React.FC = () => {
                                     margin="normal"
                                 />
                                 <TextField
+                                    label="Phone Number"
+                                    variant="outlined"
+                                    fullWidth
+                                    margin="normal"
+                                />
+                                <TextField
+                                    label="Subject"
+                                    variant="outlined"
+                                    fullWidth
+                                    margin="normal"
+                                />
+                                <TextField
                                     label="Message"
                                     variant="outlined"
                                     fullWidth
                                     multiline
-                                    rows={4}
+                                    rows={6}
                                     margin="normal"
                                 />
                                 <Button variant="contained" color="primary" className={styles['animated-button']}>
@@ -99,6 +116,26 @@ const ContactUsPage: React.FC = () => {
                         </motion.div>
                     </Grid>
                 </Grid>
+                <Box mt={4} ref={storyRef}>
+                    <motion.div
+                        variants={itemVariants}
+                        initial="hidden"
+                        animate={isStoryVisible ? "visible" : "hidden"}
+                    >
+                        <Typography variant="h6" gutterBottom>
+                            Our Story
+                        </Typography>
+                        <Typography variant="body1" color="textSecondary" gutterBottom>
+                            Learn more about our brand's history, values, and commitment to quality. We have been dedicated to providing high-quality clothing and excellent customer service since our founding in 2024. Our mission is to create stylish and comfortable apparel that empowers individuals to express their unique personalities.
+                        </Typography>
+                        <Typography variant="body1" color="textSecondary" gutterBottom>
+                            At TTTM - Smart Tailor, we believe that fashion should be accessible to everyone. That's why we strive to offer a wide range of sizes, styles, and price points to cater to diverse needs and preferences. Our team of talented designers works tirelessly to create trendy and timeless pieces that you'll love to wear season after season.
+                        </Typography>
+                        <Typography variant="body1" color="textSecondary" gutterBottom>
+                            We are committed to sustainable and ethical practices throughout our entire supply chain. From sourcing high-quality materials to ensuring fair labor practices, we prioritize responsible and eco-friendly production methods. By choosing TTTM - Smart Tailor, you can feel good about your purchase, knowing that you're contributing to a more sustainable future.
+                        </Typography>
+                    </motion.div>
+                </Box>
                 <Box mt={4} textAlign="center">
                     <motion.div variants={itemVariants}>
                         <Typography variant="h6" gutterBottom color="black">

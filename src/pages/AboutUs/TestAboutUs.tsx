@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { styled } from '@mui/material/styles';
 import { Grid, Typography, Box, Button, Avatar, Fade, CardMedia, Card, CardContent, CardActionArea } from '@mui/material';
 import Slider from 'react-slick';
@@ -6,6 +6,7 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import CarouselComponent from './CarouselComponent';
 import CardComponent from './FilterComponent';
+import { motion, useInView } from 'framer-motion';
 
 const StyledBox = styled(Box)(({ theme }) => ({
     padding: theme.spacing(6, 2),
@@ -73,6 +74,11 @@ const AboutUsPage: React.FC = () => {
         ],
     };
 
+    const titleRef = useRef(null);
+    const teamRef = useRef(null);
+    const isTitleVisible = useInView(titleRef, { once: true });
+    const isTeamVisible = useInView(teamRef, { once: true });
+
     return (
         <div>
             <StyledBox>
@@ -130,29 +136,42 @@ const AboutUsPage: React.FC = () => {
                 </Grid>
             </StyledBox>
 
-            <Fade in timeout={800}>
+            <motion.div
+                ref={titleRef}
+                initial={{ opacity: 0, y: 50 }}
+                animate={isTitleVisible ? { opacity: 1, y: 0, transition: { duration: 0.5 } } : {}}
+            >
                 <Typography variant="h3" gutterBottom align="center" sx={{ marginTop: 6 }} style={{ color: "black" }}>
                     About Our Services
                 </Typography>
-            </Fade>
+            </motion.div>
 
             <CarouselComponent />
             <CardComponent />
-            <Fade in timeout={800}>
+
+            <motion.div
+                ref={teamRef}
+                initial={{ opacity: 0, y: 50 }}
+                animate={isTeamVisible ? { opacity: 1, y: 0, transition: { duration: 0.5 } } : {}}
+            >
                 <Typography variant="h3" gutterBottom align="center" sx={{ marginTop: 6 }} style={{ color: "black" }}>
                     Our Talented Team
                 </Typography>
-            </Fade>
+            </motion.div>
+
             <Grid container spacing={3} sx={{ marginTop: 4 }}>
                 {[1, 2, 3, 4].map((_, index) => (
                     <Grid item xs={6} sm={3} key={index}>
-                        <Fade in timeout={(index + 1) * 400}>
+                        <motion.div
+                            initial={{ opacity: 0, y: 50 }}
+                            animate={isTeamVisible ? { opacity: 1, y: 0, transition: { delay: (index + 1) * 0.2, duration: 0.5 } } : {}}
+                        >
                             <StyledTeamMember>
                                 <StyledAvatar src={`../../../../src/assets/img/avatar.jpg`} />
                                 <Typography variant="h6" style={{ color: "black" }}>Tam Thanh</Typography>
                                 <Typography variant="body2" style={{ color: "black" }}>Member Tailor</Typography>
                             </StyledTeamMember>
-                        </Fade>
+                        </motion.div>
                     </Grid>
                 ))}
             </Grid>
