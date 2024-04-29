@@ -7,7 +7,6 @@ import CustomDesignScreen from './pages/CustomDesign/CustomDesignScreen';
 import SignInScreen from './pages/Authentication/SignIn/SignInScreens';
 import DashboardAdminScreens from './pages/AdminManagement/DashboardAdmin/DashboardAdminScreens';
 import DashboardAdminProfileScreens from './pages/AdminManagement/AdminProfile/AdminProfileComponent';
-import AboutUsScreens from './pages/AboutUs/AboutUsScreens';
 import AboutUsPage from './pages/AboutUs/TestAboutUs';
 import HomeScreen from './pages/Home/HomeScreen';
 

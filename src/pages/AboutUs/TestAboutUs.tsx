@@ -156,7 +156,6 @@ const AboutUsPage: React.FC = () => {
                     </Grid>
                 ))}
             </Grid>
-
             <StyledFooter>
                 <Fade in timeout={800}>
                     <Typography variant="body1">
