@@ -9,6 +9,7 @@ import DashboardAdminScreens from './pages/AdminManagement/DashboardAdmin/Dashbo
 import DashboardAdminProfileScreens from './pages/AdminManagement/AdminProfile/AdminProfileComponent';
 import AboutUsPage from './pages/AboutUs/TestAboutUs';
 import HomeScreen from './pages/Home/HomeScreen';
+import ContactUsPage from './pages/ContactUs/ContactUsScreen';
 
 const tokenIsValid = (token) => {
   // Implement your token validation logic here
@@ -54,6 +55,7 @@ function App() {
           <Route path='/admin' element={<DashboardAdminScreens></DashboardAdminScreens>} />
           <Route path='/admin_profile' element={<DashboardAdminProfileScreens></DashboardAdminProfileScreens>} />
           <Route path='/about' element={<AboutUsPage></AboutUsPage>} />
+          <Route path='/contact' element={<ContactUsPage></ContactUsPage>} />
 
 
 
