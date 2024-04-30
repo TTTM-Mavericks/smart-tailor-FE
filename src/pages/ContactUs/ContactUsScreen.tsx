@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { Container, Typography, Box, Button, Grid, TextField } from '@mui/material';
 import { motion, useScroll, useInView } from 'framer-motion';
 import styles from './ContactUsStyles.module.scss';
-import brandImage from '../../assets/img/landing-img/slider-bird1.jpg';
+import brandImage from '../../../src/assets/img/avatar.jpg';
 import { FaFacebook, FaTwitter, FaInstagram } from 'react-icons/fa';
 
 const ContactUsPage: React.FC = () => {
