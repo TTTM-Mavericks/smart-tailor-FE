@@ -10,11 +10,24 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import Swal from 'sweetalert2';
 
-interface AddUserWithHandsFormProps {
-    closeCard: () => void;
+interface User {
+    id: number;
+    registrarId: string;
+    name: string;
+    age: number;
+    phone: string;
+    email: string;
+    address: string;
+    city: string;
+    zipCode: string;
 }
 
-const AddEachUsersWithHand: React.FC<AddUserWithHandsFormProps> = ({ closeCard }) => {
+interface AddUserWithHandsFormProps {
+    closeCard: () => void;
+    addNewUser: (addedNewUser: User) => void
+}
+
+const AddEachUsersWithHand: React.FC<AddUserWithHandsFormProps> = ({ closeCard, addNewUser }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [formData, setFormData] = useState({
         registrarId: "string",
@@ -111,14 +124,13 @@ const AddEachUsersWithHand: React.FC<AddUserWithHandsFormProps> = ({ closeCard }
             console.log('Response:', responseData);
 
             if (responseData) {
+                addNewUser(responseData);
                 Swal.fire(
                     'Add Success!',
                     'User has been updated!',
                     'success'
-                );
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
+                )
+
             } else {
                 Swal.fire(
                     'Add User fail!',

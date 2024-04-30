@@ -104,6 +104,16 @@ const ManageUsers: React.FC = () => {
             .catch(error => console.error('Error fetching data:', error));
     }, []);
 
+    // Thêm người dùng mới vào danh sách
+    const handleAddUser = (newUser: User) => {
+        setData(prevData => [...prevData, newUser]);
+    }
+
+    // Cập nhật người dùng trong danh sách
+    const handleUpdateUser = (updatedUser: User) => {
+        setData(prevData => prevData.map(user => user.id === updatedUser.id ? updatedUser : user));
+    }
+
     // EDIT 
     const handleEditClick = (id: number, registrarId: string, name: string, age: number, phone: string, email: string, address: string, city: string, zipCode: string) => {
         // Handle edit action
@@ -158,10 +168,9 @@ const ManageUsers: React.FC = () => {
                     'Deleted User Success!',
                     'User has been deleted!!!',
                     'success'
-                );
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
+                )
+                // Loại bỏ người dùng khỏi danh sách hiện tại
+                setData(prevData => prevData.filter(user => user.id !== id));
             } else {
                 Swal.fire(
                     'Cancel The Deleted Process',
@@ -234,6 +243,10 @@ const ManageUsers: React.FC = () => {
         }
     ];
 
+    const getRowId = (row: any) => {
+        return row.registrarId; // Sử dụng một thuộc tính duy nhất làm id cho mỗi hàng
+    };
+
     return (
         <Box m="20px">
             <Box
@@ -298,7 +311,7 @@ const ManageUsers: React.FC = () => {
                             aria-describedby="modal-modal-description"
                         >
                             <Box sx={style}>
-                                <AddEachUsersWithHand closeCard={handleAddClose} />
+                                <AddEachUsersWithHand closeCard={handleAddClose} addNewUser={handleAddUser} />
                             </Box>
                         </Modal>
                     </MenuItem>
@@ -311,7 +324,7 @@ const ManageUsers: React.FC = () => {
                             aria-describedby="modal-modal-description"
                         >
                             <Box sx={style} className={styles.bebe2}>
-                                <AddMultipleComponentWithExcel closeMultipleCard={handleAddMultipleClose} />
+                                <AddMultipleComponentWithExcel closeMultipleCard={handleAddMultipleClose} addNewUser={handleAddUser} />
                             </Box>
                         </Modal>
 
@@ -324,6 +337,7 @@ const ManageUsers: React.FC = () => {
                     slots={{ toolbar: GridToolbar }}
                     // checkboxSelection
                     disableRowSelectionOnClick
+                    getRowId={getRowId}
                 />
                 <Modal
                     open={editopen}
@@ -335,6 +349,7 @@ const ManageUsers: React.FC = () => {
                             <EditUserPopUpScreens
                                 editClose={handleEditClose}
                                 fid={formId}
+                                updateUser={handleUpdateUser}
                             />
                         )}
                     </Box>

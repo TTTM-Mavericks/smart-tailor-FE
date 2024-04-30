@@ -2,16 +2,14 @@ import * as React from 'react';
 import DownloadIcon from '@mui/icons-material/CloudDownload';
 import { Box, Button, IconButton, Typography } from '@mui/material';
 import { AgricultureOutlined, Cancel, Close, ConfirmationNumber, ErrorOutline } from '@mui/icons-material';
+import { DataGrid } from '@mui/x-data-grid';
 import * as XLSX from "xlsx-js-style";
 // import "./AddMultipleUsersStyles.module.scss";
 
 const ADDUSERWITHFILEEXCELS = 'http://localhost:5173/Add_New_Users_Sample_Files.xlsx';
 
-interface AddUserWithMultipleExcelFormProps {
-    closeMultipleCard: () => void;
-}
-
-interface ExcelData {
+interface User {
+    id: number;
     registrarId: string;
     name: string;
     age: number;
@@ -22,7 +20,25 @@ interface ExcelData {
     zipCode: string;
 }
 
-const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps> = ({ closeMultipleCard }) => {
+interface ExcelData {
+    id: number;
+    registrarId: string;
+    name: string;
+    age: number;
+    phone: string;
+    email: string;
+    address: string;
+    city: string;
+    zipCode: string;
+}
+
+interface AddUserWithMultipleExcelFormProps {
+    closeMultipleCard: () => void;
+    addNewUser: (addedNewUser: ExcelData) => void
+}
+
+
+const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps> = ({ closeMultipleCard, addNewUser }) => {
     const [excelData, setExcelData] = React.useState<ExcelData[]>([]);
     const [loading, setLoading] = React.useState<boolean>(false);
     const [error, setError] = React.useState<string>('');
@@ -97,7 +113,13 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
 
         if (excelData.length > 0 && !hasErrors) {
             uploadData(excelData);
-            // window.location.reload();
+            for (const data of excelData) {
+                addNewUser(data);
+            }
+            setExcelData([]);
+            setLoading(false);
+            setError('');
+            closeMultipleCard();
         } else {
             setError('Please resolve errors before confirming');
         }
