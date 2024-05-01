@@ -62,7 +62,7 @@ const ContactUsPage: React.FC = () => {
                                 <Typography variant="body1" color="textSecondary" gutterBottom>
                                     Learn more about our brand's history, values, and commitment to quality.
                                 </Typography>
-                                <Button variant="contained" color="primary" className={styles['animated-button']}>
+                                <Button variant="contained" style={{ backgroundColor: "#E96208" }} className={styles['animated-button']}>
                                     Read More
                                 </Button>
                             </Box>
@@ -109,7 +109,7 @@ const ContactUsPage: React.FC = () => {
                                     rows={6}
                                     margin="normal"
                                 />
-                                <Button variant="contained" color="primary" className={styles['animated-button']}>
+                                <Button variant="contained" style={{ backgroundColor: "#E96208" }} className={styles['animated-button']}>
                                     Submit
                                 </Button>
                             </Box>
@@ -149,7 +149,7 @@ const ContactUsPage: React.FC = () => {
                                 whileHover={{ scale: 1.2 }}
                                 whileTap={{ scale: 0.9 }}
                             >
-                                <FaFacebook />
+                                <FaFacebook color='#E96208' />
                             </motion.a>
                             <motion.a
                                 href="#"
@@ -158,7 +158,7 @@ const ContactUsPage: React.FC = () => {
                                 whileHover={{ scale: 1.2 }}
                                 whileTap={{ scale: 0.9 }}
                             >
-                                <FaTwitter />
+                                <FaTwitter color='#E96208' />
                             </motion.a>
                             <motion.a
                                 href="#"
@@ -167,7 +167,7 @@ const ContactUsPage: React.FC = () => {
                                 whileHover={{ scale: 1.2 }}
                                 whileTap={{ scale: 0.9 }}
                             >
-                                <FaInstagram />
+                                <FaInstagram color='#E96208' />
                             </motion.a>
                         </div>
                     </motion.div>

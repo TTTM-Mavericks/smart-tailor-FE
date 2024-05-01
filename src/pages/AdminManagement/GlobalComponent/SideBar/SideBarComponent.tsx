@@ -128,15 +128,15 @@ const SideBarComponent = () => {
                                 />
                             </Box>
                             <Box textAlign="center">
-                                <Typography
-                                    variant="h2"
+                                {/* <Typography
+                                    variant="h3"
                                     color={colors.grey[100]}
                                     fontWeight="bold"
                                     sx={{ m: "10px 0 0 0" }}
                                 >
                                     Tammt
-                                </Typography>
-                                <Typography variant="h5" color={colors.greenAccent[500]}>
+                                </Typography> */}
+                                <Typography variant="h5" color={colors.greenAccent[500]} sx={{ m: "10px 0 0 0" }}>
                                     Admin TTTM
                                 </Typography>
                             </Box>
@@ -156,6 +156,7 @@ const SideBarComponent = () => {
                             variant="h6"
                             color={colors.grey[300]}
                             sx={{ m: "15px 0 5px 20px" }}
+                            style={{ fontSize: "15px" }}
                         >
                             Data
                         </Typography>
@@ -185,6 +186,7 @@ const SideBarComponent = () => {
                             variant="h6"
                             color={colors.grey[300]}
                             sx={{ m: "15px 0 5px 20px" }}
+                            style={{ fontSize: "15px" }}
                         >
                             Pages
                         </Typography>
@@ -214,6 +216,7 @@ const SideBarComponent = () => {
                             variant="h6"
                             color={colors.grey[300]}
                             sx={{ m: "15px 0 5px 20px" }}
+                            style={{ fontSize: "15px" }}
                         >
                             Charts
                         </Typography>

@@ -1,14 +1,13 @@
 import * as React from "react";
-import { MenuItem, InputBase, Avatar, Box, Button, Divider, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, SwipeableDrawer, ToggleButton, ToggleButtonGroup, Tooltip, useColorScheme, useTheme, Badge, Modal, makeStyles } from "@mui/material";
+import { MenuItem, InputBase, Avatar, Box, Divider, IconButton, List, ListItemIcon, Menu, SwipeableDrawer, ToggleButton, ToggleButtonGroup, Tooltip, useColorScheme, useTheme } from "@mui/material";
 import { tokens } from "../../../../theme";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
-import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchIcon from "@mui/icons-material/Search";
-import { Logout, PersonAdd, Settings } from "@mui/icons-material";
+import { Logout, Settings } from "@mui/icons-material";
 import { Link } from "react-router-dom";
+import NotificationComponent from "../Notification/NotificationComponent";
 type Anchor = 'top' | 'left' | 'bottom' | 'right';
 
 const TopbarComponent = () => {
@@ -73,41 +72,6 @@ const TopbarComponent = () => {
         </Box>
     );
 
-    // Open notification
-    const [anchorOpenNotification, setAnchorOpenNOtification] = React.useState(null);
-    const [notifications, setNotifications] = React.useState<any>([]);
-    const [invisible, setInvisible] = React.useState(false);
-
-    // Simulate fetching notifications from an API
-    React.useEffect(() => {
-        // Replace this with your actual API call to fetch notifications
-        const fetchNotifications = async () => {
-            try {
-                // Simulated data
-                const data = [
-                    { id: 1, message: 'Notification 1' },
-                    { id: 2, message: 'Notification 2' },
-                    { id: 3, message: 'Notification 3' }
-                ];
-                setNotifications(data);
-            } catch (error) {
-                console.error('Error fetching notifications:', error);
-            }
-        };
-
-        // Fetch notifications when component mounts
-        fetchNotifications();
-    }, [notifications]);
-
-    const handleClickNotification = (event: any) => {
-        setAnchorOpenNOtification(event.currentTarget);
-        setInvisible(true)
-    };
-
-    const handleCloseNotification = () => {
-        setAnchorOpenNOtification(null);
-    };
-
     return (
         <Box display="flex" justifyContent="space-between" p={2}>
             {/* SEARCH BAR */}
@@ -133,24 +97,7 @@ const TopbarComponent = () => {
                 </IconButton>
 
                 {/* Notification */}
-                <IconButton>
-                    <Badge color="error" variant="dot" onClick={handleClickNotification} invisible={invisible}>
-                        <NotificationsOutlinedIcon />
-                    </Badge>
-                    <Menu
-                        anchorEl={anchorOpenNotification}
-                        open={Boolean(anchorOpenNotification)}
-                        onClose={handleCloseNotification}
-                    >
-                        {notifications.map((notification: any) => (
-                            <MenuItem key={notification.id} onClick={handleCloseNotification}>
-                                {notification.message}
-                            </MenuItem>
-                        ))}
-                        <Divider component="li" />
-                        <Button>Mark all as read</Button><Button>View All</Button>
-                    </Menu>
-                </IconButton>
+                <NotificationComponent />
 
                 {/* Setting */}
                 <IconButton onClick={toggleDrawer('right', true)}>
@@ -217,9 +164,6 @@ const TopbarComponent = () => {
                         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                     >
-                        <MenuItem onClick={handleClose}>
-                            <Avatar /> Profile
-                        </MenuItem>
                         <MenuItem>
                             <Link to={"/admin_profile"} style={{ display: "flex", textDecoration: "none", color: colors.grey[100] }}>
                                 <Avatar /> My account

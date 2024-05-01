@@ -1,3 +1,4 @@
+import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import ProgressCircle from "../ProgressCircle/ProgressCircleComponent";
 import { tokens } from "../../../../theme";
@@ -6,12 +7,15 @@ interface StatBoxProps {
     title: string;
     subtitle: string;
     progress: number;
-    increase: string;
+    increase: number;
     icon: React.ReactNode;
 }
+
 const StatBox = ({ title, subtitle, progress, increase, icon }: StatBoxProps) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+
+    const increaseColor = increase >= 0 ? colors.greenAccent[400] : colors.redAccent[400];
 
     return (
         <Box width="100%" m="0 30px" p="12px 0">
@@ -21,7 +25,7 @@ const StatBox = ({ title, subtitle, progress, increase, icon }: StatBoxProps) =>
                     <Typography
                         variant="h4"
                         fontWeight="bold"
-                        sx={{ color: colors.grey[100] }}
+                        sx={{ color: colors.primary[100] }}
                     >
                         {title}
                     </Typography>
@@ -31,15 +35,15 @@ const StatBox = ({ title, subtitle, progress, increase, icon }: StatBoxProps) =>
                 </Box>
             </Box>
             <Box display="flex" justifyContent="space-between" mt="2px">
-                <Typography variant="h5" sx={{ color: colors.greenAccent[500] }}>
+                <Typography variant="h5" sx={{ color: colors.greenAccent[400] }}>
                     {subtitle}
                 </Typography>
                 <Typography
                     variant="h5"
                     fontStyle="italic"
-                    sx={{ color: colors.greenAccent[600] }}
+                    sx={{ color: increaseColor }} // Use calculated color
                 >
-                    {increase}
+                    {increase > 0 ? `+${increase}` : increase} {/* Add '+' sign for positive increases */}
                 </Typography>
             </Box>
         </Box>

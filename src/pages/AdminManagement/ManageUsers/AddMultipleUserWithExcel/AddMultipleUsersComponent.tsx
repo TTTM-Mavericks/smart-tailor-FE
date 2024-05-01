@@ -1,9 +1,10 @@
 import * as React from 'react';
 import DownloadIcon from '@mui/icons-material/CloudDownload';
 import { Box, Button, IconButton, Typography } from '@mui/material';
-import { AgricultureOutlined, Cancel, Close, ConfirmationNumber, ErrorOutline } from '@mui/icons-material';
+import { AgricultureOutlined, Cancel, CheckCircleOutline, CheckCircleOutlineRounded, CheckCircleRounded, Close, ConfirmationNumber, ErrorOutline } from '@mui/icons-material';
 import { DataGrid } from '@mui/x-data-grid';
 import * as XLSX from "xlsx-js-style";
+import Swal from 'sweetalert2';
 // import "./AddMultipleUsersStyles.module.scss";
 
 const ADDUSERWITHFILEEXCELS = 'http://localhost:5173/Add_New_Users_Sample_Files.xlsx';
@@ -120,8 +121,18 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
             setLoading(false);
             setError('');
             closeMultipleCard();
+            Swal.fire(
+                'Add Success!',
+                'User has been updated!',
+                'success'
+            )
         } else {
             setError('Please resolve errors before confirming');
+            Swal.fire(
+                'Add User fail!',
+                'Please check information!',
+                'error'
+            );
         }
     };
 
@@ -184,11 +195,21 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
     }
 
     return (
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px' }}>
             <Typography variant="h5" align="center">
                 Add New User By Excel
             </Typography>
-            <IconButton style={{ position: 'absolute', top: 0, right: 0 }} onClick={closeMultipleCard}>
+            <IconButton
+                style={{
+                    position: 'absolute',
+                    top: '10px',
+                    right: '10px',
+                    backgroundColor: '#E96208',
+                    borderRadius: '50%',
+                    padding: '5px',
+                }}
+                onClick={closeMultipleCard}
+            >
                 <Close />
             </IconButton>
             <Box height={50} />
@@ -198,54 +219,69 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
                 href={ADDUSERWITHFILEEXCELS}
                 download
                 endIcon={<DownloadIcon />}
-                style={{ backgroundColor: 'black', color: 'white' }}
+                style={{
+                    backgroundColor: 'black',
+                    color: 'white',
+                    marginBottom: '20px',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                    backgroundColor: '#E96208'
+                }}
             >
                 Download Excel Sample File
             </Button>
-            <h1>Upload Data with Excel</h1>
-            <input type="file" onChange={handleFileInputChange} />
-            {loading && <p>Loading...</p>}
+            <h1 style={{ marginBottom: '10px' }}>Upload Data with Excel</h1>
+            <input
+                type="file"
+                onChange={handleFileInputChange}
+                style={{ marginBottom: '20px', padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+            />
+            {loading && <p style={{ fontStyle: 'italic' }}>Loading...</p>}
             {error && (
-                <div>
+                <div style={{ marginBottom: '20px' }}>
                     <p style={{ color: 'red' }}>{error}</p>
                     <Button
                         variant="contained"
                         color="secondary"
                         onClick={handleDownloadFullData}
+                        style={{ boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)', backgroundColor: '#E96208' }}
                     >
                         Download Error Data
                     </Button>
                 </div>
             )}
             {excelData.length > 0 && (
-                <div>
-                    <table>
+                <div style={{ overflowX: 'auto', width: '100%' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                         <thead>
-                            <tr>
-                                <th>RegistrarId</th>
-                                <th>Name</th>
-                                <th>Age</th>
-                                <th>Phone</th>
-                                <th>Email</th>
-                                <th>Address</th>
-                                <th>City</th>
-                                <th>Zip Code</th>
-                                <th>Error Check</th>
+                            <tr style={{ backgroundColor: '#f5f5f5' }}>
+                                <th style={{ border: '1px solid #ddd', padding: '8px' }}>RegistrarId</th>
+                                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Name</th>
+                                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Age</th>
+                                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Phone</th>
+                                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Email</th>
+                                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Address</th>
+                                <th style={{ border: '1px solid #ddd', padding: '8px' }}>City</th>
+                                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Zip Code</th>
+                                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Error Check</th>
                             </tr>
                         </thead>
                         <tbody>
                             {excelData.map((data, index) => (
                                 <tr key={index}>
-                                    <td style={{ color: data.registrarId ? 'black' : 'red' }}>{data.registrarId || 'Error Registrated ID'}</td>
-                                    <td style={{ color: data.name ? 'black' : 'red' }}>{data.name || 'Error Name'}</td>
-                                    <td style={{ color: data.age ? 'black' : 'red' }}>{data.age || 'Error Age'}</td>
-                                    <td style={{ color: data.phone ? 'black' : 'red' }}>{data.phone || 'Error Phone'}</td>
-                                    <td style={{ color: data.email ? 'black' : 'red' }}>{data.email || 'Error Email'}</td>
-                                    <td style={{ color: data.address ? 'black' : 'red' }}>{data.address || 'Error Address'}</td>
-                                    <td style={{ color: data.city ? 'black' : 'red' }}>{data.city || 'Error City'}</td>
-                                    <td style={{ color: data.zipCode ? 'black' : 'red' }}>{data.zipCode || 'Error Zip Code'}</td>
-                                    <td style={{ color: data.zipCode ? 'black' : 'red' }}>
-                                        {data.registrarId && data.name && data.age && data.phone && data.email && data.address && data.city && data.zipCode ? <AgricultureOutlined style={{ color: "green" }} /> : <ErrorOutline style={{ color: 'red' }} />}
+                                    <td style={{ border: '1px solid #ddd', padding: '8px', color: data.registrarId ? 'black' : 'red' }}>{data.registrarId || 'Error Registrated ID'}</td>
+                                    <td style={{ border: '1px solid #ddd', padding: '8px', color: data.name ? 'black' : 'red' }}>{data.name || 'Error Name'}</td>
+                                    <td style={{ border: '1px solid #ddd', padding: '8px', color: data.age ? 'black' : 'red' }}>{data.age || 'Error Age'}</td>
+                                    <td style={{ border: '1px solid #ddd', padding: '8px', color: data.phone ? 'black' : 'red' }}>{data.phone || 'Error Phone'}</td>
+                                    <td style={{ border: '1px solid #ddd', padding: '8px', color: data.email ? 'black' : 'red' }}>{data.email || 'Error Email'}</td>
+                                    <td style={{ border: '1px solid #ddd', padding: '8px', color: data.address ? 'black' : 'red' }}>{data.address || 'Error Address'}</td>
+                                    <td style={{ border: '1px solid #ddd', padding: '8px', color: data.city ? 'black' : 'red' }}>{data.city || 'Error City'}</td>
+                                    <td style={{ border: '1px solid #ddd', padding: '8px', color: data.zipCode ? 'black' : 'red' }}>{data.zipCode || 'Error Zip Code'}</td>
+                                    <td style={{ border: '1px solid #ddd', padding: '8px', color: data.zipCode ? 'black' : 'red' }}>
+                                        {data.registrarId && data.name && data.age && data.phone && data.email && data.address && data.city && data.zipCode ? (
+                                            <AgricultureOutlined style={{ color: "green" }} />
+                                        ) : (
+                                            <ErrorOutline style={{ color: 'red' }} />
+                                        )}
                                     </td>
                                 </tr>
                             ))}
@@ -253,29 +289,25 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
                     </table>
                 </div>
             )}
-            <div style={{ display: "flex" }}>
-                <div
-                    onClick={closeMultipleCard}
-                    style={{ textAlign: 'center', alignItems: 'center', marginTop: '3rem' }}
-                >
+            <div style={{ display: "flex", justifyContent: 'center', marginTop: '20px' }}>
+                <div style={{ marginRight: '10px' }}>
                     <Button
                         variant="contained"
                         color="primary"
+                        onClick={closeMultipleCard}
                         endIcon={<Cancel />}
-                        style={{ backgroundColor: 'black', color: 'white' }}
+                        style={{ backgroundColor: '#E96208', color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
                     >
                         CANCEL
                     </Button>
                 </div>
-                <div
-                    onClick={handleConfirm}
-                    style={{ textAlign: 'center', alignItems: 'center', marginTop: '3rem' }}
-                >
+                <div>
                     <Button
                         variant="contained"
                         color="primary"
-                        endIcon={<ConfirmationNumber />}
-                        style={{ backgroundColor: 'black', color: 'white' }}
+                        onClick={handleConfirm}
+                        endIcon={<CheckCircleRounded />}
+                        style={{ backgroundColor: '#E96208', color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
                     >
                         OK
                     </Button>
