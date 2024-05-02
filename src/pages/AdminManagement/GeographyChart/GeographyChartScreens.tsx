@@ -50,7 +50,7 @@ const GeographyChart = ({ isDashboard = false }) => {
             valueFormat=".2s"
             projectionScale={isDashboard ? 80 : 1800}
             projectionTranslation={isDashboard ? [0.3, 0.4] : [0.5, 1]}
-            projectionRotation={[260, 0, 0]}
+            projectionRotation={[255, 0, 0]}
             borderWidth={1.5}
             borderColor="#ffffff"
         // legends={

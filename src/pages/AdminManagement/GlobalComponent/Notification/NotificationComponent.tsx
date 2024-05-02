@@ -5,50 +5,49 @@ import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined
 const NotificationComponent = () => {
     const [anchorOpenNotification, setAnchorOpenNotification] = React.useState<null | HTMLElement>(null);
     const [notifications, setNotifications] = React.useState<any>([]);
-    const [badgeVariant, setBadgeVariant] = React.useState<"dot" | "standard">("standard");
+    const prevNotificationsCount = React.useRef<number>(0);
+    const [badgeVariant, setBadgeVariant] = React.useState<'dot' | 'standard'>('dot');
+    const [badgeClicked, setBadgeClicked] = React.useState(false);
 
     React.useEffect(() => {
-        const storedBadgeVariant = localStorage.getItem('badgeVariant');
-        if (storedBadgeVariant === "dot") {
-            setBadgeVariant("dot");
-        } else {
-            setBadgeVariant("standard");
-        }
-
-        const fetchNotifications = async () => {
-            try {
-                const response = await fetch('https://66080c21a2a5dd477b13eae5.mockapi.io/CPSE_CHART');
-                const newData = await response.json();
-
-                setNotifications(newData);
-                if (newData.length > notifications.length) {
-                    setBadgeVariant("dot");
-                    localStorage.setItem('badgeVariant', 'dot')
-                } else {
-                    setBadgeVariant("standard");
-                    localStorage.setItem('badgeVariant', 'standard')
-                }
-            } catch (error) {
-                console.error('Error fetching notifications:', error);
-            }
-        };
-
         fetchNotifications();
+        const intervalId = setInterval(fetchNotifications, 3000);
+        return () => clearInterval(intervalId);
     }, []);
+
+    const fetchNotifications = async () => {
+        try {
+            const response = await fetch('https://66080c21a2a5dd477b13eae5.mockapi.io/CPSE_CHART');
+            const newData = await response.json();
+
+            const isNewNotification = newData.length > prevNotificationsCount.current;
+
+            if (isNewNotification && badgeVariant !== 'dot') {
+                setBadgeVariant('dot');
+            } else if (!isNewNotification && badgeVariant === 'dot') {
+                setBadgeVariant('standard');
+            }
+
+            prevNotificationsCount.current = newData.length;
+            setNotifications(newData);
+        } catch (error) {
+            console.error('Error fetching notifications:', error);
+        }
+    };
 
     const handleClickNotification = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorOpenNotification(event.currentTarget);
-        setBadgeVariant("standard");
-        localStorage.setItem('badgeVariant', 'standard')
+        setBadgeClicked(true);
     };
 
     const handleCloseNotification = () => {
         setAnchorOpenNotification(null);
+        setBadgeClicked(false);
     };
 
     const handleMarkAllAsRead = () => {
         setBadgeVariant("standard");
-        localStorage.setItem('badgeVariant', 'standard');
+        setBadgeClicked(false);
     };
 
     const [openPopup, setOpenPopup] = React.useState(false);
@@ -64,8 +63,8 @@ const NotificationComponent = () => {
     return (
         <IconButton>
             <Badge
+                badgeContent={prevNotificationsCount.current > 0 ? prevNotificationsCount.current : null}
                 color="error"
-                variant={badgeVariant}
                 onClick={handleClickNotification}
             >
                 <NotificationsOutlinedIcon />
@@ -77,9 +76,12 @@ const NotificationComponent = () => {
                 style={{ height: "70%" }}
             >
                 {notifications.map((notification: any) => (
-                    <MenuItem key={notification.id} onClick={handleCloseNotification}>
+                    <MenuItem
+                        key={notification.id}
+                        onClick={handleCloseNotification}
+                        sx={{ bgcolor: badgeClicked ? 'rgba(0, 0, 0, 0.5)' : undefined, color: "black" }} // Set background color to black when clicked
+                    >
                         <a
-                            key={notification.id}
                             href={notification.message}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -89,7 +91,7 @@ const NotificationComponent = () => {
                     </MenuItem>
                 ))}
                 <Divider component="li" />
-                <div style={{ position: "sticky", bottom: 0, padding: "8px", display: "flex", justifyContent: "flex-end", backgroundColor: "#fafbfd" }} >
+                <div style={{ position: "sticky", bottom: 0, padding: "8px", display: "flex", justifyContent: "flex-end", backgroundColor: "#fafbfd" }}>
                     <Button onClick={handleMarkAllAsRead} style={{ color: "black" }}>Mark all as read</Button>
                     <Button onClick={handleOpenPopup} style={{ color: "black" }}>View All</Button>
                 </div>
@@ -112,7 +114,7 @@ const NotificationComponent = () => {
                     <Button onClick={handleClosePopup}>Close</Button>
                 </DialogActions>
             </Dialog>
-        </IconButton >
+        </IconButton>
     );
 };
 

@@ -192,14 +192,14 @@ const SideBarComponent = () => {
                         </Typography>
                         <Item
                             title="Manage Income"
-                            to="/form"
+                            to="/manage_income"
                             icon={<PersonOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
                         />
                         <Item
                             title="Manage Revenue"
-                            to="/calendar"
+                            to="/manage_revenue"
                             icon={<CalendarTodayOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}

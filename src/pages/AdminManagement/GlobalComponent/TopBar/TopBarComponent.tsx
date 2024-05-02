@@ -1,5 +1,5 @@
 import * as React from "react";
-import { MenuItem, InputBase, Avatar, Box, Divider, IconButton, List, ListItemIcon, Menu, SwipeableDrawer, ToggleButton, ToggleButtonGroup, Tooltip, useColorScheme, useTheme } from "@mui/material";
+import { MenuItem, InputBase, Avatar, Box, Divider, IconButton, List, ListItemIcon, Menu, SwipeableDrawer, ToggleButton, ToggleButtonGroup, Tooltip, useColorScheme, useTheme, Typography } from "@mui/material";
 import { tokens } from "../../../../theme";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
@@ -51,7 +51,10 @@ const TopbarComponent = () => {
 
     const list = (anchor: Anchor) => (
         <Box
-            sx={{ width: anchor === 'top' || anchor === 'bottom' ? 'auto' : 250 }}
+            sx={{
+                width: anchor === 'top' || anchor === 'bottom' ? 'auto' : 250,
+                padding: '16px', // Add padding for better spacing
+            }}
             role="presentation"
             onClick={toggleDrawer(anchor, false)}
             onKeyDown={toggleDrawer(anchor, false)}
@@ -64,13 +67,21 @@ const TopbarComponent = () => {
                     onChange={handleChange}
                     aria-label="Platform"
                 >
-                    <ToggleButton value="light">Light</ToggleButton>
-                    <ToggleButton value="system">System</ToggleButton>
-                    <ToggleButton value="dark">Dark</ToggleButton>
+                    <ToggleButton value="light" sx={{ color: 'black' }}>
+                        Light
+                    </ToggleButton>
+                    <ToggleButton value="system" sx={{ color: 'black' }}>
+                        System
+                    </ToggleButton>
+                    <ToggleButton value="dark" sx={{ color: 'black' }}>
+                        Dark
+                    </ToggleButton>
                 </ToggleButtonGroup>
             </List>
         </Box>
     );
+
+
 
     return (
         <Box display="flex" justifyContent="space-between" p={2}>

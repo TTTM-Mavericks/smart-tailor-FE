@@ -7,6 +7,8 @@ import 'slick-carousel/slick/slick-theme.css';
 import CarouselComponent from './CarouselComponent';
 import { motion, useInView } from 'framer-motion';
 import brandImage from '../../assets/img/landing-img/slider-bird1.jpg';
+import HeaderComponent from '../../components/Header/HeaderComponent';
+import FooterComponent from '../../components/Footer/FooterComponent';
 
 const StyledBox = styled(Box)(({ theme }) => ({
     padding: theme.spacing(6, 2),
@@ -169,6 +171,7 @@ const AboutUsPage: React.FC = () => {
     const isContainerVisible = useInView(containerRef, { once: true });
     return (
         <div>
+            <HeaderComponent />
             <StyledBox>
                 <Grid container spacing={6}>
                     <Grid item xs={12} md={5} >
@@ -361,13 +364,7 @@ const AboutUsPage: React.FC = () => {
                     </Grid>
                 ))}
             </Grid>
-            <StyledFooter>
-                <Fade in timeout={800}>
-                    <Typography variant="body1">
-                        &copy; 2023 Tailor Shop. All rights reserved.
-                    </Typography>
-                </Fade>
-            </StyledFooter>
+            <FooterComponent />
         </div>
     );
 };

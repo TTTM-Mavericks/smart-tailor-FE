@@ -5,13 +5,13 @@ import { Box, CssBaseline, useMediaQuery, useTheme } from "@mui/material";
 import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
 import theme from '../../../theme';
 import styles from "./DashboardAdminStyle.module.scss"
-import ManageUsers from '../ManageUsers/ManageUsersScreens';
 import LineChartComponent from '../LineChart/LineChartComponent';
 import BarChartComponent from '../BarChart/BarChartComponent';
 import PieChartComponent from '../PieChart/PieChartComponent';
-import GeographyChartComponent from '../GeographyChart/GeographyChartComponent';
 import CardInformationDetailComponent from '../CardInformationDetail/CardInformationDetailComponent';
 import GeographyChart from '../GeographyChart/GeographyChartScreens';
+import RecentTransactionsComponent from '../RecentTransaction/RecentTransactionComponent';
+import Grid from "@mui/material/Unstable_Grid2";
 
 export default function DashboardAdminScreens() {
     const theme1 = useTheme();
@@ -23,52 +23,37 @@ export default function DashboardAdminScreens() {
                 <SideBarComponent />
                 <main className={`${styles.content}`}>
                     <TopbarComponent />
-                    <Box
-                        display="grid"
-                        gridTemplateColumns="repeat(12, 1fr)"
-                        gridAutoRows="140px"
-                        gap="20px"
-                    >
-                        <Box
-                            gridColumn="span 12"
-                            gridRow="span 2"
-                        >
-                            <CardInformationDetailComponent />
-
-                        </Box>
-
-                        <Box
-                            gridColumn="span 12"
-                            gridRow="span 5"
-                        >
-                            <GeographyChart />
-                        </Box>
-                        <Box
-                            gridColumn="span 12"
-                            gridRow="span 5"
-                        >
-                            <LineChartComponent />
-                        </Box>
-                        <Box
-                            gridColumn="span 12"
-                            gridRow="span 5"
-                        >
-                            <BarChartComponent />
-                        </Box>
-                        <Box
-                            gridColumn="span 12"
-                            gridRow="span 5"
-                        >
-
-                            <PieChartComponent />
-                        </Box>
-                        <Box
-                            gridColumn="span 12"
-                            gridRow="span 5"
-                        >
-                            <ManageUsers />
-
-                        </Box>
+                    <Box>
+                        <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+                            <Grid sx={12}>
+                                <CardInformationDetailComponent />
+                            </Grid>
+                            <Grid
+                                xs={12}
+                                sm={12}
+                                md={8}
+                                lg={8}
+                                container
+                                rowSpacing={1}
+                                columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+                            >
+                                <Grid xs={12}>
+                                    <LineChartComponent />
+                                </Grid>
+                                <Grid xs={12} sm={12} md={5}>
+                                    <PieChartComponent />
+                                </Grid>
+                                <Grid xs={12} sm={12} md={7}>
+                                    <BarChartComponent />
+                                </Grid>
+                            </Grid>
+                            <Grid xs={12} sm={12} md={4} lg={4} xl={4}>
+                                <GeographyChart />
+                            </Grid>
+                            <Grid xs={12}>
+                                <RecentTransactionsComponent />
+                            </Grid>
+                        </Grid>
                     </Box>
                 </main>
             </div>

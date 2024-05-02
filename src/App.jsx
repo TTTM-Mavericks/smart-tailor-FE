@@ -10,6 +10,8 @@ import DashboardAdminProfileScreens from './pages/AdminManagement/AdminProfile/A
 import AboutUsPage from './pages/AboutUs/AboutUsScreen';
 import HomeScreen from './pages/Home/HomeScreen';
 import ContactUsPage from './pages/ContactUs/ContactUsScreen';
+import DashboardManageUserScreen from './pages/AdminManagement/ManageUsers/DashBoardManageUserComponent';
+import DashboardRecentTransactionScreen from './pages/AdminManagement/RecentTransaction/DashboardRecentTransactionComponent';
 
 const tokenIsValid = (token) => {
   // Implement your token validation logic here
@@ -56,6 +58,8 @@ function App() {
           <Route path='/admin_profile' element={<DashboardAdminProfileScreens></DashboardAdminProfileScreens>} />
           <Route path='/about' element={<AboutUsPage></AboutUsPage>} />
           <Route path='/contact' element={<ContactUsPage></ContactUsPage>} />
+          <Route path='/manager_user' element={<DashboardManageUserScreen></DashboardManageUserScreen>} />
+          <Route path='/manage_revenue' element={<DashboardRecentTransactionScreen></DashboardRecentTransactionScreen>} />
 
 
 

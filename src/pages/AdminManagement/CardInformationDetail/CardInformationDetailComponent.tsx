@@ -61,6 +61,69 @@ const CardInformationDetailComponent = () => {
                         />
                     </Box>
                 </Grid>
+                <Grid xs={12} sm={12} md={6} lg={3} xl={3}>
+                    <Box
+                        width="100%"
+                        backgroundColor={colors.primary[400]}
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                    >
+                        <StatBox
+                            title={emailData.emailsSent}
+                            subtitle="Hà Nội User"
+                            progress="0.25"
+                            increase={emailData.increase}
+                            icon={
+                                <EmailIcon
+                                    sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+                                />
+                            }
+                        />
+                    </Box>
+                </Grid>
+                <Grid xs={12} sm={12} md={6} lg={3} xl={3}>
+                    <Box
+                        width="100%"
+                        backgroundColor={colors.primary[400]}
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                    >
+                        <StatBox
+                            title={emailData.emailsSent}
+                            subtitle="Hà Nội User"
+                            progress="0.25"
+                            increase={emailData.increase}
+                            icon={
+                                <EmailIcon
+                                    sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+                                />
+                            }
+                        />
+                    </Box>
+                </Grid>
+                <Grid xs={12} sm={12} md={6} lg={3} xl={3}>
+                    <Box
+                        width="100%"
+                        backgroundColor={colors.primary[400]}
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                    >
+                        <StatBox
+                            title={emailData.emailsSent}
+                            subtitle="Hà Nội User"
+                            progress="0.25"
+                            increase={emailData.increase}
+                            icon={
+                                <EmailIcon
+                                    sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+                                />
+                            }
+                        />
+                    </Box>
+                </Grid>
             </Grid>
         </Box>
     );
