@@ -44,26 +44,26 @@ export default function SignInScreen() {
      * handleInputChange
      * @param event 
      */
-  const handleInputChange = (event: any) => {
-    const { name, value, type, checked } = event.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
+  // const handleInputChange = (event: any) => {
+  //   const { name, value, type, checked } = event.target;
+  //   setFormData((prevData) => ({
+  //     ...prevData,
+  //     [name]: type === 'checkbox' ? checked : value,
+  //   }));
 
-    const errorMessage =
-      name === "email"
-        ? validateEmail(value)
-        : name === "password"
-          ? validatePassword(value)
+  //   const errorMessage =
+  //     name === "email"
+  //       ? validateEmail(value)
+  //       : name === "password"
+  //         ? validatePassword(value)
 
-          : ""
+  //         : ""
 
-    setFormErrors((prevErrors) => ({
-      ...prevErrors,
-      [name]: errorMessage,
-    }));
-  };
+  //   setFormErrors((prevErrors) => ({
+  //     ...prevErrors,
+  //     [name]: errorMessage,
+  //   }));
+  // };
 
 
 
