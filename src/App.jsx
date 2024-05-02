@@ -7,9 +7,11 @@ import CustomDesignScreen from './pages/CustomDesign/CustomDesignScreen';
 import SignInScreen from './pages/Authentication/SignIn/SignInScreens';
 import DashboardAdminScreens from './pages/AdminManagement/DashboardAdmin/DashboardAdminScreens';
 import DashboardAdminProfileScreens from './pages/AdminManagement/AdminProfile/AdminProfileComponent';
-import AboutUsScreens from './pages/AboutUs/AboutUsScreens';
-import AboutUsPage from './pages/AboutUs/TestAboutUs';
+import AboutUsPage from './pages/AboutUs/AboutUsScreen';
 import HomeScreen from './pages/Home/HomeScreen';
+import ContactUsPage from './pages/ContactUs/ContactUsScreen';
+import DashboardManageUserScreen from './pages/AdminManagement/ManageUsers/DashBoardManageUserComponent';
+import DashboardRecentTransactionScreen from './pages/AdminManagement/RecentTransaction/DashboardRecentTransactionComponent';
 
 const tokenIsValid = (token) => {
   // Implement your token validation logic here
@@ -49,13 +51,15 @@ function App() {
     <div>
       <BrowserRouter>
         <Routes>
-        <Route path='/' element={<HomeScreen></HomeScreen>} />
+          <Route path='/' element={<HomeScreen></HomeScreen>} />
           <Route path='/design' element={<CustomDesignScreen></CustomDesignScreen>} />
           <Route path='/auth/signin' element={<SignInScreen></SignInScreen>} />
           <Route path='/admin' element={<DashboardAdminScreens></DashboardAdminScreens>} />
           <Route path='/admin_profile' element={<DashboardAdminProfileScreens></DashboardAdminProfileScreens>} />
-          <Route path='/about_us' element={<AboutUsScreens></AboutUsScreens>} />
           <Route path='/about' element={<AboutUsPage></AboutUsPage>} />
+          <Route path='/contact' element={<ContactUsPage></ContactUsPage>} />
+          <Route path='/manager_user' element={<DashboardManageUserScreen></DashboardManageUserScreen>} />
+          <Route path='/manage_revenue' element={<DashboardRecentTransactionScreen></DashboardRecentTransactionScreen>} />
 
 
 

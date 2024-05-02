@@ -4,6 +4,18 @@ import CloseIcon from '@mui/icons-material/Close';
 import styles from "./EditUsersPopUpStyles.module.scss";
 import Swal from "sweetalert2";
 
+interface User {
+    id: number;
+    registrarId: string;
+    name: string;
+    age: number;
+    phone: string;
+    email: string;
+    address: string;
+    city: string;
+    zipCode: string;
+}
+
 interface EditUserPopUpScreenFormProps {
     fid: {
         id: number;
@@ -17,9 +29,10 @@ interface EditUserPopUpScreenFormProps {
         zipCode: string;
     };
     editClose: () => void;
+    updateUser: (updatedUser: User) => void;
 }
 
-const EditUserPopUpScreens: React.FC<EditUserPopUpScreenFormProps> = ({ fid, editClose }) => {
+const EditUserPopUpScreens: React.FC<EditUserPopUpScreenFormProps> = ({ fid, editClose, updateUser }) => {
     const [registrarId, setRegistrarId] = React.useState("");
     const [name, setName] = React.useState("");
     const [age, setAge] = React.useState(1);
@@ -111,15 +124,13 @@ const EditUserPopUpScreens: React.FC<EditUserPopUpScreenFormProps> = ({ fid, edi
             })
             .then((data) => {
                 console.log('Update Response Data:', data);
+                updateUser(data);
                 sessionStorage.setItem("obj", JSON.stringify(obj));
                 Swal.fire(
                     'Edit Success!',
                     'User information updated successfully!',
                     'success'
                 );
-                // setTimeout(() => {
-                //     window.location.reload();
-                // }, 1000);
             })
             .catch((err) => {
                 console.error('Update Error:', err);
