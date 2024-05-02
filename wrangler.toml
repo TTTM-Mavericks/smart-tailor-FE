@@ -1,10 +1,9 @@
 name = "smart-tailor"
-type = "webpack"
-account_id = "dooptu"
-workers_dev = true
-route = ""
-zone_id = ""
+pages_build_output_dir = "./dist"
 
-[build]
-command = "npm run build"
-upload = "dist"
+[[kv_namespaces]]
+binding = "KV"
+id = ""
+
+[vars]
+API_KEY = "1234567asdf"
