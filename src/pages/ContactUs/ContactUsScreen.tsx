@@ -7,7 +7,7 @@ import { FaFacebook, FaTwitter, FaInstagram } from 'react-icons/fa';
 import HeaderComponent from '../../components/Header/HeaderComponent';
 import FooterComponent from '../../components/Footer/FooterComponent';
 
-const ContactUsPage: React.FC = () => {
+const ContactUsPage = () => {
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {

@@ -18,9 +18,9 @@ import HeaderComponent from '../../components/Header/HeaderComponent';
 
 
 interface PartOfCloth {
-  partValue: string,
-  imgUrl: string
-}
+  partValue: string;
+  imgUrl: string;
+};
 
 const partOfClothData: PartOfCloth[] = [
   {
