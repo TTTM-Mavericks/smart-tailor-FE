@@ -1,7 +1,7 @@
 export const url = 'http://54.169.240.232:6969/'
 export const crossUrl = 'https://cors-anywhere-production-30f7.up.railway.app/'
 export const apiBaseUrl = url;
-export const basePonitUrl = {
+export const basePointUrl = {
     auth: 'auth',
     customer: 'customer',
     birds: 'bird',
