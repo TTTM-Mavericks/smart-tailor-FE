@@ -71,7 +71,7 @@
     "sweetalert2": "^11.6.13",
     "swiper": "^10.0.0",
     "three": "^0.162.0",
-    "typescript": "^5.2.2",
+    "typescript": "^3.9.2",
     "valtio": "^1.13.2",
     "xlsx": "^0.18.5",
     "xlsx-js-style": "^1.2.0",
