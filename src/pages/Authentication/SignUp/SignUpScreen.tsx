@@ -15,7 +15,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 // import ApiService from '../ApiAuthService';
-import { apiBaseUrl, basePonitUrl } from '../../../api/ApiConfig';
+import { apiBaseUrl, basePointUrl } from '../../../api/ApiConfig';
 import dayjs from 'dayjs';
 import { Login, Visibility, VisibilityOff } from '@mui/icons-material';
 
@@ -28,7 +28,7 @@ const defaultTheme = createTheme();
 export default function SignUpScreen() {
 
     //** Variable */
-    const baseUrl = basePonitUrl.auth;
+    const baseUrl = basePointUrl.auth;
     // const apiService = new ApiService();
 
     //** UseState variable */ 

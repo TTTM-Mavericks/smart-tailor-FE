@@ -248,6 +248,8 @@ import { Fragment, useState } from 'react'
 import { Dialog, Popover, Tab, Transition } from '@headlessui/react'
 import { Bars3Icon, MagnifyingGlassIcon, ShoppingBagIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { primaryColor } from '../../root/ColorSystem'
+import styles from './Header.module.scss';
+import { systemLogo } from '../../assets';
 
 const navigation = {
   categories: [
@@ -407,7 +409,7 @@ export default function HeaderComponent() {
   const [open, setOpen] = useState(false)
 
   return (
-    <div className="bg-white mb-200" style={{marginBottom: '20px'}}>
+    <div className={`${styles.header__container} bg-white mb-200`}>
       {/* Mobile menu */}
       <Transition.Root show={open} as={Fragment}>
         <Dialog as="div" className="relative z-40 lg:hidden" onClose={setOpen}>
@@ -529,7 +531,7 @@ export default function HeaderComponent() {
                   </div>
                   <div className="flow-root">
                     <a href="#" className="-m-2 block p-2 font-medium text-gray-900">
-                      Create account
+                      Sign up
                     </a>
                   </div>
                 </div>
@@ -537,9 +539,9 @@ export default function HeaderComponent() {
                 <div className="border-t border-gray-200 px-4 py-6">
                   <a href="#" className="-m-2 flex items-center p-2">
                     <img
-                      src="https://tailwindui.com/img/flags/flag-canada.svg"
+                      src={systemLogo}
                       alt=""
-                      className="block h-auto w-5 flex-shrink-0"
+                      className={`${styles.logo}`}
                     />
                     <span className="ml-3 block text-base font-medium text-gray-900">CAD</span>
                     <span className="sr-only">, change currency</span>
@@ -552,9 +554,9 @@ export default function HeaderComponent() {
       </Transition.Root>
 
       <header className="relative bg-white">
-        <p 
-        className="flex h-10 items-center justify-center px-4 text-sm font-medium text-white sm:px-6 lg:px-8"
-        style={{backgroundColor: primaryColor}}
+        <p
+          className="flex h-10 items-center justify-center px-4 text-sm font-medium text-white sm:px-6 lg:px-8"
+          style={{ backgroundColor: primaryColor }}
         >
           Get free delivery on orders over $100
         </p>
@@ -573,12 +575,11 @@ export default function HeaderComponent() {
               </button>
 
               {/* Logo */}
-              <div className="ml-4 flex lg:ml-0">
+              <div className="ml-4 flex lg:ml-0" >
                 <a href="#">
-                  <span className="sr-only">Your Company</span>
                   <img
-                    className="h-8 w-auto"
-                    src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
+                    className={`${styles.logo}`}
+                    src={systemLogo}
                     alt=""
                   />
                 </a>
@@ -690,12 +691,12 @@ export default function HeaderComponent() {
 
               <div className="ml-auto flex items-center">
                 <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
-                  <a href="#" className="text-sm font-medium text-gray-700 hover:text-gray-800">
+                  <a href="/auth/signin" className="text-sm font-medium text-gray-700 hover:text-gray-800">
                     Sign in
                   </a>
                   <span className="h-6 w-px bg-gray-200" aria-hidden="true" />
                   <a href="#" className="text-sm font-medium text-gray-700 hover:text-gray-800">
-                    Create account
+                    Sign up
                   </a>
                 </div>
 

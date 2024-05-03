@@ -114,9 +114,9 @@ const HomeScreen = () => {
     // ---------------Usable Variable---------------//
     // ---------------UseEffect---------------//
     // ---------------FunctionHandler---------------//
-    function classNames(...classes: any[]) {
+    const classNames = (...classes: any[]) => {
         return classes.filter(Boolean).join(' ')
-    }
+    };
 
     return (
         <div>
@@ -124,7 +124,7 @@ const HomeScreen = () => {
             <HeaderComponent></HeaderComponent>
 
             {/* Slider */}
-            <div className="relative overflow-hidden bg-white ">
+            <div className="relative overflow-hidden bg-white mt-20 ">
                 <div className="pb-80 pt-16 sm:pb-40 sm:pt-24 lg:pb-48 lg:pt-40">
                     <div className="relative mx-auto max-w-7xl px-4 sm:static sm:px-6 lg:px-8">
                         <div className="sm:max-w-lg">
@@ -206,7 +206,7 @@ const HomeScreen = () => {
 
                                 <a
                                     href="#"
-                                    style={{backgroundColor: primaryColor}}
+                                    style={{ backgroundColor: primaryColor }}
                                     className="inline-block rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-center font-medium text-white hover:bg-indigo-700"
                                 >
                                     Shop Collection
@@ -235,8 +235,8 @@ const HomeScreen = () => {
                             {features.map((feature) => (
                                 <div key={feature.name} className="relative pl-16">
                                     <dt className="text-base font-semibold leading-7 text-gray-900">
-                                    
-                                        <div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600" style={{backgroundColor: primaryColor}} >
+
+                                        <div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600" style={{ backgroundColor: primaryColor }} >
                                             <feature.icon className="h-6 w-6 text-white" aria-hidden="true" />
                                         </div>
                                         {feature.name}
@@ -371,7 +371,7 @@ const HomeScreen = () => {
                                     </p>
                                     <a
                                         href="#"
-                                        style={{backgroundColor: primaryColor}}
+                                        style={{ backgroundColor: primaryColor }}
                                         className="mt-10 block w-full rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                                     >
                                         Get access
@@ -531,7 +531,7 @@ const HomeScreen = () => {
                                 <Switch
                                     checked={agreed}
                                     onChange={setAgreed}
-                                    style={{backgroundColor: primaryColor}}
+                                    style={{ backgroundColor: primaryColor }}
                                     className={classNames(
                                         agreed ? 'bg-indigo-600' : 'bg-gray-200',
                                         'flex w-8 flex-none cursor-pointer rounded-full p-px ring-1 ring-inset ring-gray-900/5 transition-colors duration-200 ease-in-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'
@@ -559,7 +559,7 @@ const HomeScreen = () => {
                     <div className="mt-10">
                         <button
                             type="submit"
-                            style={{backgroundColor: primaryColor}}
+                            style={{ backgroundColor: primaryColor }}
                             className="block w-full rounded-md bg-indigo-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                         >
                             Let's talk
