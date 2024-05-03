@@ -6,7 +6,7 @@ import ImageEditor from './Designer/ImageEditor'
 import styles from './CustomDesign.module.scss';
 // import { SRGBToLinear } from 'three';
 import ImageDraggableComponent from '../../components/Draggable/ImageDraggableComponent';
-import { BACK_CLOTH_PART, FRONT_CLOTH_PART, LOGO_PART, SLEEVE_CLOTH_PART } from '../../models/ClothModel';
+import { BACK_CLOTH_PART, FRONT_CLOTH_PART, LOGO_PART, PartOfCloth, SLEEVE_CLOTH_PART } from '../../models/ClothModel';
 import { downloadCanvasToImage, reader } from '../../utils/DesignerUtils';
 import { DecalTypes, EditorTabs } from '../../config/TabSetting';
 import state from '../../store';
@@ -17,12 +17,7 @@ import HeaderComponent from '../../components/Header/HeaderComponent';
 
 
 
-interface PartOfCloth {
-  partValue: string;
-  imgUrl: string;
-};
-
-const partOfClothData: PartOfCloth[] = [
+const partOfClothData = [
   {
     partValue: LOGO_PART,
     imgUrl: '../../assets/img/landing-img/wave.jpg'
@@ -39,12 +34,15 @@ const partOfClothData: PartOfCloth[] = [
     partValue: SLEEVE_CLOTH_PART,
     imgUrl: '../../assets/img/landing-img/wave.jpg'
   }
-]
+];
 
 function CustomDesignScreen() {
 
   // ---------------UseState Variable---------------//
-  const [selectedPartOfCloth, setSelectedPartOfCloth] = useState<PartOfCloth | undefined>();
+  const [selectedPartOfCloth, setSelectedPartOfCloth] = useState<PartOfCloth>({
+    partValue: '',
+    imgUrl: ''
+  });
   const [selectedItem, setSelectedItem] = useState('');
   const [file, setFile] = useState('');
   const [activeEditorTab, setActiveEditorTab] = useState('')
@@ -76,15 +74,16 @@ function CustomDesignScreen() {
       default:
         return null
     }
-  }
+  };
 
-  const _handleSetselectedItem = (item: PartOfCloth) => {
-    setSelectedPartOfCloth(item)
+  const handleSetSelectedItem = (item: PartOfCloth) => {
+
+    setSelectedPartOfCloth(item);
     const result: PartOfCloth | undefined = partOfClothData.find((itemFounded: PartOfCloth) => itemFounded.partValue === item.partValue)
     if (result) {
-      setSelectedItem(result.partValue)
+      setSelectedItem(result.partValue);
     }
-  }
+  };
 
   // Define a type for the keys of DecalTypes
   type DecalTypeKey = keyof typeof DecalTypes;
@@ -179,7 +178,7 @@ function CustomDesignScreen() {
         )}
         <div className={styles.customDesign__container__editorArea__partOfCloth}>
           {partOfClothData.map((item: PartOfCloth, key: any) => (
-            <div key={key} className={styles.partOfClothSellector} style={{ backgroundColor: selectedItem === item.partValue ? 'red' : 'black' }} onClick={() => _handleSetselectedItem(item)}>
+            <div key={key} className={styles.partOfClothSellector} style={{ backgroundColor: selectedItem === item.partValue ? 'red' : 'black' }} onClick={() => handleSetSelectedItem(item)}>
               <img src={item.imgUrl} className={styles.partOfClothSellector__img}></img>
             </div>
           ))}

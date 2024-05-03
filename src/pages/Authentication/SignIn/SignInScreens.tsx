@@ -68,25 +68,22 @@ export default function SignInScreen() {
 
 
   const __handleClickShowPassword = () => setShowPassword((show) => !show);
-  const handleMouseDownPassword = (event: any) => {
-    event.preventDefault();
-  };
 
   /**
        * validateEmail
        * @param value 
        * @returns 
        */
-  const validateEmail = (value: string) => {
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+  // const validateEmail = (value: string | any) => {
+  //   const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
 
-    if (!value) {
-      return "Email is required.";
-    } else if (!emailRegex.test(value)) {
-      return "Invalid email format.";
-    }
-    return "";
-  };
+  //   if (!value) {
+  //     return "Email is required.";
+  //   } else if (!emailRegex.test(value)) {
+  //     return "Invalid email format.";
+  //   }
+  //   return "";
+  // };
 
   /**
      * validatePassword
