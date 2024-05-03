@@ -3,15 +3,17 @@ import {
     Box,
     useTheme,
     useMediaQuery,
+    Card,
+    CardContent,
+    Typography,
+    IconButton,
+    CardMedia,
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
-import EmailIcon from "@mui/icons-material/Email";
-import StatBox from "../GlobalComponent/Card/CardComponent";
 import { tokens } from "../../../theme";
 
 const CardInformationDetailComponent = () => {
     const theme = useTheme();
-    const smScreen = useMediaQuery(theme.breakpoints.up("sm"));
     const colors = tokens(theme.palette.mode);
 
     const [emailData, setEmailData] = useState({
@@ -41,91 +43,106 @@ const CardInformationDetailComponent = () => {
         <Box m="20px">
             <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
                 <Grid xs={12} sm={12} md={6} lg={3} xl={3}>
-                    <Box
-                        width="100%"
-                        backgroundColor={colors.primary[400]}
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                    >
-                        <StatBox
-                            title={emailData.emailsSent}
-                            subtitle="Hà Nội User"
-                            progress="0.25"
-                            increase={emailData.increase}
-                            icon={
-                                <EmailIcon
-                                    sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-                                />
-                            }
+                    <Card sx={{ display: 'flex', backgroundColor: `${colors.primary[100]} !important` }}>
+                        <CardMedia
+                            component="img"
+                            sx={{ width: 80 }}
+                            image={`../../../../../src/assets/img/avatar.jpg`}
                         />
-                    </Box>
+                        <Box>
+                            <CardContent sx={{ flex: '1 0 auto' }}>
+                                <Typography component="div" variant="h5">
+                                    Total Product
+                                </Typography>
+                            </CardContent>
+
+                            <Box>
+                                <CardContent>
+                                    <p style={{ fontWeight: "bold" }}>
+                                        100
+                                    </p>
+                                </CardContent>
+                            </Box>
+                        </Box>
+                    </Card>
                 </Grid>
+
                 <Grid xs={12} sm={12} md={6} lg={3} xl={3}>
-                    <Box
-                        width="100%"
-                        backgroundColor={colors.primary[400]}
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                    >
-                        <StatBox
-                            title={emailData.emailsSent}
-                            subtitle="Hà Nội User"
-                            progress="0.25"
-                            increase={emailData.increase}
-                            icon={
-                                <EmailIcon
-                                    sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-                                />
-                            }
+                    <Card sx={{ display: 'flex', backgroundColor: `${colors.primary[100]} !important` }}>
+                        <CardMedia
+                            component="img"
+                            sx={{ width: 80 }}
+                            image={`../../../../../src/assets/img/avatar.jpg`}
                         />
-                    </Box>
+                        <Box>
+                            <CardContent sx={{ flex: '1 0 auto' }}>
+                                <Typography component="div" variant="h5">
+                                    Total Earning
+                                </Typography>
+                            </CardContent>
+
+                            <Box>
+                                <CardContent>
+                                    <p style={{ fontWeight: "bold" }}>
+                                        1,123,456
+                                    </p>
+                                </CardContent>
+                            </Box>
+                        </Box>
+                    </Card>
                 </Grid>
+
                 <Grid xs={12} sm={12} md={6} lg={3} xl={3}>
-                    <Box
-                        width="100%"
-                        backgroundColor={colors.primary[400]}
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                    >
-                        <StatBox
-                            title={emailData.emailsSent}
-                            subtitle="Hà Nội User"
-                            progress="0.25"
-                            increase={emailData.increase}
-                            icon={
-                                <EmailIcon
-                                    sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-                                />
-                            }
+                    <Card sx={{ display: 'flex', backgroundColor: `${colors.primary[100]} !important` }}>
+                        <CardMedia
+                            component="img"
+                            sx={{ width: 80 }}
+                            image={`../../../../../src/assets/img/avatar.jpg`}
                         />
-                    </Box>
+                        <Box>
+                            <CardContent sx={{ flex: '1 0 auto' }}>
+                                <Typography component="div" variant="h5">
+                                    Report
+                                </Typography>
+                            </CardContent>
+
+                            <Box>
+                                <CardContent>
+                                    <p style={{ fontWeight: "bold" }}>
+                                        10
+                                    </p>
+                                </CardContent>
+                            </Box>
+                        </Box>
+                    </Card>
                 </Grid>
+
                 <Grid xs={12} sm={12} md={6} lg={3} xl={3}>
-                    <Box
-                        width="100%"
-                        backgroundColor={colors.primary[400]}
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                    >
-                        <StatBox
-                            title={emailData.emailsSent}
-                            subtitle="Hà Nội User"
-                            progress="0.25"
-                            increase={emailData.increase}
-                            icon={
-                                <EmailIcon
-                                    sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-                                />
-                            }
+                    <Card sx={{ display: 'flex', backgroundColor: `${colors.primary[100]} !important` }}>
+                        <CardMedia
+                            component="img"
+                            sx={{ width: 80 }}
+                            image={`../../../../../src/assets/img/avatar.jpg`}
                         />
-                    </Box>
+                        <Box>
+                            <CardContent sx={{ flex: '1 0 auto' }}>
+                                <Typography component="div" variant="h5">
+                                    Total Income
+                                </Typography>
+                            </CardContent>
+
+                            <Box>
+                                <CardContent>
+                                    <p style={{ fontWeight: "bold" }}>
+                                        1,456,123
+                                    </p>
+                                </CardContent>
+                            </Box>
+                        </Box>
+                    </Card>
                 </Grid>
             </Grid>
-        </Box>
+        </Box >
     );
 };
 

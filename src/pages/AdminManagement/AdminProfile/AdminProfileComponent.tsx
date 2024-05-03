@@ -6,6 +6,7 @@ import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/s
 import theme from '../../../theme';
 import styles from "./AdminProfileStyles.module.scss"
 import AdminProfileScreens from './AdminProfileScreens';
+import ProfileSetup from './AdminProfileSettingComponent';
 export default function DashboardAdminProfileScreens() {
     return (
         <CssVarsProvider theme={theme}>
@@ -14,7 +15,9 @@ export default function DashboardAdminProfileScreens() {
                 <SideBarComponent />
                 <main className={`${styles.content}`}>
                     <TopbarComponent />
-                    <AdminProfileScreens />
+                    {/* <AdminProfileScreens />
+                     */}
+                    <ProfileSetup />
                 </main>
             </div>
         </CssVarsProvider>

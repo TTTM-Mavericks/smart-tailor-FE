@@ -1,4 +1,4 @@
-import { useTheme } from "@mui/material";
+import { Card, ToggleButton, ToggleButtonGroup, Typography, useTheme } from "@mui/material";
 import { ResponsiveBar } from "@nivo/bar";
 import { tokens } from "../../../theme";
 import { mockBarData as barChartData } from "./DataTestBarChart";
@@ -13,42 +13,67 @@ const BarChart = ({ isDashboard = false }) => {
     const filteredData = option === "month" ? barChartData : [];
     console.log("filter data" + filteredData + option);
 
+    const handleChange = (e: any) => {
+        setOption(e.target.value)
+    }
     return (
         <>
-            <button onClick={() => setOption("month")}>Month</button><br />
-            <button onClick={() => setOption("year")}>Year</button>
+            <div style={{ display: "flex", margin: "2%" }}>
+                <Typography variant="h5" >
+                    Bar Chart
+                </Typography>
+                <Card sx={{ backgroundColor: `${colors.primary[100]} !important`, width: "18%", color: `${colors.primary[100]}`, marginTop: "2%", marginLeft: "60%" }}>
+                    <ToggleButtonGroup
+                        color="primary"
+                        value={option}
+                        exclusive
+                        onChange={handleChange}
+                        aria-label="Platform"
+                    >
+                        <ToggleButton value="month" sx={{ color: colors.primary[200], fontWeight: "bold" }}>
+                            month
+                        </ToggleButton>
+                        <ToggleButton value="year" sx={{ color: colors.primary[200], fontWeight: "bold" }}>
+                            year
+                        </ToggleButton>
+                        <ToggleButton value="week" sx={{ color: colors.primary[200], fontWeight: "bold" }}>
+                            week
+                        </ToggleButton>
+                    </ToggleButtonGroup>
+                </Card>
+            </div>
             <ResponsiveBar
                 data={filteredData}
                 theme={{
                     axis: {
                         domain: {
                             line: {
-                                stroke: colors.grey[100],
+                                stroke: colors.primary[200],
                             },
                         },
                         legend: {
                             text: {
-                                fill: colors.grey[100],
+                                fill: colors.primary[200],
                             },
                         },
                         ticks: {
                             line: {
-                                stroke: colors.grey[100],
+                                stroke: colors.primary[200],
                                 strokeWidth: 1,
                             },
                             text: {
-                                fill: colors.grey[100],
+                                fill: colors.primary[200],
                             },
                         },
                     },
                     legends: {
                         text: {
-                            fill: colors.grey[500],
+                            fill: colors.primary[200],
                         },
                     },
                     tooltip: {
                         container: {
-                            color: colors.primary[500],
+                            color: colors.primary[300],
                         },
                     },
                 }}
@@ -138,6 +163,7 @@ const BarChart = ({ isDashboard = false }) => {
                 }}
             />
         </>
+
     );
 };
 

@@ -38,7 +38,7 @@ const Item: React.FC<ItemProps> = ({ title, to, icon, selected, setSelected }) =
         <MenuItem
             active={selected === title}
             style={{
-                color: colors.grey[100],
+                color: colors.primary[200],
             }}
             onClick={handleItemClick}
             icon={icon}
@@ -72,7 +72,7 @@ const SideBarComponent = () => {
         <Box
             sx={{
                 "& .pro-sidebar-inner": {
-                    background: `${colors.primary[400]} !important`,
+                    background: `${colors.primary[100]} !important`,
                 },
                 "& .pro-icon-wrapper": {
                     backgroundColor: "transparent !important",
@@ -81,10 +81,10 @@ const SideBarComponent = () => {
                     padding: "5px 35px 5px 20px !important",
                 },
                 "& .pro-inner-item:hover": {
-                    color: "#868dfb !important",
+                    color: "#E96208 !important",
                 },
                 "& .pro-menu-item.active": {
-                    color: "#6870fa !important",
+                    color: "#E96208 !important",
                 },
             }}
         >
@@ -96,7 +96,7 @@ const SideBarComponent = () => {
                         icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
                         style={{
                             margin: "10px 0 20px 0",
-                            color: colors.grey[100],
+                            color: colors.primary[300],
                         }}
                     >
                         {!isCollapsed && (
@@ -106,7 +106,7 @@ const SideBarComponent = () => {
                                 alignItems="center"
                                 ml="15px"
                             >
-                                <Typography variant="h6" color={colors.grey[100]}>
+                                <Typography variant="h6" color={colors.primary[200]}>
                                     ADMINIS
                                 </Typography>
                                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
@@ -128,15 +128,7 @@ const SideBarComponent = () => {
                                 />
                             </Box>
                             <Box textAlign="center">
-                                {/* <Typography
-                                    variant="h3"
-                                    color={colors.grey[100]}
-                                    fontWeight="bold"
-                                    sx={{ m: "10px 0 0 0" }}
-                                >
-                                    Tammt
-                                </Typography> */}
-                                <Typography variant="h5" color={colors.greenAccent[500]} sx={{ m: "10px 0 0 0" }}>
+                                <Typography variant="h5" color={colors.primary[200]} sx={{ m: "10px 0 0 0" }}>
                                     Admin TTTM
                                 </Typography>
                             </Box>
@@ -154,7 +146,7 @@ const SideBarComponent = () => {
 
                         <Typography
                             variant="h6"
-                            color={colors.grey[300]}
+                            color={colors.primary[200]}
                             sx={{ m: "15px 0 5px 20px" }}
                             style={{ fontSize: "15px" }}
                         >
@@ -176,7 +168,7 @@ const SideBarComponent = () => {
                         />
                         <Item
                             title="Manage Invoice"
-                            to="/invoices"
+                            to="/manage_invoice"
                             icon={<ReceiptOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
@@ -184,7 +176,7 @@ const SideBarComponent = () => {
 
                         <Typography
                             variant="h6"
-                            color={colors.grey[300]}
+                            color={colors.primary[200]}
                             sx={{ m: "15px 0 5px 20px" }}
                             style={{ fontSize: "15px" }}
                         >
@@ -214,7 +206,7 @@ const SideBarComponent = () => {
 
                         <Typography
                             variant="h6"
-                            color={colors.grey[300]}
+                            color={colors.primary[200]}
                             sx={{ m: "15px 0 5px 20px" }}
                             style={{ fontSize: "15px" }}
                         >
