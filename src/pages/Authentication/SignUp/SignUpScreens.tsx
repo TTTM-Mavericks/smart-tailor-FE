@@ -1,12 +1,12 @@
 import * as React from 'react';
 
 import { createTheme, Theme, ThemeProvider } from '@mui/material/styles';
-import styles from './SignInStyle.module.scss';
+import styles from './SignUpStyle.module.scss';
 import { HiEye, HiEyeOff } from 'react-icons/hi';
 
 // import ApiService from '../ApiAuthService';
 import { apiBaseUrl } from '../../../api/ApiConfig';
-import './SignInStyle.css'
+import './SignUpStyle.css'
 import { jwtDecode } from "jwt-decode";
 import { primaryColor } from '../../../root/ColorSystem';
 import { systemLogo } from '../../../assets';
@@ -18,7 +18,7 @@ import { systemLogo } from '../../../assets';
 const defaultTheme = createTheme();
 
 
-export default function SignInScreen() {
+export default function SignUpScreens() {
 
   //** Variable */
   //   const apiService = new ApiService();
@@ -160,13 +160,17 @@ export default function SignInScreen() {
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
               <img
                 className="mx-auto h-20 w-auto"
-                style={{borderRadius: 90}}
+                style={{ borderRadius: 90 }}
                 src={systemLogo}
                 alt="Your Company"
               />
               <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-                Sign in to your account
+                Sign up
               </h2>
+            </div>
+
+            <div className="sm:mx-auto text-center sm:w-full sm:max-w-sm">
+              <h4>Become a new member</h4>
             </div>
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
@@ -186,7 +190,6 @@ export default function SignInScreen() {
               </div>
 
               <div>
-
                 <div className="relative mt-2">
                   <input
                     id="password"
@@ -206,11 +209,34 @@ export default function SignInScreen() {
                     {showPassword ? <HiEyeOff /> : <HiEye />}
                   </button>
                 </div>
+              </div>
+
+              <div>
+                <div className="relative mt-2">
+                  <input
+                    id="confirmpassword"
+                    name="confirmpassword"
+                    type={showPassword ? "text" : "password"} // Toggle input type based on visibility state
+                    placeholder='Confirm Password'
+                    autoComplete="current-password"
+                    required
+                    className={`block h-11 w-full pl-3 pr-10 rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6  ${styles.signIn_input}`}
+                  />
+                  {/* Show/hide password toggle button */}
+                  {/* <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 focus:outline-none"
+                    onClick={__handleClickShowPassword}
+                  >
+                    {showPassword ? <HiEyeOff /> : <HiEye />}
+                  </button> */}
+                </div>
+              </div>
+
+              <div>
                 <div className="flex items-center justify-between">
                   <div className="text-sm mt-2 mb-2">
-                    <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                      Forgot password?
-                    </a>
+                    
                   </div>
                 </div>
               </div>
@@ -221,24 +247,24 @@ export default function SignInScreen() {
                   className="flex mb-2 h-11 w-full items-center justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                   style={{ backgroundColor: primaryColor }}
                 >
-                  Sign in
+                  Sign up
                 </button>
 
 
                 <button
                   type="submit"
                   className="flex h-11 w-full items-center justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                onClick={()=> window.location.href = 'https://st.mavericks-tttm.studio/oauth2/authorization/google'}
+                  onClick={() => window.location.href = 'https://st.mavericks-tttm.studio/oauth2/authorization/google'}
                 >
-                  Sign in with Google
+                  Sign up with Google
                 </button>
 
               </div>
 
               <p className="mt-10 text-center text-sm text-gray-500">
-                Not a member?{' '}
-                <a href="/auth/signup" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-                  Create an account
+                You had an account?{' '}
+                <a href="/auth/signin" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+                  Sign in now
                 </a>
               </p>
             </div>
