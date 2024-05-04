@@ -56,13 +56,6 @@ export default function SignInScreen() {
 
   // ---------------FunctionHandler---------------//
 
-
-  //** Variable */
-  //   const apiService = new ApiService();
-
-
-
-
   const handleLanguageChange = (language: string) => {
     setSelectedLanguage(language);
   };
