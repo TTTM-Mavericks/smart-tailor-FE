@@ -1,24 +1,51 @@
 @import '../../../index.module.scss';
 
 .signin__container {
-    display: flex;
+    position: relative;
     width: 100%;
     height: 100vh;
-    background: linear-gradient(155deg, rgba(233,116,35,0.9) 0%, rgba(233,116,35,0.9) 38.500080333246004%, rgba(235, 235, 235, 0.9) 74.85924410434251%, rgba(248, 248, 248, 0.9) 100%);
-    justify-content: center;
-    align-items: center;
+    background: linear-gradient(155deg, rgba(233, 116, 35, 0.9) 0%, rgba(233, 116, 35, 0.9) 38.500080333246004%, rgba(235, 235, 235, 0.9) 74.85924410434251%, rgba(248, 248, 248, 0.9) 100%);
 }
 
 .signin__box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 30vw;
     height: fit-content;
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: 20px;
+}
+
+.signIn_input:focus {
+    outline: auto;
+    outline-color: $primaryColor;
 
 }
 
-.signIn_input:focus{
-    outline: auto;
-    outline-color: $primaryColor;
-    
+.language__button {
+    display: flex;
+    width: 100%;
+}
+
+.language__button span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-left: 10px;
+}
+
+.language__button :hover {
+    background-color: rgb(237, 237, 237);
+}
+
+.icon_language {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    float: right;
+    align-items: flex-end;
 }
