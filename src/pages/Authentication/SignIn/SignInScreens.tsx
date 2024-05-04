@@ -34,7 +34,7 @@ export default function SignInScreen() {
     email: "",
     password: "",
   });
-
+  const [codeLanguage, setCodeLanguage] = React.useState('EN');
   // ---------------Usable Variable---------------//
   const baseUrl = apiBaseUrl;
   const { t, i18n } = useTranslation();
@@ -43,7 +43,16 @@ export default function SignInScreen() {
   React.useEffect(() => {
     i18n.changeLanguage(selectedLanguage);
     localStorage.setItem('language', selectedLanguage);
+
   }, [selectedLanguage, i18n]);
+
+  React.useEffect(() => {
+    if (selectedLanguage) {
+      const uppercase = selectedLanguage.toUpperCase();
+      setCodeLanguage(uppercase)
+    }
+
+  }, [selectedLanguage]);
 
   // ---------------FunctionHandler---------------//
 
@@ -202,7 +211,7 @@ export default function SignInScreen() {
                 <button className={`flex  space-x-2 ${styles.language__button}`} onClick={() => handleLanguageChange('vi')}>
                   <div className={`${styles.language__button}`}>
                     <img src={vietnamFlag} style={{ width: '35px', height: '35px', marginLeft: 30 }}></img>
-                    <span className='text-black'>{selectedLanguage === 'en' ? t('EN000016') : t('VN000016')}</span>
+                    <span className='text-black'>{t(codeLanguage + '000016')}</span>
                   </div>
                 </button>
               </Menu.Item>
@@ -230,7 +239,7 @@ export default function SignInScreen() {
                 alt="Your Company"
               />
               <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-                {selectedLanguage === 'en' ? t('EN000014') : t('VN000014')}
+                {t(codeLanguage + '000014')}
               </h2>
             </div>
 
@@ -257,7 +266,7 @@ export default function SignInScreen() {
                     id="password"
                     name="password"
                     type={showPassword ? "text" : "password"} // Toggle input type based on visibility state
-                    placeholder={selectedLanguage === 'en' ? t('EN000010') : t('VN000010')}
+                    placeholder={t(codeLanguage + '000010')}
                     autoComplete="current-password"
                     required
                     className={`block h-11 w-full pl-3 pr-10 rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6  ${styles.signIn_input}`}
@@ -274,7 +283,7 @@ export default function SignInScreen() {
                 <div className="flex items-center justify-between">
                   <div className="text-sm mt-2 mb-2">
                     <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                      {selectedLanguage === 'en' ? t('EN000007') : t('VN000007')} ?
+                      {t(codeLanguage + '000007')} ?
                     </a>
                   </div>
                 </div>
@@ -286,7 +295,7 @@ export default function SignInScreen() {
                   className="flex mb-2 h-11 w-full items-center justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                   style={{ backgroundColor: primaryColor }}
                 >
-                  {selectedLanguage === 'en' ? t('EN000002') : t('VN000002')}
+                  {t(codeLanguage +'000002')}
                 </button>
 
 
@@ -295,15 +304,15 @@ export default function SignInScreen() {
                   className="flex h-11 w-full items-center justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                   onClick={() => window.location.href = 'https://st.mavericks-tttm.studio/oauth2/authorization/google'}
                 >
-                  {selectedLanguage === 'en' ? t('EN000005') : t('VN000005')}
+                  {t(codeLanguage +'000005')}
                 </button>
 
               </div>
 
               <p className="mt-10 text-center text-sm text-gray-500">
-                {selectedLanguage === 'en' ? t('EN000008') : t('VN000008')}?{' '}
+                {t(codeLanguage +'000008')}?{' '}
                 <a href="/auth/signup" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-                  {selectedLanguage === 'en' ? t('EN000015') : t('VN000015')}
+                  {t(codeLanguage + '000015')}
                 </a>
               </p>
             </div>
