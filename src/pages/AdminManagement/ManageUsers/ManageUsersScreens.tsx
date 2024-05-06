@@ -30,11 +30,12 @@ const style = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 400,
+    width: "50%",
     bgcolor: 'background.paper',
     border: '2px solid #000',
     boxShadow: 24,
-    p: 4
+    p: 4,
+    borderRadius: "20px"
 };
 
 const ManageUsers: React.FC = () => {
@@ -191,7 +192,6 @@ const ManageUsers: React.FC = () => {
             field: "name",
             headerName: "Name",
             flex: 1,
-            cellClassName: "name-column--cell",
         },
         {
             field: "age",
@@ -236,7 +236,7 @@ const ManageUsers: React.FC = () => {
                         <EditIcon />
                     </IconButton>
                     <IconButton onClick={() => confirmDelete(params.row.id)}>
-                        <DeleteIcon />
+                        <DeleteIcon htmlColor={colors.primary[300]} />
                     </IconButton>
                 </Box>
             )
@@ -260,24 +260,24 @@ const ManageUsers: React.FC = () => {
                         borderBottom: "none",
                     },
                     "& .name-column--cell": {
-                        color: colors.greenAccent[300],
+                        color: colors.primary[300],
                     },
                     "& .MuiDataGrid-columnHeaders": {
-                        backgroundColor: colors.blueAccent[700],
+                        backgroundColor: colors.primary[300],
                         borderBottom: "none",
                     },
                     "& .MuiDataGrid-virtualScroller": {
-                        backgroundColor: colors.primary[400],
+                        backgroundColor: colors.primary[100],
                     },
                     "& .MuiDataGrid-footerContainer": {
                         borderTop: "none",
-                        backgroundColor: colors.blueAccent[700],
+                        backgroundColor: colors.primary[100],
                     },
                     "& .MuiCheckbox-root": {
-                        color: `${colors.greenAccent[200]} !important`,
+                        color: `${colors.primary[100]} !important`,
                     },
                     "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-                        color: `${colors.grey[100]} !important`,
+                        color: `${colors.primary[200]} !important`,
                     },
                 }}
             >
@@ -290,7 +290,7 @@ const ManageUsers: React.FC = () => {
                     endIcon={<Add />}
                     variant="contained"
                     color="primary"
-                    style={{ backgroundColor: `${colors.greenAccent[200]} !important`, color: `${colors.grey[100]} !important`, marginLeft: "80%" }}
+                    style={{ backgroundColor: `${colors.primary[300]} !important`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
                 >
                     Add User
                 </Button>
@@ -310,7 +310,18 @@ const ManageUsers: React.FC = () => {
                             aria-labelledby="modal-modal-title"
                             aria-describedby="modal-modal-description"
                         >
-                            <Box sx={style}>
+                            <Box sx={{
+                                backgroundColor: colors.primary[100], position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                width: "50%",
+                                bgcolor: 'background.paper',
+                                border: '2px solid #000',
+                                boxShadow: 24,
+                                p: 4,
+                                borderRadius: "20px"
+                            }}>
                                 <AddEachUsersWithHand closeCard={handleAddClose} addNewUser={handleAddUser} />
                             </Box>
                         </Modal>
@@ -323,7 +334,18 @@ const ManageUsers: React.FC = () => {
                             aria-labelledby="modal-modal-title"
                             aria-describedby="modal-modal-description"
                         >
-                            <Box sx={style} className={styles.bebe2}>
+                            <Box sx={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                width: "70%",
+                                bgcolor: colors.primary[100],
+                                border: '2px solid #000',
+                                boxShadow: 24,
+                                p: 4,
+                                borderRadius: "20px"
+                            }}>
                                 <AddMultipleComponentWithExcel closeMultipleCard={handleAddMultipleClose} addNewUser={handleAddUser} />
                             </Box>
                         </Modal>

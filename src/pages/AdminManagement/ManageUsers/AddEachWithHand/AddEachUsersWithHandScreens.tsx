@@ -9,6 +9,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import Swal from 'sweetalert2';
+import { width } from '@mui/system';
 
 interface User {
     id: number;
@@ -149,7 +150,17 @@ const AddEachUsersWithHand: React.FC<AddUserWithHandsFormProps> = ({ closeCard, 
     };
 
     return (
-        <Box style={{ height: '500px', overflowY: 'auto', innerWidth: "20000px" }}>
+        <Box style={{
+            height: '500px',
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            '&::-webkit-scrollbar': {
+                width: 0,
+                backgroundColor: '#f5f5f5',
+            }
+        }}>
             <div>
                 <Typography variant="h5" align="center">
                     Add New User By Hands
@@ -265,7 +276,7 @@ const AddEachUsersWithHand: React.FC<AddUserWithHandsFormProps> = ({ closeCard, 
                     onClick={closeCard}
                     style={{ textAlign: 'center', alignItems: 'center', marginTop: '3rem' }}
                 >
-                    <Button onClick={handleSubmit}>
+                    <Button onClick={handleSubmit} style={{ backgroundColor: "#EC6208", color: "white" }}>
                         Submit
                     </Button>
                 </div>

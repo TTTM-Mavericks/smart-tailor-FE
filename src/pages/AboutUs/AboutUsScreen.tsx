@@ -188,7 +188,7 @@ const AboutUsPage: React.FC = () => {
                             </Typography>
                         </Fade>
                         <Fade in timeout={1600}>
-                            <Button variant="contained" style={{ color: "black", backgroundColor: "white" }}>
+                            <Button variant="contained" style={{ color: "white", backgroundColor: "#088FE9" }}>
                                 Learn More
                             </Button>
                         </Fade>

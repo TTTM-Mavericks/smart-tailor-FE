@@ -89,7 +89,7 @@ const TopbarComponent = () => {
             <Box
                 display="flex"
                 borderRadius="3px"
-                sx={{ backgroundColor: colors.primary[400] }}
+                sx={{ backgroundColor: colors.primary[100] }}
             >
                 <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Search" />
                 <IconButton type="button" sx={{ p: 1 }}>
@@ -176,7 +176,7 @@ const TopbarComponent = () => {
                         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                     >
                         <MenuItem>
-                            <Link to={"/admin_profile"} style={{ display: "flex", textDecoration: "none", color: colors.grey[100] }}>
+                            <Link to={"/admin_profile"} style={{ display: "flex", textDecoration: "none", color: colors.primary[200] }}>
                                 <Avatar /> My account
                             </Link>
                         </MenuItem>

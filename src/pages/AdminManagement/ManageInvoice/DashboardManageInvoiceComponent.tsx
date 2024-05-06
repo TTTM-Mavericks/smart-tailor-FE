@@ -4,11 +4,11 @@ import SideBarComponent from '../GlobalComponent/SideBar/SideBarComponent';
 import { Box, CssBaseline, useMediaQuery, useTheme } from "@mui/material";
 import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
 import theme from '../../../theme';
-import styles from "./DashBoardUserStyle.module.scss"
-import ManageUsers from '../ManageUsers/ManageUsersScreens';
+import styles from "./DashboardManageInvoiceStyle.module.scss"
 import Grid from "@mui/material/Unstable_Grid2";
+import ManageInvoiceScreen from './ManageInvoiceScreens';
 
-export default function DashboardManageUserScreen() {
+export default function DashboardManageInvoiceScreen() {
     const theme1 = useTheme();
     const smScreen = useMediaQuery(theme1.breakpoints.up("sm"));
     return (
@@ -18,18 +18,12 @@ export default function DashboardManageUserScreen() {
                 <SideBarComponent />
                 <main className={`${styles.content}`}>
                     <TopbarComponent />
-                    <Box
-                        display="grid"
-                        gridTemplateColumns="repeat(12, 1fr)"
-                        gridAutoRows="140px"
-                        gap="20px"
-                    >
-                        <Box
-                            gridColumn="span 12"
-                            gridRow="span 2"
-                        >
-                            <ManageUsers />
-                        </Box>
+                    <Box>
+                        <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+                            <Grid xs={12}>
+                                <ManageInvoiceScreen />
+                            </Grid>
+                        </Grid>
                     </Box>
                 </main>
             </div>
