@@ -1,13 +1,16 @@
 import * as React from 'react';
 import DownloadIcon from '@mui/icons-material/CloudDownload';
-import { Box, Button, IconButton, Typography } from '@mui/material';
+import { Box, Button, IconButton, Modal, Typography } from '@mui/material';
 import { AgricultureOutlined, Cancel, CheckCircleRounded, Close, ErrorOutline } from '@mui/icons-material';
 import * as XLSX from "xlsx-js-style";
 import Swal from 'sweetalert2';
 import { tokens } from '../../../../theme';
 import { useTheme } from "@mui/material";
-
-const ADDUSERWITHFILEEXCELS = 'http://localhost:5173/Add_New_Users_Sample_Files.xlsx';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import EditMultipleUsersInExcelTable from './CRUDWithExcelTable/EditMultipleUsersInExcelTable';
+import AddUserModalInExcelTable from './CRUDWithExcelTable/AddUserInExcelTable';
+const ADDUSERWITHFILEEXCELS = 'http://localhost:3000/Add_New_Users_Sample_Files.xlsx';
 
 interface ExcelData {
     id: number;
@@ -19,14 +22,28 @@ interface ExcelData {
     address: string;
     city: string;
     zipCode: string;
-    error: boolean;
-    imageBase64: string
+    error: boolean
 }
 
 interface AddUserWithMultipleExcelFormProps {
     closeMultipleCard: () => void;
     addNewUser: (addedNewUser: ExcelData) => void
 }
+
+// Make Style of popup
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: "50%",
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+    borderRadius: "20px"
+
+};
 
 const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps> = ({ closeMultipleCard, addNewUser }) => {
     const theme = useTheme();
@@ -247,8 +264,71 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
         return buf;
     }
 
+    // Function To CRUD
+
+    const [editingData, setEditingData] = React.useState<ExcelData | null>(null);
+    const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
+
+    const [editOpen, setEditOpen] = React.useState(false);
+    const handleEditOpen = () => setEditOpen(true);
+    const handleEditClose = () => setEditOpen(false);
+
+    const confirmDelete = (index: number) => {
+        const result = window.confirm('Are you sure? Do you want to delete this user?');
+        if (result) {
+            const newData = [...excelData];
+            newData.splice(index, 1);
+            setExcelData(newData);
+            window.alert('User has been deleted.');
+        }
+    };
+
+    // Hàm xác nhận chỉnh sửa dữ liệu
+    const confirmEdit = (index: number) => {
+        setEditingIndex(index);
+        setEditingData(excelData[index]);
+        handleEditOpen();
+    };
+
+    // Hàm để cập nhật dữ liệu sau khi chỉnh sửa
+    const updateData = (updatedData: ExcelData, index: number) => {
+        const newData = [...excelData];
+        newData[index] = updatedData;
+        setExcelData(newData);
+        setEditingData(null);
+        setEditingIndex(null);
+    };
+
+    // Hàm để hủy chỉnh sửa dữ liệu
+    const cancelEdit = () => {
+        setEditingData(null);
+        setEditingIndex(null);
+        handleEditClose()
+    };
+
+    // Thêm một state để theo dõi trạng thái của modal
+    const [openAddUserModal, setOpenAddUserModal] = React.useState(false);
+
+    // Hàm để mở modal
+    const handleOpenAddUserModal = () => {
+        setOpenAddUserModal(true);
+    };
+
+    // Hàm để đóng modal
+    const handleCloseAddUserModal = () => {
+        setOpenAddUserModal(false);
+    };
+
+    // Hàm để thêm người dùng mới
+    const handleAddUser = (userData: any) => {
+        const newData = [...excelData];
+        newData.push(userData);
+        setExcelData(newData);
+        setOpenAddUserModal(false);
+    };
+
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px', maxHeight: '80vh', overflowY: 'auto' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px', maxHeight: '80vh', overflowY: 'auto', position: "relative" }}>
             <Typography variant="h5" align="center" marginBottom={"20px"}>
                 Add New User By Excel
             </Typography>
@@ -260,6 +340,7 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
                     backgroundColor: '#E96208',
                     borderRadius: '50%',
                     padding: '5px',
+                    color: "white"
                 }}
                 onClick={closeMultipleCard}
             >
@@ -280,28 +361,38 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
             >
                 Download Excel Sample File
             </Button>
-            <h1 style={{ marginBottom: '10px' }}>Upload Data with Excel</h1>
-            <input
-                type="file"
-                onChange={handleFileInputChange}
-                style={{ marginBottom: '20px', padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
-            />
-            {loading && <p style={{ fontStyle: 'italic' }}>Loading...</p>}
             {
-                error && (
-                    <div style={{ marginBottom: '20px' }}>
-                        <p style={{ color: 'red' }}>{error}</p>
-                        <Button
-                            variant="contained"
-                            color="secondary"
-                            onClick={handleDownloadFullData}
-                            style={{ boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)', backgroundColor: '#E96208' }}
-                        >
-                            Download Error Data
-                        </Button>
-                    </div>
+                excelData.length > 0 && !editingData && (
+                    <>
+                        <Button onClick={handleOpenAddUserModal}>Add User</Button>
+                        <AddUserModalInExcelTable open={openAddUserModal} onClose={handleCloseAddUserModal} onAddUser={handleAddUser} />
+                    </>
                 )
             }
+
+            <div style={{ display: "flex" }}>
+                <input
+                    type="file"
+                    onChange={handleFileInputChange}
+                    style={{ marginBottom: '20px', padding: '10px', borderRadius: '5px', border: '1px solid #ccc', marginRight: "20px" }}
+                />
+                {
+                    error && (
+                        <div>
+                            <p style={{ color: 'red' }}>{error}</p>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                onClick={handleDownloadFullData}
+                                style={{ boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)', backgroundColor: '#E96208' }}
+                            >
+                                Download Error Data
+                            </Button>
+                        </div>
+                    )
+                }
+            </div>
+
             {
                 excelData.length > 0 && (
                     <div style={{ overflowX: 'auto', width: '100%' }}>
@@ -317,6 +408,7 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>City</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Zip Code</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Error Check</th>
+                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -356,6 +448,16 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
                                                 }
                                             })()}
                                         </td>
+                                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>
+                                            {/* {editingData ? (
+                                                <EditMultipleUsersInExcelTable data={editingData} index={editingIndex} updateData={updateData} onClose={cancelEdit} />
+                                            ) : ( */}
+                                            <div style={{ display: "flex" }}>
+                                                <EditIcon style={{ color: "blue", cursor: "pointer" }} onClick={() => confirmEdit(index)} />
+                                                <DeleteIcon style={{ color: "red", cursor: "pointer" }} onClick={() => confirmDelete(index)} />
+                                            </div>
+                                            {/* )} */}
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -364,6 +466,20 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
                 )
             }
 
+            <Modal
+                open={editOpen}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={style}>
+                    {editingData !== null && (
+                        <EditMultipleUsersInExcelTable
+                            data={editingData} index={editingIndex} updateData={updateData} onClose={cancelEdit}
+                        />
+                    )}
+                </Box>
+            </Modal>
+
             <div style={{ display: "flex", justifyContent: 'center', marginTop: '20px' }}>
                 <div style={{ marginRight: '10px' }}>
                     <Button
@@ -371,7 +487,7 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
                         color="primary"
                         onClick={closeMultipleCard}
                         endIcon={<Cancel />}
-                        style={{ backgroundColor: '#E96208', color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
+                        style={{ backgroundColor: '#088FE9', color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
                     >
                         CANCEL
                     </Button>

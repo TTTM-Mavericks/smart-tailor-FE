@@ -36,7 +36,6 @@ const style = {
     boxShadow: 24,
     p: 4,
     borderRadius: "20px"
-
 };
 
 const ManageUsers: React.FC = () => {

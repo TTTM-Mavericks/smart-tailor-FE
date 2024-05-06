@@ -15,8 +15,6 @@ export default function DashboardAdminProfileScreens() {
                 <SideBarComponent />
                 <main className={`${styles.content}`}>
                     <TopbarComponent />
-                    {/* <AdminProfileScreens />
-                     */}
                     <ProfileSetup />
                 </main>
             </div>

@@ -1,71 +1,124 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Grid, TextField, Button, Avatar, IconButton, Select, MenuItem, useTheme, InputLabel, FormControl } from '@mui/material';
+import React, { useEffect, useRef, useState } from 'react';
+import { Box, Grid, TextField, Button, Avatar, IconButton, Select, MenuItem, useTheme, InputLabel, FormControl, Typography } from '@mui/material';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import { tokens } from '../../../theme';
-
-const host = "https://provinces.open-api.vn/api/";
+import VNLocationData from '../../../locationData.json';
 
 const ProfileSetup = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [provinces, setProvinces] = useState([]);
-    const [districts, setDistricts] = useState([]);
-    const [wards, setWards] = useState([]);
-    const [selectedProvince, setSelectedProvince] = useState("");
-    const [selectedDistrict, setSelectedDistrict] = useState("");
-    const [selectedWard, setSelectedWard] = useState("");
+
+    const [locations, setLocations] = useState<any[]>([]);
+    const [selectedProvince, setSelectedProvince] = useState<any>(null);
+    const [selectedDistrict, setSelectedDistrict] = useState<any>(null);
+    const [selectedWard, setSelectedWard] = useState<any>(null);
+
+    console.log(selectedProvince + selectedDistrict + selectedWard);
+
+    useEffect(() => {
+        Promise.resolve(VNLocationData)
+            .then(data => setLocations(data))
+            .catch(err => console.log("err ", err));
+    }, []);
+
+    const handleProvinceChange = (event: any) => {
+        const provinceName = event.target.value;
+        const selectedProvince = locations.find((location: any) => location.Name === provinceName);
+        setSelectedProvince(selectedProvince);
+        setSelectedDistrict(null);
+        setSelectedWard(null);
+    };
+
+    const handleDistrictChange = (event: any) => {
+        const districtName = event.target.value;
+        const selectedDistrict = selectedProvince.Districts.find((district: any) => district.Name === districtName);
+        setSelectedDistrict(selectedDistrict);
+        setSelectedWard(null);
+    };
+
+    const handleWardChange = (event: any) => {
+        const wardName = event.target.value;
+        const selectedWard = selectedDistrict.Wards.find((ward: any) => ward.Name === wardName);
+        setSelectedWard(selectedWard);
+    };
+
+
     const [profileData, setProfileData] = useState({
-        name: 'John',
-        surname: '',
+        name: 'Tam',
+        surname: 'Mai',
         specialty: 'Developer',
-        skills: '',
+        skills: 'English',
         gender: 'Male',
         birthDate: '2017-06-04',
         phone: '+123456789',
         email: 'demo@gmail.com',
-        country: 'Russia',
-        city: 'Krasnodar',
-        profilePicture: null,
+        profilePicture: '',
+        address: ''
     });
-
-    useEffect(() => {
-        fetchAPI(host + "?depth=1", setProvinces);
-    }, []);
-
-    const fetchAPI = (api: any, setter: any) => {
-        fetch(api)
-            .then(response => response.json())
-            .then(data => setter(data))
-            .catch(error => console.error("Error fetching data:", error));
-    };
 
     const handleChange = (e: any) => {
         setProfileData({ ...profileData, [e.target.name]: e.target.value });
-    };
-
-    const handleProfilePictureChange = (e: any) => {
-        setProfileData({ ...profileData, profilePicture: e.target.files[0] });
     };
 
     const handleUpdate = () => {
         console.log('Profile data:', profileData);
     };
 
-    const handleProvinceChange = (e: any) => {
-        setSelectedProvince(e.target.value);
-        fetchAPI(host + "p/" + e.target.value + "?depth=2", setDistricts);
-        setSelectedDistrict("");
-        setSelectedWard("");
+    // Upload Image into Cloudinary
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [files, setFiles] = useState<string[]>([]);
+
+    const handleChanges = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFiles = e.target.files;
+
+        if (selectedFiles && selectedFiles.length > 0) {
+            const imageUrls = await uploadToCloudinary(selectedFiles);
+
+            setFiles((prevFiles) => [...prevFiles, ...imageUrls]);
+            setProfileData((prevFormData) => ({
+                ...prevFormData,
+                profilePicture: imageUrls[0],
+            }));
+        } else {
+            setFiles([]);
+        }
     };
 
-    const handleDistrictChange = (e: any) => {
-        setSelectedDistrict(e.target.value);
-        fetchAPI(host + "d/" + e.target.value + "?depth=2", setWards);
-        setSelectedWard("");
-    };
+    const uploadToCloudinary = async (files: FileList): Promise<string[]> => {
+        try {
+            const cloud_name = "dby2saqmn";
+            const preset_key = "whear-app";
+            const folder_name = "test";
+            const formData = new FormData();
+            formData.append("upload_preset", preset_key);
+            formData.append("folder", folder_name);
 
-    const handleWardChange = (e: any) => {
-        setSelectedWard(e.target.value);
+            const uploadedUrls: string[] = [];
+
+            for (const file of Array.from(files)) {
+                formData.append("file", file);
+
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`, {
+                    method: "POST",
+                    body: formData,
+                });
+
+                const responseData = await response.json();
+
+                if (responseData.secure_url) {
+                    const imageUrl = responseData.secure_url;
+                    console.log(imageUrl);
+                    uploadedUrls.push(imageUrl);
+                } else {
+                    console.error("Error uploading image to Cloudinary. Response:", responseData);
+                }
+            }
+
+            return uploadedUrls;
+        } catch (error) {
+            console.error("Error uploading images to Cloudinary:", error);
+            return [];
+        }
     };
 
     return (
@@ -76,11 +129,11 @@ const ProfileSetup = () => {
                         <Box display="flex" alignItems="center" >
                             <Avatar
                                 alt="Profile Picture"
-                                src={profileData.profilePicture ? URL.createObjectURL(profileData.profilePicture) : ''}
+                                src={profileData.profilePicture}
                                 sx={{ width: 150, height: 150 }}
                             />
-                            <IconButton color="primary" aria-label="upload picture" component="label" style={{ marginLeft: "-10%", marginTop: "30%" }}>
-                                <input hidden accept="image/*" type="file" onChange={handleProfilePictureChange} />
+                            <IconButton color="primary" aria-label="upload picture" component="label" style={{ marginLeft: "-35%", marginTop: "90%" }}>
+                                <input hidden accept="image/*" type="file" onChange={handleChanges} ref={fileInputRef} />
                                 <PhotoCamera />
                             </IconButton>
                         </Box>
@@ -155,60 +208,32 @@ const ProfileSetup = () => {
                         fullWidth
                         margin="normal"
                     />
-                    <TextField
-                        label="Country"
-                        name="country"
-                        value={profileData.country}
-                        onChange={handleChange}
-                        fullWidth
-                        margin="normal"
-                    />
-                    <TextField
-                        label="City"
-                        name="city"
-                        value={profileData.city}
-                        onChange={handleChange}
-                        fullWidth
-                        margin="normal"
-                    />
-                    <Select
-                        labelId='1'
-                        label="Province"
-                        value={selectedProvince}
-                        onChange={handleProvinceChange}
-                        fullWidth
-                        style={{ marginTop: "2%" }}
-                    >
-                        <MenuItem value="">Chọn</MenuItem>
-                        {provinces.map((province: any) => (
-                            <MenuItem key={province.code} value={province.code}>{province.name}</MenuItem>
-                        ))}
-                    </Select>
-                    <Select
-                        label="District"
-                        value={selectedDistrict}
-                        onChange={handleDistrictChange}
-                        fullWidth
-                        style={{ marginTop: "2%" }}
-                    >
-                        <MenuItem value="">Chọn</MenuItem>
-                        {districts.map((district: any) => (
-                            <MenuItem key={district.code} value={district.code}>{district.name}</MenuItem>
-                        ))}
-                    </Select>
-                    <Select
-                        label="Ward"
-                        value={selectedWard}
-                        onChange={handleWardChange}
-                        fullWidth
-                        style={{ marginTop: "2%" }}
-                    >
-                        <MenuItem value="">Chọn</MenuItem>
-                        {wards.map((ward: any) => (
-                            <MenuItem key={ward.code} value={ward.code}>{ward.name}</MenuItem>
-                        ))}
-                    </Select>
-                    <div id="result">{selectedProvince ? selectedProvince : "Not choose"} | {selectedDistrict ? selectedDistrict : "Not choose"} | {selectedWard ? selectedWard : "Not choose"}</div>
+
+                    <div>
+                        <select onChange={handleProvinceChange} style={{ padding: '10px', marginTop: '10px', width: '100%', borderRadius: '5px', border: '1px solid #ccc' }}>
+                            <option>Select Province</option>
+                            {locations.map((location: any) => (
+                                <option key={location.Name}>{location.Name}</option>
+                            ))}
+                        </select>
+                        {selectedProvince && (
+                            <select onChange={handleDistrictChange} style={{ padding: '10px', marginTop: '10px', width: '100%', borderRadius: '5px', border: '1px solid #ccc' }}>
+                                <option>Select District</option>
+                                {selectedProvince.Districts.map((district: any) => (
+                                    <option key={district.Name}>{district.Name}</option>
+                                ))}
+                            </select>
+                        )}
+                        {selectedDistrict && (
+                            <select onChange={handleWardChange} style={{ padding: '10px', marginTop: '10px', width: '100%', borderRadius: '5px', border: '1px solid #ccc' }}>
+                                <option>Select Ward</option>
+                                {selectedDistrict.Wards.map((ward: any) => (
+                                    <option key={ward.Name}>{ward.Name}</option>
+                                ))}
+                            </select>
+                        )}
+                    </div>
+
                     <Button variant="contained" color="primary" onClick={handleUpdate} sx={{ mt: 2 }}>
                         UPDATE
                     </Button>

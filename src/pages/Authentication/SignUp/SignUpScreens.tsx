@@ -1,40 +1,47 @@
 import * as React from 'react';
+
 import { createTheme, Theme, ThemeProvider } from '@mui/material/styles';
-import styles from './SignInStyle.module.scss';
+import styles from './SignUpStyle.module.scss';
 import { HiEye, HiEyeOff } from 'react-icons/hi';
-import { FaFlagUsa, FaFlag } from 'react-icons/fa';
+
 // import ApiService from '../ApiAuthService';
 import { apiBaseUrl } from '../../../api/ApiConfig';
-import './SignInStyle.css'
+import './SignUpStyle.css'
 import { jwtDecode } from "jwt-decode";
 import { primaryColor } from '../../../root/ColorSystem';
-import { languageIcon, systemLogo, usaFlag, vietnamFlag } from '../../../assets';
+import { systemLogo, usaFlag, vietnamFlag } from '../../../assets';
+
+// import Logo from '../../../assets/system/smart-tailor_logo.png'
 import { useTranslation } from 'react-i18next';
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Fragment } from 'react';
 
+
 const defaultTheme = createTheme();
 
 
-
-export default function SignInScreen() {
+export default function SignUpScreens() {
 
   // ---------------UseState Variable---------------//
-  const [selectedLanguage, setSelectedLanguage] = React.useState<string>(localStorage.getItem('language') || 'en');
   const [showLogin, setShowLogin] = React.useState(true);
   const [showRegister, setShowRegister] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
+
   const [formData, setFormData] = React.useState({
     email: "",
     password: "",
 
   });
+
   const [formErrors, setFormErrors] = React.useState({
     email: "",
     password: "",
   });
+  const [selectedLanguage, setSelectedLanguage] = React.useState<string>(localStorage.getItem('language') || 'en');
   const [codeLanguage, setCodeLanguage] = React.useState('EN');
+
+
   // ---------------Usable Variable---------------//
   const baseUrl = apiBaseUrl;
   const { t, i18n } = useTranslation();
@@ -53,14 +60,14 @@ export default function SignInScreen() {
     }
 
   }, [selectedLanguage]);
-
   // ---------------FunctionHandler---------------//
-
   const handleLanguageChange = (language: string) => {
     setSelectedLanguage(language);
   };
-  // UseSate variable
 
+  //   const apiService = new ApiService();
+
+  // UseSate variable
 
   /**
      * handleInputChange
@@ -176,7 +183,8 @@ export default function SignInScreen() {
 
   return (
     <ThemeProvider theme={defaultTheme}>
-      <div className={styles.signin__container}>
+      <div className={styles.signup__container}>
+
         <Menu as="div" className={`${styles.icon_language}`}>
           <div >
             <Menu.Button className="relative flex rounded-full text-sm focus:outline-none ">
@@ -222,7 +230,7 @@ export default function SignInScreen() {
           </Transition>
         </Menu>
 
-        <div className={styles.signin__box}>
+        <div className={styles.signup__box}>
           <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
               <img
@@ -232,8 +240,12 @@ export default function SignInScreen() {
                 alt="Your Company"
               />
               <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-                {t(codeLanguage + '000014')}
+                {t(codeLanguage + '000003')}
               </h2>
+            </div>
+
+            <div className="sm:mx-auto text-center sm:w-full sm:max-w-sm">
+              <h4>{t(codeLanguage + '000017')}</h4>
             </div>
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
@@ -247,13 +259,12 @@ export default function SignInScreen() {
                     placeholder='Email'
                     autoComplete="email"
                     required
-                    className={`block h-11 w-full pl-3 pr-10 rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6  ${styles.signIn_input}`}
+                    className={`block h-11 w-full pl-3 pr-10 rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6  ${styles.signup__input}`}
                   />
                 </div>
               </div>
 
               <div>
-
                 <div className="relative mt-2">
                   <input
                     id="password"
@@ -262,7 +273,7 @@ export default function SignInScreen() {
                     placeholder={t(codeLanguage + '000010')}
                     autoComplete="current-password"
                     required
-                    className={`block h-11 w-full pl-3 pr-10 rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6  ${styles.signIn_input}`}
+                    className={`block h-11 w-full pl-3 pr-10 rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6  ${styles.signup__input}`}
                   />
                   {/* Show/hide password toggle button */}
                   <button
@@ -273,11 +284,34 @@ export default function SignInScreen() {
                     {showPassword ? <HiEyeOff /> : <HiEye />}
                   </button>
                 </div>
+              </div>
+
+              <div>
+                <div className="relative mt-2">
+                  <input
+                    id="confirmpassword"
+                    name="confirmpassword"
+                    type={showPassword ? "text" : "password"} // Toggle input type based on visibility state
+                    placeholder={t(codeLanguage + '000011')}
+                    autoComplete="current-password"
+                    required
+                    className={`block h-11 w-full pl-3 pr-10 rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6  ${styles.signup__input}`}
+                  />
+                  {/* Show/hide password toggle button */}
+                  {/* <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 focus:outline-none"
+                    onClick={__handleClickShowPassword}
+                  >
+                    {showPassword ? <HiEyeOff /> : <HiEye />}
+                  </button> */}
+                </div>
+              </div>
+
+              <div>
                 <div className="flex items-center justify-between">
                   <div className="text-sm mt-2 mb-2">
-                    <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                      {t(codeLanguage + '000007')} ?
-                    </a>
+
                   </div>
                 </div>
               </div>
@@ -288,7 +322,7 @@ export default function SignInScreen() {
                   className="flex mb-2 h-11 w-full items-center justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                   style={{ backgroundColor: primaryColor }}
                 >
-                  {t(codeLanguage +'000002')}
+                  {t(codeLanguage + '000003')}
                 </button>
 
 
@@ -297,15 +331,15 @@ export default function SignInScreen() {
                   className="flex h-11 w-full items-center justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                   onClick={() => window.location.href = 'https://st.mavericks-tttm.studio/oauth2/authorization/google'}
                 >
-                  {t(codeLanguage +'000005')}
+                  {t(codeLanguage + '000006')}
                 </button>
 
               </div>
 
               <p className="mt-10 text-center text-sm text-gray-500">
-                {t(codeLanguage +'000008')}?{' '}
-                <a href="/auth/signup" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-                  {t(codeLanguage + '000015')}
+                {t(codeLanguage + '000013')}?{' '}
+                <a href="/auth/signin" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+                {t(codeLanguage + '000018')}
                 </a>
               </p>
             </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Typography, CircularProgress, Container, Paper, Avatar, Modal, TextField, Button, Grid } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import Swal from 'sweetalert2';
@@ -17,6 +17,66 @@ const AdminProfileScreens: React.FC = () => {
     const [editedName, setEditedName] = useState<string>('');
     const [editedEmail, setEditedEmail] = useState<string>('');
     const [editedImgUrl, setEditedImgUrl] = useState<string>('');
+
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [formData, setFormData] = useState({ clothesImages: [] as string[], });
+    const [files, setFiles] = useState<string[]>([]);
+
+
+    const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFiles = e.target.files;
+
+        if (selectedFiles && selectedFiles.length > 0) {
+            const imageUrls = await uploadToCloudinary(selectedFiles);
+
+            setFiles((prevFiles) => [...prevFiles, ...imageUrls]);
+            setFormData((prevFormData) => ({
+                ...prevFormData,
+                clothesImages: [...prevFormData.clothesImages, ...imageUrls],
+            }));
+        } else {
+            setFiles([]);
+        }
+    };
+
+
+    const uploadToCloudinary = async (files: FileList): Promise<string[]> => {
+        try {
+            const cloud_name = "dby2saqmn";
+            const preset_key = "whear-app";
+            const folder_name = "test";
+            const formData = new FormData();
+            formData.append("upload_preset", preset_key);
+            formData.append("folder", folder_name);
+
+            const uploadedUrls: string[] = [];
+
+            for (const file of Array.from(files)) {
+                formData.append("file", file);
+
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`, {
+                    method: "POST",
+                    body: formData,
+                });
+
+                const responseData = await response.json();
+
+                if (responseData.secure_url) {
+                    const imageUrl = responseData.secure_url;
+                    console.log(imageUrl);
+                    uploadedUrls.push(imageUrl);
+                } else {
+                    console.error("Error uploading image to Cloudinary. Response:", responseData);
+                }
+            }
+
+            return uploadedUrls;
+        } catch (error) {
+            console.error("Error uploading images to Cloudinary:", error);
+            return [];
+        }
+    };
+
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -176,6 +236,15 @@ const AdminProfileScreens: React.FC = () => {
                                         setEditedImgUrl(URL.createObjectURL(e.target.files[0]));
                                     }
                                 }} />
+                            </Grid>
+
+                            <Grid item xs={12}>
+                                <input type="file" multiple onChange={handleChange}
+                                    ref={fileInputRef} />
+                                {files.map((imageUrl, index) => (
+                                    <img key={index} src={imageUrl} alt={`Image ${index}`} />
+                                ))}
+                                <Typography>Bebebe</Typography>
                             </Grid>
 
                         </Grid>

@@ -13,6 +13,7 @@ import ContactUsPage from './pages/ContactUs/ContactUsScreen';
 import DashboardManageUserScreen from './pages/AdminManagement/ManageUsers/DashBoardManageUserComponent';
 import DashboardRecentTransactionScreen from './pages/AdminManagement/RecentTransaction/DashboardRecentTransactionComponent';
 import DashboardManageInvoiceScreen from './pages/AdminManagement/ManageInvoice/DashboardManageInvoiceComponent';
+import SignUpScreens from './pages/Authentication/SignUp/SignUpScreens';
 
 const tokenIsValid = (token) => {
   // Implement your token validation logic here
@@ -55,6 +56,7 @@ function App() {
           <Route path='/' element={<HomeScreen></HomeScreen>} />
           <Route path='/design' element={<CustomDesignScreen></CustomDesignScreen>} />
           <Route path='/auth/signin' element={<SignInScreen></SignInScreen>} />
+          <Route path='/auth/signup' element={<SignUpScreens></SignUpScreens>} />
           <Route path='/admin' element={<DashboardAdminScreens></DashboardAdminScreens>} />
           <Route path='/admin_profile' element={<DashboardAdminProfileScreens></DashboardAdminProfileScreens>} />
           <Route path='/about' element={<AboutUsPage></AboutUsPage>} />

@@ -46,7 +46,7 @@ const CardInformationDetailComponent = () => {
                     <Card sx={{ display: 'flex', backgroundColor: `${colors.primary[100]} !important` }}>
                         <CardMedia
                             component="img"
-                            sx={{ width: 80 }}
+                            sx={{ width: 90 }}
                             image={`../../../../../src/assets/img/avatar.jpg`}
                         />
                         <Box>
@@ -71,7 +71,7 @@ const CardInformationDetailComponent = () => {
                     <Card sx={{ display: 'flex', backgroundColor: `${colors.primary[100]} !important` }}>
                         <CardMedia
                             component="img"
-                            sx={{ width: 80 }}
+                            sx={{ width: 90 }}
                             image={`../../../../../src/assets/img/avatar.jpg`}
                         />
                         <Box>
@@ -96,7 +96,7 @@ const CardInformationDetailComponent = () => {
                     <Card sx={{ display: 'flex', backgroundColor: `${colors.primary[100]} !important` }}>
                         <CardMedia
                             component="img"
-                            sx={{ width: 80 }}
+                            sx={{ width: 90 }}
                             image={`../../../../../src/assets/img/avatar.jpg`}
                         />
                         <Box>
@@ -121,7 +121,7 @@ const CardInformationDetailComponent = () => {
                     <Card sx={{ display: 'flex', backgroundColor: `${colors.primary[100]} !important` }}>
                         <CardMedia
                             component="img"
-                            sx={{ width: 80 }}
+                            sx={{ width: 90 }}
                             image={`../../../../../src/assets/img/avatar.jpg`}
                         />
                         <Box>
