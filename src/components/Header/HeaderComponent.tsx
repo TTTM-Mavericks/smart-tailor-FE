@@ -244,12 +244,13 @@
   }
   ```
 */
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Dialog, Popover, Tab, Transition } from '@headlessui/react'
 import { Bars3Icon, MagnifyingGlassIcon, ShoppingBagIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { primaryColor } from '../../root/ColorSystem'
 import styles from './Header.module.scss';
 import { systemLogo } from '../../assets';
+import { useTranslation } from 'react-i18next';
 
 const navigation = {
   categories: [
@@ -407,6 +408,18 @@ function classNames(...classes: any[]) {
 
 export default function HeaderComponent() {
   const [open, setOpen] = useState(false)
+
+  // Get language in local storage
+  const selectedLanguage = localStorage.getItem('language');
+  const codeLanguage = selectedLanguage?.toUpperCase();
+
+  // Using i18n
+  const { t, i18n } = useTranslation();
+  useEffect(() => {
+    if (selectedLanguage !== null) {
+      i18n.changeLanguage(selectedLanguage);
+    }
+  }, [selectedLanguage, i18n]);
 
   return (
     <div className={`${styles.header__container} bg-white mb-200`}>

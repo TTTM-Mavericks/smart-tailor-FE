@@ -3,6 +3,7 @@ import { Box, Grid, TextField, Button, Avatar, IconButton, Select, MenuItem, use
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import { tokens } from '../../../theme';
 import VNLocationData from '../../../locationData.json';
+import { useTranslation } from 'react-i18next';
 
 const ProfileSetup = () => {
     const theme = useTheme();
@@ -121,6 +122,18 @@ const ProfileSetup = () => {
         }
     };
 
+    // Get language in local storage
+    const selectedLanguage = localStorage.getItem('language');
+    const codeLanguage = selectedLanguage?.toUpperCase();
+
+    // Using i18n
+    const { t, i18n } = useTranslation();
+    useEffect(() => {
+        if (selectedLanguage !== null) {
+            i18n.changeLanguage(selectedLanguage);
+        }
+    }, [selectedLanguage, i18n]);
+
     return (
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
             <Grid container spacing={4}>
@@ -235,7 +248,7 @@ const ProfileSetup = () => {
                     </div>
 
                     <Button variant="contained" color="primary" onClick={handleUpdate} sx={{ mt: 2 }}>
-                        UPDATE
+                        {t(codeLanguage + '000060')}
                     </Button>
                 </Grid>
             </Grid>

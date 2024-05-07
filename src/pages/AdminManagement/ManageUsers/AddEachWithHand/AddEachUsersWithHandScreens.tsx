@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState, useRef } from 'react';
+import React, { ChangeEvent, useState, useRef, useEffect } from 'react';
 import {
     Box,
     Button,
@@ -10,6 +10,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import Swal from 'sweetalert2';
 import { width } from '@mui/system';
+import { useTranslation } from 'react-i18next';
 
 interface User {
     id: number;
@@ -149,6 +150,18 @@ const AddEachUsersWithHand: React.FC<AddUserWithHandsFormProps> = ({ closeCard, 
         }
     };
 
+    // Get language in local storage
+    const selectedLanguage = localStorage.getItem('language');
+    const codeLanguage = selectedLanguage?.toUpperCase();
+
+    // Using i18n
+    const { t, i18n } = useTranslation();
+    useEffect(() => {
+        if (selectedLanguage !== null) {
+            i18n.changeLanguage(selectedLanguage);
+        }
+    }, [selectedLanguage, i18n]);
+
     return (
         <Box style={{
             height: '500px',
@@ -163,7 +176,7 @@ const AddEachUsersWithHand: React.FC<AddUserWithHandsFormProps> = ({ closeCard, 
         }}>
             <div>
                 <Typography variant="h5" align="center">
-                    Add New User By Hands
+                    {t(codeLanguage + '000051')}
                 </Typography>
                 <IconButton style={{ position: 'absolute', top: 0, right: 0 }} onClick={closeCard}>
                     <CloseIcon />

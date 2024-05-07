@@ -5,6 +5,7 @@ import { useTheme } from "@mui/material";
 import * as React from "react";
 import { ViewCompactAltOutlined, GetAppOutlined } from "@mui/icons-material";
 import jsPDF from "jspdf";
+import { useTranslation } from 'react-i18next';
 
 interface Invoice {
     id: number;
@@ -140,6 +141,17 @@ const ManageInvoiceScreen: React.FC = () => {
         return row.registrarId;
     };
 
+    // Get language in local storage
+    const selectedLanguage = localStorage.getItem('language');
+    const codeLanguage = selectedLanguage?.toUpperCase();
+
+    // Using i18n
+    const { t, i18n } = useTranslation();
+    React.useEffect(() => {
+        if (selectedLanguage !== null) {
+            i18n.changeLanguage(selectedLanguage);
+        }
+    }, [selectedLanguage, i18n]);
     return (
         <Box m="20px">
             <Box
@@ -217,7 +229,7 @@ const ManageInvoiceScreen: React.FC = () => {
                             marginBottom: 20,
                         }}
                     >
-                        Invoice Details
+                        {t(codeLanguage + '000057')}
                     </h2>
                     {selectedInvoice && (
                         <div style={{ height: "90%" }}>
@@ -237,10 +249,10 @@ const ManageInvoiceScreen: React.FC = () => {
                     )}
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 20 }}>
                         <Button onClick={downloadInvoiceAsPDF} startIcon={<GetAppOutlined />} variant="contained" color="primary">
-                            Download PDF
+                            {t(codeLanguage + '000058')}
                         </Button>
                         <Button onClick={handleCloseModal} variant="contained" color="primary">
-                            Close
+                            {t(codeLanguage + '000059')}
                         </Button>
                     </div>
                 </Box>

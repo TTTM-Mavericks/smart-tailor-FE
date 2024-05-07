@@ -244,11 +244,12 @@
   }
   ```
 */
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Dialog, Popover, Tab, Transition } from '@headlessui/react'
 import { Bars3Icon, MagnifyingGlassIcon, ShoppingBagIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { primaryColor } from '../../root/ColorSystem'
 import { systemLogo } from '../../assets'
+import { useTranslation } from 'react-i18next';
 
 
 
@@ -256,6 +257,18 @@ import { systemLogo } from '../../assets'
 
 export default function FooterComponent() {
   const [open, setOpen] = useState(false)
+
+  // Get language in local storage
+  const selectedLanguage = localStorage.getItem('language');
+  const codeLanguage = selectedLanguage?.toUpperCase();
+
+  // Using i18n
+  const { t, i18n } = useTranslation();
+  useEffect(() => {
+    if (selectedLanguage !== null) {
+      i18n.changeLanguage(selectedLanguage);
+    }
+  }, [selectedLanguage, i18n]);
 
   return (
     <div className="bg-white">
@@ -266,7 +279,7 @@ export default function FooterComponent() {
           <div className="md:flex md:justify-between">
             <div className="mb-6 md:mb-0">
               <a href="https://flowbite.com/" className="flex items-center">
-                <img src={systemLogo} style={{borderRadius: 90, width: '50px', height: '50px'}} className="h-8 me-3" alt="FlowBite Logo" />
+                <img src={systemLogo} style={{ borderRadius: 90, width: '50px', height: '50px' }} className="h-8 me-3" alt="FlowBite Logo" />
                 <span className="self-center text-2xl font-semibold whitespace-nowrap text-black">Smart Tailor</span>
               </a>
             </div>

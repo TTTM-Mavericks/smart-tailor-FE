@@ -16,6 +16,7 @@ import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 import { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 interface ItemProps {
     title: string;
@@ -68,6 +69,18 @@ const SideBarComponent = () => {
         localStorage.setItem('sidebarCollapsed', JSON.stringify(isCollapsed));
     }, [isCollapsed]);
 
+    // Get language in local storage
+    const selectedLanguage = localStorage.getItem('language');
+    const codeLanguage = selectedLanguage?.toUpperCase();
+
+    // Using i18n
+    const { t, i18n } = useTranslation();
+    useEffect(() => {
+        if (selectedLanguage !== null) {
+            i18n.changeLanguage(selectedLanguage);
+        }
+    }, [selectedLanguage, i18n]);
+
     return (
         <Box
             sx={{
@@ -107,7 +120,7 @@ const SideBarComponent = () => {
                                 ml="15px"
                             >
                                 <Typography variant="h6" color={colors.primary[200]}>
-                                    ADMINIS
+                                    {t(codeLanguage + '000034')}
                                 </Typography>
                                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                                     <MenuOutlinedIcon />
@@ -129,7 +142,7 @@ const SideBarComponent = () => {
                             </Box>
                             <Box textAlign="center">
                                 <Typography variant="h5" color={colors.primary[200]} sx={{ m: "10px 0 0 0" }}>
-                                    Admin TTTM
+                                    {t(codeLanguage + '000035')}
                                 </Typography>
                             </Box>
                         </Box>
@@ -137,7 +150,7 @@ const SideBarComponent = () => {
 
                     <Box paddingLeft={isCollapsed ? undefined : "10%"}>
                         <Item
-                            title="Dashboard"
+                            title={t(codeLanguage + '000019')}
                             to="/admin"
                             icon={<HomeOutlinedIcon />}
                             selected={selected}
@@ -146,28 +159,28 @@ const SideBarComponent = () => {
 
                         <Typography
                             variant="h6"
-                            color={colors.primary[200]}
+                            color={colors.primary[300]}
                             sx={{ m: "15px 0 5px 20px" }}
                             style={{ fontSize: "15px" }}
                         >
-                            Data
+                            {t(codeLanguage + '000033')}
                         </Typography>
                         <Item
-                            title="Manage Users"
+                            title={t(codeLanguage + '000020')}
                             to="/manager_user"
                             icon={<PeopleOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
                         />
                         <Item
-                            title="Manage Employees"
+                            title={t(codeLanguage + '000021')}
                             to="/contacts"
                             icon={<ContactsOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
                         />
                         <Item
-                            title="Manage Invoice"
+                            title={t(codeLanguage + '000022')}
                             to="/manage_invoice"
                             icon={<ReceiptOutlinedIcon />}
                             selected={selected}
@@ -176,28 +189,28 @@ const SideBarComponent = () => {
 
                         <Typography
                             variant="h6"
-                            color={colors.primary[200]}
+                            color={colors.primary[300]}
                             sx={{ m: "15px 0 5px 20px" }}
                             style={{ fontSize: "15px" }}
                         >
-                            Pages
+                            {t(codeLanguage + '000032')}
                         </Typography>
                         <Item
-                            title="Manage Income"
+                            title={t(codeLanguage + '000023')}
                             to="/manage_income"
                             icon={<PersonOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
                         />
                         <Item
-                            title="Manage Revenue"
+                            title={t(codeLanguage + '000024')}
                             to="/manage_revenue"
                             icon={<CalendarTodayOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
                         />
                         <Item
-                            title="FAQ Page"
+                            title={t(codeLanguage + '000030')}
                             to="/faq"
                             icon={<HelpOutlineOutlinedIcon />}
                             selected={selected}
@@ -206,35 +219,35 @@ const SideBarComponent = () => {
 
                         <Typography
                             variant="h6"
-                            color={colors.primary[200]}
+                            color={colors.primary[300]}
                             sx={{ m: "15px 0 5px 20px" }}
                             style={{ fontSize: "15px" }}
                         >
-                            Charts
+                            {t(codeLanguage + '000031')}
                         </Typography>
                         <Item
-                            title="Bar Chart"
+                            title={t(codeLanguage + '000026')}
                             to="/bar"
                             icon={<BarChartOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
                         />
                         <Item
-                            title="Pie Chart"
+                            title={t(codeLanguage + '000027')}
                             to="/pie"
                             icon={<PieChartOutlineOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
                         />
                         <Item
-                            title="Line Chart"
+                            title={t(codeLanguage + '000028')}
                             to="/line"
                             icon={<TimelineOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
                         />
                         <Item
-                            title="Geography Chart"
+                            title={t(codeLanguage + '000029')}
                             to="/geography"
                             icon={<MapOutlinedIcon />}
                             selected={selected}

@@ -3,13 +3,28 @@ import { ResponsiveChoropleth } from "@nivo/geo";
 import { tokens } from "../../../theme";
 import { geoFeatures } from "./DataTestGeographyFeature";
 import { mockGeographyData as geographyData } from "./DataTestGeographyChart";
+import { useTranslation } from 'react-i18next';
+import { useEffect } from "react";
+
 const GeographyChart = ({ isDashboard = false }) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+
+    // Get language in local storage
+    const selectedLanguage = localStorage.getItem('language');
+    const codeLanguage = selectedLanguage?.toUpperCase();
+
+    // Using i18n
+    const { t, i18n } = useTranslation();
+    useEffect(() => {
+        if (selectedLanguage !== null) {
+            i18n.changeLanguage(selectedLanguage);
+        }
+    }, [selectedLanguage, i18n]);
     return (
         <>
             <Typography m="40px" variant="h5">
-                Việt Nam Geography Cordination
+                {t(codeLanguage + '000040')}
             </Typography>
             <ResponsiveChoropleth
                 data={geographyData}

@@ -3,6 +3,8 @@ import { Card, ToggleButton, ToggleButtonGroup, Typography, useTheme } from "@mu
 import { tokens } from "../../../theme";
 import React, { useEffect, useState } from "react";
 import { mockLineData as dataLineChart } from "./DataTestLineChart";
+import { useTranslation } from 'react-i18next';
+
 const LineChart = ({ isDashboard = false }) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
@@ -35,6 +37,18 @@ const LineChart = ({ isDashboard = false }) => {
     //         })
     // }, [])
 
+    // Get language in local storage
+    const selectedLanguage = localStorage.getItem('language');
+    const codeLanguage = selectedLanguage?.toUpperCase();
+
+    // Using i18n
+    const { t, i18n } = useTranslation();
+    useEffect(() => {
+        if (selectedLanguage !== null) {
+            i18n.changeLanguage(selectedLanguage);
+        }
+    }, [selectedLanguage, i18n]);
+
     return (
         <>
             <div style={{ display: "flex", margin: "2%" }}>
@@ -50,13 +64,13 @@ const LineChart = ({ isDashboard = false }) => {
                         aria-label="Platform"
                     >
                         <ToggleButton value="month" sx={{ color: colors.primary[200], fontWeight: "bold" }}>
-                            month
+                            {t(codeLanguage + '000041')}
                         </ToggleButton>
                         <ToggleButton value="year" sx={{ color: colors.primary[200], fontWeight: "bold" }}>
-                            year
+                            {t(codeLanguage + '000042')}
                         </ToggleButton>
                         <ToggleButton value="week" sx={{ color: colors.primary[200], fontWeight: "bold" }}>
-                            week
+                            {t(codeLanguage + '000043')}
                         </ToggleButton>
                     </ToggleButtonGroup>
                 </Card>

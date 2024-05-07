@@ -1,5 +1,5 @@
 import * as React from "react";
-import { MenuItem, InputBase, Avatar, Box, Divider, IconButton, List, ListItemIcon, Menu, SwipeableDrawer, ToggleButton, ToggleButtonGroup, Tooltip, useColorScheme, useTheme, Typography } from "@mui/material";
+import { MenuItem, InputBase, Avatar, Box, Divider, IconButton, List, ListItemIcon, SwipeableDrawer, Menu, ToggleButton, ToggleButtonGroup, Tooltip, useColorScheme, useTheme, Typography, Button, makeStyles } from "@mui/material";
 import { tokens } from "../../../../theme";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
@@ -8,6 +8,9 @@ import SearchIcon from "@mui/icons-material/Search";
 import { Logout, Settings } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import NotificationComponent from "../Notification/NotificationComponent";
+import { useTranslation } from 'react-i18next';
+import LanguageSetting from "../LanguageSetting/LanguageSettingComponent";
+
 type Anchor = 'top' | 'left' | 'bottom' | 'right';
 
 const TopbarComponent = () => {
@@ -81,7 +84,17 @@ const TopbarComponent = () => {
         </Box>
     );
 
+    // Get language in local storage
+    const selectedLanguage = localStorage.getItem('language');
+    const codeLanguage = selectedLanguage?.toUpperCase();
 
+    // Using i18n
+    const { t, i18n } = useTranslation();
+    React.useEffect(() => {
+        if (selectedLanguage !== null) {
+            i18n.changeLanguage(selectedLanguage);
+        }
+    }, [selectedLanguage, i18n]);
 
     return (
         <Box display="flex" justifyContent="space-between" p={2}>
@@ -99,6 +112,10 @@ const TopbarComponent = () => {
 
             {/* ICONS */}
             <Box display="flex">
+                {/* EN VI Mode */}
+                <LanguageSetting />
+
+                {/* Dark Light Mode */}
                 <IconButton onClick={() => setMode(mode === 'light' ? 'dark' : 'light')}>
                     {theme.palette.mode === "dark" ? (
                         <DarkModeOutlinedIcon />
@@ -127,7 +144,7 @@ const TopbarComponent = () => {
                 {/* Account Setting Dropdown Menu */}
                 <React.Fragment>
                     <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
-                        <Tooltip title="Account settings">
+                        <Tooltip title={t(codeLanguage + '000044')}>
                             <IconButton
                                 onClick={handleClick}
                                 size="small"
@@ -177,7 +194,7 @@ const TopbarComponent = () => {
                     >
                         <MenuItem>
                             <Link to={"/admin_profile"} style={{ display: "flex", textDecoration: "none", color: colors.primary[200] }}>
-                                <Avatar /> My account
+                                <Avatar /> {t(codeLanguage + '000045')}
                             </Link>
                         </MenuItem>
                         <Divider />
@@ -185,13 +202,13 @@ const TopbarComponent = () => {
                             <ListItemIcon>
                                 <Settings fontSize="small" />
                             </ListItemIcon>
-                            Settings
+                            {t(codeLanguage + '000046')}
                         </MenuItem>
                         <MenuItem onClick={handleClose}>
                             <ListItemIcon>
                                 <Logout fontSize="small" />
                             </ListItemIcon>
-                            Logout
+                            {t(codeLanguage + '000047')}
                         </MenuItem>
                     </Menu>
                 </React.Fragment>

@@ -3,6 +3,7 @@ import { Box, Button, Grid, IconButton, TextField, Typography } from "@mui/mater
 import CloseIcon from '@mui/icons-material/Close';
 import styles from "./EditUsersPopUpStyles.module.scss";
 import Swal from "sweetalert2";
+import { useTranslation } from 'react-i18next';
 
 interface User {
     id: number;
@@ -86,6 +87,17 @@ const EditUserPopUpScreens: React.FC<EditUserPopUpScreenFormProps> = ({ fid, edi
         setZipCode(e.target.value);
     }
 
+    // Get language in local storage
+    const selectedLanguage = localStorage.getItem('language');
+    const codeLanguage = selectedLanguage?.toUpperCase();
+
+    // Using i18n
+    const { t, i18n } = useTranslation();
+    React.useEffect(() => {
+        if (selectedLanguage !== null) {
+            i18n.changeLanguage(selectedLanguage);
+        }
+    }, [selectedLanguage, i18n]);
 
     const handleSubmit = () => {
         const obj = {
@@ -102,9 +114,6 @@ const EditUserPopUpScreens: React.FC<EditUserPopUpScreenFormProps> = ({ fid, edi
         console.log('Update Request:', id, obj);
         console.log(JSON.stringify(obj));
         console.log("id" + id);
-
-
-
         fetch('https://66080c21a2a5dd477b13eae5.mockapi.io/CPSE_DATA_TEST/' + id, {
             method: 'PUT',
             body: JSON.stringify({
@@ -127,16 +136,16 @@ const EditUserPopUpScreens: React.FC<EditUserPopUpScreenFormProps> = ({ fid, edi
                 updateUser(data);
                 sessionStorage.setItem("obj", JSON.stringify(obj));
                 Swal.fire(
-                    'Edit Success!',
-                    'User information updated successfully!',
+                    `${t(codeLanguage + '000069')}`,
+                    `${t(codeLanguage + '000070')}`,
                     'success'
                 );
             })
             .catch((err) => {
                 console.error('Update Error:', err);
                 Swal.fire(
-                    'Edit Failed',
-                    'There was an error updating the user.',
+                    `${t(codeLanguage + '000071')}`,
+                    `${t(codeLanguage + '000072')}`,
                     'error'
                 );
             });
@@ -145,7 +154,7 @@ const EditUserPopUpScreens: React.FC<EditUserPopUpScreenFormProps> = ({ fid, edi
     return (
         <Box style={{ height: '500px', overflowY: 'auto' }}>
             <Typography variant="h5" align="left">
-                Edit User
+                {t(codeLanguage + '000068')}
             </Typography>
             <IconButton
                 style={{ position: "absolute", top: 0, right: 0 }}
@@ -181,8 +190,8 @@ const EditUserPopUpScreens: React.FC<EditUserPopUpScreenFormProps> = ({ fid, edi
                 </Grid>
             </Grid>
             <div onClick={editClose} style={{ textAlign: "center", alignItems: "center", marginTop: "3rem" }}>
-                <Button onClick={handleSubmit} style={{ backgroundColor: "#5858FA", width: "60%", borderRadius: "8px", marginLeft: "-10%", marginRight: "10%", color: "#FFFFFF" }}>Update</Button>
-                <Button style={{ borderRadius: "8px", border: "1px solid black", color: "black" }}>Cancel</Button>
+                <Button onClick={handleSubmit} style={{ backgroundColor: "#5858FA", width: "60%", borderRadius: "8px", marginLeft: "-10%", marginRight: "10%", color: "#FFFFFF" }}>{t(codeLanguage + '000060')}</Button>
+                <Button style={{ borderRadius: "8px", border: "1px solid black", color: "black" }}>{t(codeLanguage + '000055')}</Button>
             </div>
         </Box>
     );

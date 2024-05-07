@@ -2,7 +2,8 @@ import { ResponsivePie } from "@nivo/pie";
 import { tokens } from "../../../theme";
 import { Card, ToggleButton, ToggleButtonGroup, Typography, useTheme } from "@mui/material";
 import { mockPieData as pieChartData } from "./PieDataTest";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 const PieChart = () => {
     const theme = useTheme();
@@ -15,6 +16,18 @@ const PieChart = () => {
     const handleChange = (e: any) => {
         setOption(e.target.value)
     }
+
+    // Get language in local storage
+    const selectedLanguage = localStorage.getItem('language');
+    const codeLanguage = selectedLanguage?.toUpperCase();
+
+    // Using i18n
+    const { t, i18n } = useTranslation();
+    useEffect(() => {
+        if (selectedLanguage !== null) {
+            i18n.changeLanguage(selectedLanguage);
+        }
+    }, [selectedLanguage, i18n]);
     return (
         <>
             <div style={{ display: "flex", margin: "2%" }}>
@@ -30,13 +43,13 @@ const PieChart = () => {
                         aria-label="Platform"
                     >
                         <ToggleButton value="month" sx={{ color: colors.primary[200], fontWeight: "bold" }}>
-                            month
+                            {t(codeLanguage + '000041')}
                         </ToggleButton>
                         <ToggleButton value="year" sx={{ color: colors.primary[200], fontWeight: "bold" }}>
-                            year
+                            {t(codeLanguage + '000042')}
                         </ToggleButton>
                         <ToggleButton value="week" sx={{ color: colors.primary[200], fontWeight: "bold" }}>
-                            week
+                            {t(codeLanguage + '000043')}
                         </ToggleButton>
                     </ToggleButtonGroup>
                 </Card>
