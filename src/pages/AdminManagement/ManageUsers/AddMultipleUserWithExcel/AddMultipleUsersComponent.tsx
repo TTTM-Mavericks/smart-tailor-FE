@@ -10,7 +10,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import EditMultipleUsersInExcelTable from './CRUDWithExcelTable/EditMultipleUsersInExcelTable';
 import AddUserModalInExcelTable from './CRUDWithExcelTable/AddUserInExcelTable';
-const ADDUSERWITHFILEEXCELS = 'http://localhost:3000/Add_New_Users_Sample_Files.xlsx';
+const ADDUSERWITHFILEEXCELS = 'https://smart-tailor-fe.pages.dev/Add_New_Users_Sample_Files.xlsx';
 import { useTranslation } from 'react-i18next';
 
 interface ExcelData {

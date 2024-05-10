@@ -111,6 +111,7 @@ const LineChart = () => {
                     },
                 }}
 
+                animate={false}
                 tooltip={({ point }) => (
                     <div
                         style={{
@@ -158,13 +159,11 @@ const LineChart = () => {
                 axisTop={null}
                 axisRight={null}
                 axisBottom={{
-                    tickSize: 5,
-                    tickPadding: 5,
+                    orient: "bottom",
+                    tickSize: 0,
+                    tickPadding: 10,
                     tickRotation: 0,
-                    legend: "transportation",
-                    legendOffset: 36,
-                    legendPosition: "middle",
-                    truncateTickAt: 0
+                    tickValues: [1.1, 2.1, 3.5, 5.5]
                 }}
                 axisLeft={{
                     tickValues: 5,
