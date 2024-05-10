@@ -186,7 +186,7 @@ const ImageDraggableComponent: React.FC<props> = ({ partOfCloth, selectedItem })
                             onResize={_handleOnResize}
                             onResizeStop={_handleResizeEnd}
                             maxHeight={500}
-                            maxWidth={450}
+                            maxWidth={600}
                             ref={draggableRef}                                
                             
 

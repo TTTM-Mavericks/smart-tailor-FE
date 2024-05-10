@@ -11,13 +11,13 @@
 }
 
 .imageDraggable__boundary {
-    position: absolute;
+    position: relative;
     width: 450px;
     height: 500px;
-    border: 1px solid black;
-    top: 50%;
-    left: 35%;
-    transform: translate(-50%, -35%);
+    border: 1px dashed black;
+    display: flex;
+    align-items: center;
+    transform: translate(15%, 0%);
 }
 
 .imageDraggable__centerWrapper {

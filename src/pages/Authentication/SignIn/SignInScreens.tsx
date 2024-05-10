@@ -11,7 +11,6 @@ import { primaryColor } from '../../../root/ColorSystem';
 import { languageIcon, systemLogo, usaFlag, vietnamFlag } from '../../../assets';
 import { useTranslation } from 'react-i18next';
 import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Fragment } from 'react';
 
 const defaultTheme = createTheme();

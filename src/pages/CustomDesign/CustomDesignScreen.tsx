@@ -14,6 +14,7 @@ import { ColorPicker, FilePicker, Tab } from '../../components';
 import { AnimatePresence, motion } from "framer-motion";
 import { slideAnimation } from '../../config/MotionSetting';
 import HeaderComponent from '../../components/Header/HeaderComponent';
+import { systemLogo } from '../../assets';
 
 
 
@@ -140,9 +141,43 @@ function CustomDesignScreen() {
 
   return (
     <div className={styles.customDesign__container}>
-      <HeaderComponent></HeaderComponent>
+
+      <div className={styles.customDesign__container__header}>
+        <div className={styles.customDesign__container__header__logo}>
+          <img src={systemLogo}></img>
+          <div>
+            <h3>Smart Tailor</h3>
+          </div>
+        </div>
+
+        <div className={styles.customDesign__container__header__buttonGroup}>
+          <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center">
+            <svg className="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" /></svg>
+            <span>Download</span>
+          </button>
+
+          <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center">
+            <svg className="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" /></svg>
+            <span>Save design</span>
+          </button>
+
+          <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center">
+            <svg className="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" /></svg>
+            <span>Order</span>
+          </button>
+
+          <button className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center">
+            <svg className="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" /></svg>
+            <span>Sign in</span>
+          </button>
+
+
+        </div>
+
+      </div>
+
       <div className={styles.customDesign__container__editorArea}>
-        <motion.div
+        {/* <motion.div
           key="custom"
           className={styles.customDesign__container__editorArea__menu}
 
@@ -164,27 +199,44 @@ function CustomDesignScreen() {
             ))}
 
           </div>
-        </motion.div>
-        {selectedPartOfCloth ? (
-          <>
-            <ImageDraggableComponent partOfCloth={selectedPartOfCloth} selectedItem={selectedItem}></ImageDraggableComponent>
-            <div style={{ position: 'absolute', right: 0 }}>
+        </motion.div> */}
 
-            </div>
-          </>
-        ) : (
-          <ImageDraggableComponent></ImageDraggableComponent>
+        
 
-        )}
         <div className={styles.customDesign__container__editorArea__partOfCloth}>
           {partOfClothData.map((item: PartOfCloth, key: any) => (
             <div key={key} className={styles.partOfClothSellector} style={{ backgroundColor: selectedItem === item.partValue ? 'red' : 'black' }} onClick={() => handleSetSelectedItem(item)}>
-              <img src={item.imgUrl} className={styles.partOfClothSellector__img}></img>
+              <img src={systemLogo} className={styles.partOfClothSellector__img}></img>
             </div>
           ))}
 
 
         </div>
+
+        
+
+        <div className={`${styles.customDesign__container__editorArea__display} `}>
+
+          <div className={styles.customDesign__container__editorArea__display__menuBar} >
+
+
+          </div>
+
+          {selectedPartOfCloth ? (
+            <div className={styles.customDesign__container__editorArea__display__displayDesign} >
+              <ImageDraggableComponent partOfCloth={selectedPartOfCloth} selectedItem={selectedItem}></ImageDraggableComponent>
+
+            </div>
+          ) : (
+            <ImageDraggableComponent></ImageDraggableComponent>
+
+          )}
+        </div>
+
+        <div className={styles.customDesign__container__editorArea__itemSelector}>
+
+        </div>
+
       </div>
       <Designer />
       <main className={styles.customDesign__container__canvas}>
