@@ -8,6 +8,7 @@ import { useState } from 'react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { Switch } from '@headlessui/react'
 import { primaryColor } from '../../root/ColorSystem';
+import { useTranslation } from 'react-i18next';
 
 
 
@@ -118,6 +119,18 @@ const HomeScreen = () => {
         return classes.filter(Boolean).join(' ')
     };
 
+    // Get language in local storage
+    const selectedLanguage = localStorage.getItem('language');
+    const codeLanguage = selectedLanguage?.toUpperCase();
+
+    // Using i18n
+    const { t, i18n } = useTranslation();
+    React.useEffect(() => {
+        if (selectedLanguage !== null) {
+            i18n.changeLanguage(selectedLanguage);
+        }
+    }, [selectedLanguage, i18n]);
+
     return (
         <div>
             {/* Header */}
@@ -129,11 +142,10 @@ const HomeScreen = () => {
                     <div className="relative mx-auto max-w-7xl px-4 sm:static sm:px-6 lg:px-8">
                         <div className="sm:max-w-lg">
                             <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-                                Summer styles are finally here
+                                {t(codeLanguage + '000081')}
                             </h1>
                             <p className="mt-4 text-xl text-gray-500">
-                                This year, our new summer collection will shelter you from the harsh elements of a world that doesn't care
-                                if you live or die.
+                                {t(codeLanguage + '000082')}
                             </p>
                         </div>
                         <div>
@@ -209,7 +221,7 @@ const HomeScreen = () => {
                                     style={{ backgroundColor: primaryColor }}
                                     className="inline-block rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-center font-medium text-white hover:bg-indigo-700"
                                 >
-                                    Shop Collection
+                                    {t(codeLanguage + '000102')}
                                 </a>
                             </div>
                         </div>
@@ -223,7 +235,7 @@ const HomeScreen = () => {
                     <div className="mx-auto max-w-2xl lg:text-center">
                         <h2 className="text-base font-semibold leading-7 text-indigo-600">Deploy faster</h2>
                         <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                            Everything you need to deploy your app
+                            {t(codeLanguage + '000103')}
                         </p>
                         <p className="mt-6 text-lg leading-8 text-gray-600">
                             Quis tellus eget adipiscing convallis sit sit eget aliquet quis. Suspendisse eget egestas a elementum

@@ -4,6 +4,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Box, Typography, useMediaQuery, useTheme } from '@mui/material';
 import 'swiper/css';
 import 'swiper/css/scrollbar';
+import { useTranslation } from 'react-i18next';
 
 const CarouselComponent = () => {
     const [data, setData] = useState<any>([]);
@@ -27,14 +28,26 @@ const CarouselComponent = () => {
         fetchData();
     }, []);
 
+    // Get language in local storage
+    const selectedLanguage = localStorage.getItem('language');
+    const codeLanguage = selectedLanguage?.toUpperCase();
+
+    // Using i18n
+    const { t, i18n } = useTranslation();
+    React.useEffect(() => {
+        if (selectedLanguage !== null) {
+            i18n.changeLanguage(selectedLanguage);
+        }
+    }, [selectedLanguage, i18n]);
+
     return (
         <Box display="flex" alignItems="center" justifyContent="center" flexDirection={isSmallScreen ? "column" : "row"}>
             <Box width={isSmallScreen ? "90%" : "100%"} padding={isSmallScreen ? "1rem" : "2rem"} >
                 <Typography variant="h4" color="textPrimary" gutterBottom>
-                    Spotlight
+                    {t(codeLanguage + '000078')}
                 </Typography>
                 <Typography variant="body1" color="textSecondary" paragraph>
-                    More than 300 of the most covetable luxury brands at ST-TTTM ready for you to discover.
+                    {t(codeLanguage + '000079')}
                 </Typography>
             </Box>
             <Swiper

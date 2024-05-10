@@ -10,7 +10,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import EditMultipleUsersInExcelTable from './CRUDWithExcelTable/EditMultipleUsersInExcelTable';
 import AddUserModalInExcelTable from './CRUDWithExcelTable/AddUserInExcelTable';
-const ADDUSERWITHFILEEXCELS = 'http://localhost:3000/Add_New_Users_Sample_Files.xlsx';
+const ADDUSERWITHFILEEXCELS = 'https://smart-tailor-fe.pages.dev/Add_New_Users_Sample_Files.xlsx';
+import { useTranslation } from 'react-i18next';
 
 interface ExcelData {
     id: number;
@@ -327,10 +328,22 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
         setOpenAddUserModal(false);
     };
 
+    // Get language in local storage
+    const selectedLanguage = localStorage.getItem('language');
+    const codeLanguage = selectedLanguage?.toUpperCase();
+
+    // Using i18n
+    const { t, i18n } = useTranslation();
+    React.useEffect(() => {
+        if (selectedLanguage !== null) {
+            i18n.changeLanguage(selectedLanguage);
+        }
+    }, [selectedLanguage, i18n]);
+
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px', maxHeight: '80vh', overflowY: 'auto', position: "relative" }}>
             <Typography variant="h5" align="center" marginBottom={"20px"}>
-                Add New User By Excel
+                {t(codeLanguage + '000052')}
             </Typography>
             <IconButton
                 style={{
@@ -359,7 +372,7 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
                     backgroundColor: '#E96208'
                 }}
             >
-                Download Excel Sample File
+                {t(codeLanguage + '000053')}
             </Button>
             {
                 excelData.length > 0 && !editingData && (
@@ -386,7 +399,7 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
                                 onClick={handleDownloadFullData}
                                 style={{ boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)', backgroundColor: '#E96208' }}
                             >
-                                Download Error Data
+                                {t(codeLanguage + '000054')}
                             </Button>
                         </div>
                     )
@@ -489,7 +502,7 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
                         endIcon={<Cancel />}
                         style={{ backgroundColor: '#088FE9', color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
                     >
-                        CANCEL
+                        {t(codeLanguage + '000055')}
                     </Button>
                 </div>
                 <div>
@@ -500,7 +513,7 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
                         endIcon={<CheckCircleRounded />}
                         style={{ backgroundColor: '#E96208', color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
                     >
-                        OK
+                        {t(codeLanguage + '000056')}
                     </Button>
                 </div>
             </div>

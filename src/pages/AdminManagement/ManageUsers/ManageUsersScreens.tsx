@@ -11,6 +11,7 @@ import { Add } from "@mui/icons-material";
 import AddEachUsersWithHand from "./AddEachWithHand/AddEachUsersWithHandScreens";
 import AddMultipleComponentWithExcel from "./AddMultipleUserWithExcel/AddMultipleUsersComponent";
 import styles from './ManageUsersStyle.module.scss'
+import { useTranslation } from 'react-i18next';
 
 interface User {
     id: number;
@@ -84,6 +85,18 @@ const ManageUsers: React.FC = () => {
         setAddMultiple(false)
     }
 
+    // Get language in local storage
+    const selectedLanguage = localStorage.getItem('language');
+    const codeLanguage = selectedLanguage?.toUpperCase();
+
+    // Using i18n
+    const { t, i18n } = useTranslation();
+    React.useEffect(() => {
+        if (selectedLanguage !== null) {
+            i18n.changeLanguage(selectedLanguage);
+        }
+    }, [selectedLanguage, i18n]);
+
     React.useEffect(() => {
         const apiUrl = 'https://66080c21a2a5dd477b13eae5.mockapi.io/CPSE_DATA_TEST';
         fetch(apiUrl)
@@ -155,27 +168,28 @@ const ManageUsers: React.FC = () => {
     const confirmDelete = async (id: number) => {
         try {
             const result = await Swal.fire({
-                title: 'Confirm Delete',
-                text: "Are you sure you want to delete user permanently.  You can’t undo this action.",
+                title: `${t(codeLanguage + '000061')}`,
+                text: `${t(codeLanguage + '000062')}`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, I want to delete it!'
+                confirmButtonText: `${t(codeLanguage + '000063')}`,
+                cancelButtonText: `${t(codeLanguage + '000055')}`
             });
             if (result.isConfirmed) {
                 await handleDeleteClick(id);
                 Swal.fire(
-                    'Deleted User Success!',
-                    'User has been deleted!!!',
+                    `${t(codeLanguage + '000064')}`,
+                    `${t(codeLanguage + '000065')}`,
                     'success'
                 )
                 // Loại bỏ người dùng khỏi danh sách hiện tại
                 setData(prevData => prevData.filter(user => user.id !== id));
             } else {
                 Swal.fire(
-                    'Cancel The Deleted Process',
-                    'You cancelled the deleted proccess!!!',
+                    `${t(codeLanguage + '000066')}`,
+                    `${t(codeLanguage + '000067')}`,
                     'error'
                 );
             }
@@ -247,6 +261,8 @@ const ManageUsers: React.FC = () => {
         return row.registrarId; // Sử dụng một thuộc tính duy nhất làm id cho mỗi hàng
     };
 
+
+
     return (
         <Box m="20px">
             <Box
@@ -292,7 +308,7 @@ const ManageUsers: React.FC = () => {
                     color="primary"
                     style={{ backgroundColor: `${colors.primary[300]} !important`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
                 >
-                    Add User
+                    {t(codeLanguage + '000048')}
                 </Button>
                 <Menu
                     id="basic-menu"
@@ -304,7 +320,7 @@ const ManageUsers: React.FC = () => {
                     }}
                 >
                     <MenuItem >
-                        <div onClick={handleAddOpen}>Add By Hands</div>
+                        <div onClick={handleAddOpen}>{t(codeLanguage + '000049')}</div>
                         <Modal
                             open={addOpenOrClose}
                             aria-labelledby="modal-modal-title"
@@ -328,7 +344,7 @@ const ManageUsers: React.FC = () => {
                     </MenuItem>
 
                     <MenuItem>
-                        <div onClick={handleAddMultipleOpen}>Add By Excels File</div>
+                        <div onClick={handleAddMultipleOpen}>{t(codeLanguage + '000050')}</div>
                         <Modal
                             open={addMultiple}
                             aria-labelledby="modal-modal-title"

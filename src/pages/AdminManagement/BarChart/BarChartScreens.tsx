@@ -2,9 +2,10 @@ import { Card, ToggleButton, ToggleButtonGroup, Typography, useTheme } from "@mu
 import { ResponsiveBar } from "@nivo/bar";
 import { tokens } from "../../../theme";
 import { mockBarData as barChartData } from "./DataTestBarChart";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
 
-const BarChart = ({ isDashboard = false }) => {
+const BarChart = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
@@ -16,6 +17,19 @@ const BarChart = ({ isDashboard = false }) => {
     const handleChange = (e: any) => {
         setOption(e.target.value)
     }
+
+    // Get language in local storage
+    const selectedLanguage = localStorage.getItem('language');
+    const codeLanguage = selectedLanguage?.toUpperCase();
+
+    // Using i18n
+    const { t, i18n } = useTranslation();
+    useEffect(() => {
+        if (selectedLanguage !== null) {
+            i18n.changeLanguage(selectedLanguage);
+        }
+    }, [selectedLanguage, i18n]);
+
     return (
         <>
             <div style={{ display: "flex", margin: "2%" }}>
@@ -31,13 +45,13 @@ const BarChart = ({ isDashboard = false }) => {
                         aria-label="Platform"
                     >
                         <ToggleButton value="month" sx={{ color: colors.primary[200], fontWeight: "bold" }}>
-                            month
+                            {t(codeLanguage + '000041')}
                         </ToggleButton>
                         <ToggleButton value="year" sx={{ color: colors.primary[200], fontWeight: "bold" }}>
-                            year
+                            {t(codeLanguage + '000042')}
                         </ToggleButton>
                         <ToggleButton value="week" sx={{ color: colors.primary[200], fontWeight: "bold" }}>
-                            week
+                            {t(codeLanguage + '000043')}
                         </ToggleButton>
                     </ToggleButtonGroup>
                 </Card>
@@ -114,7 +128,7 @@ const BarChart = ({ isDashboard = false }) => {
                     tickSize: 5,
                     tickPadding: 5,
                     tickRotation: 0,
-                    legend: isDashboard ? undefined : "country",
+                    legend: "country",
                     legendPosition: "middle",
                     legendOffset: 32,
                 }}
@@ -122,7 +136,7 @@ const BarChart = ({ isDashboard = false }) => {
                     tickSize: 5,
                     tickPadding: 5,
                     tickRotation: 0,
-                    legend: isDashboard ? undefined : "food",
+                    legend: "food",
                     legendPosition: "middle",
                     legendOffset: -40,
                 }}

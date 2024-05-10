@@ -3,7 +3,7 @@ import TopbarComponent from '../GlobalComponent/TopBar/TopBarComponent';
 import SideBarComponent from '../GlobalComponent/SideBar/SideBarComponent';
 import { Box, CssBaseline, useMediaQuery, useTheme } from "@mui/material";
 import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
-import theme from '../../../theme';
+import theme, { tokens } from '../../../theme';
 import styles from "./DashBoardUserStyle.module.scss"
 import ManageUsers from '../ManageUsers/ManageUsersScreens';
 import Grid from "@mui/material/Unstable_Grid2";
@@ -11,6 +11,7 @@ import Grid from "@mui/material/Unstable_Grid2";
 export default function DashboardManageUserScreen() {
     const theme1 = useTheme();
     const smScreen = useMediaQuery(theme1.breakpoints.up("sm"));
+    const colors = tokens(theme1.palette.mode)
     return (
         <CssVarsProvider theme={theme}>
             <CssBaseline />

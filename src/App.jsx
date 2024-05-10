@@ -14,6 +14,7 @@ import DashboardManageUserScreen from './pages/AdminManagement/ManageUsers/DashB
 import DashboardRecentTransactionScreen from './pages/AdminManagement/RecentTransaction/DashboardRecentTransactionComponent';
 import DashboardManageInvoiceScreen from './pages/AdminManagement/ManageInvoice/DashboardManageInvoiceComponent';
 import SignUpScreens from './pages/Authentication/SignUp/SignUpScreens';
+import DashboardFAQScreens from './pages/AdminManagement/GlobalComponent/FAQ/DashboardFAQComponent';
 
 const tokenIsValid = (token) => {
   // Implement your token validation logic here
@@ -64,6 +65,7 @@ function App() {
           <Route path='/manager_user' element={<DashboardManageUserScreen></DashboardManageUserScreen>} />
           <Route path='/manage_revenue' element={<DashboardRecentTransactionScreen></DashboardRecentTransactionScreen>} />
           <Route path='/manage_invoice' element={<DashboardManageInvoiceScreen></DashboardManageInvoiceScreen>} />
+          <Route path='/admin_faq' element={<DashboardFAQScreens></DashboardFAQScreens>} />
 
 
 

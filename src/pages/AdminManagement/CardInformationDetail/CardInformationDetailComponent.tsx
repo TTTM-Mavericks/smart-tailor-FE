@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { tokens } from "../../../theme";
+import { useTranslation } from 'react-i18next';
 
 const CardInformationDetailComponent = () => {
     const theme = useTheme();
@@ -39,20 +40,33 @@ const CardInformationDetailComponent = () => {
         fetchData();
     }, []);
 
+    // Get language in local storage
+    const selectedLanguage = localStorage.getItem('language');
+    const codeLanguage = selectedLanguage?.toUpperCase();
+
+    // Using i18n
+    const { t, i18n } = useTranslation();
+    useEffect(() => {
+        if (selectedLanguage !== null) {
+            i18n.changeLanguage(selectedLanguage);
+        }
+    }, [selectedLanguage, i18n]);
+
+
     return (
-        <Box m="20px">
-            <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+        <Box m="20px" >
+            <Grid container rowSpacing={4} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
                 <Grid xs={12} sm={12} md={6} lg={3} xl={3}>
                     <Card sx={{ display: 'flex', backgroundColor: `${colors.primary[100]} !important` }}>
                         <CardMedia
                             component="img"
-                            sx={{ width: 90 }}
+                            sx={{ width: 100 }}
                             image={`../../../../../src/assets/img/avatar.jpg`}
                         />
                         <Box>
                             <CardContent sx={{ flex: '1 0 auto' }}>
                                 <Typography component="div" variant="h5">
-                                    Total Product
+                                    {t(codeLanguage + '000036')}
                                 </Typography>
                             </CardContent>
 
@@ -71,13 +85,13 @@ const CardInformationDetailComponent = () => {
                     <Card sx={{ display: 'flex', backgroundColor: `${colors.primary[100]} !important` }}>
                         <CardMedia
                             component="img"
-                            sx={{ width: 90 }}
+                            sx={{ width: 100 }}
                             image={`../../../../../src/assets/img/avatar.jpg`}
                         />
                         <Box>
                             <CardContent sx={{ flex: '1 0 auto' }}>
                                 <Typography component="div" variant="h5">
-                                    Total Earning
+                                    {t(codeLanguage + '000037')}
                                 </Typography>
                             </CardContent>
 
@@ -96,13 +110,13 @@ const CardInformationDetailComponent = () => {
                     <Card sx={{ display: 'flex', backgroundColor: `${colors.primary[100]} !important` }}>
                         <CardMedia
                             component="img"
-                            sx={{ width: 90 }}
+                            sx={{ width: 100 }}
                             image={`../../../../../src/assets/img/avatar.jpg`}
                         />
                         <Box>
                             <CardContent sx={{ flex: '1 0 auto' }}>
                                 <Typography component="div" variant="h5">
-                                    Report
+                                    {t(codeLanguage + '000038')}
                                 </Typography>
                             </CardContent>
 
@@ -121,13 +135,13 @@ const CardInformationDetailComponent = () => {
                     <Card sx={{ display: 'flex', backgroundColor: `${colors.primary[100]} !important` }}>
                         <CardMedia
                             component="img"
-                            sx={{ width: 90 }}
+                            sx={{ width: 100 }}
                             image={`../../../../../src/assets/img/avatar.jpg`}
                         />
                         <Box>
                             <CardContent sx={{ flex: '1 0 auto' }}>
                                 <Typography component="div" variant="h5">
-                                    Total Income
+                                    {t(codeLanguage + '000039')}
                                 </Typography>
                             </CardContent>
 
