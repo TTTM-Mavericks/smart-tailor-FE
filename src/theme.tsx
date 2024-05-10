@@ -8,15 +8,15 @@ export const tokens = (mode: any) => ({
         100: "#212130",
         200: "#F5F5F5",
         300: "#F93A0B",
-        400: "#00FF00"
+        400: "#17171E"
       }
     }
     : {
       primary: {
-        100: "#FFFFFF",
+        100: "#F5F5F5",
         200: "#17171E",
         300: "#F93A0B",
-        400: "#00FF00"
+        400: "#FFFFFF"
       }
     }),
 });
@@ -42,7 +42,7 @@ export const themeSettings = (mode: any) => {
             light: colors.primary[300],
           },
           background: {
-            default: colors.primary[200],
+            default: colors.primary[400],
           },
         }
         : {
@@ -59,7 +59,7 @@ export const themeSettings = (mode: any) => {
             light: colors.primary[300],
           },
           background: {
-            default: colors.primary[300],
+            default: colors.primary[400],
           },
         }),
     },

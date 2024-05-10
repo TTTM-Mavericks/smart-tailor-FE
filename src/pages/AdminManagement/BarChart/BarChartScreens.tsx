@@ -5,7 +5,7 @@ import { mockBarData as barChartData } from "./DataTestBarChart";
 import { useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
 
-const BarChart = ({ isDashboard = false }) => {
+const BarChart = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
@@ -128,7 +128,7 @@ const BarChart = ({ isDashboard = false }) => {
                     tickSize: 5,
                     tickPadding: 5,
                     tickRotation: 0,
-                    legend: isDashboard ? undefined : "country",
+                    legend: "country",
                     legendPosition: "middle",
                     legendOffset: 32,
                 }}
@@ -136,7 +136,7 @@ const BarChart = ({ isDashboard = false }) => {
                     tickSize: 5,
                     tickPadding: 5,
                     tickRotation: 0,
-                    legend: isDashboard ? undefined : "food",
+                    legend: "food",
                     legendPosition: "middle",
                     legendOffset: -40,
                 }}

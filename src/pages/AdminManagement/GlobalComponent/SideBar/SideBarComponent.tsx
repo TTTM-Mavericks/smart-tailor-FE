@@ -53,11 +53,7 @@ const Item: React.FC<ItemProps> = ({ title, to, icon, selected, setSelected }) =
 const SideBarComponent = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [selected, setSelected] = useState(() => {
-        // Retrieve the selected item from local storage or set the default state
-        const savedSelected = localStorage.getItem('selectedMenuItem');
-        return savedSelected || "Dashboard";
-    });
+
     const [isCollapsed, setIsCollapsed] = useState(() => {
         // Retrieve the state from local storage or set the default state
         const savedState = localStorage.getItem('sidebarCollapsed');
@@ -81,6 +77,16 @@ const SideBarComponent = () => {
         }
     }, [selectedLanguage, i18n]);
 
+    // const [selected, setSelected] = useState(() => {
+    //     // Retrieve the selected item from local storage or set the default state
+    //     // const savedSelected = localStorage.getItem('selectedMenuItem');
+    //     // return savedSelected || "Dashboard";
+    //     // t(codeLanguage + '000019')
+    //     "Dashboard" || ""
+    // })
+
+    const [selected, setSelected] = useState("Dashboard")
+
     return (
         <Box
             sx={{
@@ -88,7 +94,7 @@ const SideBarComponent = () => {
                     background: `${colors.primary[100]} !important`,
                 },
                 "& .pro-icon-wrapper": {
-                    backgroundColor: "transparent !important",
+                    backgroundColor: `${colors.primary[100]} !important`,
                 },
                 "& .pro-inner-item": {
                     padding: "5px 35px 5px 20px !important",
@@ -211,7 +217,7 @@ const SideBarComponent = () => {
                         />
                         <Item
                             title={t(codeLanguage + '000030')}
-                            to="/faq"
+                            to="/admin_faq"
                             icon={<HelpOutlineOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}

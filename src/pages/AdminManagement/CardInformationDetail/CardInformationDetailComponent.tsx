@@ -54,8 +54,8 @@ const CardInformationDetailComponent = () => {
 
 
     return (
-        <Box m="20px">
-            <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+        <Box m="20px" >
+            <Grid container rowSpacing={4} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
                 <Grid xs={12} sm={12} md={6} lg={3} xl={3}>
                     <Card sx={{ display: 'flex', backgroundColor: `${colors.primary[100]} !important` }}>
                         <CardMedia
