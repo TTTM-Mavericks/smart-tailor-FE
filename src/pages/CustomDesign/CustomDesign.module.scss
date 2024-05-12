@@ -1,3 +1,5 @@
+@import '../../index.module.scss';
+
 .customDesign__container {
     width: 100%;
     height: fit-content;
@@ -26,13 +28,89 @@
             }
         }
 
-        &__buttonGroup{
+        &__buttonGroup {
             display: flex;
             align-items: center;
             margin-left: auto;
 
-            button{
+            button {
                 margin-right: 20px;
+            }
+
+            &__downloadBtn {
+                background-color: $whiteColor;
+                color: $blackColor;
+                font-weight: bold;
+                border: 1.5px solid $blackColor;
+            }
+
+            &__downloadBtn:hover .downloadIcon {
+                background-color: $primaryColor;
+                color: $whiteColor;
+                border-color: $primaryColor;
+            }
+
+            &__downloadBtn:hover {
+                background-color: $primaryColor;
+                color: $whiteColor;
+                border-color: $primaryColor;
+            }
+
+            &__saveBtn {
+                background-color: $whiteColor;
+                color: $primaryColor;
+                font-weight: bold;
+                border: 2px solid $primaryColor;
+            }
+
+            &__saveBtn:hover .saveIcon {
+                background-color: $primaryColor;
+                color: $whiteColor;
+                border-color: $primaryColor;
+            }
+
+            &__saveBtn:hover {
+                background-color: $primaryColor;
+                color: $whiteColor;
+                border-color: $primaryColor;
+            }
+
+            &__orderBtn {
+                background-color: $primaryColor;
+                color: $whiteColor;
+                font-weight: bold;
+                border: 2px solid $primaryColor;
+            }
+
+            &__orderBtn:hover .orderIcon {
+                background-color: $primaryColorFade1;
+                color: $whiteColor;
+                border-color: $primaryColorFade1;
+            }
+
+            &__orderBtn:hover {
+                background-color: $primaryColorFade1;
+                color: $whiteColor;
+                border-color: $primaryColorFade1;
+            }
+
+            &__signInBtn {
+                background-color: $primaryColor;
+                color: $whiteColor;
+                font-weight: bold;
+                border: 2px solid $primaryColor;
+            }
+
+            &__signInBtn:hover {
+                background-color: $primaryColorFade1;
+                color: $whiteColor;
+                border-color: $primaryColorFade1;
+            }
+
+            &__signInBtn:hover .signInIcon {
+                background-color: $primaryColorFade1;
+                color: $whiteColor;
+                border-color: $primaryColorFade1;
             }
         }
     }
@@ -61,11 +139,96 @@
         align-content: center;
         float: left;
 
-        &__itemSelector{
+        &__itemSelector {
             width: 37.34%;
-            height: 90vh;
-            border: 1px solid #EAEAEA;
+            height: 80vh;
             float: left;
+
+            &__buttonGroup {
+
+                &__sampleModelBtn,
+                &__editorModelBtn {
+                    background-color: $whiteColor;
+                    color: $blackColor;
+                    font-weight: bold;
+                    border: 1.5px solid $blackColor;
+                    margin: 0.5em;
+                    // 
+
+                }
+
+                &__sampleModelBtn:hover,
+                &__editorModelBtn:hover {
+                    background-color: $primaryColor;
+                    color: $whiteColor;
+                    border-color: $primaryColor;
+
+                }
+
+            }
+
+            &__itemGroup {
+                width: 100%;
+                height: 100%;
+                border: 1px solid $grayColor;
+                // display: flex;
+
+                &__menuEditor {
+                    width: 15%;
+                    height: 100%;
+                    background-color: $grayColor;
+                    float: left;
+
+
+                    button {
+                        width: 100%;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        padding-top: 15px;
+                        padding-bottom: 15px;
+
+                    }
+                }
+
+                &__menuTabBar {
+                    width: 85%;
+                    height: 8vh;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    button {
+                        background-color: transparent;
+                        color: $blackColor;
+                        margin-left: 20px;
+                        margin-right: 20px;
+                        font-weight: 400;
+                        border-radius: 0;
+                        font-weight: 500;
+                    }
+                }
+
+                &__sampleItemList {
+                    width: 85%;
+                    height: 70vh;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    overflow: auto;
+                }
+
+                &__sampleItemList::-webkit-scrollbar {
+                    width: 5px;
+                    background-color: $grayColor;
+                    height: 10px;
+                    /* Width of the scrollbar */
+                }
+
+
+
+            }
         }
 
         &__partOfCloth {
@@ -99,14 +262,14 @@
 
         &__menu {
             position: absolute;
-            height: 100vh;
+            // height: 100vh;
             left: 0;
             align-items: center;
             justify-content: center;
 
-            &__tab {
-                padding-top: 40vh;
-            }
+            // &__tab {
+            //     padding-top: 40vh;
+            // }
         }
 
         &__display {
@@ -155,5 +318,30 @@
         align-items: center;
         align-content: center;
         margin: 0 auto;
+    }
+}
+
+.menuEditor__icon {
+    color: $blackColor;
+}
+
+.sampleItemCard {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    background-color: $grayColor;
+    float: left;
+    margin: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    border-radius: 8px;
+
+    &__icon{
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        color: black;
     }
 }
