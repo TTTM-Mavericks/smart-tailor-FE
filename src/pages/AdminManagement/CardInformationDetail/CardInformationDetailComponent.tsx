@@ -12,6 +12,8 @@ import {
 import Grid from "@mui/material/Unstable_Grid2";
 import { tokens } from "../../../theme";
 import { useTranslation } from 'react-i18next';
+import CountUp from 'react-countup';
+import { height } from "@mui/system";
 
 const CardInformationDetailComponent = () => {
     const theme = useTheme();
@@ -73,7 +75,7 @@ const CardInformationDetailComponent = () => {
                             <Box>
                                 <CardContent>
                                     <p style={{ fontWeight: "bold" }}>
-                                        100
+                                        <CountUp end={100} />
                                     </p>
                                 </CardContent>
                             </Box>
@@ -94,11 +96,10 @@ const CardInformationDetailComponent = () => {
                                     {t(codeLanguage + '000037')}
                                 </Typography>
                             </CardContent>
-
                             <Box>
                                 <CardContent>
                                     <p style={{ fontWeight: "bold" }}>
-                                        1,123,456
+                                        <CountUp end={1123456} />
                                     </p>
                                 </CardContent>
                             </Box>
@@ -123,7 +124,7 @@ const CardInformationDetailComponent = () => {
                             <Box>
                                 <CardContent>
                                     <p style={{ fontWeight: "bold" }}>
-                                        10
+                                        <CountUp end={10} style={{ width: "2%" }} />
                                     </p>
                                 </CardContent>
                             </Box>
@@ -148,7 +149,7 @@ const CardInformationDetailComponent = () => {
                             <Box>
                                 <CardContent>
                                     <p style={{ fontWeight: "bold" }}>
-                                        1,456,123
+                                        <CountUp end={100} />
                                     </p>
                                 </CardContent>
                             </Box>

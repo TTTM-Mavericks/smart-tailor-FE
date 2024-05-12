@@ -6,6 +6,15 @@ import * as React from "react";
 import { ViewCompactAltOutlined, GetAppOutlined } from "@mui/icons-material";
 import jsPDF from "jspdf";
 import { useTranslation } from 'react-i18next';
+import autoTable from 'jspdf-autotable';
+import { UserOptions } from 'jspdf-autotable';
+import LogoPDF from '../../../assets/system/smart-tailor_logo.png'
+import TestPDF from "./TestPDF";
+import { style } from "@mui/system";
+import { context } from "@react-three/fiber";
+interface ExtendedUserOptions extends UserOptions {
+    columnWidths?: number[];
+}
 
 interface Invoice {
     id: number;
@@ -62,38 +71,188 @@ const ManageInvoiceScreen: React.FC = () => {
 
         const doc = new jsPDF();
 
-        // Định dạng ngày thành chuỗi
-        const formattedDate = selectedInvoice.date.toString();
+        // set back ground color
+        doc.setFillColor(244, 245, 239); // White color
+        doc.rect(0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height, 'F');
 
-        // Chuẩn bị nội dung của hóa đơn
-        const content = [
-            `Invoice Details`,
-            `ID: ${selectedInvoice.id}`,
-            `Name: ${selectedInvoice.name}`,
-            `Date: ${formattedDate}`,
-            `Total: ${selectedInvoice.total}`,
-            `Email: ${selectedInvoice.email}`,
-            `Phone Number: ${selectedInvoice.phone}`,
-            `Address: ${selectedInvoice.address}`,
-            `Zip Code: ${selectedInvoice.zipCode}`,
-            `City: ${selectedInvoice.city}`,
-            `Age: ${selectedInvoice.age}`,
-            `Status: ${selectedInvoice.status ? 'Active' : 'Inactive'}`
-        ];
+        const imgData = LogoPDF;
+        const imgWidth = 40;
+        const imgHeight = 40;
+        doc.addImage(imgData, 'PNG', 15, 10, imgWidth, imgHeight);
 
-        // Đặt vị trí xuất phát của văn bản
-        let textY = 10;
+        doc.setFontSize(35);
+        doc.setFont('Playfair Display', 'bold');
 
-        // Thêm nội dung vào tệp PDF
-        content.forEach((line) => {
-            doc.text(line, 10, textY);
-            textY += 10; // Tăng vị trí y cho mỗi dòng
+        doc.text("INVOICE", 140, 30).getFont()
+
+        const textOffset = 10;
+        const tableStartY = Math.max(imgHeight + textOffset, 50);
+
+        autoTable(doc, {
+            startY: tableStartY,
+            body: [
+                [
+                    {
+                        content: `Invoice No. ${selectedInvoice.id}` + `\n${selectedInvoice.date}`,
+                        styles: {
+                            halign: 'left',
+                            valign: "middle",
+                            fontSize: 10
+                        }
+                    },
+                    {
+                        content: `SMART TAILOR, Inc` + `\nLot E2a-7, Street D1, High-Tech Park` + `\nLong Thanh My Ward City` + `\nThu Duc` + `\nHo Chi Minh City.` + `\nViet Nam`,
+                        styles: {
+                            halign: 'right',
+                            valign: "middle",
+                            fontSize: 10
+                        }
+                    }
+                ]
+            ], theme: 'plain',
+
+        })
+
+        autoTable(doc, {
+            body: [
+                [
+                    {
+                        content: `___________________________________________________________________________________________`,
+                        styles: {
+                            halign: 'left',
+                            overflow: 'linebreak'
+                        }
+                    }
+                ]
+            ], theme: 'plain'
+        })
+
+        autoTable(doc, {
+            head: [['Item', 'Quantity', 'Unit Price', 'Total']],
+            body: [
+                ['Tran Hoang Minh', '1', '$123', '$123'],
+                ['Nguyen Minh Tu', '1', '$127', '$254'],
+                ['Nguyen Hoang Lam Truong', '1', '$123', '$123'],
+                ['Mai Thanh Tâm', '10', '$999', '$999'],
+                ['Mai Thanh Tâm', '10', '$999', '$999']
+            ],
+            theme: "plain"
+        })
+
+        autoTable(doc, {
+            head: [[{ content: "Sub Total", styles: { halign: 'right' } }, { content: "$1211313132", styles: { halign: 'center' } }]],
+            body: [
+                [
+                    {
+                        content: 'Tax (0%)',
+                        styles: {
+                            halign: 'right',
+                            fontStyle: 'bold'
+                        },
+                    },
+                    {
+                        content: '$0',
+                        styles: {
+                            halign: 'center',
+                            fontStyle: 'bold',
+                        },
+                    },
+                ],
+            ],
+            theme: 'plain'
         });
 
-        // Lưu tệp PDF
-        doc.save(`Invoice_${selectedInvoice.id}.pdf`);
-    };
+        autoTable(doc, {
+            body: [
+                [
+                    {
+                        content: `                                                  __________________________________________________`,
+                        styles: {
+                            halign: 'left',
+                            overflow: 'linebreak'
+                        }
+                    }
+                ]
+            ], theme: 'plain'
+        })
 
+        autoTable(doc, {
+            body: [
+                [
+                    {
+                        content: "TOTAL",
+                        styles: {
+                            halign: 'right',
+                            fontStyle: 'bold',
+                        }
+                    },
+                    {
+                        content: "$1321465",
+                        styles: {
+                            fontStyle: 'bold',
+                            halign: 'center'
+                        }
+                    }
+                ]
+            ],
+            theme: 'plain'
+        })
+
+        autoTable(doc, {
+            body: [
+                [
+                    {
+                        content: `                                                  __________________________________________________`,
+                        styles: {
+                            halign: 'left',
+                            overflow: 'linebreak'
+                        }
+                    }
+                ]
+            ], theme: 'plain'
+        })
+
+        autoTable(doc, {
+            body: [
+                [
+                    {
+                        content: "Thank You!",
+                        styles: {
+                            halign: 'left',
+                            fontSize: 20
+                        }
+                    }
+                ]
+            ],
+            theme: "plain"
+        })
+
+        autoTable(doc, {
+            body: [
+                [
+                    {
+                        content: `SMART TAILOR, Inc` + `\nLot E2a-7, Street D1, High-Tech Park` + `\nLong Thanh My Ward City` + `\nThu Duc` + `\nHo Chi Minh City.` + `\nViet Nam`,
+                        styles: {
+                            halign: 'left',
+                            valign: "middle",
+                            fontSize: 10
+                        }
+                    },
+                    {
+                        content: `${selectedInvoice.name}` + `\n${selectedInvoice.address}`,
+                        styles: {
+                            halign: 'right',
+                            valign: "bottom",
+                            fontSize: 12
+                        }
+                    }
+                ]
+            ], theme: 'plain',
+
+        })
+
+        doc.save('table.pdf')
+    }
 
     const columns: GridColDef[] = [
         { field: "id", headerName: "ID Invoice" },

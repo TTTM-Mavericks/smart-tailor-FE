@@ -5,16 +5,12 @@ import { Box, CssBaseline, useMediaQuery, useTheme, IconButton, Card, Typography
 import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
 import { ArrowUpward } from '@mui/icons-material';
 import theme from '../../../theme';
-import styles from "./DashboardAdminStyle.module.scss"
-import LineChartComponent from '../LineChart/LineChartComponent';
+import styles from "./DashboardBarChartStyles.module.scss"
 import BarChartComponent from '../BarChart/BarChartComponent';
-import PieChartComponent from '../PieChart/PieChartComponent';
-import CardInformationDetailComponent from '../CardInformationDetail/CardInformationDetailComponent';
-import GeographyChartComponent from '../GeographyChart/GeographyChartComponent';
 import { tokens, themeSettings } from "../../../theme";
 import NotFound from '../GlobalComponent/Error404/Error404Component';
 
-const DashboardAdminScreens = () => {
+const DashboardBarChartScreens = () => {
     const themeColor = useTheme();
     const colors = tokens(themeColor.palette.mode);
     const [showScrollButton, setShowScrollButton] = React.useState(false);
@@ -59,20 +55,8 @@ const DashboardAdminScreens = () => {
                 <div className={`${styles.content}`}>
                     <TopbarComponent />
                     <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="140px" gap="20px">
-                        <Box gridColumn="span 12" gridRow="span 2">
-                            <CardInformationDetailComponent />
-                        </Box>
-                        <Box gridColumn="span 12" gridRow="span 5">
-                            <GeographyChartComponent />
-                        </Box>
                         <Box gridColumn="span 12" gridRow="span 5">
                             <BarChartComponent />
-                        </Box>
-                        <Box gridColumn="span 12" gridRow="span 5">
-                            <LineChartComponent />
-                        </Box>
-                        <Box gridColumn="span 12" gridRow="span 5">
-                            <PieChartComponent />
                         </Box>
                     </Box>
                     {showScrollButton && (
@@ -96,4 +80,4 @@ const DashboardAdminScreens = () => {
     );
 }
 
-export default DashboardAdminScreens;
+export default DashboardBarChartScreens;

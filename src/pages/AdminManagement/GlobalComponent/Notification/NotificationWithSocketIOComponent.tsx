@@ -59,93 +59,42 @@ const NotificationWithSocketIOScreen = () => {
     };
 
     // Create a WebSocket connection instance
-    // const socket = io('ws://localhost:6969');
-    // const stompClient = Stomp.over(socket);
+    const socket = io('ws://localhost:6969');
+    const stompClient = Stomp.over(socket);
 
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         try {
-    //             const response = await fetch(`http://localhost:6969/api/v1/notification/get-all-notification?userid=1&target_userid=2`);
-    //             const getData = await response.json();
-    //             if (getData.success === 200) {
-    //                 setData(getData.data);
-    //             } else {
-    //                 console.log(getData.data);
-    //             }
-    //         } catch (error) {
-    //             console.error("An error occurred during data fetching:", error);
-    //         }
-    //     };
-    //     fetchData();
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch(`http://localhost:6969/api/v1/notification/get-all-notification?userid=1&target_userid=2`);
+                const getData = await response.json();
+                if (getData.success === 200) {
+                    setData(getData.data);
+                } else {
+                    console.log(getData.data);
+                }
+            } catch (error) {
+                console.error("An error occurred during data fetching:", error);
+            }
+        };
+        fetchData();
 
-    //     // Connect to WebSocket only once
-    //     stompClient.connect({}, () => {
-    //         console.log('Connected to WebSocket');
-    //         // Subscribe to notifications topic
-    //         stompClient.subscribe('/topic/public', (message: any) => {
-    //             const newNotification: NotificationInterface = JSON.parse(message.body);
-    //             // Update state with new notification
-    //             setData((prevData) => [newNotification, ...prevData]);
-    //         });
-    //     });
+        // Connect to WebSocket only once
+        stompClient.connect({}, () => {
+            console.log('Connected to WebSocket');
+            // Subscribe to notifications topic
+            stompClient.subscribe('/topic/public', (message: any) => {
+                const newNotification: NotificationInterface = JSON.parse(message.body);
+                // Update state with new notification
+                setData((prevData) => [newNotification, ...prevData]);
+            });
+        });
 
-    //     // Cleanup function to disconnect from WebSocket
-    //     return () => {
-    //         stompClient.disconnect();
-    //     };
+        // Cleanup function to disconnect from WebSocket
+        return () => {
+            stompClient.disconnect();
+        };
 
-    // }, [stompClient]);
-
-    const handleMarkIsRead = async (event: NotificationInterface) => {
-    };
-
-    // const handleMarkAllRead = (event: any) => {
-    //     const fetchData = async () => {
-    //         // const tokenStorage = localStorage.getItem('access_token');
-    //         // const userStorage = localStorage.getItem('userData');
-
-    //         // if (userStorage) {
-    //         //     const userParse = JSON.parse(userStorage);
-
-    //         //     if (tokenStorage) {
-    //         //         const tokenString = JSON.parse(tokenStorage);
-
-    //         // const params = {};
-
-    //         try {
-    //             const promises = event.map(async (noti: any) => {
-    //                 console.log(noti.baseUserID.status);
-    //                 localStorage.setItem('test', noti.baseUserID.status)
-    //                 if (noti.baseUserID.status === "ACTIVE") {
-    //                     const response = await fetch(`http://localhost:6969/api/v1/notification/un-read-notification?noti_id=9`, {
-    //                         method: 'PUT',
-    //                         // headers: {
-    //                         //     'Content-Type': 'application/json',
-    //                         //     'Authorization': `Bearer ${tokenString}`,
-    //                         // },
-    //                         // body: JSON.stringify(params),
-    //                     });
-
-    //                     if (response.status === 200) {
-    //                         const data = await response.json();
-    //                         setData(data);
-    //                     } else {
-    //                         console.log("lỗi data hay gì đó ");
-    //                     }
-    //                 }
-    //             });
-
-    //             await Promise.all(promises);
-    //         } catch (error) {
-    //             console.error("An error occurred during data fetching:", error);
-    //         }
-    //         // }
-    //         // }
-    //         // };
-
-    //         fetchData();
-    //     };
-    // }
+    }, [stompClient]);
 
     const handleMarkAllRead = () => {
         const fetchData = async () => {
@@ -158,12 +107,12 @@ const NotificationWithSocketIOScreen = () => {
                             method: 'PUT',
                             headers: {
                                 'Content-Type': 'application/json',
-                                // Add 'Authorization' header if needed
                                 // 'Authorization': `Bearer ${tokenString}`,
                             },
                             // Uncomment the following line if you need to send data in the request body
                             // body: JSON.stringify(params),
                         });
+                        console.log("notiid" + noti.notiID);
 
                         if (response.status === 200) {
                             const updatedData = await response.json();
@@ -188,21 +137,39 @@ const NotificationWithSocketIOScreen = () => {
         fetchData();
     };
 
-    const handleConfirmClearAll = () => {
-        if (window.confirm('Are you sure you want to clear all?')) {
-            handleClearAll();
+    const handleMarkIsRead = async (clickedItem: NotificationInterface) => {
+        try {
+            const response = await fetch(`http://localhost:6969/api/v1/notification/un-read-notification?noti_id=${clickedItem.notiID}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.status === 200) {
+                // Update the status of the clicked item locally
+                setData(prevData => prevData.map(item => {
+                    if (item.notiID === clickedItem.notiID) {
+                        return { ...item, status: true }; // Mark the clicked item as read
+                    }
+                    return item;
+                }));
+            } else {
+                console.log("An error occurred:", await response.json());
+            }
+        } catch (error) {
+            console.error("An error occurred during data fetching:", error);
         }
     };
 
-    const handleClearAll = () => {
-        alert('Cleared All');
-    };
+
+    const newNotificationsCount = data.filter(item => !item.status).length;
 
     return (
         <div>
             <IconButton>
                 <Badge
-                    badgeContent={data.length}
+                    badgeContent={newNotificationsCount}
                     color="error"
                     onClick={handleClickNotification}
                 >
@@ -212,54 +179,32 @@ const NotificationWithSocketIOScreen = () => {
                     anchorEl={anchorOpenNotification}
                     open={Boolean(anchorOpenNotification)}
                     onClose={handleCloseNotification}
-                    style={{ height: "70%" }}
+                    style={{ height: "70%", minWidth: "200px", borderRadius: "10px" }}
                 >
-                    {/* {notifications.map((notification: any) => (
-                        <MenuItem
-                            key={notification.id}
-                            onClick={handleCloseNotification}
-                            sx={{ bgcolor: badgeClicked ? 'rgba(0, 0, 0, 0.5)' : undefined, color: "black" }} // Set background color to black when clicked
-                        >
-                            <a
-                                href={notification.message}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                {notification.message}
-                            </a>
-                        </MenuItem>
-                    ))} */}
                     {data.map((item) => (
-                        <div key={item.notiID} style={{ borderRadius: '8px' }}>
-                            <div onClick={() => handleMarkIsRead(item)}>
-                                {!item.status ? (
-                                    <div style={{ position: 'absolute', top: 0, left: 0, backgroundColor: 'rgba(234,49,62,1)' }}>
-                                        <span>New</span>
-                                    </div>
-                                ) : (
-                                    <div style={{ position: 'absolute', top: 0, left: 0, backgroundColor: 'rgba(162,222,82,1)' }}>
-                                        <span>Read</span>
-                                    </div>
-                                )}
+                        <div key={item.notiID} style={{ borderRadius: '8px', marginBottom: '8px', position: 'relative', backgroundColor: item.status ? 'rgba(162,222,82,0.1)' : 'rgba(234,49,62,0.1)' }} onClick={handleMarkIsRead} >
+                            <div onClick={() => handleMarkIsRead(item)} style={{ padding: '12px', cursor: 'pointer' }}>
+                                <div style={{ position: 'absolute', top: '12px', right: '12px', borderRadius: '4px', padding: '4px 8px', backgroundColor: item.status ? 'rgba(162,222,82,0.6)' : 'rgba(234,49,62,0.6)', color: '#fff' }}>
+                                    <span>{item.status ? 'Readed' : 'News'}</span>
+                                </div>
                                 <div>
-                                    <p style={{ fontSize: '12px', fontWeight: '500' }}>{item.baseUserID?.username}</p>
-                                    <p style={{ fontSize: '11px', fontWeight: '400' }}>{item.action === 'FOLLOW' ? `${item.action} You` : `${item.action} your post`}</p>
-                                    <p style={{ fontSize: '11px', fontWeight: '400' }}>{item.dateTime}</p>
-                                    <p style={{ fontSize: '11px', fontWeight: '400' }}>{item.baseUserID?.status}</p>
+                                    <p style={{ fontSize: '14px', fontWeight: '500', marginBottom: '4px', color: '#333' }}>{item.baseUserID?.username}</p>
+                                    <p style={{ fontSize: '12px', fontWeight: '400', marginBottom: '2px', color: '#555' }}>{item.action === 'FOLLOW' ? `${item.action} You` : `${item.action} your post`}</p>
+                                    <p style={{ fontSize: '11px', fontWeight: '400', color: '#888' }}>{item.dateTime}</p>
                                 </div>
                             </div>
                         </div>
                     ))}
                     <Divider component="li" />
-                    <div style={{ position: "sticky", bottom: 0, padding: "8px", display: "flex", justifyContent: "flex-end", backgroundColor: "#fafbfd" }}>
-                        <Button onClick={handleMarkAllRead} style={{ color: "black" }}>Mark all as read</Button>
-                        <Button onClick={handleOpenPopup} style={{ color: "black" }}>View All</Button>
-                        <Button onClick={handleConfirmClearAll} style={{ color: "black" }}>Clear All</Button>
+                    <div style={{ padding: "8px", display: "flex", justifyContent: "flex-end", backgroundColor: "#fafbfd", borderTop: '1px solid #eee' }}>
+                        <Button onClick={handleMarkAllRead} style={{ color: "#666", marginRight: '8px' }}>Mark all as read</Button>
+                        <Button onClick={handleOpenPopup} style={{ color: "#666" }}>View All</Button>
                     </div>
                 </Menu>
+
                 <Dialog open={openPopup} onClose={handleClosePopup} PaperProps={{
                     style: {
-                        backgroundColor: "#ad9090",
+                        backgroundColor: "white",
                         boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
                         borderRadius: "10px",
                         width: "100%"
@@ -268,21 +213,15 @@ const NotificationWithSocketIOScreen = () => {
                     <DialogTitle>All Notifications</DialogTitle>
                     <DialogContent>
                         {data.map((item) => (
-                            <div key={item.notiID} style={{ borderRadius: '8px' }}>
-                                <div onClick={() => handleMarkIsRead(item)}>
-                                    {!item.status ? (
-                                        <div style={{ position: 'absolute', top: 0, left: 0, backgroundColor: 'rgba(234,49,62,1)' }}>
-                                            <span>New</span>
-                                        </div>
-                                    ) : (
-                                        <div style={{ position: 'absolute', top: 0, left: 0, backgroundColor: 'rgba(162,222,82,1)' }}>
-                                            <span>Read</span>
-                                        </div>
-                                    )}
+                            <div key={item.notiID} style={{ borderRadius: '8px', marginBottom: '8px', position: 'relative', backgroundColor: item.status ? 'rgba(162,222,82,0.1)' : 'rgba(234,49,62,0.1)' }}>
+                                <div onClick={() => handleMarkIsRead(item)} style={{ padding: '12px', cursor: 'pointer' }}>
+                                    <div style={{ position: 'absolute', top: '12px', right: '12px', borderRadius: '4px', padding: '4px 8px', backgroundColor: item.status ? 'rgba(162,222,82,0.6)' : 'rgba(234,49,62,0.6)', color: '#fff' }}>
+                                        <span>{item.status ? 'Readed' : 'News'}</span>
+                                    </div>
                                     <div>
-                                        <p style={{ fontSize: '12px', fontWeight: '500' }}>{item.baseUserID?.username}</p>
-                                        <p style={{ fontSize: '11px', fontWeight: '400' }}>{item.action === 'FOLLOW' ? `${item.action} You` : `${item.action} your post`}</p>
-                                        <p style={{ fontSize: '11px', fontWeight: '400' }}>{item.dateTime}</p>
+                                        <p style={{ fontSize: '14px', fontWeight: '500', marginBottom: '4px', color: '#333' }}>{item.baseUserID?.username}</p>
+                                        <p style={{ fontSize: '12px', fontWeight: '400', marginBottom: '2px', color: '#555' }}>{item.action === 'FOLLOW' ? `${item.action} You` : `${item.action} your post`}</p>
+                                        <p style={{ fontSize: '11px', fontWeight: '400', color: '#888' }}>{item.dateTime}</p>
                                     </div>
                                 </div>
                             </div>
