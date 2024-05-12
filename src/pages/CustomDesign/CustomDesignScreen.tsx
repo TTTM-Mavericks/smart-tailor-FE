@@ -7,20 +7,19 @@ import styles from './CustomDesign.module.scss';
 // import { SRGBToLinear } from 'three';
 import ImageDraggableComponent from '../../components/Draggable/ImageDraggableComponent';
 import { BACK_CLOTH_PART, FRONT_CLOTH_PART, LOGO_PART, PartOfCloth, SLEEVE_CLOTH_PART } from '../../models/ClothModel';
-import { downloadCanvasToImage, reader } from '../../utils/DesignerUtils';
-import { DecalTypes, EditorTabs } from '../../config/TabSetting';
+import { __downloadCanvasToImage, reader } from '../../utils/DesignerUtils';
+import { DecalTypes } from '../../config/TabSetting';
 import state from '../../store';
 import { ColorPicker, FilePicker, Tab } from '../../components';
-import { AnimatePresence, motion } from "framer-motion";
-import { slideAnimation } from '../../config/MotionSetting';
-import HeaderComponent from '../../components/Header/HeaderComponent';
-import { systemLogo } from '../../assets';
+import { frontOfCloth, systemLogo } from '../../assets';
 
 import { HiOutlineDownload, HiShoppingCart, HiOutlineLogin } from 'react-icons/hi';
-import { FaSave, FaTshirt, FaPen, FaIcons, FaRegHeart } from "react-icons/fa";
+import { FaSave, FaTshirt, FaPen, FaIcons, FaRegHeart, FaFileCode, FaHeart } from "react-icons/fa";
 import { useTranslation } from 'react-i18next';
-import { primaryColor, whiteColor } from '../../root/ColorSystem';
-import { height } from '@mui/system';
+import { blackColor, primaryColor, whiteColor } from '../../root/ColorSystem';
+import { IoMdColorPalette } from "react-icons/io";
+import { IoText } from "react-icons/io5";
+import { GiClothes } from "react-icons/gi";
 
 
 
@@ -48,42 +47,42 @@ const currentItem = [
   {
     id: 1,
     imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/52574437729-admin/theme/68492970862-xhmp_scrub_bunny_illustration_in_the_style_of_spiritcore_symbo_3097ddb3-58eb-4701-830a-fb2e19663671_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-    isLiked: false
+
   },
   {
     id: 2,
     imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/52574437729-admin/theme/68492970862-xhmp_scrub_bunny_illustration_in_the_style_of_spiritcore_symbo_3097ddb3-58eb-4701-830a-fb2e19663671_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-    isLiked: false
+
   },
   {
     id: 3,
     imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/52574437729-admin/theme/68492970862-xhmp_scrub_bunny_illustration_in_the_style_of_spiritcore_symbo_3097ddb3-58eb-4701-830a-fb2e19663671_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-    isLiked: false
+
   },
   {
     id: 4,
     imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/52574437729-admin/theme/68492970862-xhmp_scrub_bunny_illustration_in_the_style_of_spiritcore_symbo_3097ddb3-58eb-4701-830a-fb2e19663671_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-    isLiked: false
+
   },
   {
     id: 5,
     imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/52574437729-admin/theme/68492970862-xhmp_scrub_bunny_illustration_in_the_style_of_spiritcore_symbo_3097ddb3-58eb-4701-830a-fb2e19663671_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-    isLiked: false
+
   },
   {
     id: 6,
     imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/52574437729-admin/theme/68492970862-xhmp_scrub_bunny_illustration_in_the_style_of_spiritcore_symbo_3097ddb3-58eb-4701-830a-fb2e19663671_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-    isLiked: false
+
   },
   {
     id: 7,
     imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/52574437729-admin/theme/68492970862-xhmp_scrub_bunny_illustration_in_the_style_of_spiritcore_symbo_3097ddb3-58eb-4701-830a-fb2e19663671_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-    isLiked: false
+
   },
   {
     id: 8,
     imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/52574437729-admin/theme/68492970862-xhmp_scrub_bunny_illustration_in_the_style_of_spiritcore_symbo_3097ddb3-58eb-4701-830a-fb2e19663671_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-    isLiked: false
+
   }
 ]
 
@@ -91,50 +90,59 @@ const collectionItem = [
   {
     id: 1,
     imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/77798606438-admin/theme/3298507943-xhmp_a_colorful_graphic_car_with_an_abstract_designsolid_color_c348f443-b784-4c95-951f-db3e416972c8_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-    isLiked: false
+
   },
   {
     id: 2,
     imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/77798606438-admin/theme/3298507943-xhmp_a_colorful_graphic_car_with_an_abstract_designsolid_color_c348f443-b784-4c95-951f-db3e416972c8_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-    isLiked: false
+
   },
   {
     id: 3,
     imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/77798606438-admin/theme/3298507943-xhmp_a_colorful_graphic_car_with_an_abstract_designsolid_color_c348f443-b784-4c95-951f-db3e416972c8_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-    isLiked: false
+
   },
   {
     id: 4,
     imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/77798606438-admin/theme/3298507943-xhmp_a_colorful_graphic_car_with_an_abstract_designsolid_color_c348f443-b784-4c95-951f-db3e416972c8_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-    isLiked: false
+
   },
   {
     id: 5,
     imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/77798606438-admin/theme/3298507943-xhmp_a_colorful_graphic_car_with_an_abstract_designsolid_color_c348f443-b784-4c95-951f-db3e416972c8_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-    isLiked: false
+
   },
   {
     id: 6,
     imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/77798606438-admin/theme/3298507943-xhmp_a_colorful_graphic_car_with_an_abstract_designsolid_color_c348f443-b784-4c95-951f-db3e416972c8_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-    isLiked: false
+
   },
   {
     id: 7,
     imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/77798606438-admin/theme/3298507943-xhmp_a_colorful_graphic_car_with_an_abstract_designsolid_color_c348f443-b784-4c95-951f-db3e416972c8_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-    isLiked: false
+
   },
   {
     id: 8,
     imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/77798606438-admin/theme/3298507943-xhmp_a_colorful_graphic_car_with_an_abstract_designsolid_color_c348f443-b784-4c95-951f-db3e416972c8_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-    isLiked: false
+
   }
 ]
+
+interface Item {
+  id: any;
+  imgUrl: string;
+}
 
 function CustomDesignScreen() {
 
   // ---------------UseState Variable---------------//
   const [selectedPartOfCloth, setSelectedPartOfCloth] = useState<PartOfCloth>({
     partValue: '',
+    imgUrl: ''
+  });
+  const [selectedStamp, setSelectedStamp] = useState<Item>({
+    id: '',
     imgUrl: ''
   });
   const [selectedItem, setSelectedItem] = useState('');
@@ -144,6 +152,10 @@ function CustomDesignScreen() {
   const [codeLanguage, setCodeLanguage] = useState('EN');
   const [isEditorMode, setIsEditorMode] = useState(false);
   const [isCollectionTab, setIsColectionTab] = useState(false);
+  const [toolSelected, setToolSelected] = useState('stampsItem');
+  const [collection, setCollection] = useState<Item[]>([]);
+  const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
+
 
 
 
@@ -152,6 +164,17 @@ function CustomDesignScreen() {
   // ---------------Usable Variable---------------//
   const { t, i18n } = useTranslation();
   // ---------------UseEffect---------------//
+
+  useEffect(() => {
+    const getItemFromStorage = localStorage.getItem('collection')
+    if (getItemFromStorage) {
+      console.log('getItemFromStorage: ', getItemFromStorage);
+      const savedCollection = JSON.parse(getItemFromStorage);
+      setCollection(savedCollection);
+    }
+    // localStorage.getItem('collection');
+
+  }, []);
 
   useEffect(() => {
     i18n.changeLanguage(selectedLanguage);
@@ -177,7 +200,14 @@ function CustomDesignScreen() {
 
   useEffect(() => {
     console.log('activeEditorTab: ', activeEditorTab);
-  }, [activeEditorTab])
+  }, [activeEditorTab]);
+
+
+
+  // Save collection to local storage whenever it changes
+  // useEffect(() => {
+  //   localStorage.setItem('collection', JSON.stringify(collection));
+  // }, [collection]);
   // ---------------FunctionHandler---------------//
 
   const __handleLanguageChange = (language: string) => {
@@ -191,7 +221,7 @@ function CustomDesignScreen() {
       case "filepicker":
         return <FilePicker file={file} setFile={setFile} readFile={__handleReadFile} partOfCloth={selectedItem} />
       case "download":
-        downloadCanvasToImage();
+        __downloadCanvasToImage();
       default:
         return null
     }
@@ -256,20 +286,58 @@ function CustomDesignScreen() {
       })
   }
 
-  const __handleSelectedEditorMode = (isSelected: boolean) => {
+  const __handleSelectEditorMode = (isSelected: boolean) => {
     setIsEditorMode(!isSelected);
   }
 
-  const __handleSelectedCollectionTab = (isSelected: boolean) => {
+  const __handleSelectCollectionTab = (isSelected: boolean) => {
     setIsColectionTab(!isSelected);
   }
 
+  const __handleSelectToolDesign = (selectedTool: string) => {
+    setToolSelected(selectedTool);
+  }
+
+  const __handleAddToCollection = (item: Item) => {
+    if (!collection.some((collectionItem) => collectionItem.id === item.id)) {
+      const updatedCollection = [...collection, item];
+      setCollection(updatedCollection);
+      localStorage.setItem('collection', JSON.stringify(updatedCollection));
+    }
+  };
+
+  const __handleRemoveFromCollection = (itemId: string) => {
+    const updatedCollection = collection.filter((collectionItem) => collectionItem.id !== itemId);
+    setCollection(updatedCollection);
+    localStorage.setItem('collection', JSON.stringify(updatedCollection));
+  };
+
+  const __toggleCollectionItem = (item: Item) => {
+    const itemId = item.id;
+    if (selectedItemIds.includes(itemId)) {
+      setSelectedItemIds(selectedItemIds.filter((id) => id !== itemId));
+      __handleRemoveFromCollection(itemId);
+    } else {
+      setSelectedItemIds([...selectedItemIds, itemId]);
+      __handleAddToCollection(item);
+    }
+  };
+
+  const __handleSetSelectedStamp = (item: Item) => {
+
+    setSelectedStamp(item);
+    const result: Item | undefined = currentItem.find((itemFounded: Item) => itemFounded.id === item.id)
+    if (result) {
+      setSelectedStamp(result.id);
+    }
+  };
 
 
 
   return (
     <div className={styles.customDesign__container}>
 
+      {/* Header */}
       <div className={styles.customDesign__container__header}>
         <div className={styles.customDesign__container__header__logo}>
           <img src={systemLogo}></img>
@@ -279,23 +347,23 @@ function CustomDesignScreen() {
         </div>
 
         <div className={styles.customDesign__container__header__buttonGroup}>
-          <button className={` py-2 px-4 rounded inline-flex items-center ${styles.customDesign__container__header__buttonGroup__downloadBtn} `}>
+          <button className={` py-1 px-4 rounded inline-flex items-center ${styles.customDesign__container__header__buttonGroup__downloadBtn} `} onClick={() => __downloadCanvasToImage()}>
             <HiOutlineDownload size={20} style={{ marginRight: 5, backgroundColor: 'transparent', border: 'none' }} className={styles.downloadIcon}></HiOutlineDownload>
             <span>{t(codeLanguage + '000104')}</span>
           </button>
 
-          <button className={` py-2 px-4 rounded inline-flex items-center ${styles.customDesign__container__header__buttonGroup__saveBtn} `}>
+          <button className={` py-1 px-4 rounded inline-flex items-center ${styles.customDesign__container__header__buttonGroup__saveBtn} `}>
             <FaSave size={20} style={{ marginRight: 5, backgroundColor: 'transparent', border: 'none' }} className={styles.saveIcon}></FaSave>
             <span>{t(codeLanguage + '000105')}</span>
           </button>
 
-          <button className={` py-2 px-4 rounded inline-flex items-center ${styles.customDesign__container__header__buttonGroup__orderBtn} `}>
+          <button className={` py-1 px-4 rounded inline-flex items-center ${styles.customDesign__container__header__buttonGroup__orderBtn} `}>
             <HiShoppingCart size={20} style={{ marginRight: 5, backgroundColor: 'transparent', border: 'none' }} className={styles.orderIcon}></HiShoppingCart>
             <span>{t(codeLanguage + '000106')}</span>
           </button>
 
-          <button className={` py-2 px-4 rounded inline-flex items-center ${styles.customDesign__container__header__buttonGroup__signInBtn} `}>
-            <HiOutlineLogin size={20} style={{ marginRight: 5, backgroundColor: 'transparent', border: 'none' }} className={styles.signInIcon}></HiOutlineLogin>
+          <button onClick={() => window.location.href = '/auth/signin'} className={` py-1 px-4 rounded inline-flex items-center ${styles.customDesign__container__header__buttonGroup__signInBtn} `}>
+            <HiOutlineLogin size={20} style={{ marginRight: 5, backgroundColor: 'transparent', border: 'none' }} className={styles.signInIcon} ></HiOutlineLogin>
             <span>{t(codeLanguage + '000107')}</span>
           </button>
 
@@ -310,8 +378,8 @@ function CustomDesignScreen() {
         {/* Part of cloth of Model */}
         <div className={styles.customDesign__container__editorArea__partOfCloth}>
           {partOfClothData.map((item: PartOfCloth, key: any) => (
-            <div key={key} className={styles.partOfClothSellector} style={{ backgroundColor: selectedItem === item.partValue ? 'red' : 'black' }} onClick={() => __handleSetSelectedItem(item)}>
-              <img src={systemLogo} className={styles.partOfClothSellector__img}></img>
+            <div key={key} className={styles.partOfClothSellector} style={selectedItem === item.partValue ? { border: `2px solid ${primaryColor}` } : {}} onClick={() => __handleSetSelectedItem(item)}>
+              <img src={frontOfCloth} className={styles.partOfClothSellector__img}></img>
             </div>
           ))}
         </div>
@@ -343,7 +411,7 @@ function CustomDesignScreen() {
           <div className={styles.customDesign__container__editorArea__itemSelector__buttonGroup}>
             <button
               className={` py-2 px-4 rounded inline-flex items-center ${styles.customDesign__container__editorArea__itemSelector__buttonGroup__sampleModelBtn} `}
-              onClick={() => __handleSelectedEditorMode(true)}
+              onClick={() => __handleSelectEditorMode(true)}
               style={!isEditorMode ? { backgroundColor: primaryColor, color: whiteColor, borderColor: primaryColor } : {}}
             >
               <FaTshirt size={20} style={{ marginRight: 5, backgroundColor: 'transparent', border: 'none' }} className={styles.downloadIcon}></FaTshirt>
@@ -352,7 +420,7 @@ function CustomDesignScreen() {
 
             <button
               className={` py-2 px-4 rounded inline-flex items-center ${styles.customDesign__container__editorArea__itemSelector__buttonGroup__editorModelBtn} `}
-              onClick={() => __handleSelectedEditorMode(false)}
+              onClick={() => __handleSelectEditorMode(false)}
               style={isEditorMode ? { backgroundColor: primaryColor, color: whiteColor, borderColor: primaryColor } : {}}
             >
               <FaPen size={20} style={{ marginRight: 5, backgroundColor: 'transparent', border: 'none' }} className={styles.saveIcon}></FaPen>
@@ -362,14 +430,44 @@ function CustomDesignScreen() {
           </div>
 
           {/* Display item selector */}
-          {isEditorMode && (
+          {isEditorMode ? (
             <div className={styles.customDesign__container__editorArea__itemSelector__itemGroup}>
               <div className={styles.customDesign__container__editorArea__itemSelector__itemGroup__menuEditor}>
-                <button className=" rounded inline-flex items-center">
-                  <FaIcons size={20} className={`${styles.menuEditor__icon}`}></FaIcons>
+                <button
+                  className=" rounded inline-flex items-center border-none"
+                  onClick={() => __handleSelectToolDesign('stampsItem')}
+                  style={toolSelected === 'stampsItem' ? { backgroundColor: whiteColor, borderRadius: 0 } : {}}
+                >
+                  <FaIcons color={toolSelected === 'stampsItem' ? primaryColor : blackColor} size={20} className={`${styles.menuEditor__icon}`}></FaIcons>
                 </button>
 
-                <div
+                <button
+                  className=" rounded inline-flex items-center"
+                  onClick={() => __handleSelectToolDesign('colorPicker')}
+                  style={toolSelected === 'colorPicker' ? { backgroundColor: whiteColor, borderRadius: 0 } : {}}
+                >
+                  <IoMdColorPalette color={toolSelected === 'colorPicker' ? primaryColor : blackColor} size={25} className={`${styles.menuEditor__icon}`}></IoMdColorPalette>
+                </button>
+
+                <button
+                  className=" rounded inline-flex items-center"
+                  onClick={() => __handleSelectToolDesign('filePicker')}
+                  style={toolSelected === 'filePicker' ? { backgroundColor: whiteColor, borderRadius: 0 } : {}}
+
+                >
+                  <FaFileCode color={toolSelected === 'filePicker' ? primaryColor : blackColor} size={25} className={`${styles.menuEditor__icon}`}></FaFileCode>
+                </button>
+
+                <button
+                  className=" rounded inline-flex items-center"
+                  onClick={() => __handleSelectToolDesign('downloadTool')}
+                  style={toolSelected === 'downloadTool' ? { backgroundColor: whiteColor, borderRadius: 0 } : {}}
+
+                >
+                  <IoText color={toolSelected === 'downloadTool' ? primaryColor : blackColor} size={25} className={`${styles.menuEditor__icon}`}></IoText>
+                </button>
+
+                {/* <div
                   key="custom"
                   className={styles.customDesign__container__editorArea__menu}
 
@@ -391,53 +489,146 @@ function CustomDesignScreen() {
                     ))}
 
                   </div>
-                </div>
+                </div> */}
               </div>
 
               {/* Menu bar tab colection */}
-              <div className={styles.customDesign__container__editorArea__itemSelector__itemGroup__menuTabBar}>
-                <button
-                  className=" text-white font-bold py-2 px-4 rounded"
-                  onClick={() => __handleSelectedCollectionTab(true)}
-                  style={!isCollectionTab ? { color: primaryColor, borderBottom: `2px solid ${primaryColor}` } : {}}
+              {toolSelected === 'stampsItem' && (
+                <>
+                  <div className={styles.customDesign__container__editorArea__itemSelector__itemGroup__menuTabBar}>
+                    <button
+                      className=" text-white font-bold py-2 px-4 rounded"
+                      onClick={() => __handleSelectCollectionTab(true)}
+                      style={!isCollectionTab ? { color: primaryColor, borderBottom: `2px solid ${primaryColor}` } : {}}
+                    >
+                      {t(codeLanguage + '000110')}
+                    </button>
+                    <button
+                      className=" text-white font-bold py-2 px-4 rounded"
+                      onClick={() => __handleSelectCollectionTab(false)}
+                      style={isCollectionTab ? { color: primaryColor, borderBottom: `2px solid ${primaryColor}` } : {}}
+                    >
+                      {t(codeLanguage + '000111')}
+                    </button>
+                  </div>
+
+                  {/* Sample Item list area */}
+                  {!isCollectionTab ? (
+                    <div className={styles.customDesign__container__editorArea__itemSelector__itemGroup__sampleItemList}>
+                      {currentItem.map((item: any, key) => (
+                        <div
+                          key={item.id}
+                          style={selectedStamp === item.id ? { border: `2px solid ${primaryColor}` } : {}}
+                          className={styles.sampleItemCard}
+                          
+                          >
+                          <img src={item.imgUrl} style={{ width: '90%', height: '90%' }} alt="Item" onClick={() => __handleSetSelectedStamp(item)} />
+                          <button onClick={() => __toggleCollectionItem(item)}>
+                            {collection.some((collectionItem: any) => collectionItem.id === item.id) ? (
+                              <FaHeart color='red' size={20} className={styles.sampleItemCard__icon} />
+                            ) : (
+                              <FaRegHeart size={20} className={styles.sampleItemCard__icon} />
+                            )}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )
+                    : (
+                      <div className={styles.customDesign__container__editorArea__itemSelector__itemGroup__sampleCollectionList}>
+                        {collection.map((item: any) => (
+                          <div
+                            key={item.id}
+                            style={selectedStamp === item.id ? { border: `2px solid ${primaryColor}` } : {}}
+                            className={styles.sampleItemCard}
+                            onClick={() => __handleSetSelectedStamp(item)}
+                            >
+                            <img src={item.imgUrl} style={{ width: '90%', height: '90%' }} onClick={() => __handleSetSelectedStamp(item)}></img>
+                            <button onClick={() => __toggleCollectionItem(item)}>
+                              {collection.some((collectionItem: any) => collectionItem.id === item.id) ? (
+                                <FaHeart color='red' size={20} className={styles.sampleItemCard__icon} />
+                              ) : (
+                                <FaRegHeart size={20} className={styles.sampleItemCard__icon} />
+                              )}
+                            </button>
+                          </div>
+                        ))}
+                        {collection.length === 0 && (
+                          <span style={{ padding: 20, fontSize: 15, fontWeight: 400, textAlign: 'center', color: primaryColor }}>{t(codeLanguage + '000111')}</span>
+                        )}
+                      </div>
+                    )
+                  }
+                </>
+              )}
+
+              {toolSelected === 'colorPicker' && (
+                <div
+                  className={styles.customDesign__container__editorArea__itemSelector__itemGroup__sampleItemList}
                 >
-                  {t(codeLanguage + '000110')}
-                </button>
-                <button
-                  className=" text-white font-bold py-2 px-4 rounded"
-                  onClick={() => __handleSelectedCollectionTab(false)}
-                  style={isCollectionTab ? { color: primaryColor, borderBottom: `2px solid ${primaryColor}` } : {}}
+                  <ColorPicker></ColorPicker>
+                </div>
+              )}
+
+              {toolSelected === 'filePicker' && (
+                <div
+                  className={styles.customDesign__container__editorArea__itemSelector__itemGroup__sampleItemList}
                 >
-                  {t(codeLanguage + '000111')}
+                  <FilePicker file={file} setFile={setFile} readFile={__handleReadFile} partOfCloth={selectedItem} />
+                </div>
+              )}
+
+
+            </div>
+          ) : (
+            <div className={styles.customDesign__container__editorArea__itemSelector__itemGroup}>
+              <div className={styles.customDesign__container__editorArea__itemSelector__itemGroup__menuEditor}>
+                <button
+                  className=" rounded inline-flex items-center border-none"
+                  onClick={() => __handleSelectToolDesign('stampsItem')}
+                  style={toolSelected === 'stampsItem' ? { backgroundColor: whiteColor, borderRadius: 0 } : {}}
+                >
+                  <GiClothes color={toolSelected === 'stampsItem' ? primaryColor : blackColor} size={30} className={`${styles.menuEditor__icon}`}></GiClothes>
                 </button>
+
+
+                
               </div>
 
-              {/* Sample Item list area */}
-              {!isCollectionTab ? (
-                <div className={styles.customDesign__container__editorArea__itemSelector__itemGroup__sampleItemList}>
-                  {currentItem.map((item: any, key) => (
-                    <div key={item.id} className={styles.sampleItemCard}>
-                      <img src={item.imgUrl} style={{ width: '90%', height: '90%' }}></img>
-                      <button>
-                        <FaRegHeart size={20} className={styles.sampleItemCard__icon}></FaRegHeart>
-                      </button>
+              {/* Menu bar tab colection */}
+              {toolSelected === 'stampsItem' && (
+                <>
+                  
+
+                  {/* Sample Item list area */}
+                  
+                    <div className={styles.customDesign__container__editorArea__itemSelector__itemGroup__sampleItemList}>
+                      {currentItem.map((item: any, key) => (
+                        <div
+                          key={item.id}
+                          style={selectedStamp === item.id ? { border: `2px solid ${primaryColor}` } : {}}
+                          className={styles.sampleItemCard}
+                          onClick={() => __handleSetSelectedStamp(item)}>
+                          <img src={item.imgUrl} style={{ width: '90%', height: '90%' }} alt="Item" />
+                          <button onClick={() => __toggleCollectionItem(item)}>
+                            {collection.some((collectionItem: any) => collectionItem.id === item.id) ? (
+                              <FaHeart color='red' size={20} className={styles.sampleItemCard__icon} />
+                            ) : (
+                              <FaRegHeart size={20} className={styles.sampleItemCard__icon} />
+                            )}
+                          </button>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              )
-                : (
-                  <div className={styles.customDesign__container__editorArea__itemSelector__itemGroup__sampleItemList}>
-                    {collectionItem.map((item: any) => (
-                      <div key={item.id} className={styles.sampleItemCard}>
-                        <img src={item.imgUrl} style={{ width: '90%', height: '90%' }}></img>
-                        <button>
-                          <FaRegHeart size={20} className={styles.sampleItemCard__icon}></FaRegHeart>
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )
-              }
+                  
+                    
+                  
+                </>
+              )}
+
+              
+
+
             </div>
           )}
         </div>
