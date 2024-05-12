@@ -2,6 +2,7 @@ import { useState } from 'react'
 import CustomButton from '../CustomButton/CustomButton'
 import styles from './FilePicker.module.scss'
 import { BACK_CLOTH_PART, FRONT_CLOTH_PART, LOGO_PART, SLEEVE_CLOTH_PART } from '../../models/ClothModel'
+import { primaryColor } from '../../root/ColorSystem'
 
 const FilePicker = ({ file, setFile, readFile, partOfCloth }) => {
   const [trigger, setTrigger] = useState(false);
@@ -33,6 +34,8 @@ const FilePicker = ({ file, setFile, readFile, partOfCloth }) => {
         <input
           id="file-upload"
           type="file"
+          hidden
+          multiple
           accept="image/*"
           onChange={(e) => { setFile(e.target.files[0]); setTrigger(true) }}
         />
@@ -50,7 +53,7 @@ const FilePicker = ({ file, setFile, readFile, partOfCloth }) => {
           type="filled"
           title="Upload"
           handleClick={() => _handleSetUploadFile()}
-          customStyles="font-size: 0.75rem; line-height: 1rem;"
+          customStyles={`font-size: 0.75rem; line-height: 1rem; background-color: ${primaryColor}`}
         />
         {/* <CustomButton 
           type="filled"

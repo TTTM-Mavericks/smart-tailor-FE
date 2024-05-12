@@ -8,6 +8,8 @@ import systemLogo from "./system/smart-tailor_logo.png"
 import vietnamFlag from './system/vietnam_flag.png'
 import usaFlag from './system/usa_flag.png'
 import languageIcon from './system/language.png'
+import frontOfCloth from './clothes/front.png'
+
 export {
     ai,
     fileIcon,
@@ -18,5 +20,6 @@ export {
     systemLogo,
     vietnamFlag,
     usaFlag,
-    languageIcon
+    languageIcon,
+    frontOfCloth
 };

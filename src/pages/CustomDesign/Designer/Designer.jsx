@@ -4,7 +4,7 @@ import { useSnapshot } from "valtio";
 
 import { EditorTabs, FilterTabs, DecalTypes } from "../../../config/TabSetting"
 import { download } from "../../../assets"
-import { downloadCanvasToImage, reader, urlToBase64 } from "../../../utils/DesignerUtils"
+import { __downloadCanvasToImage, reader, urlToBase64 } from "../../../utils/DesignerUtils"
 import { fadeAnimation, slideAnimation } from "../../../config/MotionSetting";
 import { ColorPicker, FilePicker, CustomButton, Tab } from "../../../components";
 import state from "../../../store"
@@ -32,7 +32,7 @@ const Designer = () => {
       case "filepicker":
         return <FilePicker file={file} setFile={setFile} readFile={readFile} />
       case "download":
-        downloadCanvasToImage();
+        __downloadCanvasToImage();
       default:
         return null
     }

@@ -1,4 +1,4 @@
-const downloadCanvasToImage = () => {
+const __downloadCanvasToImage = () => {
     const canvas = document.querySelector("canvas");
     const dataURL = canvas.toDataURL();
     const link = document.createElement("a");
@@ -29,4 +29,4 @@ const urlToBase64 = (url, callback) => {
       .catch(error => console.error(error));
 }
 
-export { downloadCanvasToImage, reader, urlToBase64 };
+export { __downloadCanvasToImage, reader, urlToBase64 };

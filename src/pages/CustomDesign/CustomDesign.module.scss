@@ -14,10 +14,13 @@
             display: flex;
             align-items: center;
             margin-left: 20px;
+            border-radius: 90px;
 
             img {
                 width: 60px;
                 height: 60px;
+                border-radius: 90px;
+
             }
 
             div>h3 {
@@ -35,6 +38,8 @@
 
             button {
                 margin-right: 20px;
+                font-size: 13px;
+                font-weight: 500;
             }
 
             &__downloadBtn {
@@ -226,6 +231,23 @@
                     /* Width of the scrollbar */
                 }
 
+                &__sampleCollectionList {
+                    width: 85%;
+                    height: 70vh;
+                    // display: flex;
+                    justify-content: center;
+                    // align-items: center;
+                    flex-wrap: wrap;
+                    overflow: auto;
+                }
+
+                &__sampleCollectionList::-webkit-scrollbar {
+                    width: 5px;
+                    background-color: $grayColor;
+                    height: 10px;
+                    /* Width of the scrollbar */
+                }
+
 
 
             }
@@ -234,14 +256,15 @@
         &__partOfCloth {
             width: 10%;
             height: 85vh;
-            border-top: 1px solid #EAEAEA;
-            border-bottom: 1px solid #EAEAEA;
+            border-left: 1px solid #EAEAEA;
+            border-right: 1px solid #EAEAEA;
             justify-content: center;
             align-items: center;
             align-content: center;
             overflow-y: auto;
             float: right;
         }
+
 
         &__partOfCloth::-webkit-scrollbar {
             width: 3px;
@@ -287,8 +310,9 @@
             &__menuBar {
                 position: relative;
                 width: 600px;
-                height: 60px;
-                border-bottom: 1px solid #EAEAEA;
+                height: 58px;
+                border: 1px solid #EAEAEA;
+                border-top: 0;
                 // transform: translate(110%, 0%);
                 margin-bottom: 20px;
 
@@ -302,22 +326,32 @@
 
 .partOfClothSellector {
     position: relative;
-    width: 110px;
-    height: 120px;
+    width: 80px;
+    height: 80px;
+    display: flex;
     justify-content: center;
     align-items: center;
     align-content: center;
     margin: 0 auto;
-    margin-top: 50px;
+    margin-top: 20px;
+    border-radius: 8px;
+
 
     &__img {
         position: relative;
-        width: 110px;
-        height: 120px;
+        width: 80%;
+        height: 80%;
         justify-content: center;
         align-items: center;
         align-content: center;
         margin: 0 auto;
+        border-radius: 8px;
+
+    }
+
+    &__img:hover {
+        cursor: pointer;
+
     }
 }
 
@@ -338,10 +372,14 @@
     flex-wrap: wrap;
     border-radius: 8px;
 
-    &__icon{
+    &__icon {
         position: absolute;
         bottom: 10px;
         right: 10px;
         color: black;
     }
+}
+
+.sampleItemCard:hover {
+    cursor: pointer;
 }
