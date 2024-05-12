@@ -11,7 +11,6 @@ import { primaryColor } from '../../../root/ColorSystem';
 import { languageIcon, systemLogo, usaFlag, vietnamFlag } from '../../../assets';
 import { useTranslation } from 'react-i18next';
 import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Fragment } from 'react';
 
 const defaultTheme = createTheme();
@@ -212,7 +211,7 @@ export default function SignInScreen() {
                 <button className={`flex  space-x-2 ${styles.language__button}`} onClick={() => handleLanguageChange('en')}>
                   <div className={`${styles.language__button}`}>
                     <img src={usaFlag} style={{ width: '35px', height: '35px', marginLeft: 30 }}></img>
-                    <span className='text-black'>USA</span>
+                    <span className='text-black'>{t(codeLanguage + '000025')}</span>
                   </div>
 
                 </button>
