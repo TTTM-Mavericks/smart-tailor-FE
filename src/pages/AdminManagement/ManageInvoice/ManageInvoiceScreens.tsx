@@ -1,4 +1,4 @@
-import { Box, Button, IconButton, Menu, MenuItem, Modal } from "@mui/material";
+import { Box, Button, CardMedia, Divider, IconButton, Menu, MenuItem, Modal } from "@mui/material";
 import { DataGrid, GridToolbar, GridColDef } from "@mui/x-data-grid";
 import { tokens } from "../../../theme";
 import { useTheme } from "@mui/material";
@@ -12,6 +12,14 @@ import LogoPDF from '../../../assets/system/smart-tailor_logo.png'
 import TestPDF from "./TestPDF";
 import { style } from "@mui/system";
 import { context } from "@react-three/fiber";
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+
 interface ExtendedUserOptions extends UserOptions {
     columnWidths?: number[];
 }
@@ -140,23 +148,37 @@ const ManageInvoiceScreen: React.FC = () => {
         })
 
         autoTable(doc, {
-            head: [[{ content: "Sub Total", styles: { halign: 'right' } }, { content: "$1211313132", styles: { halign: 'center' } }]],
+            head: [[{ content: "                          ", styles: { halign: 'right' } }, { content: "                         ", styles: { halign: 'center' } }, { content: "Sub Total", styles: { halign: 'center' } }, { content: "$1231321", styles: { halign: 'center' } }]],
             body: [
                 [
                     {
-                        content: 'Tax (0%)',
+                        content: '                           ',
                         styles: {
                             halign: 'right',
                             fontStyle: 'bold'
                         },
                     },
                     {
-                        content: '$0',
+                        content: '              ',
                         styles: {
                             halign: 'center',
                             fontStyle: 'bold',
                         },
                     },
+                    {
+                        content: "Tax (0%)",
+                        styles: {
+                            fontStyle: 'bold',
+                            halign: "center"
+                        }
+                    },
+                    {
+                        content: "$0",
+                        styles: {
+                            fontStyle: 'bold',
+                            halign: "center"
+                        }
+                    }
                 ],
             ],
             theme: 'plain'
@@ -166,7 +188,7 @@ const ManageInvoiceScreen: React.FC = () => {
             body: [
                 [
                     {
-                        content: `                                                  __________________________________________________`,
+                        content: `                                                                                                               __________________________________`,
                         styles: {
                             halign: 'left',
                             overflow: 'linebreak'
@@ -177,32 +199,15 @@ const ManageInvoiceScreen: React.FC = () => {
         })
 
         autoTable(doc, {
-            body: [
-                [
-                    {
-                        content: "TOTAL",
-                        styles: {
-                            halign: 'right',
-                            fontStyle: 'bold',
-                        }
-                    },
-                    {
-                        content: "$1321465",
-                        styles: {
-                            fontStyle: 'bold',
-                            halign: 'center'
-                        }
-                    }
-                ]
-            ],
+            head: [[{ content: "                          ", styles: { halign: 'right' } }, { content: "                         ", styles: { halign: 'center' } }, { content: "TOTAL", styles: { halign: 'center' } }, { content: "$1231321", styles: { halign: 'center' } }]],
             theme: 'plain'
-        })
+        });
 
         autoTable(doc, {
             body: [
                 [
                     {
-                        content: `                                                  __________________________________________________`,
+                        content: `                                                                                                               __________________________________`,
                         styles: {
                             halign: 'left',
                             overflow: 'linebreak'
@@ -366,7 +371,7 @@ const ManageInvoiceScreen: React.FC = () => {
                         top: '50%',
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
-                        width: 400,
+                        width: "53%",
                         bgcolor: colors.primary[100],
                         border: '2px solid #000',
                         boxShadow: 24,
@@ -391,19 +396,123 @@ const ManageInvoiceScreen: React.FC = () => {
                         {t(codeLanguage + '000057')}
                     </h2>
                     {selectedInvoice && (
-                        <div style={{ height: "90%" }}>
-                            <p style={{ marginBottom: 8 }}>ID: {selectedInvoice.id}</p>
-                            <p style={{ marginBottom: 8 }}>Name: {selectedInvoice.name}</p>
-                            <p style={{ marginBottom: 8 }}>Date: {selectedInvoice.date.toString()}</p>
-                            <p style={{ marginBottom: 8 }}>Total: {selectedInvoice.total}</p>
-                            <p style={{ marginBottom: 8 }}>Phone: {selectedInvoice.phone}</p>
-                            <p style={{ marginBottom: 8 }}>Email: {selectedInvoice.email}</p>
-                            <p style={{ marginBottom: 8 }}>Age: {selectedInvoice.age}</p>
-                            <p style={{ marginBottom: 8 }}>Registra ID: {selectedInvoice.registraId}</p>
-                            <p style={{ marginBottom: 8 }}>City: {selectedInvoice.city}</p>
-                            <p style={{ marginBottom: 8 }}>Zip Code: {selectedInvoice.zipCode}</p>
-                            <p style={{ marginBottom: 8 }}>Address: {selectedInvoice.address}</p>
-                            <p style={{ marginBottom: 8 }}>Status: {selectedInvoice.status ? 'Active' : 'Inactive'}</p>
+                        <div>
+                            {/* Image and Title */}
+                            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+                                <img src={LogoPDF} style={{ height: '150px', marginRight: '20px' }} alt="Logo" />
+                                <h1 style={{ fontSize: '50px', fontWeight: 'bolder', marginLeft: 'auto', fontFamily: "cursive", marginRight: "12%" }}>INVOICE</h1>
+                            </div>
+
+                            {/* Number of invoice ID */}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+                                <div style={{ marginTop: "5%" }}>
+                                    <p>Invoice No. {selectedInvoice.id}</p>
+                                    <p>{selectedInvoice.date.toString()}</p>
+                                </div>
+                                <div>
+                                    <p style={{ textAlign: "right" }}>
+                                        SMART TAILOR, Inc<br />
+                                        Lot E2a-7, Street D1, High-Tech Park<br />
+                                        Long Thanh My Ward City<br />
+                                        Thu Duc<br />
+                                        Ho Chi Minh City.<br />
+                                        Viet Nam
+                                    </p>
+                                </div>
+                            </div>
+
+                            <hr style={{ border: 'none', borderTop: '3px solid #202020' }} />
+
+                            {/* Table */}
+                            <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px' }}>
+                                <thead>
+                                    <tr>
+                                        <th style={{ padding: '10px', textAlign: "left" }}>Item</th>
+                                        <th style={{ padding: '10px', textAlign: "left" }}>Quantity</th>
+                                        <th style={{ padding: '10px', textAlign: "left" }}>Unit Price</th>
+                                        <th style={{ padding: '10px', textAlign: "left" }}>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style={{ padding: '10px' }}>Tran Hoang Minh</td>
+                                        <td style={{ padding: '10px' }}>1</td>
+                                        <td style={{ padding: '10px' }}>$123</td>
+                                        <td style={{ padding: '10px' }}>$123</td>
+                                    </tr>
+                                    <tr>
+                                        <td style={{ padding: '10px' }}>Tran Hoang Minh</td>
+                                        <td style={{ padding: '10px' }}>1</td>
+                                        <td style={{ padding: '10px' }}>$123</td>
+                                        <td style={{ padding: '10px' }}>$123</td>
+                                    </tr>
+                                    <tr>
+                                        <td style={{ padding: '10px' }}>Tran Hoang Minh</td>
+                                        <td style={{ padding: '10px' }}>1</td>
+                                        <td style={{ padding: '10px' }}>$123</td>
+                                        <td style={{ padding: '10px' }}>$123</td>
+                                    </tr>
+                                    <tr>
+                                        <td style={{ padding: '10px' }}>Tran Hoang Minh</td>
+                                        <td style={{ padding: '10px' }}>1</td>
+                                        <td style={{ padding: '10px' }}>$123</td>
+                                        <td style={{ padding: '10px' }}>$123</td>
+                                    </tr>
+                                    <tr>
+                                        <td style={{ padding: '10px' }}>Tran Hoang Minh</td>
+                                        <td style={{ padding: '10px' }}>1</td>
+                                        <td style={{ padding: '10px' }}>$123</td>
+                                        <td style={{ padding: '10px' }}>$123</td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td colSpan="1" style={{ padding: '10px', fontWeight: "bolder" }}>
+                                            Sub Total
+                                        </td>
+                                        <td style={{ padding: '10px', fontWeight: "bolder" }}>$1231321</td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td colSpan="1" style={{ padding: '10px', fontWeight: "bolder" }}>
+                                            Tax (0%)
+                                        </td>
+                                        <td style={{ padding: '10px', fontWeight: "bolder" }}>$0</td>
+                                    </tr>
+                                    <tr style={{ borderTop: '3px solid #202020', borderBottom: '3px solid #202020' }}>
+                                        <td></td>
+                                        <td></td>
+                                        <td colSpan="1" style={{ padding: '10px', fontWeight: "bolder" }}>
+                                            TOTAL
+                                        </td>
+                                        <td style={{ padding: '10px', fontWeight: "bolder" }}>$1231321</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+
+                            {/* Thank You! */}
+                            <h1 style={{ marginTop: '40px', fontFamily: "cursive", fontWeight: "bolder", fontSize: "30px" }}>Thank You!</h1>
+
+                            {/* Address and name */}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
+                                <div>
+                                    <p>
+                                        SMART TAILOR, Inc<br />
+                                        Lot E2a-7, Street D1, High-Tech Park<br />
+                                        Long Thanh My Ward City<br />
+                                        Thu Duc<br />
+                                        Ho Chi Minh City.<br />
+                                        Viet Nam
+                                    </p>
+                                </div>
+                                <div style={{ marginTop: "10%" }}>
+                                    <p>{selectedInvoice.name}</p>
+                                    <p>{selectedInvoice.address}</p>
+                                </div>
+                            </div>
                         </div>
                     )}
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 20 }}>
