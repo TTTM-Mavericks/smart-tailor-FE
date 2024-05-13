@@ -11,7 +11,7 @@ import { __downloadCanvasToImage, reader } from '../../utils/DesignerUtils';
 import { DecalTypes } from '../../config/TabSetting';
 import state from '../../store';
 import { ColorPicker, FilePicker, Tab } from '../../components';
-import { frontOfCloth, systemLogo } from '../../assets';
+import { frontOfCloth, shirtModel, systemLogo } from '../../assets';
 
 import { HiOutlineDownload, HiShoppingCart, HiOutlineLogin } from 'react-icons/hi';
 import { FaSave, FaTshirt, FaPen, FaIcons, FaRegHeart, FaFileCode, FaHeart } from "react-icons/fa";
@@ -20,6 +20,9 @@ import { blackColor, primaryColor, whiteColor } from '../../root/ColorSystem';
 import { IoMdColorPalette } from "react-icons/io";
 import { IoText } from "react-icons/io5";
 import { GiClothes } from "react-icons/gi";
+import ProductCardDesignComponent from '../../components/Card/ProductCardDesign/ProductCardDesignComponent';
+import { TbHomeHeart } from "react-icons/tb";
+import ProductDialogComponent from './Components/ProductDialogComponent';
 
 
 
@@ -152,9 +155,10 @@ function CustomDesignScreen() {
   const [codeLanguage, setCodeLanguage] = useState('EN');
   const [isEditorMode, setIsEditorMode] = useState(false);
   const [isCollectionTab, setIsColectionTab] = useState(false);
-  const [toolSelected, setToolSelected] = useState('stampsItem');
+  const [toolSelected, setToolSelected] = useState('modelProductTab');
   const [collection, setCollection] = useState<Item[]>([]);
   const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
+  const [isOpenProductDialog, setIsOpenProductDialog] = useState(false);
 
 
 
@@ -288,6 +292,12 @@ function CustomDesignScreen() {
 
   const __handleSelectEditorMode = (isSelected: boolean) => {
     setIsEditorMode(!isSelected);
+    if (!isSelected) {
+      setToolSelected('stampsItem');
+    } else {
+      setToolSelected('modelProductTab');
+
+    }
   }
 
   const __handleSelectCollectionTab = (isSelected: boolean) => {
@@ -332,11 +342,15 @@ function CustomDesignScreen() {
     }
   };
 
+  const __handleCloseDialog = () => {
+    setIsOpenProductDialog(false); // Close the dialog
+  };
 
 
   return (
     <div className={styles.customDesign__container}>
-
+      {/* Dialog area */}
+      <ProductDialogComponent isOpen={isOpenProductDialog} onClose={() => __handleCloseDialog()} />
       {/* Header */}
       <div className={styles.customDesign__container__header}>
         <div className={styles.customDesign__container__header__logo}>
@@ -520,8 +534,8 @@ function CustomDesignScreen() {
                           key={item.id}
                           style={selectedStamp === item.id ? { border: `2px solid ${primaryColor}` } : {}}
                           className={styles.sampleItemCard}
-                          
-                          >
+
+                        >
                           <img src={item.imgUrl} style={{ width: '90%', height: '90%' }} alt="Item" onClick={() => __handleSetSelectedStamp(item)} />
                           <button onClick={() => __toggleCollectionItem(item)}>
                             {collection.some((collectionItem: any) => collectionItem.id === item.id) ? (
@@ -542,7 +556,7 @@ function CustomDesignScreen() {
                             style={selectedStamp === item.id ? { border: `2px solid ${primaryColor}` } : {}}
                             className={styles.sampleItemCard}
                             onClick={() => __handleSetSelectedStamp(item)}
-                            >
+                          >
                             <img src={item.imgUrl} style={{ width: '90%', height: '90%' }} onClick={() => __handleSetSelectedStamp(item)}></img>
                             <button onClick={() => __toggleCollectionItem(item)}>
                               {collection.some((collectionItem: any) => collectionItem.id === item.id) ? (
@@ -585,48 +599,53 @@ function CustomDesignScreen() {
               <div className={styles.customDesign__container__editorArea__itemSelector__itemGroup__menuEditor}>
                 <button
                   className=" rounded inline-flex items-center border-none"
-                  onClick={() => __handleSelectToolDesign('stampsItem')}
-                  style={toolSelected === 'stampsItem' ? { backgroundColor: whiteColor, borderRadius: 0 } : {}}
+                  onClick={() => __handleSelectToolDesign('modelProductTab')}
+                  style={toolSelected === 'modelProductTab' ? { backgroundColor: whiteColor, borderRadius: 0 } : {}}
                 >
-                  <GiClothes color={toolSelected === 'stampsItem' ? primaryColor : blackColor} size={30} className={`${styles.menuEditor__icon}`}></GiClothes>
+                  <GiClothes color={toolSelected === 'modelProductTab' ? primaryColor : blackColor} size={30} className={`${styles.menuEditor__icon}`}></GiClothes>
                 </button>
 
-
-                
               </div>
 
               {/* Menu bar tab colection */}
-              {toolSelected === 'stampsItem' && (
+              {toolSelected === 'modelProductTab' && (
                 <>
-                  
+                  <div className={styles.customDesign__container__editorArea__itemSelector__itemGroup__menuTabBarProduct} style={{ display: '' }}>
+                    <button className={`${styles.menuTabBar__viewSample__btn}`} onClick={() => setIsOpenProductDialog(true)}>
+                      <img src={shirtModel} className={`${styles.menuTabBar__viewSample__btn__img}`}></img>
+                      <div className={`${styles.menuTabBar__viewSample__btn__content}`}>
+                        <span>{t(codeLanguage + '000114')}</span>
+                      </div>
+                      <TbHomeHeart color={primaryColor} size={20} style={{ marginLeft: '40%' }} ></TbHomeHeart>
+                    </button>
+                    <button
+                      className={` text-white font-bold py-2 px-4 rounded ${styles.menuTabBar__createBlank__btn}`}
+
+                    >
+                      <span>{t(codeLanguage + '000113')}</span>
+                    </button>
+
+                  </div>
 
                   {/* Sample Item list area */}
-                  
-                    <div className={styles.customDesign__container__editorArea__itemSelector__itemGroup__sampleItemList}>
-                      {currentItem.map((item: any, key) => (
-                        <div
-                          key={item.id}
-                          style={selectedStamp === item.id ? { border: `2px solid ${primaryColor}` } : {}}
-                          className={styles.sampleItemCard}
-                          onClick={() => __handleSetSelectedStamp(item)}>
-                          <img src={item.imgUrl} style={{ width: '90%', height: '90%' }} alt="Item" />
-                          <button onClick={() => __toggleCollectionItem(item)}>
-                            {collection.some((collectionItem: any) => collectionItem.id === item.id) ? (
-                              <FaHeart color='red' size={20} className={styles.sampleItemCard__icon} />
-                            ) : (
-                              <FaRegHeart size={20} className={styles.sampleItemCard__icon} />
-                            )}
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  
-                    
-                  
+
+                  <div className={styles.customDesign__container__editorArea__itemSelector__itemGroup__modelProductList}>
+                    {currentItem.map((item: any, key) => (
+                      <div
+                        key={item.id}
+                        style={selectedStamp === item.id ? { border: `2px solid ${primaryColor}` } : {}}
+                      >
+                        <ProductCardDesignComponent></ProductCardDesignComponent>
+                      </div>
+                    ))}
+                  </div>
+
+
+
                 </>
               )}
 
-              
+
 
 
             </div>

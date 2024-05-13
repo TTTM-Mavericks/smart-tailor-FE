@@ -9,6 +9,8 @@ import vietnamFlag from './system/vietnam_flag.png'
 import usaFlag from './system/usa_flag.png'
 import languageIcon from './system/language.png'
 import frontOfCloth from './clothes/front.png'
+import shirtModel from './clothes/shirt-model.png'
+
 
 export {
     ai,
@@ -21,5 +23,6 @@ export {
     vietnamFlag,
     usaFlag,
     languageIcon,
-    frontOfCloth
+    frontOfCloth,
+    shirtModel
 };
