@@ -5,16 +5,23 @@ import { tokens } from '../../../theme';
 import VNLocationData from '../../../locationData.json';
 import { useTranslation } from 'react-i18next';
 
+interface UserProfileData {
+    id: string;
+    name: string;
+    address: string,
+    imgURL: string
+}
+
 const ProfileSetup = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
+    const [userInfo, setUserInfo] = useState<UserProfileData | null>(null)
     const [locations, setLocations] = useState<any[]>([]);
     const [selectedProvince, setSelectedProvince] = useState<any>(null);
     const [selectedDistrict, setSelectedDistrict] = useState<any>(null);
     const [selectedWard, setSelectedWard] = useState<any>(null);
-
-    console.log(selectedProvince + selectedDistrict + selectedWard);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         Promise.resolve(VNLocationData)
@@ -22,27 +29,98 @@ const ProfileSetup = () => {
             .catch(err => console.log("err ", err));
     }, []);
 
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const userID = localStorage.getItem('userID');
+                if (!userID) {
+                    throw new Error('User ID not found in local storage');
+                }
+
+                const apiUrl = `https://66080c21a2a5dd477b13eae5.mockapi.io/CPSE_DATA_TEST/55`;
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch user data');
+                }
+
+                const userData = await response.json();
+                setUserInfo(userData);
+
+                const addressParts = userData.address.split(', ');
+
+                // Tìm và khởi tạo selectedProvince
+                const selectedProvince = locations.find((location: any) => location.Name === addressParts[0]);
+                setSelectedProvince(selectedProvince);
+
+                // Tìm và khởi tạo selectedDistrict
+                if (selectedProvince) {
+                    const selectedDistrict = selectedProvince.Districts.find((district: any) => district.Name === addressParts[1]);
+                    setSelectedDistrict(selectedDistrict);
+                }
+
+                // Tìm và khởi tạo selectedWard
+                if (selectedDistrict) {
+                    const selectedWard = selectedDistrict.Wards.find((ward: any) => ward.Name === addressParts[2]);
+                    setSelectedWard(selectedWard);
+                }
+
+                setLoading(false);
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+
+        fetchUserData();
+    }, [locations]);
+
     const handleProvinceChange = (event: any) => {
         const provinceName = event.target.value;
         const selectedProvince = locations.find((location: any) => location.Name === provinceName);
         setSelectedProvince(selectedProvince);
         setSelectedDistrict(null);
         setSelectedWard(null);
+
+        // Cập nhật địa chỉ khi thay đổi Tỉnh/Thành phố
+        setProfileData((prevFormData) => ({
+            ...prevFormData,
+            address: `${provinceName}, , `,
+        }));
     };
 
     const handleDistrictChange = (event: any) => {
         const districtName = event.target.value;
-        const selectedDistrict = selectedProvince.Districts.find((district: any) => district.Name === districtName);
+        const selectedDistrict = selectedProvince?.Districts.find((district: any) => district.Name === districtName);
         setSelectedDistrict(selectedDistrict);
         setSelectedWard(null);
+
+        // Cập nhật địa chỉ khi thay đổi Quận/Huyện
+        setProfileData((prevFormData) => ({
+            ...prevFormData,
+            address: `${selectedProvince?.Name}, ${districtName}, `,
+        }));
     };
 
     const handleWardChange = (event: any) => {
         const wardName = event.target.value;
-        const selectedWard = selectedDistrict.Wards.find((ward: any) => ward.Name === wardName);
-        setSelectedWard(selectedWard);
+        if (selectedDistrict) {
+            const selectedWard = selectedDistrict.Wards.find((ward: any) => ward.Name === wardName);
+            setSelectedWard(selectedWard);
+
+            // Cập nhật địa chỉ khi thay đổi Phường/Xã
+            setProfileData((prevFormData) => ({
+                ...prevFormData,
+                address: `${selectedProvince?.Name}, ${selectedDistrict?.Name}, ${wardName}`,
+            }));
+        }
     };
 
+    useEffect(() => {
+        if (VNLocationData) {
+            setLocations(VNLocationData);
+        } else {
+            console.error("Không tìm thấy dữ liệu địa chỉ");
+        }
+    }, []);
 
     const [profileData, setProfileData] = useState({
         name: 'Tam',
@@ -221,32 +299,68 @@ const ProfileSetup = () => {
                         fullWidth
                         margin="normal"
                     />
-
                     <div>
-                        <select onChange={handleProvinceChange} style={{ padding: '10px', marginTop: '10px', width: '100%', borderRadius: '5px', border: '1px solid #ccc' }}>
-                            <option>Select Province</option>
+                        <select
+                            onChange={handleProvinceChange}
+                            value={selectedProvince?.Name || ''}
+                            style={{
+                                padding: '10px',
+                                marginTop: '10px',
+                                width: '100%',
+                                borderRadius: '5px',
+                                border: '1px solid #ccc',
+                            }}
+                        >
+                            <option value="">Select Province</option>
                             {locations.map((location: any) => (
-                                <option key={location.Name}>{location.Name}</option>
+                                <option key={location.Name} value={location.Name}>
+                                    {location.Name}
+                                </option>
                             ))}
                         </select>
+
                         {selectedProvince && (
-                            <select onChange={handleDistrictChange} style={{ padding: '10px', marginTop: '10px', width: '100%', borderRadius: '5px', border: '1px solid #ccc' }}>
-                                <option>Select District</option>
+                            <select
+                                onChange={handleDistrictChange}
+                                value={selectedDistrict?.Name || ''}
+                                style={{
+                                    padding: '10px',
+                                    marginTop: '10px',
+                                    width: '100%',
+                                    borderRadius: '5px',
+                                    border: '1px solid #ccc',
+                                }}
+                            >
+                                <option value="">Select District</option>
                                 {selectedProvince.Districts.map((district: any) => (
-                                    <option key={district.Name}>{district.Name}</option>
+                                    <option key={district.Name} value={district.Name}>
+                                        {district.Name}
+                                    </option>
                                 ))}
                             </select>
                         )}
+
                         {selectedDistrict && (
-                            <select onChange={handleWardChange} style={{ padding: '10px', marginTop: '10px', width: '100%', borderRadius: '5px', border: '1px solid #ccc' }}>
-                                <option>Select Ward</option>
+                            <select
+                                onChange={handleWardChange}
+                                value={selectedWard?.Name || ''}
+                                style={{
+                                    padding: '10px',
+                                    marginTop: '10px',
+                                    width: '100%',
+                                    borderRadius: '5px',
+                                    border: '1px solid #ccc',
+                                }}
+                            >
+                                <option value="">Select Ward</option>
                                 {selectedDistrict.Wards.map((ward: any) => (
-                                    <option key={ward.Name}>{ward.Name}</option>
+                                    <option key={ward.Name} value={ward.Name}>
+                                        {ward.Name}
+                                    </option>
                                 ))}
                             </select>
                         )}
                     </div>
-
                     <Button variant="contained" color="primary" onClick={handleUpdate} sx={{ mt: 2 }}>
                         {t(codeLanguage + '000060')}
                     </Button>

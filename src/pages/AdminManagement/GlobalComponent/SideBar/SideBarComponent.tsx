@@ -77,15 +77,11 @@ const SideBarComponent = () => {
         }
     }, [selectedLanguage, i18n]);
 
-    // const [selected, setSelected] = useState(() => {
-    //     // Retrieve the selected item from local storage or set the default state
-    //     // const savedSelected = localStorage.getItem('selectedMenuItem');
-    //     // return savedSelected || "Dashboard";
-    //     // t(codeLanguage + '000019')
-    //     "Dashboard" || ""
-    // })
+    const [selected, setSelected] = useState(() => {
+        const savedSelected = localStorage.getItem('selectedMenuItem');
+        return savedSelected || t(codeLanguage + '000019');
+    })
 
-    const [selected, setSelected] = useState("Dashboard")
 
     return (
         <Box
@@ -233,28 +229,28 @@ const SideBarComponent = () => {
                         </Typography>
                         <Item
                             title={t(codeLanguage + '000026')}
-                            to="/bar"
+                            to="/bar_chart"
                             icon={<BarChartOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
                         />
                         <Item
                             title={t(codeLanguage + '000027')}
-                            to="/pie"
+                            to="/pie_chart"
                             icon={<PieChartOutlineOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
                         />
                         <Item
                             title={t(codeLanguage + '000028')}
-                            to="/line"
+                            to="/line_chart"
                             icon={<TimelineOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
                         />
                         <Item
                             title={t(codeLanguage + '000029')}
-                            to="/geography"
+                            to="/geography_chart"
                             icon={<MapOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}

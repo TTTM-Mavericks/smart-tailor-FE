@@ -5,7 +5,7 @@ import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import SearchIcon from "@mui/icons-material/Search";
-import { Logout, Settings } from "@mui/icons-material";
+import { Logout, MenuOutlined, Settings } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import NotificationComponent from "../Notification/NotificationComponent";
 import { useTranslation } from 'react-i18next';
@@ -97,9 +97,18 @@ const TopbarComponent = () => {
         }
     }, [selectedLanguage, i18n]);
 
+    // Logout 
+    const handleLogout = () => {
+        //Logout Function
+        localStorage.clear()
+        window.location.href = 'https://smart-tailor-fe.pages.dev/auth/signin'
+    }
+
     return (
         <Card sx={{ backgroundColor: `${colors.primary[100]} !important` }} >
             <Box display="flex" justifyContent="space-between" p={2} >
+
+
                 {/* SEARCH BAR */}
                 <Box
                     display="flex"
@@ -207,7 +216,7 @@ const TopbarComponent = () => {
                                 </ListItemIcon>
                                 {t(codeLanguage + '000046')}
                             </MenuItem>
-                            <MenuItem onClick={handleClose}>
+                            <MenuItem onClick={handleLogout}>
                                 <ListItemIcon>
                                     <Logout fontSize="small" />
                                 </ListItemIcon>

@@ -9,12 +9,15 @@ import { themeSettings } from '../../../../theme';
 import styles from "./DashboardFAQStyles.module.scss"
 import { tokens } from "../../../../theme";
 import FAQComponent from './FAQComponent';
+import NotFound from '../Error404/Error404Component';
 
 export default function DashboardFAQScreens() {
     const theme1 = useTheme();
     const smScreen = useMediaQuery(theme1.breakpoints.up("sm"));
     const colors = tokens(theme.palette);
     const [showScrollButton, setShowScrollButton] = React.useState(false);
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
 
     React.useEffect(() => {
         const handleScroll = () => {
@@ -36,6 +39,11 @@ export default function DashboardFAQScreens() {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
+    if (isMobile) {
+        return (
+            <NotFound />
+        );
+    }
     return (
         <CssVarsProvider theme={theme}>
             <CssBaseline />

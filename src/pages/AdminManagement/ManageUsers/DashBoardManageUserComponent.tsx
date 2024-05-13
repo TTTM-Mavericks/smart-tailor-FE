@@ -7,11 +7,19 @@ import theme, { tokens } from '../../../theme';
 import styles from "./DashBoardUserStyle.module.scss"
 import ManageUsers from '../ManageUsers/ManageUsersScreens';
 import Grid from "@mui/material/Unstable_Grid2";
+import NotFound from '../GlobalComponent/Error404/Error404Component';
 
 export default function DashboardManageUserScreen() {
     const theme1 = useTheme();
     const smScreen = useMediaQuery(theme1.breakpoints.up("sm"));
     const colors = tokens(theme1.palette.mode)
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+    if (isMobile) {
+        return (
+            <NotFound />
+        );
+    }
     return (
         <CssVarsProvider theme={theme}>
             <CssBaseline />

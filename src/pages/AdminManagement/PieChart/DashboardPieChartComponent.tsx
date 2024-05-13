@@ -5,20 +5,17 @@ import { Box, CssBaseline, useMediaQuery, useTheme, IconButton, Card, Typography
 import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
 import { ArrowUpward } from '@mui/icons-material';
 import theme from '../../../theme';
-import styles from "./DashboardAdminStyle.module.scss"
-import LineChartComponent from '../LineChart/LineChartComponent';
-import BarChartComponent from '../BarChart/BarChartComponent';
+import styles from "./DashboardPieChartStyles.module.scss"
 import PieChartComponent from '../PieChart/PieChartComponent';
-import CardInformationDetailComponent from '../CardInformationDetail/CardInformationDetailComponent';
-import GeographyChartComponent from '../GeographyChart/GeographyChartComponent';
 import { tokens, themeSettings } from "../../../theme";
 import NotFound from '../GlobalComponent/Error404/Error404Component';
 
-const DashboardAdminScreens = () => {
+const DashboardPieChartScreens = () => {
     const themeColor = useTheme();
     const colors = tokens(themeColor.palette.mode);
     const [showScrollButton, setShowScrollButton] = React.useState(false);
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
 
     React.useEffect(() => {
         const handleScroll = () => {
@@ -50,7 +47,6 @@ const DashboardAdminScreens = () => {
         );
     }
 
-
     return (
         <CssVarsProvider theme={theme}>
             <CssBaseline />
@@ -59,18 +55,6 @@ const DashboardAdminScreens = () => {
                 <div className={`${styles.content}`}>
                     <TopbarComponent />
                     <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="140px" gap="20px">
-                        <Box gridColumn="span 12" gridRow="span 2">
-                            <CardInformationDetailComponent />
-                        </Box>
-                        <Box gridColumn="span 12" gridRow="span 5">
-                            <GeographyChartComponent />
-                        </Box>
-                        <Box gridColumn="span 12" gridRow="span 5">
-                            <BarChartComponent />
-                        </Box>
-                        <Box gridColumn="span 12" gridRow="span 5">
-                            <LineChartComponent />
-                        </Box>
                         <Box gridColumn="span 12" gridRow="span 5">
                             <PieChartComponent />
                         </Box>
@@ -96,4 +80,4 @@ const DashboardAdminScreens = () => {
     );
 }
 
-export default DashboardAdminScreens;
+export default DashboardPieChartScreens;
