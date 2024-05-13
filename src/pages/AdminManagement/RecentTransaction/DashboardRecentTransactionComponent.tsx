@@ -7,10 +7,18 @@ import theme from '../../../theme';
 import styles from "./DashboardRecentTransactionStyle.module.scss"
 import Grid from "@mui/material/Unstable_Grid2";
 import RecentTransactionComponent from './RecentTransactionComponent';
+import NotFound from '../GlobalComponent/Error404/Error404Component';
 
 export default function DashboardRecentTransactionScreen() {
     const theme1 = useTheme();
     const smScreen = useMediaQuery(theme1.breakpoints.up("sm"));
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+    if (isMobile) {
+        return (
+            <NotFound />
+        );
+    }
     return (
         <CssVarsProvider theme={theme}>
             <CssBaseline />

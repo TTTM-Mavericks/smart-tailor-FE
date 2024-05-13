@@ -15,6 +15,10 @@ import DashboardRecentTransactionScreen from './pages/AdminManagement/RecentTran
 import DashboardManageInvoiceScreen from './pages/AdminManagement/ManageInvoice/DashboardManageInvoiceComponent';
 import SignUpScreens from './pages/Authentication/SignUp/SignUpScreens';
 import DashboardFAQScreens from './pages/AdminManagement/GlobalComponent/FAQ/DashboardFAQComponent';
+import DashboardPieChartScreens from './pages/AdminManagement/PieChart/DashboardPieChartComponent';
+import DashboardGeographyChartScreens from './pages/AdminManagement/GeographyChart/DashboardGeographyChartComponent';
+import DashboardLineChartScreens from './pages/AdminManagement/LineChart/DashboardLineChartComponent';
+import DashboardBarChartScreens from './pages/AdminManagement/BarChart/DashboardBarChartComponent';
 
 const tokenIsValid = (token) => {
   // Implement your token validation logic here
@@ -66,6 +70,10 @@ function App() {
           <Route path='/manage_revenue' element={<DashboardRecentTransactionScreen></DashboardRecentTransactionScreen>} />
           <Route path='/manage_invoice' element={<DashboardManageInvoiceScreen></DashboardManageInvoiceScreen>} />
           <Route path='/admin_faq' element={<DashboardFAQScreens></DashboardFAQScreens>} />
+          <Route path='/pie_chart' element={<DashboardPieChartScreens></DashboardPieChartScreens>} />
+          <Route path='/geography_chart' element={<DashboardGeographyChartScreens></DashboardGeographyChartScreens>} />
+          <Route path='/line_chart' element={<DashboardLineChartScreens></DashboardLineChartScreens>} />
+          <Route path='/bar_chart' element={<DashboardBarChartScreens></DashboardBarChartScreens>} />
 
 
 
