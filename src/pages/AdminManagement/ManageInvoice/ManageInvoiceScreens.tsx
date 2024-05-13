@@ -519,6 +519,9 @@ const ManageInvoiceScreen: React.FC = () => {
                         <Button onClick={downloadInvoiceAsPDF} startIcon={<GetAppOutlined />} variant="contained" color="primary">
                             {t(codeLanguage + '000058')}
                         </Button>
+                        <Button variant="contained" color="primary">
+                            Refund Transaction
+                        </Button>
                         <Button onClick={handleCloseModal} variant="contained" color="primary">
                             {t(codeLanguage + '000059')}
                         </Button>
