@@ -7,3 +7,33 @@
     transition-duration: 300ms;
     transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
 }
+
+.canvaContainer__hoodie {
+    width: 100%;
+    max-width: 100%;
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
+    margin-top: 100px;
+}
+
+.canvaContainer__pant {
+    width: 100%;
+    max-width: 100%;
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
+}
+
+.canvaContainer__longShirt {
+    width: 100%;
+    max-width: 100%;
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
+    position: absolute;
+    bottom: -100px;
+}
