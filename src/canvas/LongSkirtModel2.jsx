@@ -6,7 +6,7 @@ import state from '../store'
 import { useEffect, useState } from "react";
 
 
-const LongShirt = () => {
+const LongSkirtModel2 = () => {
 
     const [logoDecalPositionX, setLogoDecalPositionX] = useState(0);
     const [logoDecalPositionY, setLogoDecalPositionY] = useState(0);
@@ -22,7 +22,7 @@ const LongShirt = () => {
 
     const snap = useSnapshot(state)
 
-    const { nodes, materials } = useGLTF('/women_fashionable_woven_pant.glb');
+    const { nodes, materials } = useGLTF('/victorian_ladies_hoop_skirt_dress.glb');
 
 
     const logoTexture = useTexture(snap.logoDecal);
@@ -166,19 +166,20 @@ const LongShirt = () => {
 
 
 
-    useFrame((state, delta) => easing.dampC(materials.Default_material.color, snap.color, 0.25, delta))
+    useFrame((state, delta) => easing.dampC(materials['FABRIC_1_FRONT_24072'].color, snap.color, 0.25, delta))
 
     const stateString = JSON.stringify(snap)
 
     return (
+        
         <group key={stateString}>
             <mesh
                 castShadow
-                geometry={nodes.Object_9.geometry}
-                material={materials.Default_material}
+                geometry={nodes['Object_2'].geometry}
+                material={materials['FABRIC_1_FRONT_24072']}
                 material-roughness={1}
-                scale={[1, 1, 1]}
-                dispose={null}
+                scale={[0.5, 0.5, 0.5]}
+                // position={[0, 100, 100]}
             >
                 {snap.isFullTexture && (
                     <Decal
@@ -247,4 +248,4 @@ const LongShirt = () => {
         </group>
     );
 };
-export default LongShirt;
+export default LongSkirtModel2;

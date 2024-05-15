@@ -6,7 +6,7 @@ import state from '../store'
 import { useEffect, useState } from "react";
 
 
-const Pant = () => {
+const WomanSkirtTop = () => {
 
     const [logoDecalPositionX, setLogoDecalPositionX] = useState(0);
     const [logoDecalPositionY, setLogoDecalPositionY] = useState(0);
@@ -170,7 +170,7 @@ const Pant = () => {
 
     useFrame((state, delta) => easing.dampC(materials['Scene_-_Root'].color, snap.color, 0.25, delta))
 
-    
+
 
     const stateString = JSON.stringify(snap)
 
@@ -180,7 +180,7 @@ const Pant = () => {
                 castShadow
                 geometry={nodes['Plane003__0'].geometry}
                 material={materials['Scene_-_Root']}
-                material-roughness={1}
+                material-roughness={5}
                 scale={[1, 1, 1]}
                 dispose={null}
             >
@@ -251,4 +251,4 @@ const Pant = () => {
         </group>
     );
 };
-export default Pant;
+export default WomanSkirtTop;

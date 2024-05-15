@@ -5,8 +5,11 @@ import Shirt from './Shirt';
 import styles from './Canva.module.scss';
 import Hoodie from './Hoodie';
 import { PaddingTwoTone } from '@mui/icons-material';
-import Pant from './Pant';
-import LongShirt from './LongShirt';
+import LongSkirt from './LongSkirt';
+import LongSkirtModel2 from './LongSkirtModel2';
+import WomanSkirtTop from './WomanSkirtTop';
+import WomenSkirtDown from './WomenSkirtDown';
+import WomenSkirtFull from './WomenSkirtFull';
 
 const CanvasModel = () => {
 
@@ -41,27 +44,67 @@ const CanvasModel = () => {
 
             {/* <Canvas
                 shadows
-                camera={{ position: [0.5, -10, 5], fov: 35 }}
+                camera={{ position: [0, -10, 5], fov: 35 }}
                 gl={{ preserveDrawingBuffer: true }}
                 className={styles.canvaContainer__pant}
             >
                 <ambientLight intensity={0.5} />
                 <Environment preset="city" />
                 <PresentationControls speed={1.5} global zoom={0.7} polar={[-1, Math.PI / 2]} >
-                    <Pant />
+                    <WomenSkirtFull />
+                </PresentationControls>
+            </Canvas> */}
+
+            {/* <Canvas
+                shadows
+                camera={{ position: [0, -10, 5], fov: 35 }}
+                gl={{ preserveDrawingBuffer: true }}
+                className={styles.canvaContainer__pant}
+            >
+                <ambientLight intensity={0.5} />
+                <Environment preset="city" />
+                <PresentationControls speed={1.5} global zoom={0.7} polar={[-1, Math.PI / 2]} >
+                    <WomanSkirtTop />
+                </PresentationControls>
+            </Canvas> */}
+
+            {/* <Canvas
+                shadows
+                camera={{ position: [0, -10, 5], fov: 35 }}
+                gl={{ preserveDrawingBuffer: true }}
+                className={styles.canvaContainer__pant}
+            >
+                <ambientLight intensity={0.5} />
+                <Environment preset="city" />
+                <PresentationControls speed={1.5} global zoom={0.7} polar={[-1, Math.PI / 2]} >
+                    <WomenSkirtDown />
+                </PresentationControls>
+            </Canvas> */}
+
+            {/* <Canvas
+                shadows
+                camera={{ position: [0, 0, 200], fov: 23 }}
+                gl={{ preserveDrawingBuffer: true }}
+                className={styles.canvaContainer__longSkirt}
+                
+            >
+                <ambientLight intensity={0.5} />
+                <Environment preset="city" />
+                <PresentationControls speed={1.5} global zoom={0}  >
+                        <LongSkirt />
                 </PresentationControls>
             </Canvas> */}
 
             <Canvas
                 shadows
-                camera={{ position: [0, 0, 50], fov: 65 }}
+                camera={{ position: [0, 0, 20], fov: 165 }}
                 gl={{ preserveDrawingBuffer: true }}
-                className={styles.canvaContainer__longShirt}
+                className={styles.canvaContainer}
             >
                 <ambientLight intensity={0.5} />
                 <Environment preset="city" />
-                <PresentationControls speed={1.5} global zoom={0.7} polar={[-1, Math.PI / 2]} >
-                    <LongShirt />
+                <PresentationControls speed={1.5} global zoom={0.7} polar={[-1, Math.PI / 2]}>
+                    <LongSkirtModel2 />
                 </PresentationControls>
             </Canvas>
 
