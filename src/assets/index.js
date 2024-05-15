@@ -10,6 +10,16 @@ import usaFlag from './system/usa_flag.png'
 import languageIcon from './system/language.png'
 import frontOfCloth from './clothes/front.png'
 import shirtModel from './clothes/shirt-model.png'
+import hoodieModel from './clothes/hoodie-model.png'
+import skirtFullModel from './clothes/skirt-full-model.png'
+import womenSkirtTopModel from './clothes/women-skirt-top-model.png'
+import womenSkirtBottomModel from './clothes/women-skirt-bottom-model.png'
+import longSkirtModel from './clothes/long-skirt-model.png'
+
+
+
+
+
 
 
 export {
@@ -24,5 +34,10 @@ export {
     usaFlag,
     languageIcon,
     frontOfCloth,
-    shirtModel
+    shirtModel,
+    hoodieModel,
+    skirtFullModel,
+    womenSkirtTopModel,
+    womenSkirtBottomModel,
+    longSkirtModel
 };

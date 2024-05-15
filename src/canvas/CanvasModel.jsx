@@ -16,22 +16,22 @@ const CanvasModel = () => {
     return (
         <>
 
-            {/* <Canvas
-            shadows
-            camera={{ position: [0, 0, 5], fov: 65 }}
-            gl={{ preserveDrawingBuffer: true }}
-            className={styles.canvaContainer}
-        >
-            <ambientLight intensity={0.5} />
-            <Environment preset="city" />
-            <PresentationControls speed={1.5} global zoom={0.7} polar={[-1, Math.PI / 2]}>
-                <Shirt />
-            </PresentationControls>
-        </Canvas> */}
+            <Canvas
+                shadows
+                camera={{ position: [0, 0, 5], fov: 65 }}
+                gl={{ preserveDrawingBuffer: true }}
+                className={styles.canvaContainer}
+            >
+                <ambientLight intensity={0.5} />
+                <Environment preset="city" />
+                <PresentationControls speed={1.5} global zoom={0.7} polar={[-1, Math.PI / 2]}>
+                    <Shirt />
+                </PresentationControls>
+            </Canvas>
 
             {/* <Canvas
                 shadows
-                camera={{ position: [0, 0, 700], fov: 10 }}
+                camera={{ position: [0, 0, 700], fov: 11 }}
                 gl={{ preserveDrawingBuffer: true }}
                 className={styles.canvaContainer__hoodie}
             >
@@ -95,7 +95,7 @@ const CanvasModel = () => {
                 </PresentationControls>
             </Canvas> */}
 
-            <Canvas
+            {/* <Canvas
                 shadows
                 camera={{ position: [0, 0, 20], fov: 165 }}
                 gl={{ preserveDrawingBuffer: true }}
@@ -106,7 +106,7 @@ const CanvasModel = () => {
                 <PresentationControls speed={1.5} global zoom={0.7} polar={[-1, Math.PI / 2]}>
                     <LongSkirtModel2 />
                 </PresentationControls>
-            </Canvas>
+            </Canvas> */}
 
 
         </>
