@@ -1,49 +1,41 @@
 import * as React from 'react';
 
-import { createTheme, Theme, ThemeProvider } from '@mui/material/styles';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import styles from './SignUpStyle.module.scss';
 import { HiEye, HiEyeOff } from 'react-icons/hi';
 
 // import ApiService from '../ApiAuthService';
-import { apiBaseUrl } from '../../../api/ApiConfig';
 import './SignUpStyle.css'
-import { jwtDecode } from "jwt-decode";
-import { primaryColor } from '../../../root/ColorSystem';
 import { systemLogo, usaFlag, vietnamFlag } from '../../../assets';
 
 // import Logo from '../../../assets/system/smart-tailor_logo.png'
 import { useTranslation } from 'react-i18next';
-import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
+import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
+import { __validateEmail, __validatePassword } from '../Utils';
 
 
 const defaultTheme = createTheme();
 
 
-export default function SignUpScreens() {
+export default function SignUpScreen() {
 
   // ---------------UseState Variable---------------//
   const [showLogin, setShowLogin] = React.useState(true);
   const [showRegister, setShowRegister] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
-
-  const [formData, setFormData] = React.useState({
-    email: "",
-    password: "",
-
-  });
-
-  const [formErrors, setFormErrors] = React.useState({
-    email: "",
-    password: "",
-  });
   const [selectedLanguage, setSelectedLanguage] = React.useState<string>(localStorage.getItem('language') || 'en');
   const [codeLanguage, setCodeLanguage] = React.useState('EN');
+  const [email, setEmail] = React.useState('');
+  const [errorEmailValidate, setEmailErrorValidate] = React.useState('');
+  const [isEmailValidate, setIsEmailValidate] = React.useState(true);
+  const [password, setPassword] = React.useState('');
+  const [errorPasswordValidate, setPasswordErrorValidate] = React.useState('');
+  const [isPasswordValidate, setIsPasswordValidate] = React.useState(true);
 
 
   // ---------------Usable Variable---------------//
-  const baseUrl = apiBaseUrl;
   const { t, i18n } = useTranslation();
 
   // ---------------UseEffect---------------//
@@ -60,127 +52,87 @@ export default function SignUpScreens() {
     }
 
   }, [selectedLanguage]);
+
+  /**
+ * Validate Email
+ */
+  React.useEffect(() => {
+    const error = __validateEmail(email);
+    if (!error.isValid && error.error) {
+      setEmailErrorValidate(error.error);
+      setIsEmailValidate(false);
+    } else {
+      setEmail(email);
+      setIsEmailValidate(true);
+    }
+  }, [email]);
+
+  /**
+   * Validate Password
+   */
+  React.useEffect(() => {
+    const error = __validatePassword(password);
+    if (!error.isValid && error.error) {
+      setPasswordErrorValidate(error.error);
+      setIsPasswordValidate(false);
+    } else {
+      setPassword(password);
+      setIsPasswordValidate(true);
+    }
+  }, [password]);
+
+
   // ---------------FunctionHandler---------------//
   const handleLanguageChange = (language: string) => {
     setSelectedLanguage(language);
   };
 
-  //   const apiService = new ApiService();
-
-  // UseSate variable
-
-  /**
-     * handleInputChange
-     * @param event 
-     */
-  // const handleInputChange = (event: any) => {
-  //   const { name, value, type, checked } = event.target;
-  //   setFormData((prevData) => ({
-  //     ...prevData,
-  //     [name]: type === 'checkbox' ? checked : value,
-  //   }));
-
-  //   const errorMessage =
-  //     name === "email"
-  //       ? validateEmail(value)
-  //       : name === "password"
-  //         ? validatePassword(value)
-
-  //         : ""
-
-  //   setFormErrors((prevErrors) => ({
-  //     ...prevErrors,
-  //     [name]: errorMessage,
-  //   }));
-  // };
-
-
-
   const __handleClickShowPassword = () => setShowPassword((show) => !show);
 
-  /**
-       * validateEmail
-       * @param value 
-       * @returns 
-       */
-  // const validateEmail = (value: string | any) => {
-  //   const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-
-  //   if (!value) {
-  //     return "Email is required.";
-  //   } else if (!emailRegex.test(value)) {
-  //     return "Invalid email format.";
-  //   }
-  //   return "";
-  // };
 
   /**
-     * validatePassword
-     * @param password 
-     * @returns 
+     * SignUp handler
+     * @param event 
      */
-  const validatePassword = (password: string) => {
-    // if (!password) {
-    //   return "Password is required.";
-    // } else if (password.length < 8 || password.length > 20) {
-    //   return "Password must be between 8 and 20 characters.";
-    // }
+  const __handleSignUp = async () => {
 
-    // const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
-    // if (!passwordRegex.test(password)) {
-    //   return "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.";
-    // }
+    try {
+      const requestData = {
+        email: email,
+        password: password,
+      }
 
-    // return "";
+      const response = await api.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.signup}`, requestData);
+      if (response.success === 200) {
+        // sessionStorage.setItem('userData', JSON.stringify(response.data.user));
+        // sessionStorage.setItem('access_token', JSON.stringify(response.data.access_token));
+        // sessionStorage.setItem('refresh_token', JSON.stringify(response.data.refresh_token));
+        console.log(response.data);
+        setTimeout(() => {
+
+        }, 1000)
+      } else {
+        // Toast.show({
+        //   type: 'error',
+        //   text1: JSON.stringify(response.message),
+        //   position: 'top'
+        // });
+        
+
+      }
+      console.log(response);
+    } catch (error: any) {
+      console.error('Error posting data:', error);
+      // Toast.show({
+      //   type: 'error',
+      //   text1: JSON.stringify(error.message),
+      //   position: 'top'
+      // });
+      // setIsLoading(false);
+    }
+
+
   };
-
-
-  const toggleFormRegister = () => {
-    setShowRegister(!showRegister);
-  };
-
-  const toggleFormLogin = () => {
-    setShowLogin(!showLogin);
-  };
-
-  /**
-   * handleLogin
-   * @param event 
-   */
-  //   const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
-  //     event.preventDefault();
-  //     const body = formData
-  //     console.log(body);
-  //     console.log(baseUrl + 'auth' + '/login');
-
-  //     const obj = apiService.postData('auth' + '/login', body)
-  //     obj
-  //     .then((res) => {
-  //       localStorage.setItem("userID", res.userID)
-  //       localStorage.setItem("email", res.userID)
-  //       localStorage.setItem("role", res.role)
-  //       localStorage.setItem("isLogined", "isLogined")
-  //       console.log(res);
-  //       localStorage.setItem("accessToken", res.access_token)
-  //       const decoded = jwtDecode(res.access_token);
-
-  //       console.log(decoded);
-  //       const currentPage = localStorage.getItem("currentPage")
-  //       if (currentPage) {
-  //         window.location.href = currentPage
-  //       } else {
-  //         window.location.href = '/'
-
-  //       }
-  //     }).catch((err) => {
-  //       Swal.fire(
-  //         'Authentication!',
-  //         'Your email or password is wrong !!!',
-  //         'error'
-  //       );
-  //     })
-  //   };
-
   return (
     <ThemeProvider theme={defaultTheme}>
       <div className={styles.signup__container}>
@@ -260,8 +212,12 @@ export default function SignUpScreens() {
                     autoComplete="email"
                     required
                     className={`block h-11 w-full pl-3 pr-10 rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6  ${styles.signup__input}`}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
+                {!isEmailValidate && (
+                  <span className={`${styles.error__txt}`}>{errorEmailValidate}</span>
+                )}
               </div>
 
               <div>
@@ -274,6 +230,8 @@ export default function SignUpScreens() {
                     autoComplete="current-password"
                     required
                     className={`block h-11 w-full pl-3 pr-10 rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6  ${styles.signup__input}`}
+                    onChange={(e) => setPassword(e.target.value)}
+
                   />
                   {/* Show/hide password toggle button */}
                   <button
@@ -284,6 +242,9 @@ export default function SignUpScreens() {
                     {showPassword ? <HiEyeOff /> : <HiEye />}
                   </button>
                 </div>
+                {!isPasswordValidate && (
+                  <span className={`${styles.error__txt}`}>{errorPasswordValidate}</span>
+                )}
               </div>
 
               <div>
@@ -319,8 +280,8 @@ export default function SignUpScreens() {
               <div>
                 <button
                   type="submit"
-                  className="flex mb-2 h-11 w-full items-center justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                  style={{ backgroundColor: primaryColor }}
+                  className={`${styles.signup__btn} flex mb-2 h-11 w-full items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white`}
+                  onClick={() => __handleSignUp()}
                 >
                   {t(codeLanguage + '000003')}
                 </button>
@@ -328,7 +289,7 @@ export default function SignUpScreens() {
 
                 <button
                   type="submit"
-                  className="flex h-11 w-full items-center justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  className={`${styles.signupGoogle__btn} flex mb-2 h-11 w-full items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white`}
                   onClick={() => window.location.href = 'https://st.mavericks-tttm.studio/oauth2/authorization/google'}
                 >
                   {t(codeLanguage + '000006')}
@@ -339,7 +300,7 @@ export default function SignUpScreens() {
               <p className="mt-10 text-center text-sm text-gray-500">
                 {t(codeLanguage + '000013')}?{' '}
                 <a href="/auth/signin" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-                {t(codeLanguage + '000018')}
+                  {t(codeLanguage + '000018')}
                 </a>
               </p>
             </div>

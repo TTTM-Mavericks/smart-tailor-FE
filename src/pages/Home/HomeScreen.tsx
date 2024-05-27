@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import HeaderComponent from '../../components/Header/HeaderComponent';
 import FooterComponent from '../../components/Footer/FooterComponent';
@@ -9,6 +9,7 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { Switch } from '@headlessui/react'
 import { primaryColor } from '../../root/ColorSystem';
 import { useTranslation } from 'react-i18next';
+import axios from 'axios';
 
 
 
@@ -114,6 +115,21 @@ const HomeScreen = () => {
     const [agreed, setAgreed] = useState(false)
     // ---------------Usable Variable---------------//
     // ---------------UseEffect---------------//
+    useEffect(() => {
+        console.log('hostname: ', window.location.href);
+        // getHeaders(window.location.host)
+        __getHeaders(window.location.href)
+    }, []);
+
+    const __getHeaders = async (url: string) => {
+        try {
+            const response = await axios.head(url);
+            console.log(response.headers);
+            return response.headers;
+        } catch (error) {
+            console.error('Error fetching headers:', error);
+        }
+    };
     // ---------------FunctionHandler---------------//
     const classNames = (...classes: any[]) => {
         return classes.filter(Boolean).join(' ')

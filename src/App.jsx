@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import { jwtDecode } from 'jwt-decode';
 import CustomDesignScreen from './pages/CustomDesign/CustomDesignScreen';
-import SignInScreen from './pages/Authentication/SignIn/SignInScreens';
 import DashboardAdminScreens from './pages/AdminManagement/DashboardAdmin/DashboardAdminScreens';
 import DashboardAdminProfileScreens from './pages/AdminManagement/AdminProfile/AdminProfileComponent';
 import AboutUsPage from './pages/AboutUs/AboutUsScreen';
@@ -13,12 +12,12 @@ import ContactUsPage from './pages/ContactUs/ContactUsScreen';
 import DashboardManageUserScreen from './pages/AdminManagement/ManageUsers/DashBoardManageUserComponent';
 import DashboardRecentTransactionScreen from './pages/AdminManagement/RecentTransaction/DashboardRecentTransactionComponent';
 import DashboardManageInvoiceScreen from './pages/AdminManagement/ManageInvoice/DashboardManageInvoiceComponent';
-import SignUpScreens from './pages/Authentication/SignUp/SignUpScreens';
 import DashboardFAQScreens from './pages/AdminManagement/GlobalComponent/FAQ/DashboardFAQComponent';
 import DashboardPieChartScreens from './pages/AdminManagement/PieChart/DashboardPieChartComponent';
 import DashboardGeographyChartScreens from './pages/AdminManagement/GeographyChart/DashboardGeographyChartComponent';
 import DashboardLineChartScreens from './pages/AdminManagement/LineChart/DashboardLineChartComponent';
 import DashboardBarChartScreens from './pages/AdminManagement/BarChart/DashboardBarChartComponent';
+import { SignInScreen, SignUpScreen } from './pages/Authentication';
 
 const tokenIsValid = (token) => {
   // Implement your token validation logic here
@@ -61,7 +60,7 @@ function App() {
           <Route path='/' element={<HomeScreen></HomeScreen>} />
           <Route path='/design' element={<CustomDesignScreen></CustomDesignScreen>} />
           <Route path='/auth/signin' element={<SignInScreen></SignInScreen>} />
-          <Route path='/auth/signup' element={<SignUpScreens></SignUpScreens>} />
+          <Route path='/auth/signup' element={<SignUpScreen></SignUpScreen>} />
           <Route path='/admin' element={<DashboardAdminScreens></DashboardAdminScreens>} />
           <Route path='/admin_profile' element={<DashboardAdminProfileScreens></DashboardAdminProfileScreens>} />
           <Route path='/about' element={<AboutUsPage></AboutUsPage>} />
