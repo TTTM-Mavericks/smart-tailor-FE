@@ -1,6 +1,5 @@
 import React from "react";
-import { Box, Card, Typography, useTheme } from "@mui/material";
-import ProgressCircle from "../ProgressCircle/ProgressCircleComponent";
+import { Card, useTheme } from "@mui/material";
 import { tokens } from "../../../../theme";
 
 interface StatBoxProps {

@@ -1,4 +1,3 @@
-import React from "react";
 import { Box } from "@mui/material";
 import { useTheme } from '@mui/material';
 import { tokens } from '../../../../theme';

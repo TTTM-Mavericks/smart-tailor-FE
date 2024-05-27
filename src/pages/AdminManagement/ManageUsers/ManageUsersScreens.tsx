@@ -10,7 +10,6 @@ import EditUserPopUpScreens from "./EditUsersPopUpScreens";
 import { Add } from "@mui/icons-material";
 import AddEachUsersWithHand from "./AddEachWithHand/AddEachUsersWithHandScreens";
 import AddMultipleComponentWithExcel from "./AddMultipleUserWithExcel/AddMultipleUsersComponent";
-import styles from './ManageUsersStyle.module.scss'
 import { useTranslation } from 'react-i18next';
 
 interface User {
@@ -261,8 +260,6 @@ const ManageUsers: React.FC = () => {
         return row.registrarId; // Sử dụng một thuộc tính duy nhất làm id cho mỗi hàng
     };
 
-
-
     return (
         <Box m="20px">
             <Box
@@ -295,6 +292,9 @@ const ManageUsers: React.FC = () => {
                     "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
                         color: `${colors.primary[200]} !important`,
                     },
+                    "& .MuiBadge-badge": {
+                        display: "none !important"
+                    }
                 }}
             >
                 <Button

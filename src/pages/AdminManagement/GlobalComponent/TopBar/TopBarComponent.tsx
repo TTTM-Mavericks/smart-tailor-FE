@@ -1,13 +1,29 @@
 import * as React from "react";
-import { MenuItem, InputBase, Avatar, Box, Divider, IconButton, List, ListItemIcon, SwipeableDrawer, Menu, ToggleButton, ToggleButtonGroup, Tooltip, useColorScheme, useTheme, Typography, Button, makeStyles, Card } from "@mui/material";
+import {
+    MenuItem,
+    InputBase,
+    Avatar,
+    Box,
+    Divider,
+    IconButton,
+    List,
+    ListItemIcon,
+    SwipeableDrawer,
+    Menu,
+    ToggleButton,
+    ToggleButtonGroup,
+    Tooltip,
+    useColorScheme,
+    useTheme,
+    Card,
+} from "@mui/material";
 import { tokens } from "../../../../theme";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import SearchIcon from "@mui/icons-material/Search";
-import { Logout, MenuOutlined, Settings } from "@mui/icons-material";
+import { Logout, Settings } from "@mui/icons-material";
 import { Link } from "react-router-dom";
-import NotificationComponent from "../Notification/NotificationComponent";
 import { useTranslation } from 'react-i18next';
 import LanguageSetting from "../LanguageSetting/LanguageSettingComponent";
 import NotificationWithSocketIOScreen from "../Notification/NotificationWithSocketIOComponent";

@@ -19,6 +19,13 @@ import DashboardPieChartScreens from './pages/AdminManagement/PieChart/Dashboard
 import DashboardGeographyChartScreens from './pages/AdminManagement/GeographyChart/DashboardGeographyChartComponent';
 import DashboardLineChartScreens from './pages/AdminManagement/LineChart/DashboardLineChartComponent';
 import DashboardBarChartScreens from './pages/AdminManagement/BarChart/DashboardBarChartComponent';
+import DashboardEmployeeProfileScreens from './pages/EmployeeManagement/EmployeeProfile/EmployeeProfileDashboardComponent';
+import DashboardEmployeeScreens from './pages/EmployeeManagement/DashboardEmployee/DashboardEmployeeScreen';
+import DashboardEmployeeManageUserScreen from './pages/EmployeeManagement/ManageCustomer/DashboardEmployeeComponent';
+import DashboardEmployeeManageBrandScreens from './pages/EmployeeManagement/ManageBrand/DashboardEmployeeManageBrandComponent';
+import DashboardManageReportScreen from './pages/EmployeeManagement/ManageReport/DashboardManageReportComponent';
+import DashboardManageOrderScreen from './pages/EmployeeManagement/ManageOrder/DashboardManageOrderComponent';
+import DashboardManageTransactionScreen from './pages/EmployeeManagement/ManageOrder/DashboardManageOrderComponent';
 
 const tokenIsValid = (token) => {
   // Implement your token validation logic here
@@ -74,6 +81,14 @@ function App() {
           <Route path='/geography_chart' element={<DashboardGeographyChartScreens></DashboardGeographyChartScreens>} />
           <Route path='/line_chart' element={<DashboardLineChartScreens></DashboardLineChartScreens>} />
           <Route path='/bar_chart' element={<DashboardBarChartScreens></DashboardBarChartScreens>} />
+          <Route path='/employee' element={<DashboardEmployeeScreens></DashboardEmployeeScreens>} />
+          <Route path='/manager_customer' element={<DashboardEmployeeManageUserScreen></DashboardEmployeeManageUserScreen>} />
+          <Route path='/employee_profile' element={<DashboardEmployeeProfileScreens></DashboardEmployeeProfileScreens>} />
+          <Route path='/manage_brand' element={<DashboardEmployeeManageBrandScreens></DashboardEmployeeManageBrandScreens>} />
+          <Route path='/manage_report' element={<DashboardManageReportScreen></DashboardManageReportScreen>} />
+          <Route path='/manager_order' element={<DashboardManageOrderScreen></DashboardManageOrderScreen>} />
+          <Route path='/manage_transaction' element={<DashboardManageTransactionScreen></DashboardManageTransactionScreen>} />
+
 
 
 

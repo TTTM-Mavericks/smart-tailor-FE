@@ -1,19 +1,16 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
     Box,
     useTheme,
-    useMediaQuery,
     Card,
     CardContent,
     Typography,
-    IconButton,
     CardMedia,
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { tokens } from "../../../theme";
 import { useTranslation } from 'react-i18next';
 import CountUp from 'react-countup';
-import { height } from "@mui/system";
 
 const CardInformationDetailComponent = () => {
     const theme = useTheme();

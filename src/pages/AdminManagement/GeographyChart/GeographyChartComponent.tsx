@@ -1,4 +1,4 @@
-import { Box, Card, useTheme } from "@mui/material";
+import { Card, useTheme } from "@mui/material";
 import GeographyChart from "./GeographyChartScreens";
 import { tokens } from "../../../theme";
 

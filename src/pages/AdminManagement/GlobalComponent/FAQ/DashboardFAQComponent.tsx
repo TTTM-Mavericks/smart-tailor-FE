@@ -5,7 +5,6 @@ import { Box, CssBaseline, useMediaQuery, useTheme, IconButton } from "@mui/mate
 import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
 import { ArrowUpward } from '@mui/icons-material';
 import theme from '../../../../theme';
-import { themeSettings } from '../../../../theme';
 import styles from "./DashboardFAQStyles.module.scss"
 import { tokens } from "../../../../theme";
 import FAQComponent from './FAQComponent';
