@@ -32,7 +32,7 @@ const DashboardGeographyChartScreens = () => {
         };
     }, []);
 
-    const scrollToTop = () => {
+    const _handleScrollToTop = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
@@ -69,7 +69,7 @@ const DashboardGeographyChartScreens = () => {
                                 backgroundColor: "#E96208",
                                 color: "white"
                             }}
-                            onClick={scrollToTop}
+                            onClick={_handleScrollToTop}
                         >
                             <ArrowUpward />
                         </IconButton>

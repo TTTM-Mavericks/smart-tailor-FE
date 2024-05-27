@@ -24,7 +24,7 @@ const Item: React.FC<ItemProps> = ({ title, to, icon, selected, setSelected }) =
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
-    const handleItemClick = () => {
+    const _handleItemClick = () => {
         setSelected(title);
         localStorage.setItem('selectedMenuItem', title);
     };
@@ -35,7 +35,7 @@ const Item: React.FC<ItemProps> = ({ title, to, icon, selected, setSelected }) =
             style={{
                 color: colors.primary[200],
             }}
-            onClick={handleItemClick}
+            onClick={_handleItemClick}
             icon={icon}
         >
             <Typography>{title}</Typography>

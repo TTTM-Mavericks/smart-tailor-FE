@@ -17,7 +17,7 @@ const DashboardEmployeeScreens = () => {
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     React.useEffect(() => {
-        const handleScroll = () => {
+        const _handleScroll = () => {
             if (window.scrollY > 200) {
                 setShowScrollButton(true);
             } else {
@@ -25,14 +25,14 @@ const DashboardEmployeeScreens = () => {
             }
         };
 
-        window.addEventListener('scroll', handleScroll);
+        window.addEventListener('scroll', _handleScroll);
 
         return () => {
-            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('scroll', _handleScroll);
         };
     }, []);
 
-    const scrollToTop = () => {
+    const _handleScrollToTop = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
@@ -73,7 +73,7 @@ const DashboardEmployeeScreens = () => {
                                 backgroundColor: "#E96208",
                                 color: "white"
                             }}
-                            onClick={scrollToTop}
+                            onClick={_handleScrollToTop}
                         >
                             <ArrowUpward />
                         </IconButton>

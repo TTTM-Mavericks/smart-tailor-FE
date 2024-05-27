@@ -45,16 +45,16 @@ const EmployeeManageOrder: React.FC = () => {
 
     // Open Edit PopUp when clicking on the edit icon
     const [editopen, setEditOpen] = React.useState(false);
-    const handleEditOpen = () => setEditOpen(true);
-    const handleEditClose = () => setEditOpen(false);
+    const _handleEditOpen = () => setEditOpen(true);
+    const _handleEditClose = () => setEditOpen(false);
 
     // open or close the add modal
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
-    const handleClick = (event: any) => {
+    const _handleClick = (event: any) => {
         setAnchorEl(event.currentTarget);
     };
-    const handleClose = () => {
+    const _handleClose = () => {
         setAnchorEl(null);
     };
     console.log("anchorEl" + anchorEl);
@@ -62,22 +62,22 @@ const EmployeeManageOrder: React.FC = () => {
     // close open pop up
     const [addOpenOrClose, setAddOpenOrClose] = React.useState(false)
 
-    const handleAddOpen = () => {
+    const _handleAddOpen = () => {
         setAddOpenOrClose(true);
     }
 
-    const handleAddClose = () => {
+    const _handleAddClose = () => {
         setAddOpenOrClose(false)
     }
 
     // close open pop up
     const [addMultiple, setAddMultiple] = React.useState(false)
 
-    const handleAddMultipleOpen = () => {
+    const _handleAddMultipleOpen = () => {
         setAddMultiple(true);
     }
 
-    const handleAddMultipleClose = () => {
+    const _handleAddMultipleClose = () => {
         setAddMultiple(false)
     }
 
@@ -115,17 +115,17 @@ const EmployeeManageOrder: React.FC = () => {
     }, []);
 
     // Thêm người dùng mới vào danh sách
-    const handleAddUser = (newUser: User) => {
+    const _handleAddUser = (newUser: User) => {
         setData(prevData => [...prevData, newUser]);
     }
 
     // Cập nhật người dùng trong danh sách
-    const handleUpdateUser = (updatedUser: User) => {
+    const _handleUpdateUser = (updatedUser: User) => {
         setData(prevData => prevData.map(user => user.id === updatedUser.id ? updatedUser : user));
     }
 
     // EDIT 
-    const handleEditClick = (id: number, registrarId: string, name: string, age: number, phone: string, email: string, address: string, city: string, zipCode: string) => {
+    const _handleEditClick = (id: number, registrarId: string, name: string, age: number, phone: string, email: string, address: string, city: string, zipCode: string) => {
         // Handle edit action
         const userDataToEdit: User = {
             id: id,
@@ -139,11 +139,11 @@ const EmployeeManageOrder: React.FC = () => {
             zipCode: zipCode
         }
         setFormId(userDataToEdit);
-        handleEditOpen();
+        _handleEditOpen();
     };
 
     //DELETE OR UPDATE
-    const handleDeleteClick = async (id: number) => {
+    const _handleDeleteClick = async (id: number) => {
         // Handle delete action
         try {
             const response = await fetch(`https://66080c21a2a5dd477b13eae5.mockapi.io/CPSE_DATA_TEST/${id}`, {
@@ -174,7 +174,7 @@ const EmployeeManageOrder: React.FC = () => {
                 cancelButtonText: `${t(codeLanguage + '000055')}`
             });
             if (result.isConfirmed) {
-                await handleDeleteClick(id);
+                await _handleDeleteClick(id);
                 Swal.fire(
                     `${t(codeLanguage + '000064')}`,
                     `${t(codeLanguage + '000065')}`,
@@ -242,7 +242,7 @@ const EmployeeManageOrder: React.FC = () => {
             sortable: false,
             renderCell: (params) => (
                 <Box>
-                    <IconButton onClick={() => handleEditClick(params.row.id, params.row.registrarId, params.row.name, params.row.age, params.row.email, params.row.phone, params.row.address, params.row.city, params.row.zipCode)}>
+                    <IconButton onClick={() => _handleEditClick(params.row.id, params.row.registrarId, params.row.name, params.row.age, params.row.email, params.row.phone, params.row.address, params.row.city, params.row.zipCode)}>
                         <EditIcon />
                     </IconButton>
                     <IconButton onClick={() => confirmDelete(params.row.id)}>
@@ -312,9 +312,9 @@ const EmployeeManageOrder: React.FC = () => {
                     <Box sx={style}>
                         {formId !== null && (
                             <EditCustomerPopUpScreens
-                                editClose={handleEditClose}
+                                editClose={_handleEditClose}
                                 fid={formId}
-                                updateUser={handleUpdateUser}
+                                updateUser={_handleUpdateUser}
                             />
                         )}
                     </Box>

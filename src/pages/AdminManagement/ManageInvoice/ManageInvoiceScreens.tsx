@@ -56,11 +56,11 @@ const ManageInvoiceScreen: React.FC = () => {
             .catch(error => console.error('Error fetching data:', error));
     }, []);
 
-    const handleViewInvoice = (invoice: Invoice) => {
+    const _handleViewInvoice = (invoice: Invoice) => {
         setSelectedInvoice(invoice);
     };
 
-    const handleCloseModal = () => {
+    const _handleCloseModal = () => {
         setSelectedInvoice(null);
     };
 
@@ -283,7 +283,7 @@ const ManageInvoiceScreen: React.FC = () => {
             sortable: false,
             renderCell: (params) => (
                 <Box>
-                    <IconButton onClick={() => handleViewInvoice(params.row)}>
+                    <IconButton onClick={() => _handleViewInvoice(params.row)}>
                         <ViewCompactAltOutlined />
                     </IconButton>
                 </Box>
@@ -351,7 +351,7 @@ const ManageInvoiceScreen: React.FC = () => {
 
             <Modal
                 open={!!selectedInvoice}
-                onClose={handleCloseModal}
+                onClose={_handleCloseModal}
                 aria-labelledby="invoice-details-modal"
                 aria-describedby="invoice-details-description"
             >
@@ -512,7 +512,7 @@ const ManageInvoiceScreen: React.FC = () => {
                         <Button variant="contained" color="primary">
                             Refund Transaction
                         </Button>
-                        <Button onClick={handleCloseModal} variant="contained" color="primary">
+                        <Button onClick={_handleCloseModal} variant="contained" color="primary">
                             {t(codeLanguage + '000059')}
                         </Button>
                     </div>

@@ -13,7 +13,7 @@ const PieChart = () => {
     const filteredData = option === "month" ? pieChartData : [];
     console.log("filter data" + filteredData + option);
 
-    const handleChange = (e: any) => {
+    const _handleChange = (e: any) => {
         setOption(e.target.value)
     }
 
@@ -39,7 +39,7 @@ const PieChart = () => {
                         color="primary"
                         value={option}
                         exclusive
-                        onChange={handleChange}
+                        onChange={_handleChange}
                         aria-label="Platform"
                     >
                         <ToggleButton value="month" sx={{ color: colors.primary[200], fontWeight: "bold" }}>

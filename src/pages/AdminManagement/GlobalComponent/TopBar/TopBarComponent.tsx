@@ -43,14 +43,14 @@ const TopbarComponent = () => {
     // open menu account
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    const _handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
-    const handleClose = () => {
+    const _handleClose = () => {
         setAnchorEl(null);
     };
 
-    const handleChange = (e: any) => {
+    const _handleChange = (e: any) => {
         setMode(e.target.value)
     }
 
@@ -84,7 +84,7 @@ const TopbarComponent = () => {
                     color="primary"
                     value={alignment}
                     exclusive
-                    onChange={handleChange}
+                    onChange={_handleChange}
                     aria-label="Platform"
                 >
                     <ToggleButton value="light" sx={{ color: 'black' }}>
@@ -114,7 +114,7 @@ const TopbarComponent = () => {
     }, [selectedLanguage, i18n]);
 
     // Logout 
-    const handleLogout = () => {
+    const _handleLogout = () => {
         //Logout Function
         localStorage.clear()
         window.location.href = 'https://smart-tailor-fe.pages.dev/auth/signin'
@@ -174,7 +174,7 @@ const TopbarComponent = () => {
                         <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
                             <Tooltip title={t(codeLanguage + '000044')}>
                                 <IconButton
-                                    onClick={handleClick}
+                                    onClick={_handleClick}
                                     size="small"
                                     sx={{ ml: 2 }}
                                     aria-controls={open ? 'account-menu' : undefined}
@@ -189,8 +189,8 @@ const TopbarComponent = () => {
                             anchorEl={anchorEl}
                             id="account-menu"
                             open={open}
-                            onClose={handleClose}
-                            onClick={handleClose}
+                            onClose={_handleClose}
+                            onClick={_handleClose}
                             PaperProps={{
                                 elevation: 0,
                                 sx: {
@@ -226,13 +226,13 @@ const TopbarComponent = () => {
                                 </Link>
                             </MenuItem>
                             <Divider />
-                            <MenuItem onClick={handleClose}>
+                            <MenuItem onClick={_handleClose}>
                                 <ListItemIcon>
                                     <Settings fontSize="small" />
                                 </ListItemIcon>
                                 {t(codeLanguage + '000046')}
                             </MenuItem>
-                            <MenuItem onClick={handleLogout}>
+                            <MenuItem onClick={_handleLogout}>
                                 <ListItemIcon>
                                     <Logout fontSize="small" />
                                 </ListItemIcon>

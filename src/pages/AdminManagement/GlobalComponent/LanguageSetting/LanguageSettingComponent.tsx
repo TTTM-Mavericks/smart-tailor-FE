@@ -25,7 +25,7 @@ const LanguageSetting = () => {
         }
     }, [selectedLanguage]);
 
-    const handleLanguageChange = (language: string) => {
+    const _handleLanguageChange = (language: string) => {
         setSelectedLanguage(language);
     };
 
@@ -56,7 +56,7 @@ const LanguageSetting = () => {
                 >
                     <Menu.Items className="absolute justify-center items-center right-40 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                         <Menu.Item>
-                            <button className={`flex  space-x-2 ${styles.language__button}`} onClick={() => handleLanguageChange('vi')}>
+                            <button className={`flex  space-x-2 ${styles.language__button}`} onClick={() => _handleLanguageChange('vi')}>
                                 <div className={`${styles.language__button}`}>
                                     <img src={vietnamFlag} style={{ width: '35px', height: '35px', marginLeft: 30 }}></img>
                                     <span className='text-black'>{t(codeLanguage + '000016')}</span>
@@ -64,7 +64,7 @@ const LanguageSetting = () => {
                             </button>
                         </Menu.Item>
                         <Menu.Item>
-                            <button className={`flex  space-x-2 ${styles.language__button}`} onClick={() => handleLanguageChange('en')}>
+                            <button className={`flex  space-x-2 ${styles.language__button}`} onClick={() => _handleLanguageChange('en')}>
                                 <div className={`${styles.language__button}`}>
                                     <img src={usaFlag} style={{ width: '35px', height: '35px', marginLeft: 30 }}></img>
                                     <span className='text-black'>{t(codeLanguage + '000025')}</span>

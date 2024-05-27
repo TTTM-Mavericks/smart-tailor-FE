@@ -23,11 +23,11 @@ const AdminProfileScreens: React.FC = () => {
     const [files, setFiles] = useState<string[]>([]);
 
 
-    const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const _handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFiles = e.target.files;
 
         if (selectedFiles && selectedFiles.length > 0) {
-            const imageUrls = await uploadToCloudinary(selectedFiles);
+            const imageUrls = await _handleUploadToCloudinary(selectedFiles);
 
             setFiles((prevFiles) => [...prevFiles, ...imageUrls]);
             setFormData((prevFormData) => ({
@@ -40,7 +40,7 @@ const AdminProfileScreens: React.FC = () => {
     };
 
 
-    const uploadToCloudinary = async (files: FileList): Promise<string[]> => {
+    const _handleUploadToCloudinary = async (files: FileList): Promise<string[]> => {
         try {
             const cloud_name = "dby2saqmn";
             const preset_key = "whear-app";
@@ -103,7 +103,7 @@ const AdminProfileScreens: React.FC = () => {
         fetchUserData();
     }, []);
 
-    const handleEditOpen = () => {
+    const _handleEditOpen = () => {
         if (userData) {
             setEditedName(userData.username);
             setEditedEmail(userData.email);
@@ -112,11 +112,11 @@ const AdminProfileScreens: React.FC = () => {
         }
     };
 
-    const handleEditClose = () => {
+    const _handleEditClose = () => {
         setEditOpen(false);
     };
 
-    const handleEditSave = async () => {
+    const _handleEditSave = async () => {
         try {
             if (!userData || userData.userID === undefined) {
                 throw new Error('User data or user ID is missing');
@@ -153,7 +153,7 @@ const AdminProfileScreens: React.FC = () => {
         }
     };
 
-    const handleLogout = async () => {
+    const _handleLogout = async () => {
         try {
             const result = await Swal.fire({
                 title: 'Confirm Logout',
@@ -198,11 +198,11 @@ const AdminProfileScreens: React.FC = () => {
                             <Typography variant="h6" gutterBottom>Email: {userData.email}</Typography>
 
                             <div style={{ display: "flex" }}>
-                                <Button variant="contained" color="primary" startIcon={<EditIcon />} onClick={handleEditOpen} style={{ marginTop: 20 }}>
+                                <Button variant="contained" color="primary" startIcon={<EditIcon />} onClick={_handleEditOpen} style={{ marginTop: 20 }}>
                                     Edit
                                 </Button>
 
-                                <Button variant="contained" color="secondary" onClick={handleLogout} style={{ marginTop: 20, marginLeft: "20px" }}>
+                                <Button variant="contained" color="secondary" onClick={_handleLogout} style={{ marginTop: 20, marginLeft: "20px" }}>
                                     Logout
                                 </Button>
                             </div>
@@ -211,7 +211,7 @@ const AdminProfileScreens: React.FC = () => {
                 )}
 
                 {/* Edit Modal */}
-                <Modal open={editOpen} onClose={handleEditClose}>
+                <Modal open={editOpen} onClose={_handleEditClose}>
                     <Container maxWidth="sm" style={{ marginTop: '20vh', backgroundColor: 'white', padding: 20 }}>
                         <Typography variant="h5" align="center" gutterBottom>Edit Profile</Typography>
                         <Grid container spacing={2}>
@@ -239,7 +239,7 @@ const AdminProfileScreens: React.FC = () => {
                             </Grid>
 
                             <Grid item xs={12}>
-                                <input type="file" multiple onChange={handleChange}
+                                <input type="file" multiple onChange={_handleChange}
                                     ref={fileInputRef} />
                                 {files.map((imageUrl, index) => (
                                     <img key={index} src={imageUrl} alt={`Image ${index}`} />
@@ -249,7 +249,7 @@ const AdminProfileScreens: React.FC = () => {
 
                         </Grid>
                         <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20 }}>
-                            <Button variant="contained" color="primary" onClick={handleEditSave}>
+                            <Button variant="contained" color="primary" onClick={_handleEditSave}>
                                 Save Changes
                             </Button>
                         </div>

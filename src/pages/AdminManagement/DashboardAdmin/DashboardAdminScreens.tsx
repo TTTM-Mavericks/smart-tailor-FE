@@ -36,7 +36,7 @@ const DashboardAdminScreens = () => {
         };
     }, []);
 
-    const scrollToTop = () => {
+    const _handleScrollToTop = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
@@ -59,7 +59,7 @@ const DashboardAdminScreens = () => {
                 <div className={`${styles.content}`}>
                     <TopbarComponent />
                     <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="140px" gap="20px">
-                        <Box gridColumn="span 12" gridRow="span 2">
+                        <Box gridColumn="span 12" gridRow="span 1">
                             <CardInformationDetailComponent />
                         </Box>
                         <Box gridColumn="span 12" gridRow="span 5">
@@ -85,7 +85,7 @@ const DashboardAdminScreens = () => {
                                 backgroundColor: "#E96208",
                                 color: "white"
                             }}
-                            onClick={scrollToTop}
+                            onClick={_handleScrollToTop}
                         >
                             <ArrowUpward />
                         </IconButton>

@@ -95,7 +95,7 @@ const AddEachUsersWithHand: React.FC<AddUserWithHandsFormProps> = ({ closeCard, 
     //     }
     // };
 
-    const handleFormChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const _handleFormChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData(prevFormData => ({
             ...prevFormData,
@@ -104,7 +104,7 @@ const AddEachUsersWithHand: React.FC<AddUserWithHandsFormProps> = ({ closeCard, 
     };
 
 
-    const handleSubmit = async () => {
+    const _handleSubmit = async () => {
         try {
             console.log('Form Data:', JSON.stringify(formData));
 
@@ -191,7 +191,7 @@ const AddEachUsersWithHand: React.FC<AddUserWithHandsFormProps> = ({ closeCard, 
                             sx={{ minWidth: '100%' }}
                             name="registrarId"
                             value={formData.registrarId}
-                            onChange={handleFormChange}
+                            onChange={_handleFormChange}
                         />
                     </Grid>
                     <Grid item xs={12}>
@@ -203,7 +203,7 @@ const AddEachUsersWithHand: React.FC<AddUserWithHandsFormProps> = ({ closeCard, 
                             sx={{ minWidth: '100%' }}
                             name="name"
                             value={formData.name}
-                            onChange={handleFormChange}
+                            onChange={_handleFormChange}
                         />
                     </Grid>
 
@@ -216,7 +216,7 @@ const AddEachUsersWithHand: React.FC<AddUserWithHandsFormProps> = ({ closeCard, 
                             sx={{ minWidth: '100%' }}
                             name="age"
                             value={formData.age}
-                            onChange={handleFormChange}
+                            onChange={_handleFormChange}
                         />
                     </Grid>
 
@@ -229,7 +229,7 @@ const AddEachUsersWithHand: React.FC<AddUserWithHandsFormProps> = ({ closeCard, 
                             sx={{ minWidth: '100%' }}
                             name="phone"
                             value={formData.phone}
-                            onChange={handleFormChange}
+                            onChange={_handleFormChange}
                         />
                     </Grid>
 
@@ -242,7 +242,7 @@ const AddEachUsersWithHand: React.FC<AddUserWithHandsFormProps> = ({ closeCard, 
                             sx={{ minWidth: '100%' }}
                             name="email"
                             value={formData.email}
-                            onChange={handleFormChange}
+                            onChange={_handleFormChange}
                         />
                     </Grid>
 
@@ -255,7 +255,7 @@ const AddEachUsersWithHand: React.FC<AddUserWithHandsFormProps> = ({ closeCard, 
                             sx={{ minWidth: '100%' }}
                             name="address"
                             value={formData.address}
-                            onChange={handleFormChange}
+                            onChange={_handleFormChange}
                         />
                     </Grid>
 
@@ -268,7 +268,7 @@ const AddEachUsersWithHand: React.FC<AddUserWithHandsFormProps> = ({ closeCard, 
                             sx={{ minWidth: '100%' }}
                             name="city"
                             value={formData.city}
-                            onChange={handleFormChange}
+                            onChange={_handleFormChange}
                         />
                     </Grid>
                     <Grid item xs={12}>
@@ -280,7 +280,7 @@ const AddEachUsersWithHand: React.FC<AddUserWithHandsFormProps> = ({ closeCard, 
                             sx={{ minWidth: '100%' }}
                             name="zipCode"
                             value={formData.zipCode}
-                            onChange={handleFormChange}
+                            onChange={_handleFormChange}
                         />
                     </Grid>
                 </Grid>
@@ -288,7 +288,7 @@ const AddEachUsersWithHand: React.FC<AddUserWithHandsFormProps> = ({ closeCard, 
                     onClick={closeCard}
                     style={{ textAlign: 'center', alignItems: 'center', marginTop: '3rem' }}
                 >
-                    <Button onClick={handleSubmit} style={{ backgroundColor: "#EC6208", color: "white" }}>
+                    <Button onClick={_handleSubmit} style={{ backgroundColor: "#EC6208", color: "white" }}>
                         Submit
                     </Button>
                 </div>

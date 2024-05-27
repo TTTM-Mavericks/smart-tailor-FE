@@ -52,19 +52,19 @@ const NotificationWithSocketIOScreen = () => {
     // Pop Up Notification
     const [openPopup, setOpenPopup] = React.useState(false);
 
-    const handleOpenPopup = () => {
+    const _handleOpenPopup = () => {
         setOpenPopup(true);
     };
 
-    const handleClosePopup = () => {
+    const _handleClosePopup = () => {
         setOpenPopup(false);
     };
 
-    const handleCloseNotification = () => {
+    const _handleCloseNotification = () => {
         setAnchorOpenNotification(null);
     };
 
-    const handleClickNotification = (event: React.MouseEvent<HTMLElement>) => {
+    const _handleClickNotification = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorOpenNotification(event.currentTarget);
     };
 
@@ -106,7 +106,7 @@ const NotificationWithSocketIOScreen = () => {
 
     }, [stompClient]);
 
-    const handleMarkAllRead = () => {
+    const _handleMarkAllRead = () => {
         const fetchData = async () => {
             try {
                 const promises = data.map(async (noti) => {
@@ -147,7 +147,7 @@ const NotificationWithSocketIOScreen = () => {
         fetchData();
     };
 
-    const handleMarkIsRead = async (clickedItem: NotificationInterface) => {
+    const _handleMarkIsRead = async (clickedItem: NotificationInterface) => {
         try {
             const response = await fetch(`http://localhost:6969/api/v1/notification/un-read-notification?noti_id=${clickedItem.notiID}`, {
                 method: 'PUT',
@@ -181,19 +181,19 @@ const NotificationWithSocketIOScreen = () => {
                 <Badge
                     badgeContent={newNotificationsCount}
                     color="error"
-                    onClick={handleClickNotification}
+                    onClick={_handleClickNotification}
                 >
                     <NotificationsOutlinedIcon />
                 </Badge>
                 <Menu
                     anchorEl={anchorOpenNotification}
                     open={Boolean(anchorOpenNotification)}
-                    onClose={handleCloseNotification}
+                    onClose={_handleCloseNotification}
                     style={{ height: "70%", minWidth: "200px", borderRadius: "10px" }}
                 >
                     {data.map((item) => (
-                        <div key={item.notiID} style={{ borderRadius: '8px', marginBottom: '8px', position: 'relative', backgroundColor: item.status ? 'rgba(162,222,82,0.1)' : 'rgba(234,49,62,0.1)' }} onClick={handleMarkIsRead} >
-                            <div onClick={() => handleMarkIsRead(item)} style={{ padding: '12px', cursor: 'pointer' }}>
+                        <div key={item.notiID} style={{ borderRadius: '8px', marginBottom: '8px', position: 'relative', backgroundColor: item.status ? 'rgba(162,222,82,0.1)' : 'rgba(234,49,62,0.1)' }} onClick={_handleMarkIsRead} >
+                            <div onClick={() => _handleMarkIsRead(item)} style={{ padding: '12px', cursor: 'pointer' }}>
                                 <div style={{ position: 'absolute', top: '12px', right: '12px', borderRadius: '4px', padding: '4px 8px', backgroundColor: item.status ? 'rgba(162,222,82,0.6)' : 'rgba(234,49,62,0.6)', color: '#fff' }}>
                                     <span>{item.status ? 'Readed' : 'News'}</span>
                                 </div>
@@ -207,12 +207,12 @@ const NotificationWithSocketIOScreen = () => {
                     ))}
                     <Divider component="li" />
                     <div style={{ padding: "8px", display: "flex", justifyContent: "flex-end", backgroundColor: "#fafbfd", borderTop: '1px solid #eee' }}>
-                        <Button onClick={handleMarkAllRead} style={{ color: "#666", marginRight: '8px' }}>Mark all as read</Button>
-                        <Button onClick={handleOpenPopup} style={{ color: "#666" }}>View All</Button>
+                        <Button onClick={_handleMarkAllRead} style={{ color: "#666", marginRight: '8px' }}>Mark all as read</Button>
+                        <Button onClick={_handleOpenPopup} style={{ color: "#666" }}>View All</Button>
                     </div>
                 </Menu>
 
-                <Dialog open={openPopup} onClose={handleClosePopup} PaperProps={{
+                <Dialog open={openPopup} onClose={_handleClosePopup} PaperProps={{
                     style: {
                         backgroundColor: "white",
                         boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
@@ -224,7 +224,7 @@ const NotificationWithSocketIOScreen = () => {
                     <DialogContent>
                         {data.map((item) => (
                             <div key={item.notiID} style={{ borderRadius: '8px', marginBottom: '8px', position: 'relative', backgroundColor: item.status ? 'rgba(162,222,82,0.1)' : 'rgba(234,49,62,0.1)' }}>
-                                <div onClick={() => handleMarkIsRead(item)} style={{ padding: '12px', cursor: 'pointer' }}>
+                                <div onClick={() => _handleMarkIsRead(item)} style={{ padding: '12px', cursor: 'pointer' }}>
                                     <div style={{ position: 'absolute', top: '12px', right: '12px', borderRadius: '4px', padding: '4px 8px', backgroundColor: item.status ? 'rgba(162,222,82,0.6)' : 'rgba(234,49,62,0.6)', color: '#fff' }}>
                                         <span>{item.status ? 'Readed' : 'News'}</span>
                                     </div>
@@ -238,7 +238,7 @@ const NotificationWithSocketIOScreen = () => {
                         ))}
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleClosePopup}>Close</Button>
+                        <Button onClick={_handleClosePopup}>Close</Button>
                     </DialogActions>
                 </Dialog>
             </IconButton>

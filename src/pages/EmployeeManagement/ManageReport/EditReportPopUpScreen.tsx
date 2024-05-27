@@ -53,36 +53,36 @@ const EditReportPopUpScreens: React.FC<EditReportPopUpScreenFormProps> = ({ fid,
         setZipCode(fid.zipCode)
     }, [fid]);
 
-    const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const _handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setEmail(e.target.value);
     }
 
-    const handleRegistrarIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const _handleRegistrarIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setRegistrarId(e.target.value);
     }
 
-    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const _handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setName(e.target.value);
     }
 
-    const handleAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const _handleAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newAge = parseInt(e.target.value)
         setAge((newAge))
     }
 
-    const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const _handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPhone(e.target.value);
     }
 
-    const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const _handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setAddress(e.target.value);
     }
 
-    const handleCityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const _handleCityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setCity(e.target.value);
     }
 
-    const handleZipCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const _handleZipCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setZipCode(e.target.value);
     }
 
@@ -98,7 +98,7 @@ const EditReportPopUpScreens: React.FC<EditReportPopUpScreenFormProps> = ({ fid,
         }
     }, [selectedLanguage, i18n]);
 
-    const handleSubmit = () => {
+    const _handleSubmit = () => {
         const obj = {
             registrarId: registrarId,
             name: name,
@@ -164,32 +164,32 @@ const EditReportPopUpScreens: React.FC<EditReportPopUpScreenFormProps> = ({ fid,
             <Box height={50} />
             <Grid container spacing={4}>
                 <Grid item xs={11}>
-                    <TextField id="outline-basic" label="Email" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={registrarId} onChange={handleRegistrarIdChange} />
+                    <TextField id="outline-basic" label="Email" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={registrarId} onChange={_handleRegistrarIdChange} />
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField id="outline-basic" label="Phone Number" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={name} onChange={handleNameChange} />
+                    <TextField id="outline-basic" label="Phone Number" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={name} onChange={_handleNameChange} />
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField id="outline-basic" label="Username" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={age} onChange={handleAgeChange} />
+                    <TextField id="outline-basic" label="Username" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={age} onChange={_handleAgeChange} />
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField id="outline-basic" label="Dob" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={phone} onChange={handlePhoneChange} />
+                    <TextField id="outline-basic" label="Dob" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={phone} onChange={_handlePhoneChange} />
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField id="outline-basic" label="Language" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={email} onChange={handleEmailChange} />
+                    <TextField id="outline-basic" label="Language" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={email} onChange={_handleEmailChange} />
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField id="outline-basic" label="Role" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={address} onChange={handleAddressChange} />
+                    <TextField id="outline-basic" label="Role" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={address} onChange={_handleAddressChange} />
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField id="outline-basic" label="Role" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={city} onChange={handleCityChange} />
+                    <TextField id="outline-basic" label="Role" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={city} onChange={_handleCityChange} />
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField id="outline-basic" label="Role" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={zipCode} onChange={handleZipCodeChange} />
+                    <TextField id="outline-basic" label="Role" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={zipCode} onChange={_handleZipCodeChange} />
                 </Grid>
             </Grid>
             <div onClick={editClose} style={{ textAlign: "center", alignItems: "center", marginTop: "3rem" }}>
-                <Button onClick={handleSubmit} style={{ backgroundColor: "#5858FA", width: "60%", borderRadius: "8px", marginLeft: "-10%", marginRight: "10%", color: "#FFFFFF" }}>{t(codeLanguage + '000060')}</Button>
+                <Button onClick={_handleSubmit} style={{ backgroundColor: "#5858FA", width: "60%", borderRadius: "8px", marginLeft: "-10%", marginRight: "10%", color: "#FFFFFF" }}>{t(codeLanguage + '000060')}</Button>
                 <Button style={{ borderRadius: "8px", border: "1px solid black", color: "black" }}>{t(codeLanguage + '000055')}</Button>
             </div>
         </Box>

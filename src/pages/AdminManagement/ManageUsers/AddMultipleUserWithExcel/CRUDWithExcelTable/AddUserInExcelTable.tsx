@@ -20,7 +20,7 @@ const AddUserModalInExcelTable: React.FC<AddUserModalInExcelTableProps> = ({ ope
         error: false,
     });
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const _handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setUserData((prevState: any) => ({
             ...prevState,
@@ -28,7 +28,7 @@ const AddUserModalInExcelTable: React.FC<AddUserModalInExcelTableProps> = ({ ope
         }));
     };
 
-    const handleAddUser = () => {
+    const _handleAddUser = () => {
         // Kiểm tra tính hợp lệ của dữ liệu nhập vào trước khi thêm người dùng mới
         if (userData.name && userData.age && userData.phone && userData.email) {
             // Thêm người dùng vào danh sách
@@ -40,13 +40,13 @@ const AddUserModalInExcelTable: React.FC<AddUserModalInExcelTableProps> = ({ ope
         }
     };
 
-    const handleClose = () => {
+    const _handleClose = () => {
         // Đóng modal
         onClose();
     };
 
     return (
-        <Dialog open={open} onClose={handleClose}>
+        <Dialog open={open} onClose={_handleClose}>
             <DialogTitle>Add New User</DialogTitle>
             <DialogContent>
                 <TextField
@@ -56,7 +56,7 @@ const AddUserModalInExcelTable: React.FC<AddUserModalInExcelTableProps> = ({ ope
                     label="Registrar ID"
                     fullWidth
                     value={userData.registrarId}
-                    onChange={handleInputChange}
+                    onChange={_handleInputChange}
                 />
                 <TextField
                     autoFocus
@@ -65,7 +65,7 @@ const AddUserModalInExcelTable: React.FC<AddUserModalInExcelTableProps> = ({ ope
                     label="Name"
                     fullWidth
                     value={userData.name}
-                    onChange={handleInputChange}
+                    onChange={_handleInputChange}
                 />
                 <TextField
                     autoFocus
@@ -74,7 +74,7 @@ const AddUserModalInExcelTable: React.FC<AddUserModalInExcelTableProps> = ({ ope
                     label="Age"
                     fullWidth
                     value={userData.age}
-                    onChange={handleInputChange}
+                    onChange={_handleInputChange}
                 />
                 <TextField
                     autoFocus
@@ -83,7 +83,7 @@ const AddUserModalInExcelTable: React.FC<AddUserModalInExcelTableProps> = ({ ope
                     label="Phone"
                     fullWidth
                     value={userData.phone}
-                    onChange={handleInputChange}
+                    onChange={_handleInputChange}
                 />
                 <TextField
                     autoFocus
@@ -92,7 +92,7 @@ const AddUserModalInExcelTable: React.FC<AddUserModalInExcelTableProps> = ({ ope
                     label="Email"
                     fullWidth
                     value={userData.email}
-                    onChange={handleInputChange}
+                    onChange={_handleInputChange}
                 />
                 <TextField
                     autoFocus
@@ -101,7 +101,7 @@ const AddUserModalInExcelTable: React.FC<AddUserModalInExcelTableProps> = ({ ope
                     label="Address"
                     fullWidth
                     value={userData.address}
-                    onChange={handleInputChange}
+                    onChange={_handleInputChange}
                 />
                 <TextField
                     autoFocus
@@ -110,7 +110,7 @@ const AddUserModalInExcelTable: React.FC<AddUserModalInExcelTableProps> = ({ ope
                     label="City"
                     fullWidth
                     value={userData.city}
-                    onChange={handleInputChange}
+                    onChange={_handleInputChange}
                 />
                 <TextField
                     autoFocus
@@ -119,13 +119,13 @@ const AddUserModalInExcelTable: React.FC<AddUserModalInExcelTableProps> = ({ ope
                     label="Zip Code"
                     fullWidth
                     value={userData.zipCode}
-                    onChange={handleInputChange}
+                    onChange={_handleInputChange}
                 />
 
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleClose}>Cancel</Button>
-                <Button onClick={handleAddUser} variant="contained" color="primary">OK</Button>
+                <Button onClick={_handleClose}>Cancel</Button>
+                <Button onClick={_handleAddUser} variant="contained" color="primary">OK</Button>
             </DialogActions>
         </Dialog>
     );

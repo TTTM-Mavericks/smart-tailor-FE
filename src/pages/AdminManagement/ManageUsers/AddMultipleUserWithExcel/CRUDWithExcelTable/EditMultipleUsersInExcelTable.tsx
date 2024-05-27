@@ -24,12 +24,12 @@ interface EditMultipleUsersInExcelTableProps {
 const EditMultipleUsersInExcelTable: React.FC<EditMultipleUsersInExcelTableProps> = ({ open, onClose, data, index, updateData }) => {
     const [editedData, setEditedData] = useState(data);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const _handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setEditedData({ ...editedData, [name]: value });
     };
 
-    const handleSave = () => {
+    const _handleSave = () => {
         updateData(editedData, index);
         onClose();
     };
@@ -50,38 +50,38 @@ const EditMultipleUsersInExcelTable: React.FC<EditMultipleUsersInExcelTableProps
             <Box height={50} />
             <Grid container spacing={4}>
                 <Grid item xs={11}>
-                    <TextField name="name" label="Name" value={editedData?.name} onChange={handleChange} fullWidth />
+                    <TextField name="name" label="Name" value={editedData?.name} onChange={_handleChange} fullWidth />
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField name="age" label="Age" value={editedData?.age} onChange={handleChange} fullWidth />
+                    <TextField name="age" label="Age" value={editedData?.age} onChange={_handleChange} fullWidth />
 
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField name="registrarId" label="registrarId" value={editedData?.registrarId} onChange={handleChange} fullWidth />
+                    <TextField name="registrarId" label="registrarId" value={editedData?.registrarId} onChange={_handleChange} fullWidth />
 
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField name="phone" label="phone" value={editedData?.phone} onChange={handleChange} fullWidth />
+                    <TextField name="phone" label="phone" value={editedData?.phone} onChange={_handleChange} fullWidth />
 
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField name="email" label="email" value={editedData?.email} onChange={handleChange} fullWidth />
+                    <TextField name="email" label="email" value={editedData?.email} onChange={_handleChange} fullWidth />
 
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField name="address" label="city" value={editedData?.address} onChange={handleChange} fullWidth />
+                    <TextField name="address" label="city" value={editedData?.address} onChange={_handleChange} fullWidth />
 
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField id="outline-basic" label="Role" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={editedData?.city} onChange={handleChange} />
+                    <TextField id="outline-basic" label="Role" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={editedData?.city} onChange={_handleChange} />
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField name="zipCode" label="zipCode" value={editedData?.zipCode} onChange={handleChange} fullWidth />
+                    <TextField name="zipCode" label="zipCode" value={editedData?.zipCode} onChange={_handleChange} fullWidth />
 
                 </Grid>
             </Grid>
             <div onClick={onClose} style={{ textAlign: "center", alignItems: "center", marginTop: "3rem" }}>
-                <Button onClick={handleSave} style={{ backgroundColor: "#EC6208", width: "60%", borderRadius: "8px", marginLeft: "-10%", marginRight: "10%", color: "#FFFFFF" }}>Update</Button>
+                <Button onClick={_handleSave} style={{ backgroundColor: "#EC6208", width: "60%", borderRadius: "8px", marginLeft: "-10%", marginRight: "10%", color: "#FFFFFF" }}>Update</Button>
                 <Button style={{ borderRadius: "8px", border: "1px solid black", color: "black" }}>Cancel</Button>
 
             </div>
