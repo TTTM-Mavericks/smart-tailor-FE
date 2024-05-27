@@ -124,8 +124,8 @@ const HomeScreen = () => {
     const __getHeaders = async (url: string) => {
         try {
             const response = await axios.head(url);
-            console.log(response.headers);
-            return response.headers;
+            console.log(response);
+            return response;
         } catch (error) {
             console.error('Error fetching headers:', error);
         }

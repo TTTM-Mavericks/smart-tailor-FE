@@ -254,7 +254,7 @@ export default function SignInScreen() {
 
                 <div className="flex items-center justify-between">
                   <div className="text-sm mt-2 mb-2">
-                    <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                    <a href="/auth/getpassword" className="font-semibold text-indigo-600 hover:text-indigo-500">
                       {t(codeLanguage + '000007')} ?
                     </a>
                   </div>
@@ -274,8 +274,8 @@ export default function SignInScreen() {
                 <button
                   type="submit"
                   className={`${styles.signinGoogle__btn} flex mb-2 h-11 w-full items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white`}
-                  // onClick={() => window.location.href = baseURL+googleOAuth2}
-                  onClick={() => __handleSignInGoogle()}
+                  onClick={() => window.location.href = 'https://be.mavericks-tttm.studio/oauth2/authorization/google'}
+                  // onClick={() => __handleSignInGoogle()}
                 >
                   {t(codeLanguage + '000005')}
                 </button>

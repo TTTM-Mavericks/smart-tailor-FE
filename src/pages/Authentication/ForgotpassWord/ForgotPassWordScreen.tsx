@@ -102,16 +102,23 @@ export default function ForgotPassWordScreen() {
                 className="mx-auto h-20 w-auto"
                 style={{ borderRadius: 90 }}
                 src={systemLogo}
-                alt="Your Company"
               />
-              <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-                {t(codeLanguage + '000014')}
+              <h2 className="mt-5 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+                {t(codeLanguage + '000119')}
               </h2>
             </div>
 
-            <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-              <div className="space-y-6" >
-
+            <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
+              <div className="space-y-0" >
+                <div>
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm mt-2 mb-2">
+                      <span className="font-semibold text-indigo-600 hover:text-indigo-500">
+                        {t(codeLanguage + '000120')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
                 <div className="mt-2">
                   <input
                     id="email"
@@ -125,57 +132,20 @@ export default function ForgotPassWordScreen() {
                 </div>
               </div>
 
-              <div>
-
-                <div className="relative mt-2">
-                  <input
-                    id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"} // Toggle input type based on visibility state
-                    placeholder={t(codeLanguage + '000010')}
-                    autoComplete="current-password"
-                    required
-                    className={`block h-11 w-full pl-3 pr-10 rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6  ${styles.signIn_input}`}
-                  />
-                  {/* Show/hide password toggle button */}
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 focus:outline-none"
-                  >
-                    {showPassword ? <HiEyeOff /> : <HiEye />}
-                  </button>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="text-sm mt-2 mb-2">
-                    <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                      {t(codeLanguage + '000007')} ?
-                    </a>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <button
-                  type="submit"
-                  className="flex mb-2 h-11 w-full items-center justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                  style={{ backgroundColor: primaryColor }}
-                >
-                  {t(codeLanguage +'000002')}
-                </button>
 
 
+              <div className="mt-2">
                 <button
                   type="submit"
                   className="flex h-11 w-full items-center justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                  onClick={() => window.location.href = 'https://st.mavericks-tttm.studio/oauth2/authorization/google'}
+                  
                 >
-                  {t(codeLanguage +'000005')}
+                  {t(codeLanguage + '000121')}
                 </button>
-
               </div>
 
               <p className="mt-10 text-center text-sm text-gray-500">
-                {t(codeLanguage +'000008')}?{' '}
+                {t(codeLanguage + '000008')}?{' '}
                 <a href="/auth/signup" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
                   {t(codeLanguage + '000015')}
                 </a>
