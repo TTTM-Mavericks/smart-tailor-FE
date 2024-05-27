@@ -2,11 +2,11 @@
 
 .customDesign__container {
     width: 100%;
-    height: fit-content;
+    height: 70vh;
 
     &__header {
         width: 100%;
-        height: 5em;
+        height: 11.5vh;
         display: flex;
         border-bottom: 1px solid #EAEAEA;
 
@@ -35,9 +35,11 @@
             display: flex;
             align-items: center;
             margin-left: auto;
+            margin-right: 10px;
 
             button {
-                margin-right: 20px;
+                margin-right: 10px;
+                margin-left: 10px;
                 font-size: 13px;
                 font-weight: 500;
             }
@@ -138,6 +140,7 @@
 
     &__editorArea {
         width: 75%;
+        height: fit-content;
         align-items: center;
         text-align: center;
         justify-content: center;
@@ -150,7 +153,7 @@
             float: left;
 
             &__buttonGroup {
-
+                border-right: 1px solid #EAEAEA;
                 &__sampleModelBtn,
                 &__editorModelBtn {
                     background-color: $whiteColor;
@@ -194,6 +197,12 @@
                         padding-bottom: 15px;
 
                     }
+                }
+
+                &__menuTabBarProduct {
+                    width: 85%;
+                    // display: flex;
+                    float: left;
                 }
 
                 &__menuTabBar {
@@ -248,6 +257,22 @@
                     /* Width of the scrollbar */
                 }
 
+                &__modelProductList {
+                    width: 85%;
+                    height: 65vh;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    overflow: auto;
+                }
+
+                &__modelProductList::-webkit-scrollbar {
+                    width: 5px;
+                    background-color: $grayColor;
+                    height: 10px;
+                    /* Width of the scrollbar */
+                }
 
 
             }
@@ -302,7 +327,8 @@
             &__displayDesign {
                 position: relative;
                 width: 600px;
-                height: 600px;
+                height: 500px;
+                overflow: hidden;
                 // transform: translate(55%, 0%);
 
             }
@@ -311,7 +337,6 @@
                 position: relative;
                 width: 600px;
                 height: 58px;
-                border: 1px solid #EAEAEA;
                 border-top: 0;
                 // transform: translate(110%, 0%);
                 margin-bottom: 20px;
@@ -382,4 +407,47 @@
 
 .sampleItemCard:hover {
     cursor: pointer;
+}
+
+.menuTabBar__createBlank__btn {
+    width: 85%;
+    border: 2px dashed $grayColor;
+
+    span {
+        color: $blackColor;
+    }
+}
+
+.menuTabBar__viewSample__btn {
+    width: 85%;
+    display: flex;
+    margin: 10px;
+    margin-left: 8%;
+    align-items: center;
+    background-color: $grayColor;
+    border-radius: 3px;
+    border: 1px solid $grayColor;
+
+    &__img {
+        width: 30px;
+        height: 40px;
+        margin-left: 10px;
+    }
+
+    &__content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 10px;
+
+        span {
+            color: $blackColor;
+            font-size: 11px
+        }
+    }
+}
+
+.menuTabBar__viewSample__btn:hover {
+    background-color: rgba($color: $primaryColorFade1, $alpha: 0.5);
+    border: 1px solid $primaryColor;
 }
