@@ -29,6 +29,7 @@
     "@nivo/line": "^0.85.1",
     "@nivo/pie": "^0.85.1",
     "@onedoc/react-print": "^0.1.133",
+    "@react-oauth/google": "^0.12.1",
     "@react-three/drei": "^9.102.6",
     "@react-three/fiber": "^8.15.19",
     "@stomp/stompjs": "^7.0.0",

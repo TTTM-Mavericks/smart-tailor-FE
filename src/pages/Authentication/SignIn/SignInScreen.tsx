@@ -4,15 +4,12 @@ import styles from './SignInStyle.module.scss';
 import { HiEye, HiEyeOff } from 'react-icons/hi';
 // import ApiService from '../ApiAuthService';
 import './SignInStyle.css'
-// import { jwtDecode } from "jwt-decode";
-import { primaryColor, primaryColorFade1 } from '../../../root/ColorSystem';
 import { systemLogo, usaFlag, vietnamFlag } from '../../../assets';
 import { useTranslation } from 'react-i18next';
 import { Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
-import { __validateEmail, __validatePassword } from '../Utils';
-import api, { baseURL, featuresEndpoints, functionEndpoints, googleOAuth2, versionEndpoints } from '../../../api/ApiConfig';
-
+import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 const defaultTheme = createTheme();
 
 
@@ -149,6 +146,25 @@ export default function SignInScreen() {
     }
   };
 
+  const handleLoginSuccess = (response: any) => {
+    const { credential } = response;
+    // Gửi token đến backend để xác thực và nhận JWT token
+    fetch('https://be.mavericks-tttm.studio/api/v1/auth/google-login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token: credential }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        // Lưu JWT token vào localStorage
+        localStorage.setItem('jwtToken', data.jwtToken);
+        // Chuyển hướng tới trang chủ
+        window.location.href = '/';
+      });
+  };
+
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -275,12 +291,24 @@ export default function SignInScreen() {
                   type="submit"
                   className={`${styles.signinGoogle__btn} flex mb-2 h-11 w-full items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white`}
                   onClick={() => window.location.href = 'https://be.mavericks-tttm.studio/oauth2/authorization/google'}
-                  // onClick={() => __handleSignInGoogle()}
+                // onClick={() => __handleSignInGoogle()}
                 >
                   {t(codeLanguage + '000005')}
                 </button>
 
               </div>
+
+              <GoogleOAuthProvider clientId="1051460649548-ijlrpmgdcmd5td1apidcpauh3dhv7u26.apps.googleusercontent.com">
+                <div className="App">
+                  <h1>Login with Google</h1>
+                  <GoogleLogin
+                    onSuccess={handleLoginSuccess}
+                    onError={() => {
+                      console.log('Login Failed');
+                    }}
+                  />
+                </div>
+              </GoogleOAuthProvider>
 
               <p className="mt-10 text-center text-sm text-gray-500">
                 {t(codeLanguage + '000008')}?{' '}

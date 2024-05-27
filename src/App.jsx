@@ -17,7 +17,12 @@ import DashboardPieChartScreens from './pages/AdminManagement/PieChart/Dashboard
 import DashboardGeographyChartScreens from './pages/AdminManagement/GeographyChart/DashboardGeographyChartComponent';
 import DashboardLineChartScreens from './pages/AdminManagement/LineChart/DashboardLineChartComponent';
 import DashboardBarChartScreens from './pages/AdminManagement/BarChart/DashboardBarChartComponent';
-import { ForgotPassWordScreen, SignInScreen, SignUpScreen } from './pages/Authentication';
+import {
+  ForgotPassWordScreen,
+  SignInScreen,
+  SignUpScreen,
+  VerifyEmailScreen
+} from './pages/Authentication';
 
 const tokenIsValid = (token) => {
   // Implement your token validation logic here
@@ -57,11 +62,20 @@ function App() {
     <div>
       <BrowserRouter>
         <Routes>
+
+          {/* Init/Home route */}
           <Route path='/' element={<HomeScreen></HomeScreen>} />
-          <Route path='/design' element={<CustomDesignScreen></CustomDesignScreen>} />
+
+          {/* Auth route */}
           <Route path='/auth/signin' element={<SignInScreen></SignInScreen>} />
           <Route path='/auth/signup' element={<SignUpScreen></SignUpScreen>} />
           <Route path='/auth/getpassword' element={<ForgotPassWordScreen></ForgotPassWordScreen>} />
+          <Route path='/auth/verify' element={<VerifyEmailScreen></VerifyEmailScreen>} />
+          
+          {/* Design route */}
+          <Route path='/design' element={<CustomDesignScreen></CustomDesignScreen>} />
+
+          {/* Admin dashboard route */}
           <Route path='/admin' element={<DashboardAdminScreens></DashboardAdminScreens>} />
           <Route path='/admin_profile' element={<DashboardAdminProfileScreens></DashboardAdminProfileScreens>} />
           <Route path='/about' element={<AboutUsPage></AboutUsPage>} />

@@ -1,24 +1,25 @@
 import * as React from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import styles from './ForgotPassWordStyle.module.scss';
+import styles from './VerifyEmailStyle.module.scss';
 import { systemLogo, usaFlag, vietnamFlag } from '../../../assets';
 import { useTranslation } from 'react-i18next';
 import { Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
+import { grayColor, redColor, secondaryColor } from '../../../root/ColorSystem';
 
 const defaultTheme = createTheme();
+const SECONDS_LEFT = 5
 
 
-
-export default function ForgotPassWordScreen() {
+export default function VerifyEmailScreen() {
 
   // ---------------UseState Variable---------------//
   const [selectedLanguage, setSelectedLanguage] = React.useState<string>(localStorage.getItem('language') || 'en');
   const [showLogin, setShowLogin] = React.useState(true);
-  const [showRegister, setShowRegister] = React.useState(false);
-  const [showPassword, setShowPassword] = React.useState(false);
-
-  const [codeLanguage, setCodeLanguage] = React.useState('EN');
+  const [showRegister, setShowRegister] = React.useState<boolean>(false);
+  const [showPassword, setShowPassword] = React.useState<boolean>(false);
+  const [codeLanguage, setCodeLanguage] = React.useState<string>('EN');
+  const [secondsLeft, setSecondsLeft] = React.useState<number>(SECONDS_LEFT);
   // ---------------Usable Variable---------------//
   const { t, i18n } = useTranslation();
 
@@ -37,10 +38,42 @@ export default function ForgotPassWordScreen() {
 
   }, [selectedLanguage]);
 
+  React.useEffect(() => {
+    if (secondsLeft > 0) {
+      const timerId = setInterval(() => {
+        setSecondsLeft(prevSeconds => prevSeconds - 1);
+      }, 1000);
+
+      // Cleanup interval on component unmount or when secondsLeft changes
+      return () => clearInterval(timerId);
+    }
+  }, [secondsLeft]);
+
   // ---------------FunctionHandler---------------//
 
   const handleLanguageChange = (language: string) => {
     setSelectedLanguage(language);
+  };
+
+  /**
+ * Starts a countdown timer from the specified number of seconds.
+ * @param seconds - The number of seconds to count down from.
+ * @param onTick - Callback function to execute on each tick (every second).
+ * @param onComplete - Callback function to execute when the countdown completes.
+ */
+  const __handlecountdown = (seconds: number, onTick: (secondsLeft: number) => void, onComplete: () => void): void => {
+    let currentSeconds = seconds;
+
+    const intervalId = setInterval(() => {
+      onTick(currentSeconds);
+
+      if (currentSeconds <= 0) {
+        clearInterval(intervalId);
+        onComplete();
+      }
+
+      currentSeconds--;
+    }, 1000);
   };
 
 
@@ -100,7 +133,7 @@ export default function ForgotPassWordScreen() {
                 src={systemLogo}
               />
               <h2 className="mt-5 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-                {t(codeLanguage + '000119')}
+                {t(codeLanguage + '000123')}
               </h2>
             </div>
 
@@ -110,17 +143,17 @@ export default function ForgotPassWordScreen() {
                   <div className="flex items-center justify-between">
                     <div className="text-sm mt-2 mb-2">
                       <span className="font-semibold text-indigo-600 hover:text-indigo-500">
-                        {t(codeLanguage + '000120')}
+                        {t(codeLanguage + '000124')}
                       </span>
                     </div>
                   </div>
                 </div>
                 <div className="mt-2">
                   <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder='Email'
+                    id="code"
+                    name="code"
+                    type="text"
+                    placeholder='XXXXXX'
                     autoComplete="email"
                     required
                     className={`block h-11 w-full pl-3 pr-10 rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6  ${styles.signIn_input}`}
@@ -131,21 +164,24 @@ export default function ForgotPassWordScreen() {
 
 
               <div className="mt-2">
+
                 <button
                   type="submit"
                   className="flex h-11 w-full items-center justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                  
+                  style={{ backgroundColor: secondsLeft !== 0 ? secondaryColor : redColor }}
                 >
-                  {t(codeLanguage + '000121')}
+                  {secondsLeft !== 0 ? `${t(codeLanguage + '000125')} ( ${secondsLeft}s )` : `${t(codeLanguage + '000127')}`}
+
                 </button>
               </div>
 
-              <p className="mt-10 text-center text-sm text-gray-500">
+              <p className="mt-2 text-center text-sm text-gray-500">
                 {t(codeLanguage + '000008')}?{' '}
                 <a href="/auth/signup" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
                   {t(codeLanguage + '000015')}
                 </a>
               </p>
+
             </div>
           </div>
         </div>
