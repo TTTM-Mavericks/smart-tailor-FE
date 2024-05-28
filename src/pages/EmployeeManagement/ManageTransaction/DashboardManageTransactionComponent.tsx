@@ -7,7 +7,7 @@ import SideBarEmployeeComponent from '../GlobalComponent/SideBar/SideBarEmployee
 import TopbarEmployeeComponent from '../GlobalComponent/TopBar/TopBarEmployeeComponent';
 import EmployeeManageTransaction from './ManageTransactionScreen';
 
-export default function DashboardManageOrderScreen() {
+export default function DashboardManageTransactionScreen() {
     const theme1 = useTheme();
     const smScreen = useMediaQuery(theme1.breakpoints.up("sm"));
     const colors = tokens(theme1.palette.mode)

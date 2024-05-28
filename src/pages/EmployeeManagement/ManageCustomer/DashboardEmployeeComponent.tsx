@@ -10,7 +10,7 @@ import SideBarEmployeeComponent from '../GlobalComponent/SideBar/SideBarEmployee
 import TopbarEmployeeComponent from '../GlobalComponent/TopBar/TopBarEmployeeComponent';
 import EmployeeManageCustomer from '../ManageCustomer/ManageCustomerScreen';
 
-const DashboardEmployeeScreens = () => {
+const DashboardEmployeeManageUserScreens = () => {
     const themeColor = useTheme();
     const colors = tokens(themeColor.palette.mode);
     const [showScrollButton, setShowScrollButton] = React.useState(false);
@@ -84,4 +84,4 @@ const DashboardEmployeeScreens = () => {
     );
 }
 
-export default DashboardEmployeeScreens;
+export default DashboardEmployeeManageUserScreens;

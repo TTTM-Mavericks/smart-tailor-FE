@@ -4,34 +4,40 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import { jwtDecode } from 'jwt-decode';
 import CustomDesignScreen from './pages/CustomDesign/CustomDesignScreen';
-import DashboardAdminScreens from './pages/AdminManagement/DashboardAdmin/DashboardAdminScreens';
-import DashboardAdminProfileScreens from './pages/AdminManagement/AdminProfile/AdminProfileComponent';
 import AboutUsPage from './pages/AboutUs/AboutUsScreen';
 import HomeScreen from './pages/Home/HomeScreen';
 import ContactUsPage from './pages/ContactUs/ContactUsScreen';
-import DashboardManageUserScreen from './pages/AdminManagement/ManageUsers/DashBoardManageUserComponent';
-import DashboardRecentTransactionScreen from './pages/AdminManagement/RecentTransaction/DashboardRecentTransactionComponent';
-import DashboardManageInvoiceScreen from './pages/AdminManagement/ManageInvoice/DashboardManageInvoiceComponent';
-import DashboardFAQScreens from './pages/AdminManagement/GlobalComponent/FAQ/DashboardFAQComponent';
-import DashboardPieChartScreens from './pages/AdminManagement/PieChart/DashboardPieChartComponent';
-import DashboardGeographyChartScreens from './pages/AdminManagement/GeographyChart/DashboardGeographyChartComponent';
-import DashboardLineChartScreens from './pages/AdminManagement/LineChart/DashboardLineChartComponent';
-import DashboardBarChartScreens from './pages/AdminManagement/BarChart/DashboardBarChartComponent';
-import DashboardEmployeeProfileScreens from './pages/EmployeeManagement/EmployeeProfile/EmployeeProfileDashboardComponent';
-import DashboardEmployeeScreens from './pages/EmployeeManagement/DashboardEmployee/DashboardEmployeeScreen';
-import DashboardEmployeeManageUserScreen from './pages/EmployeeManagement/ManageCustomer/DashboardEmployeeComponent';
-import DashboardEmployeeManageBrandScreens from './pages/EmployeeManagement/ManageBrand/DashboardEmployeeManageBrandComponent';
-import DashboardManageReportScreen from './pages/EmployeeManagement/ManageReport/DashboardManageReportComponent';
-import DashboardManageOrderScreen from './pages/EmployeeManagement/ManageOrder/DashboardManageOrderComponent';
-import DashboardManageTransactionScreen from './pages/EmployeeManagement/ManageOrder/DashboardManageOrderComponent';
+
+import {
+  DashboardAdminScreens,
+  DashboardManageUserScreen,
+  DashboardAdminProfileScreens,
+  DashboardRecentTransactionScreen,
+  DashboardManageInvoiceScreen,
+  DashboardFAQScreens,
+  DashboardPieChartScreens,
+  DashboardGeographyChartScreens,
+  DashboardLineChartScreens,
+  DashboardBarChartScreens,
+} from './pages/AdminManagement';
+
+import {
+  DashboardEmployeeProfileScreens,
+  DashboardEmployeeScreens,
+  DashboardEmployeeManageBrandScreens,
+  DashboardManageReportScreen,
+  DashboardManageOrderScreen,
+  DashboardManageTransactionScreen,
+  DashboardEmployeeOrderDetailScreen,
+  DashboardEmployeeManageUserScreens
+} from './pages/EmployeeManagement';
+
 import {
   ForgotPassWordScreen,
   SignInScreen,
   SignUpScreen,
   VerifyEmailScreen
 } from './pages/Authentication';
-import RowDetails from './pages/EmployeeManagement/ManageOrder/RowDetailsComponent';
-import EmployeeManageOrder from './pages/EmployeeManagement/ManageOrder/ManageOrderScreen';
 
 const tokenIsValid = (token) => {
   // Implement your token validation logic here
@@ -97,15 +103,16 @@ function App() {
           <Route path='/geography_chart' element={<DashboardGeographyChartScreens></DashboardGeographyChartScreens>} />
           <Route path='/line_chart' element={<DashboardLineChartScreens></DashboardLineChartScreens>} />
           <Route path='/bar_chart' element={<DashboardBarChartScreens></DashboardBarChartScreens>} />
+
+          {/* Employee dashboard route */}
           <Route path='/employee' element={<DashboardEmployeeScreens></DashboardEmployeeScreens>} />
-          <Route path='/manager_customer' element={<DashboardEmployeeManageUserScreen></DashboardEmployeeManageUserScreen>} />
+          <Route path='/manager_customer' element={<DashboardEmployeeManageUserScreens></DashboardEmployeeManageUserScreens>} />
           <Route path='/employee_profile' element={<DashboardEmployeeProfileScreens></DashboardEmployeeProfileScreens>} />
           <Route path='/manage_brand' element={<DashboardEmployeeManageBrandScreens></DashboardEmployeeManageBrandScreens>} />
           <Route path='/manage_report' element={<DashboardManageReportScreen></DashboardManageReportScreen>} />
           <Route path='/manager_order' element={<DashboardManageOrderScreen></DashboardManageOrderScreen>} />
           <Route path='/manage_transaction' element={<DashboardManageTransactionScreen></DashboardManageTransactionScreen>} />
-          <Route path="/be" element={<EmployeeManageOrder />} />
-          <Route path="/row-details" element={<RowDetails />} />
+          <Route path="/row-details" element={<DashboardEmployeeOrderDetailScreen></DashboardEmployeeOrderDetailScreen>} />
 
 
 

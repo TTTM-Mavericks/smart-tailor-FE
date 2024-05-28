@@ -53,26 +53,7 @@ const EmployeeManageOrder: React.FC = () => {
     const _handleEditClose = () => setEditOpen(false);
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
-    const _handleClick = (event: any) => {
-        setAnchorEl(event.currentTarget);
-    };
-    const _handleClose = () => {
-        setAnchorEl(null);
-    };
-    const [addOpenOrClose, setAddOpenOrClose] = React.useState(false)
-    const _handleAddOpen = () => {
-        setAddOpenOrClose(true);
-    }
-    const _handleAddClose = () => {
-        setAddOpenOrClose(false)
-    }
-    const [addMultiple, setAddMultiple] = React.useState(false)
-    const _handleAddMultipleOpen = () => {
-        setAddMultiple(true);
-    }
-    const _handleAddMultipleClose = () => {
-        setAddMultiple(false)
-    }
+
     const selectedLanguage = localStorage.getItem('language');
     const codeLanguage = selectedLanguage?.toUpperCase();
     const { t, i18n } = useTranslation();
@@ -183,22 +164,22 @@ const EmployeeManageOrder: React.FC = () => {
         { field: "address", headerName: "Address", flex: 1 },
         { field: "city", headerName: "City", flex: 1 },
         { field: "zipCode", headerName: "Zip Code", flex: 1 },
-        {
-            field: "actions",
-            headerName: "Actions",
-            flex: 1,
-            sortable: false,
-            renderCell: (params) => (
-                <Box>
-                    <IconButton onClick={() => _handleEditClick(params.row.id, params.row.registrarId, params.row.name, params.row.age, params.row.email, params.row.phone, params.row.address, params.row.city, params.row.zipCode)}>
-                        <EditIcon />
-                    </IconButton>
-                    <IconButton onClick={() => confirmDelete(params.row.id)}>
-                        <DeleteIcon htmlColor={colors.primary[300]} />
-                    </IconButton>
-                </Box>
-            )
-        }
+        // {
+        //     field: "actions",
+        //     headerName: "Actions",
+        //     flex: 1,
+        //     sortable: false,
+        //     renderCell: (params) => (
+        //         <Box>
+        //             <IconButton onClick={() => _handleEditClick(params.row.id, params.row.registrarId, params.row.name, params.row.age, params.row.email, params.row.phone, params.row.address, params.row.city, params.row.zipCode)}>
+        //                 <EditIcon />
+        //             </IconButton>
+        //             <IconButton onClick={() => confirmDelete(params.row.id)}>
+        //                 <DeleteIcon htmlColor={colors.primary[300]} />
+        //             </IconButton>
+        //         </Box>
+        //     )
+        // }
     ];
 
     const getRowId = (row: any) => {
