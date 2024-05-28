@@ -22,8 +22,8 @@ const ImageDraggableComponent: React.FC<props> = ({ partOfCloth, selectedItem })
 
     // ---------------Usable Variable---------------//
     const snap = useSnapshot(state);
-    const parentRef = useRef<HTMLDivElement>(null);
-    const draggableRef = useRef<any>(null);
+    // const parentRef = useRef<HTMLDivElement>(null);
+    // const draggableRef = useRef<any>(null);
 
     // ---------------UseEffect---------------//
 
@@ -89,15 +89,15 @@ const ImageDraggableComponent: React.FC<props> = ({ partOfCloth, selectedItem })
     //     }
     // }, []);
 
-    useEffect(() => {
-        if (parentRef.current) {
-            const { left, top, right, bottom } = parentRef.current.getBoundingClientRect();
-            const position = parentRef.current.getBoundingClientRect();
+    // useEffect(() => {
+    //     if (parentRef.current) {
+    //         const { left, top, right, bottom } = parentRef.current.getBoundingClientRect();
+    //         const position = parentRef.current.getBoundingClientRect();
 
-            setParentBounds({ left, top, right, bottom });
-            console.log(position);
-        }
-    }, []);
+    //         setParentBounds({ left, top, right, bottom });
+    //         console.log(position);
+    //     }
+    // }, []);
 
     useEffect(() => {
         setResizing(resizing)
@@ -172,51 +172,25 @@ const ImageDraggableComponent: React.FC<props> = ({ partOfCloth, selectedItem })
         <>
 
             {partOfCloth ? (
-                <div className={styles.imageDraggable__boundary} ref={parentRef} style={{ backgroundImage: partOfCloth?.imgUrl }}>
+                <div className={styles.imageDraggable__boundary} style={{ backgroundImage: partOfCloth?.imgUrl }}>
                     <div className={styles.imageDraggable__img}>
                         <img src={partOfCloth.imgUrl} className={styles.imageDraggable__img} ></img>
-
-                        <Resizable
-                            defaultSize={{
-                                width: 250,
-                                height: 300,
-                            }}
-                            className={styles.imageDraggable__resizeable}
-                            onResizeStart={_handleResizeStart}
-                            onResize={_handleOnResize}
-                            onResizeStop={_handleResizeEnd}
-                            maxHeight={500}
-                            maxWidth={600}
-                            ref={draggableRef}                                
-                            
-
+                        
+                        <Draggable
+                            // bounds={{ top: -100, left: -100, right: 100, bottom: 100 }}
+                            // ref={draggableRef} // Set draggableRef as the ref
+                            // bounds='parent'
+                            position={position}
+                            onDrag={_handleOnDrag}
+                            onStop={_handleDragStop}
+                            onStart={_handleDragStart}
+                            disabled={resizing ? true : false}
+                            defaultClassNameDragged={styles.imageDraggable__resizeable}
                         >
-                            <Draggable
-                                bounds={{ top: -100, left: -100, right: 100, bottom: 100 }}
-                                ref={draggableRef} // Set draggableRef as the ref
-                                // bounds='parent'
-                                position={position}
-                                onDrag={_handleOnDrag}
-                                onStop={_handleDragStop}
-                                onStart={_handleDragStart}
-                                disabled={resizing ? true : false}
-                                defaultClassNameDragged={styles.imageDraggable__resizeable}
-                            >
-
-                                <div>
-                                    {imgBase64Memoized}
-                                </div>
-
-
-
-
-                            </Draggable>
-
-                            
-                                <button style={{width:'0px', height: '30px', position:'absolute' ,right: -8, top: '50%'}}> {''}</button>
-                            
-                        </Resizable>
-
+                            <div>
+                                {imgBase64Memoized}
+                            </div>
+                        </Draggable>
                     </div>
 
 

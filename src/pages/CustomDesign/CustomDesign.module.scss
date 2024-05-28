@@ -235,23 +235,30 @@
                 }
 
                 &__sampleItemList::-webkit-scrollbar {
-                    width: 5px; /* Width of the scrollbar */
-                    height: 12px; /* Height of the scrollbar */
-                  }
-                  
-                  &__sampleItemList::-webkit-scrollbar-track {
-                    background: #f1f1f177; /* Background of the track */
-                    border-radius: 10px; /* Optional: Rounded corners */
-                  }
-                  
-                  &__sampleItemList::-webkit-scrollbar-thumb {
-                    background: $grayColor; /* Color of the scrollbar thumb */
-                    border-radius: 10px; /* Optional: Rounded corners */
-                  }
-                  
-                  &__sampleItemList::-webkit-scrollbar-thumb:hover {
-                    background: #888787; /* Color when hovering over the scrollbar thumb */
-                  }
+                    width: 5px;
+                    /* Width of the scrollbar */
+                    height: 12px;
+                    /* Height of the scrollbar */
+                }
+
+                &__sampleItemList::-webkit-scrollbar-track {
+                    background: #f1f1f177;
+                    /* Background of the track */
+                    border-radius: 10px;
+                    /* Optional: Rounded corners */
+                }
+
+                &__sampleItemList::-webkit-scrollbar-thumb {
+                    background: $grayColor;
+                    /* Color of the scrollbar thumb */
+                    border-radius: 10px;
+                    /* Optional: Rounded corners */
+                }
+
+                &__sampleItemList::-webkit-scrollbar-thumb:hover {
+                    background: #888787;
+                    /* Color when hovering over the scrollbar thumb */
+                }
 
                 &__sampleCollectionList {
                     width: 85%;
@@ -334,15 +341,15 @@
         }
 
         &__display {
-            overflow-y: auto;
+            // overflow-y: auto;
             float: right;
+            margin: 0 auto;
 
             &__displayDesign {
-                position: relative;
-                width: 600px;
+                // position: relative;
+                width: 500px;
                 height: 500px;
                 overflow: hidden;
-                // transform: translate(55%, 0%);
 
             }
 

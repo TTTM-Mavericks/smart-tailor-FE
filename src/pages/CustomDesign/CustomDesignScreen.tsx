@@ -30,19 +30,19 @@ import ProductDialogComponent from './Components/Dialog/ProductDialogComponent';
 const partOfClothData = [
   {
     partValue: LOGO_PART,
-    imgUrl: '../../assets/img/landing-img/wave.jpg'
+    imgUrl: frontOfCloth
   },
   {
     partValue: FRONT_CLOTH_PART,
-    imgUrl: '../../assets/img/landing-img/slider-bird1.jpg'
+    imgUrl: frontOfCloth
   },
   {
     partValue: BACK_CLOTH_PART,
-    imgUrl: '../../assets/img/landing-img/slider-bird3.jpg'
+    imgUrl: frontOfCloth
   },
   {
     partValue: SLEEVE_CLOTH_PART,
-    imgUrl: '../../assets/img/landing-img/wave.jpg'
+    imgUrl: frontOfCloth
   }
 ];
 
@@ -198,7 +198,7 @@ function CustomDesignScreen() {
 
   useEffect(() => {
     setSelectedPartOfCloth(selectedPartOfCloth)
-  }, [setSelectedPartOfCloth]);
+  }, [selectedPartOfCloth]);
 
   useEffect(() => {
     setSelectedItem(selectedItem)
@@ -209,9 +209,9 @@ function CustomDesignScreen() {
   }, [activeEditorTab]);
 
 
-  useEffect(()=>{
+  useEffect(() => {
     console.log('typeOfModel choose: ', typeOfModel);
-  },[typeOfModel])
+  }, [typeOfModel])
 
   // Save collection to local storage whenever it changes
   // useEffect(() => {
