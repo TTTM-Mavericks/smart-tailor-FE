@@ -23,6 +23,7 @@ import {
   SignUpScreen,
   VerifyEmailScreen
 } from './pages/Authentication';
+import NotFound from './pages/AdminManagement/GlobalComponent/Error404/Error404Component';
 
 const tokenIsValid = (token) => {
   // Implement your token validation logic here
@@ -64,7 +65,7 @@ function App() {
         <Routes>
 
           {/* Init/Home route */}
-          <Route path='/' element={<HomeScreen></HomeScreen>} />
+          <Route exact path='/' element={<HomeScreen></HomeScreen>} />
 
           {/* Auth route */}
           <Route path='/auth/signin' element={<SignInScreen></SignInScreen>} />
@@ -93,7 +94,7 @@ function App() {
 
 
 
-
+          <Route element={<AboutUsPage/>} />
         </Routes>
       </BrowserRouter>
     </div>

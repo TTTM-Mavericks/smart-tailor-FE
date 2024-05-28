@@ -9,7 +9,8 @@ import { useTranslation } from 'react-i18next';
 import { Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
-import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+import { GoogleOAuthProvider, GoogleLogin, useGoogleLogin, CredentialResponse, useGoogleOAuth } from '@react-oauth/google';
+import { secondaryColor } from '../../../root/ColorSystem';
 const defaultTheme = createTheme();
 
 
@@ -31,6 +32,7 @@ export default function SignInScreen() {
 
   // ---------------Usable Variable---------------//
   const { t, i18n } = useTranslation();
+  const googleLoginButtonRef = React.useRef<HTMLDivElement>(null);
 
   // ---------------UseEffect---------------//
 
@@ -109,217 +111,233 @@ export default function SignInScreen() {
   };
 
   const __handleSignInGoogle = async () => {
-    if (isEmailValidate && isPasswordValidate) {
-      try {
-        const requestData = {
-          email: email,
-          password: password
-        };
+    // return (
+    //   <GoogleOAuthProvider clientId="1051460649548-ijlrpmgdcmd5td1apidcpauh3dhv7u26.apps.googleusercontent.com">
+    //     <button
+    //       type="submit"
+    //       className={`${styles.signinGoogle__btn} flex mb-2 h-11 w-full items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white`}
 
-        const response = await api.get(`/oauth2/authorization/google`, requestData);
-        if (response.success === 200) {
-          // sessionStorage.setItem('userData', JSON.stringify(response.data.user));
-          // sessionStorage.setItem('access_token', JSON.stringify(response.data.access_token));
-          // sessionStorage.setItem('refresh_token', JSON.stringify(response.data.refresh_token));
-          // if (response.data.user.role === 'CUSTOMER') {
-          //   sessionStorage.setItem('subrole', JSON.stringify(response.subrole));
-          // }
-          console.log(response.data);
+    //     >
+    //       <GoogleLogin
+    //         onSuccess={handleLoginSuccess}
+    //         onError={() => {
+    //           console.log('Login Failed');
+    //         }}
 
-
-        } else {
-
-        }
-        console.log(response);
-
-      } catch (error: any) {
-        console.error('Error posting data:', error);
-        // Toast.show({
-        //   type: 'error',
-        //   text1: JSON.stringify(error.message),
-        //   position: 'top'
-        // });
+    //       />
+    //     </button>
+    //   </GoogleOAuthProvider>
+    // )
+    if (googleLoginButtonRef.current) {
+      const button = document.getElementById('hehe');
+      if (button) {
+        button.click();
       }
-    } else {
-      setEmailErrorValidate(errorEmailValidate);
-      setPasswordErrorValidate(errorPasswordValidate);
     }
   };
 
   const handleLoginSuccess = (response: any) => {
     const { credential } = response;
-    // Gửi token đến backend để xác thực và nhận JWT token
+    console.log('credential: ', credential);
     fetch('https://be.mavericks-tttm.studio/api/v1/auth/google-login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ token: credential }),
+      body: JSON.stringify({ authRequest: credential }),
     })
       .then((res) => res.json())
       .then((data) => {
-        // Lưu JWT token vào localStorage
-        localStorage.setItem('jwtToken', data.jwtToken);
-        // Chuyển hướng tới trang chủ
-        window.location.href = '/';
+        console.log('data.jwtToken: ', data.data.user);
+        sessionStorage.setItem('user', data.data.user);
+        // window.location.href = '/';
       });
   };
 
+  const login = useGoogleLogin({
+    
+    onSuccess: (tokenResponse:any) => {
+      console.log('Credential:', tokenResponse);
+      handleLoginSuccess(tokenResponse);
+    },
+    onError: () => {
+      console.log('Login Failed');
+    },
+  });
+
+
 
   return (
-    <ThemeProvider theme={defaultTheme}>
-      <div className={styles.signin__container}>
-        <Menu as="div" className={`${styles.icon_language}`}>
-          <div >
-            <Menu.Button className="relative flex rounded-full text-sm focus:outline-none ">
-              <img
-                className="h-10 w-18"
-                src={selectedLanguage === 'en' ? usaFlag : vietnamFlag}
-                alt=""
-              />
-            </Menu.Button>
-          </div>
-          <Transition
-            as={Fragment}
-            enter="transition ease-out duration-100"
-            enterFrom="transform opacity-0 scale-95"
-            enterTo="transform opacity-100 scale-100"
-            leave="transition ease-in duration-75"
-            leaveFrom="transform opacity-100 scale-100"
-            leaveTo="transform opacity-0 scale-95"
+    <GoogleOAuthProvider clientId="1051460649548-ijlrpmgdcmd5td1apidcpauh3dhv7u26.apps.googleusercontent.com">
 
-          >
-            <Menu.Items className="absolute justify-center items-center right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-              <Menu.Item>
-                <button className={`flex  space-x-2 ${styles.language__button}`} onClick={() => __handleLanguageChange('vi')}>
-                  <div className={`${styles.language__button}`}>
-                    <img src={vietnamFlag} style={{ width: '35px', height: '35px', marginLeft: 30 }}></img>
-                    <span className='text-black'>{t(codeLanguage + '000016')}</span>
-                  </div>
-                </button>
-              </Menu.Item>
-              <Menu.Item>
-                <button className={`flex  space-x-2 ${styles.language__button}`} onClick={() => __handleLanguageChange('en')}>
-                  <div className={`${styles.language__button}`}>
-                    <img src={usaFlag} style={{ width: '35px', height: '35px', marginLeft: 30 }}></img>
-                    <span className='text-black'>{t(codeLanguage + '000025')}</span>
-                  </div>
-
-                </button>
-              </Menu.Item>
-            </Menu.Items>
-
-          </Transition>
-        </Menu>
-
-        <div className={styles.signin__box}>
-          <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-              <img
-                className="mx-auto h-20 w-auto"
-                style={{ borderRadius: 90 }}
-                src={systemLogo}
-                alt="Your Company"
-              />
-              <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-                {t(codeLanguage + '000014')}
-              </h2>
+      <ThemeProvider theme={defaultTheme}>
+        <div className={styles.signin__container}>
+          <Menu as="div" className={`${styles.icon_language}`}>
+            <div >
+              <Menu.Button className="relative flex rounded-full text-sm focus:outline-none ">
+                <img
+                  className="h-10 w-18"
+                  src={selectedLanguage === 'en' ? usaFlag : vietnamFlag}
+                  alt=""
+                />
+              </Menu.Button>
             </div>
+            <Transition
+              as={Fragment}
+              enter="transition ease-out duration-100"
+              enterFrom="transform opacity-0 scale-95"
+              enterTo="transform opacity-100 scale-100"
+              leave="transition ease-in duration-75"
+              leaveFrom="transform opacity-100 scale-100"
+              leaveTo="transform opacity-0 scale-95"
 
-            <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-              <div className="space-y-6" >
+            >
+              <Menu.Items className="absolute justify-center items-center right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <Menu.Item>
+                  <button className={`flex  space-x-2 ${styles.language__button}`} onClick={() => __handleLanguageChange('vi')}>
+                    <div className={`${styles.language__button}`}>
+                      <img src={vietnamFlag} style={{ width: '35px', height: '35px', marginLeft: 30 }}></img>
+                      <span className='text-black'>{t(codeLanguage + '000016')}</span>
+                    </div>
+                  </button>
+                </Menu.Item>
+                <Menu.Item>
+                  <button className={`flex  space-x-2 ${styles.language__button}`} onClick={() => __handleLanguageChange('en')}>
+                    <div className={`${styles.language__button}`}>
+                      <img src={usaFlag} style={{ width: '35px', height: '35px', marginLeft: 30 }}></img>
+                      <span className='text-black'>{t(codeLanguage + '000025')}</span>
+                    </div>
 
-                <div className="mt-2">
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder='Email'
-                    autoComplete="email"
-                    required
-                    className={`block h-11 w-full pl-3 pr-10 rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6  ${styles.signIn_input}`}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
+                  </button>
+                </Menu.Item>
+              </Menu.Items>
 
+            </Transition>
+          </Menu>
+
+          <div className={styles.signin__box}>
+            <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+              <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+                <img
+                  className="mx-auto h-20 w-auto"
+                  style={{ borderRadius: 90 }}
+                  src={systemLogo}
+                  alt="Your Company"
+                />
+                <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+                  {t(codeLanguage + '000014')}
+                </h2>
               </div>
 
-              <div>
+              <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+                <div className="space-y-6" >
 
-                <div className="relative mt-2">
-                  <input
-                    id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder={t(codeLanguage + '000010')}
-                    autoComplete="current-password"
-                    required
-                    className={`block h-11 w-full pl-3 pr-10 rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6  ${styles.signIn_input}`}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
+                  <div className="mt-2">
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder='Email'
+                      autoComplete="email"
+                      required
+                      className={`block h-11 w-full pl-3 pr-10 rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6  ${styles.signIn_input}`}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
 
-                  {/* Show/hide password toggle button */}
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 focus:outline-none"
-                    onClick={__handleClickShowPassword}
-                  >
-                    {showPassword ? <HiEyeOff /> : <HiEye />}
-                  </button>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <div className="text-sm mt-2 mb-2">
-                    <a href="/auth/getpassword" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                      {t(codeLanguage + '000007')} ?
-                    </a>
+                <div>
+
+                  <div className="relative mt-2">
+                    <input
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder={t(codeLanguage + '000010')}
+                      autoComplete="current-password"
+                      required
+                      className={`block h-11 w-full pl-3 pr-10 rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6  ${styles.signIn_input}`}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+
+                    {/* Show/hide password toggle button */}
+                    <button
+                      type="button"
+                      className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 focus:outline-none"
+                      onClick={__handleClickShowPassword}
+                    >
+                      {showPassword ? <HiEyeOff /> : <HiEye />}
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm mt-2 mb-2">
+                      <a href="/auth/getpassword" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                        {t(codeLanguage + '000007')} ?
+                      </a>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div>
-                <button
-                  type="submit"
-                  className={`${styles.signin__btn} flex mb-2 h-11 w-full items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white`}
-                  onClick={() => __handleSignIn()}
-                >
-                  {t(codeLanguage + '000002')}
-                </button>
+                <div>
+                  <button
+                    type="submit"
+                    className={`${styles.signin__btn} flex mb-2 h-11 w-full items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white`}
+                    onClick={() => __handleSignIn()}
+                  >
+                    {t(codeLanguage + '000002')}
+                  </button>
 
 
-                <button
-                  type="submit"
-                  className={`${styles.signinGoogle__btn} flex mb-2 h-11 w-full items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white`}
-                  onClick={() => window.location.href = 'https://be.mavericks-tttm.studio/oauth2/authorization/google'}
-                // onClick={() => __handleSignInGoogle()}
-                >
-                  {t(codeLanguage + '000005')}
-                </button>
+                  <button
+                    type="submit"
+                    className={`${styles.signinGoogle__btn} flex mb-2 h-11 w-full items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white`}
+                    onClick={() => login()}
+                  >
+                    {t(codeLanguage + '000005')}
+                  </button>
 
-              </div>
 
-              <GoogleOAuthProvider clientId="1051460649548-ijlrpmgdcmd5td1apidcpauh3dhv7u26.apps.googleusercontent.com">
-                <div className="App">
-                  <h1>Login with Google</h1>
                   <GoogleLogin
+                    width={'100%'}
+                    size='large'
+                    text="signin_with"
+                    theme={'filled_blue'}
                     onSuccess={handleLoginSuccess}
                     onError={() => {
                       console.log('Login Failed');
                     }}
+                    containerProps={{
+                      style: {
+                        width: "100% !important",
+                        backgroundColor: '#1A73E8',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: 5
+                      },
+                    }}
                   />
-                </div>
-              </GoogleOAuthProvider>
 
-              <p className="mt-10 text-center text-sm text-gray-500">
-                {t(codeLanguage + '000008')}?{' '}
-                <a href="/auth/signup" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-                  {t(codeLanguage + '000015')}
-                </a>
-              </p>
+                </div>
+
+
+
+
+                <p className="mt-10 text-center text-sm text-gray-500">
+                  {t(codeLanguage + '000008')}?{' '}
+                  <a href="/auth/signup" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+                    {t(codeLanguage + '000015')}
+                  </a>
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </ThemeProvider>
+      </ThemeProvider>
+    </GoogleOAuthProvider>
+
+
   );
 }
