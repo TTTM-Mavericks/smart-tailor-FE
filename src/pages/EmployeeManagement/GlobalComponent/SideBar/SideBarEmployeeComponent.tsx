@@ -165,6 +165,14 @@ const SideBarEmployeeComponent = () => {
                         </Typography>
                         <Item
                             // title={t(codeLanguage + '000020')}
+                            title='Manage Notification'
+                            to="/manage_notification"
+                            icon={<PeopleOutlinedIcon />}
+                            selected={selected}
+                            setSelected={setSelected}
+                        />
+                        <Item
+                            // title={t(codeLanguage + '000020')}
                             title='Manage Customer'
                             to="/manager_customer"
                             icon={<PeopleOutlinedIcon />}

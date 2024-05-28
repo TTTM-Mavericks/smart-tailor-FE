@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import { jwtDecode } from 'jwt-decode';
 import CustomDesignScreen from './pages/CustomDesign/CustomDesignScreen';
-import SignInScreen from './pages/Authentication/SignIn/SignInScreens';
 import DashboardAdminScreens from './pages/AdminManagement/DashboardAdmin/DashboardAdminScreens';
 import DashboardAdminProfileScreens from './pages/AdminManagement/AdminProfile/AdminProfileComponent';
 import AboutUsPage from './pages/AboutUs/AboutUsScreen';
@@ -13,7 +12,6 @@ import ContactUsPage from './pages/ContactUs/ContactUsScreen';
 import DashboardManageUserScreen from './pages/AdminManagement/ManageUsers/DashBoardManageUserComponent';
 import DashboardRecentTransactionScreen from './pages/AdminManagement/RecentTransaction/DashboardRecentTransactionComponent';
 import DashboardManageInvoiceScreen from './pages/AdminManagement/ManageInvoice/DashboardManageInvoiceComponent';
-import SignUpScreens from './pages/Authentication/SignUp/SignUpScreens';
 import DashboardFAQScreens from './pages/AdminManagement/GlobalComponent/FAQ/DashboardFAQComponent';
 import DashboardPieChartScreens from './pages/AdminManagement/PieChart/DashboardPieChartComponent';
 import DashboardGeographyChartScreens from './pages/AdminManagement/GeographyChart/DashboardGeographyChartComponent';
@@ -26,6 +24,14 @@ import DashboardEmployeeManageBrandScreens from './pages/EmployeeManagement/Mana
 import DashboardManageReportScreen from './pages/EmployeeManagement/ManageReport/DashboardManageReportComponent';
 import DashboardManageOrderScreen from './pages/EmployeeManagement/ManageOrder/DashboardManageOrderComponent';
 import DashboardManageTransactionScreen from './pages/EmployeeManagement/ManageOrder/DashboardManageOrderComponent';
+import {
+  ForgotPassWordScreen,
+  SignInScreen,
+  SignUpScreen,
+  VerifyEmailScreen
+} from './pages/Authentication';
+import RowDetails from './pages/EmployeeManagement/ManageOrder/RowDetailsComponent';
+import EmployeeManageOrder from './pages/EmployeeManagement/ManageOrder/ManageOrderScreen';
 
 const tokenIsValid = (token) => {
   // Implement your token validation logic here
@@ -65,10 +71,20 @@ function App() {
     <div>
       <BrowserRouter>
         <Routes>
+
+          {/* Init/Home route */}
           <Route path='/' element={<HomeScreen></HomeScreen>} />
-          <Route path='/design' element={<CustomDesignScreen></CustomDesignScreen>} />
+
+          {/* Auth route */}
           <Route path='/auth/signin' element={<SignInScreen></SignInScreen>} />
-          <Route path='/auth/signup' element={<SignUpScreens></SignUpScreens>} />
+          <Route path='/auth/signup' element={<SignUpScreen></SignUpScreen>} />
+          <Route path='/auth/getpassword' element={<ForgotPassWordScreen></ForgotPassWordScreen>} />
+          <Route path='/auth/verify' element={<VerifyEmailScreen></VerifyEmailScreen>} />
+
+          {/* Design route */}
+          <Route path='/design' element={<CustomDesignScreen></CustomDesignScreen>} />
+
+          {/* Admin dashboard route */}
           <Route path='/admin' element={<DashboardAdminScreens></DashboardAdminScreens>} />
           <Route path='/admin_profile' element={<DashboardAdminProfileScreens></DashboardAdminProfileScreens>} />
           <Route path='/about' element={<AboutUsPage></AboutUsPage>} />
@@ -88,7 +104,8 @@ function App() {
           <Route path='/manage_report' element={<DashboardManageReportScreen></DashboardManageReportScreen>} />
           <Route path='/manager_order' element={<DashboardManageOrderScreen></DashboardManageOrderScreen>} />
           <Route path='/manage_transaction' element={<DashboardManageTransactionScreen></DashboardManageTransactionScreen>} />
-
+          <Route path="/be" element={<EmployeeManageOrder />} />
+          <Route path="/row-details" element={<RowDetails />} />
 
 
 

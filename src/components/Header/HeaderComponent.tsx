@@ -26,13 +26,13 @@ const navigation = {
       id: 'design',
       name: 'Design',
       href: '/design',
-      number: '000123',
+      number: '000132',
       type: 'page'
     },
     {
       id: 'about',
       name: 'About us',
-      number: '000124',
+      number: '000133',
       href: '/about',
       type: 'page'
     },
@@ -40,7 +40,7 @@ const navigation = {
       id: 'report',
       name: 'Report',
       href: '/report',
-      number: '000125',
+      number: '000134',
       type: 'page'
     },
   ],
@@ -49,7 +49,7 @@ const navigation = {
       id: 'products',
       name: 'Products',
       type: 'menu',
-      number: '000121',
+      number: '000130',
       featured: [
         {
           name: 'New Arrivals',
@@ -109,7 +109,7 @@ const navigation = {
       id: 'sewingcompany',
       name: 'Sewing company',
       type: 'menu',
-      number: '000122',
+      number: '000131',
       featured: [
         {
           name: 'New Arrivals',
@@ -370,7 +370,7 @@ export default function HeaderComponent() {
           className="flex h-10 items-center justify-center px-4 text-sm font-medium text-white sm:px-6 lg:px-8"
           style={{ backgroundColor: primaryColor }}
         >
-          Get free delivery on orders over $100
+          {t(codeLanguage + '000128')}
         </p>
 
         <nav aria-label="Top" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

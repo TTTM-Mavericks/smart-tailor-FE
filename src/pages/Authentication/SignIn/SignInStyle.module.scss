@@ -49,3 +49,26 @@
     float: right;
     align-items: flex-end;
 }
+
+.signin__btn {
+    background-color: $primaryColor;
+}
+
+.signin__btn:hover {
+    scale: 1.02;
+    transition: 0.3s;
+}
+
+.signinGoogle__btn {
+    background-color: $secondaryColor;
+}
+
+.signinGoogle__btn:hover {
+    scale: 1.02;
+    transition: 0.3s;
+}
+
+.error__txt{
+    color: $errorColor;
+    font-size: 12px;
+}

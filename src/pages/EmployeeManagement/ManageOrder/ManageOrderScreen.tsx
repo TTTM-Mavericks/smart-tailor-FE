@@ -8,6 +8,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import Swal from "sweetalert2";
 import EditCustomerPopUpScreens from "./EditOrderPopUpScreen";
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from "react-router-dom";
 
 interface User {
     id: number;
@@ -21,7 +22,6 @@ interface User {
     zipCode: string;
 }
 
-// Make Style of popup
 const style = {
     position: 'absolute',
     top: '50%',
@@ -36,19 +36,21 @@ const style = {
 };
 
 const EmployeeManageOrder: React.FC = () => {
+    const navigate = useNavigate();
+
+    const handleCellClick = (params: any) => {
+        const rowData = params.row;
+        navigate('/row-details', { state: rowData });
+    };
+
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [data, setData] = React.useState<User[]>([]);
 
-    // set formid to pass it to component edit user
     const [formId, setFormId] = React.useState<User | null>(null);
-
-    // Open Edit PopUp when clicking on the edit icon
     const [editopen, setEditOpen] = React.useState(false);
     const _handleEditOpen = () => setEditOpen(true);
     const _handleEditClose = () => setEditOpen(false);
-
-    // open or close the add modal
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
     const _handleClick = (event: any) => {
@@ -57,35 +59,22 @@ const EmployeeManageOrder: React.FC = () => {
     const _handleClose = () => {
         setAnchorEl(null);
     };
-    console.log("anchorEl" + anchorEl);
-
-    // close open pop up
     const [addOpenOrClose, setAddOpenOrClose] = React.useState(false)
-
     const _handleAddOpen = () => {
         setAddOpenOrClose(true);
     }
-
     const _handleAddClose = () => {
         setAddOpenOrClose(false)
     }
-
-    // close open pop up
     const [addMultiple, setAddMultiple] = React.useState(false)
-
     const _handleAddMultipleOpen = () => {
         setAddMultiple(true);
     }
-
     const _handleAddMultipleClose = () => {
         setAddMultiple(false)
     }
-
-    // Get language in local storage
     const selectedLanguage = localStorage.getItem('language');
     const codeLanguage = selectedLanguage?.toUpperCase();
-
-    // Using i18n
     const { t, i18n } = useTranslation();
     React.useEffect(() => {
         if (selectedLanguage !== null) {
@@ -106,7 +95,6 @@ const EmployeeManageOrder: React.FC = () => {
                 if (responseData && Array.isArray(responseData)) {
                     setData(responseData);
                     console.log("Data received:", responseData);
-
                 } else {
                     console.error('Invalid data format:', responseData);
                 }
@@ -114,19 +102,15 @@ const EmployeeManageOrder: React.FC = () => {
             .catch(error => console.error('Error fetching data:', error));
     }, []);
 
-    // Thêm người dùng mới vào danh sách
     const _handleAddUser = (newUser: User) => {
         setData(prevData => [...prevData, newUser]);
     }
 
-    // Cập nhật người dùng trong danh sách
     const _handleUpdateUser = (updatedUser: User) => {
         setData(prevData => prevData.map(user => user.id === updatedUser.id ? updatedUser : user));
     }
 
-    // EDIT 
     const _handleEditClick = (id: number, registrarId: string, name: string, age: number, phone: string, email: string, address: string, city: string, zipCode: string) => {
-        // Handle edit action
         const userDataToEdit: User = {
             id: id,
             registrarId: registrarId,
@@ -142,9 +126,7 @@ const EmployeeManageOrder: React.FC = () => {
         _handleEditOpen();
     };
 
-    //DELETE OR UPDATE
     const _handleDeleteClick = async (id: number) => {
-        // Handle delete action
         try {
             const response = await fetch(`https://66080c21a2a5dd477b13eae5.mockapi.io/CPSE_DATA_TEST/${id}`, {
                 method: 'DELETE',
@@ -157,10 +139,8 @@ const EmployeeManageOrder: React.FC = () => {
         } catch (error) {
             throw error;
         }
-
     }
 
-    // confirm 
     const confirmDelete = async (id: number) => {
         try {
             const result = await Swal.fire({
@@ -180,7 +160,6 @@ const EmployeeManageOrder: React.FC = () => {
                     `${t(codeLanguage + '000065')}`,
                     'success'
                 )
-                // Loại bỏ người dùng khỏi danh sách hiện tại
                 setData(prevData => prevData.filter(user => user.id !== id));
             } else {
                 Swal.fire(
@@ -194,47 +173,16 @@ const EmployeeManageOrder: React.FC = () => {
         }
     };
 
-
     const columns: GridColDef[] = [
         { field: "id", headerName: "ID", flex: 0.5 },
         { field: "registrarId", headerName: "Registrar ID" },
-        {
-            field: "name",
-            headerName: "Name",
-            flex: 1,
-        },
-        {
-            field: "age",
-            headerName: "Age",
-            type: "number",
-            headerAlign: "left",
-            align: "left",
-        },
-        {
-            field: "phone",
-            headerName: "Phone Number",
-            flex: 1,
-        },
-        {
-            field: "email",
-            headerName: "Email",
-            flex: 1,
-        },
-        {
-            field: "address",
-            headerName: "Address",
-            flex: 1,
-        },
-        {
-            field: "city",
-            headerName: "City",
-            flex: 1,
-        },
-        {
-            field: "zipCode",
-            headerName: "Zip Code",
-            flex: 1,
-        },
+        { field: "name", headerName: "Name", flex: 1 },
+        { field: "age", headerName: "Age", type: "number", headerAlign: "left", align: "left" },
+        { field: "phone", headerName: "Phone Number", flex: 1 },
+        { field: "email", headerName: "Email", flex: 1 },
+        { field: "address", headerName: "Address", flex: 1 },
+        { field: "city", headerName: "City", flex: 1 },
+        { field: "zipCode", headerName: "Zip Code", flex: 1 },
         {
             field: "actions",
             headerName: "Actions",
@@ -254,10 +202,8 @@ const EmployeeManageOrder: React.FC = () => {
     ];
 
     const getRowId = (row: any) => {
-        return row.registrarId; // Sử dụng một thuộc tính duy nhất làm id cho mỗi hàng
+        return row.registrarId;
     };
-
-
 
     return (
         <Box m="20px">
@@ -265,44 +211,24 @@ const EmployeeManageOrder: React.FC = () => {
                 m="40px 0 0 0"
                 height="75vh"
                 sx={{
-                    "& .MuiDataGrid-root": {
-                        border: "none",
-                    },
-                    "& .MuiDataGrid-cell": {
-                        borderBottom: "none",
-                    },
-                    "& .name-column--cell": {
-                        color: colors.primary[300],
-                    },
-                    "& .MuiDataGrid-columnHeaders": {
-                        backgroundColor: colors.primary[300],
-                        borderBottom: "none",
-                    },
-                    "& .MuiDataGrid-virtualScroller": {
-                        backgroundColor: colors.primary[100],
-                    },
-                    "& .MuiDataGrid-footerContainer": {
-                        borderTop: "none",
-                        backgroundColor: colors.primary[100],
-                    },
-                    "& .MuiCheckbox-root": {
-                        color: `${colors.primary[100]} !important`,
-                    },
-                    "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-                        color: `${colors.primary[200]} !important`,
-                    },
-                    "& .MuiBadge-badge": {
-                        display: "none !important"
-                    }
+                    "& .MuiDataGrid-root": { border: "none" },
+                    "& .MuiDataGrid-cell": { borderBottom: "none" },
+                    "& .name-column--cell": { color: colors.primary[300] },
+                    "& .MuiDataGrid-columnHeaders": { backgroundColor: colors.primary[300], borderBottom: "none" },
+                    "& .MuiDataGrid-virtualScroller": { backgroundColor: colors.primary[100] },
+                    "& .MuiDataGrid-footerContainer": { borderTop: "none", backgroundColor: colors.primary[100] },
+                    "& .MuiCheckbox-root": { color: `${colors.primary[100]} !important` },
+                    "& .MuiDataGrid-toolbarContainer .MuiButton-text": { color: `${colors.primary[200]} !important` },
+                    "& .MuiBadge-badge": { display: "none !important" }
                 }}
             >
                 <DataGrid
                     rows={data}
                     columns={columns}
                     slots={{ toolbar: GridToolbar }}
-                    // checkboxSelection
                     disableRowSelectionOnClick
                     getRowId={getRowId}
+                    onCellClick={handleCellClick}
                 />
                 <Modal
                     open={editopen}
