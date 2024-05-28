@@ -25,8 +25,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import { Logout, Settings } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
-import LanguageSetting from "../LanguageSetting/LanguageSettingComponent";
 import NotificationWithSocketIOScreen from "../Notification/NotificationWithSocketIOComponent";
+import HeaderLanguageSetting from "../../../../components/LanguageSetting/LanguageSettingComponent";
 
 type Anchor = 'top' | 'left' | 'bottom' | 'right';
 
@@ -140,7 +140,7 @@ const TopbarComponent = () => {
                 {/* ICONS */}
                 <Box display="flex">
                     {/* EN VI Mode */}
-                    <LanguageSetting />
+                    <HeaderLanguageSetting />
 
                     {/* Dark Light Mode */}
                     <IconButton onClick={() => setMode(mode === 'light' ? 'dark' : 'light')}>
