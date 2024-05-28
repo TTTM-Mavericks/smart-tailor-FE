@@ -1,4 +1,4 @@
-@import '../../../index.module.scss';
+@import '../../../../index.module.scss';
 
 .dialog__container {
     position: absolute;
@@ -23,7 +23,7 @@
 
     &__header {
         width: 100%;
-        height: 7%;
+        height: 10%;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -39,6 +39,14 @@
                 color: $blackColor;
                 size: 20px;
                 font-weight: bold;
+            }
+        }
+
+        .searchBar{
+            width: 50%;
+            
+            input{
+                outline: none
             }
         }
     }
@@ -61,13 +69,15 @@
         }
     }
 
-    &__filter__container{
+    &__filter__container {
         width: 20%;
         height: 100%;
         border-right: 2px solid $grayColor;
+        display: flex;
+        justify-content: center;
     }
 
-    &__result__list{
+    &__result__list {
         width: calc(80% - 2px);
         height: 500px;
         overflow-y: auto;
@@ -79,9 +89,29 @@
         // align-content: center;
     }
 
-    &__result__list::-webkit-scrollbar{
+    &__result__list::-webkit-scrollbar {
         width: 5px;
-        background-color: $grayColor;
-        height: 0px;
+        /* Width of the scrollbar */
+        height: 12px;
+        /* Height of the scrollbar */
+    }
+
+    &__result__list::-webkit-scrollbar-track {
+        background: #f1f1f177;
+        /* Background of the track */
+        border-radius: 10px;
+        /* Optional: Rounded corners */
+    }
+
+    &__result__list::-webkit-scrollbar-thumb {
+        background: $grayColor;
+        /* Color of the scrollbar thumb */
+        border-radius: 10px;
+        /* Optional: Rounded corners */
+    }
+
+    &__result__list::-webkit-scrollbar-thumb:hover {
+        background: #888787;
+        /* Color when hovering over the scrollbar thumb */
     }
 }

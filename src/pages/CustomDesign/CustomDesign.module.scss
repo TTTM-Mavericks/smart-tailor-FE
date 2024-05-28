@@ -148,12 +148,13 @@
         float: left;
 
         &__itemSelector {
-            width: 37.34%;
+            width: 31.34%;
             height: 80vh;
             float: left;
 
             &__buttonGroup {
                 border-right: 1px solid #EAEAEA;
+
                 &__sampleModelBtn,
                 &__editorModelBtn {
                     background-color: $whiteColor;
@@ -184,7 +185,7 @@
                 &__menuEditor {
                     width: 15%;
                     height: 100%;
-                    background-color: $grayColor;
+                    background-color: $grayColor1;
                     float: left;
 
 
@@ -234,11 +235,23 @@
                 }
 
                 &__sampleItemList::-webkit-scrollbar {
-                    width: 5px;
-                    background-color: $grayColor;
-                    height: 10px;
-                    /* Width of the scrollbar */
-                }
+                    width: 5px; /* Width of the scrollbar */
+                    height: 12px; /* Height of the scrollbar */
+                  }
+                  
+                  &__sampleItemList::-webkit-scrollbar-track {
+                    background: #f1f1f177; /* Background of the track */
+                    border-radius: 10px; /* Optional: Rounded corners */
+                  }
+                  
+                  &__sampleItemList::-webkit-scrollbar-thumb {
+                    background: $grayColor; /* Color of the scrollbar thumb */
+                    border-radius: 10px; /* Optional: Rounded corners */
+                  }
+                  
+                  &__sampleItemList::-webkit-scrollbar-thumb:hover {
+                    background: #888787; /* Color when hovering over the scrollbar thumb */
+                  }
 
                 &__sampleCollectionList {
                     width: 85%;
@@ -386,11 +399,11 @@
 
 .sampleItemCard {
     position: relative;
-    width: 150px;
-    height: 150px;
+    width: 130px;
+    height: 130px;
     background-color: $grayColor;
     float: left;
-    margin: 10px;
+    margin: 5px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -411,10 +424,12 @@
 
 .menuTabBar__createBlank__btn {
     width: 85%;
-    border: 2px dashed $grayColor;
+    border: 1px dashed $grayColor;
+    padding-bottom: 20px;
 
     span {
         color: $blackColor;
+        font-size: 13px;
     }
 }
 
@@ -435,14 +450,13 @@
     }
 
     &__content {
+        width: 60%;
         display: flex;
-        align-items: center;
-        justify-content: center;
         margin-left: 10px;
 
         span {
             color: $blackColor;
-            font-size: 11px
+            font-size: 10px
         }
     }
 }
