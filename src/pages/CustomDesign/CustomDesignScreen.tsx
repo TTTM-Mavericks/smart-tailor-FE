@@ -153,9 +153,9 @@ function CustomDesignScreen() {
   const [activeEditorTab, setActiveEditorTab] = useState<string>('');
   const [selectedLanguage, setSelectedLanguage] = useState(localStorage.getItem('language') || 'en');
   const [codeLanguage, setCodeLanguage] = useState<string>('EN');
-  const [isEditorMode, setIsEditorMode] = useState<boolean>(false);
+  const [isEditorMode, setIsEditorMode] = useState<boolean>(true);
   const [isCollectionTab, setIsColectionTab] = useState<boolean>(false);
-  const [toolSelected, setToolSelected] = useState<string>('modelProductTab');
+  const [toolSelected, setToolSelected] = useState<string>('stampsItem');
   const [collection, setCollection] = useState<Item[]>([]);
   const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
   const [isOpenProductDialog, setIsOpenProductDialog] = useState<boolean>(false);
@@ -411,8 +411,8 @@ function CustomDesignScreen() {
 
           </div>
 
-          {selectedPartOfCloth ? ( 
-            <div className={`${styles.customDesign__container__editorArea__display__displayDesign} editorArea__display__displayDesign` } >
+          {selectedPartOfCloth ? (
+            <div className={`${styles.customDesign__container__editorArea__display__displayDesign} editorArea__display__displayDesign`} >
               <ImageDraggableComponent partOfCloth={selectedPartOfCloth} selectedItem={selectedItem}></ImageDraggableComponent>
 
             </div>
@@ -427,14 +427,7 @@ function CustomDesignScreen() {
 
           {/* Button group of item selected */}
           <div className={styles.customDesign__container__editorArea__itemSelector__buttonGroup}>
-            <button
-              className={` py-2 px-4 rounded inline-flex items-center ${styles.customDesign__container__editorArea__itemSelector__buttonGroup__sampleModelBtn} `}
-              onClick={() => __handleSelectEditorMode(true)}
-              style={!isEditorMode ? { backgroundColor: primaryColor, color: whiteColor, borderColor: primaryColor } : {}}
-            >
-              <FaTshirt size={20} style={{ marginRight: 5, backgroundColor: 'transparent', border: 'none' }} className={styles.downloadIcon}></FaTshirt>
-              <span>{t(codeLanguage + '000108')}</span>
-            </button>
+
 
             <button
               className={` py-2 px-4 rounded inline-flex items-center ${styles.customDesign__container__editorArea__itemSelector__buttonGroup__editorModelBtn} `}
@@ -443,6 +436,15 @@ function CustomDesignScreen() {
             >
               <FaPen size={20} style={{ marginRight: 5, backgroundColor: 'transparent', border: 'none' }} className={styles.saveIcon}></FaPen>
               <span>{t(codeLanguage + '000109')}</span>
+            </button>
+
+            <button
+              className={` py-2 px-4 rounded inline-flex items-center ${styles.customDesign__container__editorArea__itemSelector__buttonGroup__sampleModelBtn} `}
+              onClick={() => __handleSelectEditorMode(true)}
+              style={!isEditorMode ? { backgroundColor: primaryColor, color: whiteColor, borderColor: primaryColor } : {}}
+            >
+              <FaTshirt size={20} style={{ marginRight: 5, backgroundColor: 'transparent', border: 'none' }} className={styles.downloadIcon}></FaTshirt>
+              <span>{t(codeLanguage + '000108')}</span>
             </button>
 
           </div>
