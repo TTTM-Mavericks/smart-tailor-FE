@@ -54,7 +54,7 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
     const [loading, setLoading] = React.useState<boolean>(false);
     const [error, setError] = React.useState<string>('');
 
-    const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const _handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             const file = e.target.files[0];
             const reader = new FileReader();
@@ -104,7 +104,7 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
     };
 
 
-    const handleConfirm = () => {
+    const _handleConfirm = () => {
         const uniqueCols = ['name', 'email', 'phone'];
 
         // Kiểm tra xem có giá trị null không
@@ -194,7 +194,7 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
             });
     };
 
-    const handleDownloadFullData = () => {
+    const _handleDownloadFullData = () => {
         // Convert modified data to XLSX format
         const ws = XLSX.utils.json_to_sheet(excelData, { header: Object.keys(excelData[0] || {}) });
 
@@ -271,8 +271,8 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
     const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
 
     const [editOpen, setEditOpen] = React.useState(false);
-    const handleEditOpen = () => setEditOpen(true);
-    const handleEditClose = () => setEditOpen(false);
+    const _handleEditOpen = () => setEditOpen(true);
+    const _handleEditClose = () => setEditOpen(false);
 
     const confirmDelete = (index: number) => {
         const result = window.confirm('Are you sure? Do you want to delete this user?');
@@ -288,7 +288,7 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
     const confirmEdit = (index: number) => {
         setEditingIndex(index);
         setEditingData(excelData[index]);
-        handleEditOpen();
+        _handleEditOpen();
     };
 
     // Hàm để cập nhật dữ liệu sau khi chỉnh sửa
@@ -304,24 +304,24 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
     const cancelEdit = () => {
         setEditingData(null);
         setEditingIndex(null);
-        handleEditClose()
+        _handleEditClose()
     };
 
     // Thêm một state để theo dõi trạng thái của modal
     const [openAddUserModal, setOpenAddUserModal] = React.useState(false);
 
     // Hàm để mở modal
-    const handleOpenAddUserModal = () => {
+    const _handleOpenAddUserModal = () => {
         setOpenAddUserModal(true);
     };
 
     // Hàm để đóng modal
-    const handleCloseAddUserModal = () => {
+    const _handleCloseAddUserModal = () => {
         setOpenAddUserModal(false);
     };
 
     // Hàm để thêm người dùng mới
-    const handleAddUser = (userData: any) => {
+    const _handleAddUser = (userData: any) => {
         const newData = [...excelData];
         newData.push(userData);
         setExcelData(newData);
@@ -377,8 +377,8 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
             {
                 excelData.length > 0 && !editingData && (
                     <>
-                        <Button onClick={handleOpenAddUserModal}>Add User</Button>
-                        <AddUserModalInExcelTable open={openAddUserModal} onClose={handleCloseAddUserModal} onAddUser={handleAddUser} />
+                        <Button onClick={_handleOpenAddUserModal}>Add User</Button>
+                        <AddUserModalInExcelTable open={openAddUserModal} onClose={_handleCloseAddUserModal} onAddUser={_handleAddUser} />
                     </>
                 )
             }
@@ -386,7 +386,7 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
             <div style={{ display: "flex" }}>
                 <input
                     type="file"
-                    onChange={handleFileInputChange}
+                    onChange={_handleFileInputChange}
                     style={{ marginBottom: '20px', padding: '10px', borderRadius: '5px', border: '1px solid #ccc', marginRight: "20px" }}
                 />
                 {
@@ -396,7 +396,7 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
                             <Button
                                 variant="contained"
                                 color="secondary"
-                                onClick={handleDownloadFullData}
+                                onClick={_handleDownloadFullData}
                                 style={{ boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)', backgroundColor: '#E96208' }}
                             >
                                 {t(codeLanguage + '000054')}
@@ -509,7 +509,7 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
                     <Button
                         variant="contained"
                         color="primary"
-                        onClick={handleConfirm}
+                        onClick={_handleConfirm}
                         endIcon={<CheckCircleRounded />}
                         style={{ backgroundColor: '#E96208', color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
                     >

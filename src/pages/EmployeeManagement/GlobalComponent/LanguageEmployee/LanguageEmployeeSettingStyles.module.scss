@@ -1,0 +1,23 @@
+.language__button {
+    display: flex;
+    width: 100%;
+}
+
+.language__button span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-left: 10px;
+}
+
+.language__button :hover {
+    background-color: rgb(237, 237, 237);
+}
+
+.icon_language {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    right: "-5%";
+    float: left;
+}

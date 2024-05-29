@@ -1,7 +1,7 @@
 import { ResponsiveLine } from "@nivo/line";
 import { Card, ToggleButton, ToggleButtonGroup, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../../theme";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { mockLineData as dataLineChart } from "./DataTestLineChart";
 import { useTranslation } from 'react-i18next';
 
@@ -14,7 +14,7 @@ const LineChart = () => {
     const filteredData = option === "month" ? dataLineChart : [];
     console.log("filter data" + filteredData + option);
 
-    const handleChange = (e: any) => {
+    const _handleChange = (e: any) => {
         setOption(e.target.value)
     }
     // const [dataLineChart, setDataLineChart] = useState([])
@@ -60,7 +60,7 @@ const LineChart = () => {
                         color="primary"
                         value={option}
                         exclusive
-                        onChange={handleChange}
+                        onChange={_handleChange}
                         aria-label="Platform"
                     >
                         <ToggleButton value="month" sx={{ color: colors.primary[200], fontWeight: "bold" }}>

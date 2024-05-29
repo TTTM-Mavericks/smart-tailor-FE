@@ -1,4 +1,3 @@
-import * as React from 'react';
 import TopbarComponent from '../GlobalComponent/TopBar/TopBarComponent';
 import SideBarComponent from '../GlobalComponent/SideBar/SideBarComponent';
 import { Box, CssBaseline, useMediaQuery, useTheme } from "@mui/material";

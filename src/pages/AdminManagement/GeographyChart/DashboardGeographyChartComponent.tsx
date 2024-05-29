@@ -1,13 +1,13 @@
 import * as React from 'react';
 import TopbarComponent from '../GlobalComponent/TopBar/TopBarComponent';
 import SideBarComponent from '../GlobalComponent/SideBar/SideBarComponent';
-import { Box, CssBaseline, useMediaQuery, useTheme, IconButton, Card, Typography } from "@mui/material";
+import { Box, CssBaseline, useMediaQuery, useTheme, IconButton } from "@mui/material";
 import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
 import { ArrowUpward } from '@mui/icons-material';
 import theme from '../../../theme';
 import styles from "./DashboardGeographyChartStyles.module.scss"
 import GeographyChartComponent from '../GeographyChart/GeographyChartComponent';
-import { tokens, themeSettings } from "../../../theme";
+import { tokens } from "../../../theme";
 import NotFound from '../GlobalComponent/Error404/Error404Component';
 
 const DashboardGeographyChartScreens = () => {
@@ -32,7 +32,7 @@ const DashboardGeographyChartScreens = () => {
         };
     }, []);
 
-    const scrollToTop = () => {
+    const _handleScrollToTop = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
@@ -69,7 +69,7 @@ const DashboardGeographyChartScreens = () => {
                                 backgroundColor: "#E96208",
                                 color: "white"
                             }}
-                            onClick={scrollToTop}
+                            onClick={_handleScrollToTop}
                         >
                             <ArrowUpward />
                         </IconButton>

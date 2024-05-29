@@ -5,7 +5,6 @@ import { Box, CssBaseline, useMediaQuery, useTheme, IconButton } from "@mui/mate
 import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
 import { ArrowUpward } from '@mui/icons-material';
 import theme from '../../../../theme';
-import { themeSettings } from '../../../../theme';
 import styles from "./DashboardFAQStyles.module.scss"
 import { tokens } from "../../../../theme";
 import FAQComponent from './FAQComponent';
@@ -35,7 +34,7 @@ export default function DashboardFAQScreens() {
         };
     }, []);
 
-    const scrollToTop = () => {
+    const _handleScrollToTop = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
@@ -66,7 +65,7 @@ export default function DashboardFAQScreens() {
                                 backgroundColor: "#E96208",
                                 color: "white"
                             }}
-                            onClick={scrollToTop}
+                            onClick={_handleScrollToTop}
                         >
                             <ArrowUpward />
                         </IconButton>

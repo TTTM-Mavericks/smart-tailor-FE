@@ -1,7 +1,7 @@
 import * as React from 'react';
 import TopbarComponent from '../GlobalComponent/TopBar/TopBarComponent';
 import SideBarComponent from '../GlobalComponent/SideBar/SideBarComponent';
-import { Box, CssBaseline, useMediaQuery, useTheme, IconButton, Card, Typography } from "@mui/material";
+import { Box, CssBaseline, useMediaQuery, useTheme, IconButton } from "@mui/material";
 import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
 import { ArrowUpward } from '@mui/icons-material';
 import theme from '../../../theme';
@@ -11,7 +11,7 @@ import BarChartComponent from '../BarChart/BarChartComponent';
 import PieChartComponent from '../PieChart/PieChartComponent';
 import CardInformationDetailComponent from '../CardInformationDetail/CardInformationDetailComponent';
 import GeographyChartComponent from '../GeographyChart/GeographyChartComponent';
-import { tokens, themeSettings } from "../../../theme";
+import { tokens } from "../../../theme";
 import NotFound from '../GlobalComponent/Error404/Error404Component';
 
 const DashboardAdminScreens = () => {
@@ -36,7 +36,7 @@ const DashboardAdminScreens = () => {
         };
     }, []);
 
-    const scrollToTop = () => {
+    const _handleScrollToTop = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
@@ -56,10 +56,10 @@ const DashboardAdminScreens = () => {
             <CssBaseline />
             <div className={`${styles.dashboard}`}>
                 <SideBarComponent />
-                <div className={`${styles.content}`}>
+                <div className={`${styles.content}`} >
                     <TopbarComponent />
                     <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="140px" gap="20px">
-                        <Box gridColumn="span 12" gridRow="span 2">
+                        <Box gridColumn="span 12" gridRow="span 1">
                             <CardInformationDetailComponent />
                         </Box>
                         <Box gridColumn="span 12" gridRow="span 5">
@@ -85,7 +85,7 @@ const DashboardAdminScreens = () => {
                                 backgroundColor: "#E96208",
                                 color: "white"
                             }}
-                            onClick={scrollToTop}
+                            onClick={_handleScrollToTop}
                         >
                             <ArrowUpward />
                         </IconButton>
