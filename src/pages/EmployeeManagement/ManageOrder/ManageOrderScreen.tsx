@@ -196,8 +196,8 @@ const EmployeeManageOrder: React.FC = () => {
                     "& .MuiDataGrid-cell": { borderBottom: "none" },
                     "& .name-column--cell": { color: colors.primary[300] },
                     "& .MuiDataGrid-columnHeaders": { backgroundColor: colors.primary[300], borderBottom: "none" },
-                    "& .MuiDataGrid-virtualScroller": { backgroundColor: colors.primary[100] },
-                    "& .MuiDataGrid-footerContainer": { borderTop: "none", backgroundColor: colors.primary[100] },
+                    "& .MuiDataGrid-virtualScroller": { backgroundColor: colors.primary[600] },
+                    "& .MuiDataGrid-footerContainer": { borderTop: "none", backgroundColor: colors.primary[600] },
                     "& .MuiCheckbox-root": { color: `${colors.primary[100]} !important` },
                     "& .MuiDataGrid-toolbarContainer .MuiButton-text": { color: `${colors.primary[200]} !important` },
                     "& .MuiBadge-badge": { display: "none !important" }

@@ -81,10 +81,10 @@ const SideBarEmployeeComponent = () => {
         <Box
             sx={{
                 "& .pro-sidebar-inner": {
-                    background: `${colors.primary[100]} !important`,
+                    background: `${colors.primary[600]} !important`,
                 },
                 "& .pro-icon-wrapper": {
-                    backgroundColor: `${colors.primary[100]} !important`,
+                    backgroundColor: `${colors.primary[600]} !important`,
                 },
                 "& .pro-inner-item": {
                     padding: "5px 35px 5px 20px !important",

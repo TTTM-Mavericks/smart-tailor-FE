@@ -32,15 +32,38 @@ const RowDetails: React.FC = () => {
         });
     };
 
-    const handleUpdateConfirm = () => {
-        setRowData(updatedData);
-        setShowModal(false);
-        Swal.fire({
-            title: 'Updated!',
-            text: 'Your order has been updated.',
-            icon: 'success',
-            confirmButtonText: 'OK'
-        });
+    const handleUpdateConfirm = async () => {
+        try {
+            const response = await fetch('https://66080c21a2a5dd477b13eae5.mockapi.io/CPSE_DATA_TEST/' + rowData.id, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedData)
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                setRowData(result);
+                setShowModal(false);
+                Swal.fire({
+                    title: 'Updated!',
+                    text: 'Your order has been updated.',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+            } else {
+                throw new Error('Failed to update order');
+            }
+        } catch (error) {
+            console.error('Error updating order:', error);
+            Swal.fire({
+                title: 'Error!',
+                text: 'Failed to update order.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
     };
 
     return (
@@ -112,9 +135,9 @@ const RowDetails: React.FC = () => {
                                 <Typography variant="h6" gutterBottom>Customer</Typography>
                                 <Box mb={2} display="flex" alignItems="center">
                                     <Box>
-                                        <Typography variant="body2"><strong>Name:</strong> {rowData.total}</Typography>
+                                        <Typography variant="body2"><strong>Name:</strong> {rowData.name}</Typography>
                                         <Typography variant="body2"><strong>Company:</strong> {rowData.total}</Typography>
-                                        <Typography variant="body2"><strong>Address:</strong> {rowData.total}</Typography>
+                                        <Typography variant="body2"><strong>Address:</strong> {rowData.address}</Typography>
                                         <Typography variant="body2"><strong>City:</strong> {rowData.total}</Typography>
                                         <Typography variant="body2"><strong>Postal Code:</strong> {rowData.total}</Typography>
                                         <Typography variant="body2"><strong>Country:</strong> {rowData.total}</Typography>
@@ -252,7 +275,7 @@ const RowDetails: React.FC = () => {
                     </Modal>
                 </Grid>
             </Box>
-        </Container >
+        </Container>
     );
 };
 

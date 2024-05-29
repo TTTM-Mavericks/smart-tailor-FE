@@ -6,6 +6,7 @@ import DashboardManageOrderScreen from "./ManageOrder/DashboardManageOrderCompon
 import DashboardManageTransactionScreen from "./ManageTransaction/DashboardManageTransactionComponent";
 import DashboardEmployeeOrderDetailScreen from "./ManageOrder/OrderDetailInformationComponent/DashboardOrderDetailComponent";
 import DashboardEmployeeManageUserScreens from "./ManageCustomer/DashboardEmployeeComponent";
+import DashboardManageNotification from "./ManageNotification/DashboardManageNotificationComponent";
 
 export {
     DashboardEmployeeProfileScreens,
@@ -15,5 +16,6 @@ export {
     DashboardManageOrderScreen,
     DashboardManageTransactionScreen,
     DashboardEmployeeOrderDetailScreen,
-    DashboardEmployeeManageUserScreens
+    DashboardEmployeeManageUserScreens,
+    DashboardManageNotification
 }

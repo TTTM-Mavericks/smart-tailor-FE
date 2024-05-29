@@ -29,7 +29,8 @@ import {
   DashboardManageOrderScreen,
   DashboardManageTransactionScreen,
   DashboardEmployeeOrderDetailScreen,
-  DashboardEmployeeManageUserScreens
+  DashboardEmployeeManageUserScreens,
+  DashboardManageNotification
 } from './pages/EmployeeManagement';
 
 import {
@@ -113,6 +114,7 @@ function App() {
           <Route path='/manager_order' element={<DashboardManageOrderScreen></DashboardManageOrderScreen>} />
           <Route path='/manage_transaction' element={<DashboardManageTransactionScreen></DashboardManageTransactionScreen>} />
           <Route path="/row-details" element={<DashboardEmployeeOrderDetailScreen></DashboardEmployeeOrderDetailScreen>} />
+          <Route path="/manage_notification" element={<DashboardManageNotification></DashboardManageNotification>} />
 
 
 

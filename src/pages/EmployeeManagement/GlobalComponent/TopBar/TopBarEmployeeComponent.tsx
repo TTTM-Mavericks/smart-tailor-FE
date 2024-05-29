@@ -121,7 +121,7 @@ const TopbarEmployeeComponent = () => {
     }
 
     return (
-        <Card sx={{ backgroundColor: `${colors.primary[100]} !important` }} >
+        <Card sx={{ backgroundColor: `${colors.primary[600]} !important` }} >
             <Box display="flex" justifyContent="space-between" p={2} >
 
 
