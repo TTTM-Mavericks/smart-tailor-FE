@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import { Logout } from '@mui/icons-material';
 import HeaderLanguageSetting from '../LanguageSetting/LanguageSettingComponent';
+import { UserInterface } from '../../models/UserModel';
 
 const navigation = {
   categories: [
@@ -174,11 +175,18 @@ export default function HeaderComponent() {
   const [open, setOpen] = useState(false)
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userLogined, setUserLogined] = useState<UserInterface>();
 
   useEffect(() => {
     const checkLoginStatus = () => {
-      const loggedIn = true;
-      setIsLoggedIn(loggedIn);
+      const userSession = sessionStorage.getItem('userAuth');
+      if (userSession) {
+        const userParse = JSON.parse(userSession);
+        setUserLogined(userParse)
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+      }
     };
 
     checkLoginStatus();
@@ -284,7 +292,7 @@ export default function HeaderComponent() {
                       <Tab.Panel key={category.name} className="space-y-10 px-4 pb-8 pt-10">
                         <div className="grid grid-cols-2 gap-x-4">
 
-                          {category?.featured?.map((item) => (
+                          {category?.featured?.map((item:any) => (
                             <div key={item.name} className="group relative text-sm">
                               <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
                                 <img src={item.imageSrc} alt={item.imageAlt} className="object-cover object-center" />
@@ -299,7 +307,7 @@ export default function HeaderComponent() {
                             </div>
                           ))}
                         </div>
-                        {category?.sections?.map((section) => (
+                        {category?.sections?.map((section:any) => (
                           <div key={section.name}>
                             <p id={`${category.id}-${section.id}-heading-mobile`} className="font-medium text-gray-900">
                               {section.name}
@@ -309,7 +317,7 @@ export default function HeaderComponent() {
                               aria-labelledby={`${category.id}-${section.id}-heading-mobile`}
                               className="mt-6 flex flex-col space-y-6"
                             >
-                              {section.items.map((item) => (
+                              {section.items.map((item:any) => (
                                 <li key={item.name} className="flow-root">
                                   <a href={item.href} className="-m-2 block p-2 text-gray-500">
                                     {item.name}
@@ -502,7 +510,7 @@ export default function HeaderComponent() {
                             </a>
                           </div>
 
-                          {category.type !== 'page' && (
+                          {/* {category.type !== 'page' && (
                             <Transition
                               as={Fragment}
                               enter="transition ease-out duration-200"
@@ -564,7 +572,7 @@ export default function HeaderComponent() {
                                 </div>
                               </Popover.Panel>
                             </Transition>
-                          )}
+                          )} */}
                         </>
                       )}
                     </Popover>
@@ -626,7 +634,7 @@ export default function HeaderComponent() {
                           aria-haspopup="true"
                           aria-expanded={isOpen ? 'true' : undefined}
                         >
-                          <Avatar sx={{ width: 32, height: 32 }}>M</Avatar>
+                          <Avatar src={userLogined?.avatar} sx={{ width: 32, height: 32 }}>M</Avatar>
                         </IconButton>
                       </Tooltip>
                     </Box>
@@ -666,9 +674,9 @@ export default function HeaderComponent() {
                       anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                     >
                       <MenuItem>
-                        <Link to={"/profile"} style={{ display: "flex", textDecoration: "none" }}>
+                        <a href={"/profile"} style={{ display: "flex", textDecoration: "none" }}>
                           <Avatar /> <p style={{ color: "black", marginTop: "4px" }}>{t(codeLanguage + '000045')}</p>
-                        </Link>
+                        </a>
                       </MenuItem>
                       <Divider />
                       <MenuItem onClick={handleLogout}>

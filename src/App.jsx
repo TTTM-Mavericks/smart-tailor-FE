@@ -1,5 +1,5 @@
 import React from 'react'; // Import React
-
+import Cookies from 'js-cookie'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import { jwtDecode } from 'jwt-decode';
@@ -23,31 +23,33 @@ import {
   SignUpScreen,
   VerifyEmailScreen
 } from './pages/Authentication';
-import NotFound from './pages/AdminManagement/GlobalComponent/Error404/Error404Component';
+import Screen404 from './pages/Error/Screen404';
 
 const tokenIsValid = (token) => {
-  // Implement your token validation logic here
   try {
     const decoded = jwtDecode(token);
-    const expiration = decoded.exp; // assuming your token has an expiration time
+    const expiration = decoded.exp; 
 
-    // Check if the token has expired
     return expiration > Math.floor(Date.now() / 1000);
   } catch (error) {
-    return false; // Token is invalid
+    return false;
   }
 };
 
 
 
 const isAuthenticated = (requiredRole) => {
-  const token = localStorage.getItem('accessToken'); // Change this to your actual storage method
-  const userRole = localStorage.getItem('role'); // Change this to your actual storage method
+  const token = Cookies.get('token');
+  console.log('token: ', token);
+  const userAuth = sessionStorage.getItem('userAuth');
+  if (userAuth) {
+    const userParse = JSON.parse(userAuth);
+    return userParse.roleName === requiredRole
+  }
 
   if (!tokenIsValid(token)) {
-    return false; // Token is invalid
+    return false;
   }
-  return userRole === requiredRole;
 };
 
 const PrivateRoute = ({ element, path, requiredRole }) => {
@@ -72,9 +74,9 @@ function App() {
           <Route path='/auth/signup' element={<SignUpScreen></SignUpScreen>} />
           <Route path='/auth/getpassword' element={<ForgotPassWordScreen></ForgotPassWordScreen>} />
           <Route path='/auth/verify' element={<VerifyEmailScreen></VerifyEmailScreen>} />
-          
+
           {/* Design route */}
-          <Route path='/design' element={<CustomDesignScreen></CustomDesignScreen>} />
+          <Route path="/design" element={<PrivateRoute element={<CustomDesignScreen />} requiredRole="CUSTOMER" />} />
 
           {/* Admin dashboard route */}
           <Route path='/admin' element={<DashboardAdminScreens></DashboardAdminScreens>} />
@@ -94,7 +96,7 @@ function App() {
 
 
 
-          <Route element={<AboutUsPage/>} />
+          <Route path='*' element={<Screen404 />} />
         </Routes>
       </BrowserRouter>
     </div>

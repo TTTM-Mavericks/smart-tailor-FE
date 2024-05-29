@@ -11,6 +11,9 @@ import { Fragment } from 'react';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import { GoogleOAuthProvider, GoogleLogin, useGoogleLogin, CredentialResponse, useGoogleOAuth } from '@react-oauth/google';
 import { secondaryColor } from '../../../root/ColorSystem';
+import Cookies from 'js-cookie'
+import axios from 'axios';
+
 const defaultTheme = createTheme();
 
 
@@ -43,9 +46,10 @@ export default function SignInScreen() {
   }, [selectedLanguage, i18n]);
 
   React.useEffect(() => {
+    console.log(Math.floor(Date.now() / 1000));
     if (selectedLanguage) {
       const uppercase = selectedLanguage.toUpperCase();
-      setCodeLanguage(uppercase)
+      setCodeLanguage(uppercase);
     }
 
   }, [selectedLanguage]);
@@ -147,16 +151,19 @@ export default function SignInScreen() {
       body: JSON.stringify({ authRequest: credential }),
     })
       .then((res) => res.json())
-      .then((data) => {
-        console.log('data.jwtToken: ', data.data.user);
-        sessionStorage.setItem('user', data.data.user);
-        // window.location.href = '/';
+      .then((resp) => {
+        const authToken = resp.data.access_token;
+        Cookies.set('token', authToken);
+        console.log('data.jwtToken: ', resp.data);
+        axios.defaults.headers.common.Authorization = `Bearer ${authToken}`;
+        sessionStorage.setItem('userAuth', JSON.stringify(resp.data.user));
+        window.location.href = '/';
       });
   };
 
   const login = useGoogleLogin({
-    
-    onSuccess: (tokenResponse:any) => {
+
+    onSuccess: (tokenResponse: any) => {
       console.log('Credential:', tokenResponse);
       handleLoginSuccess(tokenResponse);
     },
