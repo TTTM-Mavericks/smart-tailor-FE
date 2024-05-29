@@ -61,7 +61,6 @@ const Shirt = () => {
         }
 
         if (snap.isFrontClothTexture) {
-
             if (snap.frontDecalPositionX / 1000 !== 0) {
                 if (snap.frontDecalPositionX / 1000 < 0.2) {
 
@@ -209,7 +208,7 @@ const Shirt = () => {
                         // position={[0, 0.04, 0.15]}
 
                         rotation={[0, 0, 0]}
-                        scale={0.35}
+                        scale={[0.5, 0.25, 0.3]}
                         map={frontTexture}
                         depthTest={false}
                         depthWrite={true}
