@@ -2,8 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import styles from './ImageDraggableStyle.module.scss';
 import { useSnapshot } from 'valtio';
-import state from '../../store';
-import { BACK_CLOTH_PART, FRONT_CLOTH_PART, LOGO_PART, PartOfCloth, SLEEVE_CLOTH_PART } from '../../models/ClothModel';
+import state from '../../../../store';
+import { BACK_CLOTH_PART, FRONT_CLOTH_PART, LOGO_PART, PartOfCloth, SLEEVE_CLOTH_PART } from '../../../../models/ClothModel';
 import { Resizable } from 're-resizable';
 type props = {
     partOfCloth?: PartOfCloth,
@@ -22,8 +22,8 @@ const ImageDraggableComponent: React.FC<props> = ({ partOfCloth, selectedItem })
 
     // ---------------Usable Variable---------------//
     const snap = useSnapshot(state);
-    const parentRef = useRef<HTMLDivElement>(null);
-    const draggableRef = useRef<any>(null);
+    // const parentRef = useRef<HTMLDivElement>(null);
+    // const draggableRef = useRef<any>(null);
 
     // ---------------UseEffect---------------//
 
@@ -50,7 +50,7 @@ const ImageDraggableComponent: React.FC<props> = ({ partOfCloth, selectedItem })
     }, [selectedItem, snap]);
 
     useEffect(() => {
-        if (selectedItem === LOGO_PART) {
+        if (selectedItem === LOGO_PART && !resizing) {
             setPosition({ x: snap.logoDecalPositionX, y: snap.logoDecalPositionY })
 
         }
@@ -89,31 +89,43 @@ const ImageDraggableComponent: React.FC<props> = ({ partOfCloth, selectedItem })
     //     }
     // }, []);
 
-    useEffect(() => {
-        if (parentRef.current) {
-            const { left, top, right, bottom } = parentRef.current.getBoundingClientRect();
-            const position = parentRef.current.getBoundingClientRect();
+    // useEffect(() => {
+    //     if (parentRef.current) {
+    //         const { left, top, right, bottom } = parentRef.current.getBoundingClientRect();
+    //         const position = parentRef.current.getBoundingClientRect();
 
-            setParentBounds({ left, top, right, bottom });
-            console.log(position);
-        }
-    }, []);
+    //         setParentBounds({ left, top, right, bottom });
+    //         console.log(position);
+    //     }
+    // }, []);
 
     useEffect(() => {
         setResizing(resizing)
     }, [resizing])
 
+    useEffect(() => {
+        const element = document.querySelector('.imageDraggable__resizeable');
+        if (element instanceof HTMLElement) {
+            const rect = element.getBoundingClientRect();
+            setSize({
+                width: rect.width,
+                height: rect.height,
+            });
+            console.log('w: ', rect.width, '- h: ', rect.height);
+        }
+    }, [resizing]);
+
     // ---------------FunctionHandler---------------//
 
     const _handleDragStart = (e: DraggableEvent | any, ui: DraggableData,) => {
-        e.preventDefault()
-        e.target.style.cursor = 'grabbing';
+        e.preventDefault();
     };
 
-    const _handleOnDrag = (e: DraggableEvent, ui: DraggableData) => {
-        console.log('dragg');
-        if (!resizing) {
+    const _handleOnDrag = (e: DraggableEvent | any, ui: DraggableData) => {
+        e.preventDefault();
+        e.target.style.cursor = 'grabbing';
 
+        if (!resizing) {
             const { x, y } = ui;
             setPosition({ x, y });
             console.log({ x, y });
@@ -140,30 +152,51 @@ const ImageDraggableComponent: React.FC<props> = ({ partOfCloth, selectedItem })
         }
     };
 
-    const _handleDragStop = (e: any, ui: DraggableData) => {
+    const _handleDragStop = (e: DraggableEvent | any, ui: DraggableData) => {
+        e.target.style.cursor = 'grab';
         if (!resizing) {
             const { x, y } = ui;
             setPosition({ x, y });
             console.log('Drag stopped at:', x, y);
-            e.target.style.cursor = 'grab';
         }
+
     };
 
     const imgBase64Memoized = useMemo(() => (
-        imgBase64 && <img src={imgBase64} style={{ width: '100%', height: '100%', pointerEvents: 'none' }} alt="Draggable Image" />
+        imgBase64 && <img src={imgBase64} className={`${styles.item__img__resizeable}`} style={{ pointerEvents: 'auto' }} alt="Draggable Image" />
     ), [imgBase64]);
 
 
 
-    const _handleResizeStart = () => {
+    const __handleResizeStart = () => {
+        // console.log('__handleResizeStart');
+        // const element = document.querySelector('.imageDraggable__resizeable') as HTMLElement;
+        // if (element) {
+        //     element.style.pointerEvents = 'none'; // or 'auto' or any other valid value
+        // }
+        setResizing(true);
         setResizing(true);
     };
 
-    const _handleOnResize = () => {
+    const __handleOnResize = (e: any) => {
+        console.log('__handleOnResize');
+
+        // const element = document.querySelector('.imageDraggable__resizeable') as HTMLElement;
+        // if (element) {
+        //     element.style.pointerEvents = 'none'; // or 'auto' or any other valid value
+        // }
         setResizing(true);
     };
 
-    const _handleResizeEnd = () => {
+    const __handleResizeEnd = () => {
+        console.log('__handleResizeEnd');
+
+        // const element = document.querySelector('.imageDraggable__resizeable') as HTMLElement;
+        // if (element) {
+        //     element.style.pointerEvents = 'auto'; // or 'auto' or any other valid value
+        //     console.log(element);
+        // }
+        setResizing(true);
         setResizing(false);
     };
 
@@ -172,50 +205,50 @@ const ImageDraggableComponent: React.FC<props> = ({ partOfCloth, selectedItem })
         <>
 
             {partOfCloth ? (
-                <div className={styles.imageDraggable__boundary} ref={parentRef} style={{ backgroundImage: partOfCloth?.imgUrl }}>
+                <div className={styles.imageDraggable__boundary} style={{ backgroundImage: partOfCloth?.imgUrl }}>
                     <div className={styles.imageDraggable__img}>
                         <img src={partOfCloth.imgUrl} className={styles.imageDraggable__img} ></img>
+                        {imgBase64 && (
 
-                        <Resizable
-                            defaultSize={{
-                                width: 250,
-                                height: 300,
-                            }}
-                            className={styles.imageDraggable__resizeable}
-                            onResizeStart={_handleResizeStart}
-                            onResize={_handleOnResize}
-                            onResizeStop={_handleResizeEnd}
-                            maxHeight={500}
-                            maxWidth={600}
-                            ref={draggableRef}                                
-                            
-
-                        >
                             <Draggable
-                                bounds={{ top: -100, left: -100, right: 100, bottom: 100 }}
-                                ref={draggableRef} // Set draggableRef as the ref
+                                // bounds={{ top: -100, left: -100, right: 100, bottom: 100 }}
+                                // ref={draggableRef} // Set draggableRef as the ref
                                 // bounds='parent'
                                 position={position}
                                 onDrag={_handleOnDrag}
                                 onStop={_handleDragStop}
                                 onStart={_handleDragStart}
                                 disabled={resizing ? true : false}
-                                defaultClassNameDragged={styles.imageDraggable__resizeable}
+                                defaultClassNameDragged={`${styles.imageDraggable__resizeable} imageDraggable__resizeable`}
+
                             >
+                                <Resizable
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        border: "solid 1px #ddd",
+                                        background: "#f0f0f0"
+                                    }}
+                                    onResizeStart={__handleResizeStart}
+                                    onResize={__handleOnResize}
+                                    onResizeStop={__handleResizeEnd}
+                                    defaultSize={{ width: 230, height: 230 }}
+                                    handleWrapperStyle={{ pointerEvents: 'auto' }}
+                                    className={`${styles.resizeable__element}`}
+                                    grid={[25,25]}
+                                >
+                                    <div className={`${styles.resizeable__element__resizeIcon__icon1}`} ></div>
+                                    <div className={`${styles.resizeable__element__resizeIcon__icon2}`} ></div>
+                                    <div className={`${styles.resizeable__element__resizeIcon__icon3}`} ></div>
+                                    <div className={`${styles.resizeable__element__resizeIcon__icon4}`} ></div>
+                                    <div className={`${styles.resizeable__element__resizeIcon__icon5}`} ></div>
+                                    <div className={`${styles.resizeable__element__resizeIcon__icon6}`} ></div>
 
-                                <div>
                                     {imgBase64Memoized}
-                                </div>
-
-
-
-
+                                </Resizable>
                             </Draggable>
-
-                            
-                                <button style={{width:'0px', height: '30px', position:'absolute' ,right: -8, top: '50%'}}> {''}</button>
-                            
-                        </Resizable>
+                        )}
 
                     </div>
 
