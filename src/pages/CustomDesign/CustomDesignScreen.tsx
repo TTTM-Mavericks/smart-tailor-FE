@@ -5,7 +5,7 @@ import Designer from './Designer/Designer'
 import ImageEditor from './Designer/ImageEditor'
 import styles from './CustomDesign.module.scss';
 // import { SRGBToLinear } from 'three';
-import ImageDraggableComponent from '../../components/Draggable/ImageDraggableComponent';
+import ImageDraggableComponent from './Components/Draggable/ImageDraggableComponent';
 import { BACK_CLOTH_PART, FRONT_CLOTH_PART, LOGO_PART, PartOfCloth, SLEEVE_CLOTH_PART } from '../../models/ClothModel';
 import { __downloadCanvasToImage, reader } from '../../utils/DesignerUtils';
 import { DecalTypes } from '../../config/TabSetting';
@@ -22,7 +22,7 @@ import { IoText } from "react-icons/io5";
 import { GiClothes } from "react-icons/gi";
 import ProductCardDesignComponent from '../../components/Card/ProductCardDesign/ProductCardDesignComponent';
 import { TbHomeHeart } from "react-icons/tb";
-import ProductDialogComponent from './Components/ProductDialogComponent';
+import ProductDialogComponent from './Components/Dialog/ProductDialogComponent';
 
 
 
@@ -30,19 +30,19 @@ import ProductDialogComponent from './Components/ProductDialogComponent';
 const partOfClothData = [
   {
     partValue: LOGO_PART,
-    imgUrl: '../../assets/img/landing-img/wave.jpg'
+    imgUrl: frontOfCloth
   },
   {
     partValue: FRONT_CLOTH_PART,
-    imgUrl: '../../assets/img/landing-img/slider-bird1.jpg'
+    imgUrl: frontOfCloth
   },
   {
     partValue: BACK_CLOTH_PART,
-    imgUrl: '../../assets/img/landing-img/slider-bird3.jpg'
+    imgUrl: frontOfCloth
   },
   {
     partValue: SLEEVE_CLOTH_PART,
-    imgUrl: '../../assets/img/landing-img/wave.jpg'
+    imgUrl: frontOfCloth
   }
 ];
 
@@ -148,17 +148,19 @@ function CustomDesignScreen() {
     id: '',
     imgUrl: ''
   });
-  const [selectedItem, setSelectedItem] = useState('');
+  const [selectedItem, setSelectedItem] = useState<string>('');
   const [file, setFile] = useState('');
-  const [activeEditorTab, setActiveEditorTab] = useState('');
-  const [selectedLanguage, setSelectedLanguage] = useState<string>(localStorage.getItem('language') || 'en');
-  const [codeLanguage, setCodeLanguage] = useState('EN');
-  const [isEditorMode, setIsEditorMode] = useState(false);
-  const [isCollectionTab, setIsColectionTab] = useState(false);
-  const [toolSelected, setToolSelected] = useState('modelProductTab');
+  const [activeEditorTab, setActiveEditorTab] = useState<string>('');
+  const [selectedLanguage, setSelectedLanguage] = useState(localStorage.getItem('language') || 'en');
+  const [codeLanguage, setCodeLanguage] = useState<string>('EN');
+  const [isEditorMode, setIsEditorMode] = useState<boolean>(true);
+  const [isCollectionTab, setIsColectionTab] = useState<boolean>(false);
+  const [toolSelected, setToolSelected] = useState<string>('stampsItem');
   const [collection, setCollection] = useState<Item[]>([]);
   const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
-  const [isOpenProductDialog, setIsOpenProductDialog] = useState(false);
+  const [isOpenProductDialog, setIsOpenProductDialog] = useState<boolean>(false);
+  const [typeOfModel, setTypeOfModel] = useState<string>('shirtModel');
+
 
 
 
@@ -196,7 +198,7 @@ function CustomDesignScreen() {
 
   useEffect(() => {
     setSelectedPartOfCloth(selectedPartOfCloth)
-  }, [setSelectedPartOfCloth]);
+  }, [selectedPartOfCloth]);
 
   useEffect(() => {
     setSelectedItem(selectedItem)
@@ -207,6 +209,9 @@ function CustomDesignScreen() {
   }, [activeEditorTab]);
 
 
+  useEffect(() => {
+    console.log('typeOfModel choose: ', typeOfModel);
+  }, [typeOfModel])
 
   // Save collection to local storage whenever it changes
   // useEffect(() => {
@@ -247,10 +252,6 @@ function CustomDesignScreen() {
   const __handleDecals = (type: DecalTypeKey, result: any) => {
     console.log('result: ', result);
     const decalType = DecalTypes[type];
-    console.log('aaaaaaaaaaaaaaaaaaa: ', result);
-
-
-
 
     if (selectedItem === LOGO_PART) {
       state.imageLogoUrl = result;
@@ -346,11 +347,14 @@ function CustomDesignScreen() {
     setIsOpenProductDialog(false); // Close the dialog
   };
 
+  const __handleItemSelect = (item: string) => {
+    setTypeOfModel(item);
+  };
 
   return (
     <div className={styles.customDesign__container}>
       {/* Dialog area */}
-      <ProductDialogComponent isOpen={isOpenProductDialog} onClose={() => __handleCloseDialog()} />
+      <ProductDialogComponent onItemSelect={__handleItemSelect} isOpen={isOpenProductDialog} onClose={() => __handleCloseDialog()} />
       {/* Header */}
       <div className={styles.customDesign__container__header}>
         <div className={styles.customDesign__container__header__logo}>
@@ -399,7 +403,7 @@ function CustomDesignScreen() {
         </div>
 
         {/* Monitor of editor area */}
-        <div className={`${styles.customDesign__container__editorArea__display} `}>
+        <div className={`${styles.customDesign__container__editorArea__display} editorArea__display `}>
 
           {/* Menu Bar of editor area */}
           <div className={styles.customDesign__container__editorArea__display__menuBar} >
@@ -408,7 +412,7 @@ function CustomDesignScreen() {
           </div>
 
           {selectedPartOfCloth ? (
-            <div className={styles.customDesign__container__editorArea__display__displayDesign} >
+            <div className={`${styles.customDesign__container__editorArea__display__displayDesign} editorArea__display__displayDesign`} >
               <ImageDraggableComponent partOfCloth={selectedPartOfCloth} selectedItem={selectedItem}></ImageDraggableComponent>
 
             </div>
@@ -423,14 +427,7 @@ function CustomDesignScreen() {
 
           {/* Button group of item selected */}
           <div className={styles.customDesign__container__editorArea__itemSelector__buttonGroup}>
-            <button
-              className={` py-2 px-4 rounded inline-flex items-center ${styles.customDesign__container__editorArea__itemSelector__buttonGroup__sampleModelBtn} `}
-              onClick={() => __handleSelectEditorMode(true)}
-              style={!isEditorMode ? { backgroundColor: primaryColor, color: whiteColor, borderColor: primaryColor } : {}}
-            >
-              <FaTshirt size={20} style={{ marginRight: 5, backgroundColor: 'transparent', border: 'none' }} className={styles.downloadIcon}></FaTshirt>
-              <span>{t(codeLanguage + '000108')}</span>
-            </button>
+
 
             <button
               className={` py-2 px-4 rounded inline-flex items-center ${styles.customDesign__container__editorArea__itemSelector__buttonGroup__editorModelBtn} `}
@@ -439,6 +436,15 @@ function CustomDesignScreen() {
             >
               <FaPen size={20} style={{ marginRight: 5, backgroundColor: 'transparent', border: 'none' }} className={styles.saveIcon}></FaPen>
               <span>{t(codeLanguage + '000109')}</span>
+            </button>
+
+            <button
+              className={` py-2 px-4 rounded inline-flex items-center ${styles.customDesign__container__editorArea__itemSelector__buttonGroup__sampleModelBtn} `}
+              onClick={() => __handleSelectEditorMode(true)}
+              style={!isEditorMode ? { backgroundColor: primaryColor, color: whiteColor, borderColor: primaryColor } : {}}
+            >
+              <FaTshirt size={20} style={{ marginRight: 5, backgroundColor: 'transparent', border: 'none' }} className={styles.downloadIcon}></FaTshirt>
+              <span>{t(codeLanguage + '000108')}</span>
             </button>
 
           </div>
@@ -549,12 +555,12 @@ function CustomDesignScreen() {
                     </div>
                   )
                     : (
-                      <div className={styles.customDesign__container__editorArea__itemSelector__itemGroup__sampleCollectionList}>
+                      <div className={`${styles.customDesign__container__editorArea__itemSelector__itemGroup__sampleCollectionList} pl-2.5`}>
                         {collection.map((item: any) => (
                           <div
                             key={item.id}
                             style={selectedStamp === item.id ? { border: `2px solid ${primaryColor}` } : {}}
-                            className={styles.sampleItemCard}
+                            className={`${styles.sampleItemCard}`}
                             onClick={() => __handleSetSelectedStamp(item)}
                           >
                             <img src={item.imgUrl} style={{ width: '90%', height: '90%' }} onClick={() => __handleSetSelectedStamp(item)}></img>
@@ -616,7 +622,7 @@ function CustomDesignScreen() {
                       <div className={`${styles.menuTabBar__viewSample__btn__content}`}>
                         <span>{t(codeLanguage + '000114')}</span>
                       </div>
-                      <TbHomeHeart color={primaryColor} size={20} style={{ marginLeft: '40%' }} ></TbHomeHeart>
+                      <TbHomeHeart color={primaryColor} size={20} style={{ marginLeft: '10%' }} ></TbHomeHeart>
                     </button>
                     <button
                       className={` text-white font-bold py-2 px-4 rounded ${styles.menuTabBar__createBlank__btn}`}
@@ -655,7 +661,7 @@ function CustomDesignScreen() {
       </div>
       <Designer />
       <main className={styles.customDesign__container__canvas}>
-        <CanvasModel />
+        <CanvasModel typeOfModel={typeOfModel} />
       </main>
       <ImageEditor />
     </div>
