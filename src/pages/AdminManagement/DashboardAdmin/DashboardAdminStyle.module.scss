@@ -1,26 +1,10 @@
-$light-background: rgb(242, 247, 255);
-$dark-background: rgb(33, 33, 48);
-
-
-@if $light-background {
-    .dashboard {
-        display: flex;
-        position: relative;
-        background-color: $light-background
-    }
+.dashboard {
+    display: flex;
+    position: relative;
+    background-color: rgb(242, 247, 255);
 
     .content {
         height: 100%;
         width: 100%;
     }
-
-}
-
-@else {
-    display: flex;
-    position: relative;
-    background-color: $dark-background
-}
-
-
 }
