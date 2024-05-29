@@ -2,8 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import styles from './ImageDraggableStyle.module.scss';
 import { useSnapshot } from 'valtio';
-import state from '../../store';
-import { BACK_CLOTH_PART, FRONT_CLOTH_PART, LOGO_PART, PartOfCloth, SLEEVE_CLOTH_PART } from '../../models/ClothModel';
+import state from '../../../../store';
+import { BACK_CLOTH_PART, FRONT_CLOTH_PART, LOGO_PART, PartOfCloth, SLEEVE_CLOTH_PART } from '../../../../models/ClothModel';
 import { Resizable } from 're-resizable';
 type props = {
     partOfCloth?: PartOfCloth,
@@ -50,7 +50,7 @@ const ImageDraggableComponent: React.FC<props> = ({ partOfCloth, selectedItem })
     }, [selectedItem, snap]);
 
     useEffect(() => {
-        if (selectedItem === LOGO_PART) {
+        if (selectedItem === LOGO_PART && !resizing) {
             setPosition({ x: snap.logoDecalPositionX, y: snap.logoDecalPositionY })
 
         }
@@ -103,6 +103,18 @@ const ImageDraggableComponent: React.FC<props> = ({ partOfCloth, selectedItem })
         setResizing(resizing)
     }, [resizing])
 
+    useEffect(() => {
+        const element = document.querySelector('.imageDraggable__resizeable');
+        if (element instanceof HTMLElement) {
+            const rect = element.getBoundingClientRect();
+            setSize({
+                width: rect.width,
+                height: rect.height,
+            });
+        console.log('w: ', rect.width, '- h: ', rect.height);
+        }
+    }, [resizing]);
+
     // ---------------FunctionHandler---------------//
 
     const _handleDragStart = (e: DraggableEvent | any, ui: DraggableData,) => {
@@ -111,9 +123,19 @@ const ImageDraggableComponent: React.FC<props> = ({ partOfCloth, selectedItem })
     };
 
     const _handleOnDrag = (e: DraggableEvent, ui: DraggableData) => {
-        console.log('dragg');
-        if (!resizing) {
 
+        const element = document.querySelector('.editorArea__display__displayDesign') as HTMLElement;
+        const element2 = document.querySelector('.editorArea__display') as HTMLElement;
+
+        if (element && element2) {
+            console.log(element2);
+            element.style.pointerEvents = 'none'; // or 'auto' or any other valid value
+            element2.style.pointerEvents = 'none'; // or 'auto' or any other valid value
+
+        }
+
+        if (!resizing) {
+            console.log('dragg');
             const { x, y } = ui;
             setPosition({ x, y });
             console.log({ x, y });
@@ -155,15 +177,35 @@ const ImageDraggableComponent: React.FC<props> = ({ partOfCloth, selectedItem })
 
 
 
-    const _handleResizeStart = () => {
+    const __handleResizeStart = () => {
+        console.log('__handleResizeStart');
+        const element = document.querySelector('.imageDraggable__resizeable') as HTMLElement;
+        if (element) {
+            element.style.pointerEvents = 'none'; // or 'auto' or any other valid value
+        }
+        setResizing(true);
         setResizing(true);
     };
 
-    const _handleOnResize = () => {
+    const __handleOnResize = (e: any) => {
+        console.log('__handleOnResize');
+
+        const element = document.querySelector('.imageDraggable__resizeable') as HTMLElement;
+        if (element) {
+            element.style.pointerEvents = 'none'; // or 'auto' or any other valid value
+        }
         setResizing(true);
     };
 
-    const _handleResizeEnd = () => {
+    const __handleResizeEnd = () => {
+        console.log('__handleResizeEnd');
+
+        const element = document.querySelector('.imageDraggable__resizeable') as HTMLElement;
+        if (element) {
+            element.style.pointerEvents = 'auto'; // or 'auto' or any other valid value
+            console.log(element);
+        }
+        setResizing(true);
         setResizing(false);
     };
 
@@ -175,7 +217,7 @@ const ImageDraggableComponent: React.FC<props> = ({ partOfCloth, selectedItem })
                 <div className={styles.imageDraggable__boundary} style={{ backgroundImage: partOfCloth?.imgUrl }}>
                     <div className={styles.imageDraggable__img}>
                         <img src={partOfCloth.imgUrl} className={styles.imageDraggable__img} ></img>
-                        
+
                         <Draggable
                             // bounds={{ top: -100, left: -100, right: 100, bottom: 100 }}
                             // ref={draggableRef} // Set draggableRef as the ref
@@ -185,11 +227,23 @@ const ImageDraggableComponent: React.FC<props> = ({ partOfCloth, selectedItem })
                             onStop={_handleDragStop}
                             onStart={_handleDragStart}
                             disabled={resizing ? true : false}
-                            defaultClassNameDragged={styles.imageDraggable__resizeable}
+                            defaultClassNameDragged={`${styles.imageDraggable__resizeable} imageDraggable__resizeable`}
+
                         >
-                            <div>
+                            <Resizable
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    border: "solid 1px #ddd",
+                                    background: "#f0f0f0"
+                                }}
+                                onResizeStart={__handleResizeStart}
+                                onResize={__handleOnResize}
+                                onResizeStop={__handleResizeEnd}
+                            >
                                 {imgBase64Memoized}
-                            </div>
+                            </Resizable>
                         </Draggable>
                     </div>
 

@@ -1,14 +1,14 @@
-@import '../../index.module.scss';
+@import '../../../../index.module.scss';
 
 
 .imageDraggable__resizeable {
     position: absolute;
-    z-index: 11;
-    width: 250px;
-    height: 300px;
+    z-index: 999;
+    // width: 250px;
+    // height: 300px;
     border: 1px solid black;
     z-index: 10;
-    pointer-events: auto;
+    // pointer-events: auto;
 }
 
 .imageDraggable__resizeable:hover {
@@ -20,7 +20,6 @@
     width: 500px;
     height: 500px;
     border: 1px dashed black;
-    background-color: $grayColor1;
     display: flex;
     align-items: center;
     // transform: translate(15%, 0%);
@@ -34,6 +33,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 999;
+    pointer-events: none;
 
 }
 
@@ -45,14 +45,15 @@
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 99;
-    pointer-events: none;
     z-index: 999;
     background-color: transparent;
 
     img {
-        width: 250px;
-        height: 300px;
-        
+        // width: 250px;
+        // height: 300px;
+        pointer-events: none;
+
+
     }
 
 }

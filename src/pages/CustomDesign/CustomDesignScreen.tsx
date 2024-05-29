@@ -5,7 +5,7 @@ import Designer from './Designer/Designer'
 import ImageEditor from './Designer/ImageEditor'
 import styles from './CustomDesign.module.scss';
 // import { SRGBToLinear } from 'three';
-import ImageDraggableComponent from '../../components/Draggable/ImageDraggableComponent';
+import ImageDraggableComponent from './Components/Draggable/ImageDraggableComponent';
 import { BACK_CLOTH_PART, FRONT_CLOTH_PART, LOGO_PART, PartOfCloth, SLEEVE_CLOTH_PART } from '../../models/ClothModel';
 import { __downloadCanvasToImage, reader } from '../../utils/DesignerUtils';
 import { DecalTypes } from '../../config/TabSetting';
@@ -252,10 +252,6 @@ function CustomDesignScreen() {
   const __handleDecals = (type: DecalTypeKey, result: any) => {
     console.log('result: ', result);
     const decalType = DecalTypes[type];
-    console.log('aaaaaaaaaaaaaaaaaaa: ', result);
-
-
-
 
     if (selectedItem === LOGO_PART) {
       state.imageLogoUrl = result;
@@ -407,7 +403,7 @@ function CustomDesignScreen() {
         </div>
 
         {/* Monitor of editor area */}
-        <div className={`${styles.customDesign__container__editorArea__display} `}>
+        <div className={`${styles.customDesign__container__editorArea__display} editorArea__display `}>
 
           {/* Menu Bar of editor area */}
           <div className={styles.customDesign__container__editorArea__display__menuBar} >
@@ -415,8 +411,8 @@ function CustomDesignScreen() {
 
           </div>
 
-          {selectedPartOfCloth ? (
-            <div className={styles.customDesign__container__editorArea__display__displayDesign} >
+          {selectedPartOfCloth ? ( 
+            <div className={`${styles.customDesign__container__editorArea__display__displayDesign} editorArea__display__displayDesign` } >
               <ImageDraggableComponent partOfCloth={selectedPartOfCloth} selectedItem={selectedItem}></ImageDraggableComponent>
 
             </div>
