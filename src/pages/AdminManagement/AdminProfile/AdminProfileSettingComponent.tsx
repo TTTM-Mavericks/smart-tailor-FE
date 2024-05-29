@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, Grid, TextField, Button, Avatar, IconButton, Select, MenuItem, useTheme, InputLabel, FormControl, Typography } from '@mui/material';
+import { Box, Grid, TextField, Button, Avatar, IconButton, useTheme } from '@mui/material';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import { tokens } from '../../../theme';
 import VNLocationData from '../../../locationData.json';
@@ -73,7 +73,7 @@ const ProfileSetup = () => {
         fetchUserData();
     }, [locations]);
 
-    const handleProvinceChange = (event: any) => {
+    const _handleProvinceChange = (event: any) => {
         const provinceName = event.target.value;
         const selectedProvince = locations.find((location: any) => location.Name === provinceName);
         setSelectedProvince(selectedProvince);
@@ -87,7 +87,7 @@ const ProfileSetup = () => {
         }));
     };
 
-    const handleDistrictChange = (event: any) => {
+    const _handleDistrictChange = (event: any) => {
         const districtName = event.target.value;
         const selectedDistrict = selectedProvince?.Districts.find((district: any) => district.Name === districtName);
         setSelectedDistrict(selectedDistrict);
@@ -100,7 +100,7 @@ const ProfileSetup = () => {
         }));
     };
 
-    const handleWardChange = (event: any) => {
+    const _handleWardChange = (event: any) => {
         const wardName = event.target.value;
         if (selectedDistrict) {
             const selectedWard = selectedDistrict.Wards.find((ward: any) => ward.Name === wardName);
@@ -135,11 +135,11 @@ const ProfileSetup = () => {
         address: ''
     });
 
-    const handleChange = (e: any) => {
+    const _handleChange = (e: any) => {
         setProfileData({ ...profileData, [e.target.name]: e.target.value });
     };
 
-    const handleUpdate = () => {
+    const _handleUpdate = () => {
         console.log('Profile data:', profileData);
     };
 
@@ -147,11 +147,11 @@ const ProfileSetup = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [files, setFiles] = useState<string[]>([]);
 
-    const handleChanges = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const _handleChanges = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFiles = e.target.files;
 
         if (selectedFiles && selectedFiles.length > 0) {
-            const imageUrls = await uploadToCloudinary(selectedFiles);
+            const imageUrls = await _handleUploadToCloudinary(selectedFiles);
 
             setFiles((prevFiles) => [...prevFiles, ...imageUrls]);
             setProfileData((prevFormData) => ({
@@ -163,7 +163,7 @@ const ProfileSetup = () => {
         }
     };
 
-    const uploadToCloudinary = async (files: FileList): Promise<string[]> => {
+    const _handleUploadToCloudinary = async (files: FileList): Promise<string[]> => {
         try {
             const cloud_name = "dby2saqmn";
             const preset_key = "whear-app";
@@ -224,7 +224,7 @@ const ProfileSetup = () => {
                                 sx={{ width: 150, height: 150 }}
                             />
                             <IconButton color="primary" aria-label="upload picture" component="label" style={{ marginLeft: "-35%", marginTop: "90%" }}>
-                                <input hidden accept="image/*" type="file" onChange={handleChanges} ref={fileInputRef} />
+                                <input hidden accept="image/*" type="file" onChange={_handleChanges} ref={fileInputRef} />
                                 <PhotoCamera />
                             </IconButton>
                         </Box>
@@ -235,7 +235,7 @@ const ProfileSetup = () => {
                         label="Name"
                         name="name"
                         value={profileData.name}
-                        onChange={handleChange}
+                        onChange={_handleChange}
                         fullWidth
                         margin="normal"
                     />
@@ -243,7 +243,7 @@ const ProfileSetup = () => {
                         label="Surname"
                         name="surname"
                         value={profileData.surname}
-                        onChange={handleChange}
+                        onChange={_handleChange}
                         fullWidth
                         margin="normal"
                     />
@@ -251,7 +251,7 @@ const ProfileSetup = () => {
                         label="Specialty"
                         name="specialty"
                         value={profileData.specialty}
-                        onChange={handleChange}
+                        onChange={_handleChange}
                         fullWidth
                         margin="normal"
                     />
@@ -259,7 +259,7 @@ const ProfileSetup = () => {
                         label="Skills"
                         name="skills"
                         value={profileData.skills}
-                        onChange={handleChange}
+                        onChange={_handleChange}
                         fullWidth
                         margin="normal"
                     />
@@ -267,7 +267,7 @@ const ProfileSetup = () => {
                         label="Gender"
                         name="gender"
                         value={profileData.gender}
-                        onChange={handleChange}
+                        onChange={_handleChange}
                         fullWidth
                         margin="normal"
                     />
@@ -276,7 +276,7 @@ const ProfileSetup = () => {
                         name="birthDate"
                         type="date"
                         value={profileData.birthDate}
-                        onChange={handleChange}
+                        onChange={_handleChange}
                         fullWidth
                         margin="normal"
                         InputLabelProps={{
@@ -287,7 +287,7 @@ const ProfileSetup = () => {
                         label="Phone"
                         name="phone"
                         value={profileData.phone}
-                        onChange={handleChange}
+                        onChange={_handleChange}
                         fullWidth
                         margin="normal"
                     />
@@ -295,13 +295,13 @@ const ProfileSetup = () => {
                         label="Email address"
                         name="email"
                         value={profileData.email}
-                        onChange={handleChange}
+                        onChange={_handleChange}
                         fullWidth
                         margin="normal"
                     />
                     <div>
                         <select
-                            onChange={handleProvinceChange}
+                            onChange={_handleProvinceChange}
                             value={selectedProvince?.Name || ''}
                             style={{
                                 padding: '10px',
@@ -321,7 +321,7 @@ const ProfileSetup = () => {
 
                         {selectedProvince && (
                             <select
-                                onChange={handleDistrictChange}
+                                onChange={_handleDistrictChange}
                                 value={selectedDistrict?.Name || ''}
                                 style={{
                                     padding: '10px',
@@ -342,7 +342,7 @@ const ProfileSetup = () => {
 
                         {selectedDistrict && (
                             <select
-                                onChange={handleWardChange}
+                                onChange={_handleWardChange}
                                 value={selectedWard?.Name || ''}
                                 style={{
                                     padding: '10px',
@@ -361,7 +361,7 @@ const ProfileSetup = () => {
                             </select>
                         )}
                     </div>
-                    <Button variant="contained" color="primary" onClick={handleUpdate} sx={{ mt: 2 }}>
+                    <Button variant="contained" color="primary" onClick={_handleUpdate} sx={{ mt: 2 }}>
                         {t(codeLanguage + '000060')}
                     </Button>
                 </Grid>

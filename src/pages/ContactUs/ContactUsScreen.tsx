@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { Container, Typography, Box, Button, Grid, TextField } from '@mui/material';
-import { motion, useScroll, useInView } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import styles from './ContactUsStyles.module.scss';
 import brandImage from '../../../src/assets/img/avatar.jpg';
 import { FaFacebook, FaTwitter, FaInstagram } from 'react-icons/fa';

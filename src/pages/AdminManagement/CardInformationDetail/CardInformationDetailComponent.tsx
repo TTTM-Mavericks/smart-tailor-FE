@@ -1,19 +1,16 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
     Box,
     useTheme,
-    useMediaQuery,
     Card,
     CardContent,
     Typography,
-    IconButton,
     CardMedia,
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { tokens } from "../../../theme";
 import { useTranslation } from 'react-i18next';
 import CountUp from 'react-countup';
-import { height } from "@mui/system";
 
 const CardInformationDetailComponent = () => {
     const theme = useTheme();
@@ -59,7 +56,7 @@ const CardInformationDetailComponent = () => {
         <Box m="20px" >
             <Grid container rowSpacing={4} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
                 <Grid xs={12} sm={12} md={6} lg={3} xl={3}>
-                    <Card sx={{ display: 'flex', backgroundColor: `${colors.primary[100]} !important` }}>
+                    <Card sx={{ display: 'flex', backgroundColor: `${colors.primary[600]} !important` }}>
                         <CardMedia
                             component="img"
                             sx={{ width: 100 }}
@@ -84,7 +81,7 @@ const CardInformationDetailComponent = () => {
                 </Grid>
 
                 <Grid xs={12} sm={12} md={6} lg={3} xl={3}>
-                    <Card sx={{ display: 'flex', backgroundColor: `${colors.primary[100]} !important` }}>
+                    <Card sx={{ display: 'flex', backgroundColor: `${colors.primary[600]} !important` }}>
                         <CardMedia
                             component="img"
                             sx={{ width: 100 }}
@@ -108,7 +105,7 @@ const CardInformationDetailComponent = () => {
                 </Grid>
 
                 <Grid xs={12} sm={12} md={6} lg={3} xl={3}>
-                    <Card sx={{ display: 'flex', backgroundColor: `${colors.primary[100]} !important` }}>
+                    <Card sx={{ display: 'flex', backgroundColor: `${colors.primary[600]} !important` }}>
                         <CardMedia
                             component="img"
                             sx={{ width: 100 }}
@@ -133,7 +130,7 @@ const CardInformationDetailComponent = () => {
                 </Grid>
 
                 <Grid xs={12} sm={12} md={6} lg={3} xl={3}>
-                    <Card sx={{ display: 'flex', backgroundColor: `${colors.primary[100]} !important` }}>
+                    <Card sx={{ display: 'flex', backgroundColor: `${colors.primary[600]} !important` }}>
                         <CardMedia
                             component="img"
                             sx={{ width: 100 }}

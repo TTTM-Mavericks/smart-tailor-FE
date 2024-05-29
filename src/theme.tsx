@@ -8,7 +8,9 @@ export const tokens = (mode: any) => ({
         100: "#212130",
         200: "#F5F5F5",
         300: "#F93A0B",
-        400: "#17171E"
+        400: "#17171E",
+        500: "#F2F7FF",
+        600: "#212130"
       }
     }
     : {
@@ -16,83 +18,12 @@ export const tokens = (mode: any) => ({
         100: "#F5F5F5",
         200: "#17171E",
         300: "#F93A0B",
-        400: "#FFFFFF"
+        400: "#FFFFFF",
+        500: "#FFFFFF",
+        600: "#FFFFFF",
       }
     }),
 });
-
-// mui theme settings
-export const themeSettings = (mode: any) => {
-  const colors = tokens(mode);
-  return {
-    palette: {
-      mode: mode,
-      ...(mode === "dark"
-        ? {
-          // palette values for dark mode
-          primary: {
-            main: colors.primary[300],
-          },
-          secondary: {
-            main: colors.primary[300],
-          },
-          neutral: {
-            dark: colors.primary[300],
-            main: colors.primary[300],
-            light: colors.primary[300],
-          },
-          background: {
-            default: colors.primary[400],
-          },
-        }
-        : {
-          // palette values for light mode
-          primary: {
-            main: colors.primary[300],
-          },
-          secondary: {
-            main: colors.primary[300],
-          },
-          neutral: {
-            dark: colors.primary[300],
-            main: colors.primary[300],
-            light: colors.primary[300],
-          },
-          background: {
-            default: colors.primary[400],
-          },
-        }),
-    },
-    typography: {
-      fontFamily: ["Source Sans Pro", "sans-serif"].join(","),
-      fontSize: 12,
-      h1: {
-        fontFamily: ["Source Sans Pro", "sans-serif"].join(","),
-        fontSize: 40,
-      },
-      h2: {
-        fontFamily: ["Source Sans Pro", "sans-serif"].join(","),
-        fontSize: 32,
-      },
-      h3: {
-        fontFamily: ["Source Sans Pro", "sans-serif"].join(","),
-        fontSize: 24,
-      },
-      h4: {
-        fontFamily: ["Source Sans Pro", "sans-serif"].join(","),
-        fontSize: 20,
-      },
-      h5: {
-        fontFamily: ["Source Sans Pro", "sans-serif"].join(","),
-        fontSize: 16,
-      },
-      h6: {
-        fontFamily: ["Source Sans Pro", "sans-serif"].join(","),
-        fontSize: 14,
-      },
-    },
-  };
-};
 
 // Get light dark mode
 const theme = extendTheme({

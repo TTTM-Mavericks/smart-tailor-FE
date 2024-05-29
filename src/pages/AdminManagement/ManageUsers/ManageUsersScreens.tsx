@@ -10,7 +10,6 @@ import EditUserPopUpScreens from "./EditUsersPopUpScreens";
 import { Add } from "@mui/icons-material";
 import AddEachUsersWithHand from "./AddEachWithHand/AddEachUsersWithHandScreens";
 import AddMultipleComponentWithExcel from "./AddMultipleUserWithExcel/AddMultipleUsersComponent";
-import styles from './ManageUsersStyle.module.scss'
 import { useTranslation } from 'react-i18next';
 
 interface User {
@@ -49,16 +48,16 @@ const ManageUsers: React.FC = () => {
 
     // Open Edit PopUp when clicking on the edit icon
     const [editopen, setEditOpen] = React.useState(false);
-    const handleEditOpen = () => setEditOpen(true);
-    const handleEditClose = () => setEditOpen(false);
+    const _handleEditOpen = () => setEditOpen(true);
+    const _handleEditClose = () => setEditOpen(false);
 
     // open or close the add modal
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
-    const handleClick = (event: any) => {
+    const _handleClick = (event: any) => {
         setAnchorEl(event.currentTarget);
     };
-    const handleClose = () => {
+    const _handleClose = () => {
         setAnchorEl(null);
     };
     console.log("anchorEl" + anchorEl);
@@ -66,22 +65,22 @@ const ManageUsers: React.FC = () => {
     // close open pop up
     const [addOpenOrClose, setAddOpenOrClose] = React.useState(false)
 
-    const handleAddOpen = () => {
+    const _handleAddOpen = () => {
         setAddOpenOrClose(true);
     }
 
-    const handleAddClose = () => {
+    const _handleAddClose = () => {
         setAddOpenOrClose(false)
     }
 
     // close open pop up
     const [addMultiple, setAddMultiple] = React.useState(false)
 
-    const handleAddMultipleOpen = () => {
+    const _handleAddMultipleOpen = () => {
         setAddMultiple(true);
     }
 
-    const handleAddMultipleClose = () => {
+    const _handleAddMultipleClose = () => {
         setAddMultiple(false)
     }
 
@@ -119,17 +118,17 @@ const ManageUsers: React.FC = () => {
     }, []);
 
     // Thêm người dùng mới vào danh sách
-    const handleAddUser = (newUser: User) => {
+    const _handleAddUser = (newUser: User) => {
         setData(prevData => [...prevData, newUser]);
     }
 
     // Cập nhật người dùng trong danh sách
-    const handleUpdateUser = (updatedUser: User) => {
+    const _handleUpdateUser = (updatedUser: User) => {
         setData(prevData => prevData.map(user => user.id === updatedUser.id ? updatedUser : user));
     }
 
     // EDIT 
-    const handleEditClick = (id: number, registrarId: string, name: string, age: number, phone: string, email: string, address: string, city: string, zipCode: string) => {
+    const _handleEditClick = (id: number, registrarId: string, name: string, age: number, phone: string, email: string, address: string, city: string, zipCode: string) => {
         // Handle edit action
         const userDataToEdit: User = {
             id: id,
@@ -143,11 +142,11 @@ const ManageUsers: React.FC = () => {
             zipCode: zipCode
         }
         setFormId(userDataToEdit);
-        handleEditOpen();
+        _handleEditOpen();
     };
 
     //DELETE OR UPDATE
-    const handleDeleteClick = async (id: number) => {
+    const _handleDeleteClick = async (id: number) => {
         // Handle delete action
         try {
             const response = await fetch(`https://66080c21a2a5dd477b13eae5.mockapi.io/CPSE_DATA_TEST/${id}`, {
@@ -165,7 +164,7 @@ const ManageUsers: React.FC = () => {
     }
 
     // confirm 
-    const confirmDelete = async (id: number) => {
+    const _hanldeConfirmDelete = async (id: number) => {
         try {
             const result = await Swal.fire({
                 title: `${t(codeLanguage + '000061')}`,
@@ -178,7 +177,7 @@ const ManageUsers: React.FC = () => {
                 cancelButtonText: `${t(codeLanguage + '000055')}`
             });
             if (result.isConfirmed) {
-                await handleDeleteClick(id);
+                await _handleDeleteClick(id);
                 Swal.fire(
                     `${t(codeLanguage + '000064')}`,
                     `${t(codeLanguage + '000065')}`,
@@ -246,10 +245,10 @@ const ManageUsers: React.FC = () => {
             sortable: false,
             renderCell: (params) => (
                 <Box>
-                    <IconButton onClick={() => handleEditClick(params.row.id, params.row.registrarId, params.row.name, params.row.age, params.row.email, params.row.phone, params.row.address, params.row.city, params.row.zipCode)}>
+                    <IconButton onClick={() => _handleEditClick(params.row.id, params.row.registrarId, params.row.name, params.row.age, params.row.email, params.row.phone, params.row.address, params.row.city, params.row.zipCode)}>
                         <EditIcon />
                     </IconButton>
-                    <IconButton onClick={() => confirmDelete(params.row.id)}>
+                    <IconButton onClick={() => _hanldeConfirmDelete(params.row.id)}>
                         <DeleteIcon htmlColor={colors.primary[300]} />
                     </IconButton>
                 </Box>
@@ -260,8 +259,6 @@ const ManageUsers: React.FC = () => {
     const getRowId = (row: any) => {
         return row.registrarId; // Sử dụng một thuộc tính duy nhất làm id cho mỗi hàng
     };
-
-
 
     return (
         <Box m="20px">
@@ -295,6 +292,9 @@ const ManageUsers: React.FC = () => {
                     "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
                         color: `${colors.primary[200]} !important`,
                     },
+                    "& .MuiBadge-badge": {
+                        display: "none !important"
+                    }
                 }}
             >
                 <Button
@@ -302,7 +302,7 @@ const ManageUsers: React.FC = () => {
                     aria-controls={open ? 'basic-menu' : undefined}
                     aria-haspopup="true"
                     aria-expanded={open ? 'true' : undefined}
-                    onClick={handleClick}
+                    onClick={_handleClick}
                     endIcon={<Add />}
                     variant="contained"
                     color="primary"
@@ -314,13 +314,13 @@ const ManageUsers: React.FC = () => {
                     id="basic-menu"
                     anchorEl={anchorEl}
                     open={open}
-                    onClose={handleClose}
+                    onClose={_handleClose}
                     MenuListProps={{
                         'aria-labelledby': 'basic-button',
                     }}
                 >
                     <MenuItem >
-                        <div onClick={handleAddOpen}>{t(codeLanguage + '000049')}</div>
+                        <div onClick={_handleAddOpen}>{t(codeLanguage + '000049')}</div>
                         <Modal
                             open={addOpenOrClose}
                             aria-labelledby="modal-modal-title"
@@ -338,13 +338,13 @@ const ManageUsers: React.FC = () => {
                                 p: 4,
                                 borderRadius: "20px"
                             }}>
-                                <AddEachUsersWithHand closeCard={handleAddClose} addNewUser={handleAddUser} />
+                                <AddEachUsersWithHand closeCard={_handleAddClose} addNewUser={_handleAddUser} />
                             </Box>
                         </Modal>
                     </MenuItem>
 
                     <MenuItem>
-                        <div onClick={handleAddMultipleOpen}>{t(codeLanguage + '000050')}</div>
+                        <div onClick={_handleAddMultipleOpen}>{t(codeLanguage + '000050')}</div>
                         <Modal
                             open={addMultiple}
                             aria-labelledby="modal-modal-title"
@@ -362,7 +362,7 @@ const ManageUsers: React.FC = () => {
                                 p: 4,
                                 borderRadius: "20px"
                             }}>
-                                <AddMultipleComponentWithExcel closeMultipleCard={handleAddMultipleClose} addNewUser={handleAddUser} />
+                                <AddMultipleComponentWithExcel closeMultipleCard={_handleAddMultipleClose} addNewUser={_handleAddUser} />
                             </Box>
                         </Modal>
 
@@ -385,9 +385,9 @@ const ManageUsers: React.FC = () => {
                     <Box sx={style}>
                         {formId !== null && (
                             <EditUserPopUpScreens
-                                editClose={handleEditClose}
+                                editClose={_handleEditClose}
                                 fid={formId}
-                                updateUser={handleUpdateUser}
+                                updateUser={_handleUpdateUser}
                             />
                         )}
                     </Box>

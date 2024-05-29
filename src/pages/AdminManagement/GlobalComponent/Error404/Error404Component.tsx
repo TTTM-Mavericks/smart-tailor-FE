@@ -32,19 +32,6 @@ const OopsText = styled(Typography)({
     },
 });
 
-// Styled component for the button
-const StyledButton = styled(Button)({
-    backgroundColor: '#fff',
-    color: 'black',
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
-    transition: 'all 0.3s ease',
-    '&:hover': {
-        backgroundColor: '#000',
-        color: '#fff',
-        transform: 'scale(1.1)',
-    },
-});
 
 const NotFound: React.FC = () => {
     return (
@@ -56,7 +43,6 @@ const NotFound: React.FC = () => {
             <Typography variant="body2" gutterBottom color="black">
                 This Function is not support for this device!!!!
             </Typography>
-            {/* <StyledButton variant="contained">GO TO HOMEPAGE</StyledButton> */}
         </Container>
     );
 };

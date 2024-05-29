@@ -1,4 +1,4 @@
-import { Box, Button, CardMedia, Divider, IconButton, Menu, MenuItem, Modal } from "@mui/material";
+import { Box, Button, IconButton, Modal } from "@mui/material";
 import { DataGrid, GridToolbar, GridColDef } from "@mui/x-data-grid";
 import { tokens } from "../../../theme";
 import { useTheme } from "@mui/material";
@@ -9,16 +9,6 @@ import { useTranslation } from 'react-i18next';
 import autoTable from 'jspdf-autotable';
 import { UserOptions } from 'jspdf-autotable';
 import LogoPDF from '../../../assets/system/smart-tailor_logo.png'
-import TestPDF from "./TestPDF";
-import { style } from "@mui/system";
-import { context } from "@react-three/fiber";
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
 
 interface ExtendedUserOptions extends UserOptions {
     columnWidths?: number[];
@@ -66,11 +56,11 @@ const ManageInvoiceScreen: React.FC = () => {
             .catch(error => console.error('Error fetching data:', error));
     }, []);
 
-    const handleViewInvoice = (invoice: Invoice) => {
+    const _handleViewInvoice = (invoice: Invoice) => {
         setSelectedInvoice(invoice);
     };
 
-    const handleCloseModal = () => {
+    const _handleCloseModal = () => {
         setSelectedInvoice(null);
     };
 
@@ -293,7 +283,7 @@ const ManageInvoiceScreen: React.FC = () => {
             sortable: false,
             renderCell: (params) => (
                 <Box>
-                    <IconButton onClick={() => handleViewInvoice(params.row)}>
+                    <IconButton onClick={() => _handleViewInvoice(params.row)}>
                         <ViewCompactAltOutlined />
                     </IconButton>
                 </Box>
@@ -361,7 +351,7 @@ const ManageInvoiceScreen: React.FC = () => {
 
             <Modal
                 open={!!selectedInvoice}
-                onClose={handleCloseModal}
+                onClose={_handleCloseModal}
                 aria-labelledby="invoice-details-modal"
                 aria-describedby="invoice-details-description"
             >
@@ -522,7 +512,7 @@ const ManageInvoiceScreen: React.FC = () => {
                         <Button variant="contained" color="primary">
                             Refund Transaction
                         </Button>
-                        <Button onClick={handleCloseModal} variant="contained" color="primary">
+                        <Button onClick={_handleCloseModal} variant="contained" color="primary">
                             {t(codeLanguage + '000059')}
                         </Button>
                     </div>
