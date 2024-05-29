@@ -4,9 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { usaFlag, vietnamFlag } from '../../../../assets';
 import { Fragment } from 'react';
 import { Menu, Transition } from '@headlessui/react'
-import styles from './LanguageEmployeeSettingStyles.module.scss'
+import styles from './LanguageBrandSettingStyles.module.scss'
 
-const LanguageEmployeeSetting = () => {
+const LanguageBrandSetting = () => {
 
     // Setting VI EN Mode
     const [selectedLanguage, setSelectedLanguage] = React.useState<string>(localStorage.getItem('language') || 'en');
@@ -80,4 +80,4 @@ const LanguageEmployeeSetting = () => {
     );
 };
 
-export default LanguageEmployeeSetting;
+export default LanguageBrandSetting;

@@ -56,7 +56,7 @@ const DashboardAdminScreens = () => {
             <CssBaseline />
             <div className={`${styles.dashboard}`}>
                 <SideBarComponent />
-                <div className={`${styles.content}`}>
+                <div className={`${styles.content}`} >
                     <TopbarComponent />
                     <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="140px" gap="20px">
                         <Box gridColumn="span 12" gridRow="span 1">

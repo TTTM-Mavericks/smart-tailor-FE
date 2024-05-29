@@ -44,7 +44,7 @@ const Item: React.FC<ItemProps> = ({ title, to, icon, selected, setSelected }) =
     );
 };
 
-const SideBarEmployeeComponent = () => {
+const SideBarBrandComponent = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
@@ -149,7 +149,7 @@ const SideBarEmployeeComponent = () => {
                     <Box paddingLeft={isCollapsed ? undefined : "10%"}>
                         <Item
                             title={t(codeLanguage + '000019')}
-                            to="/employee"
+                            to="/brand"
                             icon={<HomeOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
@@ -166,7 +166,7 @@ const SideBarEmployeeComponent = () => {
                         <Item
                             // title={t(codeLanguage + '000020')}
                             title='Manage Notification'
-                            to="/manage_notification"
+                            to="/brand_manage_notification"
                             icon={<PeopleOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
@@ -195,15 +195,6 @@ const SideBarEmployeeComponent = () => {
                             selected={selected}
                             setSelected={setSelected}
                         />
-                        {/* 
-                        <Typography
-                            variant="h6"
-                            color={colors.primary[300]}
-                            sx={{ m: "15px 0 5px 20px" }}
-                            style={{ fontSize: "15px" }}
-                        >
-                            {t(codeLanguage + '000032')}
-                        </Typography> */}
                         <Item
                             // title={t(codeLanguage + '000023')}
                             title="Manage Report"
@@ -223,7 +214,7 @@ const SideBarEmployeeComponent = () => {
                         <Item
                             // title={t(codeLanguage + '000021')}
                             title="Profile"
-                            to="/employee_profile"
+                            to="/brand_profile"
                             icon={<ContactsOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
@@ -235,4 +226,4 @@ const SideBarEmployeeComponent = () => {
     );
 };
 
-export default SideBarEmployeeComponent;
+export default SideBarBrandComponent;

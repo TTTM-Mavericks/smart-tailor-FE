@@ -35,7 +35,7 @@ interface UserInterFace {
     followed?: boolean;
 }
 
-const NotificationEmployeeComponent = () => {
+const NotificationBrandComponent = () => {
     const [anchorOpenNotification, setAnchorOpenNotification] = React.useState<null | HTMLElement>(null);
     const [data, setData] = useState<NotificationInterface[]>([]);
 
@@ -236,4 +236,4 @@ const NotificationEmployeeComponent = () => {
     );
 };
 
-export default NotificationEmployeeComponent;
+export default NotificationBrandComponent;

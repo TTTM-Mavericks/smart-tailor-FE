@@ -124,7 +124,6 @@ const TopbarComponent = () => {
         <Card sx={{ backgroundColor: `${colors.primary[100]} !important` }} >
             <Box display="flex" justifyContent="space-between" p={2} >
 
-
                 {/* SEARCH BAR */}
                 <Box
                     display="flex"

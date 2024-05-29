@@ -87,7 +87,7 @@ const SideBarComponent = () => {
         <Box
             sx={{
                 "& .pro-sidebar-inner": {
-                    background: `${colors.primary[100]} !important`,
+                    background: `${colors.primary[600]} !important`,
                 },
                 "& .pro-icon-wrapper": {
                     backgroundColor: `${colors.primary[100]} !important`,

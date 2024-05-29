@@ -40,6 +40,12 @@ import {
   VerifyEmailScreen
 } from './pages/Authentication';
 
+import {
+  DashboardBrandManageNotification,
+  DashboardBrandProfileScreens,
+  DashboardBrandScreens
+} from './pages/BrandManagement';
+
 const tokenIsValid = (token) => {
   // Implement your token validation logic here
   try {
@@ -116,6 +122,10 @@ function App() {
           <Route path="/row-details" element={<DashboardEmployeeOrderDetailScreen></DashboardEmployeeOrderDetailScreen>} />
           <Route path="/manage_notification" element={<DashboardManageNotification></DashboardManageNotification>} />
 
+          {/* Brand Dashboard Route */}
+          <Route path='/brand' element={<DashboardBrandScreens></DashboardBrandScreens>} />
+          <Route path="/brand_manage_notification" element={<DashboardBrandManageNotification></DashboardBrandManageNotification>} />
+          <Route path='/brand_profile' element={<DashboardBrandProfileScreens></DashboardBrandProfileScreens>} />
 
 
 

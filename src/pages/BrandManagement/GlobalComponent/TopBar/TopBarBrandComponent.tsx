@@ -25,12 +25,12 @@ import SearchIcon from "@mui/icons-material/Search";
 import { Logout, Settings } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
-import LanguageEmployeeSetting from "../LanguageEmployee/LanguageEmployeeSettingComponent";
-import NotificationEmployeeComponent from "../Notification/NotificationEmployeeComponent";
+import LanguageEmployeeSetting from "../LanguageBrand/LanguageBrandSettingComponent";
+import NotificationEmployeeComponent from "../Notification/NotificationBrandComponent";
 
 type Anchor = 'top' | 'left' | 'bottom' | 'right';
 
-const TopbarEmployeeComponent = () => {
+const TopbarBrandComponent = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const { mode, setMode } = useColorScheme();
@@ -220,7 +220,7 @@ const TopbarEmployeeComponent = () => {
                             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                         >
                             <MenuItem>
-                                <Link to={"/employee_profile"} style={{ display: "flex", textDecoration: "none", color: colors.primary[200] }}>
+                                <Link to={"/brand_profile"} style={{ display: "flex", textDecoration: "none", color: colors.primary[200] }}>
                                     <Avatar /> {t(codeLanguage + '000045')}
                                 </Link>
                             </MenuItem>
@@ -246,4 +246,4 @@ const TopbarEmployeeComponent = () => {
     );
 };
 
-export default TopbarEmployeeComponent;
+export default TopbarBrandComponent;

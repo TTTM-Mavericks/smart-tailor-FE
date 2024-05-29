@@ -3,12 +3,11 @@ import { Box, CssBaseline, useMediaQuery, useTheme, IconButton } from "@mui/mate
 import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
 import { ArrowUpward } from '@mui/icons-material';
 import theme from '../../../theme';
-import styles from "./DashboardEmployeeStyles.module.scss"
+import styles from "./DashboardBrandStyles.module.scss"
 import { tokens } from "../../../theme";
 import NotFound from '../GlobalComponent/Error404/Error404Component';
-import SideBarEmployeeComponent from '../GlobalComponent/SideBar/SideBarEmployeeComponent';
-import TopbarEmployeeComponent from '../GlobalComponent/TopBar/TopBarEmployeeComponent';
-
+import TopbarBrandComponent from '../GlobalComponent/TopBar/TopBarBrandComponent';
+import SideBarBrandComponent from '../GlobalComponent/SideBar/SideBarBrandComponent';
 const DashboardBrandScreens = () => {
     const themeColor = useTheme();
     const colors = tokens(themeColor.palette.mode);
@@ -50,17 +49,13 @@ const DashboardBrandScreens = () => {
         <CssVarsProvider theme={theme}>
             <CssBaseline />
             <div className={`${styles.dashboard}`}>
-                <SideBarEmployeeComponent />
+                <SideBarBrandComponent />
                 <div className={`${styles.content}`}>
-                    <TopbarEmployeeComponent />
+                    <TopbarBrandComponent />
                     <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="140px" gap="20px">
                         <Box gridColumn="span 12" gridRow="span 5">
                             <></>
                         </Box>
-                        {/* <Box gridColumn="span 12" gridRow="span 5">
-                            <GeographyChartComponent />
-                        </Box> */}
-
                     </Box>
                     {showScrollButton && (
                         <IconButton
