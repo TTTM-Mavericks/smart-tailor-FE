@@ -180,7 +180,7 @@ const TopbarEmployeeComponent = () => {
                                     aria-haspopup="true"
                                     aria-expanded={open ? 'true' : undefined}
                                 >
-                                    <Avatar sx={{ width: 32, height: 32 }}>M</Avatar>
+                                    <Avatar sx={{ width: 32, height: 32 }} src="https://controlio.net/i/svg/brand-figure.svg">M</Avatar>
                                 </IconButton>
                             </Tooltip>
                         </Box>
@@ -221,7 +221,7 @@ const TopbarEmployeeComponent = () => {
                         >
                             <MenuItem>
                                 <Link to={"/employee_profile"} style={{ display: "flex", textDecoration: "none", color: colors.primary[200] }}>
-                                    <Avatar /> {t(codeLanguage + '000045')}
+                                    <Avatar src="https://controlio.net/i/svg/brand-figure.svg" /> {t(codeLanguage + '000045')}
                                 </Link>
                             </MenuItem>
                             <Divider />
