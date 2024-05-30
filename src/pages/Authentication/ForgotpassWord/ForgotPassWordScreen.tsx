@@ -5,15 +5,15 @@ import { systemLogo, usaFlag, vietnamFlag } from '../../../assets';
 import { useTranslation } from 'react-i18next';
 import { Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
-import { __validateEmail } from '../Utils';
+import { __validateEmail, __validatePassword } from '../Utils';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import { useNavigate, useParams } from 'react-router-dom';
 import { HiEye, HiEyeOff } from 'react-icons/hi';
-import { greenColor, secondaryColor } from '../../../root/ColorSystem';
+import { greenColor, redColor, secondaryColor } from '../../../root/ColorSystem';
 import LoadingComponent from '../../../components/Loading/LoadingComponent';
+import { toast, ToastContainer } from 'react-toastify';
 
 const defaultTheme = createTheme();
-
 
 
 export default function ForgotPassWordScreen() {
@@ -33,6 +33,7 @@ export default function ForgotPassWordScreen() {
   const [password, setPassword] = React.useState<string>('');
   const [errorPasswordValidate, setPasswordErrorValidate] = React.useState<string>('');
   const [isPasswordValidate, setIsPasswordValidate] = React.useState<boolean>(true);
+
   // ---------------Usable Variable---------------//
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -67,6 +68,20 @@ export default function ForgotPassWordScreen() {
   }, [email]);
 
   /**
+ * Validate Password
+ */
+  React.useEffect(() => {
+    const error = __validatePassword(password);
+    if (!error.isValid && error.error) {
+      setPasswordErrorValidate(error.error);
+      setIsPasswordValidate(false);
+    } else {
+      setPassword(password);
+      setIsPasswordValidate(true);
+    }
+  }, [password]);
+
+  /**
     * Check verify status
     *
     */
@@ -74,7 +89,6 @@ export default function ForgotPassWordScreen() {
     if (isEmailSent) {
       let intervalId: any;
       const checkVerificationStatus = async () => {
-        setIsLoading(true);
         console.log('reset init');
         try {
           console.log(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.checkVerifyPassword}/${email}`);
@@ -82,12 +96,12 @@ export default function ForgotPassWordScreen() {
           if (response.status === 200) {
             console.log('verify');
             setIsVerify(true);
-            setIsLoading(false);
             clearInterval(intervalId);
           }
         } catch (error) {
           console.error('Error checking verification status:', error);
           setIsLoading(false);
+          toast.error(`${error}`, { autoClose: 4000 });
         }
       };
       intervalId = setInterval(checkVerificationStatus, 5000);
@@ -122,14 +136,14 @@ export default function ForgotPassWordScreen() {
         } else {
           console.log(response);
           setIsLoading(false);
-
+          toast.error(`${response.message}`, { autoClose: 4000 });
         }
-        localStorage.setItem('email', email);
 
       } catch (error: any) {
         console.error('Error posting data:', error);
         setIsEmailSent(false);
         setIsLoading(false);
+        toast.error(`${error}`, { autoClose: 4000 });
 
       }
     } else {
@@ -156,9 +170,12 @@ export default function ForgotPassWordScreen() {
 
         } else {
           console.log(response);
+          toast.error(`${response.message}`, { autoClose: 4000 });
+
         }
 
       } catch (error: any) {
+        toast.error(`${error}`, { autoClose: 3000 });
         console.error('Error posting data:', error);
       }
     } else {
@@ -171,10 +188,15 @@ export default function ForgotPassWordScreen() {
    */
   const __handleClickShowPassword = () => setShowPassword((show) => !show);
 
+  const __handleVerifyAllert = () => {
+    toast.error(`Please verify email to change password`, { autoClose: 4000 });
+
+  }
+
   return (
     <ThemeProvider theme={defaultTheme}>
       <LoadingComponent isLoading={isLoading} time={5000}></LoadingComponent>
-
+      <ToastContainer />
       <div className={styles.forgot__container}>
         <Menu as="div" className={`${styles.icon_language}`}>
           <div >
@@ -260,9 +282,17 @@ export default function ForgotPassWordScreen() {
                 {!isEmailValidate && (
                   <span className={`${styles.error__txt}`}>{errorEmailValidate}</span>
                 )}
-                {isEmailSent && 'Please wait to verify!'}
                 {isVerify && (
-                  <>
+                  <div className='mt-0'>
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm mt-2 mb-0">
+                          <span className="font-semibold text-indigo-600 hover:text-indigo-500">
+                            Enter new password
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                     <div className="relative mt-2">
                       <input
                         id="password"
@@ -288,7 +318,7 @@ export default function ForgotPassWordScreen() {
                       <span className={`${styles.error__txt}`}>{errorPasswordValidate}</span>
 
                     )}
-                  </>
+                  </div>
                 )}
               </div>
 
@@ -298,10 +328,10 @@ export default function ForgotPassWordScreen() {
                 <button
                   type="submit"
                   className="flex h-11 w-full items-center justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                  style={{ backgroundColor: isVerify ? greenColor : secondaryColor }}
-                  onClick={() => !isVerify ? __handleRetrievePassword() : __handleChangePassword()}
+                  style={{ backgroundColor: !isEmailSent ? secondaryColor : isVerify ? greenColor : redColor }}
+                  onClick={() => !isEmailSent ? __handleRetrievePassword() : isVerify ? __handleChangePassword() : __handleVerifyAllert()}
                 >
-                  {!isVerify ? 'Retrieve new password' : 'Change password'}
+                  {!isEmailSent ? 'Retrieve new password' : !isVerify ? 'Please verify in your email' : 'Change password'}
                 </button>
               </div>
 

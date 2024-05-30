@@ -9,6 +9,7 @@ import { greenColor, redColor } from '../../../root/ColorSystem';
 import { useNavigate, useParams } from 'react-router-dom';
 import CircularProgress from '@mui/material/CircularProgress';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
+import { toast, ToastContainer } from 'react-toastify';
 
 const defaultTheme = createTheme();
 const SECONDS_LEFT = 5
@@ -23,10 +24,12 @@ export default function VerifyEmailScreen() {
     const [isVerify, setIsVerify] = React.useState<boolean>(false);
     const [isLoading, setIsLoading] = React.useState<boolean>(false);
     const [isResend, setIsResend] = React.useState<boolean>(false);
+
     // ---------------Usable Variable---------------//
     const { t, i18n } = useTranslation();
     const { email } = useParams();
     const navigate = useNavigate();
+
     // ---------------UseEffect---------------//
     React.useEffect(() => {
         i18n.changeLanguage(selectedLanguage);
@@ -42,6 +45,9 @@ export default function VerifyEmailScreen() {
 
     }, [selectedLanguage]);
 
+    /**
+     * Count num per second
+     */
     React.useEffect(() => {
         if (secondsLeft > 0) {
             const timerId = setInterval(() => {
@@ -61,7 +67,6 @@ export default function VerifyEmailScreen() {
     React.useEffect(() => {
         if (email || isResend) {
 
-
             let intervalId: any;
             const checkVerificationStatus = async () => {
                 setIsLoading(true);
@@ -78,10 +83,14 @@ export default function VerifyEmailScreen() {
                         setTimeout(() => {
                             navigate('/auth/signin');
                         }, 5000)
+                    } else {
+                        toast.error(`${response.message}`, { autoClose: 4000 });
                     }
                 } catch (error) {
                     console.error('Error checking verification status:', error);
                     setIsLoading(false);
+                    toast.error(`${error}`, { autoClose: 3000 });
+
                 }
             };
 
@@ -118,6 +127,9 @@ export default function VerifyEmailScreen() {
         }, 1000);
     };
 
+    /**
+     * Handle resend to email
+     */
     const __handleResendEmail = async () => {
         const userRegister = localStorage.getItem('userRegister');
         if (userRegister) {
@@ -131,11 +143,11 @@ export default function VerifyEmailScreen() {
                     console.log(response);
                     setIsResend(true);
                 } else {
-
+                    toast.error(`${response.message}`, { autoClose: 4000 });
                 }
-                console.log(response);
             } catch (error: any) {
                 console.error('Error posting data:', error);
+                toast.error(`${error}`, { autoClose: 4000 });
 
             }
         }
@@ -145,6 +157,8 @@ export default function VerifyEmailScreen() {
     return (
         <ThemeProvider theme={defaultTheme}>
             {/* <LoadingComponent isLoading={true} time={5000}></LoadingComponent> */}
+            <ToastContainer />
+
             <div className={styles.verify__container}>
                 <Menu as="div" className={`${styles.icon_language}`}>
                     <div >
@@ -235,7 +249,7 @@ export default function VerifyEmailScreen() {
 
                             <p className="mt-2 pr-1 text-center text-sm text-gray-500">
                                 Have not recieved yet? {' '}
-                                <a style={{cursor:'pointer'}} onClick={() => __handleResendEmail()} className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+                                <a style={{ cursor: 'pointer' }} onClick={() => __handleResendEmail()} className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
                                     Resend email
                                 </a>
                             </p>

@@ -2,15 +2,13 @@ import * as React from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import styles from './SignInStyle.module.scss';
 import { HiEye, HiEyeOff } from 'react-icons/hi';
-// import ApiService from '../ApiAuthService';
 import './SignInStyle.css'
 import { systemLogo, usaFlag, vietnamFlag } from '../../../assets';
 import { useTranslation } from 'react-i18next';
 import { Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
-import { GoogleOAuthProvider, GoogleLogin, useGoogleLogin, CredentialResponse, useGoogleOAuth } from '@react-oauth/google';
-import { secondaryColor } from '../../../root/ColorSystem';
+import { GoogleOAuthProvider, GoogleLogin, useGoogleLogin } from '@react-oauth/google';
 import Cookies from 'js-cookie'
 import axios from 'axios';
 import LoadingComponent from '../../../components/Loading/LoadingComponent';
@@ -25,10 +23,8 @@ export default function SignInScreen() {
 
   // ---------------UseState Variable---------------//
   const [selectedLanguage, setSelectedLanguage] = React.useState<string>(localStorage.getItem('language') || 'en');
-  const [showLogin, setShowLogin] = React.useState<boolean>(true);
-  const [showRegister, setShowRegister] = React.useState<boolean>(false);
   const [showPassword, setShowPassword] = React.useState<boolean>(false);
-  const [email, setEmail] = React.useState<string>('');
+  const [email, setEmail] = React.useState<string>('Email');
   const [errorEmailValidate, setEmailErrorValidate] = React.useState<string>('');
   const [isEmailValidate, setIsEmailValidate] = React.useState<boolean>(true);
   const [password, setPassword] = React.useState<string>('');
@@ -96,7 +92,7 @@ export default function SignInScreen() {
           // }
           console.log(response.data.user);
           setIsloading(false);
-          window.location.href='/'
+          window.location.href = '/'
 
         } else {
           setIsloading(false);
@@ -298,7 +294,7 @@ export default function SignInScreen() {
 
                   <div className="flex items-center justify-between">
                     <div className="text-sm mt-2 mb-2">
-                      <a href="/auth/getpassword" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                      <a onClick={() => window.location.href = `/auth/getpassword/${email ? email : 'Email'}`} style={{ cursor: 'pointer' }} className="font-semibold text-indigo-600 hover:text-indigo-500">
                         {t(codeLanguage + '000007')} ?
                       </a>
                     </div>
