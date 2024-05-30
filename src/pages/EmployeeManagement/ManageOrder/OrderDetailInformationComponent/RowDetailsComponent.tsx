@@ -143,7 +143,7 @@ const RowDetails: React.FC = () => {
                                         <Typography variant="body2"><strong>Country:</strong> {rowData.total}</Typography>
                                         <Typography variant="body2"><strong>Email:</strong> {rowData.total}</Typography>
                                     </Box>
-                                    <Avatar alt={rowData.customerName} src={rowData.customerAvatar} style={{ marginLeft: "30%", marginTop: "-50%" }} />
+                                    <Avatar alt={rowData.customerName} src={"https://controlio.net/i/svg/brand-figure.svg"} style={{ marginLeft: "30%", marginTop: "-50%" }} />
                                 </Box>
 
                                 <Typography variant="h6" gutterBottom>Order Details</Typography>

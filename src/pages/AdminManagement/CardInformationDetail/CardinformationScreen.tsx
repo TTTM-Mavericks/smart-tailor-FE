@@ -6,11 +6,7 @@ const CardInformationScreen = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     return (
-        <Card style={{ height: "100vh", backgroundColor: colors.primary[100], margin: "2%" }}>
-            <Box height="80vh">
-                <CardInformationDetailComponent />
-            </Box>
-        </Card>
+        <CardInformationDetailComponent />
     );
 };
 

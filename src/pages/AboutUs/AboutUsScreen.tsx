@@ -33,14 +33,6 @@ const StyledAvatar = styled(Avatar)({
     marginBottom: 16,
 });
 
-const StyledFooter = styled(Box)(({ theme }) => ({
-    padding: theme.spacing(4),
-    backgroundColor: theme.palette.grey[800],
-    color: theme.palette.common.white,
-    textAlign: 'center',
-    marginTop: 5
-}));
-
 const StyledCardCarousel = styled(Slider)({
     marginTop: 32,
     marginBottom: 32,
@@ -188,12 +180,7 @@ const AboutUsPage: React.FC = () => {
             <HeaderComponent />
             <StyledBox>
                 <Grid container spacing={6}>
-                    <Grid item xs={12} md={5} >
-                        <Fade in timeout={800}>
-                            <Typography variant="h3" gutterBottom>
-                                {t(codeLanguage + '000076')}
-                            </Typography>
-                        </Fade>
+                    <Grid item xs={12} md={5} style={{ marginTop: "10%" }}>
                         <Fade in timeout={1200}>
                             <Typography variant="body1" paragraph>
                                 {t(codeLanguage + '000073')}
@@ -205,12 +192,12 @@ const AboutUsPage: React.FC = () => {
                             </Button>
                         </Fade>
                     </Grid>
-                    <Grid item xs={12} md={6}>
-                        <Fade in timeout={800}>
+                    <Grid item xs={12} md={6} style={{ marginTop: "5%" }}>
+                        {/* <Fade in timeout={800}>
                             <Typography variant="h3" gutterBottom style={{ marginLeft: "6%" }}>
                                 {t(codeLanguage + '000077')}
                             </Typography>
-                        </Fade>
+                        </Fade> */}
                         <StyledCardCarousel {...cardSettings}>
                             {[1, 2, 3, 4, 5, 6].map((_, index) => (
                                 <Fade in timeout={(index + 1) * 400} key={index} >

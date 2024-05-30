@@ -5,7 +5,7 @@ import { Box, CssBaseline, useMediaQuery, useTheme, IconButton } from "@mui/mate
 import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
 import { ArrowUpward } from '@mui/icons-material';
 import theme from '../../../theme';
-import styles from "./DashboardAdminStyle.module.scss"
+import styles from "./DashboardAdminStyle.module.scss";
 import LineChartComponent from '../LineChart/LineChartComponent';
 import BarChartComponent from '../BarChart/BarChartComponent';
 import PieChartComponent from '../PieChart/PieChartComponent';
@@ -14,11 +14,12 @@ import GeographyChartComponent from '../GeographyChart/GeographyChartComponent';
 import { tokens } from "../../../theme";
 import NotFound from '../GlobalComponent/Error404/Error404Component';
 
-const DashboardAdminScreens = () => {
+const DashboardAdminScreens: React.FC = () => {
     const themeColor = useTheme();
     const colors = tokens(themeColor.palette.mode);
     const [showScrollButton, setShowScrollButton] = React.useState(false);
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const backgroundColorDashboardRef = React.useRef<HTMLDivElement | null>(null);
 
     React.useEffect(() => {
         const handleScroll = () => {
@@ -36,27 +37,38 @@ const DashboardAdminScreens = () => {
         };
     }, []);
 
+    React.useEffect(() => {
+        const handleStorageChange = () => {
+            console.log("localStorage changed");
+            const mode = localStorage.getItem("mui-mode");
+            if (backgroundColorDashboardRef.current) {
+                backgroundColorDashboardRef.current.style.backgroundColor = mode === "dark" ? "#121212" : "#ffffff";
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+
+        handleStorageChange();
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+        };
+    }, []);
+
     const _handleScrollToTop = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    const checkDarkOrLightMode = localStorage.getItem("mui-mode")
-
-    console.log("checkDarkOrLightMode" + checkDarkOrLightMode);
-
     if (isMobile) {
-        return (
-            <NotFound />
-        );
+        return <NotFound />;
     }
-
 
     return (
         <CssVarsProvider theme={theme}>
             <CssBaseline />
             <div className={`${styles.dashboard}`}>
                 <SideBarComponent />
-                <div className={`${styles.content}`} >
+                <div className={`${styles.content}`}>
                     <TopbarComponent />
                     <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="140px" gap="20px">
                         <Box gridColumn="span 12" gridRow="span 1">
@@ -92,7 +104,7 @@ const DashboardAdminScreens = () => {
                     )}
                 </div>
             </div>
-        </CssVarsProvider >
+        </CssVarsProvider>
     );
 }
 
