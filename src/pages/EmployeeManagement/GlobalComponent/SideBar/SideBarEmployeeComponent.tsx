@@ -133,7 +133,7 @@ const SideBarEmployeeComponent = () => {
                                     alt="profile-user"
                                     width="100px"
                                     height="100px"
-                                    src={`../../../../../src/assets/img/avatar.jpg`}
+                                    src={`https://controlio.net/i/svg/brand-figure.svg`}
                                     style={{ cursor: "pointer", borderRadius: "50%" }}
                                 />
                             </Box>

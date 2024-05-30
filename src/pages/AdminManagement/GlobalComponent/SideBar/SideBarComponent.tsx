@@ -90,7 +90,7 @@ const SideBarComponent = () => {
                     background: `${colors.primary[600]} !important`,
                 },
                 "& .pro-icon-wrapper": {
-                    backgroundColor: `${colors.primary[100]} !important`,
+                    backgroundColor: `${colors.primary[600]} !important`,
                 },
                 "& .pro-inner-item": {
                     padding: "5px 35px 5px 20px !important",
@@ -138,7 +138,7 @@ const SideBarComponent = () => {
                                     alt="profile-user"
                                     width="100px"
                                     height="100px"
-                                    src={`../../../../../src/assets/img/avatar.jpg`}
+                                    src={`https://smart-tailor-fe.pages.dev/assets/smart-tailor_logo-CUmlLF_X.png`}
                                     style={{ cursor: "pointer", borderRadius: "50%" }}
                                 />
                             </Box>

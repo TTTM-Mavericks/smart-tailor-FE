@@ -121,8 +121,8 @@ const TopbarComponent = () => {
     }
 
     return (
-        <Card sx={{ backgroundColor: `${colors.primary[100]} !important` }} >
-            <Box display="flex" justifyContent="space-between" p={2} >
+        <Card sx={{ backgroundColor: `${colors.primary[600]} !important` }} >
+            <Box display="flex" justifyContent="space-between" p={2} sx={{ backgroundColor: `${colors.primary[600]} !important` }}>
 
                 {/* SEARCH BAR */}
                 <Box
@@ -180,7 +180,7 @@ const TopbarComponent = () => {
                                     aria-haspopup="true"
                                     aria-expanded={open ? 'true' : undefined}
                                 >
-                                    <Avatar sx={{ width: 32, height: 32 }}>M</Avatar>
+                                    <Avatar sx={{ width: 32, height: 32 }} src='https://smart-tailor-fe.pages.dev/assets/smart-tailor_logo-CUmlLF_X.png'>M</Avatar>
                                 </IconButton>
                             </Tooltip>
                         </Box>
@@ -221,7 +221,7 @@ const TopbarComponent = () => {
                         >
                             <MenuItem>
                                 <Link to={"/admin_profile"} style={{ display: "flex", textDecoration: "none", color: colors.primary[200] }}>
-                                    <Avatar /> {t(codeLanguage + '000045')}
+                                    <Avatar src="https://smart-tailor-fe.pages.dev/assets/smart-tailor_logo-CUmlLF_X.png" /> {t(codeLanguage + '000045')}
                                 </Link>
                             </MenuItem>
                             <Divider />

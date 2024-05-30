@@ -143,9 +143,6 @@ const ManageNotificationScreens = () => {
 
     return (
         <div style={{ padding: '20px' }}>
-            <Typography variant="h4" gutterBottom>
-                Notifications
-            </Typography>
             <Button
                 variant="contained"
                 color="primary"
