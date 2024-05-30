@@ -243,7 +243,7 @@ const HomeScreen = () => {
             </div>
 
             {/* Product */}
-            <div className="bg-white py-24 sm:py-32">
+            <div className="bg-white py-24 sm:py-32" style={{ marginTop: "-4%" }}>
                 <motion.div
                     ref={productRef}
                     initial={{ opacity: 0, y: 50 }}
@@ -295,7 +295,7 @@ const HomeScreen = () => {
             </div>
 
             {/* Content */}
-            <div className="bg-white animate-fadeIn py-24 sm:py-32">
+            <div className="bg-white animate-fadeIn py-24 sm:py-32" style={{ marginTop: "-10%" }}>
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
                     <div className="mx-auto max-w-2xl lg:text-center">
                         <motion.div
@@ -362,7 +362,7 @@ const HomeScreen = () => {
 
             {/* Products */}
 
-            <div className="bg-white">
+            <div className="bg-white" style={{ marginTop: "-8%" }}>
                 <motion.div
                     ref={testimonialsRef}
                     initial={{ opacity: 0, y: 50 }}
@@ -409,7 +409,7 @@ const HomeScreen = () => {
             </div>
 
             {/* Companies */}
-            <div className="bg-white py-24 sm:py-32">
+            <div className="bg-white py-24 sm:py-32" style={{ marginTop: "-8%" }}>
                 <motion.div
                     ref={containerRef}
                     initial={{ opacity: 0, y: 50 }}
@@ -464,7 +464,7 @@ const HomeScreen = () => {
             </div>
 
             {/* Upgrade detail */}
-            <div className="bg-white py-24 sm:py-32">
+            <div className="bg-white py-24 sm:py-32" style={{ marginTop: "-9%" }}>
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
                     <div className="mx-auto max-w-2xl sm:text-center">
                         <motion.div
@@ -543,7 +543,7 @@ const HomeScreen = () => {
             </div>
 
             {/* Numberic */}
-            <div className="bg-white py-24 sm:py-32" style={{ marginTop: "-5%" }}>
+            <div className="bg-white py-24 sm:py-32" style={{ marginTop: "-12%" }} >
                 <motion.div
                     ref={numbericRef}
                     initial={{ opacity: 0, y: 50 }}
@@ -579,7 +579,7 @@ const HomeScreen = () => {
             </div>
 
             {/* Contact form */}
-            <div className="isolate bg-white px-6 py-24 sm:py-32 lg:px-8">
+            <div className="isolate bg-white px-6 py-24 sm:py-32 lg:px-8" style={{ marginTop: "-10%" }}>
                 <motion.div
                     ref={contactRef}
                     initial={{ opacity: 0, y: 50 }}
