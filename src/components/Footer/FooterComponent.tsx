@@ -3,7 +3,7 @@ import { systemLogo } from '../../assets'
 import { useTranslation } from 'react-i18next';
 
 export default function FooterComponent() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState<boolean>(false)
 
   // Get language in local storage
   const selectedLanguage = localStorage.getItem('language');

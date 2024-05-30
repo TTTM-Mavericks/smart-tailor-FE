@@ -172,14 +172,14 @@ function classNames(...classes: any[]) {
 }
 
 export default function HeaderComponent() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState<boolean>(false)
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [userLogined, setUserLogined] = useState<UserInterface>();
 
   useEffect(() => {
     const checkLoginStatus = () => {
-      const userSession = sessionStorage.getItem('userAuth');
+      const userSession = localStorage.getItem('userAuth');
       if (userSession) {
         const userParse = JSON.parse(userSession);
         setUserLogined(userParse)
@@ -220,7 +220,7 @@ export default function HeaderComponent() {
   }, [selectedLanguage, i18n]);
 
 
-  const [proposalOpen, setProposalOpen] = useState(false);
+  const [proposalOpen, setProposalOpen] = useState<boolean>(false);
 
   const toggleProposal = () => {
     setProposalOpen(!proposalOpen);

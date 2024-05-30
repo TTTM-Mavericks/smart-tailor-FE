@@ -51,7 +51,7 @@ const ManageNotificationScreens = () => {
             try {
                 const response = await fetch(`http://localhost:6969/api/v1/notification/get-all-notification?userid=1&target_userid=2`);
                 const getData = await response.json();
-                if (getData.success === 200) {
+                if (getData.status === 200) {
                     setData(getData.data);
                 } else {
                     console.log(getData.data);

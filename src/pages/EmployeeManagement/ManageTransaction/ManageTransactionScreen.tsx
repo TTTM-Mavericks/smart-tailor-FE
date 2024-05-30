@@ -44,7 +44,7 @@ const EmployeeManageTransaction: React.FC = () => {
     const [formId, setFormId] = React.useState<User | null>(null);
 
     // Open Edit PopUp when clicking on the edit icon
-    const [editopen, setEditOpen] = React.useState(false);
+    const [editopen, setEditOpen] = React.useState<boolean>(false);
     const _handleEditOpen = () => setEditOpen(true);
     const _handleEditClose = () => setEditOpen(false);
 

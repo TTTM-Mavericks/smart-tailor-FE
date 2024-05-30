@@ -7,7 +7,7 @@ const NotificationComponent = () => {
     const [notifications, setNotifications] = React.useState<any>([]);
     const prevNotificationsCount = React.useRef<number>(0);
     const [badgeVariant, setBadgeVariant] = React.useState<'dot' | 'standard'>('dot');
-    const [badgeClicked, setBadgeClicked] = React.useState(false);
+    const [badgeClicked, setBadgeClicked] = React.useState<boolean>(false);
 
     React.useEffect(() => {
         fetchNotifications();
@@ -50,7 +50,7 @@ const NotificationComponent = () => {
         setBadgeClicked(false);
     };
 
-    const [openPopup, setOpenPopup] = React.useState(false);
+    const [openPopup, setOpenPopup] = React.useState<boolean>(false);
 
     const handleOpenPopup = () => {
         setOpenPopup(true);

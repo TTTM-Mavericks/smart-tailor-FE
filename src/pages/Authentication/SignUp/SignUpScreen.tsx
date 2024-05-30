@@ -14,7 +14,8 @@ import { Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import { __validateEmail, __validatePassword } from '../Utils';
-
+import { useNavigate } from 'react-router-dom';
+import LoadingComponent from '../../../components/Loading/LoadingComponent';
 
 const defaultTheme = createTheme();
 
@@ -22,21 +23,24 @@ const defaultTheme = createTheme();
 export default function SignUpScreen() {
 
   // ---------------UseState Variable---------------//
-  const [showLogin, setShowLogin] = React.useState(true);
-  const [showRegister, setShowRegister] = React.useState(false);
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [showLogin, setShowLogin] = React.useState<boolean>(true);
+  const [showRegister, setShowRegister] = React.useState<boolean>(false);
+  const [showPassword, setShowPassword] = React.useState<boolean>(false);
   const [selectedLanguage, setSelectedLanguage] = React.useState<string>(localStorage.getItem('language') || 'en');
   const [codeLanguage, setCodeLanguage] = React.useState('EN');
-  const [email, setEmail] = React.useState('');
-  const [errorEmailValidate, setEmailErrorValidate] = React.useState('');
-  const [isEmailValidate, setIsEmailValidate] = React.useState(true);
-  const [password, setPassword] = React.useState('');
-  const [errorPasswordValidate, setPasswordErrorValidate] = React.useState('');
-  const [isPasswordValidate, setIsPasswordValidate] = React.useState(true);
+  const [email, setEmail] = React.useState<string>('');
+  const [errorEmailValidate, setEmailErrorValidate] = React.useState<string>('');
+  const [isEmailValidate, setIsEmailValidate] = React.useState<boolean>(true);
+  const [password, setPassword] = React.useState<string>('');
+  const [errorPasswordValidate, setPasswordErrorValidate] = React.useState<string>('');
+  const [isPasswordValidate, setIsPasswordValidate] = React.useState<boolean>(true);
+  const [isLoading, setIsloading] = React.useState<boolean>(false);
 
 
   // ---------------Usable Variable---------------//
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+
 
   // ---------------UseEffect---------------//
   React.useEffect(() => {
@@ -95,7 +99,7 @@ export default function SignUpScreen() {
      * @param event 
      */
   const __handleSignUp = async () => {
-
+    setIsloading(true);
     try {
       const requestData = {
         email: email,
@@ -103,25 +107,26 @@ export default function SignUpScreen() {
       }
 
       const response = await api.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.signup}`, requestData);
-      if (response.success === 200) {
-        // sessionStorage.setItem('userData', JSON.stringify(response.data.user));
-        // sessionStorage.setItem('access_token', JSON.stringify(response.data.access_token));
-        // sessionStorage.setItem('refresh_token', JSON.stringify(response.data.refresh_token));
+      if (response.status === 200) {
+        // localStorage.setItem('userData', JSON.stringify(response.data.user));
+        // localStorage.setItem('access_token', JSON.stringify(response.data.access_token));
+        localStorage.setItem('userRegister', JSON.stringify(requestData));
         console.log(response.data);
-        setTimeout(() => {
-
-        }, 1000)
+        navigate(`/auth/verify/${email}`);
+        setIsloading(false);
       } else {
         // Toast.show({
         //   type: 'error',
         //   text1: JSON.stringify(response.message),
         //   position: 'top'
         // });
-        
+        setIsloading(false);
+
 
       }
       console.log(response);
     } catch (error: any) {
+      setIsloading(false);
       console.error('Error posting data:', error);
       // Toast.show({
       //   type: 'error',
@@ -135,6 +140,8 @@ export default function SignUpScreen() {
   };
   return (
     <ThemeProvider theme={defaultTheme}>
+      <LoadingComponent isLoading={isLoading} time={5000}></LoadingComponent>
+
       <div className={styles.signup__container}>
 
         <Menu as="div" className={`${styles.icon_language}`}>

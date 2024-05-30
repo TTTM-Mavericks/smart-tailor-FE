@@ -47,7 +47,7 @@ const ManageUsers: React.FC = () => {
     const [formId, setFormId] = React.useState<User | null>(null);
 
     // Open Edit PopUp when clicking on the edit icon
-    const [editopen, setEditOpen] = React.useState(false);
+    const [editopen, setEditOpen] = React.useState<boolean>(false);
     const _handleEditOpen = () => setEditOpen(true);
     const _handleEditClose = () => setEditOpen(false);
 
@@ -63,7 +63,7 @@ const ManageUsers: React.FC = () => {
     console.log("anchorEl" + anchorEl);
 
     // close open pop up
-    const [addOpenOrClose, setAddOpenOrClose] = React.useState(false)
+    const [addOpenOrClose, setAddOpenOrClose] = React.useState<boolean>(false)
 
     const _handleAddOpen = () => {
         setAddOpenOrClose(true);
@@ -74,7 +74,7 @@ const ManageUsers: React.FC = () => {
     }
 
     // close open pop up
-    const [addMultiple, setAddMultiple] = React.useState(false)
+    const [addMultiple, setAddMultiple] = React.useState<boolean>(false)
 
     const _handleAddMultipleOpen = () => {
         setAddMultiple(true);

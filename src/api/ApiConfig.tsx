@@ -15,7 +15,13 @@ export const featuresEndpoints = {
 export const functionEndpoints = {
   auth: {
     signin: '/login',
-    signup: '/register'
+    signup: '/register',
+    forgot: '/forgot-password',
+    updatePassword: '/update-password',
+    checkVerify: '/check-verify',
+    checkVerifyPassword: '/check-verify-password',
+
+
   }
 }
 

@@ -34,18 +34,21 @@ import {
 } from './pages/EmployeeManagement';
 
 import {
+  ChangePasswordScreen,
   ForgotPassWordScreen,
   SignInScreen,
   SignUpScreen,
-  VerifyEmailScreen
+  VerifyEmailScreen,
 } from './pages/Authentication';
-import Screen404 from './pages/Error/Screen404';
 
 import {
   DashboardBrandManageNotification,
   DashboardBrandProfileScreens,
   DashboardBrandScreens
 } from './pages/BrandManagement';
+
+import Screen404 from './pages/Error/Screen404';
+
 
 const tokenIsValid = (token) => {
   try {
@@ -63,7 +66,7 @@ const tokenIsValid = (token) => {
 const isAuthenticated = (requiredRole) => {
   const token = Cookies.get('token');
   console.log('token: ', token);
-  const userAuth = sessionStorage.getItem('userAuth');
+  const userAuth = localStorage.getItem('userAuth');
   if (userAuth) {
     const userParse = JSON.parse(userAuth);
     return userParse.roleName === requiredRole
@@ -94,8 +97,10 @@ function App() {
           {/* Auth route */}
           <Route path='/auth/signin' element={<SignInScreen></SignInScreen>} />
           <Route path='/auth/signup' element={<SignUpScreen></SignUpScreen>} />
-          <Route path='/auth/getpassword' element={<ForgotPassWordScreen></ForgotPassWordScreen>} />
-          <Route path='/auth/verify' element={<VerifyEmailScreen></VerifyEmailScreen>} />
+          <Route path='/auth/getpassword/:emailParam' element={<ForgotPassWordScreen></ForgotPassWordScreen>} />
+          <Route path='/auth/changepassword/:email' element={<ChangePasswordScreen></ChangePasswordScreen>} />
+          <Route path='/auth/verify/:email' element={<VerifyEmailScreen></VerifyEmailScreen>} />
+
 
           {/* Design route */}
           <Route path="/design" element={<PrivateRoute element={<CustomDesignScreen />} requiredRole="CUSTOMER" />} />

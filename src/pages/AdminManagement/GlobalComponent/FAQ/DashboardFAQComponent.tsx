@@ -14,7 +14,7 @@ export default function DashboardFAQScreens() {
     const theme1 = useTheme();
     const smScreen = useMediaQuery(theme1.breakpoints.up("sm"));
     const colors = tokens(theme.palette);
-    const [showScrollButton, setShowScrollButton] = React.useState(false);
+    const [showScrollButton, setShowScrollButton] = React.useState<boolean>(false);
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
 

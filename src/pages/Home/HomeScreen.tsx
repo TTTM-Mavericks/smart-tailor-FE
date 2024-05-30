@@ -72,7 +72,7 @@ const products = [
 const HomeScreen = () => {
 
     // ---------------UseState Variable---------------//
-    const [agreed, setAgreed] = useState(false)
+    const [agreed, setAgreed] = useState<boolean>(false)
 
     const titleRef = useRef(null);
     const isTitleVisible = useInView(titleRef, { once: true });
@@ -114,7 +114,6 @@ const HomeScreen = () => {
     const __getHeaders = async (url: string) => {
         try {
             const response = await axios.head(url);
-            console.log(response);
             return response;
         } catch (error) {
             console.error('Error fetching headers:', error);

@@ -13,6 +13,9 @@ import { GoogleOAuthProvider, GoogleLogin, useGoogleLogin, CredentialResponse, u
 import { secondaryColor } from '../../../root/ColorSystem';
 import Cookies from 'js-cookie'
 import axios from 'axios';
+import LoadingComponent from '../../../components/Loading/LoadingComponent';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const defaultTheme = createTheme();
 
@@ -22,16 +25,17 @@ export default function SignInScreen() {
 
   // ---------------UseState Variable---------------//
   const [selectedLanguage, setSelectedLanguage] = React.useState<string>(localStorage.getItem('language') || 'en');
-  const [showLogin, setShowLogin] = React.useState(true);
-  const [showRegister, setShowRegister] = React.useState(false);
-  const [showPassword, setShowPassword] = React.useState(false);
-  const [email, setEmail] = React.useState('');
-  const [errorEmailValidate, setEmailErrorValidate] = React.useState('');
-  const [isEmailValidate, setIsEmailValidate] = React.useState(true);
-  const [password, setPassword] = React.useState('');
-  const [errorPasswordValidate, setPasswordErrorValidate] = React.useState('');
-  const [isPasswordValidate, setIsPasswordValidate] = React.useState(true);
-  const [codeLanguage, setCodeLanguage] = React.useState('EN');
+  const [showLogin, setShowLogin] = React.useState<boolean>(true);
+  const [showRegister, setShowRegister] = React.useState<boolean>(false);
+  const [showPassword, setShowPassword] = React.useState<boolean>(false);
+  const [email, setEmail] = React.useState<string>('');
+  const [errorEmailValidate, setEmailErrorValidate] = React.useState<string>('');
+  const [isEmailValidate, setIsEmailValidate] = React.useState<boolean>(true);
+  const [password, setPassword] = React.useState<string>('');
+  const [errorPasswordValidate, setPasswordErrorValidate] = React.useState<string>('');
+  const [isPasswordValidate, setIsPasswordValidate] = React.useState<boolean>(true);
+  const [codeLanguage, setCodeLanguage] = React.useState<string>('EN');
+  const [isLoading, setIsloading] = React.useState<boolean>(false);
 
   // ---------------Usable Variable---------------//
   const { t, i18n } = useTranslation();
@@ -73,10 +77,8 @@ export default function SignInScreen() {
    * Handle signin
    * @param event 
    */
-  /**
- * SignIn
- */
   const __handleSignIn = async () => {
+    setIsloading(true);
     if (isEmailValidate && isPasswordValidate) {
       try {
         const requestData = {
@@ -85,23 +87,30 @@ export default function SignInScreen() {
         };
 
         const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.signin}`, requestData);
-        if (response.success === 200) {
-          // sessionStorage.setItem('userData', JSON.stringify(response.data.user));
-          // sessionStorage.setItem('access_token', JSON.stringify(response.data.access_token));
-          // sessionStorage.setItem('refresh_token', JSON.stringify(response.data.refresh_token));
+        if (response.status === 200) {
+          localStorage.setItem('userAuth', JSON.stringify(response.data.user));
+          const authToken = response.data.access_token;
+          Cookies.set('token', authToken);
           // if (response.data.user.role === 'CUSTOMER') {
-          //   sessionStorage.setItem('subrole', JSON.stringify(response.subrole));
+          //   localStorage.setItem('subrole', JSON.stringify(response.subrole));
           // }
           console.log(response.data.user);
-
+          setIsloading(false);
+          window.location.href='/'
 
         } else {
+          setIsloading(false);
+          toast.error(`${response.message}`, { autoClose: 3000 });
 
         }
         console.log(response);
 
       } catch (error: any) {
         console.error('Error posting data:', error);
+        setIsloading(false);
+        toast.error(`${error}`, { autoClose: 3000 });
+
+
         // Toast.show({
         //   type: 'error',
         //   text1: JSON.stringify(error.message),
@@ -123,7 +132,7 @@ export default function SignInScreen() {
 
     //     >
     //       <GoogleLogin
-    //         onSuccess={handleLoginSuccess}
+    //         onSuccess={__handleLoginSuccess}
     //         onError={() => {
     //           console.log('Login Failed');
     //         }}
@@ -140,32 +149,39 @@ export default function SignInScreen() {
     }
   };
 
-  const handleLoginSuccess = (response: any) => {
-    const { credential } = response;
-    console.log('credential: ', credential);
-    fetch('https://be.mavericks-tttm.studio/api/v1/auth/google-login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ authRequest: credential }),
-    })
-      .then((res) => res.json())
-      .then((resp) => {
-        const authToken = resp.data.access_token;
-        Cookies.set('token', authToken);
-        console.log('data.jwtToken: ', resp.data);
-        axios.defaults.headers.common.Authorization = `Bearer ${authToken}`;
-        sessionStorage.setItem('userAuth', JSON.stringify(resp.data.user));
-        window.location.href = '/';
-      });
+  const __handleLoginSuccess = (response: any) => {
+    try {
+      const { credential } = response;
+      console.log('credential: ', credential);
+      fetch('https://be.mavericks-tttm.studio/api/v1/auth/google-login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ authRequest: credential }),
+      })
+        .then((res) => res.json())
+        .then((resp) => {
+          const authToken = resp.data.access_token;
+          Cookies.set('token', authToken);
+          console.log('data.jwtToken: ', resp.data);
+          axios.defaults.headers.common.Authorization = `Bearer ${authToken}`;
+          localStorage.setItem('userAuth', JSON.stringify(resp.data.user));
+          setIsloading(true);
+
+          window.location.href = '/';
+        });
+    } catch (error) {
+      toast.error(`${error}`, { autoClose: 3000 });
+    }
+
   };
 
   const login = useGoogleLogin({
 
     onSuccess: (tokenResponse: any) => {
       console.log('Credential:', tokenResponse);
-      handleLoginSuccess(tokenResponse);
+      __handleLoginSuccess(tokenResponse);
     },
     onError: () => {
       console.log('Login Failed');
@@ -178,6 +194,8 @@ export default function SignInScreen() {
     <GoogleOAuthProvider clientId="1051460649548-ijlrpmgdcmd5td1apidcpauh3dhv7u26.apps.googleusercontent.com">
 
       <ThemeProvider theme={defaultTheme}>
+        <ToastContainer />
+        <LoadingComponent isLoading={isLoading} time={5000}></LoadingComponent>
         <div className={styles.signin__container}>
           <Menu as="div" className={`${styles.icon_language}`}>
             <div >
@@ -311,7 +329,7 @@ export default function SignInScreen() {
                     size='large'
                     text="signin_with"
                     theme={'filled_blue'}
-                    onSuccess={handleLoginSuccess}
+                    onSuccess={__handleLoginSuccess}
                     onError={() => {
                       console.log('Login Failed');
                     }}
