@@ -91,9 +91,9 @@ const ProductDialogComponent: React.FC<Props> = ({ isOpen, onClose, onItemSelect
     // ---------------UseState Variable---------------//
     const [selectedLanguage, setSelectedLanguage] = useState<string>(localStorage.getItem('language') || 'en');
     const [codeLanguage, setCodeLanguage] = useState('EN');
-    const [isOpenProductDialog, setIsOpenProductDialog] = useState(false);
-    const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-    const [itemSelected, setItemSelected] = useState('')
+    const [isOpenProductDialog, setIsOpenProductDialog] = useState<boolean>(false);
+    const [mobileFiltersOpen, setMobileFiltersOpen] = useState<boolean>(false);
+    const [itemSelected, setItemSelected] = useState<string>('')
 
     // ---------------Usable Variable---------------//
     const { t, i18n } = useTranslation();

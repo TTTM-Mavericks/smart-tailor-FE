@@ -48,7 +48,7 @@ const EmployeeManageOrder: React.FC = () => {
     const [data, setData] = React.useState<User[]>([]);
 
     const [formId, setFormId] = React.useState<User | null>(null);
-    const [editopen, setEditOpen] = React.useState(false);
+    const [editopen, setEditOpen] = React.useState<boolean>(false);
     const _handleEditOpen = () => setEditOpen(true);
     const _handleEditClose = () => setEditOpen(false);
     const [anchorEl, setAnchorEl] = React.useState(null);

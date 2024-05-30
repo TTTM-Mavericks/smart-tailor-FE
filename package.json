@@ -47,6 +47,7 @@
     "formik": "^2.2.9",
     "framer-motion": "^11.0.14",
     "i18next": "^23.11.3",
+    "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.8.2",
@@ -92,6 +93,7 @@
   },
   "devDependencies": {
     "@types/core-js": "^2.5.8",
+    "@types/js-cookie": "^3.0.6",
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",
     "@types/react-resizable": "^3.0.7",

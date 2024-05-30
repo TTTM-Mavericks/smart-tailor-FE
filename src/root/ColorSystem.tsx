@@ -7,4 +7,6 @@ export const grayColor1= '#F5F5F5';
 export const whiteColor = '#ffffff';
 export const blackColor = '#000000';
 export const redColor = '#E74032';
-export const errorColor = '#DB0F00'
+export const errorColor = '#DB0F00';
+export const greenColor = '#37B358';
+

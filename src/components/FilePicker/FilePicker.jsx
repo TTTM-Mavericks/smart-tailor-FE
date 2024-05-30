@@ -5,7 +5,7 @@ import { BACK_CLOTH_PART, FRONT_CLOTH_PART, LOGO_PART, SLEEVE_CLOTH_PART } from 
 import { primaryColor } from '../../root/ColorSystem'
 
 const FilePicker = ({ file, setFile, readFile, partOfCloth }) => {
-  const [trigger, setTrigger] = useState(false);
+  const [trigger, setTrigger] = useState<boolean>(false);
 
   const _handleSetUploadFile = () => {
     console.log(partOfCloth);

@@ -1,11 +1,11 @@
 export interface UserInterface {
+    avatar: string;
     email: string;
-    password: string;
-    language: string;
-    phoneNumber: string;
     fullName: string;
-    address: string;
-    province: string;
+    language: string | null;
+    phoneNumber: string | null;
     provider: string;
-    district: string;
-}
+    roleName: string;
+    userID: string;
+    userStatus: boolean;
+  }

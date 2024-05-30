@@ -149,7 +149,7 @@ function CustomDesignScreen() {
     imgUrl: ''
   });
   const [selectedItem, setSelectedItem] = useState<string>('');
-  const [file, setFile] = useState('');
+  const [file, setFile] = useState<string>('');
   const [activeEditorTab, setActiveEditorTab] = useState<string>('');
   const [selectedLanguage, setSelectedLanguage] = useState(localStorage.getItem('language') || 'en');
   const [codeLanguage, setCodeLanguage] = useState<string>('EN');

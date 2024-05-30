@@ -13,7 +13,7 @@ import NotFound from '../GlobalComponent/Error404/Error404Component';
 const DashboardBarChartScreens = () => {
     const themeColor = useTheme();
     const colors = tokens(themeColor.palette.mode);
-    const [showScrollButton, setShowScrollButton] = React.useState(false);
+    const [showScrollButton, setShowScrollButton] = React.useState<boolean>(false);
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     React.useEffect(() => {

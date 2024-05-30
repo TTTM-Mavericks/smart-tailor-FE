@@ -1,20 +1,17 @@
 import * as React from 'react';
-
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import styles from './SignUpStyle.module.scss';
 import { HiEye, HiEyeOff } from 'react-icons/hi';
-
-// import ApiService from '../ApiAuthService';
 import './SignUpStyle.css'
 import { systemLogo, usaFlag, vietnamFlag } from '../../../assets';
-
-// import Logo from '../../../assets/system/smart-tailor_logo.png'
 import { useTranslation } from 'react-i18next';
 import { Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import { __validateEmail, __validatePassword } from '../Utils';
-
+import { useNavigate } from 'react-router-dom';
+import LoadingComponent from '../../../components/Loading/LoadingComponent';
+import { toast, ToastContainer } from 'react-toastify';
 
 const defaultTheme = createTheme();
 
@@ -22,21 +19,29 @@ const defaultTheme = createTheme();
 export default function SignUpScreen() {
 
   // ---------------UseState Variable---------------//
-  const [showLogin, setShowLogin] = React.useState(true);
-  const [showRegister, setShowRegister] = React.useState(false);
-  const [showPassword, setShowPassword] = React.useState(false);
   const [selectedLanguage, setSelectedLanguage] = React.useState<string>(localStorage.getItem('language') || 'en');
   const [codeLanguage, setCodeLanguage] = React.useState('EN');
-  const [email, setEmail] = React.useState('');
-  const [errorEmailValidate, setEmailErrorValidate] = React.useState('');
-  const [isEmailValidate, setIsEmailValidate] = React.useState(true);
-  const [password, setPassword] = React.useState('');
-  const [errorPasswordValidate, setPasswordErrorValidate] = React.useState('');
-  const [isPasswordValidate, setIsPasswordValidate] = React.useState(true);
+  const [email, setEmail] = React.useState<string>('');
+  const [errorEmailValidate, setEmailErrorValidate] = React.useState<string>('');
+  const [isEmailValidate, setIsEmailValidate] = React.useState<boolean>(true);
+
+  const [passwordConfirm, setPasswordConfirm] = React.useState<string>('');
+  const [errorPasswordConfirmValidate, setPasswordConfirmErrorValidate] = React.useState<string>('');
+  const [isPasswordConfirmValidate, setIsPasswordConfirmValidate] = React.useState<boolean>(true);
+  const [showPasswordConfirm, setShowPasswordConfirm] = React.useState<boolean>(false);
+
+  const [password, setPassword] = React.useState<string>('');
+  const [errorPasswordValidate, setPasswordErrorValidate] = React.useState<string>('');
+  const [isPasswordValidate, setIsPasswordValidate] = React.useState<boolean>(true);
+  const [showPassword, setShowPassword] = React.useState<boolean>(false);
+  const [isPasswordMacth, setIsPasswordMatch] = React.useState<boolean>(false);
+  const [isLoading, setIsloading] = React.useState<boolean>(false);
 
 
   // ---------------Usable Variable---------------//
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+
 
   // ---------------UseEffect---------------//
   React.useEffect(() => {
@@ -81,6 +86,26 @@ export default function SignUpScreen() {
     }
   }, [password]);
 
+  /**
+ * Validate password confirm
+ */
+  React.useEffect(() => {
+    const error = __validatePassword(passwordConfirm);
+    if (!error.isValid && error.error) {
+      setPasswordConfirmErrorValidate(error.error);
+      setIsPasswordConfirmValidate(false);
+    } else {
+      if (password !== passwordConfirm) {
+        setPasswordConfirmErrorValidate('Not match');
+        setIsPasswordMatch(false);
+      } else {
+        setPasswordConfirm(passwordConfirm);
+        setIsPasswordConfirmValidate(true);
+        setIsPasswordMatch(true);
+      }
+    }
+  }, [passwordConfirm]);
+
 
   // ---------------FunctionHandler---------------//
   const handleLanguageChange = (language: string) => {
@@ -88,6 +113,8 @@ export default function SignUpScreen() {
   };
 
   const __handleClickShowPassword = () => setShowPassword((show) => !show);
+  const __handleClickShowPasswordConfirm = () => setShowPasswordConfirm((show) => !show);
+
 
 
   /**
@@ -96,6 +123,12 @@ export default function SignUpScreen() {
      */
   const __handleSignUp = async () => {
 
+    if(!isPasswordMacth || !isEmailValidate || !isPasswordConfirmValidate ||isPasswordValidate) {
+      toast.error(`Invalid input. Please check!`, { autoClose: 4000 });
+      return;
+    }
+
+    setIsloading(true);
     try {
       const requestData = {
         email: email,
@@ -103,38 +136,30 @@ export default function SignUpScreen() {
       }
 
       const response = await api.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.signup}`, requestData);
-      if (response.success === 200) {
-        // sessionStorage.setItem('userData', JSON.stringify(response.data.user));
-        // sessionStorage.setItem('access_token', JSON.stringify(response.data.access_token));
-        // sessionStorage.setItem('refresh_token', JSON.stringify(response.data.refresh_token));
+      if (response.status === 200) {
+        localStorage.setItem('userRegister', JSON.stringify(requestData));
         console.log(response.data);
-        setTimeout(() => {
-
-        }, 1000)
+        navigate(`/auth/verify/${email}`);
+        setIsloading(false);
       } else {
-        // Toast.show({
-        //   type: 'error',
-        //   text1: JSON.stringify(response.message),
-        //   position: 'top'
-        // });
-        
+        setIsloading(false);
+        toast.error(`${response.message}`, { autoClose: 4000 });
 
       }
       console.log(response);
     } catch (error: any) {
+      setIsloading(false);
       console.error('Error posting data:', error);
-      // Toast.show({
-      //   type: 'error',
-      //   text1: JSON.stringify(error.message),
-      //   position: 'top'
-      // });
-      // setIsLoading(false);
+      toast.error(`${error}`, { autoClose: 3000 });
+
     }
 
 
   };
   return (
     <ThemeProvider theme={defaultTheme}>
+      <LoadingComponent isLoading={isLoading} time={5000}></LoadingComponent>
+      <ToastContainer />
       <div className={styles.signup__container}>
 
         <Menu as="div" className={`${styles.icon_language}`}>
@@ -252,21 +277,25 @@ export default function SignUpScreen() {
                   <input
                     id="confirmpassword"
                     name="confirmpassword"
-                    type={showPassword ? "text" : "password"} // Toggle input type based on visibility state
-                    placeholder={t(codeLanguage + '000011')}
+                    type={showPasswordConfirm ? "text" : "password"} // Toggle input type based on visibility state
+                    placeholder='Confirm password'
                     autoComplete="current-password"
                     required
                     className={`block h-11 w-full pl-3 pr-10 rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6  ${styles.signup__input}`}
+                    onChange={(e) => setPasswordConfirm(e.target.value)}
                   />
                   {/* Show/hide password toggle button */}
-                  {/* <button
+                  <button
                     type="button"
                     className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 focus:outline-none"
-                    onClick={__handleClickShowPassword}
+                    onClick={__handleClickShowPasswordConfirm}
                   >
-                    {showPassword ? <HiEyeOff /> : <HiEye />}
-                  </button> */}
+                    {showPasswordConfirm ? <HiEyeOff /> : <HiEye />}
+                  </button>
                 </div>
+                {!isPasswordConfirmValidate && (
+                  <span className={`${styles.error__txt}`}>{errorPasswordConfirmValidate}</span>
+                )}
               </div>
 
               <div>

@@ -21,7 +21,7 @@ const BrandProfileSetup = () => {
     const [selectedProvince, setSelectedProvince] = useState<any>(null);
     const [selectedDistrict, setSelectedDistrict] = useState<any>(null);
     const [selectedWard, setSelectedWard] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         Promise.resolve(VNLocationData)

@@ -12,10 +12,10 @@ import styles from './Designer.module.scss'
 
 const Designer = () => {
   const snap = useSnapshot(state);
-  const [file, setFile] = useState('');
-  const [prompt, setPrompt] = useState('')
-  const [generateImg, setGenerateImg] = useState('')
-  const [activeEditorTab, setActiveEditorTab] = useState('')
+  const [file, setFile] = useState<string>('');
+  const [prompt, setPrompt] = useState<string>('')
+  const [generateImg, setGenerateImg] = useState<string>('')
+  const [activeEditorTab, setActiveEditorTab] = useState<string>('')
   const [activeFilterTab, setActiveFilterTab] = useState({
     logoShirt: false,
     stylishShirt: false

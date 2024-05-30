@@ -21,7 +21,7 @@ const RowDetails: React.FC = () => {
     const [rowData, setRowData] = useState(location.state);
     const [updatedData, setUpdatedData] = useState({ ...rowData });
 
-    const [showModal, setShowModal] = useState(false);
+    const [showModal, setShowModal] = useState<boolean>(false);
     const handleOpen = () => setShowModal(true);
     const handleClose = () => setShowModal(false);
 

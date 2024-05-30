@@ -270,7 +270,7 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
     const [editingData, setEditingData] = React.useState<ExcelData | null>(null);
     const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
 
-    const [editOpen, setEditOpen] = React.useState(false);
+    const [editOpen, setEditOpen] = React.useState<boolean>(false);
     const _handleEditOpen = () => setEditOpen(true);
     const _handleEditClose = () => setEditOpen(false);
 
@@ -308,7 +308,7 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
     };
 
     // Thêm một state để theo dõi trạng thái của modal
-    const [openAddUserModal, setOpenAddUserModal] = React.useState(false);
+    const [openAddUserModal, setOpenAddUserModal] = React.useState<boolean>(false);
 
     // Hàm để mở modal
     const _handleOpenAddUserModal = () => {

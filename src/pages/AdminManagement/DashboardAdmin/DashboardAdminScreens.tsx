@@ -17,7 +17,7 @@ import NotFound from '../GlobalComponent/Error404/Error404Component';
 const DashboardAdminScreens: React.FC = () => {
     const themeColor = useTheme();
     const colors = tokens(themeColor.palette.mode);
-    const [showScrollButton, setShowScrollButton] = React.useState(false);
+    const [showScrollButton, setShowScrollButton] = React.useState<boolean>(false);
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const backgroundColorDashboardRef = React.useRef<HTMLDivElement | null>(null);
 

@@ -11,7 +11,7 @@ import SideBarBrandComponent from '../GlobalComponent/SideBar/SideBarBrandCompon
 const DashboardBrandScreens = () => {
     const themeColor = useTheme();
     const colors = tokens(themeColor.palette.mode);
-    const [showScrollButton, setShowScrollButton] = React.useState(false);
+    const [showScrollButton, setShowScrollButton] = React.useState<boolean>(false);
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     React.useEffect(() => {
