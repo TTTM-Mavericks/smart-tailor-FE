@@ -29,7 +29,7 @@ export const functionEndpoints = {
 
 const axiosInstance = axios.create({
   baseURL,
-  timeout: 50000,
+  timeout: 100000,
   headers: {
     'Content-Type': 'application/json',
   },

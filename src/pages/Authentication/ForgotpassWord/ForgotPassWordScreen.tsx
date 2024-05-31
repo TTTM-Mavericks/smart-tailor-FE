@@ -123,32 +123,37 @@ export default function ForgotPassWordScreen() {
    * @param event 
    */
   const __handleRetrievePassword = async () => {
-    setIsLoading(true);
-    if (isEmailValidate) {
-      try {
-        const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.forgot}?email=${email}`);
-        if (response.status === 200) {
-          console.log('retrieve');
-          setIsEmailSent(true);
-          localStorage.setItem('email', email);
-          setIsLoading(false);
 
-        } else {
-          console.log(response);
-          setIsLoading(false);
-          toast.error(`${response.message}`, { autoClose: 4000 });
-        }
-
-      } catch (error: any) {
-        console.error('Error posting data:', error);
-        setIsEmailSent(false);
-        setIsLoading(false);
-        toast.error(`${error}`, { autoClose: 4000 });
-
-      }
-    } else {
+    if (!isEmailValidate) {
       setEmailErrorValidate(errorEmailValidate);
+      toast.error(`Email invalidate`, { autoClose: 4000 });
+      return;
+
     }
+
+    setIsLoading(true);
+    try {
+      const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.forgot}?email=${email}`);
+      if (response.status === 200) {
+        console.log('retrieve');
+        setIsEmailSent(true);
+        localStorage.setItem('email', email);
+        setIsLoading(false);
+
+      } else {
+        console.log(response);
+        setIsLoading(false);
+        toast.error(`${response.message}`, { autoClose: 4000 });
+      }
+
+    } catch (error: any) {
+      console.error('Error posting data:', error);
+      setIsEmailSent(false);
+      setIsLoading(false);
+      toast.error(`${error}`, { autoClose: 4000 });
+
+    }
+
   };
 
   /**
@@ -156,31 +161,41 @@ export default function ForgotPassWordScreen() {
  * @param event 
  */
   const __handleChangePassword = async () => {
-    if (isPasswordValidate) {
-      try {
-        const request = {
-          email: email,
-          password: password,
-        }
 
-        console.log(request);
-        const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.updatePassword}`, request);
-        if (response.status === 200) {
-          console.log(response);
+    if (!isPasswordValidate) {
 
-        } else {
-          console.log(response);
-          toast.error(`${response.message}`, { autoClose: 4000 });
-
-        }
-
-      } catch (error: any) {
-        toast.error(`${error}`, { autoClose: 3000 });
-        console.error('Error posting data:', error);
-      }
-    } else {
       setPasswordErrorValidate(errorPasswordValidate);
+      toast.error(`Password invalidate`, { autoClose: 4000 });
+      return;
+
     }
+
+    try {
+      const request = {
+        email: email,
+        password: password,
+      }
+
+      console.log(request);
+      const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.updatePassword}`, request);
+      if (response.status === 200) {
+        console.log(response);
+        toast.success(`${response.message}`, { autoClose: 4000 });
+        setTimeout(() => {
+          setIsLoading(true);
+          navigate('/auth/signin');
+        }, 3000)
+      } else {
+        console.log(response);
+        toast.error(`${response.message}`, { autoClose: 4000 });
+
+      }
+
+    } catch (error: any) {
+      toast.error(`${error}`, { autoClose: 3000 });
+      console.error('Error posting data:', error);
+    }
+
   };
 
   /**
