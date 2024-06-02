@@ -89,7 +89,7 @@ const ReviewProductScreen: React.FC = () => {
 
 
     return (
-        <div className="w-full flex justify-start items-start flex-col bg-gray-50 dark:bg-gray-800 p-8">
+        <div className="w-full flex justify-start items-start flex-col dark:bg-gray-800 p-8">
             <Typography variant="h4" className="text-gray-800 dark:text-white mb-4" style={{ marginBottom: "2%" }}>
                 Reviews
             </Typography>
