@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Stomp } from '@stomp/stompjs';
 import io from 'socket.io-client';
 import { Avatar, Rating, Typography } from '@mui/material';
+import axios from 'axios';
 
 // Interface for Notification data
 interface NotificationInterface {
@@ -36,12 +37,16 @@ interface UserInterFace {
     followed?: boolean;
 }
 
-const ReviewProductComponent: React.FC = () => {
+const ReviewProductScreen: React.FC = () => {
+
+    // ---------------UseState Variable---------------//
     const [data, setData] = useState<NotificationInterface[]>([]);
 
-    const socket = io('ws://localhost:6969');
+    // ---------------Usable Variable---------------//
+    const socket = io('ws');
     const stompClient = Stomp.over(socket);
 
+    // ---------------UseEffect---------------//
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -61,18 +66,27 @@ const ReviewProductComponent: React.FC = () => {
 
         fetchData();
 
-        stompClient.connect({}, () => {
+        const onConnect = () => {
             console.log('Connected to WebSocket');
-            stompClient.subscribe('/topic/public', (message) => {
-                const newNotification: NotificationInterface = JSON.parse(message.body);
+            stompClient.subscribe('/topic/notifications', (message) => {
+                const newNotification = JSON.parse(message.body);
                 setData((prevData) => [newNotification, ...prevData]);
+                console.log("bebe ");
+
             });
-        });
+        };
+
+        if (stompClient && stompClient.connect) {
+            stompClient.connect({}, onConnect);
+        }
 
         return () => {
-            stompClient.disconnect();
+            if (stompClient && stompClient.connected) {
+                stompClient.disconnect();
+            }
         };
     }, [stompClient]);
+
 
     return (
         <div className="w-full flex justify-start items-start flex-col bg-gray-50 dark:bg-gray-800 p-8">
@@ -152,4 +166,4 @@ const ReviewProductComponent: React.FC = () => {
     );
 };
 
-export default ReviewProductComponent;
+export default ReviewProductScreen;

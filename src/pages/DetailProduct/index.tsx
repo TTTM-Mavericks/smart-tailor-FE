@@ -1,7 +1,7 @@
-import DetailProductComponent from "./DetailProductComponent";
-import DetailProductScreen from "./DetailProductScreen";
+import ProductDetailScreens from "./ProductDetail/ProductDetailScreens"
+import ReviewProductScreen from "./ReviewProduct/ReviewProductScreen"
 
 export {
-    DetailProductComponent,
-    DetailProductScreen
+    ProductDetailScreens,
+    ReviewProductScreen
 }

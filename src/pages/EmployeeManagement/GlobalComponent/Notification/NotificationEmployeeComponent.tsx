@@ -59,14 +59,16 @@ const NotificationEmployeeComponent = () => {
     };
 
     // Create a WebSocket connection instance
-    const socket = io('ws://localhost:6969');
-    const stompClient = Stomp.over(socket);
+    // const socket = io('ws://localhost:6969');
+    // const stompClient = Stomp.over(socket);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await fetch(`http://localhost:6969/api/v1/notification/get-all-notification?userid=1&target_userid=2`);
                 const getData = await response.json();
+                console.log("tam test log: " + getData.data);
+
                 if (getData) {
                     setData(getData.data);
                 } else {
@@ -79,22 +81,22 @@ const NotificationEmployeeComponent = () => {
         fetchData();
 
         // Connect to WebSocket only once
-        stompClient.connect({}, () => {
-            console.log('Connected to WebSocket');
-            // Subscribe to notifications topic
-            stompClient.subscribe('/topic/public', (message: any) => {
-                const newNotification: NotificationInterface = JSON.parse(message.body);
-                // Update state with new notification
-                setData((prevData) => [newNotification, ...prevData]);
-            });
-        });
+        // stompClient.connect({}, () => {
+        //     console.log('Connected to WebSocket');
+        //     // Subscribe to notifications topic
+        //     stompClient.subscribe('/topic/public', (message: any) => {
+        //         const newNotification: NotificationInterface = JSON.parse(message.body);
+        //         // Update state with new notification
+        //         setData((prevData) => [newNotification, ...prevData]);
+        //     });
+        // });
 
-        // Cleanup function to disconnect from WebSocket
-        return () => {
-            stompClient.disconnect();
-        };
+        // // Cleanup function to disconnect from WebSocket
+        // return () => {
+        //     stompClient.disconnect();
+        // };
 
-    }, [stompClient]);
+    }, []);
 
     const _handleMarkAllRead = () => {
         const fetchData = async () => {
