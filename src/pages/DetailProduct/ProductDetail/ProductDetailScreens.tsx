@@ -252,7 +252,7 @@ const ProductDetailScreens = () => {
                     </motion.div>
 
                     {/* Feedback With Socket IO */}
-                    <ReviewProductComponent />
+                    {/* <ReviewProductComponent /> */}
 
                 </div>
             </div>

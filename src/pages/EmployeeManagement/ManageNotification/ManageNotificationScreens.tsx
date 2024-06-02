@@ -42,43 +42,43 @@ const ManageNotificationScreens = () => {
     const [data, setData] = useState<NotificationInterface[]>([]);
 
     // WebSocket connection instance
-    const socket = io('ws://localhost:6969');
-    const stompClient = Stomp.over(socket);
+    // const socket = io('ws://localhost:6969');
+    // const stompClient = Stomp.over(socket);
 
-    useEffect(() => {
-        // Fetch initial notification data
-        const fetchData = async () => {
-            try {
-                const response = await fetch(`http://localhost:6969/api/v1/notification/get-all-notification?userid=1&target_userid=2`);
-                const getData = await response.json();
-                if (getData) {
-                    setData(getData.data);
-                } else {
-                    console.log(getData.data);
-                }
-            } catch (error) {
-                console.error("An error occurred during data fetching:", error);
-            }
-        };
+    // useEffect(() => {
+    //     // Fetch initial notification data
+    //     const fetchData = async () => {
+    //         try {
+    //             const response = await fetch(`http://localhost:6969/api/v1/notification/get-all-notification?userid=1&target_userid=2`);
+    //             const getData = await response.json();
+    //             if (getData) {
+    //                 setData(getData.data);
+    //             } else {
+    //                 console.log(getData.data);
+    //             }
+    //         } catch (error) {
+    //             console.error("An error occurred during data fetching:", error);
+    //         }
+    //     };
 
-        fetchData();
+    //     fetchData();
 
-        // Connect to WebSocket
-        stompClient.connect({}, () => {
-            console.log('Connected to WebSocket');
-            // Subscribe to notifications topic
-            stompClient.subscribe('/topic/public', (message) => {
-                const newNotification: NotificationInterface = JSON.parse(message.body);
-                // Update state with new notification
-                setData((prevData) => [newNotification, ...prevData]);
-            });
-        });
+    //     // Connect to WebSocket
+    //     stompClient.connect({}, () => {
+    //         console.log('Connected to WebSocket');
+    //         // Subscribe to notifications topic
+    //         stompClient.subscribe('/topic/public', (message) => {
+    //             const newNotification: NotificationInterface = JSON.parse(message.body);
+    //             // Update state with new notification
+    //             setData((prevData) => [newNotification, ...prevData]);
+    //         });
+    //     });
 
-        // Cleanup function to disconnect from WebSocket
-        return () => {
-            stompClient.disconnect();
-        };
-    }, [stompClient]);
+    //     // Cleanup function to disconnect from WebSocket
+    //     return () => {
+    //         stompClient.disconnect();
+    //     };
+    // }, [stompClient]);
 
     const handleMarkAllRead = async () => {
         const fetchData = async () => {

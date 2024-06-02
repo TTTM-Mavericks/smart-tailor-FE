@@ -35,7 +35,7 @@ export default function DashboardBrandManageNotification() {
                             gridColumn="span 12"
                             gridRow="span 2"
                         >
-                            <ManageNotificationScreens />
+                            {/* <ManageNotificationScreens /> */}
                         </Box>
                     </Box>
                 </main>
