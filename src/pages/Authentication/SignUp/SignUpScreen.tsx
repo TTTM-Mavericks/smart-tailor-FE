@@ -123,7 +123,7 @@ export default function SignUpScreen() {
      */
   const __handleSignUp = async () => {
 
-    if(!isPasswordMacth || !isEmailValidate || !isPasswordConfirmValidate ||isPasswordValidate) {
+    if(!isPasswordMacth || (!isEmailValidate &&!isPasswordConfirmValidate && !isPasswordValidate) ){
       toast.error(`Invalid input. Please check!`, { autoClose: 4000 });
       return;
     }

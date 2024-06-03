@@ -140,16 +140,13 @@ interface Item {
 function CustomDesignScreen() {
 
   // ---------------UseState Variable---------------//
-  const [selectedPartOfCloth, setSelectedPartOfCloth] = useState<PartOfCloth>({
-    partValue: '',
-    imgUrl: ''
-  });
+  const [selectedPartOfCloth, setSelectedPartOfCloth] = useState<PartOfCloth>(partOfClothData[0]);
   const [selectedStamp, setSelectedStamp] = useState<Item>({
     id: '',
     imgUrl: ''
   });
-  const [selectedItem, setSelectedItem] = useState<string>('');
-  const [file, setFile] = useState<string>('');
+  const [selectedItem, setSelectedItem] = useState<string>('LOGO_PART');
+  const [file, setFile] = useState('');
   const [activeEditorTab, setActiveEditorTab] = useState<string>('');
   const [selectedLanguage, setSelectedLanguage] = useState(localStorage.getItem('language') || 'en');
   const [codeLanguage, setCodeLanguage] = useState<string>('EN');
