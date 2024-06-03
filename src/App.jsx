@@ -48,12 +48,13 @@ import {
 } from './pages/BrandManagement';
 
 import Screen404 from './pages/Error/Screen404';
+import { ProductDetailScreens } from './pages/DetailProduct';
 
 
 const tokenIsValid = (token) => {
   try {
     const decoded = jwtDecode(token);
-    const expiration = decoded.exp; 
+    const expiration = decoded.exp;
 
     return expiration > Math.floor(Date.now() / 1000);
   } catch (error) {
@@ -135,7 +136,8 @@ function App() {
           <Route path="/brand_manage_notification" element={<DashboardBrandManageNotification></DashboardBrandManageNotification>} />
           <Route path='/brand_profile' element={<DashboardBrandProfileScreens></DashboardBrandProfileScreens>} />
 
-
+          {/* Detail Product Route */}
+          <Route path='/detail_product' element={<ProductDetailScreens></ProductDetailScreens>} />
 
           <Route path='*' element={<Screen404 />} />
         </Routes>
