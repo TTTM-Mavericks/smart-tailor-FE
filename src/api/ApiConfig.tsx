@@ -10,7 +10,8 @@ export const versionEndpoints = {
   v2: '/api/v2'
 }
 export const featuresEndpoints = {
-  auth: '/auth'
+  auth: '/auth',
+  design: 'design'
 }
 export const functionEndpoints = {
   auth: {
@@ -20,8 +21,9 @@ export const functionEndpoints = {
     updatePassword: '/update-password',
     checkVerify: '/check-verify',
     checkVerifyPassword: '/check-verify-password',
-
-
+  },
+  design: {
+    systemItem: '/systemItem'
   }
 }
 

@@ -1,7 +1,7 @@
 export interface MaskItemInterface {
-    item_id?: string; // UUID
+    item_mask_id: string; // UUID
     part_of_design_id?: string; // UUID
-    mask_item_name?: string; // Enum?: String
+    item_mask_name?: string; // Enum?: String
     type_of_item?: string; // String
     position_x?: number; // Float
     position_y?: number; // Float
@@ -9,7 +9,11 @@ export interface MaskItemInterface {
     scale_y?: number; // Float
     create_date?: string; // LocalDateTime
     last_modified_date?: string; // LocalDateTime
-    img_url?: string;
+    image_url: string;
+    isSystemItem?: boolean;
+    isPremium?: boolean;
+
+
 }
 
 export interface PartOfDesignInterface {
@@ -54,9 +58,9 @@ export const sampleDesignData: DesignInterface = {
             "img_url": "https://example.com/images/front_part.png",
             "mask_item": [
                 {
-                    "item_id": "423e4567-e89b-12d3-a456-426614174003",
+                    "item_mask_id": "423e4567-e89b-12d3-a456-426614174003",
                     "part_of_design_id": "323e4567-e89b-12d3-a456-426614174002",
-                    "mask_item_name": "Logo",
+                    "item_mask_name": "Logo",
                     "type_of_item": "Image",
                     "position_x": 50.0,
                     "position_y": 75.0,
@@ -64,7 +68,7 @@ export const sampleDesignData: DesignInterface = {
                     "scale_y": 1.0,
                     "create_date": "2023-05-29T12:34:56Z",
                     "last_modified_date": "2023-06-01T08:21:34Z",
-                    "img_url": "https://example.com/images/logo.png"
+                    "image_url": "https://example.com/images/logo.png"
                 }
             ]
         },

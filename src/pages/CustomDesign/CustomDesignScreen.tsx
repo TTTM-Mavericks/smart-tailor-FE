@@ -1,16 +1,15 @@
 
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 import CanvasModel from '../../canvas/CanvasModel'
 import Designer from './Designer/Designer'
 import ImageEditor from './Designer/ImageEditor'
 import styles from './CustomDesign.module.scss';
-// import { SRGBToLinear } from 'three';
 import ImageDraggableComponent from './Components/Draggable/ImageDraggableComponent';
 import { BACK_CLOTH_PART, FRONT_CLOTH_PART, LOGO_PART, PartOfCloth, SLEEVE_CLOTH_PART } from '../../models/ClothModel';
-import { __downloadCanvasToImage, reader } from '../../utils/DesignerUtils';
+import { __downloadCanvasToImage, __handleChangeImageToBase64, __urlToBase64, reader } from '../../utils/DesignerUtils';
 import { DecalTypes } from '../../config/TabSetting';
 import state from '../../store';
-import { ColorPicker, FilePicker, Tab } from '../../components';
+import { ColorPicker, FilePicker } from '../../components';
 import { frontOfCloth, shirtModel, systemLogo } from '../../assets';
 
 import { HiOutlineDownload, HiShoppingCart, HiOutlineLogin } from 'react-icons/hi';
@@ -20,10 +19,11 @@ import { blackColor, primaryColor, whiteColor } from '../../root/ColorSystem';
 import { IoMdColorPalette } from "react-icons/io";
 import { IoText } from "react-icons/io5";
 import { GiClothes } from "react-icons/gi";
-import ProductCardDesignComponent from '../../components/Card/ProductCardDesign/ProductCardDesignComponent';
 import { TbHomeHeart } from "react-icons/tb";
 import ProductDialogComponent from './Components/Dialog/ProductDialogComponent';
-
+import api from '../../api/ApiConfig';
+import { MaskItemInterface } from '../../models/DesignModel';
+import { Skeleton } from '@mui/material';
 
 
 
@@ -46,105 +46,12 @@ const partOfClothData = [
   }
 ];
 
-const currentItem = [
-  {
-    id: 1,
-    imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/52574437729-admin/theme/68492970862-xhmp_scrub_bunny_illustration_in_the_style_of_spiritcore_symbo_3097ddb3-58eb-4701-830a-fb2e19663671_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-
-  },
-  {
-    id: 2,
-    imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/52574437729-admin/theme/68492970862-xhmp_scrub_bunny_illustration_in_the_style_of_spiritcore_symbo_3097ddb3-58eb-4701-830a-fb2e19663671_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-
-  },
-  {
-    id: 3,
-    imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/52574437729-admin/theme/68492970862-xhmp_scrub_bunny_illustration_in_the_style_of_spiritcore_symbo_3097ddb3-58eb-4701-830a-fb2e19663671_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-
-  },
-  {
-    id: 4,
-    imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/52574437729-admin/theme/68492970862-xhmp_scrub_bunny_illustration_in_the_style_of_spiritcore_symbo_3097ddb3-58eb-4701-830a-fb2e19663671_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-
-  },
-  {
-    id: 5,
-    imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/52574437729-admin/theme/68492970862-xhmp_scrub_bunny_illustration_in_the_style_of_spiritcore_symbo_3097ddb3-58eb-4701-830a-fb2e19663671_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-
-  },
-  {
-    id: 6,
-    imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/52574437729-admin/theme/68492970862-xhmp_scrub_bunny_illustration_in_the_style_of_spiritcore_symbo_3097ddb3-58eb-4701-830a-fb2e19663671_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-
-  },
-  {
-    id: 7,
-    imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/52574437729-admin/theme/68492970862-xhmp_scrub_bunny_illustration_in_the_style_of_spiritcore_symbo_3097ddb3-58eb-4701-830a-fb2e19663671_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-
-  },
-  {
-    id: 8,
-    imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/52574437729-admin/theme/68492970862-xhmp_scrub_bunny_illustration_in_the_style_of_spiritcore_symbo_3097ddb3-58eb-4701-830a-fb2e19663671_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-
-  }
-]
-
-const collectionItem = [
-  {
-    id: 1,
-    imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/77798606438-admin/theme/3298507943-xhmp_a_colorful_graphic_car_with_an_abstract_designsolid_color_c348f443-b784-4c95-951f-db3e416972c8_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-
-  },
-  {
-    id: 2,
-    imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/77798606438-admin/theme/3298507943-xhmp_a_colorful_graphic_car_with_an_abstract_designsolid_color_c348f443-b784-4c95-951f-db3e416972c8_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-
-  },
-  {
-    id: 3,
-    imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/77798606438-admin/theme/3298507943-xhmp_a_colorful_graphic_car_with_an_abstract_designsolid_color_c348f443-b784-4c95-951f-db3e416972c8_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-
-  },
-  {
-    id: 4,
-    imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/77798606438-admin/theme/3298507943-xhmp_a_colorful_graphic_car_with_an_abstract_designsolid_color_c348f443-b784-4c95-951f-db3e416972c8_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-
-  },
-  {
-    id: 5,
-    imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/77798606438-admin/theme/3298507943-xhmp_a_colorful_graphic_car_with_an_abstract_designsolid_color_c348f443-b784-4c95-951f-db3e416972c8_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-
-  },
-  {
-    id: 6,
-    imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/77798606438-admin/theme/3298507943-xhmp_a_colorful_graphic_car_with_an_abstract_designsolid_color_c348f443-b784-4c95-951f-db3e416972c8_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-
-  },
-  {
-    id: 7,
-    imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/77798606438-admin/theme/3298507943-xhmp_a_colorful_graphic_car_with_an_abstract_designsolid_color_c348f443-b784-4c95-951f-db3e416972c8_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-
-  },
-  {
-    id: 8,
-    imgUrl: 'https://catkissfish-en-prod.oss-ap-southeast-1.aliyuncs.com/admin/theme/77798606438-admin/theme/3298507943-xhmp_a_colorful_graphic_car_with_an_abstract_designsolid_color_c348f443-b784-4c95-951f-db3e416972c8_pixian_ai.png?x-oss-process=image/resize,m_fill,h_600,w_600,color_FFFFFF/format,webp',
-
-  }
-]
-
-interface Item {
-  id: any;
-  imgUrl: string;
-}
 
 function CustomDesignScreen() {
 
   // ---------------UseState Variable---------------//
   const [selectedPartOfCloth, setSelectedPartOfCloth] = useState<PartOfCloth>(partOfClothData[0]);
-  const [selectedStamp, setSelectedStamp] = useState<Item>({
-    id: '',
-    imgUrl: ''
-  });
+  const [selectedStamp, setSelectedStamp] = useState<MaskItemInterface>();
   const [selectedItem, setSelectedItem] = useState<string>('LOGO_PART');
   const [file, setFile] = useState('');
   const [activeEditorTab, setActiveEditorTab] = useState<string>('');
@@ -153,13 +60,13 @@ function CustomDesignScreen() {
   const [isEditorMode, setIsEditorMode] = useState<boolean>(true);
   const [isCollectionTab, setIsColectionTab] = useState<boolean>(false);
   const [toolSelected, setToolSelected] = useState<string>('stampsItem');
-  const [collection, setCollection] = useState<Item[]>([]);
+  const [collection, setCollection] = useState<MaskItemInterface[]>([]);
   const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
   const [isOpenProductDialog, setIsOpenProductDialog] = useState<boolean>(false);
   const [typeOfModel, setTypeOfModel] = useState<string>('shirtModel');
-
-
-
+  const [currentItemList, setCurrentItemList] = useState<MaskItemInterface[]>();
+  const [isCurrentItemListLoading, setIsCurrentItemListLoading] = useState<boolean>(true);
+  const [isModelLoading, setIsModelLoading] = useState<boolean>(false);
 
 
 
@@ -175,7 +82,9 @@ function CustomDesignScreen() {
       const savedCollection = JSON.parse(getItemFromStorage);
       setCollection(savedCollection);
     }
-    // localStorage.getItem('collection');
+
+    __handleFetchSystemItemData();
+
 
   }, []);
 
@@ -208,13 +117,35 @@ function CustomDesignScreen() {
 
   useEffect(() => {
     console.log('typeOfModel choose: ', typeOfModel);
-  }, [typeOfModel])
+  }, [typeOfModel]);
+
+  // useEffect(() => {
+  //   __handleFetchSystemItemData();
+  // }, []);
 
   // Save collection to local storage whenever it changes
   // useEffect(() => {
   //   localStorage.setItem('collection', JSON.stringify(collection));
   // }, [collection]);
   // ---------------FunctionHandler---------------//
+
+  const __handleFetchSystemItemData = async () => {
+    setIsCurrentItemListLoading(true);
+    try {
+      // const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.design.systemItem}`);
+      const response = await api.get(`https://665dc0c3e88051d604081de3.mockapi.io/api/v1/stamps`);
+
+      if (response) {
+        console.log('response: ', response[0]);
+        setCurrentItemList(response);
+        setIsCurrentItemListLoading(false);
+      }
+    } catch (error) {
+      console.error('Error checking verification status:', error);
+      setIsCurrentItemListLoading(false);
+
+    }
+  }
 
   const __handleLanguageChange = (language: string) => {
     setSelectedLanguage(language);
@@ -246,9 +177,7 @@ function CustomDesignScreen() {
   type DecalTypeKey = keyof typeof DecalTypes;
 
   // Now you can use DecalTypeKey as the type for the `type` parameter
-  const __handleDecals = (type: DecalTypeKey, result: any) => {
-    console.log('result: ', result);
-    const decalType = DecalTypes[type];
+  const __handleDecals = (result: any) => {
 
     if (selectedItem === LOGO_PART) {
       state.imageLogoUrl = result;
@@ -284,7 +213,7 @@ function CustomDesignScreen() {
   const __handleReadFile = (type: any) => {
     reader(file)
       .then((result) => {
-        __handleDecals(type, result);
+        __handleDecals(result);
       })
   }
 
@@ -306,8 +235,8 @@ function CustomDesignScreen() {
     setToolSelected(selectedTool);
   }
 
-  const __handleAddToCollection = (item: Item) => {
-    if (!collection.some((collectionItem) => collectionItem.id === item.id)) {
+  const __handleAddToCollection = (item: MaskItemInterface) => {
+    if (!collection.some((collectionItem) => collectionItem.item_mask_id === item.item_mask_id)) {
       const updatedCollection = [...collection, item];
       setCollection(updatedCollection);
       localStorage.setItem('collection', JSON.stringify(updatedCollection));
@@ -315,13 +244,13 @@ function CustomDesignScreen() {
   };
 
   const __handleRemoveFromCollection = (itemId: string) => {
-    const updatedCollection = collection.filter((collectionItem) => collectionItem.id !== itemId);
+    const updatedCollection = collection.filter((collectionItem) => collectionItem.item_mask_id !== itemId);
     setCollection(updatedCollection);
     localStorage.setItem('collection', JSON.stringify(updatedCollection));
   };
 
-  const __toggleCollectionItem = (item: Item) => {
-    const itemId = item.id;
+  const __toggleCollectionItem = (item: MaskItemInterface) => {
+    const itemId = item.item_mask_id;
     if (selectedItemIds.includes(itemId)) {
       setSelectedItemIds(selectedItemIds.filter((id) => id !== itemId));
       __handleRemoveFromCollection(itemId);
@@ -331,12 +260,15 @@ function CustomDesignScreen() {
     }
   };
 
-  const __handleSetSelectedStamp = (item: Item) => {
+  const __handleSetSelectedStamp = async (item: MaskItemInterface) => {
 
     setSelectedStamp(item);
-    const result: Item | undefined = currentItem.find((itemFounded: Item) => itemFounded.id === item.id)
+    const result: MaskItemInterface | undefined = currentItemList?.find((itemFounded: MaskItemInterface) => itemFounded.item_mask_id === item.item_mask_id)
     if (result) {
-      setSelectedStamp(result.id);
+      setSelectedStamp(result);
+      const imgBase64 = await __handleChangeImageToBase64(result.image_url);
+      __handleDecals(imgBase64);
+
     }
   };
 
@@ -408,24 +340,20 @@ function CustomDesignScreen() {
 
           </div>
 
-          {selectedPartOfCloth ? (
-            <div className={`${styles.customDesign__container__editorArea__display__displayDesign} editorArea__display__displayDesign`} >
-              <ImageDraggableComponent partOfCloth={selectedPartOfCloth} selectedItem={selectedItem}></ImageDraggableComponent>
-
-            </div>
-          ) : (
-            <ImageDraggableComponent></ImageDraggableComponent>
-
+          {selectedPartOfCloth && (
+            <>
+              <div className={`${styles.customDesign__container__editorArea__display__displayDesign} editorArea__display__displayDesign`} >
+                <ImageDraggableComponent partOfCloth={selectedPartOfCloth} selectedItem={selectedItem}></ImageDraggableComponent>
+              </div>
+            </>
           )}
         </div>
 
-        {/* Iteam selector area */}
+        {/* Item selector area */}
         <div className={styles.customDesign__container__editorArea__itemSelector}>
 
           {/* Button group of item selected */}
           <div className={styles.customDesign__container__editorArea__itemSelector__buttonGroup}>
-
-
             <button
               className={` py-2 px-4 rounded inline-flex items-center ${styles.customDesign__container__editorArea__itemSelector__buttonGroup__editorModelBtn} `}
               onClick={() => __handleSelectEditorMode(false)}
@@ -443,7 +371,6 @@ function CustomDesignScreen() {
               <FaTshirt size={20} style={{ marginRight: 5, backgroundColor: 'transparent', border: 'none' }} className={styles.downloadIcon}></FaTshirt>
               <span>{t(codeLanguage + '000108')}</span>
             </button>
-
           </div>
 
           {/* Display item selector */}
@@ -470,7 +397,6 @@ function CustomDesignScreen() {
                   className=" rounded inline-flex items-center"
                   onClick={() => __handleSelectToolDesign('filePicker')}
                   style={toolSelected === 'filePicker' ? { backgroundColor: whiteColor, borderRadius: 0 } : {}}
-
                 >
                   <FaFileCode color={toolSelected === 'filePicker' ? primaryColor : blackColor} size={25} className={`${styles.menuEditor__icon}`}></FaFileCode>
                 </button>
@@ -479,7 +405,6 @@ function CustomDesignScreen() {
                   className=" rounded inline-flex items-center"
                   onClick={() => __handleSelectToolDesign('downloadTool')}
                   style={toolSelected === 'downloadTool' ? { backgroundColor: whiteColor, borderRadius: 0 } : {}}
-
                 >
                   <IoText color={toolSelected === 'downloadTool' ? primaryColor : blackColor} size={25} className={`${styles.menuEditor__icon}`}></IoText>
                 </button>
@@ -532,37 +457,53 @@ function CustomDesignScreen() {
                   {/* Sample Item list area */}
                   {!isCollectionTab ? (
                     <div className={styles.customDesign__container__editorArea__itemSelector__itemGroup__sampleItemList}>
-                      {currentItem.map((item: any, key) => (
+                      {currentItemList ? currentItemList.map((item: MaskItemInterface, key) => (
                         <div
-                          key={item.id}
-                          style={selectedStamp === item.id ? { border: `2px solid ${primaryColor}` } : {}}
+                          key={item.item_mask_id}
+                          style={selectedStamp?.item_mask_id === item.item_mask_id ? { border: `2px solid ${primaryColor}` } : {}}
                           className={styles.sampleItemCard}
-
                         >
-                          <img src={item.imgUrl} style={{ width: '90%', height: '90%' }} alt="Item" onClick={() => __handleSetSelectedStamp(item)} />
+                          {/* <img src='https://img.freepik.com/free-vector/spring-flower-collection_23-2148844218.jpg?t=st=1717421364~exp=1717424964~hmac=02f845451c8c3419d99367bfcaf97e3cb4096fd549cd76045b0c7b09eff61e07&w=740' style={{ width: '100%', height: '100%', borderRadius: 8 }} alt='Item' onClick={() => __handleSetSelectedStamp(item)} /> */}
+                          <img src={item.image_url} style={{ width: '90%', height: '90%', borderRadius: 8 }} onClick={() => __handleSetSelectedStamp(item)} />
                           <button onClick={() => __toggleCollectionItem(item)}>
-                            {collection.some((collectionItem: any) => collectionItem.id === item.id) ? (
+                            {collection.some((collectionItem: MaskItemInterface) => collectionItem.item_mask_id === item.item_mask_id) ? (
                               <FaHeart color='red' size={20} className={styles.sampleItemCard__icon} />
                             ) : (
                               <FaRegHeart size={20} className={styles.sampleItemCard__icon} />
                             )}
                           </button>
                         </div>
-                      ))}
+                      )) : (
+                        <>
+                          {Array.from({ length: 10 }).map((_, index) => (
+                            <div
+                              key={index}
+                              className={styles.sampleItemCard}
+                            >
+                              <Skeleton
+                                key={index}
+                                variant="rectangular"
+                                width={'100%'}
+                                height={'100%'}
+                              />
+                            </div>
+                          ))}
+                        </>
+                      )}
                     </div>
                   )
                     : (
                       <div className={`${styles.customDesign__container__editorArea__itemSelector__itemGroup__sampleCollectionList} pl-2.5`}>
-                        {collection.map((item: any) => (
+                        {collection.map((item: MaskItemInterface) => (
                           <div
-                            key={item.id}
-                            style={selectedStamp === item.id ? { border: `2px solid ${primaryColor}` } : {}}
+                            key={item.item_mask_id}
+                            style={selectedStamp?.item_mask_id === item.item_mask_id ? { border: `2px solid ${primaryColor}` } : {}}
                             className={`${styles.sampleItemCard}`}
                             onClick={() => __handleSetSelectedStamp(item)}
                           >
-                            <img src={item.imgUrl} style={{ width: '90%', height: '90%' }} onClick={() => __handleSetSelectedStamp(item)}></img>
+                            <img src={item.image_url} style={{ width: '90%', height: '90%', borderRadius: 8 }} onClick={() => __handleSetSelectedStamp(item)}></img>
                             <button onClick={() => __toggleCollectionItem(item)}>
-                              {collection.some((collectionItem: any) => collectionItem.id === item.id) ? (
+                              {collection.some((collectionItem: MaskItemInterface) => collectionItem.item_mask_id === item.item_mask_id) ? (
                                 <FaHeart color='red' size={20} className={styles.sampleItemCard__icon} />
                               ) : (
                                 <FaRegHeart size={20} className={styles.sampleItemCard__icon} />
@@ -632,7 +573,7 @@ function CustomDesignScreen() {
 
                   {/* Sample Item list area */}
 
-                  <div className={styles.customDesign__container__editorArea__itemSelector__itemGroup__modelProductList}>
+                  {/* <div className={styles.customDesign__container__editorArea__itemSelector__itemGroup__modelProductList}>
                     {currentItem.map((item: any, key) => (
                       <div
                         key={item.id}
@@ -641,7 +582,7 @@ function CustomDesignScreen() {
                         <ProductCardDesignComponent></ProductCardDesignComponent>
                       </div>
                     ))}
-                  </div>
+                  </div> */}
 
 
 
@@ -661,7 +602,7 @@ function CustomDesignScreen() {
         <CanvasModel typeOfModel={typeOfModel} />
       </main>
       <ImageEditor />
-    </div>
+    </div >
   )
 }
 

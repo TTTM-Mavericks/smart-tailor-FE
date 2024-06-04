@@ -236,7 +236,7 @@ const ImageDraggableComponent: React.FC<props> = ({ partOfCloth, selectedItem })
                                     defaultSize={{ width: 230, height: 230 }}
                                     handleWrapperStyle={{ pointerEvents: 'auto' }}
                                     className={`${styles.resizeable__element}`}
-                                    grid={[25,25]}
+                                    grid={[25, 25]}
                                 >
                                     <div className={`${styles.resizeable__element__resizeIcon__icon1}`} ></div>
                                     <div className={`${styles.resizeable__element__resizeIcon__icon2}`} ></div>
@@ -249,6 +249,47 @@ const ImageDraggableComponent: React.FC<props> = ({ partOfCloth, selectedItem })
                                 </Resizable>
                             </Draggable>
                         )}
+                        {/* {imgBase64 && (
+
+                            <Draggable
+                                // bounds={{ top: -100, left: -100, right: 100, bottom: 100 }}
+                                // ref={draggableRef} // Set draggableRef as the ref
+                                // bounds='parent'
+                                position={position}
+                                onDrag={_handleOnDrag}
+                                onStop={_handleDragStop}
+                                onStart={_handleDragStart}
+                                disabled={resizing ? true : false}
+                                defaultClassNameDragged={`${styles.imageDraggable__resizeable} imageDraggable__resizeable`}
+
+                            >
+                                <Resizable
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        border: "solid 1px #ddd",
+                                        background: "#f0f0f0"
+                                    }}
+                                    onResizeStart={__handleResizeStart}
+                                    onResize={__handleOnResize}
+                                    onResizeStop={__handleResizeEnd}
+                                    defaultSize={{ width: 230, height: 230 }}
+                                    handleWrapperStyle={{ pointerEvents: 'auto' }}
+                                    className={`${styles.resizeable__element}`}
+                                    grid={[25, 25]}
+                                >
+                                    <div className={`${styles.resizeable__element__resizeIcon__icon1}`} ></div>
+                                    <div className={`${styles.resizeable__element__resizeIcon__icon2}`} ></div>
+                                    <div className={`${styles.resizeable__element__resizeIcon__icon3}`} ></div>
+                                    <div className={`${styles.resizeable__element__resizeIcon__icon4}`} ></div>
+                                    <div className={`${styles.resizeable__element__resizeIcon__icon5}`} ></div>
+                                    <div className={`${styles.resizeable__element__resizeIcon__icon6}`} ></div>
+
+                                    {imgBase64Memoized}
+                                </Resizable>
+                            </Draggable>
+                        )} */}
 
                     </div>
 
