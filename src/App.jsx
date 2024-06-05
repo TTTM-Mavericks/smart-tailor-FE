@@ -44,7 +44,8 @@ import {
 import {
   DashboardBrandManageNotification,
   DashboardBrandProfileScreens,
-  DashboardBrandScreens
+  DashboardBrandScreens,
+  DashboardManageMaterialScreen
 } from './pages/BrandManagement';
 
 import Screen404 from './pages/Error/Screen404';
@@ -135,6 +136,7 @@ function App() {
           <Route path='/brand' element={<DashboardBrandScreens></DashboardBrandScreens>} />
           <Route path="/brand_manage_notification" element={<DashboardBrandManageNotification></DashboardBrandManageNotification>} />
           <Route path='/brand_profile' element={<DashboardBrandProfileScreens></DashboardBrandProfileScreens>} />
+          <Route path='/manage_material' element={<DashboardManageMaterialScreen></DashboardManageMaterialScreen>} />
 
           {/* Detail Product Route */}
           <Route path='/detail_product' element={<ProductDetailScreens></ProductDetailScreens>} />

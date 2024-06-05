@@ -212,6 +212,14 @@ const SideBarBrandComponent = () => {
                             setSelected={setSelected}
                         />
                         <Item
+                            // title={t(codeLanguage + '000023')}
+                            title="Manage Material"
+                            to="/manage_material"
+                            icon={<PersonOutlinedIcon />}
+                            selected={selected}
+                            setSelected={setSelected}
+                        />
+                        <Item
                             // title={t(codeLanguage + '000021')}
                             title="Profile"
                             to="/brand_profile"
