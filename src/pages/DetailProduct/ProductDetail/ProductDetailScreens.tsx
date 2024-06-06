@@ -4,6 +4,7 @@ import FooterComponent from '../../../components/Footer/FooterComponent';
 import { Rating } from '@mui/material';
 import { motion, useInView } from 'framer-motion';
 import ReviewProductComponent from '../ReviewProduct/ReviewProductScreen';
+import { useParams } from 'react-router-dom';
 
 const ProductDetailScreens = () => {
 
@@ -16,7 +17,7 @@ const ProductDetailScreens = () => {
 
     // ---------------Usable Variable---------------//
     const maxQuantity = 16;
-
+    const { id } = useParams();
     const isTitleVisible = useInView(titleRef, { once: true });
     const isTeamVisible = useInView(teamRef, { once: true });
 

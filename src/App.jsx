@@ -50,6 +50,7 @@ import {
 
 import Screen404 from './pages/Error/Screen404';
 import { ProductDetailScreens } from './pages/DetailProduct';
+import { FilterProductScreen } from './pages/FilterProduct';
 
 
 const tokenIsValid = (token) => {
@@ -139,7 +140,8 @@ function App() {
           <Route path='/manage_material' element={<DashboardManageMaterialScreen></DashboardManageMaterialScreen>} />
 
           {/* Detail Product Route */}
-          <Route path='/detail_product' element={<ProductDetailScreens></ProductDetailScreens>} />
+          <Route path='/detail_product/:id' element={<ProductDetailScreens></ProductDetailScreens>} />
+          <Route path='/product' element={<FilterProductScreen></FilterProductScreen>} />
 
           <Route path='*' element={<Screen404 />} />
         </Routes>

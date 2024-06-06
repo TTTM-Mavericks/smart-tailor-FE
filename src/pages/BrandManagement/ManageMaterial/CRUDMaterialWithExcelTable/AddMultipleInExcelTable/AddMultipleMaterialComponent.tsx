@@ -73,24 +73,24 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                         // Tạo mảng để lưu dữ liệu trùng lặp
                         const duplicateData: ExcelData[] = [];
 
-                        // Filter out duplicates based on name, phone, and email
-                        const uniqueData = jsonData.filter((item, index, self) => {
-                            const isDuplicate = self.findIndex((t) => (
-                                t.category_name === item.category_name && t.material_name === item.material_name && t.price === item.price && t.unit === item.unit
-                            )) !== index;
+                        // Filter out duplicates
+                        // const uniqueData = jsonData.filter((item, index, self) => {
+                        //     const isDuplicate = self.findIndex((t) => (
+                        //         t.category_name === item.category_name && t.material_name === item.material_name && t.price === item.price && t.unit === item.unit
+                        //     )) !== index;
 
-                            // Nếu mục dữ liệu là trùng lặp, thêm vào mảng dữ liệu trùng lặp
-                            if (isDuplicate) {
-                                duplicateData.push(item);
-                            }
+                        //     // Nếu mục dữ liệu là trùng lặp, thêm vào mảng dữ liệu trùng lặp
+                        //     if (isDuplicate) {
+                        //         duplicateData.push(item);
+                        //     }
 
-                            return !isDuplicate;
-                        });
+                        //     return !isDuplicate;
+                        // });
 
                         // Update error property for duplicate entries
                         const updatedData = jsonData.map(item => {
-                            const isDuplicate = duplicateData.some(d => d.category_name === item.category_name && d.material_name === item.material_name && d.price === item.price && d.unit === item.unit);
-                            const hasNullName = !item.category_name;
+                            const isDuplicate = duplicateData.some(d => d.material_name === item.material_name);
+                            const hasNullName = !item.material_name;
                             return { ...item, error: isDuplicate || hasNullName };
                         });
 
@@ -122,31 +122,32 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
         }
     };
 
+
     // Check Dupplicate
     const checkForDuplicates = (apiData: ExcelData[], excelData: ExcelData[]): DuplicateCheckResponse => {
-        const categoryNameSet = new Set();
+        // const categoryNameSet = new Set();
         const materialNameSet = new Set();
-        const priceSet = new Set();
-        const unitSet = new Set();
+        // const priceSet = new Set();
+        // const unitSet = new Set();
         const duplicates: ExcelData[] = [];
 
         // Loop through API data to populate sets for each field
         apiData.forEach(item => {
-            categoryNameSet.add(item.category_name);
+            // categoryNameSet.add(item.category_name);
             materialNameSet.add(item.material_name);
-            priceSet.add(item.price);
-            unitSet.add(item.unit);
+            // priceSet.add(item.price);
+            // unitSet.add(item.unit);
         });
 
         // Loop through Excel data to check for duplicates in each field
         excelData.forEach(item => {
-            // Check for duplicates in category name
-            if (categoryNameSet.has(item.category_name)) {
-                duplicates.push(item);
-                return;
-            } else {
-                categoryNameSet.add(item.category_name);
-            }
+            // // Check for duplicates in category name
+            // if (categoryNameSet.has(item.category_name)) {
+            //     duplicates.push(item);
+            //     return;
+            // } else {
+            //     categoryNameSet.add(item.category_name);
+            // }
 
             // Check for duplicates in material name
             if (materialNameSet.has(item.material_name)) {
@@ -156,21 +157,21 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                 materialNameSet.add(item.material_name);
             }
 
-            // Check for duplicates in price
-            if (priceSet.has(item.price)) {
-                duplicates.push(item);
-                return;
-            } else {
-                priceSet.add(item.price);
-            }
+            // // Check for duplicates in price
+            // if (priceSet.has(item.price)) {
+            //     duplicates.push(item);
+            //     return;
+            // } else {
+            //     priceSet.add(item.price);
+            // }
 
-            // Check for duplicates in unit
-            if (unitSet.has(item.unit)) {
-                duplicates.push(item);
-                return;
-            } else {
-                unitSet.add(item.unit);
-            }
+            // // Check for duplicates in unit
+            // if (unitSet.has(item.unit)) {
+            //     duplicates.push(item);
+            //     return;
+            // } else {
+            //     unitSet.add(item.unit);
+            // }
         });
 
         return { hasDuplicates: duplicates.length > 0, duplicates };
@@ -178,7 +179,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
 
 
     const _handleConfirm = async () => {
-        const uniqueCols = ['category_name', 'material_name', 'price', 'unit'];
+        const uniqueCols = ['material_name'];
 
         // Check for missing information or duplicate data
         const hasNullValues = excelData.some(data =>
@@ -305,7 +306,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
         // Get the range of the worksheet
         const range = XLSX.utils.decode_range(ws['!ref'] || "A1:A1");
 
-        const uniqueCols = ['category_name', 'material_name', 'price', 'unit'];
+        const uniqueCols = ['material_name'];
 
         // Iterate through the range and apply style to error cells
         for (let row = range.s.r; row <= range.e.r; row++) {
@@ -531,19 +532,19 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                                         <td style={{ border: '1px solid #ddd', padding: '8px' }}>
                                             {(() => {
                                                 const hasNullValues = Object.values(data).some(value => value === null || value === '');
-                                                const isCategoryNameDuplicate = excelData.some((item, i) => i !== index && item.category_name === data.category_name);
+                                                // const isCategoryNameDuplicate = excelData.some((item, i) => i !== index && item.category_name === data.category_name);
                                                 const isMaterialNameDuplicate = excelData.some((item, i) => i !== index && item.material_name === data.material_name);
-                                                const isPriceDuplicate = excelData.some((item, i) => i !== index && item.price === data.price);
-                                                const isUnitDuplicate = excelData.some((item, i) => i !== index && item.unit === data.unit);
+                                                // const isPriceDuplicate = excelData.some((item, i) => i !== index && item.price === data.price);
+                                                // const isUnitDuplicate = excelData.some((item, i) => i !== index && item.unit === data.unit);
 
 
-                                                if (hasNullValues || isCategoryNameDuplicate || isMaterialNameDuplicate || isPriceDuplicate || isUnitDuplicate) {
+                                                if (hasNullValues || isMaterialNameDuplicate) {
                                                     const errorMessage = [];
                                                     if (hasNullValues) errorMessage.push('Null Values');
-                                                    if (isCategoryNameDuplicate) errorMessage.push('Duplicate Category Name');
+                                                    // if (isCategoryNameDuplicate) errorMessage.push('Duplicate Category Name');
                                                     if (isMaterialNameDuplicate) errorMessage.push('Duplicate Material Phone');
-                                                    if (isPriceDuplicate) errorMessage.push('Duplicate Price Email');
-                                                    if (isUnitDuplicate) errorMessage.push('Duplicate Unit Email');
+                                                    // if (isPriceDuplicate) errorMessage.push('Duplicate Price Email');
+                                                    // if (isUnitDuplicate) errorMessage.push('Duplicate Unit Email');
 
                                                     return (
                                                         <div style={{ color: 'red' }}>
