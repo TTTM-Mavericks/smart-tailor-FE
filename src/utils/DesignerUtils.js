@@ -64,4 +64,11 @@ const __handleChangeImageToBase64 = async (imageUrl) => {
   }
 };
 
-export { __downloadCanvasToImage, reader, __urlToBase64, __handleChangeImageToBase64 };
+const __handleGenerateItemId = () => {
+  // Generate a random alphanumeric string as the item_mask_id
+  const randomString = Math.random().toString(36).substring(7);
+  return `item_${randomString}`;
+};
+
+
+export { __downloadCanvasToImage, reader, __urlToBase64, __handleChangeImageToBase64, __handleGenerateItemId };

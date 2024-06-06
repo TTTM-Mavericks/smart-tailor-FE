@@ -13,14 +13,15 @@ import React, { useEffect } from 'react';
 
 
 
-const CanvasModel = ({ typeOfModel }) => {
+const CanvasModel = ({ typeOfModel, modelData }) => {
 
     // ---------------UseState Variable---------------//
 
     // ---------------Usable Variable---------------//
     useEffect(() => {
         console.log('typeOfModel: ', typeOfModel);
-    }, [typeOfModel])
+    }, [typeOfModel]);
+
     // ---------------UseEffect---------------//
     // ---------------FunctionHandler---------------//
 
@@ -37,7 +38,7 @@ const CanvasModel = ({ typeOfModel }) => {
                     <ambientLight intensity={0.5} />
                     <Environment preset="city" />
                     <PresentationControls speed={1.5} global zoom={0.7} polar={[-1, Math.PI / 2]}>
-                        <Shirt />
+                        <Shirt modelData={modelData} />
                     </PresentationControls>
                 </Canvas>
             )}

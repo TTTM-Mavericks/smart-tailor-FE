@@ -14,10 +14,10 @@ const state = proxy({
   fullDecal: './threejs.png',
   
   isFrontClothTexture: false,
-  frontClothDecal: './threejs.png',
+  frontClothDecal: [],
   frontDecalPositionX: 0,
   frontDecalPositionY: 0,
-  imageFrontClothUrl: undefined,
+  imageFrontClothUrl: [],
   
   isBackClothTexture: false,
   backClothDecal: './threejs.png',

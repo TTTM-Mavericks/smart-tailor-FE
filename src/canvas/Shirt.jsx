@@ -1,12 +1,13 @@
 import { easing } from "maath";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useLoader } from "@react-three/fiber";
 import { useGLTF, Decal, useTexture } from "@react-three/drei";
 import { useSnapshot } from "valtio";
 import state from '../store'
 import { useEffect, useState } from "react";
+import { TextureLoader } from "three";
 
 
-const Shirt = () => {
+const Shirt = ({ modelData }) => {
 
     const [logoDecalPositionX, setLogoDecalPositionX] = useState(0);
     const [logoDecalPositionY, setLogoDecalPositionY] = useState(0);
@@ -19,6 +20,9 @@ const Shirt = () => {
 
     const [sleeveDecalPositionX, setSleeveDecalPositionX] = useState(0);
     const [sleeveDecalPositionY, setSleeveDecalPositionY] = useState(0);
+    const [position, setPosition] = useState([0, 0, 0]);
+
+    const [textureUrl, setTextureUrl] = useState();
 
     const snap = useSnapshot(state)
 
@@ -27,11 +31,38 @@ const Shirt = () => {
 
     const logoTexture = useTexture(snap.logoDecal);
     const fullTexture = useTexture(snap.fullDecal);
-    const frontTexture = useTexture(snap.frontClothDecal);
     const backTexture = useTexture(snap.backClothDecal);
     const sleeveTexture = useTexture(snap.sleeveClothDecal);
+    
+    const [frontTexture, setFrontTexture] = useState(null);
+  
+    useEffect(() => {
+      if (modelData.length > 0 && modelData[0].item_mask.length > 0) {
+        const front = modelData[0].item_mask[0].image_url;
+        console.log('modelData[0].item_mask[0]: ', modelData[0]);
+        setTextureUrl(front);
+      }
+    }, [modelData]);
 
-
+    useEffect(() => {
+        // Example: Update position based on modelData
+        if (modelData.length > 0 && modelData[0].item_mask.length > 0) {
+          const newPosition = [modelData[0].item_mask[0].position['1'].x, modelData[0].item_mask[0].position['1'].y, 0];
+          console.log('newPosition: ', newPosition); // Replace with actual position data from modelData
+          setPosition(newPosition);
+        }
+      }, [modelData]);
+  
+    useEffect(() => {
+      if (textureUrl) {
+        const loadTexture = async () => {
+          const texture = await new TextureLoader().loadAsync(textureUrl);
+          setFrontTexture(texture);
+          console.log('frontTexture: ', texture);
+        };
+        loadTexture();
+      }
+    }, [textureUrl]);
 
     useEffect(() => {
         if (snap.isLogoTexture) {
@@ -188,22 +219,24 @@ const Shirt = () => {
                     />
                 )}
 
-                {snap.isLogoTexture && (
+                {/* {snap.isLogoTexture && ( */}
                     <Decal
                         // position={[logoDecalPositionX ? logoDecalPositionX : 0, logoDecalPositionY ? logoDecalPositionY : 0, 0.15]}
                         position={[0, 0.04, 0.15]}
 
                         rotation={[0, 0, 0]}
                         scale={0.1}
-                        map={logoTexture}
+                        map={frontTexture}
                         depthTest={false}
                         depthWrite={true}
                     />
-                )}
+                {/* )} */}
+
+                {frontTexture && <meshBasicMaterial map={frontTexture} />}
 
 
-                {snap.isFrontClothTexture && (
-                    <Decal
+                {/* {snap.isFrontClothTexture && ( */}
+                    {/* <Decal
                         position={[frontDecalPositionX ? frontDecalPositionX : 0, frontDecalPositionY ? frontDecalPositionY : 0, 0.15]}
                         // position={[0, 0.04, 0.15]}
 
@@ -212,8 +245,8 @@ const Shirt = () => {
                         map={frontTexture}
                         depthTest={false}
                         depthWrite={true}
-                    />
-                )}
+                    /> */}
+                {/* )} */}
 
                 {snap.isBackClothTexture && (
                     <Decal

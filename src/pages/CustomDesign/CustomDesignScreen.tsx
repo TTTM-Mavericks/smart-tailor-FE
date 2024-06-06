@@ -1,17 +1,13 @@
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import CanvasModel from '../../canvas/CanvasModel'
 import Designer from './Designer/Designer'
 import ImageEditor from './Designer/ImageEditor'
 import styles from './CustomDesign.module.scss';
 import ImageDraggableComponent from './Components/Draggable/ImageDraggableComponent';
-import { BACK_CLOTH_PART, FRONT_CLOTH_PART, LOGO_PART, PartOfCloth, SLEEVE_CLOTH_PART } from '../../models/ClothModel';
-import { __downloadCanvasToImage, __handleChangeImageToBase64, __urlToBase64, reader } from '../../utils/DesignerUtils';
-import { DecalTypes } from '../../config/TabSetting';
-import state from '../../store';
+import { __downloadCanvasToImage, __handleChangeImageToBase64, __handleGenerateItemId, reader } from '../../utils/DesignerUtils';
 import { ColorPicker, FilePicker } from '../../components';
 import { frontOfCloth, shirtModel, systemLogo } from '../../assets';
-
 import { HiOutlineDownload, HiShoppingCart, HiOutlineLogin } from 'react-icons/hi';
 import { FaSave, FaTshirt, FaPen, FaIcons, FaRegHeart, FaFileCode, FaHeart } from "react-icons/fa";
 import { useTranslation } from 'react-i18next';
@@ -19,39 +15,22 @@ import { blackColor, primaryColor, whiteColor } from '../../root/ColorSystem';
 import { IoMdColorPalette } from "react-icons/io";
 import { IoText } from "react-icons/io5";
 import { GiClothes } from "react-icons/gi";
+import { IoMdUndo, IoMdRedo } from "react-icons/io";
 import { TbHomeHeart } from "react-icons/tb";
 import ProductDialogComponent from './Components/Dialog/ProductDialogComponent';
 import api from '../../api/ApiConfig';
-import { MaskItemInterface } from '../../models/DesignModel';
+import { DesignInterface, ItemMaskInterface, PartOfDesignInterface, PartOfShirtDesignData } from '../../models/DesignModel';
 import { Skeleton } from '@mui/material';
 
 
 
-const partOfClothData = [
-  {
-    partValue: LOGO_PART,
-    imgUrl: frontOfCloth
-  },
-  {
-    partValue: FRONT_CLOTH_PART,
-    imgUrl: frontOfCloth
-  },
-  {
-    partValue: BACK_CLOTH_PART,
-    imgUrl: frontOfCloth
-  },
-  {
-    partValue: SLEEVE_CLOTH_PART,
-    imgUrl: frontOfCloth
-  }
-];
-
-
 function CustomDesignScreen() {
+  // TODO MUTIL LANGUAGE
 
   // ---------------UseState Variable---------------//
-  const [selectedPartOfCloth, setSelectedPartOfCloth] = useState<PartOfCloth>(partOfClothData[0]);
-  const [selectedStamp, setSelectedStamp] = useState<MaskItemInterface>();
+  const [selectedPartOfCloth, setSelectedPartOfCloth] = useState<PartOfDesignInterface>(PartOfShirtDesignData[0]);
+  const [partOfClothData, setPartOfClothData] = useState<PartOfDesignInterface[]>();
+  const [selectedStamp, setSelectedStamp] = useState<ItemMaskInterface[]>();
   const [selectedItem, setSelectedItem] = useState<string>('LOGO_PART');
   const [file, setFile] = useState('');
   const [activeEditorTab, setActiveEditorTab] = useState<string>('');
@@ -60,30 +39,49 @@ function CustomDesignScreen() {
   const [isEditorMode, setIsEditorMode] = useState<boolean>(true);
   const [isCollectionTab, setIsColectionTab] = useState<boolean>(false);
   const [toolSelected, setToolSelected] = useState<string>('stampsItem');
-  const [collection, setCollection] = useState<MaskItemInterface[]>([]);
+  const [collection, setCollection] = useState<ItemMaskInterface[]>([]);
   const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
   const [isOpenProductDialog, setIsOpenProductDialog] = useState<boolean>(false);
   const [typeOfModel, setTypeOfModel] = useState<string>('shirtModel');
-  const [currentItemList, setCurrentItemList] = useState<MaskItemInterface[]>();
+  const [currentItemList, setCurrentItemList] = useState<ItemMaskInterface[]>();
   const [isCurrentItemListLoading, setIsCurrentItemListLoading] = useState<boolean>(true);
   const [isModelLoading, setIsModelLoading] = useState<boolean>(false);
+  const [designModelData, setDesignModelData] = useState<DesignInterface>();
+  const [partOfDesignModelData, setPartOfDesignModelData] = useState<PartOfDesignInterface[]>([]);
+  const [itemMaskDesignModelData, setItemMaskDesignModelData] = useState<ItemMaskInterface[]>([]);
+  const [imgBase64Array, setImgBase64Array] = useState<[]>([]);
+  const [itemPositions, setItemPositions] = useState<{ [key: string]: { x: number; y: number } }>({});
+  const [itemZIndices, setItemZIndices] = useState<{ [key: string]: number }>({});
+  const [highestZIndex, setHighestZIndex] = useState<number>(1);
+  const [undoStack, setUndoStack] = useState<any[]>([]);
+  const [redoStack, setRedoStack] = useState<any[]>([]);
+  const [itemMaskData, setItemMaskData] = useState<ItemMaskInterface[]>([]);
+  const [newPartOfDesignData, setNewPartOfDeignData] = useState<PartOfDesignInterface[]>();
+  const [updatePartData, setUpdatePartData] = useState<any>(null); // Replace `any` with the appropriate type
+
 
 
 
 
   // ---------------Usable Variable---------------//
   const { t, i18n } = useTranslation();
+
+  const handleUpdatePart = useCallback((updatePart: any) => { // Replace `any` with the appropriate type
+    console.log('Received updatePart from child: ', updatePart);
+    setUpdatePartData(updatePart);
+    setPartOfClothData(updatePart);
+  }, []);
   // ---------------UseEffect---------------//
 
   useEffect(() => {
     const getItemFromStorage = localStorage.getItem('collection')
     if (getItemFromStorage) {
-      console.log('getItemFromStorage: ', getItemFromStorage);
       const savedCollection = JSON.parse(getItemFromStorage);
       setCollection(savedCollection);
     }
 
     __handleFetchSystemItemData();
+    __handleFetchDesignModelData();
 
 
   }, []);
@@ -103,7 +101,14 @@ function CustomDesignScreen() {
   }, [selectedLanguage]);
 
   useEffect(() => {
-    setSelectedPartOfCloth(selectedPartOfCloth)
+    console.log('selectedPartOfCloth: ', partOfClothData);
+    setSelectedPartOfCloth(selectedPartOfCloth);
+    const result = partOfClothData?.find((item: PartOfDesignInterface) => item.part_name === selectedPartOfCloth.part_name);
+    if (result) {
+      console.log('result.item_mask: ', result.item_mask);
+      setSelectedStamp(result.item_mask)
+    }
+
   }, [selectedPartOfCloth]);
 
   useEffect(() => {
@@ -111,24 +116,110 @@ function CustomDesignScreen() {
   }, [selectedItem]);
 
   useEffect(() => {
-    console.log('activeEditorTab: ', activeEditorTab);
-  }, [activeEditorTab]);
-
+    setPartOfClothData(partOfClothData);
+  }, [partOfClothData])
 
   useEffect(() => {
-    console.log('typeOfModel choose: ', typeOfModel);
+    if (typeOfModel === 'shirtModel') {
+      setPartOfClothData(PartOfShirtDesignData);
+      setSelectedPartOfCloth(PartOfShirtDesignData[0]);
+    }
   }, [typeOfModel]);
 
-  // useEffect(() => {
-  //   __handleFetchSystemItemData();
-  // }, []);
+  useEffect(() => {
+    if (selectedStamp) {
+      const result = partOfClothData?.filter((item: PartOfDesignInterface) => item.part_name === selectedPartOfCloth.part_name);
+      if (result) {
+        const updatedPartOfClothData = partOfClothData?.map(part =>
+          part.part_of_design_id === selectedPartOfCloth.part_of_design_id
+            ? { ...part, item_mask: selectedStamp }
+            : part
+        );
+        setPartOfClothData(updatedPartOfClothData);
+      }
+    }
+  }, [selectedStamp, selectedPartOfCloth]);
 
-  // Save collection to local storage whenever it changes
-  // useEffect(() => {
-  //   localStorage.setItem('collection', JSON.stringify(collection));
-  // }, [collection]);
   // ---------------FunctionHandler---------------//
 
+  const __handleSetNewPartOfDesignData = (items: PartOfDesignInterface[] | undefined) => {
+    setNewPartOfDeignData(items);
+  }
+
+  const __handleRemoveStamp = (itemId: string) => {
+    setSelectedStamp((prev) => prev?.filter((stamp: ItemMaskInterface) => stamp.item_mask_id !== itemId));
+  };
+
+  const __handleSaveStateToUndoStack = () => {
+    setUndoStack(prev => [
+      ...prev,
+      {
+        itemPositions: { ...itemPositions },
+        itemZIndices: { ...itemZIndices },
+        highestZIndex,
+      },
+    ]);
+    setRedoStack([]);
+  };
+
+  const __handleUndoFlow = () => {
+    if (undoStack.length > 0) {
+      const lastState = undoStack.pop()!;
+      setRedoStack(prev => [
+        ...prev,
+        {
+          itemPositions: { ...itemPositions },
+          itemZIndices: { ...itemZIndices },
+          highestZIndex,
+        },
+      ]);
+      setItemPositions(lastState.itemPositions);
+      setItemZIndices(lastState.itemZIndices);
+      setHighestZIndex(lastState.highestZIndex);
+      setUndoStack([...undoStack]);
+    }
+  };
+
+  const __handleRedoFlow = () => {
+    if (redoStack.length > 0) {
+      const lastState = redoStack.pop()!;
+      setUndoStack(prev => [
+        ...prev,
+        {
+          itemPositions: { ...itemPositions },
+          itemZIndices: { ...itemZIndices },
+          highestZIndex,
+        },
+      ]);
+      setItemPositions(lastState.itemPositions);
+      setItemZIndices(lastState.itemZIndices);
+      setHighestZIndex(lastState.highestZIndex);
+      setRedoStack([...redoStack]);
+    }
+  };
+
+  /**
+   * Handle fetch apit to get system Item data
+   */
+  const __handleFetchDesignModelData = async () => {
+    try {
+      // const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.design.systemItem}`);
+      const response = await api.get(`https://665dc0c3e88051d604081de3.mockapi.io/api/v1/design`);
+
+      if (response) {
+        setDesignModelData(response);
+        // setIsCurrentItemListLoading(false);
+      }
+    } catch (error) {
+      console.error('Error checking verification status:', error);
+      setIsCurrentItemListLoading(false);
+
+    }
+  }
+
+  /**
+   * Handle fetch apit to get system Item data
+   */
   const __handleFetchSystemItemData = async () => {
     setIsCurrentItemListLoading(true);
     try {
@@ -136,7 +227,6 @@ function CustomDesignScreen() {
       const response = await api.get(`https://665dc0c3e88051d604081de3.mockapi.io/api/v1/stamps`);
 
       if (response) {
-        console.log('response: ', response[0]);
         setCurrentItemList(response);
         setIsCurrentItemListLoading(false);
       }
@@ -164,56 +254,32 @@ function CustomDesignScreen() {
     }
   };
 
-  const __handleSetSelectedItem = (item: PartOfCloth) => {
+  const __handleSetSelectedItem = (item: PartOfDesignInterface) => {
 
     setSelectedPartOfCloth(item);
-    const result: PartOfCloth | undefined = partOfClothData.find((itemFounded: PartOfCloth) => itemFounded.partValue === item.partValue)
+    const result: PartOfDesignInterface | undefined = partOfClothData?.find((itemFounded: PartOfDesignInterface) => itemFounded.part_name === item.part_name)
     if (result) {
-      setSelectedItem(result.partValue);
+      setSelectedItem(result.part_name);
     }
   };
-
-  // Define a type for the keys of DecalTypes
-  type DecalTypeKey = keyof typeof DecalTypes;
-
-  // Now you can use DecalTypeKey as the type for the `type` parameter
-  const __handleDecals = (result: any) => {
-
-    if (selectedItem === LOGO_PART) {
-      state.imageLogoUrl = result;
-      state.isLogoTexture = true;
-      state.logoDecal = result;
-    }
-
-    if (selectedItem === FRONT_CLOTH_PART) {
-      state.imageFrontClothUrl = result;
-      state.isFrontClothTexture = true;
-      state.frontClothDecal = result
-
-    }
-
-    if (selectedItem === BACK_CLOTH_PART) {
-      state.imageBackClothUrl = result;
-      state.isBackClothTexture = true;
-      state.backClothDecal = result
-
-    }
-
-    if (selectedItem === SLEEVE_CLOTH_PART) {
-      state.imagesleeveClothUrl = result;
-      state.isSleeveClothTexture = true;
-      state.sleeveClothDecal = result
-
-    }
-
-
-  }
 
 
   const __handleReadFile = (type: any) => {
     reader(file)
       .then((result) => {
-        __handleDecals(result);
+        setSelectedStamp((prev) => {
+          const newItem: ItemMaskInterface = {
+            item_mask_id: __handleGenerateItemId(),
+            type_of_item: 'IMAGE',
+            image_url: result,
+          };
+
+          if (prev && prev.length > 0) {
+            return [...prev, { ...prev[prev.length - 1], ...newItem }];
+          } else {
+            return [newItem];
+          }
+        });
       })
   }
 
@@ -235,7 +301,7 @@ function CustomDesignScreen() {
     setToolSelected(selectedTool);
   }
 
-  const __handleAddToCollection = (item: MaskItemInterface) => {
+  const __handleAddToCollection = (item: ItemMaskInterface) => {
     if (!collection.some((collectionItem) => collectionItem.item_mask_id === item.item_mask_id)) {
       const updatedCollection = [...collection, item];
       setCollection(updatedCollection);
@@ -249,7 +315,7 @@ function CustomDesignScreen() {
     localStorage.setItem('collection', JSON.stringify(updatedCollection));
   };
 
-  const __toggleCollectionItem = (item: MaskItemInterface) => {
+  const __toggleCollectionItem = (item: ItemMaskInterface) => {
     const itemId = item.item_mask_id;
     if (selectedItemIds.includes(itemId)) {
       setSelectedItemIds(selectedItemIds.filter((id) => id !== itemId));
@@ -260,15 +326,37 @@ function CustomDesignScreen() {
     }
   };
 
-  const __handleSetSelectedStamp = async (item: MaskItemInterface) => {
 
-    setSelectedStamp(item);
-    const result: MaskItemInterface | undefined = currentItemList?.find((itemFounded: MaskItemInterface) => itemFounded.item_mask_id === item.item_mask_id)
+  /**
+   * Add or remove selected Item from setSelectedStamp
+   * @param item 
+   */
+  const __handleSetSelectedStamp = async (item: ItemMaskInterface) => {
+    const result: ItemMaskInterface | undefined = currentItemList?.find(
+      (itemFounded: ItemMaskInterface) => itemFounded.item_mask_id === item.item_mask_id
+    );
+
     if (result) {
-      setSelectedStamp(result);
       const imgBase64 = await __handleChangeImageToBase64(result.image_url);
-      __handleDecals(imgBase64);
+      result.image_url = imgBase64; // Update the image_url with base64 string
 
+      setSelectedStamp((prevSelectedStamp = []) => {
+        const existingItemIndex = prevSelectedStamp.findIndex(
+          (existingItem) => existingItem.item_mask_id === item.item_mask_id
+        );
+
+        if (existingItemIndex > -1) {
+          // Remove existing item
+          const updatedStamps = prevSelectedStamp.filter(
+            (existingItem) => existingItem.item_mask_id !== item.item_mask_id
+          );
+          return updatedStamps;
+        } else {
+          // Add new item
+          const addItemArr = [...prevSelectedStamp, result];
+          return addItemArr;
+        }
+      });
     }
   };
 
@@ -321,11 +409,10 @@ function CustomDesignScreen() {
       <div className={styles.customDesign__container__editorArea}>
 
 
-
         {/* Part of cloth of Model */}
         <div className={styles.customDesign__container__editorArea__partOfCloth}>
-          {partOfClothData.map((item: PartOfCloth, key: any) => (
-            <div key={key} className={styles.partOfClothSellector} style={selectedItem === item.partValue ? { border: `2px solid ${primaryColor}` } : {}} onClick={() => __handleSetSelectedItem(item)}>
+          {partOfClothData?.map((item: PartOfDesignInterface, key: any) => (
+            <div key={key} className={styles.partOfClothSellector} style={selectedItem === item.part_name ? { border: `2px solid ${primaryColor}` } : {}} onClick={() => __handleSetSelectedItem(item)}>
               <img src={frontOfCloth} className={styles.partOfClothSellector__img}></img>
             </div>
           ))}
@@ -336,14 +423,45 @@ function CustomDesignScreen() {
 
           {/* Menu Bar of editor area */}
           <div className={styles.customDesign__container__editorArea__display__menuBar} >
-
-
+            <div className={styles.customDesign__container__editorArea__display__menuBar__buttonGroup}>
+              <button onClick={__handleUndoFlow}>
+                <IoMdUndo size={20} style={{ float: 'left' }} />
+                <span>
+                  Undo
+                </span>
+              </button>
+              <button onClick={__handleRedoFlow}>
+                <span>
+                  Redo
+                </span>
+                <IoMdRedo size={20} style={{ float: 'right' }} />
+              </button>
+            </div>
           </div>
 
           {selectedPartOfCloth && (
             <>
               <div className={`${styles.customDesign__container__editorArea__display__displayDesign} editorArea__display__displayDesign`} >
-                <ImageDraggableComponent partOfCloth={selectedPartOfCloth} selectedItem={selectedItem}></ImageDraggableComponent>
+                <ImageDraggableComponent
+                  partOfCloth={selectedPartOfCloth}
+                  partOfClothData={partOfClothData}
+                  itemPositions={itemPositions}
+                  setItemPositions={(positions) => {
+                    __handleSaveStateToUndoStack();
+                    setItemPositions(positions);
+                  }}
+                  itemZIndices={itemZIndices}
+                  setItemZIndices={(zIndices) => {
+                    __handleSaveStateToUndoStack();
+                    setItemZIndices(zIndices);
+                  }}
+                  highestZIndex={highestZIndex}
+                  setHighestZIndex={setHighestZIndex}
+                  onDeleteItem={__handleRemoveStamp}
+                  setNewItemData={(items) => __handleSetNewPartOfDesignData(items)}
+                  onUpdatePart={handleUpdatePart}
+                  stamps={selectedStamp}
+                ></ImageDraggableComponent>
               </div>
             </>
           )}
@@ -457,16 +575,20 @@ function CustomDesignScreen() {
                   {/* Sample Item list area */}
                   {!isCollectionTab ? (
                     <div className={styles.customDesign__container__editorArea__itemSelector__itemGroup__sampleItemList}>
-                      {currentItemList ? currentItemList.map((item: MaskItemInterface, key) => (
+                      {currentItemList ? currentItemList.map((item: ItemMaskInterface, key) => (
                         <div
                           key={item.item_mask_id}
-                          style={selectedStamp?.item_mask_id === item.item_mask_id ? { border: `2px solid ${primaryColor}` } : {}}
+                          style={
+                            selectedStamp?.some((selectedItem) => selectedItem.item_mask_id === item.item_mask_id)
+                              ? { border: `2px solid ${primaryColor}` }
+                              : {}
+                          }
                           className={styles.sampleItemCard}
+                          onClick={() => __handleSetSelectedStamp(item)}
                         >
-                          {/* <img src='https://img.freepik.com/free-vector/spring-flower-collection_23-2148844218.jpg?t=st=1717421364~exp=1717424964~hmac=02f845451c8c3419d99367bfcaf97e3cb4096fd549cd76045b0c7b09eff61e07&w=740' style={{ width: '100%', height: '100%', borderRadius: 8 }} alt='Item' onClick={() => __handleSetSelectedStamp(item)} /> */}
-                          <img src={item.image_url} style={{ width: '90%', height: '90%', borderRadius: 8 }} onClick={() => __handleSetSelectedStamp(item)} />
+                          <img src={item.image_url} style={{ width: '90%', height: '90%', borderRadius: 8 }} />
                           <button onClick={() => __toggleCollectionItem(item)}>
-                            {collection.some((collectionItem: MaskItemInterface) => collectionItem.item_mask_id === item.item_mask_id) ? (
+                            {collection.some((collectionItem: ItemMaskInterface) => collectionItem.item_mask_id === item.item_mask_id) ? (
                               <FaHeart color='red' size={20} className={styles.sampleItemCard__icon} />
                             ) : (
                               <FaRegHeart size={20} className={styles.sampleItemCard__icon} />
@@ -494,16 +616,20 @@ function CustomDesignScreen() {
                   )
                     : (
                       <div className={`${styles.customDesign__container__editorArea__itemSelector__itemGroup__sampleCollectionList} pl-2.5`}>
-                        {collection.map((item: MaskItemInterface) => (
+                        {collection.map((item: ItemMaskInterface) => (
                           <div
                             key={item.item_mask_id}
-                            style={selectedStamp?.item_mask_id === item.item_mask_id ? { border: `2px solid ${primaryColor}` } : {}}
+                            style={
+                              selectedStamp?.some((selectedItem) => selectedItem.item_mask_id === item.item_mask_id)
+                                ? { border: `2px solid ${primaryColor}` }
+                                : {}
+                            }
                             className={`${styles.sampleItemCard}`}
                             onClick={() => __handleSetSelectedStamp(item)}
                           >
-                            <img src={item.image_url} style={{ width: '90%', height: '90%', borderRadius: 8 }} onClick={() => __handleSetSelectedStamp(item)}></img>
+                            <img src={item.image_url} style={{ width: '90%', height: '90%', borderRadius: 8 }}></img>
                             <button onClick={() => __toggleCollectionItem(item)}>
-                              {collection.some((collectionItem: MaskItemInterface) => collectionItem.item_mask_id === item.item_mask_id) ? (
+                              {collection.some((collectionItem: ItemMaskInterface) => collectionItem.item_mask_id === item.item_mask_id) ? (
                                 <FaHeart color='red' size={20} className={styles.sampleItemCard__icon} />
                               ) : (
                                 <FaRegHeart size={20} className={styles.sampleItemCard__icon} />
@@ -599,7 +725,7 @@ function CustomDesignScreen() {
       </div>
       <Designer />
       <main className={styles.customDesign__container__canvas}>
-        <CanvasModel typeOfModel={typeOfModel} />
+        <CanvasModel typeOfModel={typeOfModel} modelData={partOfClothData} />
       </main>
       <ImageEditor />
     </div >

@@ -6,8 +6,7 @@
     z-index: 999;
     // width: 250px;
     // height: 300px;
-    border: 1px solid black;
-    z-index: 10;
+    // float: left;
     // pointer-events: auto;
 }
 
@@ -46,12 +45,13 @@
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 99;
-    background-color: transparent;
 
     img {
         // width: 250px;
         // height: 300px;
         pointer-events: none;
+
+
 
 
     }
@@ -124,6 +124,25 @@
             right: -2px;
         }
 
+        &__icon7 {
+            position: absolute;
+            color: black;
+            background-color: $grayColor;
+            border-radius: 90px;
+            top: -10px;
+            left: 50%;
+            transform: translate(-50%, 0);
+            opacity: 0.5;
+            pointer-events: auto;
+            cursor: pointer !important;
+            z-index: 9999;
+        }
+
+        &__icon7:hover {
+            opacity: 1;
+            color: $primaryColor;
+            cursor: pointer;
+        }
 
     }
 

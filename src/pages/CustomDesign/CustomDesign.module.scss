@@ -341,11 +341,8 @@
         }
 
         &__display {
-            // overflow-y: auto;
             float: right;
-            margin: 0 auto;
             pointer-events: none;
-
 
             &__displayDesign {
                 // position: relative;
@@ -353,7 +350,6 @@
                 height: 500px;
                 overflow: hidden;
                 pointer-events: none;
-
             }
 
             &__menuBar {
@@ -361,9 +357,40 @@
                 width: 600px;
                 height: 58px;
                 border-top: 0;
-                // transform: translate(110%, 0%);
                 margin-bottom: 20px;
+                pointer-events: auto;
+                display: flex;
+                align-items: center;
+                justify-content: left;
+            
+                &__buttonGroup {
+                    width: 100%;
+                    display: flex;
+                    justify-content: flex-start;
+                    button {
+                        background-color: $whiteColor;
+                        border: 2px solid $primaryColor;
+                        color: $blackColor;
+                        padding: 5px 10px 5px 10px;
+                        margin-left: 5px;
+                        margin-right: 5px;
+                        border-radius: 8px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+            
+                        span {
+                            margin-left: 5px;
+                            margin-right: 5px;
+                            font-size: 13px;
+                        }
+                    }
 
+                    button:hover {
+                        background-color: $primaryColor;
+                        color: $whiteColor;
+                    }
+                }
             }
         }
 
