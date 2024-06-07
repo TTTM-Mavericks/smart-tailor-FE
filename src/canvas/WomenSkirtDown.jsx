@@ -2,8 +2,8 @@ import { easing } from "maath";
 import { useFrame } from "@react-three/fiber";
 import { useGLTF, Decal, useTexture } from "@react-three/drei";
 import { useSnapshot } from "valtio";
-import state from '../store'
 import { useEffect, useState } from "react";
+import state from "../store";
 
 
 const WomenSkirtDown = () => {
@@ -155,9 +155,7 @@ const WomenSkirtDown = () => {
         const scaleRatioX = deltaX / otherElementX;
         const scaleRatioY = deltaY / otherElementY;
 
-        console.log('nodes: ', nodes);
-        console.log('materials: ', materials);
-
+ 
 
 
 

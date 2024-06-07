@@ -59,7 +59,7 @@
 }
 
 .resizeable__element {
-    border: 2px solid black;
+    // border: 2px solid black;
     z-index: 10;
 
     &__resizeIcon {
@@ -146,11 +146,18 @@
 
     }
 
+
+
 }
 
 .item__img__resizeable {
-    border: 1px solid black;
+    // border: 1px solid black;
     width: 100%;
     height: 100%;
     pointer-events: 'auto' !important;
+    
+}
+
+.item__img__resizeable:focus{
+    background-color: 1px solid $blackColor;
 }

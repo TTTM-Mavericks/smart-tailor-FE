@@ -7,8 +7,8 @@ import { download } from "../../../assets"
 import { __downloadCanvasToImage, reader, __urlToBase64 } from "../../../utils/DesignerUtils"
 import { fadeAnimation, slideAnimation } from "../../../config/MotionSetting";
 import { ColorPicker, FilePicker, CustomButton, Tab } from "../../../components";
-import state from "../../../store"
 import styles from './Designer.module.scss'
+import state from "../../../store";
 
 const Designer = () => {
   const snap = useSnapshot(state);
@@ -21,9 +21,6 @@ const Designer = () => {
     stylishShirt: false
   })
 
-  useEffect(()=>{
-    console.log('file', file);
-  },[file])
 
   const generateTabContent = () => {
     switch (activeEditorTab) {
@@ -39,7 +36,6 @@ const Designer = () => {
   }
 
   const handleDecals = (type, result) => {
-    console.log('result: ', result);
     const decalType = DecalTypes[type];
 
     state[decalType.stateProperty] = result;

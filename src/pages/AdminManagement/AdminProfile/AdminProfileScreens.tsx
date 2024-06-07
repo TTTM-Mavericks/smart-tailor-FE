@@ -63,7 +63,6 @@ const AdminProfileScreens: React.FC = () => {
 
                 if (responseData.secure_url) {
                     const imageUrl = responseData.secure_url;
-                    console.log(imageUrl);
                     uploadedUrls.push(imageUrl);
                 } else {
                     console.error("Error uploading image to Cloudinary. Response:", responseData);
@@ -123,7 +122,6 @@ const AdminProfileScreens: React.FC = () => {
             }
 
             const updatedUserData: AdminProfileScreensData = { ...userData, username: editedName, email: editedEmail, imgUrl: editedImgUrl };
-            console.log(updatedUserData);
 
             const userID = localStorage.getItem("userID")
             const response = await fetch(`https://host.whearapp.tech/api/v1/user/update-user-by-userid`, {

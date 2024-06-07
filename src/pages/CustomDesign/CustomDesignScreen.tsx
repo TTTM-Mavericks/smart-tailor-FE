@@ -725,7 +725,7 @@ function CustomDesignScreen() {
       </div>
       <Designer />
       <main className={styles.customDesign__container__canvas}>
-        <CanvasModel typeOfModel={typeOfModel} modelData={partOfClothData} />
+        <CanvasModel typeOfModel={typeOfModel} />
       </main>
       <ImageEditor />
     </div >
