@@ -1,9 +1,11 @@
 import React, { useState, useRef } from 'react';
 import HeaderComponent from '../../../components/Header/HeaderComponent';
 import FooterComponent from '../../../components/Footer/FooterComponent';
-import { Rating } from '@mui/material';
+import { IconButton, Rating } from '@mui/material';
 import { motion, useInView } from 'framer-motion';
 import ReviewProductComponent from '../ReviewProduct/ReviewProductScreen';
+import { useParams } from 'react-router-dom';
+import { ArrowUpward } from '@mui/icons-material';
 
 const ProductDetailScreens = () => {
 
@@ -13,10 +15,30 @@ const ProductDetailScreens = () => {
     const [quantity, setQuantity] = useState(1);
     const titleRef = useRef(null);
     const teamRef = useRef(null);
+    const [showScrollButton, setShowScrollButton] = useState<boolean>(false);
+
+
+    // ---------------UseEffect---------------//
+
+    React.useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 200) {
+                setShowScrollButton(true);
+            } else {
+                setShowScrollButton(false);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
 
     // ---------------Usable Variable---------------//
     const maxQuantity = 16;
-
+    const { id } = useParams();
     const isTitleVisible = useInView(titleRef, { once: true });
     const isTeamVisible = useInView(teamRef, { once: true });
 
@@ -28,10 +50,19 @@ const ProductDetailScreens = () => {
     ];
 
     // ---------------FunctionHandler---------------//
+
+    /**
+     * 
+     * @param size 
+     */
     const _handleSizeClick = (size: any) => {
         setSelectedSize(size);
     };
 
+    /**
+     * 
+     * @param change 
+     */
     const _handleQuantityChange = (change: any) => {
         setQuantity((prevQuantity) => {
             const newQuantity = prevQuantity + change;
@@ -39,6 +70,13 @@ const ProductDetailScreens = () => {
             if (newQuantity > maxQuantity) return maxQuantity;
             return newQuantity;
         });
+    };
+
+    /**
+    * Scrolls the window to the top smoothly.
+    */
+    const _handleScrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
     return (
@@ -254,6 +292,21 @@ const ProductDetailScreens = () => {
                     {/* Feedback With Socket IO */}
                     {/* <ReviewProductComponent /> */}
 
+                    {showScrollButton && (
+                        <IconButton
+                            style={{
+                                position: 'fixed',
+                                bottom: '20px',
+                                right: '20px',
+                                zIndex: 100,
+                                backgroundColor: "#E96208",
+                                color: "white"
+                            }}
+                            onClick={_handleScrollToTop}
+                        >
+                            <ArrowUpward />
+                        </IconButton>
+                    )}
                 </div>
             </div>
             <FooterComponent />
