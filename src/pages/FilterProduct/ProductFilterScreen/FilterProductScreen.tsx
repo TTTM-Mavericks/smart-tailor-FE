@@ -1,4 +1,4 @@
-import { useState, useMemo, Fragment } from 'react';
+import { useState, useMemo, Fragment, useEffect } from 'react';
 import { Dialog, Disclosure, Menu, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { ChevronDownIcon, FunnelIcon, MinusIcon, PlusIcon, Squares2X2Icon } from '@heroicons/react/20/solid';
@@ -6,7 +6,10 @@ import HeaderComponent from '../../../components/Header/HeaderComponent';
 import FooterComponent from '../../../components/Footer/FooterComponent';
 import Rating from '@mui/material/Rating';
 import { useNavigate } from 'react-router-dom';
+import { ArrowUpward } from '@mui/icons-material';
+import { IconButton } from "@mui/material";
 
+// Fake Data to test
 const sortOptions = [
     { name: 'Most Popular', href: '#', current: true },
     { name: 'Best Rating', href: '#', current: false },
@@ -169,24 +172,186 @@ const products = [
         rating: 4,
         dateAdded: '2023-05-21',
     },
+    {
+        id: 10,
+        name: 'Basic Tee',
+        price: '$35',
+        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
+        imageAlt: 'A plain white t-shirt',
+        category: 'new-arrivals',
+        color: 'white',
+        popularity: 4.5,
+        rating: 5,
+        dateAdded: '2023-05-10',
+    },
+    {
+        id: 11,
+        name: 'Basic Sweatshirt',
+        price: '$65',
+        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
+        imageAlt: 'A plain grey sweatshirt',
+        category: 'totes',
+        color: 'new-arrivals',
+        popularity: 4.5,
+        rating: 4,
+        dateAdded: '2023-05-22',
+    },
+    {
+        id: 12,
+        name: 'Basic Pants',
+        price: '$50',
+        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-02.jpg',
+        imageAlt: 'A pair of plain black pants',
+        category: 'new-arrivals',
+        color: 'beige',
+        popularity: 4.5,
+        rating: 4,
+        dateAdded: '2023-05-21',
+    },
+    {
+        id: 13,
+        name: 'Basic Tee',
+        price: '$35',
+        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
+        imageAlt: 'A plain white t-shirt',
+        category: 'totes',
+        color: 'white',
+        popularity: 4.5,
+        rating: 4.7,
+        dateAdded: '2023-05-14',
+    },
+    {
+        id: 14,
+        name: 'Basic Sweatshirt',
+        price: '$65',
+        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
+        imageAlt: 'A plain grey sweatshirt',
+        category: 'sale',
+        color: 'white',
+        popularity: 4.5,
+        rating: 4.7,
+        dateAdded: '2023-05-13',
+    },
+    {
+        id: 15,
+        name: 'Basic Pants',
+        price: '$50',
+        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-02.jpg',
+        imageAlt: 'A pair of plain black pants',
+        category: 'totes',
+        color: 'white',
+        popularity: 2.5,
+        rating: 3.7,
+        dateAdded: '2023-05-12',
+    },
+    {
+        id: 16,
+        name: 'Basic Tee',
+        price: '$35',
+        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
+        imageAlt: 'A plain white t-shirt',
+        category: 'sale',
+        color: 'white',
+        popularity: 2.5,
+        rating: 3,
+        dateAdded: '2023-05-10',
+    },
+    {
+        id: 17,
+        name: 'Basic Tee',
+        price: '$35',
+        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
+        imageAlt: 'A plain white t-shirt',
+        category: 'totes',
+        color: 'white',
+        popularity: 4.5,
+        rating: 4.7,
+        dateAdded: '2023-05-14',
+    },
+    {
+        id: 18,
+        name: 'Basic Sweatshirt',
+        price: '$65',
+        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
+        imageAlt: 'A plain grey sweatshirt',
+        category: 'sale',
+        color: 'white',
+        popularity: 4.5,
+        rating: 4.7,
+        dateAdded: '2023-05-13',
+    },
+    {
+        id: 19,
+        name: 'Basic Pants',
+        price: '$50',
+        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-02.jpg',
+        imageAlt: 'A pair of plain black pants',
+        category: 'totes',
+        color: 'white',
+        popularity: 2.5,
+        rating: 3.7,
+        dateAdded: '2023-05-12',
+    },
+    {
+        id: 20,
+        name: 'Basic Tee',
+        price: '$35',
+        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
+        imageAlt: 'A plain white t-shirt',
+        category: 'sale',
+        color: 'white',
+        popularity: 2.5,
+        rating: 3,
+        dateAdded: '2023-05-10',
+    },
 ];
 
+// End Fake data to test
+
+/**
+ * Combines an array of CSS class names into a single string.
+ * @param {...string[]} classes - Array of CSS class names to combine.
+ * @returns {string} - A string containing all the non-falsy class names separated by a space.
+ */
 function classNames(...classes: string[]): string {
-    return classes.filter(Boolean).join(' ');
+    // Filter out falsy values from classes array
+    return classes.filter(Boolean)
+        // Join remaining classes with a space separator
+        .join(' ');
 }
 
 export default function FilterProductScreen() {
+    // ---------------UseState Variable---------------//
     const navigate = useNavigate();
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
     const [selectedSubCategory, setSelectedSubCategory] = useState<any>([]);
     const [selectedColors, setSelectedColors] = useState<any>([]);
     const [selectedSortOption, setSelectedSortOption] = useState('Most Popular');
+    const [showScrollButton, setShowScrollButton] = useState<boolean>(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [productsPerPage] = useState(8);
 
-    const handleCheckboxChange = (setState: any, value: any) => {
+
+
+
+    // ---------------FunctionHandler---------------//
+
+    /**
+     * Handles the change event for a checkbox, updating the state based on whether the value is currently selected.
+     * @param {Function} setState - The state setter function for the selected values.
+     * @param {any} value - The value of the checkbox that was changed.
+     */
+    const _handleCheckboxChange = (setState: any, value: any) => {
         setState((prevSelected: any) =>
             prevSelected.includes(value) ? prevSelected.filter((item: any) => item !== value) : [...prevSelected, value]
         );
     };
+
+    /**
+     * Filters the products based on selected subcategories and colors.
+     * @param {Array} selectedSubCategory - Array of selected subcategories to filter the products by.
+     * @param {Array} selectedColors - Array of selected colors to filter the products by.
+     */
 
     const filteredProducts = useMemo(() => {
         return products.filter(
@@ -196,6 +361,12 @@ export default function FilterProductScreen() {
         );
     }, [selectedSubCategory, selectedColors]);
 
+
+    /**
+     * Sorts the filtered products based on the selected sorting option.
+     * @param {string} selectedSortOption - The selected sorting criteria (e.g., 'Most Popular', 'Best Rating', 'Newest', 'Price: Low to High', 'Price: High to Low').
+     * @returns {Array} sortedProducts - The products sorted according to the selected sorting criteria.
+     */
     const sortedProducts = useMemo(() => {
         switch (selectedSortOption) {
             case 'Most Popular':
@@ -212,6 +383,57 @@ export default function FilterProductScreen() {
                 return filteredProducts;
         }
     }, [filteredProducts, selectedSortOption]);
+
+
+
+    /**
+     * Scrolls the window to the top smoothly.
+     */
+    const _handleScrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    // ---------------UseEffect---------------//
+
+    /**
+     * Move to Top When scroll down
+     */
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 200) {
+                setShowScrollButton(true);
+            } else {
+                setShowScrollButton(false);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
+
+
+    /**
+    * Call again the Number when sorting
+    */
+    useEffect(() => {
+        // Calculate the new total number of pages after filtering
+        const newTotalPages = Math.ceil(sortedProducts.length / productsPerPage);
+
+        // If the current page exceeds the new total number of pages, update the current page
+        if (currentPage > newTotalPages) {
+            setCurrentPage(newTotalPages);
+        }
+    }, [sortedProducts, productsPerPage]);
+
+    // ---------------Usable Variable---------------//
+    const indexOfLastProduct = currentPage * productsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    const currentProducts = sortedProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+    const paginate = (pageNumber: any) => setCurrentPage(pageNumber);
+
 
     return (
         <div className="bg-white" style={{ marginTop: "5%" }}>
@@ -292,7 +514,7 @@ export default function FilterProductScreen() {
                                                                             defaultValue={option.value}
                                                                             type="checkbox"
                                                                             checked={selectedColors.includes(option.value)}
-                                                                            onChange={() => handleCheckboxChange(setSelectedColors, option.value)}
+                                                                            onChange={() => _handleCheckboxChange(setSelectedColors, option.value)}
                                                                             className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                                                         />
                                                                         <label
@@ -349,8 +571,9 @@ export default function FilterProductScreen() {
                                                         <a
                                                             href={option.href}
                                                             className={classNames(
-                                                                option.current ? 'font-medium text-gray-900' : 'text-gray-500',
+                                                                option.current ? 'text-gray-500' : 'text-gray-500',
                                                                 active ? 'bg-gray-100' : '',
+                                                                selectedSortOption === option.name ? 'text-gray-900' : '',
                                                                 'block px-4 py-2 text-sm'
                                                             )}
                                                             onClick={(e) => {
@@ -424,7 +647,7 @@ export default function FilterProductScreen() {
                                                                     defaultValue={option.value}
                                                                     type="checkbox"
                                                                     checked={selectedColors.includes(option.value)}
-                                                                    onChange={() => handleCheckboxChange(setSelectedColors, option.value)}
+                                                                    onChange={() => _handleCheckboxChange(setSelectedColors, option.value)}
                                                                     className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                                                 />
                                                                 <label
@@ -449,7 +672,7 @@ export default function FilterProductScreen() {
                                     Showing <span className="font-semibold">{filteredProducts.length}</span> results
                                 </div>
                                 <div className="grid grid-cols-1 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8 mt-6">
-                                    {sortedProducts.map((product) => (
+                                    {currentProducts.map((product) => (
                                         <div
                                             key={product.id}
                                             className="transition-transform duration-300 ease-in-out transform hover:scale-105"
@@ -488,8 +711,59 @@ export default function FilterProductScreen() {
                                         </div>
                                     ))}
                                 </div>
+
+                                {/* Pagination */}
+                                <div className="max-w-full md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl mx-auto bg-white p-6 rounded-lg shadow-sm" style={{ marginTop: "5%" }}>
+                                    <div className="flex justify-center">
+                                        <nav className="flex space-x-2" aria-label="Pagination">
+                                            <a
+                                                href="#"
+                                                className={`relative inline-flex items-center px-4 py-2 text-sm ${currentPage === 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-gradient-to-r from-violet-300 to-indigo-300'} border border-fuchsia-100 hover:border-violet-100 text-white font-semibold leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10`}
+                                                onClick={() => {
+                                                    if (currentPage > 1) paginate(currentPage - 1);
+                                                }}
+                                            >
+                                                Previous
+                                            </a>
+                                            {Array.from(Array(Math.ceil(sortedProducts.length / productsPerPage)).keys()).map((number) => (
+                                                <a
+                                                    href="#"
+                                                    key={number + 1}
+                                                    onClick={() => paginate(number + 1)}
+                                                    className={`relative inline-flex items-center px-4 py-2 text-sm font-medium ${currentPage === number + 1 ? 'text-white bg-indigo-600 border-indigo-600' : 'text-gray-700 bg-white border border-fuchsia-100 hover:bg-fuchsia-200 cursor-pointer'} rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10`}
+                                                >
+                                                    {number + 1}
+                                                </a>
+                                            ))}
+                                            <a
+                                                href="#"
+                                                onClick={() => {
+                                                    if (currentPage < Math.ceil(sortedProducts.length / productsPerPage)) paginate(currentPage + 1);
+                                                }}
+                                                className={`relative inline-flex items-center px-4 py-2 text-sm ${currentPage === Math.ceil(sortedProducts.length / productsPerPage) ? 'bg-gray-300 cursor-not-allowed' : 'bg-gradient-to-r from-violet-300 to-indigo-300'} border border-fuchsia-100 hover:border-violet-100 text-white font-semibold leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10`}
+                                            >
+                                                Next
+                                            </a>
+                                        </nav>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                        {showScrollButton && (
+                            <IconButton
+                                style={{
+                                    position: 'fixed',
+                                    bottom: '20px',
+                                    right: '20px',
+                                    zIndex: 100,
+                                    backgroundColor: "#E96208",
+                                    color: "white"
+                                }}
+                                onClick={_handleScrollToTop}
+                            >
+                                <ArrowUpward />
+                            </IconButton>
+                        )}
                     </section>
                 </main>
             </div>
