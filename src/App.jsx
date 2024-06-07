@@ -106,7 +106,9 @@ function App() {
 
 
           {/* Design route */}
-          <Route path="/design" element={<PrivateRoute element={<CustomDesignScreen />} requiredRole="CUSTOMER" />} />
+          {/* <Route path="/design" element={<PrivateRoute element={<CustomDesignScreen />} requiredRole="CUSTOMER" />} /> */}
+          <Route path='/design' element={<CustomDesignScreen></CustomDesignScreen>} />
+
 
           {/* Admin dashboard route */}
           <Route path='/admin' element={<DashboardAdminScreens></DashboardAdminScreens>} />

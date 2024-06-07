@@ -1,108 +1,116 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import styles from './ImageDraggableStyle.module.scss';
 import { useSnapshot } from 'valtio';
 import state from '../../../../store';
-import { BACK_CLOTH_PART, FRONT_CLOTH_PART, LOGO_PART, PartOfCloth, SLEEVE_CLOTH_PART } from '../../../../models/ClothModel';
 import { Resizable } from 're-resizable';
+import { ItemMaskInterface, PartOfDesignInterface } from '../../../../models/DesignModel';
+import { Menu, MenuItem } from '@mui/material';
+import { IoTrashOutline } from "react-icons/io5";
+
 type props = {
-    partOfCloth?: PartOfCloth,
-    selectedItem?: string
+    partOfCloth?: PartOfDesignInterface,
+    partOfClothData?: PartOfDesignInterface[],
+    itemPositions: any;
+    setItemPositions: (positions: { [key: string]: any }) => void;
+    itemZIndices: { [key: string]: number };
+    setItemZIndices: (zIndices: { [key: string]: any }) => void;
+    highestZIndex: number;
+    setHighestZIndex: (zIndex: any) => void;
+    onDeleteItem: (item: any) => void;
+    setNewItemData: (items: PartOfDesignInterface[] | undefined) => void;
+    onUpdatePart: (updatePart: PartOfDesignInterface[]) => void;
+    stamps?: ItemMaskInterface[] | undefined;
 }
 
-const ImageDraggableComponent: React.FC<props> = ({ partOfCloth, selectedItem }) => {
+const ImageDraggableComponent: React.FC<props> = ({
+    partOfCloth,
+    partOfClothData,
+    itemPositions,
+    setItemPositions,
+    itemZIndices,
+    setItemZIndices,
+    highestZIndex,
+    setHighestZIndex,
+    onDeleteItem,
+    setNewItemData,
+    onUpdatePart,
+    stamps
+}) => {
+
+    // TODO MUTIL LANGUAGE
+
     // ---------------UseState Variable---------------//
-    const [position, setPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-    const [imgBase64, setImgBase64] = useState<string | undefined>();
-    const [parentBounds, setParentBounds] = useState<{ left: number; top: number; right: number; bottom: number } | null>(null);
-    const [width, setWidth] = useState<number>(200); // Initial width
-    const [height, setHeight] = useState<number>(200); // Initial height
     const [resizing, setResizing] = useState<boolean>(false);
     const [size, setSize] = useState({ width: 200, height: 200 });
+    const [selectedItemDrag, setSelectedItemDrag] = useState<ItemMaskInterface>();
+    const [data, setData] = useState<ItemMaskInterface[] | undefined>();
+    const [contextMenu, setContextMenu] = useState<{
+        mouseX: number;
+        mouseY: number;
+    } | null>(null);
+    const [selectedItemForContext, setSelectedItemForContext] = useState<ItemMaskInterface | null>(null);
+    const [oldPartOfClothData, setOldPartOfClothData] = useState<PartOfDesignInterface[]>();
+    const [positonItemDrag, setPositionItemDrag] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
 
     // ---------------Usable Variable---------------//
     const snap = useSnapshot(state);
-    // const parentRef = useRef<HTMLDivElement>(null);
-    // const draggableRef = useRef<any>(null);
+
 
     // ---------------UseEffect---------------//
 
+    /**
+     * Set value of data when  partOfCloth and partOfClothData change
+     */
     useEffect(() => {
-        if (selectedItem === LOGO_PART) {
-            setImgBase64(snap.imageLogoUrl);
-
+        if (JSON.stringify(partOfClothData) !== JSON.stringify(oldPartOfClothData)) {
+            console.log('partOfClothData: ', partOfClothData);
+            const result: PartOfDesignInterface[] | undefined = partOfClothData?.filter((item: PartOfDesignInterface) => item.part_name === partOfCloth?.part_name);
+            if (result && result.length > 0) {
+                const itemMask = result.find((item: PartOfDesignInterface) => item.part_of_design_id === partOfCloth?.part_of_design_id);
+                if (itemMask) {
+                    console.log('itemMask: ', itemMask);
+                    setData(itemMask.item_mask);
+                    setOldPartOfClothData(partOfClothData);
+                }
+            }
         }
+    }, [partOfCloth, partOfClothData]);
 
-        if (selectedItem === FRONT_CLOTH_PART) {
-            setImgBase64(snap.imageFrontClothUrl);
-
-        }
-
-        if (selectedItem === BACK_CLOTH_PART) {
-            setImgBase64(snap.imageBackClothUrl);
-
-        }
-
-        if (selectedItem === SLEEVE_CLOTH_PART) {
-            setImgBase64(snap.imagesleeveClothUrl);
-
-        }
-    }, [selectedItem, snap]);
-
+    /**
+     * Set PartOfDesignData when part_name === partname of partOfClothData
+     */
     useEffect(() => {
-        if (selectedItem === LOGO_PART && !resizing) {
-            setPosition({ x: snap.logoDecalPositionX, y: snap.logoDecalPositionY })
+        const result = partOfClothData?.filter((item: PartOfDesignInterface) => item.part_name === partOfCloth?.part_name);
+        if (result) {
+            partOfClothData?.map(part =>
+                part.part_of_design_id === partOfCloth?.part_of_design_id
+                    ? { ...part, item_mask: !data ? [] : data } : part
 
+            );
         }
+    }, [ partOfCloth]);
 
-        if (selectedItem === FRONT_CLOTH_PART) {
-            setPosition({ x: snap.frontDecalPositionX, y: snap.frontDecalPositionY })
-
-        }
-
-        if (selectedItem === BACK_CLOTH_PART) {
-            setPosition({ x: snap.backDecalPositionX, y: snap.backDecalPositionY })
-
-
-        }
-
-        if (selectedItem === SLEEVE_CLOTH_PART) {
-            setPosition({ x: snap.sleeveDecalPositionX, y: snap.sleeveDecalPositionY })
+    /**
+     * State change of itemPositions, itemZIndices, size.width, size.height, selectedItemDrag 
+     * to trigger __handleSetNewPartOfDesignData function
+     */
+    useEffect(() => {
+        __handleSetNewPartOfDesignData();
+    }, [itemPositions, itemZIndices, size.width, size.height, selectedItemDrag]);
 
 
-        }
 
-    }, [partOfCloth])
-
-    // useEffect(() => {
-    //     // Get the dimensions of the boundary container
-    //     const boundaryContainer = document.querySelector(`.${styles.imageDraggable__boundary}`);
-    //     if (boundaryContainer) {
-    //         const boundaryRect = boundaryContainer.getBoundingClientRect();
-
-    //         // Calculate initial position to center the image
-    //         const initialX = (boundaryRect.width - 100) / 2; // Assuming image width is 100px
-    //         const initialY = (boundaryRect.height - 100) / 2; // Assuming image height is 100px
-
-    //         setPosition({ x: initialX, y: initialY });
-    //         console.log('x: ', initialX, '-y: ', initialY);
-    //     }
-    // }, []);
-
-    // useEffect(() => {
-    //     if (parentRef.current) {
-    //         const { left, top, right, bottom } = parentRef.current.getBoundingClientRect();
-    //         const position = parentRef.current.getBoundingClientRect();
-
-    //         setParentBounds({ left, top, right, bottom });
-    //         console.log(position);
-    //     }
-    // }, []);
-
+    /**
+     * Set size of resizable
+     */
     useEffect(() => {
         setResizing(resizing)
     }, [resizing])
 
+    /**
+     * Set size of resizable
+     */
     useEffect(() => {
         const element = document.querySelector('.imageDraggable__resizeable');
         if (element instanceof HTMLElement) {
@@ -115,141 +123,290 @@ const ImageDraggableComponent: React.FC<props> = ({ partOfCloth, selectedItem })
         }
     }, [resizing]);
 
+
     // ---------------FunctionHandler---------------//
 
-    const _handleDragStart = (e: DraggableEvent | any, ui: DraggableData,) => {
-        e.preventDefault();
+    /**
+     * Save PartOfClothData while edit and response to customDesign
+     */
+    const __handleSetNewPartOfDesignData = () => {
+        const result: ItemMaskInterface[] | undefined = data?.filter((item: ItemMaskInterface) => item.item_mask_id === selectedItemDrag?.item_mask_id);
+        if (result) {
+            const updateItemData: ItemMaskInterface[] | undefined = data?.map(part =>
+                part.item_mask_id === selectedItemDrag?.item_mask_id
+                    ? {
+                        ...part,
+                        // position: positonItemDrag,
+                        z_index: itemZIndices,
+                        scale_x: size.width,
+                        scale_y: size.height
+                    }
+                    : part
+            );
+            const updatePart = partOfClothData?.map(part =>
+                part.part_of_design_id === partOfCloth?.part_of_design_id
+                    ? { ...part, item_mask: !updateItemData ? [] : updateItemData } : part
+            );
+
+            if (updatePart) {
+                onUpdatePart(updatePart)
+                state.modelData = updatePart;
+            }
+
+            if (JSON.stringify(updateItemData) !== JSON.stringify(data)) {
+                console.log('updateItemData: ', updateItemData);
+                setData(updateItemData);
+            }
+        }
+    }
+
+
+    /**
+     * Select drag item
+     * @param item 
+     */
+    const __handleSelectedIteamDrag = (item: ItemMaskInterface) => {
+        setSelectedItemDrag(item);
     };
 
-    const _handleOnDrag = (e: DraggableEvent | any, ui: DraggableData) => {
-        e.preventDefault();
-        e.target.style.cursor = 'grabbing';
+    /**
+     * Handle logic when onDragStart trigger
+     * @param e 
+     * @param ui 
+     * @param item 
+     */
+    const __handleDragStart = (e: DraggableEvent, ui: DraggableData, item: ItemMaskInterface) => {
+        const target = e.target as HTMLElement;
+        if (target) {
+            e.preventDefault();
+            setSelectedItemDrag(item);
 
-        if (!resizing) {
-            const { x, y } = ui;
-            setPosition({ x, y });
-            console.log({ x, y });
-            if (selectedItem === LOGO_PART) {
-                // state.logoDecalPositionX = ui.x;
-                // state.logoDecalPositionY = ui.y;
-                setPosition({ x: 0, y: 0 });
-            }
+        }
+    };
 
-            if (selectedItem === FRONT_CLOTH_PART) {
-                state.frontDecalPositionX = ui.x;
-                state.frontDecalPositionY = ui.y;
-            }
+    /**
+     * Handle logic when onDrag trigger
+     * @param e
+     * @param ui 
+     * @param item 
+     */
+    const __handleOnDrag = (e: DraggableEvent, ui: DraggableData, item: ItemMaskInterface) => {
+        const target = e.target as HTMLElement;
+        if (target) {
+            e.preventDefault();
+            target.style.cursor = 'grabbing';
 
-            if (selectedItem === BACK_CLOTH_PART) {
-                state.backDecalPositionX = ui.x;
-                state.backDecalPositionY = ui.y;
-            }
+        }
+    };
 
-            if (selectedItem === SLEEVE_CLOTH_PART) {
-                state.sleeveDecalPositionX = ui.x;
-                state.sleeveDecalPositionY = ui.y;
+    /**
+     * Handle set position when onDragEnd trigger
+     * @param e 
+     * @param ui 
+     * @param item 
+     */
+    const __handleDragStop = (e: DraggableEvent, ui: DraggableData, item: ItemMaskInterface) => {
+        const target = e.target as HTMLElement;
+        if (target) {
+            target.style.cursor = 'grab';
+            if (!resizing) {
+                const { x, y } = ui;
+                setData((prevData) => {
+                    if (!prevData) return prevData;
+                    return prevData.map((dataItem: ItemMaskInterface) => {
+                        if (dataItem.item_mask_id === item.item_mask_id) {
+                            return {
+                                ...dataItem,
+                                position: { x: x, y: y },
+                                position_x: x,
+                                position_y: y
+                            };
+                        }
+                        return dataItem;
+                    });
+                });
+
+                setSelectedItemDrag(item);
+
             }
         }
     };
 
-    const _handleDragStop = (e: DraggableEvent | any, ui: DraggableData) => {
-        e.target.style.cursor = 'grab';
-        if (!resizing) {
-            const { x, y } = ui;
-            setPosition({ x, y });
-            console.log('Drag stopped at:', x, y);
-        }
-
-    };
-
-    const imgBase64Memoized = useMemo(() => (
-        imgBase64 && <img src={imgBase64} className={`${styles.item__img__resizeable}`} style={{ pointerEvents: 'auto' }} alt="Draggable Image" />
-    ), [imgBase64]);
-
-
-
+    /**
+     * Handle logic when onResizeStart trigger
+     */
     const __handleResizeStart = () => {
-        // console.log('__handleResizeStart');
-        // const element = document.querySelector('.imageDraggable__resizeable') as HTMLElement;
-        // if (element) {
-        //     element.style.pointerEvents = 'none'; // or 'auto' or any other valid value
-        // }
         setResizing(true);
         setResizing(true);
     };
 
+    /**
+     * Handle logic when onResize trigger
+     */
     const __handleOnResize = (e: any) => {
         console.log('__handleOnResize');
-
-        // const element = document.querySelector('.imageDraggable__resizeable') as HTMLElement;
-        // if (element) {
-        //     element.style.pointerEvents = 'none'; // or 'auto' or any other valid value
-        // }
         setResizing(true);
     };
 
+    /**
+     * Handle logic when onResizeEnd trigger
+     */
     const __handleResizeEnd = () => {
         console.log('__handleResizeEnd');
-
-        // const element = document.querySelector('.imageDraggable__resizeable') as HTMLElement;
-        // if (element) {
-        //     element.style.pointerEvents = 'auto'; // or 'auto' or any other valid value
-        //     console.log(element);
-        // }
         setResizing(true);
         setResizing(false);
+        __handleSetNewPartOfDesignData();
     };
 
+    /**
+     * Handle open menu wwhen MouseEvent trigger
+     * @param event 
+     * @param item 
+     */
+    const __handleContextMenu = (event: MouseEvent, item: ItemMaskInterface) => {
+        event.preventDefault();
+        setContextMenu(
+            contextMenu === null
+                ? {
+                    mouseX: event.clientX - 2,
+                    mouseY: event.clientY - 4,
+                }
+                : null,
+        );
+        setSelectedItemForContext(item);
+    };
 
-    return (
-        <>
+    /**
+     * Handle close menu
+     */
+    const __handleClose = () => {
+        setContextMenu(null);
+        setSelectedItemForContext(null);
+    };
 
-            {partOfCloth ? (
-                <div className={styles.imageDraggable__boundary} style={{ backgroundImage: partOfCloth?.imgUrl }}>
-                    <div className={styles.imageDraggable__img}>
-                        <img src={partOfCloth.imgUrl} className={styles.imageDraggable__img} ></img>
-                        {imgBase64 && (
+    /**
+     * Handle make item move to above another
+     */
+    const __handleMoveToAbove = () => {
+        if (selectedItemForContext) {
+            const currentZIndex = itemZIndices[selectedItemForContext.item_mask_id];
+            const newZIndex = currentZIndex + 1;
 
-                            <Draggable
-                                // bounds={{ top: -100, left: -100, right: 100, bottom: 100 }}
-                                // ref={draggableRef} // Set draggableRef as the ref
-                                // bounds='parent'
-                                position={position}
-                                onDrag={_handleOnDrag}
-                                onStop={_handleDragStop}
-                                onStart={_handleDragStart}
-                                disabled={resizing ? true : false}
-                                defaultClassNameDragged={`${styles.imageDraggable__resizeable} imageDraggable__resizeable`}
+            setItemZIndices((prevZIndices: any) => {
+                const updatedZIndices = { ...prevZIndices };
+                Object.keys(updatedZIndices).forEach(key => {
+                    if (updatedZIndices[key] === newZIndex) {
+                        updatedZIndices[key] = currentZIndex;
+                    }
+                });
+                updatedZIndices[selectedItemForContext.item_mask_id] = newZIndex;
+                return updatedZIndices;
+            });
 
-                            >
-                                <Resizable
-                                    style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        border: "solid 1px #ddd",
-                                        background: "#f0f0f0"
-                                    }}
-                                    onResizeStart={__handleResizeStart}
-                                    onResize={__handleOnResize}
-                                    onResizeStop={__handleResizeEnd}
-                                    defaultSize={{ width: 230, height: 230 }}
-                                    handleWrapperStyle={{ pointerEvents: 'auto' }}
-                                    className={`${styles.resizeable__element}`}
-                                    grid={[25,25]}
-                                >
+            __handleClose();
+        }
+    };
+
+    /**
+     * Handle make item move to below another
+     */
+    const __handleMoveToBelow = () => {
+        if (selectedItemForContext) {
+            const currentZIndex = itemZIndices[selectedItemForContext.item_mask_id];
+            const newZIndex = currentZIndex - 1;
+
+            setItemZIndices((prevZIndices: any) => {
+                const updatedZIndices = { ...prevZIndices };
+                Object.keys(updatedZIndices).forEach(key => {
+                    if (updatedZIndices[key] === newZIndex) {
+                        updatedZIndices[key] = currentZIndex;
+                    }
+                });
+                updatedZIndices[selectedItemForContext.item_mask_id] = newZIndex;
+                return updatedZIndices;
+            });
+
+            __handleClose();
+        }
+    };
+
+    /**
+     * resizableItems element
+     */
+    const resizableItems = useMemo(
+        () =>
+            data && data?.map((item: ItemMaskInterface) => (
+                <Draggable
+                    key={item.item_mask_id}
+                    position={item.position ? { x: item.position.x, y: item.position.y } : { x: 0, y: 0 }}
+                    onDrag={(e, ui) => __handleOnDrag(e, ui, item)}
+                    onStop={(e, ui) => __handleDragStop(e, ui, item)}
+                    onStart={(e, ui) => __handleDragStart(e, ui, item)}
+                    disabled={resizing ? true : false}
+                    defaultClassNameDragged={`${styles.imageDraggable__resizeable} imageDraggable__resizeable`}
+
+                >
+                    <div style={{ position: 'absolute', zIndex: itemZIndices[item.item_mask_id] ?? 1 }} onContextMenu={(e: any) => __handleContextMenu(e, item)}>
+                        <Resizable
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                // backgroundColor: 'white',
+                                border: 'none',
+                                zIndex: itemZIndices[item.item_mask_id] ?? 1,
+                            }}
+                            onResizeStart={__handleResizeStart}
+                            onResize={__handleOnResize}
+                            onResizeStop={__handleResizeEnd}
+                            defaultSize={{ width: 230, height: 230 }}
+                            handleWrapperStyle={{ pointerEvents: 'auto' }}
+                            className={`${styles.resizeable__element}`}
+                        >
+                            {selectedItemDrag === item && (
+                                <>
                                     <div className={`${styles.resizeable__element__resizeIcon__icon1}`} ></div>
                                     <div className={`${styles.resizeable__element__resizeIcon__icon2}`} ></div>
                                     <div className={`${styles.resizeable__element__resizeIcon__icon3}`} ></div>
                                     <div className={`${styles.resizeable__element__resizeIcon__icon4}`} ></div>
                                     <div className={`${styles.resizeable__element__resizeIcon__icon5}`} ></div>
                                     <div className={`${styles.resizeable__element__resizeIcon__icon6}`} ></div>
+                                    <IoTrashOutline
+                                        mode={'outline'}
+                                        size={20}
+                                        className={`${styles.resizeable__element__resizeIcon__icon7}`}
+                                        onClick={() => onDeleteItem(item.item_mask_id)}
+                                    />
+                                </>
+                            )}
+                            <img src={item.image_url} className={`${styles.item__img__resizeable}`} style={{ border: selectedItemDrag === item ? '1px solid black' : 'none', pointerEvents: 'auto' }} onClick={() => __handleSelectedIteamDrag(item)} alt="Draggable Image" />
+                        </Resizable>
+                    </div>
+                </Draggable>
+            )), [data, selectedItemDrag, itemPositions, itemZIndices, resizing])
 
-                                    {imgBase64Memoized}
-                                </Resizable>
-                            </Draggable>
-                        )}
 
+    return (
+        <>
+
+            {partOfCloth ? (
+                <div className={styles.imageDraggable__boundary} style={{ backgroundImage: partOfCloth?.img_url }}>
+                    <div className={styles.imageDraggable__img}>
+                        <img src={partOfCloth.img_url} className={styles.imageDraggable__img} ></img>
+                        {resizableItems}
+                        <Menu
+                            open={contextMenu !== null}
+                            onClose={__handleClose}
+                            anchorReference="anchorPosition"
+                            anchorPosition={
+                                contextMenu !== null
+                                    ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+                                    : undefined
+                            }
+                        >
+                            <MenuItem onClick={__handleMoveToAbove}>Move to Above</MenuItem>
+                            <MenuItem onClick={__handleMoveToBelow}>Move to Below</MenuItem>
+                        </Menu>
                     </div>
 
 

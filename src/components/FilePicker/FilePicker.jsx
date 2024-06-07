@@ -5,24 +5,24 @@ import { BACK_CLOTH_PART, FRONT_CLOTH_PART, LOGO_PART, SLEEVE_CLOTH_PART } from 
 import { primaryColor } from '../../root/ColorSystem'
 
 const FilePicker = ({ file, setFile, readFile, partOfCloth }) => {
-  const [trigger, setTrigger] = useState<boolean>(false);
+  const [trigger, setTrigger] = useState(false);
 
   const _handleSetUploadFile = () => {
     console.log(partOfCloth);
     if (partOfCloth === LOGO_PART) {
-      readFile('logo')
+      readFile('logo');
     }
 
     if (partOfCloth === FRONT_CLOTH_PART) {
-      readFile('front')
+      readFile('front');
     }
 
     if (partOfCloth === BACK_CLOTH_PART) {
-      readFile('back')
+      readFile('back');
     }
 
     if (partOfCloth === SLEEVE_CLOTH_PART) {
-      readFile('sleeve')
+      readFile('sleeve');
     }
 
 

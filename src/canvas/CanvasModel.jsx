@@ -13,14 +13,12 @@ import React, { useEffect } from 'react';
 
 
 
-const CanvasModel = ({ typeOfModel }) => {
+const CanvasModel = ({ typeOfModel}) => {
 
     // ---------------UseState Variable---------------//
 
     // ---------------Usable Variable---------------//
-    useEffect(() => {
-        console.log('typeOfModel: ', typeOfModel);
-    }, [typeOfModel])
+
     // ---------------UseEffect---------------//
     // ---------------FunctionHandler---------------//
 
