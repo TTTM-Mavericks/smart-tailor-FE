@@ -6,6 +6,8 @@ import { IconButton } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
 
 const OrderDetailScreen: React.FC = () => {
+
+    // ---------------UseState---------------//
     const orderDetails = {
         orderNumber: 'W086438695',
         date: '2021-03-22',
@@ -39,7 +41,6 @@ const OrderDetailScreen: React.FC = () => {
         progressDate: 'March 24, 2021'
     };
 
-    // ---------------UseState---------------//
     const [showScrollButton, setShowScrollButton] = useState<boolean>(false);
 
     // ---------------UseEffect---------------//
@@ -75,7 +76,7 @@ const OrderDetailScreen: React.FC = () => {
     /**
      * Handle cancel order click
      */
-    const handleCancelOrder = () => {
+    const _handleCancelOrder = () => {
         Swal.fire({
             title: 'Are you sure?',
             text: "Do you really want to cancel the order?",
@@ -219,7 +220,7 @@ const OrderDetailScreen: React.FC = () => {
                 {/* Cancel Order Button */}
                 <div className="flex justify-end mt-4">
                     <button
-                        onClick={handleCancelOrder}
+                        onClick={_handleCancelOrder}
                         className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-200"
                     >
                         Cancel Order
