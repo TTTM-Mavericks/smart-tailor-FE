@@ -171,20 +171,21 @@ const ProductDialogComponent: React.FC<Props> = ({ isOpen, onClose, onItemSelect
                         <button
                             className={` py-2 px-4 rounded inline-flex items-center`}
                         >
-                            {t(codeLanguage + '000117')}
+                            Products
                         </button>
-
+                        
                         <button
                             className={` py-2 px-4 rounded inline-flex items-center`}
                         >
-                            {t(codeLanguage + '000118')}
+                            {t(codeLanguage + '000117')}
                         </button>
+
                     </div>
 
 
                 </div>
 
-                <div style={{ width: '100%', display: 'flex', height: '85%' }}>
+                <div style={{ width: '100%', display: 'flex', height: '80%' }}>
                     <div className={`${styles.dialog__area__filter__container}`}>
                         <OptionFilterCompnent></OptionFilterCompnent>
                     </div>

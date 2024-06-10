@@ -140,6 +140,10 @@ function CustomDesignScreen() {
     }
   }, [selectedStamp, selectedPartOfCloth]);
 
+
+  useEffect(() => {
+    setSelectedStamp(selectedStamp);
+  },[selectedStamp])
   // ---------------FunctionHandler---------------//
 
   const __handleSetNewPartOfDesignData = (items: PartOfDesignInterface[] | undefined) => {
@@ -342,13 +346,13 @@ function CustomDesignScreen() {
 
       setSelectedStamp((prevSelectedStamp = []) => {
         const existingItemIndex = prevSelectedStamp.findIndex(
-          (existingItem) => existingItem.item_mask_id === item.item_mask_id
+          (existingItem: ItemMaskInterface) => existingItem.item_mask_id === item.item_mask_id
         );
 
         if (existingItemIndex > -1) {
           // Remove existing item
           const updatedStamps = prevSelectedStamp.filter(
-            (existingItem) => existingItem.item_mask_id !== item.item_mask_id
+            (existingItem: ItemMaskInterface) => existingItem.item_mask_id !== item.item_mask_id
           );
           return updatedStamps;
         } else {

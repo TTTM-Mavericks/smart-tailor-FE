@@ -3,7 +3,7 @@ import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import styles from './ImageDraggableStyle.module.scss';
 import { useSnapshot } from 'valtio';
 import state from '../../../../store';
-import { Resizable } from 're-resizable';
+import { Resizable, ResizableProps, ResizeCallback } from 're-resizable';
 import { ItemMaskInterface, PartOfDesignInterface } from '../../../../models/DesignModel';
 import { Menu, MenuItem } from '@mui/material';
 import { IoTrashOutline } from "react-icons/io5";
@@ -51,7 +51,6 @@ const ImageDraggableComponent: React.FC<props> = ({
     } | null>(null);
     const [selectedItemForContext, setSelectedItemForContext] = useState<ItemMaskInterface | null>(null);
     const [oldPartOfClothData, setOldPartOfClothData] = useState<PartOfDesignInterface[]>();
-    const [positonItemDrag, setPositionItemDrag] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
 
     // ---------------Usable Variable---------------//
     const snap = useSnapshot(state);
@@ -89,7 +88,7 @@ const ImageDraggableComponent: React.FC<props> = ({
 
             );
         }
-    }, [ partOfCloth]);
+    }, [partOfCloth]);
 
     /**
      * State change of itemPositions, itemZIndices, size.width, size.height, selectedItemDrag 
@@ -97,7 +96,7 @@ const ImageDraggableComponent: React.FC<props> = ({
      */
     useEffect(() => {
         __handleSetNewPartOfDesignData();
-    }, [itemPositions, itemZIndices, size.width, size.height, selectedItemDrag]);
+    }, [itemPositions, itemZIndices, size.width, size.height, selectedItemDrag, data]);
 
 
 
@@ -137,9 +136,9 @@ const ImageDraggableComponent: React.FC<props> = ({
                     ? {
                         ...part,
                         // position: positonItemDrag,
-                        z_index: itemZIndices,
-                        scale_x: size.width,
-                        scale_y: size.height
+                        // z_index: itemZIndices,
+                        // scale_x: size.width,
+                        // scale_y: size.height
                     }
                     : part
             );
@@ -222,11 +221,10 @@ const ImageDraggableComponent: React.FC<props> = ({
                                 position_y: y
                             };
                         }
+                        console.log('{ x: x, y: y }: ', { x: x, y: y });
                         return dataItem;
                     });
                 });
-
-                setSelectedItemDrag(item);
 
             }
         }
@@ -251,11 +249,34 @@ const ImageDraggableComponent: React.FC<props> = ({
     /**
      * Handle logic when onResizeEnd trigger
      */
-    const __handleResizeEnd = () => {
+    const __handleResizeEnd: ResizeCallback = (e, direction, refToElement, delta) => {
         console.log('__handleResizeEnd');
-        setResizing(true);
-        setResizing(false);
-        __handleSetNewPartOfDesignData();
+
+        const target = refToElement as HTMLElement;
+        if (target) {
+            target.style.cursor = 'grab';
+            setResizing(false); // End resizing after the state updates
+
+            setData((prevData) => {
+                if (!prevData) return prevData;
+
+                // Get new width and height from the refToElement
+                const newWidth = target.style.width ? parseInt(target.style.width, 10) : undefined;
+                const newHeight = target.style.height ? parseInt(target.style.height, 10) : undefined;
+
+                return prevData.map((dataItem: ItemMaskInterface) => {
+                    if (dataItem.item_mask_id === selectedItemDrag?.item_mask_id) {
+                        return {
+                            ...dataItem,
+                            scale_x: newWidth,
+                            scale_y: newHeight,
+                        };
+                    }
+                    return dataItem;
+                });
+            });
+
+        }
     };
 
     /**
@@ -358,7 +379,7 @@ const ImageDraggableComponent: React.FC<props> = ({
                             }}
                             onResizeStart={__handleResizeStart}
                             onResize={__handleOnResize}
-                            onResizeStop={__handleResizeEnd}
+                            onResizeStop={(e, direction, refToElement, delta) => __handleResizeEnd(e, direction, refToElement, delta)}
                             defaultSize={{ width: 230, height: 230 }}
                             handleWrapperStyle={{ pointerEvents: 'auto' }}
                             className={`${styles.resizeable__element}`}
