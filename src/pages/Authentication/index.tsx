@@ -3,7 +3,7 @@ import SignInScreen from "./SignIn/SignInScreen";
 import SignUpScreen from "./SignUp/SignUpScreen";
 import ChangePasswordScreen from "./ChangePassword/ChangePasswordScreen";
 import VerifyEmailScreen from "./VerifyEmail/VerifyEmailScreen";
-
+import ProfileSettings from "./ProfileSetting/ProfileSettingScreen";
 
 export {
     SignInScreen,
@@ -11,4 +11,5 @@ export {
     ForgotPassWordScreen,
     ChangePasswordScreen,
     VerifyEmailScreen,
+    ProfileSettings
 }
