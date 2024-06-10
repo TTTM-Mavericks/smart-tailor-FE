@@ -1,5 +1,5 @@
 import { easing } from "maath";
-import { useFrame } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { useGLTF, Decal, useTexture } from "@react-three/drei";
 import { useSnapshot } from "valtio";
 import { useEffect, useState } from "react";
@@ -31,8 +31,8 @@ const Hoodie = () => {
 
             // Accumulate all item masks from different parts
             const newDecals = snap.modelData.reduce((acc, item) => {
-                if (item.item_mask) {
-                    acc.push({ key: item.part_name, items: item.item_mask });
+                if (item.itemMasks) {
+                    acc.push({ key: item.partOfDesignName, items: item.itemMasks });
                 }
                 return acc;
             }, []);
@@ -46,8 +46,8 @@ const Hoodie = () => {
             const reusult = snap.modelData
             setModelData(snap.modelData);
             reusult.map((item) => {
-                if (item.part_name === 'LOGO_PART') {
-                    setDecal(item.item_mask);
+                if (item.partOfDesignName === 'LOGO_PART') {
+                    setDecal(item.itemMasks);
                 }
             })
 
@@ -59,12 +59,12 @@ const Hoodie = () => {
             const promises = deCalData.reduce((acc, decalGroup) => {
                 acc.push(...decalGroup.items.map(async (item) => {
                     try {
-                        const texture = await loadTexture(item.image_url);
+                        const texture = await loadTexture(item.imageUrl);
                         console.log('////////////////////////////: ', texture);
                         setText(texture);
                         return { ...item, texture };
                     } catch (error) {
-                        console.error(`Failed to load texture for item ${item.item_mask_id}`, error);
+                        console.error(`Failed to load texture for item ${item.itemMaskID}`, error);
                         return null;
                     }
                 }));
@@ -100,12 +100,12 @@ const Hoodie = () => {
             const A_height = 500; // Example height of div A
             const B_width = 170; // Example width of div B
             const B_height = 300; // Example height of div B
-            const offsetX = (A_width / 2) - (B_width / 2) - (firstItemMask.scale_x / A_width);
-            const offsetY = (A_height / 2) - (B_height / 2) - (firstItemMask.scale_y / A_height);
+            const offsetX = (A_width / 2) - (B_width / 2) - (firstItemMask.scaleX / A_width);
+            const offsetY = (A_height / 2) - (B_height / 2) - (firstItemMask.scaleY / A_height);
             let pos;
             pos = [
-                (firstItemMask.position.x - 130 + (firstItemMask.scale_x / 230)) / 1000,
-                -(firstItemMask.position.y - 80 + (firstItemMask.scale_y / 230)) / 1000,
+                (firstItemMask.position.x - 130 + (firstItemMask.scaleX / 230)) / 1000,
+                -(firstItemMask.position.y - 80 + (firstItemMask.scaleY / 230)) / 1000,
                 key === 'LOGO_PART' || key === 'FRONT_CLOTH_PART' ? 0.15
                     :
                     key === 'BACK_CLOTH_PART' ? -0.25
@@ -120,8 +120,8 @@ const Hoodie = () => {
     const __handleScale = (item) => {
         console.log(item);
         if (item) {
-            console.log('[item.scale_x / 1000, item.scale_y / 1000, 0.3]: ', [item.scale_x / 1000, item.scale_y / 1000, 0.3]);
-            return ([item.scale_x / 1000, item.scale_y / 1000, 0.3]);
+            console.log('[item.scaleX / 1000, item.scaleY / 1000, 0.3]: ', [item.scaleX / 1000, item.scaleY / 1000, 0.3]);
+            return ([item.scaleX / 1000, item.scaleY / 1000, 0.3]);
         }
     }
 
@@ -138,30 +138,30 @@ const Hoodie = () => {
 
     return (
         <group key={stateString}>
+            <ambientLight intensity={0.5} />
+            <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
             <mesh
                 castShadow
                 geometry={nodes.test_lambert1_0.geometry}
                 material={materials.lambert1}
                 material-roughness={1}
                 scale={[1, 1, 1]}
+
             >
-                            <meshStandardMaterial normalScale={0.2} attach="material" map={text} />
-
-                {/* <meshStandardMaterial normalScale={0.2} attach="material" map={texture} /> */}
-                {deCalData && deCalData.map((decalGroup) => (
+                {/* <meshStandardMaterial map={text} depthTest={true} depthWrite={true} /> */}
+                {deCalData && deCalData.map((decalGroup) =>
                     decalGroup.items.map((item) => (
-                        <mesh key={item.item_mask_id} position={__handleFixPosition(item, decalGroup.key)} rotation={[0, 0, 0]} scale={__handleScale(item)}>
-                            <planeGeometry args={[1, 1]} /> Adjust the size according to your needs
-                            <meshStandardMaterial normalScale={0.2} attach="material" map={item.texture} />
-                        </mesh>
+                        <Decal
+                            key={item.itemMaskID}
+                            position={__handleFixPosition(item, decalGroup.key)}
+                            rotation={[0, 0, 0]}
+                            scale={__handleScale(item)}
+                        >
+                            <planeGeometry args={[1, 1]} />
+                            <meshStandardMaterial map={item.texture} depthTest={false} depthWrite={true} />
+                        </Decal>
                     ))
-                ))}
-
-
-
-
-
-
+                )}
 
             </mesh>
         </group>
