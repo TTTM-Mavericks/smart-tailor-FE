@@ -1,21 +1,26 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import Swal from 'sweetalert2';
 import HeaderComponent from '../../../components/Header/HeaderComponent';
 import FooterComponent from '../../../components/Footer/FooterComponent';
 import VNLocationData from '../../../locationData.json';
 
 type Location = {
+    Id: string;
     Name: string;
     Districts: District[];
 };
 
 type District = {
+    Id: string;
     Name: string;
     Wards: Ward[];
 };
 
 type Ward = {
+    Id: string;
     Name: string;
+    Level?: string;
 };
 
 type ProfileData = {
@@ -63,15 +68,27 @@ const ProfileSettings: React.FC = () => {
 
     // ---------------UseEffect---------------//
     /**
-     * Get the location to dropdown
+     * Get the location of the api and set it to dropdown
      */
     useEffect(() => {
         if (VNLocationData) {
             setLocations(VNLocationData);
+            const initialProvince = VNLocationData.find(location => location.Name === profileData.province) as Location;
+            setSelectedProvince(initialProvince || null);
+
+            if (initialProvince) {
+                const initialDistrict = initialProvince.Districts.find(district => district.Name === profileData.district) as District;
+                setSelectedDistrict(initialDistrict || null);
+
+                if (initialDistrict) {
+                    const initialWard = initialDistrict.Wards.find(ward => ward.Name === profileData.ward) as Ward;
+                    setSelectedWard(initialWard || null);
+                }
+            }
         } else {
             console.error("Không tìm thấy dữ liệu địa chỉ");
         }
-    }, []);
+    }, [profileData]);
 
     /**
      * Get the image to user for review
@@ -180,6 +197,23 @@ const ProfileSettings: React.FC = () => {
         };
 
         console.log('Updated profile data:', updatedProfileData);
+
+        // Mock API call to update the profile data (replace with actual API call)
+        const isUpdateSuccessful = true; // Simulate the success of the update operation
+
+        if (isUpdateSuccessful) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Profile Updated',
+                text: 'Your profile has been updated successfully!',
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Update Failed',
+                text: 'There was an error updating your profile. Please try again later.',
+            });
+        }
     };
 
     /**
@@ -447,7 +481,7 @@ const ProfileSettings: React.FC = () => {
                             <div className="flex justify-end">
                                 <button
                                     type="submit"
-                                    className="px-5 py-2.5 text-sm font-medium text-white bg-orange-700 rounded-lg hover:bg-orange-800 focus:ring-4 focus:outline-none focus:ring-orange-300"
+                                    className="px-5 py-2.5 text-sm font-medium text-white bg-orange-700 rounded-lg hover:bg-orange-800"
                                 >
                                     Save
                                 </button>
