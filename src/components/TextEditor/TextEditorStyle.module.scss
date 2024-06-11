@@ -1,0 +1,27 @@
+@import '../../index.module.scss';
+
+.textEditor__container{
+    width: 95%;
+    position: absolute;
+    top: 20px;
+    color: $blackColor;
+    &__inputForm{
+        height: 100px;
+    }
+    overflow-y: none;
+}
+
+.textEditor__button{
+    display: flex;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.textEditor__countLetters{
+    display: flex;
+    justify-content: end;
+    span{
+        font-size: 13px;
+    }
+}

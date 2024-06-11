@@ -1,4 +1,4 @@
-import { frontOfCloth } from "../assets";
+import { shirtBackDesign, shirtFrontDesign } from "../assets";
 import { BACK_CLOTH_PART, FRONT_CLOTH_PART, LOGO_PART, SLEEVE_CLOTH_PART } from "./ClothModel";
 import { UserInterface } from "./UserModel";
 
@@ -55,7 +55,7 @@ export const PartOfShirtDesignData = [
     partOfDesignName: LOGO_PART,
     createDate: '',
     lastModifiedDate: '',
-    imgUrl: frontOfCloth,
+    imgUrl: shirtFrontDesign,
     successImageUrl: '',
     itemMasks: [],
 
@@ -66,7 +66,7 @@ export const PartOfShirtDesignData = [
     partOfDesignName: FRONT_CLOTH_PART,
     createDate: '',
     lastModifiedDate: '',
-    imgUrl: frontOfCloth,
+    imgUrl: shirtFrontDesign,
     itemMasks: [],
   },
   {
@@ -75,7 +75,7 @@ export const PartOfShirtDesignData = [
     partOfDesignName: BACK_CLOTH_PART,
     createDate: '',
     lastModifiedDate: '',
-    imgUrl: frontOfCloth,
+    imgUrl: shirtBackDesign,
     itemMasks: [],
   },
   {
@@ -84,7 +84,7 @@ export const PartOfShirtDesignData = [
     partOfDesignName: SLEEVE_CLOTH_PART,
     createDate: '',
     lastModifiedDate: '',
-    imgUrl: frontOfCloth,
+    imgUrl: shirtFrontDesign,
     itemMasks: [],
   },
 
@@ -97,7 +97,7 @@ export const PartOfHoodieDesignData = [
     partOfDesignName: LOGO_PART,
     createDate: '',
     lastModifiedDate: '',
-    imgUrl: frontOfCloth,
+    imgUrl: shirtFrontDesign,
     successImageUrl: '',
     itemMasks: [],
 
@@ -108,7 +108,7 @@ export const PartOfHoodieDesignData = [
     partOfDesignName: FRONT_CLOTH_PART,
     createDate: '',
     lastModifiedDate: '',
-    imgUrl: frontOfCloth,
+    imgUrl: shirtFrontDesign,
     itemMasks: [],
   },
   {
@@ -117,7 +117,7 @@ export const PartOfHoodieDesignData = [
     partOfDesignName: BACK_CLOTH_PART,
     createDate: '',
     lastModifiedDate: '',
-    imgUrl: frontOfCloth,
+    imgUrl: shirtFrontDesign,
     itemMasks: [],
   },
   {
@@ -126,7 +126,7 @@ export const PartOfHoodieDesignData = [
     partOfDesignName: SLEEVE_CLOTH_PART,
     createDate: '',
     lastModifiedDate: '',
-    imgUrl: frontOfCloth,
+    imgUrl: shirtFrontDesign,
     itemMasks: [],
   },
 

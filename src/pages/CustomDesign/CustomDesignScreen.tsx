@@ -6,8 +6,8 @@ import ImageEditor from './Designer/ImageEditor'
 import styles from './CustomDesign.module.scss';
 import ImageDraggableComponent from './Components/Draggable/ImageDraggableComponent';
 import { __downloadCanvasToImage, __handleChangeImageToBase64, __handleGenerateItemId, reader } from '../../utils/DesignerUtils';
-import { ColorPicker, FilePicker } from '../../components';
-import { frontOfCloth, shirtModel, systemLogo } from '../../assets';
+import { ColorPicker, FilePicker, TextEditor } from '../../components';
+import { shirtFrontDesign, shirtModel, systemLogo } from '../../assets';
 import { HiOutlineDownload, HiShoppingCart, HiOutlineLogin } from 'react-icons/hi';
 import { FaSave, FaTshirt, FaPen, FaIcons, FaRegHeart, FaFileCode, FaHeart } from "react-icons/fa";
 import { useTranslation } from 'react-i18next';
@@ -66,7 +66,7 @@ function CustomDesignScreen() {
   // ---------------Usable Variable---------------//
   const { t, i18n } = useTranslation();
 
-  const handleUpdatePart = useCallback((updatePart: any) => { // Replace `any` with the appropriate type
+  const __handleUpdatePart = useCallback((updatePart: any) => { // Replace `any` with the appropriate type
     console.log('Received updatePart from child: ', updatePart);
     setUpdatePartData(updatePart);
     setPartOfClothData(updatePart);
@@ -148,7 +148,7 @@ function CustomDesignScreen() {
 
   useEffect(() => {
     setSelectedStamp(selectedStamp);
-  },[selectedStamp])
+  }, [selectedStamp])
   // ---------------FunctionHandler---------------//
 
   const __handleSetNewPartOfDesignData = (items: PartOfDesignInterface[] | undefined) => {
@@ -292,6 +292,25 @@ function CustomDesignScreen() {
       })
   }
 
+  const __handleAddTextToDesign = (txtBase64: any) => {
+    setSelectedStamp((prev) => {
+      const newItem: ItemMaskInterface = {
+        itemMaskID: __handleGenerateItemId(),
+        typeOfItem: 'TEXT',
+        imageUrl: txtBase64,
+        position: {x:150, y:170},
+        positionX: 150,
+        positionY: 170
+      };
+
+      if (prev && prev.length > 0) {
+        return [...prev, { ...prev[prev.length - 1], ...newItem }];
+      } else {
+        return [newItem];
+      }
+    });
+  }
+
   const __handleSelectEditorMode = (isSelected: boolean) => {
     setIsEditorMode(!isSelected);
     if (!isSelected) {
@@ -422,7 +441,7 @@ function CustomDesignScreen() {
         <div className={styles.customDesign__container__editorArea__partOfCloth}>
           {partOfClothData?.map((item: PartOfDesignInterface, key: any) => (
             <div key={key} className={styles.partOfClothSellector} style={selectedItem === item.partOfDesignName ? { border: `2px solid ${primaryColor}` } : {}} onClick={() => __handleSetSelectedItem(item)}>
-              <img src={frontOfCloth} className={styles.partOfClothSellector__img}></img>
+              <img src={item.imgUrl} className={styles.partOfClothSellector__img}></img>
             </div>
           ))}
         </div>
@@ -468,7 +487,7 @@ function CustomDesignScreen() {
                   setHighestZIndex={setHighestZIndex}
                   onDeleteItem={__handleRemoveStamp}
                   setNewItemData={(items) => __handleSetNewPartOfDesignData(items)}
-                  onUpdatePart={handleUpdatePart}
+                  onUpdatePart={__handleUpdatePart}
                   stamps={selectedStamp}
                 ></ImageDraggableComponent>
               </div>
@@ -530,10 +549,10 @@ function CustomDesignScreen() {
 
                 <button
                   className=" rounded inline-flex items-center"
-                  onClick={() => __handleSelectToolDesign('downloadTool')}
-                  style={toolSelected === 'downloadTool' ? { backgroundColor: whiteColor, borderRadius: 0 } : {}}
+                  onClick={() => __handleSelectToolDesign('textEditorTool')}
+                  style={toolSelected === 'textEditorTool' ? { backgroundColor: whiteColor, borderRadius: 0 } : {}}
                 >
-                  <IoText color={toolSelected === 'downloadTool' ? primaryColor : blackColor} size={25} className={`${styles.menuEditor__icon}`}></IoText>
+                  <IoText color={toolSelected === 'textEditorTool' ? primaryColor : blackColor} size={25} className={`${styles.menuEditor__icon}`}></IoText>
                 </button>
 
                 {/* <div
@@ -668,6 +687,15 @@ function CustomDesignScreen() {
                   className={styles.customDesign__container__editorArea__itemSelector__itemGroup__sampleItemList}
                 >
                   <FilePicker file={file} setFile={setFile} readFile={__handleReadFile} partOfCloth={selectedItem} />
+                </div>
+              )}
+
+              {toolSelected === 'textEditorTool' && (
+                <div
+                  className={styles.customDesign__container__editorArea__itemSelector__itemGroup__sampleItemList}
+                  style={{ position: 'relative' }}
+                >
+                  <TextEditor onSetText={(txtBase64) => __handleAddTextToDesign(txtBase64)}></TextEditor>
                 </div>
               )}
 

@@ -24,6 +24,7 @@ const Shirt = () => {
 
 
     useEffect(() => {
+        console.log('nodesnodesnodesnodesnodesnodes: ', nodes);
         if (snap.modelData) {
             setModelData(snap.modelData);
 

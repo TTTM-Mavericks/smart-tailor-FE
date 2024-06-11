@@ -26,6 +26,7 @@ const Hoodie = () => {
 
 
     useEffect(() => {
+        console.log('nodesnodesnodesnodesnodesnodes: ', nodes);
         if (snap.modelData) {
             setModelData(snap.modelData);
 
@@ -148,8 +149,9 @@ const Hoodie = () => {
                 scale={[1, 1, 1]}
 
             >
+                <meshBasicMaterial attach="material" map={text}/>
                 {/* <meshStandardMaterial map={text} depthTest={true} depthWrite={true} /> */}
-                {deCalData && deCalData.map((decalGroup) =>
+                {/* {deCalData && deCalData.map((decalGroup) =>
                     decalGroup.items.map((item) => (
                         <Decal
                             key={item.itemMaskID}
@@ -161,7 +163,7 @@ const Hoodie = () => {
                             <meshStandardMaterial map={item.texture} depthTest={false} depthWrite={true} />
                         </Decal>
                     ))
-                )}
+                )} */}
 
             </mesh>
         </group>
