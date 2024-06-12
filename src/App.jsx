@@ -36,6 +36,7 @@ import {
 import {
   ChangePasswordScreen,
   ForgotPassWordScreen,
+  ProfileSettings,
   SignInScreen,
   SignUpScreen,
   VerifyEmailScreen,
@@ -108,6 +109,7 @@ function App() {
           <Route path='/auth/getpassword/:emailParam' element={<ForgotPassWordScreen></ForgotPassWordScreen>} />
           <Route path='/auth/changepassword/:email' element={<ChangePasswordScreen></ChangePasswordScreen>} />
           <Route path='/auth/verify/:email' element={<VerifyEmailScreen></VerifyEmailScreen>} />
+          <Route path='/auth/profilesetting' element={<ProfileSettings></ProfileSettings>} />
 
 
           {/* Design route */}
