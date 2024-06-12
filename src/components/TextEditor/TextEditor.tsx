@@ -6,6 +6,7 @@ import styles from './TextEditorStyle.module.scss';
 import html2canvas from 'html2canvas';
 import CustomButton from '../CustomButton/CustomButton';
 import { primaryColor } from '../../root/ColorSystem';
+import { renderToStaticMarkup } from 'react-dom/server';
 
 
 // Define the props for the Editor component
@@ -14,14 +15,9 @@ interface EditorProps {
     onSetText?: (txtBase64: any) => void;
 }
 
-/*
- * Custom "star" icon for the toolbar using an Octicon
- * https://octicons.github.io
- */
 
 /*
  * Event handler to be attached using Quill toolbar module
- * http://quilljs.com/docs/modules/toolbar/
  */
 const insertStar = function (this: any) {
     const cursorPosition = this.getSelection()?.index;
@@ -64,7 +60,6 @@ const CustomToolbar: React.FC = () => (
 );
 
 // Quill modules to attach to editor
-// See http://quilljs.com/docs/modules/ for complete options
 const quillModules = {
     toolbar: {
         container: '#toolbar',
@@ -75,7 +70,6 @@ const quillModules = {
 };
 
 // Quill editor formats
-// See http://quilljs.com/docs/formats/
 const quillFormats = [
     'header',
     'font',
@@ -107,7 +101,7 @@ const TextEditor: React.FC<EditorProps> = ({ placeholder, onSetText }) => {
         if (quillRef.current) {
             const editorElement = quillRef.current.editor?.root;
             if (editorElement) {
-                // editorElement.style.transform = `rotate(${angle}deg)`;
+                editorElement.style.transform = `rotate(${angle}deg)`;
             }
         }
     };
@@ -121,7 +115,17 @@ const TextEditor: React.FC<EditorProps> = ({ placeholder, onSetText }) => {
         }
     }, []);
 
+
     // ---------------FunctionHandler---------------//
+
+    const print = () => {
+        console.log(editorHtml);
+        if (editorHtml) {
+            const txt = __handleConvertHtmlToSvg(editorHtml)
+            console.log(txt);
+        }
+
+    }
 
     const __handleChange = useCallback(() => {
         if (quillRef.current) {
@@ -147,6 +151,60 @@ const TextEditor: React.FC<EditorProps> = ({ placeholder, onSetText }) => {
             }
         }
     };
+
+    const __handleConvertHtmlToSvg = (html: string): string => {
+        // Create a parser and parse the HTML string
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+      
+        // Select the first element in the document
+        const rootElement = doc.documentElement;
+      
+        // Get all text nodes and elements in the root element
+        const textSpans = Array.from(rootElement.childNodes).map((node, index) => {
+          if (node.nodeType === Node.TEXT_NODE) {
+            return <tspan key={index}>{node.textContent}</tspan>;
+          }
+      
+          const element = node as HTMLElement;
+          const styles = window.getComputedStyle(element);
+          const tag = element.tagName.toLowerCase();
+          const attrs: { [key: string]: string | number } = {};
+      
+          if (tag === 'strong' || tag === 'em' || tag === 'span') {
+            if (tag === 'strong') attrs['font-weight'] = 'bold';
+            if (tag === 'em') attrs['font-style'] = 'italic';
+            if (element.style.color) attrs['fill'] = element.style.color;
+            if (element.classList.contains('ql-size-large')) attrs['font-size'] = 30;
+            if (element.classList.contains('ql-size-small')) attrs['font-size'] = 15;
+      
+            return (
+              <tspan key={index} {...attrs}>
+                {element.textContent}
+              </tspan>
+            );
+          }
+      
+          return <tspan key={index}>{element.textContent}</tspan>;
+        });
+      
+        // Generate SVG markup with text path
+        return renderToStaticMarkup(
+          <svg width="300" height="300" viewBox="0 0 300 300">
+            <defs>
+              <path
+                id="circlePath"
+                d="M 150, 150 m -100, 0 a 100,100 0 1,1 200,0 a 100,100 0 1,1 -200,0"
+              />
+            </defs>
+            <text font-size="20" font-family="Arial" text-anchor="middle">
+              <textPath href="#circlePath" startOffset="50%">
+                {textSpans}
+              </textPath>
+            </text>
+          </svg>
+        );
+      };
 
     return (
         <div className={styles.textEditor__container}>
@@ -174,7 +232,7 @@ const TextEditor: React.FC<EditorProps> = ({ placeholder, onSetText }) => {
                     value={angle}
                     onChange={(e) => setAngle(parseInt(e.target.value))}
                 />
-                <button onClick={applyCurvature}>Apply Curvature</button>
+                <button onClick={print}>Apply Curvature</button>
             </div>
 
 
@@ -186,6 +244,7 @@ const TextEditor: React.FC<EditorProps> = ({ placeholder, onSetText }) => {
                     customStyles={`font-size: 0.75rem; line-height: 1rem; background-color: ${primaryColor}; width: 250'`}
                 />
             </div>
+            {__handleConvertHtmlToSvg(editorHtml)}
 
         </div>
     );

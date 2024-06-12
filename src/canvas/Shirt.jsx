@@ -123,6 +123,10 @@ const Shirt = () => {
     }
 
 
+    const degreesToEuler = (degrees) => {
+        const radians = degrees * (Math.PI / 180);
+        return  radians;
+    };
 
 
     const loadTexture = (imageUrl) => {
@@ -146,7 +150,7 @@ const Shirt = () => {
                         <Decal
                             position={__handleFixPosition(item, decalGroup.key)}
                             key={item.itemMaskID}
-                            rotation={[0, 0, 0]}
+                            rotation={[0, 0, -degreesToEuler(item.rotate)]}
                             scale={__handleScale(item)}
                             map={item.texture}
                             depthTest={true}

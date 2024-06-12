@@ -20,7 +20,8 @@ import { TbHomeHeart } from "react-icons/tb";
 import ProductDialogComponent from './Components/Dialog/ProductDialogComponent';
 import api from '../../api/ApiConfig';
 import { DesignInterface, ItemMaskInterface, PartOfDesignInterface, PartOfHoodieDesignData, PartOfShirtDesignData } from '../../models/DesignModel';
-import { Skeleton } from '@mui/material';
+import { Skeleton, Slider, Tooltip } from '@mui/material';
+import ItemEditorToolsComponent from './Components/ItemEditorTools/ItemEditorToolsComponent';
 
 
 
@@ -58,6 +59,8 @@ function CustomDesignScreen() {
   const [itemMaskData, setItemMaskData] = useState<ItemMaskInterface[]>([]);
   const [newPartOfDesignData, setNewPartOfDeignData] = useState<PartOfDesignInterface[]>();
   const [updatePartData, setUpdatePartData] = useState<any>(null); // Replace `any` with the appropriate type
+  const [angle, setAngle] = useState<number>(0);
+  const [itemIdToChangeRotate, setItemIdToChangeRotate] = useState<any>();
 
 
 
@@ -82,7 +85,6 @@ function CustomDesignScreen() {
 
     __handleFetchSystemItemData();
     __handleFetchDesignModelData();
-
 
   }, []);
 
@@ -298,7 +300,7 @@ function CustomDesignScreen() {
         itemMaskID: __handleGenerateItemId(),
         typeOfItem: 'TEXT',
         imageUrl: txtBase64,
-        position: {x:150, y:170},
+        position: { x: 150, y: 170 },
         positionX: 150,
         positionY: 170
       };
@@ -396,6 +398,10 @@ function CustomDesignScreen() {
     setTypeOfModel(item);
   };
 
+  const __handleOnSetIsOtherItemSelected = (itemId: any) => {
+    setItemIdToChangeRotate(itemId);
+  }
+
   return (
     <div className={styles.customDesign__container}>
       {/* Dialog area */}
@@ -440,9 +446,11 @@ function CustomDesignScreen() {
         {/* Part of cloth of Model */}
         <div className={styles.customDesign__container__editorArea__partOfCloth}>
           {partOfClothData?.map((item: PartOfDesignInterface, key: any) => (
-            <div key={key} className={styles.partOfClothSellector} style={selectedItem === item.partOfDesignName ? { border: `2px solid ${primaryColor}` } : {}} onClick={() => __handleSetSelectedItem(item)}>
-              <img src={item.imgUrl} className={styles.partOfClothSellector__img}></img>
-            </div>
+            <Tooltip title={item.partOfDesignName} placement="bottom" arrow style={{ marginTop: -10 }}>
+              <div key={key} className={styles.partOfClothSellector} style={selectedItem === item.partOfDesignName ? { border: `2px solid ${primaryColor}` } : {}} onClick={() => __handleSetSelectedItem(item)}>
+                <img src={item.imgUrl} className={styles.partOfClothSellector__img}></img>
+              </div>
+            </Tooltip>
           ))}
         </div>
 
@@ -489,6 +497,8 @@ function CustomDesignScreen() {
                   setNewItemData={(items) => __handleSetNewPartOfDesignData(items)}
                   onUpdatePart={__handleUpdatePart}
                   stamps={selectedStamp}
+                  rotate={angle}
+                  onSetIsOtherItemSelected={(itemId) =>__handleOnSetIsOtherItemSelected(itemId)}
                 ></ImageDraggableComponent>
               </div>
             </>
@@ -763,8 +773,12 @@ function CustomDesignScreen() {
       <Designer />
       <main className={styles.customDesign__container__canvas}>
         <CanvasModel typeOfModel={typeOfModel} />
+        
       </main>
-      <ImageEditor />
+      <div className={styles.customDesign__container__itemEditor}>
+        <ItemEditorToolsComponent itemIdSelected={itemIdToChangeRotate} onValueChange={setAngle}></ItemEditorToolsComponent>
+      </div>
+
     </div >
   )
 }

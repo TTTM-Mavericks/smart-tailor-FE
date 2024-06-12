@@ -18,7 +18,8 @@ export interface ItemMaskInterface {
   isSystemItem?: boolean;
   isPremium?: boolean;
   zIndex?: any;
-  printType?: string
+  printType?: string,
+  rotate?: any
 
 
 }
@@ -58,6 +59,7 @@ export const PartOfShirtDesignData = [
     imgUrl: shirtFrontDesign,
     successImageUrl: '',
     itemMasks: [],
+    rotate: 0
 
   },
   {
@@ -68,6 +70,7 @@ export const PartOfShirtDesignData = [
     lastModifiedDate: '',
     imgUrl: shirtFrontDesign,
     itemMasks: [],
+    rotate: 0
   },
   {
     partOfDesignID: '3',
@@ -77,6 +80,7 @@ export const PartOfShirtDesignData = [
     lastModifiedDate: '',
     imgUrl: shirtBackDesign,
     itemMasks: [],
+    rotate: 0
   },
   {
     partOfDesignID: '4',
@@ -86,6 +90,7 @@ export const PartOfShirtDesignData = [
     lastModifiedDate: '',
     imgUrl: shirtFrontDesign,
     itemMasks: [],
+    rotate: 0
   },
 
 ]
@@ -100,6 +105,7 @@ export const PartOfHoodieDesignData = [
     imgUrl: shirtFrontDesign,
     successImageUrl: '',
     itemMasks: [],
+    rotate: 0
 
   },
   {
@@ -110,6 +116,7 @@ export const PartOfHoodieDesignData = [
     lastModifiedDate: '',
     imgUrl: shirtFrontDesign,
     itemMasks: [],
+    rotate: 0
   },
   {
     partOfDesignID: '3',
@@ -119,6 +126,7 @@ export const PartOfHoodieDesignData = [
     lastModifiedDate: '',
     imgUrl: shirtFrontDesign,
     itemMasks: [],
+    rotate: 0
   },
   {
     partOfDesignID: '4',
@@ -128,6 +136,7 @@ export const PartOfHoodieDesignData = [
     lastModifiedDate: '',
     imgUrl: shirtFrontDesign,
     itemMasks: [],
+    rotate: 0
   },
 
 ]
@@ -142,8 +151,8 @@ const ItemMaskDataList = [
     "isSystemItem": false,
     "isPremium": false,
     "position": {
-      "x": 0,
-      "y": 0
+      "x": 150,
+      "y": 170
     },
     "scaleX": 230,
     "scaleY": 230,
@@ -161,11 +170,11 @@ const ItemMaskDataList = [
     "isSystemItem": false,
     "isPremium": false,
     "position": {
-      "x": 0,
-      "y": 0
+      "x": 150,
+      "y": 170
     },
-    "scaleX": 19,
-    "scaleY": 6,
+    "scaleX": 230,
+    "scaleY": 230,
     "imageUrl": "https://res.cloudinary.com/dby2saqmn/image/upload/v1717753160/system-item/ksq4ukq6y7rrqphhargb.png",
     "print_type": "print_type 2",
     "createDate": 1717587082,
@@ -180,8 +189,8 @@ const ItemMaskDataList = [
     "isSystemItem": false,
     "isPremium": false,
     "position": {
-      "x": 0,
-      "y": 0
+      "x": 150,
+      "y": 170
     },
     "scaleX": 230,
     "scaleY": 230,
@@ -199,8 +208,8 @@ const ItemMaskDataList = [
     "isSystemItem": false,
     "isPremium": false,
     "position": {
-      "x": 0,
-      "y": 0
+      "x": 150,
+      "y": 170
     },
     "scaleX": 230,
     "scaleY": 230,
@@ -218,8 +227,8 @@ const ItemMaskDataList = [
     "isSystemItem": false,
     "isPremium": false,
     "position": {
-      "x": 0,
-      "y": 0
+      "x": 150,
+      "y": 170
     },
     "scaleX": 230,
     "scaleY": 230,
@@ -237,8 +246,8 @@ const ItemMaskDataList = [
     "isSystemItem": false,
     "isPremium": false,
     "position": {
-      "x": 0,
-      "y": 0
+      "x": 150,
+      "y": 170
     },
     "scaleX": 230,
     "scaleY": 230,
@@ -256,8 +265,8 @@ const ItemMaskDataList = [
     "isSystemItem": false,
     "isPremium": false,
     "position": {
-      "x": 0,
-      "y": 0
+      "x": 150,
+      "y": 170
     },
     "scaleX": 230,
     "scaleY": 230,
@@ -275,11 +284,11 @@ const ItemMaskDataList = [
     "isSystemItem": false,
     "isPremium": false,
     "position": {
-      "x": 0,
-      "y": 0
+      "x": 150,
+      "y": 170
     },
-    "scaleX": 97,
-    "scaleY": 27,
+    "scaleX": 230,
+    "scaleY": 230,
     "imageUrl": "imageUrl 8",
     "print_type": "print_type 8",
     "createDate": 1717586722,
@@ -294,11 +303,11 @@ const ItemMaskDataList = [
     "isSystemItem": false,
     "isPremium": false,
     "position": {
-      "x": 0,
-      "y": 0
+      "x": 150,
+      "y": 170
     },
-    "scaleX": 88,
-    "scaleY": 23,
+    "scaleX": 230,
+    "scaleY": 230,
     "imageUrl": "imageUrl 9",
     "print_type": "print_type 9",
     "createDate": 1717586662,

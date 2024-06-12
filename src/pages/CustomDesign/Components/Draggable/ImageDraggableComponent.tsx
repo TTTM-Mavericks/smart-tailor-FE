@@ -21,6 +21,8 @@ type props = {
     setNewItemData: (items: PartOfDesignInterface[] | undefined) => void;
     onUpdatePart: (updatePart: PartOfDesignInterface[]) => void;
     stamps?: ItemMaskInterface[] | undefined;
+    rotate?: any;
+    onSetIsOtherItemSelected?: (itemId: any)=>void;
 }
 
 const ImageDraggableComponent: React.FC<props> = ({
@@ -35,7 +37,9 @@ const ImageDraggableComponent: React.FC<props> = ({
     onDeleteItem,
     setNewItemData,
     onUpdatePart,
-    stamps
+    stamps,
+    rotate,
+    onSetIsOtherItemSelected
 }) => {
 
     // TODO MUTIL LANGUAGE
@@ -98,8 +102,6 @@ const ImageDraggableComponent: React.FC<props> = ({
         __handleSetNewPartOfDesignData();
     }, [itemPositions, itemZIndices, size.width, size.height, selectedItemDrag, data]);
 
-
-
     /**
      * Set size of resizable
      */
@@ -121,6 +123,26 @@ const ImageDraggableComponent: React.FC<props> = ({
             console.log('w: ', rect.width, '- h: ', rect.height);
         }
     }, [resizing]);
+
+    /**
+     * Set rotate degree for item
+     */
+    useEffect(() => {
+        if (!selectedItemDrag) return;
+        setData((prevData) => {
+            if (!prevData) return prevData;
+            return prevData.map((dataItem: ItemMaskInterface) => {
+                if (dataItem.itemMaskID === selectedItemDrag.itemMaskID) {
+                    return {
+                        ...dataItem,
+                        rotate: rotate
+                    };
+                }
+                return dataItem;
+            });
+        });
+        console.log(`${rotate}deg`);
+    }, [rotate,selectedItemDrag])
 
 
     // ---------------FunctionHandler---------------//
@@ -166,6 +188,9 @@ const ImageDraggableComponent: React.FC<props> = ({
      */
     const __handleSelectedIteamDrag = (item: ItemMaskInterface) => {
         setSelectedItemDrag(item);
+        if(onSetIsOtherItemSelected) {
+            onSetIsOtherItemSelected(item.itemMaskID);
+        }
     };
 
     /**
@@ -178,7 +203,7 @@ const ImageDraggableComponent: React.FC<props> = ({
         const target = e.target as HTMLElement;
         if (target) {
             e.preventDefault();
-            setSelectedItemDrag(item);
+            // setSelectedItemDrag(item);
 
         }
     };
@@ -218,7 +243,8 @@ const ImageDraggableComponent: React.FC<props> = ({
                                 ...dataItem,
                                 position: { x: x, y: y },
                                 positionX: x,
-                                positionY: y
+                                positionY: y,
+                                rotate: rotate
                             };
                         }
                         console.log('{ x: x, y: y }: ', { x: x, y: y });
@@ -351,6 +377,8 @@ const ImageDraggableComponent: React.FC<props> = ({
         }
     };
 
+    
+
     /**
      * resizableItems element
      */
@@ -373,9 +401,10 @@ const ImageDraggableComponent: React.FC<props> = ({
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                // backgroundColor: 'white',
                                 border: 'none',
                                 zIndex: itemZIndices[item.itemMaskID] ?? 1,
+                                rotate: `${item.rotate}deg`
+
                             }}
                             onResizeStart={__handleResizeStart}
                             onResize={__handleOnResize}
