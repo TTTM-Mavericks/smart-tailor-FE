@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import Rating from '@mui/material/Rating';
 import { motion, useInView } from 'framer-motion';
+import { TokenRefreshDialogComponent } from '../Authentication';
 
 const products = [
     {
@@ -140,6 +141,7 @@ const HomeScreen = () => {
         <div>
             {/* Header */}
             <HeaderComponent></HeaderComponent>
+            <TokenRefreshDialogComponent></TokenRefreshDialogComponent>
 
 
             {/* Slider */}
@@ -276,7 +278,7 @@ const HomeScreen = () => {
                                                 className="text-indigo-400 underline"
                                                 style={{
                                                     textDecoration: "none",
-                                                    backgroundColor: "#E96208",
+                                                    backgroundColor: primaryColor,
                                                     color: "white",
                                                     padding: "5px",
                                                     borderRadius: "6%",

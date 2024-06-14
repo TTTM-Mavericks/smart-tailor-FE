@@ -1,9 +1,9 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useSnapshot } from "valtio";
-import { CustomButton } from "../../../components";
 import { fadeAnimation, slideAnimation } from "../../../config/MotionSetting";
 import styles from './Designer.module.scss';
 import state from "../../../store";
+import { CustomButton } from "../../../components";
 
 const ImageEditor = () => {
     const snap = useSnapshot(state);

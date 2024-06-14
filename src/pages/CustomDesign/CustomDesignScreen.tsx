@@ -7,7 +7,9 @@ import styles from './CustomDesign.module.scss';
 import ImageDraggableComponent from './Components/Draggable/ImageDraggableComponent';
 import { __downloadCanvasToImage, __handleChangeImageToBase64, __handleGenerateItemId, reader } from '../../utils/DesignerUtils';
 import { ColorPicker, FilePicker, TextEditor } from '../../components';
-import { shirtFrontDesign, shirtModel, systemLogo } from '../../assets';
+import { shirtFrontDesign } from '../../assets';
+// import { ColorPicker, FilePicker } from '../../components';
+import { shirtModel, systemLogo } from '../../assets';
 import { HiOutlineDownload, HiShoppingCart, HiOutlineLogin } from 'react-icons/hi';
 import { FaSave, FaTshirt, FaPen, FaIcons, FaRegHeart, FaFileCode, FaHeart } from "react-icons/fa";
 import { useTranslation } from 'react-i18next';
@@ -498,7 +500,7 @@ function CustomDesignScreen() {
                   onUpdatePart={__handleUpdatePart}
                   stamps={selectedStamp}
                   rotate={angle}
-                  onSetIsOtherItemSelected={(itemId) =>__handleOnSetIsOtherItemSelected(itemId)}
+                  onSetIsOtherItemSelected={(itemId) => __handleOnSetIsOtherItemSelected(itemId)}
                 ></ImageDraggableComponent>
               </div>
             </>
@@ -773,7 +775,7 @@ function CustomDesignScreen() {
       <Designer />
       <main className={styles.customDesign__container__canvas}>
         <CanvasModel typeOfModel={typeOfModel} />
-        
+
       </main>
       <div className={styles.customDesign__container__itemEditor}>
         <ItemEditorToolsComponent itemIdSelected={itemIdToChangeRotate} onValueChange={setAngle}></ItemEditorToolsComponent>

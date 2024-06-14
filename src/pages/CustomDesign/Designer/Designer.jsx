@@ -6,9 +6,10 @@ import { EditorTabs, FilterTabs, DecalTypes } from "../../../config/TabSetting"
 import { download } from "../../../assets"
 import { __downloadCanvasToImage, reader, __urlToBase64 } from "../../../utils/DesignerUtils"
 import { fadeAnimation, slideAnimation } from "../../../config/MotionSetting";
-import { ColorPicker, FilePicker, CustomButton, Tab } from "../../../components";
+// import { ColorPicker, FilePicker, CustomButton, Tab } from "../../../components";
 import styles from './Designer.module.scss'
 import state from "../../../store";
+import { ColorPicker, FilePicker } from "../../../components";
 
 const Designer = () => {
   const snap = useSnapshot(state);

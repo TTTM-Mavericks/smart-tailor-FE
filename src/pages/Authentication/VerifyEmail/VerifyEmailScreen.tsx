@@ -84,13 +84,11 @@ export default function VerifyEmailScreen() {
                             navigate('/auth/signin');
                         }, 5000)
                     } else {
-                        toast.error(`${response.message}`, { autoClose: 4000 });
+                        // toast.error(`${response.message}`, { autoClose: 4000 });
                     }
                 } catch (error) {
                     console.error('Error checking verification status:', error);
                     setIsLoading(false);
-                    toast.error(`${error}`, { autoClose: 3000 });
-
                 }
             };
 
@@ -137,7 +135,7 @@ export default function VerifyEmailScreen() {
             try {
                 const requestData = userParse
 
-                const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.signup}`, requestData);
+                const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.resendVerificationToken}`, requestData);
                 if (response.status === 200) {
                     console.log('resend');
                     console.log(response);

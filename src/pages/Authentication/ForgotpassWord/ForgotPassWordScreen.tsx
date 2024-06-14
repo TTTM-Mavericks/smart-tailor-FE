@@ -97,11 +97,12 @@ export default function ForgotPassWordScreen() {
             console.log('verify');
             setIsVerify(true);
             clearInterval(intervalId);
+          } else {
+            toast.error(`${response.message}`, { autoClose: 4000 });
           }
         } catch (error) {
           console.error('Error checking verification status:', error);
           setIsLoading(false);
-          toast.error(`${error}`, { autoClose: 4000 });
         }
       };
       intervalId = setInterval(checkVerificationStatus, 5000);
@@ -133,7 +134,7 @@ export default function ForgotPassWordScreen() {
 
     setIsLoading(true);
     try {
-      const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.forgot}?email=${email}`);
+      const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.forgot}/${email}`);
       if (response.status === 200) {
         console.log('retrieve');
         setIsEmailSent(true);

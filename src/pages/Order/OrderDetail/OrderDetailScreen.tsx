@@ -5,6 +5,7 @@ import FooterComponent from '../../../components/Footer/FooterComponent';
 import { IconButton } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { primaryColor } from '../../../root/ColorSystem';
 
 const OrderDetailScreen: React.FC = () => {
 
@@ -247,7 +248,7 @@ const OrderDetailScreen: React.FC = () => {
                             bottom: '20px',
                             right: '20px',
                             zIndex: 100,
-                            backgroundColor: "#E96208",
+                            backgroundColor: primaryColor,
                             color: "white"
                         }}
                         onClick={_handleScrollToTop}
