@@ -6,7 +6,7 @@ import ImageEditor from './Designer/ImageEditor'
 import styles from './CustomDesign.module.scss';
 import ImageDraggableComponent from './Components/Draggable/ImageDraggableComponent';
 import { __downloadCanvasToImage, __handleChangeImageToBase64, __handleGenerateItemId, reader } from '../../utils/DesignerUtils';
-import { ColorPicker, FilePicker } from '../../components';
+// import { ColorPicker, FilePicker } from '../../components';
 import { frontOfCloth, shirtModel, systemLogo } from '../../assets';
 import { HiOutlineDownload, HiShoppingCart, HiOutlineLogin } from 'react-icons/hi';
 import { FaSave, FaTshirt, FaPen, FaIcons, FaRegHeart, FaFileCode, FaHeart } from "react-icons/fa";
@@ -21,6 +21,7 @@ import ProductDialogComponent from './Components/Dialog/ProductDialogComponent';
 import api from '../../api/ApiConfig';
 import { DesignInterface, ItemMaskInterface, PartOfDesignInterface, PartOfShirtDesignData } from '../../models/DesignModel';
 import { Skeleton } from '@mui/material';
+import { ColorPicker, FilePicker } from '../../components';
 
 
 

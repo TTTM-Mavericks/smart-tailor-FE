@@ -39,6 +39,7 @@ import {
   ProfileSettings,
   SignInScreen,
   SignUpScreen,
+  TokenRefreshDialogComponent,
   VerifyEmailScreen,
 } from './pages/Authentication';
 
@@ -101,7 +102,7 @@ function App() {
         <Routes>
 
           {/* Init/Home route */}
-          <Route exact path='/' element={<HomeScreen></HomeScreen>} />
+          <Route index element={<HomeScreen></HomeScreen>} />
 
           {/* Auth route */}
           <Route path='/auth/signin' element={<SignInScreen></SignInScreen>} />

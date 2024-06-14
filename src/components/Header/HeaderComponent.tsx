@@ -19,6 +19,8 @@ import {
 import { Logout } from '@mui/icons-material';
 import HeaderLanguageSetting from '../LanguageSetting/LanguageSettingComponent';
 import { UserInterface } from '../../models/UserModel';
+import Cookies from 'js-cookie';
+import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../api/ApiConfig';
 
 const navigation = {
   categories: [
@@ -202,9 +204,35 @@ export default function HeaderComponent() {
   };
 
   // Logout 
-  const handleLogout = () => {
-    localStorage.clear()
-    window.location.href = 'https://smart-tailor-fe.pages.dev/auth/signin'
+  const __handleLogout = async () => {
+    try {
+      const authToken = Cookies.get('token');
+      console.log('authToken: ', authToken);
+
+      const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.signout}`, authToken);
+      if (response.status === 200) {
+        // if (response.data.user.role === 'CUSTOMER') {
+        //   localStorage.setItem('subrole', JSON.stringify(response.subrole));
+        // }
+        localStorage.clear();
+        Cookies.remove('token');
+        Cookies.remove('refreshToken');
+        window.location.href = '/auth/signin'
+
+      } else {
+
+      }
+      console.log(response);
+
+    } catch (error: any) {
+      console.error('Error posting data:', error);
+
+      // Toast.show({
+      //   type: 'error',
+      //   text1: JSON.stringify(error.message),
+      //   position: 'top'
+      // });
+    }
   }
 
   // Get language in local storage
@@ -609,7 +637,7 @@ export default function HeaderComponent() {
 
                   {/* Profile */}
                   <React.Fragment>
-                    <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
                       <Tooltip title={t(codeLanguage + '000044')}>
                         <IconButton
                           onClick={handleClick}
@@ -622,7 +650,7 @@ export default function HeaderComponent() {
                           <Avatar src={userLogined?.avatar} sx={{ width: 32, height: 32 }}>M</Avatar>
                         </IconButton>
                       </Tooltip>
-                    </Box>
+                    </div>
                     <Menu
                       anchorEl={anchorEl}
                       id="account-menu"
@@ -664,7 +692,7 @@ export default function HeaderComponent() {
                         </a>
                       </MenuItem>
                       <Divider />
-                      <MenuItem onClick={handleLogout}>
+                      <MenuItem onClick={__handleLogout}>
                         <ListItemIcon>
                           <Logout fontSize="small" />
                         </ListItemIcon>
