@@ -7,9 +7,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 import { jwtDecode } from 'jwt-decode';
 import Cookies from 'js-cookie';
-import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
+import api, { featuresEndpoints, functionEndpoints, isAuthenticated, versionEndpoints } from '../../../../api/ApiConfig';
 import { ToastContainer, toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
 import LoadingComponent from '../../../../components/Loading/LoadingComponent';
 import { primaryColor, redColor, whiteColor } from '../../../../root/ColorSystem';
 
@@ -97,36 +96,11 @@ const TokenRefreshDialogComponent: React.FC = () => {
         }
     }
 
-    /**
-     * Check validate token
-     * @param token 
-     * @returns 
-     */
-    const tokenIsValid = (token: string) => {
-        try {
-            const decoded = jwtDecode(token);
-            const expiration = decoded.exp;
-            return expiration && expiration > Math.floor(Date.now() / 1000);
-        } catch (error) {
-            return false;
-        }
-    };
 
-    /**
-     * Check validate token
-     * @param token 
-     * @returns 
-     */
-    const isAuthenticated = (token: any) => {
-
-        if (!tokenIsValid(token)) {
-            return false;
-        } else return true
-    }
 
     return (
-        <div style={{}}>
-            <div style={{width: '100%', marginTop: -80}}>
+        <div>
+            <div style={{width: '100%', marginTop: 0, overflow: 'hidden'}}>
                 <LoadingComponent isLoading={isLoading} time={5000}></LoadingComponent>
             </div>
             <ToastContainer />

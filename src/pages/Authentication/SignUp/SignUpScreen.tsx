@@ -149,6 +149,10 @@ export default function SignUpScreen() {
         toast.error(`${response.message}`, { autoClose: 4000 });
 
       }
+
+      if (response.status === 400) {
+        await __handleResendEmail();
+      }
       console.log(response);
     } catch (error: any) {
       setIsloading(false);
@@ -157,8 +161,31 @@ export default function SignUpScreen() {
 
     }
 
-
   };
+
+  /**
+     * Handle resend to email
+     */
+  const __handleResendEmail = async () => {
+    console.log(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.resendVerificationToken}/${email}`);
+    try {
+      const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.resendVerificationToken}/${email}`);
+      if (response.status === 200) {
+        console.log('resend');
+        navigate(`/auth/verify/${email}`);
+        setIsloading(false);
+        console.log(response);
+      } else {
+        setIsloading(false);
+        toast.error(`${response.message}`, { autoClose: 4000 });
+      }
+    } catch (error: any) {
+      console.error('Error posting data:', error);
+      toast.error(`${error}`, { autoClose: 4000 });
+      setIsloading(false);
+    }
+  }
+
   return (
     <ThemeProvider theme={defaultTheme}>
       <ImageMasonry></ImageMasonry>
@@ -225,7 +252,7 @@ export default function SignUpScreen() {
               </h2>
             </div>
 
-            <div className="sm:mx-auto text-center sm:w-full sm:max-w-sm " style={{color: primaryColor}}>
+            <div className="sm:mx-auto text-center sm:w-full sm:max-w-sm " style={{ color: primaryColor }}>
               <h4>{t(codeLanguage + '000017')}</h4>
             </div>
 

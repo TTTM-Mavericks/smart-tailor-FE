@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
+import { jwtDecode } from 'jwt-decode';
 
 
 // const baseURL = 'https://whear-app.azurewebsites.net';
@@ -24,7 +25,7 @@ export const functionEndpoints = {
     checkVerify: '/check-verify-account',
     checkVerifyPassword: '/check-verify-forgot-password',
     signout: '/log-out',
-    resendVerificationToken: 'resend-verification-token',
+    resendVerificationToken: '/resend-verification-token',
     refreshToken: '/refresh-token'
   },
   design: {
@@ -101,5 +102,32 @@ const getRequestConfig = (accessToken?: string, params?: any): AxiosRequestConfi
     params,
   };
 };
+
+/**
+ * Check validate token
+ * @param token 
+ * @returns 
+ */
+export const tokenIsValid = (token: string) => {
+  try {
+    const decoded = jwtDecode(token);
+    const expiration = decoded.exp;
+    return expiration && expiration > Math.floor(Date.now() / 1000);
+  } catch (error) {
+    return false;
+  }
+};
+
+/**
+ * Check validate token
+ * @param token 
+ * @returns 
+ */
+export const isAuthenticated = (token: any) => {
+
+  if (!tokenIsValid(token)) {
+    return false;
+  } else return true
+}
 
 export default api;

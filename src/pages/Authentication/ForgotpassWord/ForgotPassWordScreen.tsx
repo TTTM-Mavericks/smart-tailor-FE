@@ -33,6 +33,7 @@ export default function ForgotPassWordScreen() {
   const [password, setPassword] = React.useState<string>('');
   const [errorPasswordValidate, setPasswordErrorValidate] = React.useState<string>('');
   const [isPasswordValidate, setIsPasswordValidate] = React.useState<boolean>(true);
+  const [hideResent, setHideResent] = React.useState<boolean>(false);
 
   // ---------------Usable Variable---------------//
   const { t, i18n } = useTranslation();
@@ -98,7 +99,6 @@ export default function ForgotPassWordScreen() {
             setIsVerify(true);
             clearInterval(intervalId);
           } else {
-            toast.error(`${response.message}`, { autoClose: 4000 });
           }
         } catch (error) {
           console.error('Error checking verification status:', error);
@@ -209,6 +209,36 @@ export default function ForgotPassWordScreen() {
 
   }
 
+  /**
+     * Handle resend to email
+     */
+  const __handleResendEmail = async () => {
+    setIsEmailSent(false);
+    console.log(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.resendVerificationToken}/${email}`);
+    try {
+      setIsLoading(true);
+      const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.resendVerificationToken}/${email}`);
+      if (response.status === 200) {
+        console.log('resend');
+        toast.success(`${response.message}`, { autoClose: 4000 });
+        setIsEmailSent(true);
+        setIsLoading(false);
+        setHideResent(true);
+        setTimeout(() => {
+        }, 2000)
+      } else {
+        setIsLoading(false);
+        toast.error(`${response.message}`, { autoClose: 4000 });
+        setIsEmailSent(false);
+      }
+    } catch (error: any) {
+      console.error('Error posting data:', error);
+      toast.error(`${error}`, { autoClose: 4000 });
+      setIsLoading(false);
+      setIsEmailSent(false);
+    }
+  }
+
   return (
     <ThemeProvider theme={defaultTheme}>
       <LoadingComponent isLoading={isLoading} time={5000}></LoadingComponent>
@@ -291,7 +321,7 @@ export default function ForgotPassWordScreen() {
                     placeholder='Email'
                     autoComplete="email"
                     required
-                    className={`block h-11 w-full pl-3 pr-10 rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6  ${styles.signup__input}`}
+                    className={`block h-11 w-full pl-3 pr-10 rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6  ${styles.forgot__input}`}
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
@@ -317,7 +347,7 @@ export default function ForgotPassWordScreen() {
                         placeholder={t(codeLanguage + '000010')}
                         autoComplete="current-password"
                         required
-                        className={`block h-11 w-full pl-3 pr-10 rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6  ${styles.changepassword__input}`}
+                        className={`block h-11 w-full pl-3 pr-10 rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6  ${styles.forgot__input}`}
                         onChange={(e) => setPassword(e.target.value)}
 
                       />
@@ -349,9 +379,18 @@ export default function ForgotPassWordScreen() {
                 >
                   {!isEmailSent ? 'Retrieve new password' : !isVerify ? 'Please verify in your email' : 'Change password'}
                 </button>
+
+                {isEmailSent && (
+                  <p className="mt-5 pr-1 text-center text-sm text-gray-500">
+                    Have not recieved yet? {' '}
+                    <a style={{ cursor: 'pointer', color: redColor }} onClick={() => __handleResendEmail()} className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+                      Resend email
+                    </a>
+                  </p>
+                )}
               </div>
 
-              <p className="mt-10 text-center text-sm text-gray-500">
+              <p className="mt-2 text-center text-sm text-gray-500">
                 {t(codeLanguage + '000008')}?{' '}
                 <a href="/auth/signup" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
                   {t(codeLanguage + '000015')}

@@ -1,5 +1,5 @@
 export interface UserInterface {
-    avatar: string;
+    avatar?: string;
     email: string;
     fullName: string;
     language: string | null;
@@ -8,4 +8,5 @@ export interface UserInterface {
     roleName: string;
     userID: string;
     userStatus: boolean;
+    imageUrl?: string
   }

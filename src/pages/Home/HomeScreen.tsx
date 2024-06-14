@@ -141,8 +141,6 @@ const HomeScreen = () => {
         <div>
             {/* Header */}
             <HeaderComponent></HeaderComponent>
-            <TokenRefreshDialogComponent></TokenRefreshDialogComponent>
-
 
             {/* Slider */}
             <div className="relative overflow-hidden bg-white mt-20 ">

@@ -65,7 +65,7 @@ export default function VerifyEmailScreen() {
     *
     */
     React.useEffect(() => {
-        if (email || isResend) {
+        if (email && !isResend) {
 
             let intervalId: any;
             const checkVerificationStatus = async () => {
@@ -129,25 +129,29 @@ export default function VerifyEmailScreen() {
      * Handle resend to email
      */
     const __handleResendEmail = async () => {
-        const userRegister = localStorage.getItem('userRegister');
-        if (userRegister) {
-            const userParse = JSON.parse(userRegister);
-            try {
-                const requestData = userParse
-
-                const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.resendVerificationToken}`, requestData);
-                if (response.status === 200) {
-                    console.log('resend');
-                    console.log(response);
-                    setIsResend(true);
-                } else {
-                    toast.error(`${response.message}`, { autoClose: 4000 });
-                }
-            } catch (error: any) {
-                console.error('Error posting data:', error);
-                toast.error(`${error}`, { autoClose: 4000 });
-
+        setIsResend(true);
+        console.log(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.resendVerificationToken}/${email}`);
+        try {
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.resendVerificationToken}/${email}`);
+            if (response.status === 200) {
+                console.log('resend');
+                navigate(`/auth/verify/${email}`);
+                setIsLoading(false);
+                toast.success(`${response.message}`, { autoClose: 4000 });
+                setIsResend(true);
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000)
+            } else {
+                setIsLoading(false);
+                toast.error(`${response.message}`, { autoClose: 4000 });
+                setIsResend(false);
             }
+        } catch (error: any) {
+            console.error('Error posting data:', error);
+            toast.error(`${error}`, { autoClose: 4000 });
+            setIsLoading(false);
+            setIsResend(false);
         }
     }
 
@@ -232,17 +236,28 @@ export default function VerifyEmailScreen() {
 
 
                             <div className="mt-3">
+                                {!isResend ? (
+                                    <button
+                                        type="submit"
+                                        className="flex h-11 w-full items-center justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                        style={{ backgroundColor: !isVerify ? redColor : greenColor }}
+                                    >
+                                        {!isVerify && (<CircularProgress className='mr-2' color={'primary'} style={{ width: 30, height: 30 }} />)}
 
-                                <button
-                                    type="submit"
-                                    className="flex h-11 w-full items-center justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                                    style={{ backgroundColor: !isVerify ? redColor : greenColor }}
-                                >
-                                    {!isVerify && (<CircularProgress className='mr-2' color={'primary'} style={{ width: 30, height: 30 }} />)}
+                                        {/* {secondsLeft !== 0 ? `${t(codeLanguage + '000125')} ( ${secondsLeft}s )` : `${t(codeLanguage + '000127')}`} */}
+                                        {isVerify ? `Verified! Change to login (${secondsLeft}s )` : 'Verifing...'}
+                                    </button>
+                                )
+                                    : (
+                                        <button
+                                        type="submit"
+                                        className="flex h-11 w-full items-center justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                        style={{ backgroundColor: greenColor }}
+                                    >
+                                       <CircularProgress className='mr-2' color={'primary'} style={{ width: 30, height: 30 }} /> Verify code is sending 
+                                    </button>
+                            )}
 
-                                    {/* {secondsLeft !== 0 ? `${t(codeLanguage + '000125')} ( ${secondsLeft}s )` : `${t(codeLanguage + '000127')}`} */}
-                                    {isVerify ? `Verified! Change to login (${secondsLeft}s )` : 'Verifing...'}
-                                </button>
                             </div>
 
                             <p className="mt-2 pr-1 text-center text-sm text-gray-500">
