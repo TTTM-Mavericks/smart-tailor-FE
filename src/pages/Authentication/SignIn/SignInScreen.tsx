@@ -284,7 +284,6 @@ function SignInScreen() {
 
   return (
     <GoogleOAuthProvider clientId="1051460649548-ijlrpmgdcmd5td1apidcpauh3dhv7u26.apps.googleusercontent.com">
-
       <ThemeProvider theme={defaultTheme}>
         <ImageMasonry></ImageMasonry>
         <ToastContainer />

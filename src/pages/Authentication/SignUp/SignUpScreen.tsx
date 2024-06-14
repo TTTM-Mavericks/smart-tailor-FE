@@ -12,6 +12,8 @@ import { __validateEmail, __validatePassword } from '../Utils';
 import { useNavigate } from 'react-router-dom';
 import LoadingComponent from '../../../components/Loading/LoadingComponent';
 import { toast, ToastContainer } from 'react-toastify';
+import ImageMasonry from '../../../components/ImageMasonry/ImageMasonryCoponent';
+import { primaryColor } from '../../../root/ColorSystem';
 
 const defaultTheme = createTheme();
 
@@ -123,7 +125,7 @@ export default function SignUpScreen() {
      */
   const __handleSignUp = async () => {
 
-    if(!isPasswordMacth || (!isEmailValidate &&!isPasswordConfirmValidate && !isPasswordValidate) ){
+    if (!isPasswordMacth || (!isEmailValidate && !isPasswordConfirmValidate && !isPasswordValidate)) {
       toast.error(`Invalid input. Please check!`, { autoClose: 4000 });
       return;
     }
@@ -159,6 +161,7 @@ export default function SignUpScreen() {
   };
   return (
     <ThemeProvider theme={defaultTheme}>
+      <ImageMasonry></ImageMasonry>
       <LoadingComponent isLoading={isLoading} time={5000}></LoadingComponent>
       <ToastContainer />
       <div className={styles.signup__container}>
@@ -222,7 +225,7 @@ export default function SignUpScreen() {
               </h2>
             </div>
 
-            <div className="sm:mx-auto text-center sm:w-full sm:max-w-sm">
+            <div className="sm:mx-auto text-center sm:w-full sm:max-w-sm " style={{color: primaryColor}}>
               <h4>{t(codeLanguage + '000017')}</h4>
             </div>
 
