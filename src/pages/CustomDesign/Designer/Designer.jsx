@@ -9,7 +9,7 @@ import { fadeAnimation, slideAnimation } from "../../../config/MotionSetting";
 // import { ColorPicker, FilePicker, CustomButton, Tab } from "../../../components";
 import styles from './Designer.module.scss'
 import state from "../../../store";
-import { ColorPicker, FilePicker } from "../../../components";
+import { ColorPicker, FilePicker, Tab } from "../../../components";
 
 const Designer = () => {
   const snap = useSnapshot(state);

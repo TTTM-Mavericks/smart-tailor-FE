@@ -22,7 +22,7 @@ type props = {
     onUpdatePart: (updatePart: PartOfDesignInterface[]) => void;
     stamps?: ItemMaskInterface[] | undefined;
     rotate?: any;
-    onSetIsOtherItemSelected?: (itemId: any)=>void;
+    onSetIsOtherItemSelected?: (itemId: any) => void;
 }
 
 const ImageDraggableComponent: React.FC<props> = ({
@@ -142,7 +142,7 @@ const ImageDraggableComponent: React.FC<props> = ({
             });
         });
         console.log(`${rotate}deg`);
-    }, [rotate,selectedItemDrag])
+    }, [rotate, selectedItemDrag])
 
 
     // ---------------FunctionHandler---------------//
@@ -188,7 +188,7 @@ const ImageDraggableComponent: React.FC<props> = ({
      */
     const __handleSelectedIteamDrag = (item: ItemMaskInterface) => {
         setSelectedItemDrag(item);
-        if(onSetIsOtherItemSelected) {
+        if (onSetIsOtherItemSelected) {
             onSetIsOtherItemSelected(item.itemMaskID);
         }
     };
@@ -377,7 +377,7 @@ const ImageDraggableComponent: React.FC<props> = ({
         }
     };
 
-    
+
 
     /**
      * resizableItems element
@@ -395,8 +395,9 @@ const ImageDraggableComponent: React.FC<props> = ({
                     defaultClassNameDragged={`${styles.imageDraggable__resizeable} imageDraggable__resizeable`}
 
                 >
-                    <div style={{ position: 'absolute', zIndex: itemZIndices[item.itemMaskID] ?? 1 }} onContextMenu={(e: any) => __handleContextMenu(e, item)}>
+                    <div key={item.itemMaskID} style={{ position: 'absolute', zIndex: itemZIndices[item.itemMaskID] ?? 1 }} onContextMenu={(e: any) => __handleContextMenu(e, item)}>
                         <Resizable
+                            key={item.itemMaskID}
                             style={{
                                 display: 'flex',
                                 alignItems: 'center',
