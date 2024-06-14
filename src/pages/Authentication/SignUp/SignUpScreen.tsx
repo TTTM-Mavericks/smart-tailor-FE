@@ -133,6 +133,7 @@ export default function SignUpScreen() {
       const requestData = {
         email: email,
         password: password,
+        roleName: 'CUSTOMER'
       }
 
       const response = await api.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.signup}`, requestData);
@@ -184,7 +185,7 @@ export default function SignUpScreen() {
             leaveTo="transform opacity-0 scale-95"
 
           >
-            <Menu.Items className="absolute justify-center items-center right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <Menu.Items className="absolute justify-center items-center right-0 z-10 mt-1 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
               <Menu.Item>
                 <button className={`flex  space-x-2 ${styles.language__button}`} onClick={() => handleLanguageChange('vi')}>
                   <div className={`${styles.language__button}`}>
@@ -216,7 +217,7 @@ export default function SignUpScreen() {
                 src={systemLogo}
                 alt="Your Company"
               />
-              <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+              <h2 className=" text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
                 {t(codeLanguage + '000003')}
               </h2>
             </div>
@@ -225,7 +226,7 @@ export default function SignUpScreen() {
               <h4>{t(codeLanguage + '000017')}</h4>
             </div>
 
-            <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+            <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
               <div className="space-y-6" >
 
                 <div className="mt-2">
@@ -316,13 +317,13 @@ export default function SignUpScreen() {
                 </button>
 
 
-                <button
+                {/* <button
                   type="submit"
                   className={`${styles.signupGoogle__btn} flex mb-2 h-11 w-full items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white`}
                   onClick={() => window.location.href = 'https://st.mavericks-tttm.studio/oauth2/authorization/google'}
                 >
                   {t(codeLanguage + '000006')}
-                </button>
+                </button> */}
 
               </div>
 

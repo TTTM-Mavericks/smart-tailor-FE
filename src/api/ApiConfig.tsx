@@ -3,7 +3,9 @@ import axios, { AxiosRequestConfig } from 'axios';
 
 // const baseURL = 'https://whear-app.azurewebsites.net';
 // const baseURL = 'https://tam.mavericks-tttm.studio';
-export const baseURL = 'https://be.mavericks-tttm.studio';
+// export const baseURL = 'https://be.mavericks-tttm.studio';
+export const baseURL = 'https://dev01.smart-tailor.live';
+
 export const googleOAuth2 = '/oauth2/authorization/google'
 export const versionEndpoints = {
   v1: '/api/v1',
@@ -19,8 +21,11 @@ export const functionEndpoints = {
     signup: '/register',
     forgot: '/forgot-password',
     updatePassword: '/update-password',
-    checkVerify: '/check-verify',
-    checkVerifyPassword: '/check-verify-password',
+    checkVerify: '/check-verify-account',
+    checkVerifyPassword: '/check-verify-forgot-password',
+    signout: '/log-out',
+    resendVerificationToken: 'resend-verification-token',
+    refreshToken: '/refresh-token'
   },
   design: {
     systemItem: '/systemItem'
@@ -47,7 +52,7 @@ const api = {
     }
   },
 
-  post: async (url: string, data: any, accessToken?: string) => {
+  post: async (url: string, data?: any, accessToken?: string) => {
     try {
       const response = await axiosInstance.post(url, data, getRequestConfig(accessToken));
       return response.data;
