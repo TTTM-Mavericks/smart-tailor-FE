@@ -21,6 +21,7 @@ import HeaderLanguageSetting from '../LanguageSetting/LanguageSettingComponent';
 import { UserInterface } from '../../models/UserModel';
 import Cookies from 'js-cookie';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../api/ApiConfig';
+import { ToastContainer, toast } from 'react-toastify';
 
 const navigation = {
   categories: [
@@ -180,6 +181,7 @@ export default function HeaderComponent() {
   const [userLogined, setUserLogined] = useState<UserInterface>();
 
   useEffect(() => {
+    console.log('header: ', userLogined);
     const checkLoginStatus = () => {
       const userSession = localStorage.getItem('userAuth');
       if (userSession) {
@@ -207,26 +209,21 @@ export default function HeaderComponent() {
   const __handleLogout = async () => {
     try {
       const authToken = Cookies.get('token');
-      console.log('authToken: ', authToken);
-
       const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.signout}`, authToken);
       if (response.status === 200) {
-        // if (response.data.user.role === 'CUSTOMER') {
-        //   localStorage.setItem('subrole', JSON.stringify(response.subrole));
-        // }
         localStorage.clear();
         Cookies.remove('token');
         Cookies.remove('refreshToken');
         window.location.href = '/auth/signin'
 
       } else {
-
+        toast.error(`${response.message}`, { autoClose: 4000 });
       }
       console.log(response);
 
     } catch (error: any) {
       console.error('Error posting data:', error);
-
+      toast.error(`${error}`, { autoClose: 4000 });
       // Toast.show({
       //   type: 'error',
       //   text1: JSON.stringify(error.message),
@@ -256,6 +253,7 @@ export default function HeaderComponent() {
 
   return (
     <div className={`${styles.header__container} bg-white mb-200`}>
+      <ToastContainer></ToastContainer>
       {/* Mobile menu */}
       <Transition.Root show={open} as={Fragment}>
         <Dialog as="div" className="relative z-40 lg:hidden" onClose={setOpen}>
@@ -647,7 +645,7 @@ export default function HeaderComponent() {
                           aria-haspopup="true"
                           aria-expanded={isOpen ? 'true' : undefined}
                         >
-                          <Avatar src={userLogined?.avatar} sx={{ width: 32, height: 32 }}>M</Avatar>
+                          <Avatar src={userLogined?.imageUrl} sx={{ width: 32, height: 32 }}>M</Avatar>
                         </IconButton>
                       </Tooltip>
                     </div>

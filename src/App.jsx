@@ -1,6 +1,6 @@
 import React from 'react'; // Import React
 import Cookies from 'js-cookie'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 import { jwtDecode } from 'jwt-decode';
 import CustomDesignScreen from './pages/CustomDesign/CustomDesignScreen';
@@ -95,10 +95,29 @@ const PrivateRoute = ({ element, path, requiredRole }) => {
   }
 };
 
+
+const ConditionalTokenRefreshDialog = () => {
+  const location = useLocation();
+
+  const hideOnRoutes = [
+    '/auth/signin',
+    '/auth/signup',
+    '/auth/getpassword',
+    '/auth/changepassword',
+    '/auth/verify',
+  ];
+
+  const shouldHide = hideOnRoutes.some(route => location.pathname.startsWith(route));
+
+  return !shouldHide ? <TokenRefreshDialogComponent /> : null;
+};
+
+
 function App() {
   return (
     <div>
       <BrowserRouter>
+      <ConditionalTokenRefreshDialog />
         <Routes>
 
           {/* Init/Home route */}

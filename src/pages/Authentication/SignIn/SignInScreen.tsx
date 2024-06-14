@@ -7,7 +7,7 @@ import { systemLogo, usaFlag, vietnamFlag } from '../../../assets';
 import { useTranslation } from 'react-i18next';
 import { Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
-import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
+import api, { baseURL, featuresEndpoints, functionEndpoints, isAuthenticated, versionEndpoints } from '../../../api/ApiConfig';
 import { GoogleOAuthProvider, GoogleLogin, useGoogleLogin } from '@react-oauth/google';
 import Cookies from 'js-cookie'
 import axios from 'axios';
@@ -16,6 +16,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ImageMasonry from '../../../components/ImageMasonry/ImageMasonryCoponent';
 import { __validateEmail } from '../Utils';
+import { useNavigate } from 'react-router-dom';
 
 const defaultTheme = createTheme();
 
@@ -38,8 +39,22 @@ function SignInScreen() {
   // ---------------Usable Variable---------------//
   const { t, i18n } = useTranslation();
   const googleLoginButtonRef = React.useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   // ---------------UseEffect---------------//
+
+  /**
+ * Fetch validate token
+ */
+  React.useEffect(() => {
+    const token = Cookies.get('token');
+    if (token) {
+      const isValid = isAuthenticated(token);
+      if (isValid) {
+        navigate('/')
+      } 
+    }
+  }, []);
 
   React.useEffect(() => {
     i18n.changeLanguage(selectedLanguage);
@@ -56,8 +71,8 @@ function SignInScreen() {
   }, [selectedLanguage]);
 
   /**
-* Validate Email
-*/
+  * Validate Email
+  */
   React.useEffect(() => {
     const error = __validateEmail(email);
     if (!error.isValid && error.error) {
