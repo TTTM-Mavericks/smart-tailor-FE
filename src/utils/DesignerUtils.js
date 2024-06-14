@@ -65,7 +65,7 @@ const __handleChangeImageToBase64 = async (imageUrl) => {
 };
 
 const __handleGenerateItemId = () => {
-  // Generate a random alphanumeric string as the item_mask_id
+  // Generate a random alphanumeric string as the itemMaskID
   const randomString = Math.random().toString(36).substring(7);
   return `item_${randomString}`;
 };

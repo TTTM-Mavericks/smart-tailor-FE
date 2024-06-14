@@ -2,7 +2,7 @@ import { DesignInterface } from "./DesignModel";
 
 export interface ProductInterface {
     product_id?: string; // UUID
-    design_id?: string; // UUID
+    designID?: string; // UUID
     brand_id?: string; // UUID
     product_name?: string; // String
     user_id?: string; // UUID
@@ -11,7 +11,7 @@ export interface ProductInterface {
     rating?: number; // Integer
     public_status?: boolean; // Boolean
     size?: string; // String
-    create_date?: Date; // LocalDateTime
-    last_modified_date?: Date; // LocalDateTime
+    createDate?: Date; // LocalDateTime
+    lastModifiedDate?: Date; // LocalDateTime
     design?: DesignInterface
 }

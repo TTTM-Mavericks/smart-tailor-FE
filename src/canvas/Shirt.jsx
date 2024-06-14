@@ -9,173 +9,125 @@ import state from "../store";
 
 const Shirt = () => {
 
-    const [position, setPosition] = useState([0, 0, 0]);
-    const [scale, setScale] = useState([0, 0, 0]);
-
     /** @type {[PartOfDesignInterface[], React.Dispatch<React.SetStateAction<PartOfDesignInterface[]>>]} */
     const [modelData, setModelData] = useState();
 
     /** @type {[ItemMaskInterface[], React.Dispatch<React.SetStateAction<ItemMaskInterface[]>>]} */
-    const [deCal, setDecal] = useState()
+    const [deCal, setDecal] = useState();
 
-    const [textureUrl, setTextureUrl] = useState();
+    // /** @type {{key:string , items:[ItemMaskInterface[]}, React.Dispatch<React.SetStateAction<ItemMaskInterface[]>>]} */
+    const [deCalData, setDecalData] = useState([]);
 
     const snap = useSnapshot(state)
 
     const { nodes, materials } = useGLTF('/shirt_baked.glb');
 
-    const [frontTexture, setFrontTexture] = useState(null);
+
+    useEffect(() => {
+        console.log('nodesnodesnodesnodesnodesnodes: ', nodes);
+        if (snap.modelData) {
+            setModelData(snap.modelData);
+
+            // Accumulate all item masks from different parts
+            const newDecals = snap.modelData.reduce((acc, item) => {
+                if (item.itemMasks) {
+                    acc.push({ key: item.partOfDesignName, items: item.itemMasks });
+                }
+                return acc;
+            }, []);
+
+            setDecalData(newDecals);
+        }
+    }, [snap.modelData]);
 
     useEffect(() => {
         if (snap.modelData) {
             const reusult = snap.modelData
             setModelData(snap.modelData);
             reusult.map((item) => {
-                if (item.part_name === 'LOGO_PART') {
-                    setDecal(item.item_mask);
+                if (item.partOfDesignName === 'LOGO_PART') {
+                    setDecal(item.itemMasks);
                 }
             })
 
         }
-    }, [snap.modelData])
+    }, [modelData]);
 
-    // useEffect(() => {
-    //     if (
-    //         modelData &&
-    //         modelData.length > 0 &&
-    //         modelData[0].item_mask &&
-    //         modelData[0].item_mask.length > 0
-    //     ) {
-    //         const firstItemMask = modelData[0].item_mask[0];
-    //         setTextureUrl(firstItemMask.image_url);
-    //         setScale([firstItemMask.scale_x / 1000, firstItemMask.scale_y / 1000, 0.3]);
-    //         console.log('[firstItemMask.scale_x/1000, firstItemMask_scale_y/1000, 0.3]: ', [firstItemMask.scale_x / 1000, firstItemMask.scale_y / 1000, 0.3]);
+    useEffect(() => {
+        const loadDecals = async () => {
+            const promises = deCalData.reduce((acc, decalGroup) => {
+                acc.push(...decalGroup.items.map(async (item) => {
+                    try {
+                        const texture = await loadTexture(item.imageUrl);
+                        return { ...item, texture };
+                    } catch (error) {
+                        console.error(`Failed to load texture for item ${item.itemMaskID}`, error);
+                        return null;
+                    }
+                }));
+                return acc;
+            }, []);
 
-    //         if (firstItemMask.position) {
-    //             let pos;
+            const results = await Promise.all(promises);
+            setDecalData((prev) => {
+                return prev.map((decalGroup, index) => {
+                    return {
+                        ...decalGroup,
+                        items: decalGroup.items.map((item, itemIndex) => {
+                            return results[index * decalGroup.items.length + itemIndex] || item;
+                        })
+                    };
+                });
+            });
+        };
 
-    //             if (firstItemMask.position[2] && 'x' in firstItemMask.position[2] && 'y' in firstItemMask.position[2]) {
-    //                 pos = [
-    //                     firstItemMask.position[2].x / 1000,
-    //                     firstItemMask.position[2].y / 1000,
-    //                     0
-    //                 ];
-    //             } else if (firstItemMask.position[1] && 'x' in firstItemMask.position[1] && 'y' in firstItemMask.position[1]) {
-    //                 pos = [
-    //                     firstItemMask.position[1].x / 1000,
-    //                     firstItemMask.position[1].y / 1000,
-    //                     0
-    //                 ];
-    //             } else if ('x' in firstItemMask.position && 'y' in firstItemMask.position) {
-    //                 pos = [
-    //                     firstItemMask.position.x / 1000,
-    //                     firstItemMask.position.y / 1000,
-    //                     0
-    //                 ];
-    //             }
-
-    //             // Check for NaN values
-    //             if (pos && !isNaN(pos[0]) && !isNaN(pos[1]) && !isNaN(pos[2])) {
-    //                 setPosition(pos);
-    //             } else {
-    //                 console.error('Position contains NaN values or is undefined:', pos);
-    //                 setPosition([0, 0, 0]); // Set to a default valid position
-    //             }
-    //             console.log('position: ', pos);
-    //         }
-    //     }
-    // }, [modelData]);
-
-    //   const frontTexture = textureUrl ? useTexture(textureUrl) : null;
-
-    // useEffect(() => {
-    //     // Example: Update position based on modelData
-    //     if (modelData.length > 0 && modelData[0].item_mask.length > 0) {
-    //         const newPosition = [modelData[0].item_mask[0].position['1'].x, modelData[0].item_mask[0].position['1'].y, 0];
-    //         console.log('newPosition: ', newPosition); // Replace with actual position data from modelData
-    //         setPosition(newPosition);
-    //     }
-    // }, [modelData]);
-
-    // useEffect(() => {
-    //     if (textureUrl) {
-    //         const loadTexture = async () => {
-    //             const texture = await new TextureLoader().loadAsync(textureUrl);
-    //             setFrontTexture(texture);
-    //             console.log('frontTexture: ', texture);
-    //         };
-    //         loadTexture();
-    //     }
-    // }, [textureUrl]);
+        if (deCalData && deCalData.length > 0) {
+            loadDecals();
+        }
+    }, [modelData]);
 
 
     useFrame((state, delta) => easing.dampC(materials.lambert1.color, snap.color, 0.25, delta))
 
     const stateString = JSON.stringify(snap)
 
-    const __handleFixPosition = (firstItemMask) => {
+    const __handleFixPosition = (firstItemMask, key) => {
         if (firstItemMask.position) {
+            const A_width = 500; // Example width of div A
+            const A_height = 500; // Example height of div A
+            const B_width = 170; // Example width of div B
+            const B_height = 300; // Example height of div B
+            const offsetX = (A_width / 2) - (B_width / 2) - (firstItemMask.scaleX / A_width);
+            const offsetY = (A_height / 2) - (B_height / 2) - (firstItemMask.scaleY / A_height);
             let pos;
+            pos = [
+                (firstItemMask.position.x - 130 + (firstItemMask.scaleX / 230) + (firstItemMask.scaleX-230)/2) / 1000 ,
+                -(firstItemMask.position.y - 80 + (firstItemMask.scaleY / 230) + (firstItemMask.scaleY-230)/2) / 1000 ,
+                key === 'LOGO_PART' || key === 'FRONT_CLOTH_PART' ? 0.15
+                    :
+                    key === 'BACK_CLOTH_PART' ? -0.25
+                        : 0
+            ];
+            return pos;
 
-            if (firstItemMask.position[firstItemMask.item_mask_id] && 'x' in firstItemMask.position[firstItemMask.item_mask_id] && 'y' in firstItemMask.position[2]) {
-                pos = [
-                    firstItemMask.position[2].x / 1000,
-                    firstItemMask.position[2].y / 1000,
-                    0.15
-                ];
-            } else if (firstItemMask.position[firstItemMask.item_mask_id] && 'x' in firstItemMask.position[firstItemMask.item_mask_id] && 'y' in firstItemMask.position[1]) {
-                pos = [
-                    firstItemMask.position[1].x / 1000,
-                    firstItemMask.position[1].y / 1000,
-                    0.15
-                ];
-            } else if ('x' in firstItemMask.position && 'y' in firstItemMask.position) {
-                pos = [
-                    firstItemMask.position.x / 1000,
-                    firstItemMask.position.y / 1000,
-                    0.15
-                ];
-            }
 
-            // Check for NaN values
-            if (pos && !isNaN(pos[0]) && !isNaN(pos[1]) && !isNaN(pos[2])) {
-                console.log(pos);
-                return pos;
-            } else {
-                console.error('Position contains NaN values or is undefined:', pos);
-                return [0, 0, 0]; // Set to a default valid position
-            }
         }
     }
 
     const __handleScale = (item) => {
         console.log(item);
         if (item) {
-            console.log('[item.scale_x / 1000, item.scale_y / 1000, 0.3]: ', [item.scale_x / 1000, item.scale_y / 1000, 0.3]);
-            return ([item.scale_x / 1000, item.scale_y / 1000, 0.3]);
+            console.log('[item.scaleX / 1000, item.scaleY / 1000, 0.3]: ', [item.scaleX / 1000, item.scaleY / 1000, 0.3]);
+            return ([item.scaleX / 1000, item.scaleY / 1000, 0.3]);
         }
     }
 
-    useEffect(() => {
-        const loadDecals = async () => {
-            const promises = deCal.map(async (item) => {
-                try {
-                    const texture = await loadTexture(item.image_url);
-                    return { ...item, texture };
-                } catch (error) {
-                    console.error(`Failed to load texture for item ${item.item_mask_id}`, error);
-                    return null; // Handle failure gracefully
-                }
-            });
 
-            const results = await Promise.all(promises);
-            setDecal(results.filter((item) => item !== null)); // Filter out failed items
-        };
+    const degreesToEuler = (degrees) => {
+        const radians = degrees * (Math.PI / 180);
+        return  radians;
+    };
 
-        if (deCal && deCal.length > 0) {
-            loadDecals();
-        }
-    }, [modelData]);
 
     const loadTexture = (imageUrl) => {
         const loader = new TextureLoader();
@@ -193,23 +145,19 @@ const Shirt = () => {
                 dispose={null}
             >
 
-                {deCal && deCal.map((item) => (
-                    <Decal
-                        // position={[logoDecalPositionX ? logoDecalPositionX : 0, logoDecalPositionY ? logoDecalPositionY : 0, 0.15]}
-                        position={__handleFixPosition(item)}
-                        key={item.item_mask_id}
-                        rotation={[0, 0, 0]}
-                        scale={__handleScale(item)}
-                        map={item.texture}
-                        depthTest={false}
-                        depthWrite={true}
-                    />
+                {deCalData && deCalData.map((decalGroup) => (
+                    decalGroup.items.map((item) => (
+                        <Decal
+                            position={__handleFixPosition(item, decalGroup.key)}
+                            key={item.itemMaskID}
+                            rotation={[0, 0, -degreesToEuler(item.rotate)]}
+                            scale={__handleScale(item)}
+                            map={item.texture}
+                            depthTest={true}
+                            depthWrite={true}
+                        />
+                    ))
                 ))}
-
-
-
-
-
 
             </mesh>
         </group>

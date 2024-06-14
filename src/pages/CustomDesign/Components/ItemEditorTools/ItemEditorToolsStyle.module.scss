@@ -1,0 +1,28 @@
+@import '../../../../index.module.scss';
+
+.itemEditor__conainer {
+    width:100%;
+    margin-top: 30px;
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+
+    button{
+        font-size: 11px;
+        background-color: $primaryColor ;
+        color: $whiteColor;
+        padding: 3px;
+        margin-right: 20px;
+        border-radius: 5px;
+        pointer-events: none;
+    }
+
+    &__icon{
+        background-color: $grayColor;
+        padding: 5px;
+        margin-left: 20px;
+        cursor: pointer;
+        border-radius: 5px;
+
+    }
+}

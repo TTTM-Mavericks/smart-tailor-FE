@@ -72,9 +72,31 @@
     &__filter__container {
         width: 20%;
         height: 100%;
-        border-right: 2px solid $grayColor;
+        // border-right: 2px solid $grayColor;
+        overflow-y: auto;
+        display: inline-block;
+        flex-wrap: wrap;
         display: flex;
-        justify-content: center;
+    }
+    
+    &__filter__containert::-webkit-scrollbar {
+        width: 5px;
+        height: 12px;
+    }
+
+    &__filter__containert::-webkit-scrollbar-track {
+        background: #55151577;
+        border-radius: 10px;
+    }
+
+    &__filter__containert::-webkit-scrollbar-thumb {
+        background: $grayColor;
+        border-radius: 10px;
+    }
+
+    &__filter__containert::-webkit-scrollbar-thumb:hover {
+        background: #888787;
+        /* Color when hovering over the scrollbar thumb */
     }
 
     &__result__list {
@@ -86,32 +108,24 @@
         flex-wrap: wrap;
         display: flex;
         align-items: center;
-        // align-content: center;
     }
 
     &__result__list::-webkit-scrollbar {
         width: 5px;
-        /* Width of the scrollbar */
         height: 12px;
-        /* Height of the scrollbar */
     }
 
     &__result__list::-webkit-scrollbar-track {
         background: #f1f1f177;
-        /* Background of the track */
         border-radius: 10px;
-        /* Optional: Rounded corners */
     }
 
     &__result__list::-webkit-scrollbar-thumb {
         background: $grayColor;
-        /* Color of the scrollbar thumb */
         border-radius: 10px;
-        /* Optional: Rounded corners */
     }
 
     &__result__list::-webkit-scrollbar-thumb:hover {
         background: #888787;
-        /* Color when hovering over the scrollbar thumb */
     }
 }

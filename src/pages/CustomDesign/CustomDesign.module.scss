@@ -136,6 +136,12 @@
 
     }
 
+    &__itemEditor{
+        overflow: hidden;
+        position: relative;
+        width: 25%;
+    }
+
     ;
 
     &__editorArea {

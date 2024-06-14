@@ -3,5 +3,6 @@ import ColorPicker from './ColorPicker/ColorPicker'
 import FilePicker from './FilePicker/FilePicker'
 import CustomButton from './CustomButton/CustomButton'
 import Tab from './Tab/Tab'
+import TextEditor from './TextEditor/TextEditor'
 
-export { AIPicker, ColorPicker, FilePicker, CustomButton, Tab}
+export { AIPicker, ColorPicker, FilePicker, CustomButton, Tab, TextEditor}

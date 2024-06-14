@@ -55,30 +55,6 @@ const FilePicker = ({ file, setFile, readFile, partOfCloth }) => {
           handleClick={() => _handleSetUploadFile()}
           customStyles={`font-size: 0.75rem; line-height: 1rem; background-color: ${primaryColor}`}
         />
-        {/* <CustomButton 
-          type="filled"
-          title="Full"
-          handleClick={() => readFile('full')}
-          customStyles="font-size: 0.75rem; line-height: 1rem;"
-        />
-        <CustomButton 
-          type="filled"
-          title="front"
-          handleClick={() => readFile('front')}
-          customStyles="font-size: 0.75rem; line-height: 1rem;"
-        />
-        <CustomButton 
-          type="filled"
-          title="back"
-          handleClick={() => readFile('back')}
-          customStyles="font-size: 0.75rem; line-height: 1rem;"
-        />
-        <CustomButton 
-          type="filled"
-          title="back"
-          handleClick={() => readFile('back')}
-          customStyles="font-size: 0.75rem; line-height: 1rem;"
-        /> */}
       </div>
     </div>
   )

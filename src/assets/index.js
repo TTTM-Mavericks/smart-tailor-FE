@@ -8,13 +8,15 @@ import systemLogo from "./system/smart-tailor_logo.png"
 import vietnamFlag from './system/vietnam_flag.png'
 import usaFlag from './system/usa_flag.png'
 import languageIcon from './system/language.png'
-import frontOfCloth from './clothes/front.png'
 import shirtModel from './clothes/shirt-model.png'
 import hoodieModel from './clothes/hoodie-model.png'
 import skirtFullModel from './clothes/skirt-full-model.png'
 import womenSkirtTopModel from './clothes/women-skirt-top-model.png'
 import womenSkirtBottomModel from './clothes/women-skirt-bottom-model.png'
 import longSkirtModel from './clothes/long-skirt-model.png'
+
+import shirtFrontDesign from './clothes/shirt-front-design.png'
+import shirtBackDesign from './clothes/shirt-back-design.png'
 
 
 
@@ -33,11 +35,12 @@ export {
     vietnamFlag,
     usaFlag,
     languageIcon,
-    frontOfCloth,
+    shirtFrontDesign,
     shirtModel,
     hoodieModel,
     skirtFullModel,
     womenSkirtTopModel,
     womenSkirtBottomModel,
-    longSkirtModel
+    longSkirtModel,
+    shirtBackDesign
 };
