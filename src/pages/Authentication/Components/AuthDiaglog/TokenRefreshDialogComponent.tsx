@@ -31,7 +31,6 @@ const TokenRefreshDialogComponent: React.FC = () => {
     useEffect(() => {
         const token = Cookies.get('token');
         if (token) {
-            console.log('token', token);
             setAuthToken(token);
             const isValid = isAuthenticated(token);
             if (isValid) {
@@ -52,9 +51,7 @@ const TokenRefreshDialogComponent: React.FC = () => {
         setIsLoading(true);
         try {
             const refreshToken = Cookies.get('refreshToken');
-            console.log(refreshToken);
             const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.refreshToken}`, null, refreshToken);
-            console.log(response);
             if (response.status === 200) {
                 const authToken = response.data.access_token;
                 const refreshToken = response.data.refresh_token;
@@ -63,7 +60,6 @@ const TokenRefreshDialogComponent: React.FC = () => {
                 setIsLoading(false);
                 setOpen(false);
             } else {
-                console.log(response);
                 setIsLoading(false);
                 toast.error(`${response.message}`, { autoClose: 4000 });
             }

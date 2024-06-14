@@ -48,7 +48,6 @@ function SignInScreen() {
   }, [selectedLanguage, i18n]);
 
   React.useEffect(() => {
-    console.log(Math.floor(Date.now() / 1000));
     if (selectedLanguage) {
       const uppercase = selectedLanguage.toUpperCase();
       setCodeLanguage(uppercase);
@@ -105,7 +104,6 @@ function SignInScreen() {
           const refreshToken = response.data.refresh_token;
           Cookies.set('token', authToken);
           Cookies.set('refreshToken', refreshToken);
-          console.log(response.data.user);
           setTimeout(() => {
             window.location.href = '/'
           }, 2000)
@@ -132,7 +130,6 @@ function SignInScreen() {
   const __handleLoginSuccess = (response: any) => {
     try {
       const { credential } = response;
-      console.log('credential: ', credential);
       fetch(`${baseURL}/api/v1/auth/google-login`, {
         method: 'POST',
         headers: {
@@ -143,11 +140,10 @@ function SignInScreen() {
         .then((res) => res.json())
         .then((resp) => {
           if (resp.data.access_token) {
-            const authToken = response.data.access_token;
-            const refreshToken = response.data.refresh_token;
+            const authToken = resp.data.access_token;
+            const refreshToken = resp.data.refresh_token;
             Cookies.set('token', authToken);
             Cookies.set('refreshToken', refreshToken);
-            console.log('data.jwtToken: ', resp.data);
             axios.defaults.headers.common.Authorization = `Bearer ${authToken}`;
             localStorage.setItem('userAuth', JSON.stringify(resp.data.user));
           }
@@ -165,7 +161,6 @@ function SignInScreen() {
   const login = useGoogleLogin({
 
     onSuccess: (tokenResponse: any) => {
-      console.log('Credential:', tokenResponse);
       __handleLoginSuccess(tokenResponse);
     },
     onError: () => {
