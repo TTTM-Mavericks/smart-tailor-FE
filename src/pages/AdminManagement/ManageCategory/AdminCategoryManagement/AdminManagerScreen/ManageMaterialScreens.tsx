@@ -1,28 +1,19 @@
 import { Box, Button, IconButton, Menu, MenuItem, Modal } from "@mui/material";
 import { DataGrid, GridToolbar, GridColDef } from "@mui/x-data-grid";
-import { tokens } from "../../../theme";
+import { tokens } from "../../../../../theme";
 import { useTheme } from "@mui/material";
 import * as React from "react";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Swal from "sweetalert2";
-import EditUserPopUpScreens from "./EditUsersPopUpScreens";
+import EditMaterialPopUpScreens from "../AdminEditMaterial/EditMaterialPopUpScreens";
 import { Add } from "@mui/icons-material";
-import AddEachUsersWithHand from "./AddEachWithHand/AddEachUsersWithHandScreens";
-import AddMultipleComponentWithExcel from "./AddMultipleUserWithExcel/AddMultipleUsersComponent";
+import AddEachCategoryWithHand from "../../AddEachWithHand/AddEachCategoryWithHandScreens";
+import AddMultipleComponentWithExcel from "../../AddMultipleCategoryWithExcel/AddMultipleMaterialComponent";
 import { useTranslation } from 'react-i18next';
-
-interface User {
-    id: number;
-    registrarId: string;
-    name: string;
-    age: number;
-    phone: string;
-    email: string;
-    address: string;
-    city: string;
-    zipCode: string;
-}
+import { Category } from "../../../../../models/AdminCategoryExcelModel";
+import axios from "axios";
+import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 
 // Make Style of popup
 const style = {
@@ -38,13 +29,13 @@ const style = {
     borderRadius: "20px"
 };
 
-const ManageUsers: React.FC = () => {
+const ManageCategories: React.FC = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [data, setData] = React.useState<User[]>([]);
+    const [data, setData] = React.useState<Category[]>([]);
 
-    // set formid to pass it to component edit user
-    const [formId, setFormId] = React.useState<User | null>(null);
+    // set formid to pass it to component edit Material
+    const [formId, setFormId] = React.useState<Category | null>(null);
 
     // Open Edit PopUp when clicking on the edit icon
     const [editopen, setEditOpen] = React.useState<boolean>(false);
@@ -97,19 +88,19 @@ const ManageUsers: React.FC = () => {
     }, [selectedLanguage, i18n]);
 
     React.useEffect(() => {
-        const apiUrl = 'https://66080c21a2a5dd477b13eae5.mockapi.io/CPSE_DATA_TEST';
-        fetch(apiUrl)
+        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.getAllCategory}`;
+
+        axios.get(apiUrl)
             .then(response => {
-                if (!response.ok) {
+                if (response.status !== 200) {
                     throw new Error('Network response was not ok');
                 }
-                return response.json();
+                return response.data;
             })
             .then((responseData) => {
-                if (responseData && Array.isArray(responseData)) {
-                    setData(responseData);
+                if (responseData && Array.isArray(responseData.data)) {
+                    setData(responseData.data);
                     console.log("Data received:", responseData);
-
                 } else {
                     console.error('Invalid data format:', responseData);
                 }
@@ -118,50 +109,45 @@ const ManageUsers: React.FC = () => {
     }, []);
 
     // Thêm người dùng mới vào danh sách
-    const _handleAddUser = (newUser: User) => {
-        setData(prevData => [...prevData, newUser]);
+    const _handleAddCategory = (newCategory: Category) => {
+        setData(prevData => [...prevData, newCategory]);
     }
 
     // Cập nhật người dùng trong danh sách
-    const _handleUpdateUser = (updatedUser: User) => {
-        setData(prevData => prevData.map(user => user.id === updatedUser.id ? updatedUser : user));
+    const _handleUpdateCategory = (updateCategory: Category) => {
+        setData(prevData => prevData.map(Category => Category.categoryID === updateCategory.categoryID ? updateCategory : Category));
     }
 
     // EDIT 
-    const _handleEditClick = (id: number, registrarId: string, name: string, age: number, phone: string, email: string, address: string, city: string, zipCode: string) => {
+    const _handleEditClick = (
+        categoryID: string,
+        categoryName: string,
+    ) => {
         // Handle edit action
-        const userDataToEdit: User = {
-            id: id,
-            registrarId: registrarId,
-            name: name,
-            age: age,
-            phone: phone,
-            email: email,
-            address: address,
-            city: city,
-            zipCode: zipCode
+        const CategoryDataToEdit: Category = {
+            categoryID: categoryID,
+            categoryName: categoryName
         }
-        setFormId(userDataToEdit);
+        setFormId(CategoryDataToEdit);
         _handleEditOpen();
     };
 
     //DELETE OR UPDATE
-    const _handleDeleteClick = async (id: number) => {
-        // Handle delete action
+    const _handleDeleteClick = async (categoryID: string) => {
         try {
-            const response = await fetch(`https://66080c21a2a5dd477b13eae5.mockapi.io/CPSE_DATA_TEST/${id}`, {
-                method: 'DELETE',
-            });
-            if (!response.ok) {
-                throw new Error('Error deleting user');
+            const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.updateCategory}`;
+
+            const response = await axios.put(apiUrl + `/${categoryID}`)
+
+            if (!response.data) {
+                throw new Error('Error deleting material');
             }
-            const data = await response.json();
-            return data;
+
+            return response.data;
         } catch (error) {
             throw error;
         }
-
-    }
+    };
 
     // confirm 
     const _hanldeConfirmDelete = async (id: number) => {
@@ -176,15 +162,17 @@ const ManageUsers: React.FC = () => {
                 confirmButtonText: `${t(codeLanguage + '000063')}`,
                 cancelButtonText: `${t(codeLanguage + '000055')}`
             });
+
             if (result.isConfirmed) {
-                await _handleDeleteClick(id);
+                await _handleDeleteClick(id.toString()); // Ensure id is converted to string if necessary
                 Swal.fire(
                     `${t(codeLanguage + '000064')}`,
                     `${t(codeLanguage + '000065')}`,
                     'success'
-                )
-                // Loại bỏ người dùng khỏi danh sách hiện tại
-                setData(prevData => prevData.filter(user => user.id !== id));
+                );
+
+                // Remove the deleted material from the current data list
+                setData(prevData => prevData.filter(Material => Material.materialID !== id));
             } else {
                 Swal.fire(
                     `${t(codeLanguage + '000066')}`,
@@ -192,52 +180,41 @@ const ManageUsers: React.FC = () => {
                     'error'
                 );
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error:', error);
+            Swal.fire(
+                'Error',
+                `${error.message || 'Unknown error'}`,
+                'error'
+            );
         }
     };
 
-
     const columns: GridColDef[] = [
-        { field: "id", headerName: "ID", flex: 0.5 },
-        { field: "registrarId", headerName: "Registrar ID" },
+        // { field: "id", headerName: "ID", flex: 0.5 },
         {
-            field: "name",
-            headerName: "Name",
+            field: "categoryName",
+            headerName: "Category Name",
             flex: 1,
         },
-        {
-            field: "age",
-            headerName: "Age",
-            type: "number",
-            headerAlign: "left",
-            align: "left",
-        },
-        {
-            field: "phone",
-            headerName: "Phone Number",
-            flex: 1,
-        },
-        {
-            field: "email",
-            headerName: "Email",
-            flex: 1,
-        },
-        {
-            field: "address",
-            headerName: "Address",
-            flex: 1,
-        },
-        {
-            field: "city",
-            headerName: "City",
-            flex: 1,
-        },
-        {
-            field: "zipCode",
-            headerName: "Zip Code",
-            flex: 1,
-        },
+        // {
+        //     field: "create_date",
+        //     headerName: "Create Date",
+        //     flex: 1,
+        // },
+        // {
+        //     field: "last_modifidate",
+        //     headerName: "Last Modify Date",
+        //     type: "number",
+        //     headerAlign: "left",
+        //     align: "left",
+        // },
+        // {
+        //     field: "status",
+        //     headerName: "status",
+        //     flex: 1,
+        // },
+
         {
             field: "actions",
             headerName: "Actions",
@@ -245,10 +222,10 @@ const ManageUsers: React.FC = () => {
             sortable: false,
             renderCell: (params) => (
                 <Box>
-                    <IconButton onClick={() => _handleEditClick(params.row.id, params.row.registrarId, params.row.name, params.row.age, params.row.email, params.row.phone, params.row.address, params.row.city, params.row.zipCode)}>
+                    <IconButton onClick={() => _handleEditClick(params.row.categoryID, params.row.categoryName)}>
                         <EditIcon />
                     </IconButton>
-                    <IconButton onClick={() => _hanldeConfirmDelete(params.row.id)}>
+                    <IconButton onClick={() => _hanldeConfirmDelete(params.row.categoryID)}>
                         <DeleteIcon htmlColor={colors.primary[300]} />
                     </IconButton>
                 </Box>
@@ -256,9 +233,8 @@ const ManageUsers: React.FC = () => {
         }
     ];
 
-    const getRowId = (row: any) => {
-        return row.registrarId; // Sử dụng một thuộc tính duy nhất làm id cho mỗi hàng
-    };
+    const getRowId = (row: any) => `${row.categoryID}-${row.categoryName}`;
+
 
     return (
         <Box m="20px">
@@ -338,7 +314,7 @@ const ManageUsers: React.FC = () => {
                                 p: 4,
                                 borderRadius: "20px"
                             }}>
-                                <AddEachUsersWithHand closeCard={_handleAddClose} addNewUser={_handleAddUser} />
+                                <AddEachCategoryWithHand closeCard={_handleAddClose} addNewCategory={_handleAddCategory} />
                             </Box>
                         </Modal>
                     </MenuItem>
@@ -362,7 +338,7 @@ const ManageUsers: React.FC = () => {
                                 p: 4,
                                 borderRadius: "20px"
                             }}>
-                                <AddMultipleComponentWithExcel closeMultipleCard={_handleAddMultipleClose} addNewUser={_handleAddUser} />
+                                <AddMultipleComponentWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddCategory} />
                             </Box>
                         </Modal>
 
@@ -373,7 +349,6 @@ const ManageUsers: React.FC = () => {
                     rows={data}
                     columns={columns}
                     slots={{ toolbar: GridToolbar }}
-                    // checkboxSelection
                     disableRowSelectionOnClick
                     getRowId={getRowId}
                 />
@@ -384,10 +359,10 @@ const ManageUsers: React.FC = () => {
                 >
                     <Box sx={style}>
                         {formId !== null && (
-                            <EditUserPopUpScreens
+                            <EditMaterialPopUpScreens
                                 editClose={_handleEditClose}
                                 fid={formId}
-                                updateUser={_handleUpdateUser}
+                                updateMaterial={_handleUpdateCategory}
                             />
                         )}
                     </Box>
@@ -397,4 +372,4 @@ const ManageUsers: React.FC = () => {
     );
 };
 
-export default ManageUsers;
+export default ManageCategories;

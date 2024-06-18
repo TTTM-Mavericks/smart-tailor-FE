@@ -3,26 +3,25 @@ import DownloadIcon from '@mui/icons-material/CloudDownload';
 import { Box, Button, IconButton, Modal, Typography } from '@mui/material';
 import { Cancel, CheckCircleRounded, Close, ErrorOutline } from '@mui/icons-material';
 import * as XLSX from "xlsx-js-style";
-import { tokens } from '../../../../../theme';
+import { tokens } from '../../../../theme';
 import { useTheme } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import EditMultipleMaterialInExcelTable from '../EditMaterialInExcelTable/EditMultipleUsersInExcelTable';
+import EditMultipleUsersInExcelTable from './CRUDWithExcelTable/EditMultipleMaterialInExcelTable';
+import AddUserModalInExcelTable from './CRUDWithExcelTable/AddMaterialInExcelTable';
 const ADDUSERWITHFILEEXCELS = 'http://localhost:3000/Import_Brand_Material.xlsx';
 import { useTranslation } from 'react-i18next';
-import { ExcelData } from '../../../../../models/BrandMaterialExcelModel';
-import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
+import { ExcelData } from '../../../../models/AdminMaterialExcelModel';
 import axios from 'axios';
-const brand_name = "LA LA LISA BRAND"
+import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import ExcelJS from 'exceljs';
 import { toast, ToastContainer } from 'react-toastify';
 
-// const BRANDNAME = localStorage.getItem('brandName')
-
 interface AddMaterialWithMultipleExcelFormProps {
     closeMultipleCard: () => void;
-    addNewMaterial: (addNewMaterial: ExcelData) => void
+    addNewMaterial: (addedNewMaterial: ExcelData) => void
 }
+
 
 // Make Style of popup
 const style = {
@@ -36,10 +35,10 @@ const style = {
     boxShadow: 24,
     p: 4,
     borderRadius: "20px"
-
 };
 
-const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormProps> = ({ closeMultipleCard, addNewMaterial }) => {
+const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormProps> = ({ closeMultipleCard, addNewMaterial }) => {
+
     // ---------------UseState Variable---------------//
     const [error, setError] = React.useState<string>('');
     const [excelData, setExcelData] = React.useState<ExcelData[]>([]);
@@ -48,13 +47,18 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
     const [editingData, setEditingData] = React.useState<ExcelData | null>(null);
     const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
     const [editOpen, setEditOpen] = React.useState<boolean>(false);
-
-
-
-    // ---------------Usable Variable---------------//
+    const [openAddUserModal, setOpenAddUserModal] = React.useState<boolean>(false);
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+    const [loading, setLoading] = React.useState<boolean>(false);
 
+    // ---------------Usable Variable---------------//
+    // Get language in local storage
+    const selectedLanguage = localStorage.getItem('language');
+    const codeLanguage = selectedLanguage?.toUpperCase();
+
+    // Using i18n
+    const { t, i18n } = useTranslation();
 
     const hasDataChanged = () => {
         if (JSON.stringify(originalData) !== JSON.stringify(excelData)) {
@@ -96,14 +100,6 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
         _handleEditClose()
     };
 
-
-    // Get language in local storage
-    const selectedLanguage = localStorage.getItem('language');
-    const codeLanguage = selectedLanguage?.toUpperCase();
-
-    // Using i18n
-    const { t, i18n } = useTranslation();
-
     // ---------------UseEffect---------------//
     React.useEffect(() => {
         if (selectedLanguage !== null) {
@@ -114,12 +110,12 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
     // ---------------FunctionHandler---------------//
 
     /**
-     * 
-     * @param e 
-     * @returns 
-     * Check Validate With The File
-     * If file not excel then show error
-     */
+    * 
+    * @param e 
+    * @returns 
+    * Check Validate With The File
+    * If file not excel then show error
+    */
     const _handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             const file = e.target.files[0];
@@ -186,6 +182,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
         try {
             const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0YW1tdHNlMTYxMDg3QGZwdC5lZHUudm4iLCJpYXQiOjE3MTgyODUyMTMsImV4cCI6MTcxODM3MTYxM30.UUpy2s9SwYGF_TyIru6VASQ-ZzGTOqx7mkWkcSR2__0'; // Replace with the actual bearer token
             const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_material + functionEndpoints.brand.addExcel}`, formData,
+
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -208,178 +205,194 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
             } else {
                 console.error('Error uploading data:', error.message);
             }
-            setError('The Price is null or Price is must be greater than 0');
+            setError('An error occurred while uploading data');
         }
     };
-
 
     /**
      * When User click on Ok Button It will check
      * Check the data change (update or delete)
-     * Chekc the validate of the price (null, undefine, < 0)
-     * if have validate then move to _handleDownloadErrorData
-     * If not then upload data
+     * Check if categoryName and materialName are duplicate
+     * Check if categoryName, materialName, hscode, basePrice, and unit are null
+     * If there are validation errors, download the error data
+     * If not, upload data
      */
     const _handleConfirm = async () => {
-        // Check if any price is less than 0 or null
-        const invalidPrice = excelData.some(item => item.Price === null || item.Price < 0 || item.Price === undefined);
+        // Check if there are duplicate entries or missing values
+        const duplicates = checkForDuplicates(excelData, ['Category_Name', 'Material_Name']);
+        const invalidEntries = excelData.some(item =>
+            !item.Category_Name || !item.Material_Name || !item.HS_Code || item.Base_Price === null || !item.Unit
+        );
 
-        if (invalidPrice) {
-            setError('Price must be greater than or equal to 0 for all items');
-        }
-        if (!hasDataChanged()) {
-            setError('The data of file excel have change please download and push again!')
-        }
-        else {
-            // Proceed with upload if all prices are valid
+        if (invalidEntries || duplicates.size > 0) {
+            setError('The value is dupplicate or null!')
+        } else {
             await _handleUploadData();
             closeMultipleCard();
         }
     };
 
-    /**
-     * Download Error Data When One Fields Error or Dupplicate
-     * If Error then download all data in CSV and fill color yellow to the fields
-     * The columns Material, Category, Hs Code, Unit, Base Price is view only and can not edit
-     * Download CSV File for the Brand to save in the local computer
-     */
-    const _handleDownloadErrorData = async () => {
-        try {
-            const dataToDownload = excelData.map(({ error, ...item }) => item);
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Brand Material');
+    // ---------------Handle Modal---------------//
 
-            // Add headers
-            const headers = Object.keys(dataToDownload[0] || {});
-            worksheet.addRow(headers);
-
-            // Add data rows
-            dataToDownload.forEach(data => {
-                worksheet.addRow(Object.values(data));
-            });
-
-            // Unprotect all cells in the worksheet
-            worksheet.eachRow((row: any) => {
-                row.eachCell((cell: any) => {
-                    cell.protection = {
-                        locked: false
-                    };
-                });
-            });
-
-            // Protect specified columns
-            const lastColumnIndex = worksheet.columns.length;
-            const protectedColumns = [1, 2, 3, 4, 5]; // ExcelJS uses 1-based indexing
-
-            worksheet.columns.forEach((column: any, columnIndex: any) => {
-                if (protectedColumns.includes(columnIndex + 1)) {
-                    column.eachCell((cell: any) => {
-                        cell.protection = {
-                            locked: true,
-                        };
-                    });
-                } else if (columnIndex + 1 === 6) {
-                    column.eachCell((cell: any) => {
-                        if (cell.value === null) { // Only lock non-null cells
-                            cell.protection = {
-                                locked: false,
-                            };
-                            cell.fill = {
-                                type: 'pattern',
-                                pattern: 'solid',
-                                fgColor: { argb: 'FFFF00' } // Yellow fill color
-                            };
-                            cell.value = 'Null Value';
-                            cell.font = { // Set font color
-                                color: { argb: 'FF0000' }, // Red font color
-                                bold: true
-                            };
-                        }
-                    });
-                }
-            });
-
-            // Protect header row
-            worksheet.getRow(1).eachCell((cell: any) => {
-                cell.protection = {
-                    locked: true,
-                };
-            });
-
-            const columnWidths = headers.map((take, index) => {
-                const maxLength = Math.max(...dataToDownload.map(data => `${data[take]}`.length));
-                return Math.max(10, Math.min(maxLength + 2, 50)); // Adjust min and max widths as needed
-            });
-
-            // Set column widths
-            worksheet.columns.forEach((column, index) => {
-                column.width = columnWidths[index];
-            });
-
-            // Set the sheet protection property
-            worksheet.protect('DMLOLTU123@', { selectLockedCells: true, selectUnlockedCells: true });
-
-            // Set fill color for cells where Price < 0 or null 
-            worksheet.eachRow((row, rowIndex) => {
-                row.eachCell((cell, colIndex) => {
-                    if (headers[colIndex - 1] === 'Price') {
-                        const value = cell.value as number | undefined;
-                        if (value === undefined || value < 0) {
-                            cell.fill = {
-                                type: 'pattern',
-                                pattern: 'solid',
-                                fgColor: { argb: 'FFFF00' } // Yellow fill color
-                            };
-                            cell.value = `${value}  #Price must more than 0`,
-                                cell.font = {
-                                    color: { argb: 'FF0000' }, // Red font color
-                                    bold: true
-                                };
-                        }
-                    }
-                });
-            });
-
-            // Generate and save the file
-            const buffer = await workbook.xlsx.writeBuffer();
-            const blob = new Blob([buffer], { type: "application/octet-stream" });
-            saveAs(blob, "BrandMaterialData.xlsx");
-        } catch (error) {
-            console.error("Error generating Excel file:", error);
-            alert("Error generating Excel file. Please try again.");
-        }
-    };
-
-    /**
-     * Saves the blob as a file with the given fileName.
-     * @param blob The Blob data to save.
-     * @param fileName The name of the file to save as.
-     */
-    function saveAs(blob: Blob, fileName: string): void {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-    }
-
-    /**
-     * 
-     * @returns 
-     * Open the edit pop up
-     */
+    // Open Modal
     const _handleEditOpen = () => setEditOpen(true);
 
-    /**
-     * 
-     * @returns 
-     * Close the Edit Popup
-     */
+    // Close Modal
     const _handleEditClose = () => setEditOpen(false);
+
+    // Handle Open Add User Modal
+    const _handleAddUserOpen = () => setOpenAddUserModal(true);
+
+    // Handle Close Add User Modal
+    const _handleAddUserClose = () => setOpenAddUserModal(false);
+
+    // Define a custom type for your data structure
+    interface ExcelRowData {
+        [key: string]: any;
+    }
+
+    // Function to check for duplicate values in specific columns
+    const checkForDuplicates = (data: ExcelRowData[], columns: string[]) => {
+        const duplicates: Set<string> = new Set();
+        const seen: Set<string> = new Set();
+
+        data.forEach(row => {
+            const key = columns.map(column => row[column]).join('|');
+            if (seen.has(key)) {
+                duplicates.add(key);
+            } else {
+                seen.add(key);
+            }
+        });
+
+        return duplicates;
+    };
+
+    const checkDuplicatesForUI = (data: ExcelRowData[], columns: string[]) => {
+        const seen = new Set<string>();
+        const result: ExcelRowData[] = [];
+
+        for (const row of data) {
+            const key = columns.map(column => row[column]).join('|');
+            if (seen.has(key)) {
+                result.push({ ...row, duplicate: true });
+            } else {
+                seen.add(key);
+                result.push({ ...row, duplicate: false });
+            }
+        }
+
+        return result;
+    };
+
+    const isNameAndCategoryDuplicate = (data: ExcelData, index: number) => {
+        return excelData.some((item, i) => i !== index && item.Category_Name === data.Category_Name && item.Material_Name === data.Material_Name);
+    };
+
+
+    const _handleDownloadErrorData = async () => {
+        const workBook = new ExcelJS.Workbook();
+        const worksheet = workBook.addWorksheet('Error Data');
+
+        worksheet.columns = [
+            { header: 'Category_Name', key: 'Category_Name', width: 25 },
+            { header: 'Material_Name', key: 'Material_Name', width: 25 },
+            { header: 'HS_Code', key: 'HS_Code', width: 20 },
+            { header: 'Base_Price', key: 'Base_Price', width: 20 },
+            { header: 'Unit', key: 'Unit', width: 20 },
+        ];
+
+        const rows = excelData.map(item => ({
+            Category_Name: item.Category_Name,
+            Material_Name: item.Material_Name,
+            HS_Code: item.HS_Code,
+            Base_Price: item.Base_Price,
+            Unit: item.Unit,
+            error: item.error
+        }));
+
+        // Identify and sort rows with errors
+        const rowsWithError = rows.filter(row => {
+            const hasNullValues = Object.values(row).some(value => value === null || value === '' || value === undefined);
+            const isCategoryNameNull = row.Category_Name === null || row.Category_Name === undefined;
+            const isMaterialNameNull = row.Material_Name === null || row.Material_Name === undefined;
+            const isHsCodeNull = row.HS_Code === null || row.HS_Code === undefined;
+            const isBasePriceNull = row.Base_Price === null || row.Base_Price === undefined;
+
+            return hasNullValues || isCategoryNameNull || isMaterialNameNull || isHsCodeNull || isBasePriceNull;
+        });
+
+        const rowsWithoutError = rows.filter(row => !rowsWithError.includes(row));
+
+        // Concatenate rows with errors first
+        const sortedRows = [...rowsWithError, ...rowsWithoutError];
+
+        // Add rows to the worksheet
+        worksheet.addRows(sortedRows);
+
+        // Set styles for header row
+        worksheet.getRow(1).eachCell(cell => {
+            cell.font = { bold: true };
+            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+            cell.border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' },
+            };
+        });
+
+        // Apply validation and coloring for errors
+        const duplicates = checkForDuplicates(sortedRows, ['Category_Name', 'Material_Name']);
+
+        sortedRows.forEach((row, rowIndex) => {
+            const excelRow = worksheet.getRow(rowIndex + 2); // +2 to account for header row and 1-based index
+            excelRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+                const columnName = worksheet.getColumn(colNumber).key as string;
+                const value = row[columnName];
+
+                if (columnName === 'Category_Name' || columnName === 'Material_Name') {
+                    if (duplicates.has(`${row.Category_Name}|${row.Material_Name}`)) {
+                        const duplicateRowNumber = sortedRows.findIndex(r => r.Category_Name === row.Category_Name && r.Material_Name === row.Material_Name && r !== row) + 2;
+                        cell.fill = {
+                            type: 'pattern',
+                            pattern: 'solid',
+                            fgColor: { argb: 'FFFF00' }, // Yellow fill for errors
+                        };
+                        cell.value = `${value} #Duplicate with row ${duplicateRowNumber}`;
+                    } else if (!value) {
+                        cell.fill = {
+                            type: 'pattern',
+                            pattern: 'solid',
+                            fgColor: { argb: 'FFFF00' }, // Yellow fill for errors
+                        };
+                        cell.value = 'Null Value';
+                    }
+                } else if (columnName === 'HS_Code' || columnName === 'Base_Price' || columnName === 'Unit') {
+                    if (!value) {
+                        cell.fill = {
+                            type: 'pattern',
+                            pattern: 'solid',
+                            fgColor: { argb: 'FFFF00' }, // Yellow fill for errors
+                        };
+                        cell.value = 'null value';
+                    }
+                }
+            });
+        });
+
+        const buf = await workBook.xlsx.writeBuffer();
+
+        const blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+        const url = window.URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "ErrorData.xlsx";
+        a.click();
+        window.URL.revokeObjectURL(url);
+    };
+
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px', maxHeight: '80vh', overflowY: 'auto', position: "relative" }}>
@@ -415,6 +428,14 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
             >
                 {t(codeLanguage + '000053')}
             </Button>
+            {/* {
+                excelData.length > 0 && !editingData && (
+                    <>
+                        <Button onClick={_handleOpenAddUserModal}>Add User</Button>
+                        <AddUserModalInExcelTable open={openAddUserModal} onClose={_handleCloseAddUserModal} onAddUser={_handleAddUser} />
+                    </>
+                )
+            } */}
 
             <div style={{ display: "flex" }}>
                 <input
@@ -462,30 +483,41 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>HS CODE</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Unit</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Base Price</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Price</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Error Check</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {excelData.map((data, index) => (
-                                    <tr key={data.id}>
+                                    <tr key={index}>
                                         <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Category_Name ? colors.primary[200] : 'red' }} >{data.Category_Name || 'Null Category Name'}</td>
                                         <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Material_Name ? colors.primary[200] : 'red' }}>{data.Material_Name || 'Null Material Name'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.HS_Code ? colors.primary[200] : 'red' }}>{data.HS_Code || 'Null'}</td>
+                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.HS_Code ? colors.primary[200] : 'red' }}>{data.HS_Code || 'Null Hs Code'}</td>
                                         <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Unit ? colors.primary[200] : 'red' }}>{data.Unit || 'Null Unit'}</td>
                                         <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Base_Price ? colors.primary[200] : 'red' }}>{data.Base_Price || 'Null Base Price'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Price ? colors.primary[200] : 'red' }}>{data.Price || 'Null Material Name'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>
+                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.error ? 'red' : 'green' }}>
                                             {(() => {
-                                                const hasNullValues = Object.values(data).some(value => value === null || value === '' || value === undefined);
-                                                const isPriceInvalid = data.Price <= 0;
-                                                const isPriceNull = data.Price === null || data.Price === undefined
-                                                if (hasNullValues || isPriceInvalid || isPriceNull) {
+                                                const hasNullValues = Object.values(data).some(value => value === null || value === undefined);
+                                                const isCategoryNameNull = data.Category_Name === null || data.Category_Name === undefined;
+                                                const isMaterialNameNull = data.Material_Name === null || data.Material_Name === undefined;
+                                                const isHsCodeNull = data.HS_Code === null || data.HS_Code === undefined;
+                                                const isBasePriceNull = data.Base_Price === null || data.Base_Price === undefined;
+                                                const isUnit = data.Unit === null || data.Unit === undefined;
+                                                const isDuplicate = excelData.some((item, i) => {
+                                                    if (i !== index) {
+                                                        return item.Category_Name === data.Category_Name && item.Material_Name === data.Material_Name;
+                                                    }
+                                                    return false;
+                                                });
+
+                                                if (hasNullValues || isCategoryNameNull || isMaterialNameNull || isHsCodeNull || isBasePriceNull || isDuplicate) {
                                                     const errorMessage = [];
                                                     if (hasNullValues) errorMessage.push('Null Values');
-                                                    if (isPriceInvalid) errorMessage.push('Price must be greater than 0');
-                                                    if (isPriceNull) errorMessage.push('Price Is Null')
+                                                    if (isCategoryNameNull) errorMessage.push('Category Name Is Null');
+                                                    if (isBasePriceNull) errorMessage.push('Base Price Is Null');
+                                                    if (isMaterialNameNull) errorMessage.push('Material Name Is Null');
+                                                    if (isUnit) errorMessage.push('Unit Is Null');
+                                                    if (isDuplicate) errorMessage.push('Duplicate Entry');
 
                                                     return (
                                                         <div style={{ color: 'red' }}>
@@ -498,7 +530,6 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                                                 }
                                             })()}
                                         </td>
-
                                         <td style={{ border: '1px solid #ddd', padding: '8px' }}>
                                             <div style={{ display: "flex" }}>
                                                 <EditIcon style={{ color: "blue", cursor: "pointer" }} onClick={() => confirmEdit(index)} />
@@ -512,6 +543,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                     </div>
                 )
             }
+
             <Modal
                 open={editOpen}
                 aria-labelledby="modal-modal-title"
@@ -519,7 +551,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
             >
                 <Box sx={style}>
                     {editingData !== null && (
-                        <EditMultipleMaterialInExcelTable
+                        <EditMultipleUsersInExcelTable
                             data={editingData} index={editingIndex} updateData={updateData} onClose={cancelEdit}
                         />
                     )}
@@ -554,4 +586,4 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
     );
 };
 
-export default AddMultipleMaterialWithExcel;
+export default AddMultipleComponentWithExcel;

@@ -1,12 +1,14 @@
 import axios, { AxiosRequestConfig } from 'axios';
+import { asyncDispose } from 'core-js/fn/symbol';
 import { jwtDecode } from 'jwt-decode';
 
 
 // const baseURL = 'https://whear-app.azurewebsites.net';
 // const baseURL = 'https://tam.mavericks-tttm.studio';
 // export const baseURL = 'https://be.mavericks-tttm.studio';
-export const baseURL = 'https://dev01.smart-tailor.live';
+// export const baseURL = 'https://dev01.smart-tailor.live';
 
+export const baseURL = 'http://localhost:6969';
 export const googleOAuth2 = '/oauth2/authorization/google'
 export const versionEndpoints = {
   v1: '/api/v1',
@@ -14,7 +16,12 @@ export const versionEndpoints = {
 }
 export const featuresEndpoints = {
   auth: '/auth',
-  design: 'design'
+  design: 'design',
+  brand_material: '/brand-material',
+  customer: '/customer',
+  admin: '/admin',
+  material: '/material',
+  category: '/category'
 }
 export const functionEndpoints = {
   auth: {
@@ -30,9 +37,30 @@ export const functionEndpoints = {
   },
   design: {
     systemItem: '/systemItem'
+  },
+  brand: {
+    addExcel: '/add-new-brand-material-by-excel-file',
+    addManual: '/add-new-brand-material'
+  },
+  customer: {
+    updateProfile: '/update-customer-profile'
+  },
+  admin: {
+    dashboard: '/dashboard',
+  },
+  material: {
+    addNewMaterial: '/add-new-material',
+    getAllMaterial: '/get-all-material',
+    updateMaterial: '/update-material',
+    updateStatusMaterial: '/update-status-material'
+  },
+  category: {
+    addNewCategory: '/add-new-category',
+    updateCategory: '/update-category',
+    getCategoryById: '/get-category-by-id',
+    getAllCategory: '/get-all-category'
   }
 }
-
 
 
 const axiosInstance = axios.create({

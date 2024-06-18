@@ -139,7 +139,6 @@ const SideBarBrandComponent = () => {
                             </Box>
                             <Box textAlign="center">
                                 <Typography variant="h5" color={colors.primary[200]} sx={{ m: "10px 0 0 0" }}>
-                                    {/* {t(codeLanguage + '000035')} */}
                                     Employee ST
                                 </Typography>
                             </Box>
@@ -164,7 +163,6 @@ const SideBarBrandComponent = () => {
                             {t(codeLanguage + '000033')}
                         </Typography>
                         <Item
-                            // title={t(codeLanguage + '000020')}
                             title='Manage Notification'
                             to="/brand_manage_notification"
                             icon={<PeopleOutlinedIcon />}
@@ -172,7 +170,6 @@ const SideBarBrandComponent = () => {
                             setSelected={setSelected}
                         />
                         <Item
-                            // title={t(codeLanguage + '000020')}
                             title='Manage Customer'
                             to="/manager_customer"
                             icon={<PeopleOutlinedIcon />}
@@ -180,7 +177,6 @@ const SideBarBrandComponent = () => {
                             setSelected={setSelected}
                         />
                         <Item
-                            // title={t(codeLanguage + '000022')}
                             title="Manage Brand"
                             to="/manage_brand"
                             icon={<ReceiptOutlinedIcon />}
@@ -188,7 +184,6 @@ const SideBarBrandComponent = () => {
                             setSelected={setSelected}
                         />
                         <Item
-                            // title={t(codeLanguage + '000020')}
                             title='Manage Order'
                             to="/manager_order"
                             icon={<PeopleOutlinedIcon />}
@@ -196,7 +191,6 @@ const SideBarBrandComponent = () => {
                             setSelected={setSelected}
                         />
                         <Item
-                            // title={t(codeLanguage + '000023')}
                             title="Manage Report"
                             to="/manage_report"
                             icon={<PersonOutlinedIcon />}
@@ -204,7 +198,6 @@ const SideBarBrandComponent = () => {
                             setSelected={setSelected}
                         />
                         <Item
-                            // title={t(codeLanguage + '000023')}
                             title="Manage Transaction"
                             to="/manage_transaction"
                             icon={<PersonOutlinedIcon />}

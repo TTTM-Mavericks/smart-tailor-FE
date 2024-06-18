@@ -8,27 +8,15 @@ import { tokens } from '../../../../theme';
 import { useTheme } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import EditMultipleUsersInExcelTable from './CRUDWithExcelTable/EditMultipleUsersInExcelTable';
-import AddUserModalInExcelTable from './CRUDWithExcelTable/AddUserInExcelTable';
+import EditMultipleUsersInExcelTable from './CRUDWithExcelTable/EditMultipleMaterialInExcelTable';
+import AddUserModalInExcelTable from './CRUDWithExcelTable/AddMaterialInExcelTable';
 const ADDUSERWITHFILEEXCELS = 'https://smart-tailor-fe.pages.dev/Add_New_Users_Sample_Files.xlsx';
 import { useTranslation } from 'react-i18next';
+import { ExcelData } from '../../../../models/AdminMaterialExcelModel';
 
-interface ExcelData {
-    id: number;
-    registrarId: string;
-    name: string;
-    age: number;
-    phone: string;
-    email: string;
-    address: string;
-    city: string;
-    zipCode: string;
-    error: boolean
-}
-
-interface AddUserWithMultipleExcelFormProps {
+interface AddMaterialWithMultipleExcelFormProps {
     closeMultipleCard: () => void;
-    addNewUser: (addedNewUser: ExcelData) => void
+    addNewMaterial: (addedNewMaterial: ExcelData) => void
 }
 
 // Make Style of popup
@@ -46,7 +34,7 @@ const style = {
 
 };
 
-const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps> = ({ closeMultipleCard, addNewUser }) => {
+const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormProps> = ({ closeMultipleCard, addNewMaterial }) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
@@ -137,7 +125,7 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
         if (excelData.length > 0 && !hasErrors) {
             uploadData(excelData);
             for (const data of excelData) {
-                addNewUser(data);
+                addNewMaterial(data);
             }
             setExcelData([]);
             setLoading(false);
@@ -412,14 +400,12 @@ const AddMultipleComponentWithExcel: React.FC<AddUserWithMultipleExcelFormProps>
                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <thead>
                                 <tr style={{ backgroundColor: colors.primary[100] }}>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>RegistrarId</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Name</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Age</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Phone</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Email</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Address</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>City</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Zip Code</th>
+                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Category Name</th>
+                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Material Name</th>
+                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>HS CODE</th>
+                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Unit</th>
+                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Base Price</th>
+                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Price</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Error Check</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Action</th>
                                 </tr>

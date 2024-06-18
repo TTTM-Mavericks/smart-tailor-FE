@@ -1,19 +1,9 @@
 import React, { useState } from 'react';
-import { Button, TextField, Box, Typography, IconButton, Grid } from '@mui/material'; // Import necessary components from Material-UI
+import { Button, TextField, Box, Typography, IconButton, Grid } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-interface ExcelData {
-    id: number;
-    registrarId: string;
-    name: string;
-    age: number;
-    phone: string;
-    email: string;
-    address: string;
-    city: string;
-    zipCode: string
-}
+import { ExcelData } from '../../../../../models/AdminMaterialExcelModel';
 
-interface EditMultipleUsersInExcelTableProps {
+interface EditMultipleMaterialsInExcelTableProps {
     open: boolean;
     onClose: () => void;
     data: ExcelData;
@@ -21,7 +11,7 @@ interface EditMultipleUsersInExcelTableProps {
     updateData: (editedData: ExcelData, index: number) => void;
 }
 
-const EditMultipleUsersInExcelTable: React.FC<EditMultipleUsersInExcelTableProps> = ({ open, onClose, data, index, updateData }) => {
+const EditMultipleMaterialsInExcelTable: React.FC<EditMultipleMaterialsInExcelTableProps> = ({ open, onClose, data, index, updateData }) => {
     const [editedData, setEditedData] = useState(data);
 
     const _handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,4 +79,4 @@ const EditMultipleUsersInExcelTable: React.FC<EditMultipleUsersInExcelTableProps
     );
 };
 
-export default EditMultipleUsersInExcelTable;
+export default EditMultipleMaterialsInExcelTable;

@@ -1,14 +1,14 @@
 import * as React from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
 
-interface AddUserModalInExcelTableProps {
+interface AddMaterialModalInExcelTableProps {
     open: boolean;
     onClose: () => void;
-    onAddUser: (userData: any) => void;
+    onAddMaterial: (materialData: any) => void;
 }
 
-const AddUserModalInExcelTable: React.FC<AddUserModalInExcelTableProps> = ({ open, onClose, onAddUser }) => {
-    const [userData, setUserData] = React.useState<any>({
+const AddMaterialModalInExcelTable: React.FC<AddMaterialModalInExcelTableProps> = ({ open, onClose, onAddMaterial }) => {
+    const [materialData, setMaterialData] = React.useState<any>({
         registrarId: '',
         name: '',
         age: '',
@@ -22,7 +22,7 @@ const AddUserModalInExcelTable: React.FC<AddUserModalInExcelTableProps> = ({ ope
 
     const _handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setUserData((prevState: any) => ({
+        setMaterialData((prevState: any) => ({
             ...prevState,
             [name]: value
         }));
@@ -30,9 +30,9 @@ const AddUserModalInExcelTable: React.FC<AddUserModalInExcelTableProps> = ({ ope
 
     const _handleAddUser = () => {
         // Kiểm tra tính hợp lệ của dữ liệu nhập vào trước khi thêm người dùng mới
-        if (userData.name && userData.age && userData.phone && userData.email) {
+        if (materialData.name && materialData.age && materialData.phone && materialData.email) {
             // Thêm người dùng vào danh sách
-            onAddUser(userData);
+            onAddMaterial(materialData);
             // Đóng modal
             onClose();
         } else {
@@ -55,7 +55,7 @@ const AddUserModalInExcelTable: React.FC<AddUserModalInExcelTableProps> = ({ ope
                     name="registrarId"
                     label="Registrar ID"
                     fullWidth
-                    value={userData.registrarId}
+                    value={materialData.registrarId}
                     onChange={_handleInputChange}
                 />
                 <TextField
@@ -64,7 +64,7 @@ const AddUserModalInExcelTable: React.FC<AddUserModalInExcelTableProps> = ({ ope
                     name="name"
                     label="Name"
                     fullWidth
-                    value={userData.name}
+                    value={materialData.name}
                     onChange={_handleInputChange}
                 />
                 <TextField
@@ -73,7 +73,7 @@ const AddUserModalInExcelTable: React.FC<AddUserModalInExcelTableProps> = ({ ope
                     name="age"
                     label="Age"
                     fullWidth
-                    value={userData.age}
+                    value={materialData.age}
                     onChange={_handleInputChange}
                 />
                 <TextField
@@ -82,7 +82,7 @@ const AddUserModalInExcelTable: React.FC<AddUserModalInExcelTableProps> = ({ ope
                     name="phone"
                     label="Phone"
                     fullWidth
-                    value={userData.phone}
+                    value={materialData.phone}
                     onChange={_handleInputChange}
                 />
                 <TextField
@@ -91,7 +91,7 @@ const AddUserModalInExcelTable: React.FC<AddUserModalInExcelTableProps> = ({ ope
                     name="email"
                     label="Email"
                     fullWidth
-                    value={userData.email}
+                    value={materialData.email}
                     onChange={_handleInputChange}
                 />
                 <TextField
@@ -100,7 +100,7 @@ const AddUserModalInExcelTable: React.FC<AddUserModalInExcelTableProps> = ({ ope
                     name="address"
                     label="Address"
                     fullWidth
-                    value={userData.address}
+                    value={materialData.address}
                     onChange={_handleInputChange}
                 />
                 <TextField
@@ -109,7 +109,7 @@ const AddUserModalInExcelTable: React.FC<AddUserModalInExcelTableProps> = ({ ope
                     name="city"
                     label="City"
                     fullWidth
-                    value={userData.city}
+                    value={materialData.city}
                     onChange={_handleInputChange}
                 />
                 <TextField
@@ -118,7 +118,7 @@ const AddUserModalInExcelTable: React.FC<AddUserModalInExcelTableProps> = ({ ope
                     name="zipCode"
                     label="Zip Code"
                     fullWidth
-                    value={userData.zipCode}
+                    value={materialData.zipCode}
                     onChange={_handleInputChange}
                 />
 
@@ -131,4 +131,4 @@ const AddUserModalInExcelTable: React.FC<AddUserModalInExcelTableProps> = ({ ope
     );
 };
 
-export default AddUserModalInExcelTable;
+export default AddMaterialModalInExcelTable;

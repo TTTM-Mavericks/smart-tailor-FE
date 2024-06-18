@@ -1,41 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Swal from 'sweetalert2';
+import axios from 'axios';
 import HeaderComponent from '../../../components/Header/HeaderComponent';
 import FooterComponent from '../../../components/Footer/FooterComponent';
 import VNLocationData from '../../../locationData.json';
-
-type Location = {
-    Id: string;
-    Name: string;
-    Districts: District[];
-};
-
-type District = {
-    Id: string;
-    Name: string;
-    Wards: Ward[];
-};
-
-type Ward = {
-    Id: string;
-    Name: string;
-    Level?: string;
-};
-
-type ProfileData = {
-    name: string;
-    surname: string;
-    gender: string;
-    birthDate: string;
-    phone: string;
-    email: string;
-    profilePicture: string;
-    address: string;
-    province: string;
-    district: string;
-    ward: string;
-};
+import { CustomerProfile } from '../../../models/CustomerProfileModel';
+import { Location, District, Ward } from '../../../models/CustomerProfileModel';
+import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 
 const ProfileSettings: React.FC = () => {
     // ---------------UseState Variable---------------//
@@ -43,18 +15,17 @@ const ProfileSettings: React.FC = () => {
     const [selectedProvince, setSelectedProvince] = useState<Location | null>(null);
     const [selectedDistrict, setSelectedDistrict] = useState<District | null>(null);
     const [selectedWard, setSelectedWard] = useState<Ward | null>(null);
-    const [profileData, setProfileData] = useState<ProfileData>({
-        name: 'Tam',
-        surname: 'Mai',
-        gender: 'Male',
-        birthDate: '2017-06-04',
-        phone: '+123456789',
-        email: 'demo@gmail.com',
-        profilePicture: '',
-        address: '10/6C',
-        province: 'Thành phố Hải Phòng',
-        district: 'Huyện Vĩnh Bảo',
-        ward: 'Xã Liên Am'
+    const [profileData, setProfileData] = useState<CustomerProfile>({
+        email: "tammtse161087@fpt.edu.vn",
+        fullName: 'Tam',
+        phoneNumber: '0919477712',
+        imageUrl: '',
+        gender: true,
+        dateOfBirth: '14-01-2002',
+        address: '',
+        province: '',
+        district: '',
+        ward: ''
     });
 
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -170,12 +141,23 @@ const ProfileSettings: React.FC = () => {
     };
 
     /**
+     * @param dateString
+     * Format the date string from dd-MM-yyyy to yyyy-MM-dd
+     */
+    const formatDateString = (dateString: string): string => {
+        const [dd, MM, yyyy] = dateString.split('-');
+        return `${yyyy}-${MM}-${dd}`;
+    };
+
+    /**
      * 
      * @param e 
      * Tracking the fields to update
      */
-    const _handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setProfileData({ ...profileData, [e.target.name]: e.target.value });
+    const _handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        const fieldValue = name === 'gender' ? (value === 'true') : name === 'dateOfBirth' ? formatDateString(value) : value;
+        setProfileData({ ...profileData, [name]: fieldValue });
     };
 
     /**
@@ -193,21 +175,34 @@ const ProfileSettings: React.FC = () => {
 
         const updatedProfileData = {
             ...profileData,
-            profilePicture: imageUrls.length > 0 ? imageUrls[0] : profileData.profilePicture,
+            imageUrl: imageUrls.length > 0 ? imageUrls[0] : profileData.imageUrl,
         };
 
         console.log('Updated profile data:', updatedProfileData);
 
-        // Mock API call to update the profile data (replace with actual API call)
-        const isUpdateSuccessful = true; // Simulate the success of the update operation
+        // Make API call to update the profile using PUT method
+        try {
+            const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0YW1tdHNlMTYxMDg3QGZwdC5lZHUudm4iLCJpYXQiOjE3MTgyODUyMTMsImV4cCI6MTcxODM3MTYxM30.UUpy2s9SwYGF_TyIru6VASQ-ZzGTOqx7mkWkcSR2__0'; // Replace with the actual bearer token
+            const response = await axios.put(
+                `${baseURL + versionEndpoints.v1 + featuresEndpoints.customer + functionEndpoints.customer.updateProfile}`,
+                updatedProfileData,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+            );
 
-        if (isUpdateSuccessful) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Profile Updated',
-                text: 'Your profile has been updated successfully!',
-            });
-        } else {
+            if (response.status === 200) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Profile Updated',
+                    text: 'Your profile has been updated successfully!',
+                });
+            } else {
+                throw new Error('Update failed');
+            }
+        } catch (error) {
             Swal.fire({
                 icon: 'error',
                 title: 'Update Failed',
@@ -215,6 +210,8 @@ const ProfileSettings: React.FC = () => {
             });
         }
     };
+
+
 
     /**
      * Delete The image to get another image
@@ -286,6 +283,24 @@ const ProfileSettings: React.FC = () => {
         }
     };
 
+    /**
+     * 
+     * @param date 
+     * @returns 
+     * Validate the date of birth is not under 18 year old
+     */
+    const validateAge = (date: string) => {
+        const today = new Date();
+        const [dd, MM, yyyy] = date.split('-'); // Split the date string into day, month, and year
+        const birthDate = new Date(`${MM}/${dd}/${yyyy}`); // Format the date as MM/dd/yyyy
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age >= 1;
+    };
+
     return (
         <div className="min-h-screen flex flex-col">
             <HeaderComponent />
@@ -317,9 +332,9 @@ const ProfileSettings: React.FC = () => {
                                         alt="Profile Preview"
                                         className="w-full h-full object-cover"
                                     />
-                                ) : profileData.profilePicture ? (
+                                ) : profileData.imageUrl ? (
                                     <img
-                                        src={profileData.profilePicture}
+                                        src={profileData.imageUrl}
                                         alt="Profile"
                                         className="w-full h-full object-cover"
                                     />
@@ -356,31 +371,31 @@ const ProfileSettings: React.FC = () => {
                         <form className="mt-8 space-y-6" onSubmit={_handleUpdate}>
                             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                                 <div>
-                                    <label htmlFor="first_name" className="block text-sm font-medium text-gray-700">
+                                    <label htmlFor="full_name" className="block text-sm font-medium text-gray-700">
                                         Your first name
                                     </label>
                                     <input
                                         type="text"
-                                        id="first_name"
+                                        id="full_name"
                                         className="mt-1 block w-full px-3 py-2 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500"
                                         placeholder="Your first name"
-                                        name="name"
-                                        value={profileData.name}
+                                        name="fullName"
+                                        value={profileData.fullName}
                                         onChange={_handleChange}
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label htmlFor="last_name" className="block text-sm font-medium text-gray-700">
-                                        Your last name
+                                    <label htmlFor="phone_number" className="block text-sm font-medium text-gray-700">
+                                        Your Phone Number
                                     </label>
                                     <input
                                         type="text"
-                                        id="last_name"
+                                        id="phone_number"
                                         className="mt-1 block w-full px-3 py-2 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500"
-                                        placeholder="Your last name"
-                                        name="surname"
-                                        value={profileData.surname}
+                                        placeholder="Your phone number"
+                                        name="phoneNumber"
+                                        value={profileData.phoneNumber}
                                         onChange={_handleChange}
                                         required
                                     />
@@ -401,6 +416,50 @@ const ProfileSettings: React.FC = () => {
                                 />
                             </div>
                             <div>
+                                <label className="block text-gray-600 font-medium">Gender</label>
+                                <div className="mt-2 flex items-center">
+                                    <label className="mr-4">
+                                        <input
+                                            type="radio"
+                                            name="gender"
+                                            value="true"
+                                            checked={profileData.gender === true}
+                                            onChange={_handleChange}
+                                            className="mr-2"
+                                        />
+                                        Male
+                                    </label>
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="gender"
+                                            value="false"
+                                            checked={profileData.gender === false}
+                                            onChange={_handleChange}
+                                            className="mr-2"
+                                        />
+                                        Female
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-gray-600 font-medium">Date of Birth</label>
+                                <input
+                                    type="date"
+                                    name="dateOfBirth"
+                                    value={formatDateString(profileData.dateOfBirth)}
+                                    onChange={_handleChange}
+                                    className="mt-2 px-3 py-2 border rounded-lg w-full"
+                                    required
+                                />
+                                {!validateAge(profileData.dateOfBirth) && (
+                                    <span className="text-red-500 text-xs mt-1">
+                                        You must be at least 18 years old.
+                                    </span>
+                                )}
+                            </div>
+                            <div>
                                 <label htmlFor="address" className="block text-sm font-medium text-gray-700">
                                     Your address
                                 </label>
@@ -412,7 +471,6 @@ const ProfileSettings: React.FC = () => {
                                     name="address"
                                     value={profileData.address}
                                     onChange={_handleChange}
-                                    required
                                 />
                             </div>
                             <div>

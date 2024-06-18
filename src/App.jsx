@@ -10,7 +10,7 @@ import ContactUsPage from './pages/ContactUs/ContactUsScreen';
 
 import {
   DashboardAdminScreens,
-  DashboardManageUserScreen,
+  DashboardAdminManageMaterialScreen,
   DashboardAdminProfileScreens,
   DashboardRecentTransactionScreen,
   DashboardManageInvoiceScreen,
@@ -19,6 +19,8 @@ import {
   DashboardGeographyChartScreens,
   DashboardLineChartScreens,
   DashboardBarChartScreens,
+  FileUpload,
+  DashboardAdminManageCategoryScreen,
 } from './pages/AdminManagement';
 
 import {
@@ -58,6 +60,7 @@ import {
   OrderDetailScreen,
   OrderHistory
 } from './pages/Order';
+import Brand from './pages/BrandManagement/DashboardBrand/BrandDashboardScreen';
 
 
 const tokenIsValid = (token) => {
@@ -117,7 +120,7 @@ function App() {
   return (
     <div>
       <BrowserRouter>
-      <ConditionalTokenRefreshDialog />
+        <ConditionalTokenRefreshDialog />
         <Routes>
 
           {/* Init/Home route */}
@@ -142,7 +145,8 @@ function App() {
           <Route path='/admin_profile' element={<DashboardAdminProfileScreens></DashboardAdminProfileScreens>} />
           <Route path='/about' element={<AboutUsPage></AboutUsPage>} />
           <Route path='/contact' element={<ContactUsPage></ContactUsPage>} />
-          <Route path='/manager_user' element={<DashboardManageUserScreen></DashboardManageUserScreen>} />
+          <Route path='/admin_manager_material' element={<DashboardAdminManageMaterialScreen></DashboardAdminManageMaterialScreen>} />
+          <Route path='/admin_manager_category' element={<DashboardAdminManageCategoryScreen></DashboardAdminManageCategoryScreen>} />
           <Route path='/manage_revenue' element={<DashboardRecentTransactionScreen></DashboardRecentTransactionScreen>} />
           <Route path='/manage_invoice' element={<DashboardManageInvoiceScreen></DashboardManageInvoiceScreen>} />
           <Route path='/admin_faq' element={<DashboardFAQScreens></DashboardFAQScreens>} />
@@ -164,6 +168,7 @@ function App() {
 
           {/* Brand Dashboard Route */}
           <Route path='/brand' element={<DashboardBrandScreens></DashboardBrandScreens>} />
+          <Route path='/brands' element={<Brand />} />
           <Route path="/brand_manage_notification" element={<DashboardBrandManageNotification></DashboardBrandManageNotification>} />
           <Route path='/brand_profile' element={<DashboardBrandProfileScreens></DashboardBrandProfileScreens>} />
           <Route path='/manage_material' element={<DashboardManageMaterialScreen></DashboardManageMaterialScreen>} />

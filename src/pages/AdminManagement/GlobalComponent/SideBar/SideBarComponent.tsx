@@ -169,7 +169,14 @@ const SideBarComponent = () => {
                         </Typography>
                         <Item
                             title={t(codeLanguage + '000020')}
-                            to="/manager_user"
+                            to="/admin_manager_material"
+                            icon={<PeopleOutlinedIcon />}
+                            selected={selected}
+                            setSelected={setSelected}
+                        />
+                        <Item
+                            title={t(codeLanguage + '000212')}
+                            to="/admin_manager_category"
                             icon={<PeopleOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
