@@ -1,0 +1,11 @@
+name = "smart-tailor-fe"
+type = "webpack"
+account_id = "e5983ad52b09aa6b73d8d158b3e8f1d0"
+zone_id = "cab8d479f506a574f7e45c2087f1835d"
+
+[build]
+command = "npm run build --legacy-peer-deps"
+
+[site]
+bucket = "./build"
+entry-point = "worker"

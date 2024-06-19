@@ -1,174 +1,136 @@
 import { easing } from "maath";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useLoader } from "@react-three/fiber";
 import { useGLTF, Decal, useTexture } from "@react-three/drei";
 import { useSnapshot } from "valtio";
-import state from '../store'
 import { useEffect, useState } from "react";
+import { TextureLoader } from "three";
+import state from "../store";
 
 
-const Shirt = () => {
+const Shirt = ({isDefault}) => {
 
-    const [logoDecalPositionX, setLogoDecalPositionX] = useState(0);
-    const [logoDecalPositionY, setLogoDecalPositionY] = useState(0);
+    /** @type {[PartOfDesignInterface[], React.Dispatch<React.SetStateAction<PartOfDesignInterface[]>>]} */
+    const [modelData, setModelData] = useState();
 
-    const [frontDecalPositionX, setFrontDecalPositionX] = useState(0);
-    const [frontDecalPositionY, setFrontDecalPositionY] = useState(0);
+    /** @type {[ItemMaskInterface[], React.Dispatch<React.SetStateAction<ItemMaskInterface[]>>]} */
+    const [deCal, setDecal] = useState();
 
-    const [backDecalPositionX, setBackDecalPositionX] = useState(0);
-    const [backDecalPositionY, setBackDecalPositionY] = useState(0);
-
-    const [sleeveDecalPositionX, setSleeveDecalPositionX] = useState(0);
-    const [sleeveDecalPositionY, setSleeveDecalPositionY] = useState(0);
+    // /** @type {{key:string , items:[ItemMaskInterface[]}, React.Dispatch<React.SetStateAction<ItemMaskInterface[]>>]} */
+    const [deCalData, setDecalData] = useState([]);
 
     const snap = useSnapshot(state)
 
     const { nodes, materials } = useGLTF('/shirt_baked.glb');
 
 
-    const logoTexture = useTexture(snap.logoDecal);
-    const fullTexture = useTexture(snap.fullDecal);
-    const frontTexture = useTexture(snap.frontClothDecal);
-    const backTexture = useTexture(snap.backClothDecal);
-    const sleeveTexture = useTexture(snap.sleeveClothDecal);
+    useEffect(() => {
+        if(isDefault) return;
+        if (snap.modelData) {
+            setModelData(snap.modelData);
 
+            // Accumulate all item masks from different parts
+            const newDecals = snap.modelData.reduce((acc, item) => {
+                if (item.itemMasks) {
+                    acc.push({ key: item.partOfDesignName, items: item.itemMasks });
+                }
+                return acc;
+            }, []);
 
+            setDecalData(newDecals);
+        }
+    }, [snap.modelData]);
 
     useEffect(() => {
-        if (snap.isLogoTexture) {
-
-            if (snap.logoDecalPositionX / 1000 !== 0) {
-                if (snap.logoDecalPositionX / 1000 < 0.2) {
-
-                    setLogoDecalPositionX(snap.logoDecalPositionX / 1000)
-                } else {
-                    setLogoDecalPositionX(-snap.logoDecalPositionX / 1000)
-
+        if (snap.modelData) {
+            const reusult = snap.modelData
+            setModelData(snap.modelData);
+            reusult.map((item) => {
+                if (item.partOfDesignName === 'LOGO_PART') {
+                    setDecal(item.itemMasks);
                 }
-
-            }
-
-            if (snap.logoDecalPositionY !== 0) {
-                if (snap.logoDecalPositionY / 1000 < 0.2) {
-
-                    setLogoDecalPositionY(-snap.logoDecalPositionY / 1000)
-                } else {
-                    setLogoDecalPositionY(snap.logoDecalPositionY / 1000)
-
-                }
-
-            }
+            })
 
         }
+    }, [modelData]);
 
-        if (snap.isFrontClothTexture) {
+    useEffect(() => {
+        const loadDecals = async () => {
+            const promises = deCalData.reduce((acc, decalGroup) => {
+                acc.push(...decalGroup.items.map(async (item) => {
+                    try {
+                        const texture = await loadTexture(item.imageUrl);
+                        return { ...item, texture };
+                    } catch (error) {
+                        console.error(`Failed to load texture for item ${item.itemMaskID}`, error);
+                        return null;
+                    }
+                }));
+                return acc;
+            }, []);
 
-            if (snap.frontDecalPositionX / 1000 !== 0) {
-                if (snap.frontDecalPositionX / 1000 < 0.2) {
+            const results = await Promise.all(promises);
+            setDecalData((prev) => {
+                return prev.map((decalGroup, index) => {
+                    return {
+                        ...decalGroup,
+                        items: decalGroup.items.map((item, itemIndex) => {
+                            return results[index * decalGroup.items.length + itemIndex] || item;
+                        })
+                    };
+                });
+            });
+        };
 
-                    setFrontDecalPositionX(snap.frontDecalPositionX / 1000)
-                } else {
-                    setFrontDecalPositionX(-snap.frontDecalPositionX / 1000)
-
-                }
-
-            }
-
-            if (snap.frontDecalPositionY !== 0) {
-                if (snap.frontDecalPositionY / 1000 < 0.2) {
-
-                    setFrontDecalPositionY(-snap.frontDecalPositionY / 1000)
-                } else {
-                    setFrontDecalPositionY(snap.frontDecalPositionY / 1000)
-
-                }
-
-            }
-
+        if (deCalData && deCalData.length > 0) {
+            loadDecals();
         }
-
-        if (snap.isBackClothTexture) {
-
-            if (snap.backDecalPositionX / 1000 !== 0) {
-                if (snap.backDecalPositionX / 1000 < 0.2) {
-
-                    setBackDecalPositionX(snap.backDecalPositionX / 1000)
-                } else {
-                    setBackDecalPositionX(-snap.backDecalPositionX / 1000)
-
-                }
-
-            }
-
-            if (snap.backDecalPositionY !== 0) {
-                if (snap.backDecalPositionY / 1000 < 0.2) {
-
-                    setBackDecalPositionY(-snap.backDecalPositionY / 1000)
-                } else {
-                    setBackDecalPositionY(snap.backDecalPositionY / 1000)
-
-                }
-
-            }
-
-        }
-
-        if (snap.isSleeveClothTexture) {
-
-            if (snap.sleeveDecalPositionX / 1000 !== 0) {
-                if (snap.sleeveDecalPositionX / 1000 < 0.2) {
-
-                    setSleeveDecalPositionX(snap.sleeveDecalPositionX / 1000)
-                } else {
-                    setSleeveDecalPositionX(-snap.sleeveDecalPositionX / 1000)
-
-                }
-
-            }
-
-            if (snap.sleeveDecalPositionY !== 0) {
-                if (snap.sleeveDecalPositionY / 1000 < 0.2) {
-
-                    setSleeveDecalPositionY(-snap.sleeveDecalPositionY / 1000)
-                } else {
-                    setSleeveDecalPositionY(snap.sleeveDecalPositionY / 1000)
-
-                }
-
-            }
-
-        }
-
-
-        // Vị trí ban đầu của phần tử con
-        const initialPositionX = snap.logoDecalPositionX;
-        const initialPositionY = snap.logoDecalPositionY;
-
-        // Vị trí ban đầu của phần tử khác
-        const otherElementX = 0;
-        const otherElementY = 0;
-
-        // Sự chênh lệch giữa hai vị trí theo trục X và trục Y
-        const deltaX = initialPositionX - otherElementX;
-        const deltaY = initialPositionY - otherElementY;
-
-        // Tính toán tỉ lệ
-        const scaleRatioX = deltaX / otherElementX;
-        const scaleRatioY = deltaY / otherElementY;
-
-        console.log(nodes, materials)
-
-
-
-
-
-    }, [snap])
-
-
+    }, [modelData]);
 
 
     useFrame((state, delta) => easing.dampC(materials.lambert1.color, snap.color, 0.25, delta))
 
     const stateString = JSON.stringify(snap)
+
+    const __handleFixPosition = (firstItemMask, key) => {
+        if (firstItemMask.position) {
+            const A_width = 500; // Example width of div A
+            const A_height = 500; // Example height of div A
+            const B_width = 170; // Example width of div B
+            const B_height = 300; // Example height of div B
+            const offsetX = (A_width / 2) - (B_width / 2) - (firstItemMask.scaleX / A_width);
+            const offsetY = (A_height / 2) - (B_height / 2) - (firstItemMask.scaleY / A_height);
+            let pos;
+            pos = [
+                (firstItemMask.position.x - 130 + (firstItemMask.scaleX / 230) + (firstItemMask.scaleX-230)/2) / 1000 ,
+                -(firstItemMask.position.y - 80 + (firstItemMask.scaleY / 230) + (firstItemMask.scaleY-230)/2) / 1000 ,
+                key === 'LOGO_PART' || key === 'FRONT_CLOTH_PART' ? 0.15
+                    :
+                    key === 'BACK_CLOTH_PART' ? -0.25
+                        : 0
+            ];
+            return pos;
+
+
+        }
+    }
+
+    const __handleScale = (item) => {
+        if (item) {
+            return ([item.scaleX / 1000, item.scaleY / 1000, 0.3]);
+        }
+    }
+
+
+    const degreesToEuler = (degrees) => {
+        const radians = degrees * (Math.PI / 180);
+        return  radians;
+    };
+
+
+    const loadTexture = (imageUrl) => {
+        const loader = new TextureLoader();
+        return loader.loadAsync(imageUrl);
+    };
 
     return (
         <group key={stateString}>
@@ -180,68 +142,20 @@ const Shirt = () => {
                 scale={[6, 6, 6]}
                 dispose={null}
             >
-                {snap.isFullTexture && (
-                    <Decal
-                        position={[0, 0, 0]}
-                        rotation={[0, 0, 0]}
-                        scale={1}
-                        map={fullTexture}
-                    />
-                )}
 
-                {snap.isLogoTexture && (
-                    <Decal
-                        // position={[logoDecalPositionX ? logoDecalPositionX : 0, logoDecalPositionY ? logoDecalPositionY : 0, 0.15]}
-                        position={[0, 0.04, 0.15]}
-
-                        rotation={[0, 0, 0]}
-                        scale={0.1}
-                        map={logoTexture}
-                        depthTest={false}
-                        depthWrite={true}
-                    />
-                )}
-
-
-                {snap.isFrontClothTexture && (
-                    <Decal
-                        position={[frontDecalPositionX ? frontDecalPositionX : 0, frontDecalPositionY ? frontDecalPositionY : 0, 0.15]}
-                        // position={[0, 0.04, 0.15]}
-
-                        rotation={[0, 0, 0]}
-                        scale={0.35}
-                        map={frontTexture}
-                        depthTest={false}
-                        depthWrite={true}
-                    />
-                )}
-
-                {snap.isBackClothTexture && (
-                    <Decal
-                        position={[0, backDecalPositionY ? backDecalPositionY : 0, -0.25]}
-                        // position={[0, 0.01, 0.2]}
-
-                        rotation={[0, 0, 0]}
-                        scale={0.5}
-                        map={backTexture}
-                        depthTest={false}
-                        depthWrite={true}
-                    />
-                )}
-
-                {snap.isSleeveClothTexture && (
-                    <Decal
-                        // position={[sleeveDecalPositionX ? sleeveDecalPositionX/10 : 0, sleeveDecalPositionY ? sleeveDecalPositionY : 0, 0]}
-                        position={[-0.15, 0.15, 0]}
-
-                        rotation={[0, 0, 0]}
-                        scale={0.2}
-                        map={sleeveTexture}
-                        depthTest={false}
-                        depthWrite={true}
-                    />
-                )}
-
+                {deCalData && deCalData.map((decalGroup) => (
+                    decalGroup.items.map((item) => (
+                        <Decal
+                            position={__handleFixPosition(item, decalGroup.key)}
+                            key={item.itemMaskID}
+                            rotation={[0, 0, -degreesToEuler(item.rotate)]}
+                            scale={__handleScale(item)}
+                            map={item.texture}
+                            depthTest={true}
+                            depthWrite={true}
+                        />
+                    ))
+                ))}
 
             </mesh>
         </group>

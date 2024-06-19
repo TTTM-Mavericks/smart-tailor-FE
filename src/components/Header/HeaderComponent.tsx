@@ -1,276 +1,69 @@
-// import { Fragment } from 'react'
-// import { Disclosure, Menu, Transition } from '@headlessui/react'
-// import { Bars3Icon, BellIcon, ShoppingCartIcon, XMarkIcon } from '@heroicons/react/24/outline'
-// import { primaryColor } from '../../root/ColorSystem'
-
-// const user = {
-//   name: 'Tom Cook',
-//   email: 'tom@example.com',
-//   imageUrl:
-//     'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-// }
-// const navigation = [
-//   { name: 'Home', href: 'home', current: true },
-//   { name: 'Products', href: 'products', current: false },
-//   { name: 'Design', href: 'design', current: false },
-//   { name: 'Sewing company', href: 'sewingcom', current: false },
-//   { name: 'About us', href: 'about', current: false },
-//   { name: 'Reports', href: 'report', current: false },
-// ]
-// const userNavigation = [
-//   { name: 'Your Profile', href: '#' },
-//   { name: 'Settings', href: '#' },
-//   { name: 'Sign out', href: '#' },
-// ]
-
-// function classNames(...classes: any[]): string {
-//   return classes.filter(Boolean).join(' ');
-// }
-
-
-// export default function HeaderComponent() {
-
-
-//   return (
-//     <>
-//       {/*
-//         This example requires updating your template:
-
-//         ```
-//         <html class="h-full bg-gray-100">
-//         <body class="h-full">
-//         ```
-//       */}
-//       <div className="min-h-full">
-//         <Disclosure as="nav" style={{ backgroundColor: primaryColor }}>
-//           {({ open }) => (
-//             <>
-//               <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-//                 <div className="flex h-16 items-center justify-between">
-//                   <div className="flex items-center">
-//                     <div className="flex-shrink-0">
-//                       <img
-//                         className="h-8 w-8"
-//                         src={'../../assets/system/smart-tailor_logo.png'}
-//                         alt="Your Company"
-//                       />
-//                     </div>
-//                     <div className="hidden md:block">
-//                       <div className="ml-10 flex items-baseline space-x-4">
-//                         {navigation.map((item) => (
-//                           <a
-//                             key={item.name}
-//                             href={item.href}
-//                             className={classNames(
-//                               item.current
-//                                 ? 'bg-gray-900 text-white'
-//                                 : 'text-gray-100 hover:bg-gray-700 hover:text-white',
-//                               'rounded-md px-3 py-2 text-sm font-medium'
-//                             )}
-//                             aria-current={item.current ? 'page' : undefined}
-//                           >
-//                             {item.name}
-//                           </a>
-//                         ))}
-//                       </div>
-//                     </div>
-//                   </div>
-//                   <div className="hidden md:block">
-//                     <div className="ml-4 flex items-center md:ml-6">
-
-//                       <button
-//                         type="button"
-//                         className="relative flex-shrink-0 rounded-full p-1 text-white hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 mr-2 ml-auto flex items-center md:ml-6 " 
-//                       >
-//                         <span className="absolute -inset-1.5" />
-//                         <span className="sr-only">View notifications</span>
-//                         <ShoppingCartIcon className="h-6 w-6" aria-hidden="true" />
-//                       </button>
-
-//                       <button
-//                         type="button"
-//                         className="relative rounded-full p-1 text-white hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-//                       >
-//                         <span className="absolute -inset-1.5" />
-//                         <span className="sr-only">View notifications</span>
-//                         <BellIcon className="h-6 w-6" aria-hidden="true" />
-//                       </button>
-
-
-
-//                       {/* Profile dropdown */}
-//                       <Menu as="div" className="relative ml-3">
-//                         <div>
-//                           <Menu.Button className="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-//                             <span className="absolute -inset-1.5" />
-//                             <span className="sr-only">Open user menu</span>
-//                             <img className="h-8 w-8 rounded-full" src={user.imageUrl} alt="" />
-//                           </Menu.Button>
-//                         </div>
-//                         <Transition
-//                           as={Fragment}
-//                           enter="transition ease-out duration-100"
-//                           enterFrom="transform opacity-0 scale-95"
-//                           enterTo="transform opacity-100 scale-100"
-//                           leave="transition ease-in duration-75"
-//                           leaveFrom="transform opacity-100 scale-100"
-//                           leaveTo="transform opacity-0 scale-95"
-//                         >
-//                           <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-//                             {userNavigation.map((item) => (
-//                               <Menu.Item key={item.name}>
-//                                 {({ active }) => (
-//                                   <a
-//                                     href={item.href}
-//                                     className={classNames(
-//                                       active ? 'bg-gray-100' : '',
-//                                       'block px-4 py-2 text-sm text-black'
-//                                     )}
-//                                   >
-//                                     {item.name}
-//                                   </a>
-//                                 )}
-//                               </Menu.Item>
-//                             ))}
-//                           </Menu.Items>
-//                         </Transition>
-//                       </Menu>
-//                     </div>
-//                   </div>
-//                   <div className="-mr-2 flex md:hidden">
-//                     {/* Mobile menu button */}
-//                     <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-//                       <span className="absolute -inset-0.5" />
-//                       <span className="sr-only">Open main menu</span>
-//                       {open ? (
-//                         <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
-//                       ) : (
-//                         <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
-//                       )}
-//                     </Disclosure.Button>
-//                   </div>
-//                 </div>
-//               </div>
-
-//               <Disclosure.Panel className="md:hidden">
-//                 <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
-//                   {navigation.map((item) => (
-//                     <Disclosure.Button
-//                       key={item.name}
-//                       as="a"
-//                       href={item.href}
-//                       className={classNames(
-//                         item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-//                         'block rounded-md px-3 py-2 text-base font-medium'
-//                       )}
-//                       aria-current={item.current ? 'page' : undefined}
-//                     >
-//                       {item.name}
-//                     </Disclosure.Button>
-//                   ))}
-//                 </div>
-//                 <div className="border-t border-gray-700 pb-3 pt-4">
-//                   <div className="flex items-center px-5">
-//                     <div className="flex-shrink-0">
-//                       <img className="h-10 w-10 rounded-full" src={user.imageUrl} alt="" />
-//                     </div>
-//                     <div className="ml-3">
-//                       <div className="text-base font-medium leading-none text-black">{user.name}</div>
-//                       <div className="text-sm font-medium leading-none text-gray-400">{user.email}</div>
-//                     </div>
-
-//                     <button
-//                       type="button"
-//                       className="relative ml-auto flex-shrink-0 rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-//                     >
-//                       <span className="absolute -inset-1.5" />
-//                       <span className="sr-only">View Cart</span>
-//                       <ShoppingCartIcon className="h-6 w-6" aria-hidden="true" />
-//                     </button>
-
-//                     <button
-//                       type="button"
-//                       className="relative ml-auto flex-shrink-0 rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-//                     >
-//                       <span className="absolute -inset-1.5" />
-//                       <span className="sr-only">View notifications</span>
-//                       <BellIcon className="h-6 w-6" aria-hidden="true" />
-//                     </button>
-
-//                   </div>
-//                   <div className="mt-3 space-y-1 px-2">
-//                     {userNavigation.map((item) => (
-//                       <Disclosure.Button
-//                         key={item.name}
-//                         as="a"
-//                         href={item.href}
-//                         className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
-//                       >
-//                         {item.name}
-//                       </Disclosure.Button>
-//                     ))}
-//                   </div>
-//                 </div>
-//               </Disclosure.Panel>
-//             </>
-//           )}
-//         </Disclosure>
-
-//         <header className="bg-white shadow">
-//           <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-//             <h1 className="text-3xl font-bold tracking-tight text-gray-900">Dashboard</h1>
-//           </div>
-//         </header>
-//         <main>
-//           <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">{/* Your content */}</div>
-//         </main>
-//       </div>
-//     </>
-
-//   )
-// }
-
-/*
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/aspect-ratio'),
-    ],
-  }
-  ```
-*/
-import { Fragment, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react';
 import { Dialog, Popover, Tab, Transition } from '@headlessui/react'
 import { Bars3Icon, MagnifyingGlassIcon, ShoppingBagIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { primaryColor } from '../../root/ColorSystem'
+import styles from './Header.module.scss';
+import { systemLogo } from '../../assets';
+import { useTranslation } from 'react-i18next';
+import {
+  Link,
+  MenuItem,
+  Avatar,
+  Box,
+  Divider,
+  IconButton,
+  ListItemIcon,
+  Menu,
+  Tooltip
+} from '@mui/material';
+import { Logout } from '@mui/icons-material';
+import HeaderLanguageSetting from '../LanguageSetting/LanguageSettingComponent';
+import { UserInterface } from '../../models/UserModel';
+import Cookies from 'js-cookie';
+import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../api/ApiConfig';
+import { ToastContainer, toast } from 'react-toastify';
 
 const navigation = {
   categories: [
+
     {
-      id: 'home',
-      name: 'Home',
-      href: '/',
+      id: 'design',
+      name: 'Design',
+      href: '/design',
+      number: '000132',
       type: 'page'
     },
+    {
+      id: 'about',
+      name: 'About us',
+      number: '000133',
+      href: '/about',
+      type: 'page'
+    },
+    {
+      id: 'report',
+      name: 'Report',
+      href: '/report',
+      number: '000134',
+      type: 'page'
+    },
+  ],
+  categories_2: [
     {
       id: 'products',
       name: 'Products',
       type: 'menu',
+      number: '000130',
       featured: [
         {
           name: 'New Arrivals',
-          href: '#',
+          href: '/product',
           imageSrc: 'https://tailwindui.com/img/ecommerce-images/mega-menu-category-01.jpg',
           imageAlt: 'Models sitting back to back, wearing Basic Tee in black and bone.',
         },
         {
           name: 'Basic Tees',
-          href: '#',
+          href: '/product',
           imageSrc: 'https://tailwindui.com/img/ecommerce-images/mega-menu-category-02.jpg',
           imageAlt: 'Close up of Basic Tee fall bundle with off-white, ochre, olive, and black tees.',
         },
@@ -320,6 +113,7 @@ const navigation = {
       id: 'sewingcompany',
       name: 'Sewing company',
       type: 'menu',
+      number: '000131',
       featured: [
         {
           name: 'New Arrivals',
@@ -373,30 +167,7 @@ const navigation = {
         },
       ],
     },
-    {
-      id: 'design',
-      name: 'Design',
-      href: '/design',
-      type: 'page'
-    },
-    {
-      id: 'about',
-      name: 'About us',
-      href: '/about',
-      type: 'page'
-    },
-    {
-      id: 'report',
-      name: 'Report',
-      href: '/report',
-      type: 'page'
-    },
-  ],
-  // pages: [
-  //   { name: 'Design', href: 'design', current: false },
-  //   { name: 'About us', href: 'about', current: false },
-  //   { name: 'Reports', href: 'report', current: false },
-  // ],
+  ]
 }
 
 function classNames(...classes: any[]) {
@@ -404,10 +175,85 @@ function classNames(...classes: any[]) {
 }
 
 export default function HeaderComponent() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState<boolean>(false)
+
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [userLogined, setUserLogined] = useState<UserInterface>();
+
+  useEffect(() => {
+    console.log('header: ', userLogined);
+    const checkLoginStatus = () => {
+      const userSession = localStorage.getItem('userAuth');
+      if (userSession) {
+        const userParse = JSON.parse(userSession);
+        setUserLogined(userParse)
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
+
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const isOpen = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  // Logout 
+  const __handleLogout = async () => {
+    try {
+      const authToken = Cookies.get('token');
+      const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.signout}`, authToken);
+      if (response.status === 200) {
+        localStorage.clear();
+        Cookies.remove('token');
+        Cookies.remove('refreshToken');
+        window.location.href = '/auth/signin'
+
+      } else {
+        toast.error(`${response.message}`, { autoClose: 4000 });
+      }
+      console.log(response);
+
+    } catch (error: any) {
+      console.error('Error posting data:', error);
+      toast.error(`${error}`, { autoClose: 4000 });
+      // Toast.show({
+      //   type: 'error',
+      //   text1: JSON.stringify(error.message),
+      //   position: 'top'
+      // });
+    }
+  }
+
+  // Get language in local storage
+  const selectedLanguage = localStorage.getItem('language');
+  const codeLanguage = selectedLanguage?.toUpperCase();
+
+  // Using i18n
+  const { t, i18n } = useTranslation();
+  useEffect(() => {
+    if (selectedLanguage !== null) {
+      i18n.changeLanguage(selectedLanguage);
+    }
+  }, [selectedLanguage, i18n]);
+
+
+  const [proposalOpen, setProposalOpen] = useState<boolean>(false);
+
+  const toggleProposal = () => {
+    setProposalOpen(!proposalOpen);
+  };
 
   return (
-    <div className="bg-white mb-200" style={{marginBottom: '20px'}}>
+    <div className={`${styles.header__container} bg-white mb-200`}>
+      <ToastContainer></ToastContainer>
       {/* Mobile menu */}
       <Transition.Root show={open} as={Fragment}>
         <Dialog as="div" className="relative z-40 lg:hidden" onClose={setOpen}>
@@ -452,7 +298,6 @@ export default function HeaderComponent() {
                     <Tab.List className="-mb-px flex space-x-8 px-4">
                       {navigation.categories.map((category) => (
                         <Tab
-                          onClick={() => { if (category.href) { window.location.href = '/' } }}
                           key={category.name}
                           className={({ selected }) =>
                             classNames(
@@ -460,18 +305,20 @@ export default function HeaderComponent() {
                               'flex-1 whitespace-nowrap border-b-2 px-1 py-4 text-base font-medium'
                             )
                           }
+                        // href={category.href}
                         >
                           {category.name}
                         </Tab>
                       ))}
                     </Tab.List>
+
                   </div>
                   <Tab.Panels as={Fragment}>
                     {navigation.categories.map((category) => (
                       <Tab.Panel key={category.name} className="space-y-10 px-4 pb-8 pt-10">
                         <div className="grid grid-cols-2 gap-x-4">
 
-                          {category?.featured?.map((item) => (
+                          {category?.featured?.map((item: any) => (
                             <div key={item.name} className="group relative text-sm">
                               <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
                                 <img src={item.imageSrc} alt={item.imageAlt} className="object-cover object-center" />
@@ -486,7 +333,7 @@ export default function HeaderComponent() {
                             </div>
                           ))}
                         </div>
-                        {category?.sections?.map((section) => (
+                        {category?.sections?.map((section: any) => (
                           <div key={section.name}>
                             <p id={`${category.id}-${section.id}-heading-mobile`} className="font-medium text-gray-900">
                               {section.name}
@@ -496,7 +343,7 @@ export default function HeaderComponent() {
                               aria-labelledby={`${category.id}-${section.id}-heading-mobile`}
                               className="mt-6 flex flex-col space-y-6"
                             >
-                              {section.items.map((item) => (
+                              {section.items.map((item: any) => (
                                 <li key={item.name} className="flow-root">
                                   <a href={item.href} className="-m-2 block p-2 text-gray-500">
                                     {item.name}
@@ -523,40 +370,41 @@ export default function HeaderComponent() {
 
                 <div className="space-y-6 border-t border-gray-200 px-4 py-6">
                   <div className="flow-root">
-                    <a href="#" className="-m-2 block p-2 font-medium text-gray-900">
+                    <a href="/auth/sigin" className="-m-2 block p-2 font-medium text-gray-900">
                       Sign in
                     </a>
                   </div>
                   <div className="flow-root">
-                    <a href="#" className="-m-2 block p-2 font-medium text-gray-900">
-                      Create account
+                    <a href="/auth/signup" className="-m-2 block p-2 font-medium text-gray-900">
+                      Sign up
                     </a>
                   </div>
                 </div>
 
-                <div className="border-t border-gray-200 px-4 py-6">
+                {/* <div className="border-t border-gray-200 px-4 py-6">
                   <a href="#" className="-m-2 flex items-center p-2">
                     <img
-                      src="https://tailwindui.com/img/flags/flag-canada.svg"
+                      src={systemLogo}
                       alt=""
-                      className="block h-auto w-5 flex-shrink-0"
+                      className={`${styles.logo}`}
                     />
                     <span className="ml-3 block text-base font-medium text-gray-900">CAD</span>
                     <span className="sr-only">, change currency</span>
                   </a>
-                </div>
+                </div> */}
               </Dialog.Panel>
             </Transition.Child>
           </div>
         </Dialog>
       </Transition.Root>
 
+      {/* Desktop */}
       <header className="relative bg-white">
-        <p 
-        className="flex h-10 items-center justify-center px-4 text-sm font-medium text-white sm:px-6 lg:px-8"
-        style={{backgroundColor: primaryColor}}
+        <p
+          className="flex h-10 items-center justify-center px-4 text-sm font-medium text-white sm:px-6 lg:px-8"
+          style={{ backgroundColor: primaryColor }}
         >
-          Get free delivery on orders over $100
+          {t(codeLanguage + '000128')}
         </p>
 
         <nav aria-label="Top" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -564,7 +412,7 @@ export default function HeaderComponent() {
             <div className="flex h-16 items-center">
               <button
                 type="button"
-                className="relative rounded-md bg-white p-2 text-gray-400 lg:hidden"
+                className="relative rounded-md bg-white p-2 text-gray-400 lg:hidden focus:outline-none"
                 onClick={() => setOpen(true)}
               >
                 <span className="absolute -inset-0.5" />
@@ -575,166 +423,325 @@ export default function HeaderComponent() {
               {/* Logo */}
               <div className="ml-4 flex lg:ml-0">
                 <a href="#">
-                  <span className="sr-only">Your Company</span>
-                  <img
-                    className="h-8 w-auto"
-                    src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                    alt=""
-                  />
+                  <img className={`${styles.logo}`} src={systemLogo} alt="" />
                 </a>
               </div>
+
+              {/* Section 2 */}
+              <Popover.Group className="hidden lg:ml-8 lg:block lg:self-stretch">
+                <div className="flex h-full space-x-8">
+                  {navigation.categories_2.map((category) => (
+                    <Popover key={category.name} className="flex">
+                      {({ open }) => (
+                        <>
+                          <div className="relative flex">
+                            <Popover.Button
+                              onClick={toggleProposal}
+                              className={classNames(
+                                open ? 'text-indigo-600 border-red-500' : 'border-transparent text-gray-700 hover:text-gray-800',
+                                'relative z-10 -mb-px flex items-center pt-px text-sm font-medium transition-colors duration-200 ease-out focus:outline-none focus:border-red-500'
+                              )}
+                            >
+                              {t(codeLanguage + `${category.number}`)}
+                            </Popover.Button>
+                          </div>
+
+                          {category.type !== 'page' && (
+                            <Transition
+                              as={Fragment}
+                              enter="transition ease-out duration-200"
+                              enterFrom="opacity-0"
+                              enterTo="opacity-100"
+                              leave="transition ease-in duration-150"
+                              leaveFrom="opacity-100"
+                              leaveTo="opacity-0"
+                            >
+                              <Popover.Panel className="absolute inset-x-0 top-full text-sm text-gray-500">
+                                <div className="absolute inset-0 top-1/2 bg-white shadow" aria-hidden="true" />
+                                <div className="relative bg-white">
+                                  <div className="mx-auto max-w-7xl px-8">
+                                    <div className="grid grid-cols-2 gap-x-8 gap-y-10 py-16">
+                                      <div className="col-start-2 grid grid-cols-2 gap-x-8">
+                                        {category?.featured?.map((item) => (
+                                          <div key={item.name} className="group relative text-base sm:text-sm">
+                                            <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
+                                              <img
+                                                src={item.imageSrc}
+                                                alt={item.imageAlt}
+                                                className="object-cover object-center"
+                                              />
+                                            </div>
+                                            <a href={item.href} className="mt-6 block font-medium text-gray-900">
+                                              <span className="absolute inset-0 z-10" aria-hidden="true" />
+                                              {item.name}
+                                            </a>
+                                            <p aria-hidden="true" className="mt-1">
+                                              Shop now
+                                            </p>
+                                          </div>
+                                        ))}
+                                      </div>
+                                      <div className="row-start-1 grid grid-cols-3 gap-x-8 gap-y-10 text-sm">
+                                        {category?.sections?.map((section) => (
+                                          <div key={section.name}>
+                                            <p id={`${section.name}-heading`} className="font-medium text-gray-900">
+                                              {section.name}
+                                            </p>
+                                            <ul
+                                              role="list"
+                                              aria-labelledby={`${section.name}-heading`}
+                                              className="mt-6 space-y-6 sm:mt-4 sm:space-y-4"
+                                            >
+                                              {section.items.map((item) => (
+                                                <li key={item.name} className="flex">
+                                                  <a href={item.href} className="hover:text-gray-800">
+                                                    {item.name}
+                                                  </a>
+                                                </li>
+                                              ))}
+                                            </ul>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </Popover.Panel>
+                            </Transition>
+                          )}
+                        </>
+                      )}
+                    </Popover>
+                  ))}
+                </div>
+              </Popover.Group>
 
               {/* Flyout menus */}
               <Popover.Group className="hidden lg:ml-8 lg:block lg:self-stretch">
                 <div className="flex h-full space-x-8">
                   {navigation.categories.map((category) => (
-                    <>
-                      <Popover key={category.name} className="flex">
-                        {({ open }) => (
-                          <>
+                    <Popover key={category.name} className="flex">
+                      {({ open }) => (
+                        <>
+                          <div className="relative flex">
+                            <a
+                              href={category.href}
+                              onClick={toggleProposal}
+                              className={classNames(
+                                open ? 'text-indigo-600 border-red-500' : 'border-transparent text-gray-700 hover:text-gray-800',
+                                'relative z-10 -mb-px flex items-center pt-px text-sm font-medium transition-colors duration-200 ease-out focus:outline-none focus:border-red-500'
+                              )}
+                            >
+                              {t(codeLanguage + `${category.number}`)}
+                            </a>
+                          </div>
 
-                            <div className="relative flex">
-                              <Popover.Button
-                                className={classNames(
-                                  open
-                                    ? 'border-indigo-600 text-indigo-600'
-                                    : 'border-transparent text-gray-700 hover:text-gray-800',
-                                  'relative z-10 -mb-px flex items-center border-b-2 pt-px text-sm font-medium transition-colors duration-200 ease-out'
-                                )}
-                              >
-                                {category.name}
-                              </Popover.Button>
-                            </div>
-                            {category.type !== 'page' && (
-                              <Transition
-                                as={Fragment}
-                                enter="transition ease-out duration-200"
-                                enterFrom="opacity-0"
-                                enterTo="opacity-100"
-                                leave="transition ease-in duration-150"
-                                leaveFrom="opacity-100"
-                                leaveTo="opacity-0"
-                              >
-                                <Popover.Panel className="absolute inset-x-0 top-full text-sm text-gray-500">
-                                  {/* Presentational element used to render the bottom shadow, if we put the shadow on the actual panel it pokes out the top, so we use this shorter element to hide the top of the shadow */}
-                                  <div className="absolute inset-0 top-1/2 bg-white shadow" aria-hidden="true" />
-
-                                  <div className="relative bg-white">
-                                    <div className="mx-auto max-w-7xl px-8">
-                                      <div className="grid grid-cols-2 gap-x-8 gap-y-10 py-16">
-                                        <div className="col-start-2 grid grid-cols-2 gap-x-8">
-                                          {category?.featured?.map((item) => (
-                                            <div key={item.name} className="group relative text-base sm:text-sm">
-                                              <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
-                                                <img
-                                                  src={item.imageSrc}
-                                                  alt={item.imageAlt}
-                                                  className="object-cover object-center"
-                                                />
-                                              </div>
-                                              <a href={item.href} className="mt-6 block font-medium text-gray-900">
-                                                <span className="absolute inset-0 z-10" aria-hidden="true" />
-                                                {item.name}
-                                              </a>
-                                              <p aria-hidden="true" className="mt-1">
-                                                Shop now
-                                              </p>
+                          {/* {category.type !== 'page' && (
+                            <Transition
+                              as={Fragment}
+                              enter="transition ease-out duration-200"
+                              enterFrom="opacity-0"
+                              enterTo="opacity-100"
+                              leave="transition ease-in duration-150"
+                              leaveFrom="opacity-100"
+                              leaveTo="opacity-0"
+                            >
+                              <Popover.Panel className="absolute inset-x-0 top-full text-sm text-gray-500">
+                                <div className="absolute inset-0 top-1/2 bg-white shadow" aria-hidden="true" />
+                                <div className="relative bg-white">
+                                  <div className="mx-auto max-w-7xl px-8">
+                                    <div className="grid grid-cols-2 gap-x-8 gap-y-10 py-16">
+                                      <div className="col-start-2 grid grid-cols-2 gap-x-8">
+                                        {category?.featured?.map((item) => (
+                                          <div key={item.name} className="group relative text-base sm:text-sm">
+                                            <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
+                                              <img
+                                                src={item.imageSrc}
+                                                alt={item.imageAlt}
+                                                className="object-cover object-center"
+                                              />
                                             </div>
-                                          ))}
-                                        </div>
-                                        <div className="row-start-1 grid grid-cols-3 gap-x-8 gap-y-10 text-sm">
-                                          {category?.sections?.map((section) => (
-                                            <div key={section.name}>
-                                              <p id={`${section.name}-heading`} className="font-medium text-gray-900">
-                                                {section.name}
-                                              </p>
-                                              <ul
-                                                role="list"
-                                                aria-labelledby={`${section.name}-heading`}
-                                                className="mt-6 space-y-6 sm:mt-4 sm:space-y-4"
-                                              >
-                                                {section.items.map((item) => (
-                                                  <li key={item.name} className="flex">
-                                                    <a href={item.href} className="hover:text-gray-800">
-                                                      {item.name}
-                                                    </a>
-                                                  </li>
-                                                ))}
-                                              </ul>
-                                            </div>
-                                          ))}
-                                        </div>
+                                            <a href={item.href} className="mt-6 block font-medium text-gray-900">
+                                              <span className="absolute inset-0 z-10" aria-hidden="true" />
+                                              {item.name}
+                                            </a>
+                                            <p aria-hidden="true" className="mt-1">
+                                              Shop now
+                                            </p>
+                                          </div>
+                                        ))}
+                                      </div>
+                                      <div className="row-start-1 grid grid-cols-3 gap-x-8 gap-y-10 text-sm">
+                                        {category?.sections?.map((section) => (
+                                          <div key={section.name}>
+                                            <p id={`${section.name}-heading`} className="font-medium text-gray-900">
+                                              {section.name}
+                                            </p>
+                                            <ul
+                                              role="list"
+                                              aria-labelledby={`${section.name}-heading`}
+                                              className="mt-6 space-y-6 sm:mt-4 sm:space-y-4"
+                                            >
+                                              {section.items.map((item) => (
+                                                <li key={item.name} className="flex">
+                                                  <a href={item.href} className="hover:text-gray-800">
+                                                    {item.name}
+                                                  </a>
+                                                </li>
+                                              ))}
+                                            </ul>
+                                          </div>
+                                        ))}
                                       </div>
                                     </div>
                                   </div>
-                                </Popover.Panel>
-                              </Transition>
-                            )}
-                          </>
-                        )}
-                      </Popover>
-                    </>
+                                </div>
+                              </Popover.Panel>
+                            </Transition>
+                          )} */}
+                        </>
+                      )}
+                    </Popover>
                   ))}
-
-                  {/* {navigation.pages.map((page) => (
-                    <a
-                      key={page.name}
-                      href={page.href}
-                      className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-800"
-                    >
-                      {page.name}
-                    </a>
-                  ))} */}
                 </div>
               </Popover.Group>
 
-              <div className="ml-auto flex items-center">
-                <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
-                  <a href="#" className="text-sm font-medium text-gray-700 hover:text-gray-800">
-                    Sign in
-                  </a>
-                  <span className="h-6 w-px bg-gray-200" aria-hidden="true" />
-                  <a href="#" className="text-sm font-medium text-gray-700 hover:text-gray-800">
-                    Create account
-                  </a>
-                </div>
+              {isLoggedIn ? (
+                <div className="ml-auto flex items-center">
+                  {/* Search */}
+                  <div className="flex lg:ml-6">
+                    <a href="#" className="p-2 text-gray-400 hover:text-gray-500">
+                      <span className="sr-only">Search</span>
+                      <MagnifyingGlassIcon className="h-6 w-6" aria-hidden="true" />
+                    </a>
+                  </div>
 
-                <div className="hidden lg:ml-8 lg:flex">
-                  <a href="#" className="flex items-center text-gray-700 hover:text-gray-800">
-                    <img
-                      src="https://tailwindui.com/img/flags/flag-canada.svg"
-                      alt=""
-                      className="block h-auto w-5 flex-shrink-0"
-                    />
-                    <span className="ml-3 block text-sm font-medium">CAD</span>
-                    <span className="sr-only">, change currency</span>
-                  </a>
-                </div>
+                  {/* Cart */}
+                  <div className="ml-4 flow-root lg:ml-6">
+                    <a href="#" className="group -m-2 flex items-center p-2">
+                      <ShoppingBagIcon
+                        className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
+                        aria-hidden="true"
+                      />
+                      <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">0</span>
+                      <span className="sr-only">items in cart, view bag</span>
+                    </a>
+                  </div>
 
-                {/* Search */}
-                <div className="flex lg:ml-6">
-                  <a href="#" className="p-2 text-gray-400 hover:text-gray-500">
-                    <span className="sr-only">Search</span>
-                    <MagnifyingGlassIcon className="h-6 w-6" aria-hidden="true" />
-                  </a>
-                </div>
+                  {/* EN VI */}
+                  <div className="ml-4 flow-root lg:ml-6">
+                    <HeaderLanguageSetting />
+                  </div>
 
-                {/* Cart */}
-                <div className="ml-4 flow-root lg:ml-6">
-                  <a href="#" className="group -m-2 flex items-center p-2">
-                    <ShoppingBagIcon
-                      className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
-                      aria-hidden="true"
-                    />
-                    <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">0</span>
-                    <span className="sr-only">items in cart, view bag</span>
-                  </a>
+                  {/* Profile */}
+                  <React.Fragment>
+                    <div style={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
+                      <Tooltip title={t(codeLanguage + '000044')}>
+                        <IconButton
+                          onClick={handleClick}
+                          size="small"
+                          sx={{ ml: 2 }}
+                          aria-controls={isOpen ? 'account-menu' : undefined}
+                          aria-haspopup="true"
+                          aria-expanded={isOpen ? 'true' : undefined}
+                        >
+                          <Avatar src={userLogined?.imageUrl} sx={{ width: 32, height: 32 }}>M</Avatar>
+                        </IconButton>
+                      </Tooltip>
+                    </div>
+                    <Menu
+                      anchorEl={anchorEl}
+                      id="account-menu"
+                      open={isOpen}
+                      onClose={handleClose}
+                      onClick={handleClose}
+                      PaperProps={{
+                        elevation: 0,
+                        sx: {
+                          overflow: 'visible',
+                          filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                          mt: 1.5,
+                          '& .MuiAvatar-root': {
+                            width: 32,
+                            height: 32,
+                            ml: -0.5,
+                            mr: 1,
+                          },
+                          '&::before': {
+                            content: '""',
+                            display: 'block',
+                            position: 'absolute',
+                            top: 0,
+                            right: 14,
+                            width: 10,
+                            height: 10,
+                            bgcolor: 'background.paper',
+                            transform: 'translateY(-50%) rotate(45deg)',
+                            zIndex: 0,
+                          },
+                        },
+                      }}
+                      transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                      anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                    >
+                      <MenuItem>
+                        <a href={"/profile"} style={{ display: "flex", textDecoration: "none" }}>
+                          <Avatar /> <p style={{ color: "black", marginTop: "4px" }}>{t(codeLanguage + '000045')}</p>
+                        </a>
+                      </MenuItem>
+                      <Divider />
+                      <MenuItem onClick={__handleLogout}>
+                        <ListItemIcon>
+                          <Logout fontSize="small" />
+                        </ListItemIcon>
+                        {t(codeLanguage + '000047')}
+                      </MenuItem>
+                    </Menu>
+                  </React.Fragment>
                 </div>
-              </div>
+              ) : (
+                <div className="ml-auto flex items-center">
+                  <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
+                    <a href="/auth/signin" className="text-sm font-medium text-gray-700 hover:text-gray-800">
+                      {t(codeLanguage + '000002')}
+                    </a>
+                    <span className="h-6 w-px bg-gray-200" aria-hidden="true" />
+                    <a href="/auth/signup" className="text-sm font-medium text-gray-700 hover:text-gray-800">
+                      {t(codeLanguage + '000003')}
+                    </a>
+                  </div>
+
+                  {/* Search */}
+                  <div className="flex lg:ml-6">
+                    <a href="#" className="p-2 text-gray-400 hover:text-gray-500">
+                      <span className="sr-only">Search</span>
+                      <MagnifyingGlassIcon className="h-6 w-6" aria-hidden="true" />
+                    </a>
+                  </div>
+
+                  {/* Cart */}
+                  <div className="ml-4 flow-root lg:ml-6">
+                    <a href="#" className="group -m-2 flex items-center p-2">
+                      <ShoppingBagIcon
+                        className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
+                        aria-hidden="true"
+                      />
+                      <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">0</span>
+                      <span className="sr-only">items in cart, view bag</span>
+                    </a>
+                  </div>
+
+                  {/* EN VI */}
+                  <div className="ml-4 flow-root lg:ml-6">
+                    <HeaderLanguageSetting />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </nav>
       </header>
+
     </div>
   )
 }

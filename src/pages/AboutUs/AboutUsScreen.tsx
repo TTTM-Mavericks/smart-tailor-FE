@@ -9,6 +9,7 @@ import { motion, useInView } from 'framer-motion';
 import brandImage from '../../assets/img/landing-img/slider-bird1.jpg';
 import HeaderComponent from '../../components/Header/HeaderComponent';
 import FooterComponent from '../../components/Footer/FooterComponent';
+import { useTranslation } from 'react-i18next';
 
 const StyledBox = styled(Box)(({ theme }) => ({
     padding: theme.spacing(6, 2),
@@ -31,14 +32,6 @@ const StyledAvatar = styled(Avatar)({
     height: 120,
     marginBottom: 16,
 });
-
-const StyledFooter = styled(Box)(({ theme }) => ({
-    padding: theme.spacing(4),
-    backgroundColor: theme.palette.grey[800],
-    color: theme.palette.common.white,
-    textAlign: 'center',
-    marginTop: 5
-}));
 
 const StyledCardCarousel = styled(Slider)({
     marginTop: 32,
@@ -169,36 +162,42 @@ const AboutUsPage: React.FC = () => {
 
     const containerRef = useRef(null);
     const isContainerVisible = useInView(containerRef, { once: true });
+
+    // Get language in local storage
+    const selectedLanguage = localStorage.getItem('language');
+    const codeLanguage = selectedLanguage?.toUpperCase();
+
+    // Using i18n
+    const { t, i18n } = useTranslation();
+    React.useEffect(() => {
+        if (selectedLanguage !== null) {
+            i18n.changeLanguage(selectedLanguage);
+        }
+    }, [selectedLanguage, i18n]);
+
     return (
         <div>
             <HeaderComponent />
             <StyledBox>
                 <Grid container spacing={6}>
-                    <Grid item xs={12} md={5} >
-                        <Fade in timeout={800}>
-                            <Typography variant="h3" gutterBottom>
-                                About Our Tailoring
-                            </Typography>
-                        </Fade>
+                    <Grid item xs={12} md={5} style={{ marginTop: "10%" }}>
                         <Fade in timeout={1200}>
                             <Typography variant="body1" paragraph>
-                                Our tailoring business has a rich history of providing high-quality clothing and
-                                exceptional customer service. We take pride in our attention to detail and
-                                commitment to making our clients look and feel their best.
+                                {t(codeLanguage + '000073')}
                             </Typography>
                         </Fade>
                         <Fade in timeout={1600}>
-                            <Button variant="contained" style={{ color: "black", backgroundColor: "white" }}>
-                                Learn More
+                            <Button variant="contained" style={{ color: "white", backgroundColor: "#088FE9" }}>
+                                {t(codeLanguage + '000074')}
                             </Button>
                         </Fade>
                     </Grid>
-                    <Grid item xs={12} md={6}>
-                        <Fade in timeout={800}>
+                    <Grid item xs={12} md={6} style={{ marginTop: "5%" }}>
+                        {/* <Fade in timeout={800}>
                             <Typography variant="h3" gutterBottom style={{ marginLeft: "6%" }}>
-                                Our Clothing Collection
+                                {t(codeLanguage + '000077')}
                             </Typography>
-                        </Fade>
+                        </Fade> */}
                         <StyledCardCarousel {...cardSettings}>
                             {[1, 2, 3, 4, 5, 6].map((_, index) => (
                                 <Fade in timeout={(index + 1) * 400} key={index} >
@@ -234,7 +233,7 @@ const AboutUsPage: React.FC = () => {
                 animate={isTitleVisible ? { opacity: 1, y: 0, transition: { duration: 0.5 } } : {}}
             >
                 <Typography variant="h3" gutterBottom align="center" sx={{ marginTop: 6 }} style={{ color: "black" }}>
-                    About Our Services
+                    {t(codeLanguage + '000075')}
                 </Typography>
                 <CarouselComponent />
             </motion.div>
@@ -245,7 +244,7 @@ const AboutUsPage: React.FC = () => {
                 animate={isServicesVisible ? { opacity: 1, y: 0, transition: { duration: 0.5 } } : {}}
             >
                 <Typography variant="h3" gutterBottom align="center" sx={{ marginTop: 20 }} style={{ color: "black" }}>
-                    Our Services
+                    {t(codeLanguage + '000080')}
                 </Typography>
             </motion.div>
 
@@ -276,10 +275,10 @@ const AboutUsPage: React.FC = () => {
                     animate={isContainerVisible ? { opacity: 1, x: 0, transition: { duration: 0.5 } } : {}}
                 >
                     <Typography variant="h2" gutterBottom style={{ color: "black" }}>
-                        Summer styles are finally here
+                        {t(codeLanguage + '000081')}
                     </Typography>
                     <Typography variant="body1" style={{ color: "black" }}>
-                        This year, our new summer collection will shelter you from the harsh elements of a world that doesn't care if you live or die.
+                        {t(codeLanguage + '000082')}
                     </Typography>
                 </StyledTextContent>
 
@@ -313,7 +312,7 @@ const AboutUsPage: React.FC = () => {
                 animate={isTestimonialsVisible ? { opacity: 1, y: 0, transition: { duration: 0.5 } } : {}}
             >
                 <Typography variant="h3" gutterBottom align="center" sx={{ marginTop: 20 }} style={{ color: "black" }}>
-                    Customer Testimonials
+                    {t(codeLanguage + '000083')}
                 </Typography>
             </motion.div>
 
@@ -344,7 +343,7 @@ const AboutUsPage: React.FC = () => {
                 animate={isTeamVisible ? { opacity: 1, y: 0, transition: { duration: 0.5 } } : {}}
             >
                 <Typography variant="h3" gutterBottom align="center" sx={{ marginTop: 20 }} style={{ color: "black" }}>
-                    Our Talented Team
+                    {t(codeLanguage + '000084')}
                 </Typography>
             </motion.div>
 

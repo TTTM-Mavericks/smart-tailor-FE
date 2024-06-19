@@ -1,10 +1,11 @@
-import { useTheme } from "@mui/material";
+import { Card, ToggleButton, ToggleButtonGroup, Typography, useTheme } from "@mui/material";
 import { ResponsiveBar } from "@nivo/bar";
 import { tokens } from "../../../theme";
 import { mockBarData as barChartData } from "./DataTestBarChart";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
 
-const BarChart = ({ isDashboard = false }) => {
+const BarChart = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
@@ -13,42 +14,80 @@ const BarChart = ({ isDashboard = false }) => {
     const filteredData = option === "month" ? barChartData : [];
     console.log("filter data" + filteredData + option);
 
+    const _handleChange = (e: any) => {
+        setOption(e.target.value)
+    }
+
+    // Get language in local storage
+    const selectedLanguage = localStorage.getItem('language');
+    const codeLanguage = selectedLanguage?.toUpperCase();
+
+    // Using i18n
+    const { t, i18n } = useTranslation();
+    useEffect(() => {
+        if (selectedLanguage !== null) {
+            i18n.changeLanguage(selectedLanguage);
+        }
+    }, [selectedLanguage, i18n]);
+
     return (
         <>
-            <button onClick={() => setOption("month")}>Month</button><br />
-            <button onClick={() => setOption("year")}>Year</button>
+            <div style={{ display: "flex", margin: "2%" }}>
+                <Typography variant="h5" >
+                    Bar Chart
+                </Typography>
+                <Card sx={{ backgroundColor: `${colors.primary[100]} !important`, width: "18%", color: `${colors.primary[100]}`, marginTop: "2%", marginLeft: "60%" }}>
+                    <ToggleButtonGroup
+                        color="primary"
+                        value={option}
+                        exclusive
+                        onChange={_handleChange}
+                        aria-label="Platform"
+                    >
+                        <ToggleButton value="month" sx={{ color: colors.primary[200], fontWeight: "bold" }}>
+                            {t(codeLanguage + '000041')}
+                        </ToggleButton>
+                        <ToggleButton value="year" sx={{ color: colors.primary[200], fontWeight: "bold" }}>
+                            {t(codeLanguage + '000042')}
+                        </ToggleButton>
+                        <ToggleButton value="week" sx={{ color: colors.primary[200], fontWeight: "bold" }}>
+                            {t(codeLanguage + '000043')}
+                        </ToggleButton>
+                    </ToggleButtonGroup>
+                </Card>
+            </div>
             <ResponsiveBar
                 data={filteredData}
                 theme={{
                     axis: {
                         domain: {
                             line: {
-                                stroke: colors.grey[100],
+                                stroke: colors.primary[200],
                             },
                         },
                         legend: {
                             text: {
-                                fill: colors.grey[100],
+                                fill: colors.primary[200],
                             },
                         },
                         ticks: {
                             line: {
-                                stroke: colors.grey[100],
+                                stroke: colors.primary[200],
                                 strokeWidth: 1,
                             },
                             text: {
-                                fill: colors.grey[100],
+                                fill: colors.primary[200],
                             },
                         },
                     },
                     legends: {
                         text: {
-                            fill: colors.grey[500],
+                            fill: colors.primary[200],
                         },
                     },
                     tooltip: {
                         container: {
-                            color: colors.primary[500],
+                            color: colors.primary[300],
                         },
                     },
                 }}
@@ -89,7 +128,7 @@ const BarChart = ({ isDashboard = false }) => {
                     tickSize: 5,
                     tickPadding: 5,
                     tickRotation: 0,
-                    legend: isDashboard ? undefined : "country",
+                    legend: "country",
                     legendPosition: "middle",
                     legendOffset: 32,
                 }}
@@ -97,7 +136,7 @@ const BarChart = ({ isDashboard = false }) => {
                     tickSize: 5,
                     tickPadding: 5,
                     tickRotation: 0,
-                    legend: isDashboard ? undefined : "food",
+                    legend: "food",
                     legendPosition: "middle",
                     legendOffset: -40,
                 }}
@@ -138,6 +177,7 @@ const BarChart = ({ isDashboard = false }) => {
                 }}
             />
         </>
+
     );
 };
 

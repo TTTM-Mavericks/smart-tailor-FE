@@ -1,5 +1,22 @@
 import * as React from "react";
-import { MenuItem, InputBase, Avatar, Box, Divider, IconButton, List, ListItemIcon, Menu, SwipeableDrawer, ToggleButton, ToggleButtonGroup, Tooltip, useColorScheme, useTheme, Typography } from "@mui/material";
+import {
+    MenuItem,
+    InputBase,
+    Avatar,
+    Box,
+    Divider,
+    IconButton,
+    List,
+    ListItemIcon,
+    SwipeableDrawer,
+    Menu,
+    ToggleButton,
+    ToggleButtonGroup,
+    Tooltip,
+    useColorScheme,
+    useTheme,
+    Card,
+} from "@mui/material";
 import { tokens } from "../../../../theme";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
@@ -7,7 +24,10 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import { Logout, Settings } from "@mui/icons-material";
 import { Link } from "react-router-dom";
-import NotificationComponent from "../Notification/NotificationComponent";
+import { useTranslation } from 'react-i18next';
+import NotificationWithSocketIOScreen from "../Notification/NotificationWithSocketIOComponent";
+import HeaderLanguageSetting from "../../../../components/LanguageSetting/LanguageSettingComponent";
+
 type Anchor = 'top' | 'left' | 'bottom' | 'right';
 
 const TopbarComponent = () => {
@@ -23,14 +43,14 @@ const TopbarComponent = () => {
     // open menu account
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    const _handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
-    const handleClose = () => {
+    const _handleClose = () => {
         setAnchorEl(null);
     };
 
-    const handleChange = (e: any) => {
+    const _handleChange = (e: any) => {
         setMode(e.target.value)
     }
 
@@ -64,7 +84,7 @@ const TopbarComponent = () => {
                     color="primary"
                     value={alignment}
                     exclusive
-                    onChange={handleChange}
+                    onChange={_handleChange}
                     aria-label="Platform"
                 >
                     <ToggleButton value="light" sx={{ color: 'black' }}>
@@ -81,122 +101,148 @@ const TopbarComponent = () => {
         </Box>
     );
 
+    // Get language in local storage
+    const selectedLanguage = localStorage.getItem('language');
+    const codeLanguage = selectedLanguage?.toUpperCase();
 
+    // Using i18n
+    const { t, i18n } = useTranslation();
+    React.useEffect(() => {
+        if (selectedLanguage !== null) {
+            i18n.changeLanguage(selectedLanguage);
+        }
+    }, [selectedLanguage, i18n]);
+
+    // Logout 
+    const _handleLogout = () => {
+        //Logout Function
+        localStorage.clear()
+        window.location.href = 'https://smart-tailor-fe.pages.dev/auth/signin'
+    }
 
     return (
-        <Box display="flex" justifyContent="space-between" p={2}>
-            {/* SEARCH BAR */}
-            <Box
-                display="flex"
-                borderRadius="3px"
-                sx={{ backgroundColor: colors.primary[400] }}
-            >
-                <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Search" />
-                <IconButton type="button" sx={{ p: 1 }}>
-                    <SearchIcon />
-                </IconButton>
-            </Box>
+        <Card sx={{ backgroundColor: `${colors.primary[600]} !important` }} >
+            <Box display="flex" justifyContent="space-between" p={2} sx={{ backgroundColor: `${colors.primary[600]} !important` }}>
 
-            {/* ICONS */}
-            <Box display="flex">
-                <IconButton onClick={() => setMode(mode === 'light' ? 'dark' : 'light')}>
-                    {theme.palette.mode === "dark" ? (
-                        <DarkModeOutlinedIcon />
-                    ) : (
-                        <LightModeOutlinedIcon />
-                    )}
-                </IconButton>
-
-                {/* Notification */}
-                <NotificationComponent />
-
-                {/* Setting */}
-                <IconButton onClick={toggleDrawer('right', true)}>
-                    <SettingsOutlinedIcon />
-                </IconButton>
-
-                <SwipeableDrawer
-                    anchor="right"
-                    open={state.right}
-                    onClose={toggleDrawer('right', false)}
-                    onOpen={toggleDrawer('right', true)}
+                {/* SEARCH BAR */}
+                <Box
+                    display="flex"
+                    borderRadius="3px"
+                    sx={{ backgroundColor: colors.primary[400] }}
                 >
-                    {list('right')}
-                </SwipeableDrawer>
+                    <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Search" />
+                    <IconButton type="button" sx={{ p: 1 }}>
+                        <SearchIcon />
+                    </IconButton>
+                </Box>
 
-                {/* Account Setting Dropdown Menu */}
-                <React.Fragment>
-                    <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
-                        <Tooltip title="Account settings">
-                            <IconButton
-                                onClick={handleClick}
-                                size="small"
-                                sx={{ ml: 2 }}
-                                aria-controls={open ? 'account-menu' : undefined}
-                                aria-haspopup="true"
-                                aria-expanded={open ? 'true' : undefined}
-                            >
-                                <Avatar sx={{ width: 32, height: 32 }}>M</Avatar>
-                            </IconButton>
-                        </Tooltip>
-                    </Box>
-                    <Menu
-                        anchorEl={anchorEl}
-                        id="account-menu"
-                        open={open}
-                        onClose={handleClose}
-                        onClick={handleClose}
-                        PaperProps={{
-                            elevation: 0,
-                            sx: {
-                                overflow: 'visible',
-                                filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-                                mt: 1.5,
-                                '& .MuiAvatar-root': {
-                                    width: 32,
-                                    height: 32,
-                                    ml: -0.5,
-                                    mr: 1,
-                                },
-                                '&::before': {
-                                    content: '""',
-                                    display: 'block',
-                                    position: 'absolute',
-                                    top: 0,
-                                    right: 14,
-                                    width: 10,
-                                    height: 10,
-                                    bgcolor: 'background.paper',
-                                    transform: 'translateY(-50%) rotate(45deg)',
-                                    zIndex: 0,
-                                },
-                            },
-                        }}
-                        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                {/* ICONS */}
+                <Box display="flex">
+                    {/* EN VI Mode */}
+                    <HeaderLanguageSetting />
+
+                    {/* Dark Light Mode */}
+                    <IconButton onClick={() => setMode(mode === 'light' ? 'dark' : 'light')}>
+                        {theme.palette.mode === "dark" ? (
+                            <DarkModeOutlinedIcon />
+                        ) : (
+                            <LightModeOutlinedIcon />
+                        )}
+                    </IconButton>
+
+                    {/* Notification */}
+                    {/* <NotificationComponent /> */}
+                    <NotificationWithSocketIOScreen />
+
+                    {/* Setting */}
+                    <IconButton onClick={toggleDrawer('right', true)}>
+                        <SettingsOutlinedIcon />
+                    </IconButton>
+
+                    <SwipeableDrawer
+                        anchor="right"
+                        open={state.right}
+                        onClose={toggleDrawer('right', false)}
+                        onOpen={toggleDrawer('right', true)}
                     >
-                        <MenuItem>
-                            <Link to={"/admin_profile"} style={{ display: "flex", textDecoration: "none", color: colors.grey[100] }}>
-                                <Avatar /> My account
-                            </Link>
-                        </MenuItem>
-                        <Divider />
-                        <MenuItem onClick={handleClose}>
-                            <ListItemIcon>
-                                <Settings fontSize="small" />
-                            </ListItemIcon>
-                            Settings
-                        </MenuItem>
-                        <MenuItem onClick={handleClose}>
-                            <ListItemIcon>
-                                <Logout fontSize="small" />
-                            </ListItemIcon>
-                            Logout
-                        </MenuItem>
-                    </Menu>
-                </React.Fragment>
-            </Box>
-        </Box >
+                        {list('right')}
+                    </SwipeableDrawer>
+
+                    {/* Account Setting Dropdown Menu */}
+                    <React.Fragment>
+                        <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
+                            <Tooltip title={t(codeLanguage + '000044')}>
+                                <IconButton
+                                    onClick={_handleClick}
+                                    size="small"
+                                    sx={{ ml: 2 }}
+                                    aria-controls={open ? 'account-menu' : undefined}
+                                    aria-haspopup="true"
+                                    aria-expanded={open ? 'true' : undefined}
+                                >
+                                    <Avatar sx={{ width: 32, height: 32 }} src='https://smart-tailor-fe.pages.dev/assets/smart-tailor_logo-CUmlLF_X.png'>M</Avatar>
+                                </IconButton>
+                            </Tooltip>
+                        </Box>
+                        <Menu
+                            anchorEl={anchorEl}
+                            id="account-menu"
+                            open={open}
+                            onClose={_handleClose}
+                            onClick={_handleClose}
+                            PaperProps={{
+                                elevation: 0,
+                                sx: {
+                                    overflow: 'visible',
+                                    filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                                    mt: 1.5,
+                                    '& .MuiAvatar-root': {
+                                        width: 32,
+                                        height: 32,
+                                        ml: -0.5,
+                                        mr: 1,
+                                    },
+                                    '&::before': {
+                                        content: '""',
+                                        display: 'block',
+                                        position: 'absolute',
+                                        top: 0,
+                                        right: 14,
+                                        width: 10,
+                                        height: 10,
+                                        bgcolor: 'background.paper',
+                                        transform: 'translateY(-50%) rotate(45deg)',
+                                        zIndex: 0,
+                                    },
+                                },
+                            }}
+                            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                        >
+                            <MenuItem>
+                                <Link to={"/admin_profile"} style={{ display: "flex", textDecoration: "none", color: colors.primary[200] }}>
+                                    <Avatar src="https://smart-tailor-fe.pages.dev/assets/smart-tailor_logo-CUmlLF_X.png" /> {t(codeLanguage + '000045')}
+                                </Link>
+                            </MenuItem>
+                            <Divider />
+                            <MenuItem onClick={_handleClose}>
+                                <ListItemIcon>
+                                    <Settings fontSize="small" />
+                                </ListItemIcon>
+                                {t(codeLanguage + '000046')}
+                            </MenuItem>
+                            <MenuItem onClick={_handleLogout}>
+                                <ListItemIcon>
+                                    <Logout fontSize="small" />
+                                </ListItemIcon>
+                                {t(codeLanguage + '000047')}
+                            </MenuItem>
+                        </Menu>
+                    </React.Fragment>
+                </Box>
+            </Box >
+        </Card >
+
     );
 };
 

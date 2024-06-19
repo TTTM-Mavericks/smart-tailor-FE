@@ -2,6 +2,7 @@ import { useState } from 'react'
 import CustomButton from '../CustomButton/CustomButton'
 import styles from './FilePicker.module.scss'
 import { BACK_CLOTH_PART, FRONT_CLOTH_PART, LOGO_PART, SLEEVE_CLOTH_PART } from '../../models/ClothModel'
+import { primaryColor } from '../../root/ColorSystem'
 
 const FilePicker = ({ file, setFile, readFile, partOfCloth }) => {
   const [trigger, setTrigger] = useState(false);
@@ -9,19 +10,19 @@ const FilePicker = ({ file, setFile, readFile, partOfCloth }) => {
   const _handleSetUploadFile = () => {
     console.log(partOfCloth);
     if (partOfCloth === LOGO_PART) {
-      readFile('logo')
+      readFile('logo');
     }
 
     if (partOfCloth === FRONT_CLOTH_PART) {
-      readFile('front')
+      readFile('front');
     }
 
     if (partOfCloth === BACK_CLOTH_PART) {
-      readFile('back')
+      readFile('back');
     }
 
     if (partOfCloth === SLEEVE_CLOTH_PART) {
-      readFile('sleeve')
+      readFile('sleeve');
     }
 
 
@@ -33,6 +34,8 @@ const FilePicker = ({ file, setFile, readFile, partOfCloth }) => {
         <input
           id="file-upload"
           type="file"
+          hidden
+          multiple
           accept="image/*"
           onChange={(e) => { setFile(e.target.files[0]); setTrigger(true) }}
         />
@@ -50,32 +53,8 @@ const FilePicker = ({ file, setFile, readFile, partOfCloth }) => {
           type="filled"
           title="Upload"
           handleClick={() => _handleSetUploadFile()}
-          customStyles="font-size: 0.75rem; line-height: 1rem;"
+          customStyles={`font-size: 0.75rem; line-height: 1rem; background-color: ${primaryColor}`}
         />
-        {/* <CustomButton 
-          type="filled"
-          title="Full"
-          handleClick={() => readFile('full')}
-          customStyles="font-size: 0.75rem; line-height: 1rem;"
-        />
-        <CustomButton 
-          type="filled"
-          title="front"
-          handleClick={() => readFile('front')}
-          customStyles="font-size: 0.75rem; line-height: 1rem;"
-        />
-        <CustomButton 
-          type="filled"
-          title="back"
-          handleClick={() => readFile('back')}
-          customStyles="font-size: 0.75rem; line-height: 1rem;"
-        />
-        <CustomButton 
-          type="filled"
-          title="back"
-          handleClick={() => readFile('back')}
-          customStyles="font-size: 0.75rem; line-height: 1rem;"
-        /> */}
       </div>
     </div>
   )

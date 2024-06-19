@@ -1,300 +1,372 @@
 import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { FormLabel, IconButton, InputAdornment, Radio, RadioGroup } from '@mui/material';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-// import ApiService from '../ApiAuthService';
-import { apiBaseUrl, basePonitUrl } from '../../../api/ApiConfig';
-import dayjs from 'dayjs';
-import { Login, Visibility, VisibilityOff } from '@mui/icons-material';
-
-/** Import Css */
-import './SignUpStyle.css';
-import { Navigate } from 'react-router-dom';
+import styles from './SignUpStyle.module.scss';
+import { HiEye, HiEyeOff } from 'react-icons/hi';
+import './SignUpStyle.css'
+import { systemLogo, usaFlag, vietnamFlag } from '../../../assets';
+import { useTranslation } from 'react-i18next';
+import { Menu, Transition } from '@headlessui/react';
+import { Fragment } from 'react';
+import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
+import { __validateEmail, __validatePassword } from '../Utils';
+import { useNavigate } from 'react-router-dom';
+import LoadingComponent from '../../../components/Loading/LoadingComponent';
+import { toast, ToastContainer } from 'react-toastify';
+import ImageMasonry from '../../../components/ImageMasonry/ImageMasonryCoponent';
+import { primaryColor } from '../../../root/ColorSystem';
 
 const defaultTheme = createTheme();
 
+
 export default function SignUpScreen() {
 
-    //** Variable */
-    const baseUrl = basePonitUrl.auth;
-    // const apiService = new ApiService();
+  // ---------------UseState Variable---------------//
+  const [selectedLanguage, setSelectedLanguage] = React.useState<string>(localStorage.getItem('language') || 'en');
+  const [codeLanguage, setCodeLanguage] = React.useState('EN');
+  const [email, setEmail] = React.useState<string>('');
+  const [errorEmailValidate, setEmailErrorValidate] = React.useState<string>('');
+  const [isEmailValidate, setIsEmailValidate] = React.useState<boolean>(true);
 
-    //** UseState variable */ 
-    const [showPassword, setShowPassword] = React.useState(false);
-    const [showConfirmPassword, setConfirmShowPassword] = React.useState(false);
-    const [isLoading, setIsLoading] = React.useState(false);
-    const [isValid, setIsValid] = React.useState(false);
-    const [formData, setFormData] = React.useState({
+  const [passwordConfirm, setPasswordConfirm] = React.useState<string>('');
+  const [errorPasswordConfirmValidate, setPasswordConfirmErrorValidate] = React.useState<string>('');
+  const [isPasswordConfirmValidate, setIsPasswordConfirmValidate] = React.useState<boolean>(true);
+  const [showPasswordConfirm, setShowPasswordConfirm] = React.useState<boolean>(false);
 
-        firstName: "",
-        lastName: "",
-        email: "",
-        phone: "",
-        password: "",
-        confirmPassword: "",
-        gender: true,
-        dateOfBirth: dayjs(),
-        address: "1",
-        role: "CUSTOMER"
+  const [password, setPassword] = React.useState<string>('');
+  const [errorPasswordValidate, setPasswordErrorValidate] = React.useState<string>('');
+  const [isPasswordValidate, setIsPasswordValidate] = React.useState<boolean>(true);
+  const [showPassword, setShowPassword] = React.useState<boolean>(false);
+  const [isPasswordMacth, setIsPasswordMatch] = React.useState<boolean>(false);
+  const [isLoading, setIsloading] = React.useState<boolean>(false);
 
-    });
 
-    const [formErrors, setFormErrors] = React.useState({
-        firstName: "",
-        lastName: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-        gender: "",
-        phone: "",
-        dateOfBirth: ""
-    });
+  // ---------------Usable Variable---------------//
+  const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
 
-    /**
-     * validateFirstName
-     * @param value 
-     * @returns 
-     */
-    const validateFirstName = (value: string) => {
-        if (!value) {
-            return "First Name is required.";
-        }
-        if (value.length >= 20) {
-            return "Frist Name must be lower than 20 character."
-        }
-        setIsValid(true)
-        return "";
 
-    };
+  // ---------------UseEffect---------------//
+  React.useEffect(() => {
+    i18n.changeLanguage(selectedLanguage);
+    localStorage.setItem('language', selectedLanguage);
 
-    /**
-     * validateLastName
-     * @param value 
-     * @returns 
-     */
-    const validateLastName = (value: string) => {
-        if (!value) {
-            return "Last Name is required.";
-        }
-        if (value.length >= 20) {
-            return "Last Name must be lower than 20 character."
-        }
-        return "";
-        setIsValid(true)
-    };
+  }, [selectedLanguage, i18n]);
 
-    /**
-     * validateEmail
-     * @param value 
-     * @returns 
-     */
-    const validateEmail = (value: string) => {
-        const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+  React.useEffect(() => {
+    if (selectedLanguage) {
+      const uppercase = selectedLanguage.toUpperCase();
+      setCodeLanguage(uppercase)
+    }
 
-        if (!value) {
-            return "Email is required.";
-        } else if (!emailRegex.test(value)) {
-            return "Invalid email format.";
-        }
+  }, [selectedLanguage]);
 
-        setIsValid(true)
-        return "";
-    };
+  /**
+ * Validate Email
+ */
+  React.useEffect(() => {
+    const error = __validateEmail(email);
+    if (!error.isValid && error.error) {
+      setEmailErrorValidate(error.error);
+      setIsEmailValidate(false);
+    } else {
+      setEmail(email);
+      setIsEmailValidate(true);
+    }
+  }, [email]);
 
-    /**
-     * validatePassword
-     * @param password 
-     * @returns 
-     */
-    const validatePassword = (password: string) => {
-        if (!password) {
-            return "Password is required.";
-        } else if (password.length < 8 || password.length > 20) {
-            return "Password must be between 8 and 20 characters.";
-        }
+  /**
+   * Validate Password
+   */
+  React.useEffect(() => {
+    const error = __validatePassword(password);
+    if (!error.isValid && error.error) {
+      setPasswordErrorValidate(error.error);
+      setIsPasswordValidate(false);
+    } else {
+      setPassword(password);
+      setIsPasswordValidate(true);
+    }
+  }, [password]);
 
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
-        if (!passwordRegex.test(password)) {
-            return "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.";
-        }
+  /**
+ * Validate password confirm
+ */
+  React.useEffect(() => {
+    const error = __validatePassword(passwordConfirm);
+    if (!error.isValid && error.error) {
+      setPasswordConfirmErrorValidate(error.error);
+      setIsPasswordConfirmValidate(false);
+    } else {
+      if (password !== passwordConfirm) {
+        setPasswordConfirmErrorValidate('Not match');
+        setIsPasswordMatch(false);
+      } else {
+        setPasswordConfirm(passwordConfirm);
+        setIsPasswordConfirmValidate(true);
+        setIsPasswordMatch(true);
+      }
+    }
+  }, [passwordConfirm]);
 
-        setIsValid(true)
-        return "";
-    };
 
-    /**
-     * validateConfirmPassword
-     * @param password 
-     * @returns 
-     */
-    const validateConfirmPassword = (password: string) => {
-        if (!password) {
-            return "Password is required.";
-        } else if (password.length < 8 || password.length > 20) {
-            return "Password must be between 8 and 20 characters.";
-        }
+  // ---------------FunctionHandler---------------//
+  const handleLanguageChange = (language: string) => {
+    setSelectedLanguage(language);
+  };
 
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
-        if (!passwordRegex.test(password)) {
-            return "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.";
-        }
+  const __handleClickShowPassword = () => setShowPassword((show) => !show);
+  const __handleClickShowPasswordConfirm = () => setShowPasswordConfirm((show) => !show);
 
-        if (password !== formData.password) {
-            return "Confirm password does not match."
-        }
 
-        setIsValid(true)
-        return "";
-    };
 
-    /**
-     * validatePhone
-     * @param phone 
-     * @returns 
-     */
-    const validatePhone = (phone: string) => {
-        const phoneRegex = /^\d{10}$/;
-
-        if (!phone) {
-            return "Phone number is required.";
-        } else if (!phoneRegex.test(phone)) {
-            return "Please enter a valid 10-digit phone number.";
-        }
-
-        setIsValid(true)
-        return "";
-    };
-
-    /**
-     * validateDateOfBirth
-     * @param dateOfBirth 
-     * @returns 
-     */
-    const validateDateOfBirth = (dateOfBirth: any) => {
-        const currentDate = dayjs();
-        const selectedDate = dayjs(dateOfBirth);
-        const minDate = dayjs('1903-01-01');
-
-        if (!dateOfBirth) {
-            return "Date of birth is required.";
-        } else if (selectedDate.isAfter(currentDate)) {
-            return "Date of birth cannot be in the future.";
-        } else if (selectedDate.isBefore(minDate)) {
-            return "Date of birth cannot be earlier than 1903.";
-        }
-
-        setIsValid(true)
-        return "";
-    };
-
-    //** Handle show pasword */ 
-    const handleClickShowPassword = () => setShowPassword((show) => !show);
-    const handleClickShowConfirmPassword = () => setConfirmShowPassword((show) => !show);
-
-    const handleMouseDownPassword = (event: any) => {
-        event.preventDefault();
-    };
-
-    /**
-     * handleInputChange
+  /**
+     * SignUp handler
      * @param event 
      */
-    const handleInputChange = (event: any) => {
-        const { name, value, type, checked } = event.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: type === 'checkbox' ? checked : value,
-        }));
+  const __handleSignUp = async () => {
 
-        const errorMessage =
-            name === "firstName"
-                ? validateFirstName(value)
-                : name === "lastName"
-                    ? validateLastName(value)
-                    : name === "email"
-                        ? validateEmail(value)
-                        : name === "password"
-                            ? validatePassword(value)
-                            : name === "phone"
-                                ? validatePhone(value)
-                                : name === "dateOfBirth"
-                                    ? validateDateOfBirth(value)
-                                    : name === "confirmPassword"
-                                        ? validateConfirmPassword(value)
-                                        : ""
+    if (!isPasswordMacth || (!isEmailValidate && !isPasswordConfirmValidate && !isPasswordValidate)) {
+      toast.error(`Invalid input. Please check!`, { autoClose: 4000 });
+      return;
+    }
 
-        if (errorMessage)
-            setIsValid(true);
-        setFormErrors((prevErrors) => ({
-            ...prevErrors,
-            [name]: errorMessage,
-        }));
-    };
+    setIsloading(true);
+    try {
+      const requestData = {
+        email: email,
+        password: password,
+        roleName: 'CUSTOMER'
+      }
 
-    /**
-     * handleDateChange
-     * @param date 
+      const response = await api.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.signup}`, requestData);
+      if (response.status === 200) {
+        localStorage.setItem('userRegister', JSON.stringify(requestData));
+        console.log(response.data);
+        navigate(`/auth/verify/${email}`);
+        setIsloading(false);
+      } else {
+        setIsloading(false);
+        toast.error(`${response.message}`, { autoClose: 4000 });
+
+      }
+
+      if (response.status === 400) {
+        await __handleResendEmail();
+      }
+      console.log(response);
+    } catch (error: any) {
+      setIsloading(false);
+      console.error('Error posting data:', error);
+      toast.error(`${error}`, { autoClose: 3000 });
+
+    }
+
+  };
+
+  /**
+     * Handle resend to email
      */
-    const handleDateChange = (date: any) => {
-        setFormData((prevData) => ({
-            ...prevData,
-            selectedDate: date,
-        }));
-    };
+  const __handleResendEmail = async () => {
+    console.log(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.resendVerificationToken}/${email}`);
+    try {
+      const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.resendVerificationToken}/${email}`);
+      if (response.status === 200) {
+        console.log('resend');
+        navigate(`/auth/verify/${email}`);
+        setIsloading(false);
+        console.log(response);
+      } else {
+        setIsloading(false);
+        toast.error(`${response.message}`, { autoClose: 4000 });
+      }
+    } catch (error: any) {
+      console.error('Error posting data:', error);
+      toast.error(`${error}`, { autoClose: 4000 });
+      setIsloading(false);
+    }
+  }
 
-    /**
-     * handleRegister
-     * @param event 
-     */
-    const handleRegister = (event: React.FormEvent<HTMLFormElement>) => {
-        // event.preventDefault();
-        // console.log(formData);
-        // console.log(apiBaseUrl);
-        
-        // const requestData = {
-        //     firstName: formData.firstName,
-        //     lastName: formData.lastName,
-        //     email: formData.email,
-        //     phone: formData.phone,
-        //     password: formData.password,
-        //     gender: formData.gender,
-        //     dateOfBirth: formData.dateOfBirth.format('YYYY-MM-DD'),
-        //     address: "1",
-        //     role: "CUSTOMER"
-        // }
-        // localStorage.setItem("userRegister", JSON.stringify(requestData))
+  return (
+    <ThemeProvider theme={defaultTheme}>
+      <ImageMasonry></ImageMasonry>
+      <LoadingComponent isLoading={isLoading} time={5000}></LoadingComponent>
+      <ToastContainer />
+      <div className={styles.signup__container}>
 
-        // const obj = apiService.postData(baseUrl + '/register', requestData);
-        // obj.then((res) => {
-        //     setIsLoading(true);
-        //     setTimeout(() => {
-        //         if (res) {
-        //             setIsLoading(false);
-        //             window.location.href = '/auth/verify'
+        <Menu as="div" className={`${styles.icon_language}`}>
+          <div >
+            <Menu.Button className="relative flex rounded-full text-sm focus:outline-none ">
+              <span className="absolute -inset-1.5" />
+              <span className="sr-only">Open user menu</span>
+              <img
+                className="h-10 w-18"
+                src={selectedLanguage === 'en' ? usaFlag : vietnamFlag}
+                alt=""
+              />
+            </Menu.Button>
+          </div>
+          <Transition
+            as={Fragment}
+            enter="transition ease-out duration-100"
+            enterFrom="transform opacity-0 scale-95"
+            enterTo="transform opacity-100 scale-100"
+            leave="transition ease-in duration-75"
+            leaveFrom="transform opacity-100 scale-100"
+            leaveTo="transform opacity-0 scale-95"
 
-        //         }
-        //     }, 2000)
+          >
+            <Menu.Items className="absolute justify-center items-center right-0 z-10 mt-1 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <Menu.Item>
+                <button className={`flex  space-x-2 ${styles.language__button}`} onClick={() => handleLanguageChange('vi')}>
+                  <div className={`${styles.language__button}`}>
+                    <img src={vietnamFlag} style={{ width: '35px', height: '35px', marginLeft: 30 }}></img>
+                    <span className='text-black'>{t(codeLanguage + '000016')}</span>
+                  </div>
+                </button>
+              </Menu.Item>
+              <Menu.Item>
+                <button className={`flex  space-x-2 ${styles.language__button}`} onClick={() => handleLanguageChange('en')}>
+                  <div className={`${styles.language__button}`}>
+                    <img src={usaFlag} style={{ width: '35px', height: '35px', marginLeft: 30 }}></img>
+                    <span className='text-black'>USA</span>
+                  </div>
+
+                </button>
+              </Menu.Item>
+            </Menu.Items>
+
+          </Transition>
+        </Menu>
+
+        <div className={styles.signup__box}>
+          <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+            <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+              <img
+                className="mx-auto h-20 w-auto"
+                style={{ borderRadius: 90 }}
+                src={systemLogo}
+                alt="Your Company"
+              />
+              <h2 className=" text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+                {t(codeLanguage + '000003')}
+              </h2>
+            </div>
+
+            <div className="sm:mx-auto text-center sm:w-full sm:max-w-sm " style={{ color: primaryColor }}>
+              <h4>{t(codeLanguage + '000017')}</h4>
+            </div>
+
+            <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
+              <div className="space-y-6" >
+
+                <div className="mt-2">
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder='Email'
+                    autoComplete="email"
+                    required
+                    className={`block h-11 w-full pl-3 pr-10 rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6  ${styles.signup__input}`}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+                {!isEmailValidate && (
+                  <span className={`${styles.error__txt}`}>{errorEmailValidate}</span>
+                )}
+              </div>
+
+              <div>
+                <div className="relative mt-2">
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"} // Toggle input type based on visibility state
+                    placeholder={t(codeLanguage + '000010')}
+                    autoComplete="current-password"
+                    required
+                    className={`block h-11 w-full pl-3 pr-10 rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6  ${styles.signup__input}`}
+                    onChange={(e) => setPassword(e.target.value)}
+
+                  />
+                  {/* Show/hide password toggle button */}
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 focus:outline-none"
+                    onClick={__handleClickShowPassword}
+                  >
+                    {showPassword ? <HiEyeOff /> : <HiEye />}
+                  </button>
+                </div>
+                {!isPasswordValidate && (
+                  <span className={`${styles.error__txt}`}>{errorPasswordValidate}</span>
+                )}
+              </div>
+
+              <div>
+                <div className="relative mt-2">
+                  <input
+                    id="confirmpassword"
+                    name="confirmpassword"
+                    type={showPasswordConfirm ? "text" : "password"} // Toggle input type based on visibility state
+                    placeholder='Confirm password'
+                    autoComplete="current-password"
+                    required
+                    className={`block h-11 w-full pl-3 pr-10 rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-black focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6  ${styles.signup__input}`}
+                    onChange={(e) => setPasswordConfirm(e.target.value)}
+                  />
+                  {/* Show/hide password toggle button */}
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 focus:outline-none"
+                    onClick={__handleClickShowPasswordConfirm}
+                  >
+                    {showPasswordConfirm ? <HiEyeOff /> : <HiEye />}
+                  </button>
+                </div>
+                {!isPasswordConfirmValidate && (
+                  <span className={`${styles.error__txt}`}>{errorPasswordConfirmValidate}</span>
+                )}
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between">
+                  <div className="text-sm mt-2 mb-2">
+
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <button
+                  type="submit"
+                  className={`${styles.signup__btn} flex mb-2 h-11 w-full items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white`}
+                  onClick={() => __handleSignUp()}
+                >
+                  {t(codeLanguage + '000003')}
+                </button>
 
 
-        // });
-    };
+                {/* <button
+                  type="submit"
+                  className={`${styles.signupGoogle__btn} flex mb-2 h-11 w-full items-center justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white`}
+                  onClick={() => window.location.href = 'https://st.mavericks-tttm.studio/oauth2/authorization/google'}
+                >
+                  {t(codeLanguage + '000006')}
+                </button> */}
 
-    return (
-        <ThemeProvider theme={defaultTheme}>
-            {/* {isLoading && (<CircularIndeterminate></CircularIndeterminate>)} */}
-            
-        </ThemeProvider>
-    );
+              </div>
+
+              <p className="mt-10 text-center text-sm text-gray-500">
+                {t(codeLanguage + '000013')}?{' '}
+                <a href="/auth/signin" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+                  {t(codeLanguage + '000018')}
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ThemeProvider>
+  );
 }
