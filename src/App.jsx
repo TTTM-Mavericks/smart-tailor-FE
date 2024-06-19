@@ -56,7 +56,8 @@ import { FilterProductScreen } from './pages/FilterProduct';
 
 import {
   OrderDetailScreen,
-  OrderHistory
+  OrderHistory,
+  OrderProductScreen
 } from './pages/Order';
 
 
@@ -175,6 +176,8 @@ function App() {
           {/* Order Detail Route */}
           <Route path='/order_detail' element={<OrderDetailScreen></OrderDetailScreen>} />
           <Route path='/order_history' element={<OrderHistory></OrderHistory>} />
+          <Route path='/order' element={<OrderProductScreen></OrderProductScreen>} />
+          
 
           <Route path='*' element={<Screen404 />} />
         </Routes>
