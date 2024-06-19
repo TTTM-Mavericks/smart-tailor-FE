@@ -7,7 +7,7 @@ import { TextureLoader } from "three";
 import state from "../store";
 
 
-const Shirt = () => {
+const Shirt = ({isDefault}) => {
 
     /** @type {[PartOfDesignInterface[], React.Dispatch<React.SetStateAction<PartOfDesignInterface[]>>]} */
     const [modelData, setModelData] = useState();
@@ -24,7 +24,7 @@ const Shirt = () => {
 
 
     useEffect(() => {
-        console.log('nodesnodesnodesnodesnodesnodes: ', nodes);
+        if(isDefault) return;
         if (snap.modelData) {
             setModelData(snap.modelData);
 
@@ -115,9 +115,7 @@ const Shirt = () => {
     }
 
     const __handleScale = (item) => {
-        console.log(item);
         if (item) {
-            console.log('[item.scaleX / 1000, item.scaleY / 1000, 0.3]: ', [item.scaleX / 1000, item.scaleY / 1000, 0.3]);
             return ([item.scaleX / 1000, item.scaleY / 1000, 0.3]);
         }
     }

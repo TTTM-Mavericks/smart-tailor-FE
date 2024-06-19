@@ -6,7 +6,7 @@ import ImageEditor from './Designer/ImageEditor'
 import styles from './CustomDesign.module.scss';
 import ImageDraggableComponent from './Components/Draggable/ImageDraggableComponent';
 import { __downloadCanvasToImage, __handleChangeImageToBase64, __handleGenerateItemId, reader } from '../../utils/DesignerUtils';
-import { ColorPicker, FilePicker, TextEditor } from '../../components';
+import { ChooseMaterialDialogComponent, ColorPicker, FilePicker, TextEditor } from '../../components';
 import { shirtFrontDesign } from '../../assets';
 // import { ColorPicker, FilePicker } from '../../components';
 import { shirtModel, systemLogo } from '../../assets';
@@ -24,6 +24,7 @@ import api from '../../api/ApiConfig';
 import { DesignInterface, ItemMaskInterface, PartOfDesignInterface, PartOfHoodieDesignData, PartOfShirtDesignData } from '../../models/DesignModel';
 import { Skeleton, Slider, Tooltip } from '@mui/material';
 import ItemEditorToolsComponent from './Components/ItemEditorTools/ItemEditorToolsComponent';
+import MaterialDetailComponent from './Components/MaterialDetail/MaterialDetailComponent';
 
 
 
@@ -36,7 +37,6 @@ function CustomDesignScreen() {
   const [selectedStamp, setSelectedStamp] = useState<ItemMaskInterface[]>();
   const [selectedItem, setSelectedItem] = useState<string>('LOGO_PART');
   const [file, setFile] = useState('');
-  const [activeEditorTab, setActiveEditorTab] = useState<string>('');
   const [selectedLanguage, setSelectedLanguage] = useState(localStorage.getItem('language') || 'en');
   const [codeLanguage, setCodeLanguage] = useState<string>('EN');
   const [isEditorMode, setIsEditorMode] = useState<boolean>(true);
@@ -48,21 +48,17 @@ function CustomDesignScreen() {
   const [typeOfModel, setTypeOfModel] = useState<string>('shirtModel');
   const [currentItemList, setCurrentItemList] = useState<ItemMaskInterface[]>();
   const [isCurrentItemListLoading, setIsCurrentItemListLoading] = useState<boolean>(true);
-  const [isModelLoading, setIsModelLoading] = useState<boolean>(false);
   const [designModelData, setDesignModelData] = useState<DesignInterface>();
-  const [partOfDesignModelData, setPartOfDesignModelData] = useState<PartOfDesignInterface[]>([]);
-  const [itemMaskDesignModelData, setItemMaskDesignModelData] = useState<ItemMaskInterface[]>([]);
-  const [imgBase64Array, setImgBase64Array] = useState<[]>([]);
   const [itemPositions, setItemPositions] = useState<{ [key: string]: { x: number; y: number } }>({});
   const [itemZIndices, setItemZIndices] = useState<{ [key: string]: number }>({});
   const [highestZIndex, setHighestZIndex] = useState<number>(1);
   const [undoStack, setUndoStack] = useState<any[]>([]);
   const [redoStack, setRedoStack] = useState<any[]>([]);
-  const [itemMaskData, setItemMaskData] = useState<ItemMaskInterface[]>([]);
   const [newPartOfDesignData, setNewPartOfDeignData] = useState<PartOfDesignInterface[]>();
   const [updatePartData, setUpdatePartData] = useState<any>(null); // Replace `any` with the appropriate type
   const [angle, setAngle] = useState<number>(0);
   const [itemIdToChangeRotate, setItemIdToChangeRotate] = useState<any>();
+  const [isOpenMaterialDialog, setIsOpenMaterialDiaglog] = useState<boolean>(false);
 
 
 
@@ -254,19 +250,6 @@ function CustomDesignScreen() {
     setSelectedLanguage(language);
   };
 
-  const __generateTabContent = () => {
-    switch (activeEditorTab) {
-      case "colorpicker":
-        return <ColorPicker />
-      case "filepicker":
-        return <FilePicker file={file} setFile={setFile} readFile={__handleReadFile} partOfCloth={selectedItem} />
-      case "download":
-        __downloadCanvasToImage();
-      default:
-        return null
-    }
-  };
-
   const __handleSetSelectedItem = (item: PartOfDesignInterface) => {
 
     setSelectedPartOfCloth(item);
@@ -404,10 +387,19 @@ function CustomDesignScreen() {
     setItemIdToChangeRotate(itemId);
   }
 
+  const __handleOpenMaterialDialog = () => {
+    setIsOpenMaterialDiaglog(true);
+  }
+
+  const __handleCloseMaterialDialog = () => {
+    setIsOpenMaterialDiaglog(false);
+  }
+
   return (
     <div className={styles.customDesign__container}>
       {/* Dialog area */}
       <ProductDialogComponent onItemSelect={__handleItemSelect} isOpen={isOpenProductDialog} onClose={() => __handleCloseDialog()} />
+
       {/* Header */}
       <div className={styles.customDesign__container__header}>
         <div className={styles.customDesign__container__header__logo}>
@@ -428,7 +420,7 @@ function CustomDesignScreen() {
             <span>{t(codeLanguage + '000105')}</span>
           </button>
 
-          <button className={` py-1 px-4 rounded inline-flex items-center ${styles.customDesign__container__header__buttonGroup__orderBtn} `}>
+          <button className={` py-1 px-4 rounded inline-flex items-center ${styles.customDesign__container__header__buttonGroup__orderBtn} `} onClick={() => __handleOpenMaterialDialog()}>
             <HiShoppingCart size={20} style={{ marginRight: 5, backgroundColor: 'transparent', border: 'none' }} className={styles.orderIcon}></HiShoppingCart>
             <span>{t(codeLanguage + '000106')}</span>
           </button>
@@ -448,7 +440,7 @@ function CustomDesignScreen() {
         {/* Part of cloth of Model */}
         <div className={styles.customDesign__container__editorArea__partOfCloth}>
           {partOfClothData?.map((item: PartOfDesignInterface, key: any) => (
-            <Tooltip title={item.partOfDesignName} placement="bottom" arrow style={{ marginTop: -10 }}>
+            <Tooltip key={key} title={item.partOfDesignName} placement="bottom" arrow style={{ marginTop: -10 }}>
               <div key={key} className={styles.partOfClothSellector} style={selectedItem === item.partOfDesignName ? { border: `2px solid ${primaryColor}` } : {}} onClick={() => __handleSetSelectedItem(item)}>
                 <img src={item.imgUrl} className={styles.partOfClothSellector__img}></img>
               </div>
@@ -748,38 +740,36 @@ function CustomDesignScreen() {
 
                   {/* Sample Item list area */}
 
-                  {/* <div className={styles.customDesign__container__editorArea__itemSelector__itemGroup__modelProductList}>
-                    {currentItem.map((item: any, key) => (
-                      <div
-                        key={item.id}
-                        style={selectedStamp === item.id ? { border: `2px solid ${primaryColor}` } : {}}
-                      >
-                        <ProductCardDesignComponent></ProductCardDesignComponent>
-                      </div>
-                    ))}
-                  </div> */}
-
-
-
+                  <div className={styles.customDesign__container__editorArea__itemSelector__itemGroup__modelProductList}>
+                    <MaterialDetailComponent primaryKey={2468} partOfDesigndata={partOfClothData}></MaterialDetailComponent>
+                  </div>
                 </>
               )}
-
-
-
-
             </div>
           )}
         </div>
-
       </div>
+
       <Designer />
       <main className={styles.customDesign__container__canvas}>
-        <CanvasModel typeOfModel={typeOfModel} />
-
+        <CanvasModel typeOfModel={typeOfModel} isDefault={false} is3D={true} />
       </main>
+
       <div className={styles.customDesign__container__itemEditor}>
         <ItemEditorToolsComponent itemIdSelected={itemIdToChangeRotate} onValueChange={setAngle}></ItemEditorToolsComponent>
       </div>
+
+      <ChooseMaterialDialogComponent
+        typeOfModel={typeOfModel}
+        isOpen={isOpenMaterialDialog}
+        onClose={() => __handleCloseMaterialDialog()}
+        child={(
+          <MaterialDetailComponent primaryKey={'DIALOG'}  partOfDesigndata={partOfClothData}></MaterialDetailComponent>
+        )}
+        model={(
+          <CanvasModel typeOfModel={typeOfModel} isDefault={true} is3D={true} />
+        )}
+      ></ChooseMaterialDialogComponent>
 
     </div >
   )

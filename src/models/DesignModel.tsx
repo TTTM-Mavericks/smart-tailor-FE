@@ -19,7 +19,8 @@ export interface ItemMaskInterface {
   isPremium?: boolean;
   zIndex?: any;
   printType?: string,
-  rotate?: any
+  rotate?: any;
+  itemMaterial?: ItemMaterialInterface
 
 
 }
@@ -46,6 +47,14 @@ export interface DesignInterface {
   partOfDesigns?: PartOfDesignInterface[];
   typeOfDesign?: string;
   imgUrl?: string,
+}
+
+export interface ItemMaterialInterface {
+  itemMaterialID?: any;
+  materialID?: any;
+  createDate?: string;
+  lastModifiedDate?: string;
+
 }
 
 
