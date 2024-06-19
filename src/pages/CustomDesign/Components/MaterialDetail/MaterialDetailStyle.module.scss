@@ -1,0 +1,60 @@
+@import '../../../../index.module.scss';
+
+.materialDetail__container {
+    overflow: none;
+
+    &__itemMaskArea::-webkit-scrollbar {
+        width: 3px;
+        height: 20px;
+    }
+    
+    &__itemMaskArea::-webkit-scrollbar-track {
+        background: $grayColor1;
+        border-radius: 10px;
+        height: 20px;
+    }
+    
+    &__itemMaskArea::-webkit-scrollbar-thumb {
+        background: #7b7b7b;
+        border-radius: 10px;
+        height: 20px;
+    }
+    
+    &__itemMaskArea::-webkit-scrollbar-thumb:hover {
+        background: #7b7b7b;
+        /* Color when hovering over the scrollbar thumb */
+    }
+}
+
+.materialDetail__content {
+
+    img {
+        width: 30px;
+        height: 40px;
+    }
+
+    &__itemMask {
+        img {
+            width: 30px;
+            height: 40px;
+            margin: 0 10px 0 10px; 
+        }
+    }
+
+    &__button {
+        span{
+            font-size: 12px;
+
+        }
+    }
+
+    span{
+        font-size: 13px;
+    }
+
+    &__itemMask{
+        label{
+            font-size: 13px;
+        }
+    }
+}
