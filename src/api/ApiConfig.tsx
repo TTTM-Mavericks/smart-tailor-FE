@@ -52,7 +52,8 @@ export const functionEndpoints = {
     addNewMaterial: '/add-new-material',
     getAllMaterial: '/get-all-material',
     updateMaterial: '/update-material',
-    updateStatusMaterial: '/update-status-material'
+    updateStatusMaterial: '/update-status-material',
+    addNewMaterialByExcelFile: '/add-new-category-material-by-excel-file'
   },
   category: {
     addNewCategory: '/add-new-category',

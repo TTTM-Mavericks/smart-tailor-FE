@@ -5,7 +5,7 @@ export interface ExcelData {
     materialName: string,
     price: number,
     unit: string,
-    hsCode: string,
+    hsCode: number,
     error: boolean,
     Category_Name: string,
     Material_Name: string,
