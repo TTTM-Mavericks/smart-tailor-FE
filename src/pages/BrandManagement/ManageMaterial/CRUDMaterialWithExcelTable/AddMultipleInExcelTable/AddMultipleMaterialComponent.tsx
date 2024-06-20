@@ -8,7 +8,6 @@ import { useTheme } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import EditMultipleMaterialInExcelTable from '../EditMaterialInExcelTable/EditMultipleUsersInExcelTable';
-const ADDUSERWITHFILEEXCELS = 'http://localhost:3000/Import_Brand_Material.xlsx';
 import { useTranslation } from 'react-i18next';
 import { ExcelData } from '../../../../../models/BrandMaterialExcelModel';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
@@ -195,6 +194,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
 
             // Handle successful response
             console.log('Data uploaded successfully:', response);
+            closeMultipleCard();
         } catch (error: any) {
             // Check for specific error status codes
             if (error.response) {
@@ -233,7 +233,6 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
         else {
             // Proceed with upload if all prices are valid
             await _handleUploadData();
-            closeMultipleCard();
         }
     };
 
@@ -368,6 +367,32 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
     }
 
     /**
+    * Download the sample data
+    */
+    const _handleDownloadSampleExcelFile = () => {
+        const url = `${baseURL + versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.downloadSampleBrandPriceExcelData}`; // Replace with your API endpoint
+
+        axios({
+            url: url,
+            method: 'GET',
+            responseType: 'blob', // Important to handle binary data
+        })
+            .then(response => {
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'Brand_Price_Sample_File.xlsx'; // Replace with your desired file name
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => {
+                console.error('There was an error downloading the file!', error);
+            });
+    };
+
+    /**
      * 
      * @returns 
      * Open the edit pop up
@@ -384,7 +409,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px', maxHeight: '80vh', overflowY: 'auto', position: "relative" }}>
             <Typography variant="h5" align="center" marginBottom={"20px"}>
-                {t(codeLanguage + '000213')}
+                {t(codeLanguage + '000216')}
             </Typography>
             <IconButton
                 style={{
@@ -403,7 +428,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
             <Button
                 variant="contained"
                 color="primary"
-                href={ADDUSERWITHFILEEXCELS}
+                onClick={_handleDownloadSampleExcelFile}
                 download
                 endIcon={<DownloadIcon />}
                 style={{

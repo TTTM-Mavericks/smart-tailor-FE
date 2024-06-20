@@ -6,14 +6,15 @@ import * as React from "react";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Swal from "sweetalert2";
-import EditMaterialPopUpScreens from "../AdminEditMaterial/EditMaterialPopUpScreens";
+import EditExpertTailoringPopUpScreens from "../ManagerEditExpertTailoring/EditExpertTailoringPopUpScreens";
 import { Add } from "@mui/icons-material";
-import AddEachMaterialsWithHand from "../../AddEachWithHand/AddEachMaterialWithHandScreens";
-import AddMultipleComponentWithExcel from "../../AddMultipleMaterialWithExcel/AddMultipleMaterialComponent";
+import AddEachExpertTailoringWithHand from "../../AddEachWithHand/AddEachExpertTailoringWithHandScreens";
+import AddMultipleExpertTailoringComponentWithExcel from "../../AddMultipleExpertTailoringWithExcel/AddMultipleExpertTailoringComponent";
 import { useTranslation } from 'react-i18next';
-import { Material } from "../../../../../models/AdminMaterialExcelModel";
 import axios from "axios";
-import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
+import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
+import { ExpertTailoring } from "../../../../../models/ManagerExpertTailoringModel";
+import { ExpertTailoringEdit } from "../../../../../models/ManagerExpertTailoringModel";
 
 // Make Style of popup
 const style = {
@@ -29,13 +30,13 @@ const style = {
     borderRadius: "20px"
 };
 
-const ManageMaterials: React.FC = () => {
+const ManageExpertTailoring: React.FC = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [data, setData] = React.useState<Material[]>([]);
+    const [data, setData] = React.useState<ExpertTailoring[]>([]);
 
     // set formid to pass it to component edit Material
-    const [formId, setFormId] = React.useState<Material | null>(null);
+    const [formId, setFormId] = React.useState<ExpertTailoringEdit | null>(null);
 
     // Open Edit PopUp when clicking on the edit icon
     const [editopen, setEditOpen] = React.useState<boolean>(false);
@@ -51,7 +52,6 @@ const ManageMaterials: React.FC = () => {
     const _handleClose = () => {
         setAnchorEl(null);
     };
-    console.log("anchorEl" + anchorEl);
 
     // close open pop up
     const [addOpenOrClose, setAddOpenOrClose] = React.useState<boolean>(false)
@@ -88,7 +88,7 @@ const ManageMaterials: React.FC = () => {
     }, [selectedLanguage, i18n]);
 
     React.useEffect(() => {
-        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.getAllMaterial}`;
+        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.getAllExpertTailoring}`;
 
         axios.get(apiUrl)
             .then(response => {
@@ -109,42 +109,37 @@ const ManageMaterials: React.FC = () => {
     }, []);
 
     // Thêm người dùng mới vào danh sách
-    const _handleAddMaterial = (newMaterial: Material) => {
-        setData(prevData => [...prevData, newMaterial]);
+    const _handleAddExpertTailoring = (addNewExpertTailoring: ExpertTailoring) => {
+        setData(prevData => [...prevData, addNewExpertTailoring]);
     }
 
     // Cập nhật người dùng trong danh sách
-    const _handleUpdateMaterial = (updatedMaterial: Material) => {
-        setData(prevData => prevData.map(Material => Material.materialID === updatedMaterial.materialID ? updatedMaterial : Material));
+    const _handleUpdateMaterial = (updatedExpertTailoring: ExpertTailoringEdit) => {
+        setData(prevData => prevData.map((ExpertTailoring: any) => ExpertTailoring.expertTailoringID === updatedExpertTailoring.expertTailoringID ? updatedExpertTailoring : ExpertTailoring));
     }
 
     // EDIT 
     const _handleEditClick = (
-        materialID: string,
-        categoryName: string,
-        materialName: string,
-        hsCode: number,
-        basePrice: number,
-        unit: string) => {
+        expertTailoringID: string,
+        expertTailoringName: string,
+        sizeImageUrl: string,
+    ) => {
         // Handle edit action
-        const MaterialDataToEdit: Material = {
-            materialID: materialID,
-            categoryName: categoryName,
-            materialName: materialName,
-            hsCode: hsCode,
-            basePrice: basePrice,
-            unit: unit
+        const ExpertTailoringDataToEdit: ExpertTailoringEdit = {
+            expertTailoringID: expertTailoringID,
+            expertTailoringName: expertTailoringName,
+            sizeImageUrl: sizeImageUrl,
         }
-        setFormId(MaterialDataToEdit);
+        setFormId(ExpertTailoringDataToEdit);
         _handleEditOpen();
     };
 
     //DELETE OR UPDATE
-    const _handleDeleteClick = async (materialID: string) => {
+    const _handleDeleteClick = async (expertTailoringID: string) => {
         try {
-            const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.updateStatusMaterial}`;
+            const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.updateStatusExpertTailoring}`;
 
-            const response = await axios.put(apiUrl + `/${materialID}`)
+            const response = await axios.put(apiUrl + `/${expertTailoringID}`)
 
             if (!response.data) {
                 throw new Error('Error deleting material');
@@ -178,8 +173,14 @@ const ManageMaterials: React.FC = () => {
                     'success'
                 );
 
-                // Remove the deleted material from the current data list
-                setData(prevData => prevData.filter(Material => Material.materialID !== id));
+                // Update the deleted material from the current data list
+                setData((prevData: any) =>
+                    prevData.map((expertTailoring: any) =>
+                        expertTailoring.expertTailoringID === id
+                            ? { ...expertTailoring, status: !expertTailoring.status }
+                            : expertTailoring
+                    )
+                );
             } else {
                 Swal.fire(
                     `${t(codeLanguage + '000066')}`,
@@ -198,40 +199,22 @@ const ManageMaterials: React.FC = () => {
     };
 
     const columns: GridColDef[] = [
-        // { field: "id", headerName: "ID", flex: 0.5 },
         {
-            field: "categoryName",
-            headerName: "Category Name",
+            field: "expertTailoringName",
+            headerName: "ExpertTailoring Name",
             flex: 1,
         },
         {
-            field: "materialName",
-            headerName: "Material Name",
-            flex: 1,
-        },
-        {
-            field: "basePrice",
-            headerName: "basePrice",
-            type: "number",
-            headerAlign: "left",
-            align: "left",
-        },
-        {
-            field: "unit",
-            headerName: "Unit",
-            flex: 1,
-        },
-        {
-            field: "hsCode",
-            headerName: "HS Code",
+            field: "sizeImageUrl",
+            headerName: "Size Image Url",
             flex: 1,
         },
         {
             field: "status",
-            headerName: "status",
-            flex: 1,
+            headerName: "Status",
+            headerAlign: "left",
+            align: "left",
         },
-
         {
             field: "actions",
             headerName: "Actions",
@@ -239,10 +222,10 @@ const ManageMaterials: React.FC = () => {
             sortable: false,
             renderCell: (params) => (
                 <Box>
-                    <IconButton onClick={() => _handleEditClick(params.row.materialID, params.row.categoryName, params.row.materialName, params.row.hsCode, params.row.basePrice, params.row.unit)}>
+                    <IconButton onClick={() => _handleEditClick(params.row.expertTailoringID, params.row.expertTailoringName, params.row.sizeImageUrl)}>
                         <EditIcon />
                     </IconButton>
-                    <IconButton onClick={() => _hanldeConfirmDelete(params.row.materialID)}>
+                    <IconButton onClick={() => _hanldeConfirmDelete(params.row.expertTailoringID)}>
                         <DeleteIcon htmlColor={colors.primary[300]} />
                     </IconButton>
                 </Box>
@@ -250,7 +233,7 @@ const ManageMaterials: React.FC = () => {
         }
     ];
 
-    const getRowId = (row: any) => `${row.materialID}-${row.categoryName}-${row.materialName}`;
+    const getRowId = (row: any) => `${row.expertTailoringID}-${row.expertTailoringName}-${row.sizeImageUrl}`;
 
     return (
         <Box m="20px">
@@ -330,7 +313,7 @@ const ManageMaterials: React.FC = () => {
                                 p: 4,
                                 borderRadius: "20px"
                             }}>
-                                <AddEachMaterialsWithHand closeCard={_handleAddClose} addNewMaterial={_handleAddMaterial} />
+                                <AddEachExpertTailoringWithHand closeCard={_handleAddClose} addNewExpertTailoring={_handleAddExpertTailoring} />
                             </Box>
                         </Modal>
                     </MenuItem>
@@ -354,7 +337,7 @@ const ManageMaterials: React.FC = () => {
                                 p: 4,
                                 borderRadius: "20px"
                             }}>
-                                <AddMultipleComponentWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddMaterial} />
+                                <AddMultipleExpertTailoringComponentWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddExpertTailoring} />
                             </Box>
                         </Modal>
 
@@ -375,10 +358,10 @@ const ManageMaterials: React.FC = () => {
                 >
                     <Box sx={style}>
                         {formId !== null && (
-                            <EditMaterialPopUpScreens
+                            <EditExpertTailoringPopUpScreens
                                 editClose={_handleEditClose}
                                 fid={formId}
-                                updateMaterial={_handleUpdateMaterial}
+                                updateExpertTailoring={_handleUpdateMaterial}
                             />
                         )}
                     </Box>
@@ -388,4 +371,4 @@ const ManageMaterials: React.FC = () => {
     );
 };
 
-export default ManageMaterials;
+export default ManageExpertTailoring;

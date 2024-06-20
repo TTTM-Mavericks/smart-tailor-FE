@@ -29,7 +29,7 @@ const EditMultipleMaterialsInExcelTable: React.FC<EditMultipleMaterialsInExcelTa
 
         <Box style={{ height: '500px', overflowY: 'auto' }}>
             <Typography variant="h5" align="left">
-                Edit User
+                Edit Category and Material
             </Typography>
             <IconButton
                 style={{ position: "absolute", top: 0, right: 0 }}
@@ -40,33 +40,22 @@ const EditMultipleMaterialsInExcelTable: React.FC<EditMultipleMaterialsInExcelTa
             <Box height={50} />
             <Grid container spacing={4}>
                 <Grid item xs={11}>
-                    <TextField name="name" label="Name" value={editedData?.name} onChange={_handleChange} fullWidth />
+                    <TextField name="Category_Name" label="Category_Name" value={editedData?.Category_Name} onChange={_handleChange} fullWidth />
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField name="age" label="Age" value={editedData?.age} onChange={_handleChange} fullWidth />
+                    <TextField name="Material_Name" label="Material_Name" value={editedData?.Material_Name} onChange={_handleChange} fullWidth />
 
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField name="registrarId" label="registrarId" value={editedData?.registrarId} onChange={_handleChange} fullWidth />
+                    <TextField name="HS_Code" label="HS_Code" value={editedData?.HS_Code} onChange={_handleChange} fullWidth />
 
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField name="phone" label="phone" value={editedData?.phone} onChange={_handleChange} fullWidth />
+                    <TextField name="Unit" label="Unit" value={editedData?.Unit} onChange={_handleChange} fullWidth />
 
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField name="email" label="email" value={editedData?.email} onChange={_handleChange} fullWidth />
-
-                </Grid>
-                <Grid item xs={11}>
-                    <TextField name="address" label="city" value={editedData?.address} onChange={_handleChange} fullWidth />
-
-                </Grid>
-                <Grid item xs={11}>
-                    <TextField id="outline-basic" label="Role" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={editedData?.city} onChange={_handleChange} />
-                </Grid>
-                <Grid item xs={11}>
-                    <TextField name="zipCode" label="zipCode" value={editedData?.zipCode} onChange={_handleChange} fullWidth />
+                    <TextField name="Base_Price" label="Base_Price" value={editedData?.Base_Price} onChange={_handleChange} fullWidth />
 
                 </Grid>
             </Grid>

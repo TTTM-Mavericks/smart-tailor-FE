@@ -6,9 +6,9 @@ import { jwtDecode } from 'jwt-decode';
 // const baseURL = 'https://whear-app.azurewebsites.net';
 // const baseURL = 'https://tam.mavericks-tttm.studio';
 // export const baseURL = 'https://be.mavericks-tttm.studio';
-// export const baseURL = 'https://dev01.smart-tailor.live';
+export const baseURL = 'https://dev01.smart-tailor.live';
 
-export const baseURL = 'http://localhost:6969';
+// export const baseURL = 'http://localhost:6969';
 export const googleOAuth2 = '/oauth2/authorization/google'
 export const versionEndpoints = {
   v1: '/api/v1',
@@ -21,7 +21,8 @@ export const featuresEndpoints = {
   customer: '/customer',
   admin: '/admin',
   material: '/material',
-  category: '/category'
+  category: '/category',
+  manager: '/expert-tailoring'
 }
 export const functionEndpoints = {
   auth: {
@@ -48,12 +49,25 @@ export const functionEndpoints = {
   admin: {
     dashboard: '/dashboard',
   },
+  manager: {
+    addNewExpertTailoring: '/add-new-expert-tailoring',
+    updateExpertTailoring: '/update-expert-tailoring',
+    updateStatusExpertTailoring: '/update-status-expert-tailoring',
+    addNewExpertTailoringByExcelFile: '/add-new-expert-tailoring-by-excel-file',
+    getAllExpertTailoring: '/get-all-expert-tailoring',
+    getExpertTailoringByID: '/get-expert-tailoring-by-id',
+    exportAllExpertTailoringByExcel: '/get-all-expert-tailoring-by-excel-file',
+    downloadSampleExcelExpertTailoring: '/generate-sample-expert-tailoring-by-excel-file',
+    getExpertTailoringByName: '/get-expert-tailoring-by-name'
+  },
   material: {
     addNewMaterial: '/add-new-material',
     getAllMaterial: '/get-all-material',
     updateMaterial: '/update-material',
     updateStatusMaterial: '/update-status-material',
-    addNewMaterialByExcelFile: '/add-new-category-material-by-excel-file'
+    addNewMaterialByExcelFile: '/add-new-category-material-by-excel-file',
+    downloadSampleDataExcelFile: '/generate-sample-category-material-by-excel-file',
+    downloadSampleBrandPriceExcelData: '/export-category-material-for-brand-by-excel'
   },
   category: {
     addNewCategory: '/add-new-category',

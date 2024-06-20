@@ -9,4 +9,6 @@ export const blackColor = '#000000';
 export const redColor = '#E74032';
 export const errorColor = '#DB0F00';
 export const greenColor = '#37B358';
+export const yellowColor = '#F6BE19';
+
 

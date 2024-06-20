@@ -111,10 +111,10 @@ const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
                 },
             });
 
-            console.log('Response:', response.data);
+            console.log('Response laf:', response.data.data);
 
             if (response.data) {
-                addNewMaterial(response.data);
+                addNewMaterial(response.data.data);
                 Swal.fire(
                     'Add Success!',
                     'User has been updated!',

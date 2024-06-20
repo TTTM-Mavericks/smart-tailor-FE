@@ -51,7 +51,6 @@ const ManageMaterials: React.FC = () => {
     const _handleClose = () => {
         setAnchorEl(null);
     };
-    console.log("anchorEl" + anchorEl);
 
     // close open pop up
     const [addOpenOrClose, setAddOpenOrClose] = React.useState<boolean>(false)
@@ -126,7 +125,6 @@ const ManageMaterials: React.FC = () => {
         hsCode: number,
         basePrice: number,
         unit: string) => {
-        // Handle edit action
         const MaterialDataToEdit: Material = {
             materialID: materialID,
             categoryName: categoryName,
@@ -179,7 +177,8 @@ const ManageMaterials: React.FC = () => {
                 );
 
                 // Remove the deleted material from the current data list
-                setData(prevData => prevData.filter(Material => Material.materialID !== id));
+
+                setData(prevData => prevData.map(Material => Material.materialID === id));
             } else {
                 Swal.fire(
                     `${t(codeLanguage + '000066')}`,

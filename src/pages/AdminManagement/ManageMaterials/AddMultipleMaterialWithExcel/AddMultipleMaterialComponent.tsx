@@ -251,12 +251,41 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
 
         if (invalidEntries || duplicates.size > 0) {
             setError('There are duplicate values or missing required fields!');
-        } else {
+        }
+        if (!hasDataChanged()) {
+            setError('Data have changing')
+        }
+        else {
             await _handleUploadData();
             closeMultipleCard();
         }
     };
 
+    /**
+     * Download the sample data
+     */
+    const _handleDownloadSampleExcelFile = () => {
+        const url = `${baseURL + versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.downloadSampleDataExcelFile}`; // Replace with your API endpoint
+
+        axios({
+            url: url,
+            method: 'GET',
+            responseType: 'blob', // Important to handle binary data
+        })
+            .then(response => {
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'Category_Material_Sample_File.xlsx'; // Replace with your desired file name
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => {
+                console.error('There was an error downloading the file!', error);
+            });
+    };
 
     // ---------------Handle Modal---------------//
 
@@ -449,7 +478,6 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
             <Button
                 variant="contained"
                 color="primary"
-                href={ADDUSERWITHFILEEXCELS}
                 download
                 endIcon={<DownloadIcon />}
                 style={{
@@ -458,6 +486,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
                     backgroundColor: '#E96208'
                 }}
+                onClick={_handleDownloadSampleExcelFile}
             >
                 {t(codeLanguage + '000053')}
             </Button>

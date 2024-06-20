@@ -58,9 +58,11 @@ import { FilterProductScreen } from './pages/FilterProduct';
 
 import {
   OrderDetailScreen,
-  OrderHistory
+  OrderHistory,
+  OrderProductScreen
 } from './pages/Order';
 import Brand from './pages/BrandManagement/DashboardBrand/BrandDashboardScreen';
+import TestManager from './pages/AdminManagement/ExpertTailoring/TestDash';
 
 
 const tokenIsValid = (token) => {
@@ -180,6 +182,12 @@ function App() {
           {/* Order Detail Route */}
           <Route path='/order_detail' element={<OrderDetailScreen></OrderDetailScreen>} />
           <Route path='/order_history' element={<OrderHistory></OrderHistory>} />
+          <Route path='/order' element={<OrderProductScreen></OrderProductScreen>} />
+
+
+          {/* Employee dashboard route */}
+          <Route path='/manager' element={<TestManager />} />
+
 
           <Route path='*' element={<Screen404 />} />
         </Routes>

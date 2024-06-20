@@ -8,10 +8,9 @@ import { useTheme } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import EditMultipleUsersInExcelTable from './CRUDWithExcelTable/EditMultipleMaterialInExcelTable';
-import AddUserModalInExcelTable from './CRUDWithExcelTable/AddMaterialInExcelTable';
 const ADDUSERWITHFILEEXCELS = 'http://localhost:3000/Import_Brand_Material.xlsx';
 import { useTranslation } from 'react-i18next';
-import { ExcelData } from '../../../../models/AdminMaterialExcelModel';
+import { ExcelData } from '../../../../models/ManagerExpertTailoringModel';
 import axios from 'axios';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import ExcelJS from 'exceljs';
@@ -19,7 +18,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import { swatch } from '../../../../assets';
 import Swal from 'sweetalert2';
 
-interface AddMaterialWithMultipleExcelFormProps {
+interface AddExpertTailoringWithMultipleExcelFormProps {
     closeMultipleCard: () => void;
     addNewMaterial: (addedNewMaterial: ExcelData) => void
 }
@@ -39,7 +38,7 @@ const style = {
     borderRadius: "20px"
 };
 
-const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormProps> = ({ closeMultipleCard, addNewMaterial }) => {
+const AddMultipleExpertTailoringComponentWithExcel: React.FC<AddExpertTailoringWithMultipleExcelFormProps> = ({ closeMultipleCard }) => {
 
     // ---------------UseState Variable---------------//
     const [error, setError] = React.useState<string>('');
@@ -138,7 +137,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
 
                         // Update error property for duplicate entries
                         const updatedData = jsonData.map(item => {
-                            const hasNullName = !item.materialName;
+                            const hasNullName = !item.expertTailoringName;
                             return { ...item, error: hasNullName };
                         });
 
@@ -146,7 +145,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                         setExcelData(updatedData)
                         setOriginalData(updatedData);
                         updatedData.forEach(item => {
-                            console.log(`Category: ${item.Category_Name}, Material Name: ${item.Material_Name}, Unit: ${item.Unit}`);
+                            console.log(`Category: ${item.Expert_Tailoring_Name}, Material Name: ${item.Size_Image_Url}`);
                         });
                         console.log(updatedData);
                     }
@@ -181,7 +180,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
 
         try {
             // const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0YW1tdHNlMTYxMDg3QGZwdC5lZHUudm4iLCJpYXQiOjE3MTgyODUyMTMsImV4cCI6MTcxODM3MTYxM30.UUpy2s9SwYGF_TyIru6VASQ-ZzGTOqx7mkWkcSR2__0'; // Replace with the actual bearer token
-            const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.addNewMaterialByExcelFile}`, formData,
+            const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.addNewExpertTailoringByExcelFile}`, formData,
 
                 // {
                 //     headers: {
@@ -192,11 +191,15 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
 
             // Handle successful response
             console.log('Data uploaded successfully:', response);
-            Swal.fire({
-                icon: 'success',
-                title: 'Profile Updated',
-                text: 'Your profile has been updated successfully!',
-            });
+            if (response.data.status === 200) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Profile Updated',
+                    text: 'Your profile has been updated successfully!',
+                });
+                closeMultipleCard();
+            }
+
         } catch (error: any) {
             // Check for specific error status codes
             if (error.response) {
@@ -229,31 +232,33 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
      */
     const _handleConfirm = async () => {
         // Function to check if a value is a number and greater than 0
-        const isValidBasePrice = (basePrice: any): boolean => {
-            return typeof basePrice === 'number' && basePrice > 0;
+        const isValidExpertTailoringName = (basePrice: any): boolean => {
+            return typeof basePrice === 'string'
         };
 
-        const isValidHSCode = (hsCode: any): boolean => {
-            return typeof hsCode === 'number' && hsCode > 0;
+        const isValidSizeImageURL = (hsCode: any): boolean => {
+            return typeof hsCode === 'string'
         };
 
         // Check for duplicates based on Category_Name and Material_Name
-        const duplicates = checkForDuplicates(excelData, ['Category_Name', 'Material_Name']);
+        const duplicates = checkForDuplicates(excelData, ['Expert_Tailoring_Name', 'Size_Image_Url']);
 
         // Check for invalid entries
         const invalidEntries = excelData.some(item =>
-            !item.Category_Name ||
-            !item.Material_Name ||
-            item.Unit === null ||
-            !isValidBasePrice(item.Base_Price) ||
-            !isValidHSCode(item.HS_Code)
+            !item.Expert_Tailoring_Name ||
+            !item.Size_Image_Url ||
+            !isValidExpertTailoringName(item.Size_Image_Url) ||
+            !isValidSizeImageURL(item.Expert_Tailoring_Name)
         );
 
         if (invalidEntries || duplicates.size > 0) {
             setError('There are duplicate values or missing required fields!');
-        } else {
+        }
+        if (!hasDataChanged()) {
+            setError('Data have changing')
+        }
+        else {
             await _handleUploadData();
-            closeMultipleCard();
         }
     };
 
@@ -290,34 +295,25 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
 
     const _handleDownloadErrorData = async () => {
         const workBook = new ExcelJS.Workbook();
-        const worksheet = workBook.addWorksheet('Category and Material');
+        const worksheet = workBook.addWorksheet('Expert Tailoring');
 
         worksheet.columns = [
-            { header: 'Category_Name', key: 'Category_Name', width: 25 },
-            { header: 'Material_Name', key: 'Material_Name', width: 25 },
-            { header: 'HS_Code', key: 'HS_Code', width: 20 },
-            { header: 'Unit', key: 'Unit', width: 20 },
-            { header: 'Base_Price', key: 'Base_Price', width: 20 },
+            { header: 'Expert_Tailoring_Name', key: 'Expert_Tailoring_Name', width: 20 },
+            { header: 'Size_Image_Url', key: 'Size_Image_Url', width: 20 },
         ];
 
         const rows = excelData.map(item => ({
-            Category_Name: item.Category_Name,
-            Material_Name: item.Material_Name,
-            HS_Code: item.HS_Code,
-            Unit: item.Unit,
-            Base_Price: item.Base_Price,
+            Expert_Tailoring_Name: item.Expert_Tailoring_Name,
+            Size_Image_Url: item.Size_Image_Url,
             error: item.error
         }));
 
         // Identify and sort rows with errors
         const rowsWithError = rows.filter(row => {
             const hasNullValues = Object.values(row).some(value => value === null || value === '' || value === undefined);
-            const isCategoryNameNull = row.Category_Name === null || row.Category_Name === undefined;
-            const isMaterialNameNull = row.Material_Name === null || row.Material_Name === undefined;
-            const isHsCodeNull = row.HS_Code === null || row.HS_Code === undefined || row.HS_Code <= 0 || typeof row.HS_Code === 'string';
-            const isBasePriceNull = row.Base_Price === null || row.Base_Price === undefined || row.Base_Price <= 0 || typeof row.Base_Price === 'string';
-            const isUnitNumber = typeof row.Unit === 'number';
-            return hasNullValues || isCategoryNameNull || isMaterialNameNull || isHsCodeNull || isBasePriceNull || isUnitNumber;
+            const isExpertTailoringName = row.Expert_Tailoring_Name === null || row.Expert_Tailoring_Name === undefined || typeof row.Expert_Tailoring_Name === 'number';
+            const isSizeImageUrl = row.Size_Image_Url === null || row.Size_Image_Url === undefined || typeof row.Size_Image_Url === 'number';
+            return hasNullValues || isExpertTailoringName || isSizeImageUrl;
         });
 
         const rowsWithoutError = rows.filter(row => !rowsWithError.includes(row));
@@ -341,7 +337,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
         });
 
         // Apply validation and coloring for errors
-        const duplicates = checkForDuplicates(sortedRows, ['Category_Name', 'Material_Name']);
+        const duplicates = checkForDuplicates(sortedRows, ['Expert_Tailoring_Name', 'Size_Image_Url']);
 
         sortedRows.forEach((row, rowIndex) => {
             const excelRow = worksheet.getRow(rowIndex + 2); // +2 to account for header row and 1-based index
@@ -349,9 +345,9 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                 const columnName = worksheet.getColumn(colNumber).key as string;
                 const value = row[columnName];
 
-                if (columnName === 'Category_Name' || columnName === 'Material_Name') {
-                    if (duplicates.has(`${row.Category_Name}|${row.Material_Name}`)) {
-                        const duplicateRowNumber = sortedRows.findIndex(r => r.Category_Name === row.Category_Name && r.Material_Name === row.Material_Name && r !== row) + 2;
+                if (columnName === 'Expert_Tailoring_Name' || columnName === 'Size_Image_Url') {
+                    if (duplicates.has(`${row.Expert_Tailoring_Name}|${row.Size_Image_Url}`)) {
+                        const duplicateRowNumber = sortedRows.findIndex(r => r.Expert_Tailoring_Name === row.Expert_Tailoring_Name && r.Size_Image_Url === row.Size_Image_Url && r !== row) + 2;
                         cell.fill = {
                             type: 'pattern',
                             pattern: 'solid',
@@ -366,7 +362,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                         };
                         cell.value = 'Null Value';
                     }
-                } else if (columnName === 'HS_Code' || columnName === 'Base_Price' || columnName === 'Unit') {
+                } else if (columnName === 'Expert_Tailoring_Name' || columnName === 'Size_Image_Url' || columnName === 'Unit') {
                     if (!value) {
                         cell.fill = {
                             type: 'pattern',
@@ -381,32 +377,32 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                             fgColor: { argb: 'FFFF00' }, // Red fill for numeric Unit
                         };
                         cell.value = `${value} (Invalid Type)`;
-                    } else if (columnName === 'HS_Code' && typeof value === 'string') {
+                    } else if (columnName === 'Expert_Tailoring_Name' && typeof value === 'string') {
                         cell.fill = {
                             type: 'pattern',
                             pattern: 'solid',
-                            fgColor: { argb: 'FFFF00' }, // Red fill for invalid HS_Code
+                            fgColor: { argb: 'FFFF00' }, // Red fill for invalid Expert_Tailoring_Name
                         };
                         cell.value = `${value} (Invalid HS Code)`;
-                    } else if (columnName === 'HS_Code' && parseFloat(value) <= 0) {
+                    } else if (columnName === 'Expert_Tailoring_Name' && parseFloat(value) <= 0) {
                         cell.fill = {
                             type: 'pattern',
                             pattern: 'solid',
-                            fgColor: { argb: 'FFFF00' }, // Red fill for invalid HS_Code
+                            fgColor: { argb: 'FFFF00' }, // Red fill for invalid Expert_Tailoring_Name
                         };
                         cell.value = `${value} (Invalid HS Code)`;
-                    } else if (columnName === 'Base_Price' && typeof value === 'string') {
+                    } else if (columnName === 'Size_Image_Url' && typeof value === 'string') {
                         cell.fill = {
                             type: 'pattern',
                             pattern: 'solid',
-                            fgColor: { argb: 'FFFF00' }, // Red fill for invalid Base_Price
+                            fgColor: { argb: 'FFFF00' }, // Red fill for invalid Size_Image_Url
                         };
                         cell.value = `${value} (Invalid Base Price)`;
-                    } else if (columnName === 'Base_Price' && parseFloat(value) <= 0) {
+                    } else if (columnName === 'Size_Image_Url' && parseFloat(value) <= 0) {
                         cell.fill = {
                             type: 'pattern',
                             pattern: 'solid',
-                            fgColor: { argb: 'FFFF00' }, // Red fill for invalid HS_Code
+                            fgColor: { argb: 'FFFF00' }, // Red fill for invalid Expert_Tailoring_Name
                         };
                         cell.value = `${value} (Invalid HS Code)`;
                     }
@@ -421,11 +417,36 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
 
         const a = document.createElement("a");
         a.href = url;
-        a.download = "ErrorData.xlsx";
+        a.download = "Exper_Tailoring_Edit.xlsx";
         a.click();
         window.URL.revokeObjectURL(url);
     };
 
+    /**
+        * Download the sample data
+        */
+    const _handleDownloadSampleExcelFile = () => {
+        const url = `${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.downloadSampleExcelExpertTailoring}`; // Replace with your API endpoint
+
+        axios({
+            url: url,
+            method: 'GET',
+            responseType: 'blob', // Important to handle binary data
+        })
+            .then(response => {
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'Expert_Tailoring_Sample_File.xlsx'; // Replace with your desired file name
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => {
+                console.error('There was an error downloading the file!', error);
+            });
+    };
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px', maxHeight: '80vh', overflowY: 'auto', position: "relative" }}>
@@ -449,7 +470,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
             <Button
                 variant="contained"
                 color="primary"
-                href={ADDUSERWITHFILEEXCELS}
+                onClick={_handleDownloadSampleExcelFile}
                 download
                 endIcon={<DownloadIcon />}
                 style={{
@@ -503,11 +524,8 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <thead>
                                 <tr style={{ backgroundColor: colors.primary[100] }}>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Category Name</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Material Name</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>HS CODE</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Unit</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Base Price</th>
+                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Expert Tailoring Name</th>
+                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Size Image Url</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Error Check</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Action</th>
                                 </tr>
@@ -515,45 +533,27 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                             <tbody>
                                 {excelData.map((data, index) => (
                                     <tr key={index}>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Category_Name ? colors.primary[200] : 'red' }} >{data.Category_Name || 'Null Category Name'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Material_Name ? colors.primary[200] : 'red' }}>{data.Material_Name || 'Null Material Name'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.HS_Code ? colors.primary[200] : 'red' }}>{data.HS_Code || 'Null Hs Code'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Unit ? colors.primary[200] : 'red' }}>{data.Unit || 'Null Unit'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Base_Price ? colors.primary[200] : 'red' }}>{data.Base_Price || 'Null Base Price'}</td>
+                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Expert_Tailoring_Name ? colors.primary[200] : 'red' }} >{data.Expert_Tailoring_Name || 'Null Category Name'}</td>
+                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Size_Image_Url ? colors.primary[200] : 'red' }}>{data.Size_Image_Url || 'Null Material Name'}</td>
                                         <td style={{ border: '1px solid #ddd', padding: '8px', color: data.error ? 'red' : 'green' }}>
                                             {(() => {
                                                 const hasNullValues = Object.values(data).some(value => value === null || value === undefined);
-                                                const isCategoryNameNull = data.Category_Name === null || data.Category_Name === undefined;
-                                                const isMaterialNameNull = data.Material_Name === null || data.Material_Name === undefined;
-                                                const isHsCodeNullOrNotString = data.HS_Code === null || data.HS_Code === undefined || typeof data.HS_Code !== 'number' || data.HS_Code <= 0;
-                                                const isBasePriceNullOrNotNumberOrZero = data.Base_Price === null || data.Base_Price === undefined || typeof data.Base_Price !== 'number' || data.Base_Price <= 0;
-                                                const isUnitNullOrNotString = data.Unit === null || data.Unit === undefined || typeof data.Unit !== 'string';
-
-                                                const isUnitNumber = () => {
-                                                    if (typeof data.Unit === 'number') {
-                                                        console.log("Unit should not be a number.");
-                                                        return true;
-                                                    }
-                                                    return false;
-                                                };
+                                                const isExpertTailoringNameNullOrNumber = data.Expert_Tailoring_Name === null || data.Expert_Tailoring_Name === undefined || typeof data.Expert_Tailoring_Name !== 'string';
+                                                const isSizeImageURLNullOrNumber = data.Size_Image_Url === null || data.Size_Image_Url === undefined || typeof data.Size_Image_Url !== 'string';
 
                                                 const isDuplicate = excelData.some((item, i) => {
                                                     if (i !== index) {
-                                                        return item.Category_Name === data.Category_Name && item.Material_Name === data.Material_Name;
+                                                        return item.Expert_Tailoring_Name === data.Expert_Tailoring_Name && item.Size_Image_Url === data.Size_Image_Url;
                                                     }
                                                     return false;
                                                 });
 
-                                                if (hasNullValues || isCategoryNameNull || isMaterialNameNull || isHsCodeNullOrNotString || isBasePriceNullOrNotNumberOrZero || isUnitNullOrNotString || isDuplicate || isUnitNumber()) {
+                                                if (hasNullValues || isExpertTailoringNameNullOrNumber || isSizeImageURLNullOrNumber || isDuplicate) {
                                                     const errorMessage = [];
                                                     if (hasNullValues) errorMessage.push('Null Values');
-                                                    if (isCategoryNameNull) errorMessage.push('Category Name Is Null');
-                                                    if (isBasePriceNullOrNotNumberOrZero) errorMessage.push('Base Price Is Invalid');
-                                                    if (isMaterialNameNull) errorMessage.push('Material Name Is Null');
-                                                    if (isUnitNullOrNotString) errorMessage.push('Unit Is Invalid');
-                                                    if (isHsCodeNullOrNotString) errorMessage.push('HS Code Is Invalid');
+                                                    if (isSizeImageURLNullOrNumber) errorMessage.push('Size Image URL Is Invalid');
+                                                    if (isExpertTailoringNameNullOrNumber) errorMessage.push('Expert Tailoring Name Is Invalid');
                                                     if (isDuplicate) errorMessage.push('Duplicate Entry');
-                                                    if (isUnitNumber()) errorMessage.push('Invalid Type of Unit');
 
                                                     return (
                                                         <div style={{ color: 'red' }}>
@@ -623,4 +623,4 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
     );
 };
 
-export default AddMultipleComponentWithExcel;
+export default AddMultipleExpertTailoringComponentWithExcel;

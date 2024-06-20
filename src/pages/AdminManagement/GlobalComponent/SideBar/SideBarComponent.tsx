@@ -175,7 +175,7 @@ const SideBarComponent = () => {
                             setSelected={setSelected}
                         />
                         <Item
-                            title={t(codeLanguage + '000212')}
+                            title={t(codeLanguage + '000215')}
                             to="/admin_manager_category"
                             icon={<PeopleOutlinedIcon />}
                             selected={selected}

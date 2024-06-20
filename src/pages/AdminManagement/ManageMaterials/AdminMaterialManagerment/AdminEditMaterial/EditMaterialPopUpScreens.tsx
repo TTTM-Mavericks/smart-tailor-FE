@@ -61,7 +61,7 @@ const EditMaterialPopUpScreens: React.FC<EditMaterialPopUpScreenFormProps> = ({ 
                 throw new Error('Error updating material');
             }
 
-            updateMaterial(response.data);
+            updateMaterial(response.data.data);
 
             sessionStorage.setItem("obj", JSON.stringify(formData));
 

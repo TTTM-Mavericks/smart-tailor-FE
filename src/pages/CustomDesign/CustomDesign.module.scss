@@ -136,7 +136,7 @@
 
     }
 
-    &__itemEditor{
+    &__itemEditor {
         overflow: hidden;
         position: relative;
         width: 25%;
@@ -288,9 +288,10 @@
                     height: 65vh;
                     display: flex;
                     justify-content: center;
-                    align-items: center;
+                    // align-items: center;
                     flex-wrap: wrap;
                     overflow: auto;
+                    margin-top: 50px;
                 }
 
                 &__modelProductList::-webkit-scrollbar {
@@ -368,11 +369,12 @@
                 display: flex;
                 align-items: center;
                 justify-content: left;
-            
+
                 &__buttonGroup {
                     width: 100%;
                     display: flex;
                     justify-content: flex-start;
+
                     button {
                         background-color: $whiteColor;
                         border: 2px solid $primaryColor;
@@ -384,7 +386,7 @@
                         display: flex;
                         align-items: center;
                         justify-content: center;
-            
+
                         span {
                             margin-left: 5px;
                             margin-right: 5px;
