@@ -12,16 +12,11 @@ import { useTranslation } from 'react-i18next';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { styled } from '@mui/system';
+import { Material } from '../../../../models/BrandMaterialExcelModel';
+import axios from 'axios';
+import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 
-interface Material {
-    id: number;
-    category_name: string;
-    material_name: string;
-    price: number;
-    unit: string;
-}
-
-const brand_name = "LV";
+const brandName = "LA LA LISA BRAND";
 
 interface AddMaterialWithHandsFormProps {
     closeCard: () => void;
@@ -44,10 +39,10 @@ const StyledButton = styled(Button)(({ theme }) => ({
 
 const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ closeCard, addNewMaterial }) => {
     const [formData, setFormData] = useState({
-        category_name: '',
-        material_name: '',
-        price: 0,
-        unit: '',
+        categoryName: 'Category',
+        materialName: 'mATERIAL',
+        price: 110000000,
+        unit: 'm'
     });
 
     const _handleFormChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -64,20 +59,16 @@ const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
 
             console.log('Form Data:', JSON.stringify(formData));
 
-            const response = await fetch('https://66080c21a2a5dd477b13eae5.mockapi.io/CPSE_CHART', {
-                method: 'POST',
+            const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_material + functionEndpoints.brand.addManual}`, {
+                ...formData,
+                brandName
+            }, {
                 headers: {
                     'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ ...formData, brand_name }),
+                }
             });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-            const responseData = await response.json();
-
+            const responseData = response.data;
             console.log('Response:', responseData);
 
             if (responseData) {
@@ -93,10 +84,10 @@ const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
     };
 
     const validateFormData = () => {
-        const { category_name, material_name, price, unit } = formData;
+        const { categoryName, materialName, price, unit } = formData;
 
         const specialCharsRegex = /[!@#$%^&*(),.?":{}|<>0-9]/;
-        if (specialCharsRegex.test(category_name) || specialCharsRegex.test(material_name)) {
+        if (specialCharsRegex.test(categoryName) || specialCharsRegex.test(materialName)) {
             toast.error('Category Name and Material Name should not contain special characters or numbers');
             return false;
         }
@@ -143,7 +134,7 @@ const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
                             variant="outlined"
                             size="small"
                             name="category_name"
-                            value={formData.category_name}
+                            value={formData.categoryName}
                             onChange={_handleFormChange}
                         />
                     </Grid>
@@ -154,7 +145,7 @@ const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
                             variant="outlined"
                             size="small"
                             name="material_name"
-                            value={formData.material_name}
+                            value={formData.materialName}
                             onChange={_handleFormChange}
                         />
                     </Grid>
@@ -180,6 +171,17 @@ const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
                             onChange={_handleFormChange}
                         />
                     </Grid>
+                    {/* <Grid item xs={10}>
+                        <AnimatedTextField
+                            fullWidth
+                            label="HS Code"
+                            variant="outlined"
+                            size="small"
+                            name="hsCode"
+                            value={formData.hsCode}
+                            onChange={_handleFormChange}
+                        />
+                    </Grid> */}
                 </Grid>
             </Box>
             <Box sx={{ p: 2, textAlign: 'center' }}>

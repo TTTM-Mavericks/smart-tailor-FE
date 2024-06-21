@@ -1,28 +1,20 @@
 import { Box, Button, IconButton, Menu, MenuItem, Modal } from "@mui/material";
 import { DataGrid, GridToolbar, GridColDef } from "@mui/x-data-grid";
-import { tokens } from "../../../theme";
+import { tokens } from "../../../../../theme";
 import { useTheme } from "@mui/material";
 import * as React from "react";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Swal from "sweetalert2";
-import EditUserPopUpScreens from "./EditUsersPopUpScreens";
+import EditExpertTailoringPopUpScreens from "../ManagerEditExpertTailoring/EditExpertTailoringPopUpScreens";
 import { Add } from "@mui/icons-material";
-import AddEachUsersWithHand from "./AddEachWithHand/AddEachUsersWithHandScreens";
-import AddMultipleComponentWithExcel from "./AddMultipleUserWithExcel/AddMultipleUsersComponent";
+import AddEachExpertTailoringWithHand from "../../AddEachWithHand/AddEachExpertTailoringWithHandScreens";
+import AddMultipleExpertTailoringComponentWithExcel from "../../AddMultipleExpertTailoringWithExcel/AddMultipleExpertTailoringComponent";
 import { useTranslation } from 'react-i18next';
-
-interface User {
-    id: number;
-    registrarId: string;
-    name: string;
-    age: number;
-    phone: string;
-    email: string;
-    address: string;
-    city: string;
-    zipCode: string;
-}
+import axios from "axios";
+import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
+import { ExpertTailoring } from "../../../../../models/ManagerExpertTailoringModel";
+import { ExpertTailoringEdit } from "../../../../../models/ManagerExpertTailoringModel";
 
 // Make Style of popup
 const style = {
@@ -38,13 +30,13 @@ const style = {
     borderRadius: "20px"
 };
 
-const ManageUsers: React.FC = () => {
+const ManageExpertTailoring: React.FC = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [data, setData] = React.useState<User[]>([]);
+    const [data, setData] = React.useState<ExpertTailoring[]>([]);
 
-    // set formid to pass it to component edit user
-    const [formId, setFormId] = React.useState<User | null>(null);
+    // set formid to pass it to component edit Material
+    const [formId, setFormId] = React.useState<ExpertTailoringEdit | null>(null);
 
     // Open Edit PopUp when clicking on the edit icon
     const [editopen, setEditOpen] = React.useState<boolean>(false);
@@ -60,7 +52,6 @@ const ManageUsers: React.FC = () => {
     const _handleClose = () => {
         setAnchorEl(null);
     };
-    console.log("anchorEl" + anchorEl);
 
     // close open pop up
     const [addOpenOrClose, setAddOpenOrClose] = React.useState<boolean>(false)
@@ -97,19 +88,19 @@ const ManageUsers: React.FC = () => {
     }, [selectedLanguage, i18n]);
 
     React.useEffect(() => {
-        const apiUrl = 'https://66080c21a2a5dd477b13eae5.mockapi.io/CPSE_DATA_TEST';
-        fetch(apiUrl)
+        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.getAllExpertTailoring}`;
+
+        axios.get(apiUrl)
             .then(response => {
-                if (!response.ok) {
+                if (response.status !== 200) {
                     throw new Error('Network response was not ok');
                 }
-                return response.json();
+                return response.data;
             })
             .then((responseData) => {
-                if (responseData && Array.isArray(responseData)) {
-                    setData(responseData);
+                if (responseData && Array.isArray(responseData.data)) {
+                    setData(responseData.data);
                     console.log("Data received:", responseData);
-
                 } else {
                     console.error('Invalid data format:', responseData);
                 }
@@ -118,50 +109,47 @@ const ManageUsers: React.FC = () => {
     }, []);
 
     // Thêm người dùng mới vào danh sách
-    const _handleAddUser = (newUser: User) => {
-        setData(prevData => [...prevData, newUser]);
+    const _handleAddExpertTailoring = (addNewExpertTailoring: ExpertTailoring) => {
+        setData(prevData => [...prevData, addNewExpertTailoring]);
     }
 
     // Cập nhật người dùng trong danh sách
-    const _handleUpdateUser = (updatedUser: User) => {
-        setData(prevData => prevData.map(user => user.id === updatedUser.id ? updatedUser : user));
+    const _handleUpdateMaterial = (updatedExpertTailoring: ExpertTailoringEdit) => {
+        setData(prevData => prevData.map((ExpertTailoring: any) => ExpertTailoring.expertTailoringID === updatedExpertTailoring.expertTailoringID ? updatedExpertTailoring : ExpertTailoring));
     }
 
     // EDIT 
-    const _handleEditClick = (id: number, registrarId: string, name: string, age: number, phone: string, email: string, address: string, city: string, zipCode: string) => {
+    const _handleEditClick = (
+        expertTailoringID: string,
+        expertTailoringName: string,
+        sizeImageUrl: string,
+    ) => {
         // Handle edit action
-        const userDataToEdit: User = {
-            id: id,
-            registrarId: registrarId,
-            name: name,
-            age: age,
-            phone: phone,
-            email: email,
-            address: address,
-            city: city,
-            zipCode: zipCode
+        const ExpertTailoringDataToEdit: ExpertTailoringEdit = {
+            expertTailoringID: expertTailoringID,
+            expertTailoringName: expertTailoringName,
+            sizeImageUrl: sizeImageUrl,
         }
-        setFormId(userDataToEdit);
+        setFormId(ExpertTailoringDataToEdit);
         _handleEditOpen();
     };
 
     //DELETE OR UPDATE
-    const _handleDeleteClick = async (id: number) => {
-        // Handle delete action
+    const _handleDeleteClick = async (expertTailoringID: string) => {
         try {
-            const response = await fetch(`https://66080c21a2a5dd477b13eae5.mockapi.io/CPSE_DATA_TEST/${id}`, {
-                method: 'DELETE',
-            });
-            if (!response.ok) {
-                throw new Error('Error deleting user');
+            const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.updateStatusExpertTailoring}`;
+
+            const response = await axios.put(apiUrl + `/${expertTailoringID}`)
+
+            if (!response.data) {
+                throw new Error('Error deleting material');
             }
-            const data = await response.json();
-            return data;
+
+            return response.data;
         } catch (error) {
             throw error;
         }
-
-    }
+    };
 
     // confirm 
     const _hanldeConfirmDelete = async (id: number) => {
@@ -176,15 +164,23 @@ const ManageUsers: React.FC = () => {
                 confirmButtonText: `${t(codeLanguage + '000063')}`,
                 cancelButtonText: `${t(codeLanguage + '000055')}`
             });
+
             if (result.isConfirmed) {
-                await _handleDeleteClick(id);
+                await _handleDeleteClick(id.toString()); // Ensure id is converted to string if necessary
                 Swal.fire(
                     `${t(codeLanguage + '000064')}`,
                     `${t(codeLanguage + '000065')}`,
                     'success'
-                )
-                // Loại bỏ người dùng khỏi danh sách hiện tại
-                setData(prevData => prevData.filter(user => user.id !== id));
+                );
+
+                // Update the deleted material from the current data list
+                setData((prevData: any) =>
+                    prevData.map((expertTailoring: any) =>
+                        expertTailoring.expertTailoringID === id
+                            ? { ...expertTailoring, status: !expertTailoring.status }
+                            : expertTailoring
+                    )
+                );
             } else {
                 Swal.fire(
                     `${t(codeLanguage + '000066')}`,
@@ -192,51 +188,32 @@ const ManageUsers: React.FC = () => {
                     'error'
                 );
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error:', error);
+            Swal.fire(
+                'Error',
+                `${error.message || 'Unknown error'}`,
+                'error'
+            );
         }
     };
 
-
     const columns: GridColDef[] = [
-        { field: "id", headerName: "ID", flex: 0.5 },
-        { field: "registrarId", headerName: "Registrar ID" },
         {
-            field: "name",
-            headerName: "Name",
+            field: "expertTailoringName",
+            headerName: "ExpertTailoring Name",
             flex: 1,
         },
         {
-            field: "age",
-            headerName: "Age",
-            type: "number",
+            field: "sizeImageUrl",
+            headerName: "Size Image Url",
+            flex: 1,
+        },
+        {
+            field: "status",
+            headerName: "Status",
             headerAlign: "left",
             align: "left",
-        },
-        {
-            field: "phone",
-            headerName: "Phone Number",
-            flex: 1,
-        },
-        {
-            field: "email",
-            headerName: "Email",
-            flex: 1,
-        },
-        {
-            field: "address",
-            headerName: "Address",
-            flex: 1,
-        },
-        {
-            field: "city",
-            headerName: "City",
-            flex: 1,
-        },
-        {
-            field: "zipCode",
-            headerName: "Zip Code",
-            flex: 1,
         },
         {
             field: "actions",
@@ -245,10 +222,10 @@ const ManageUsers: React.FC = () => {
             sortable: false,
             renderCell: (params) => (
                 <Box>
-                    <IconButton onClick={() => _handleEditClick(params.row.id, params.row.registrarId, params.row.name, params.row.age, params.row.email, params.row.phone, params.row.address, params.row.city, params.row.zipCode)}>
+                    <IconButton onClick={() => _handleEditClick(params.row.expertTailoringID, params.row.expertTailoringName, params.row.sizeImageUrl)}>
                         <EditIcon />
                     </IconButton>
-                    <IconButton onClick={() => _hanldeConfirmDelete(params.row.id)}>
+                    <IconButton onClick={() => _hanldeConfirmDelete(params.row.expertTailoringID)}>
                         <DeleteIcon htmlColor={colors.primary[300]} />
                     </IconButton>
                 </Box>
@@ -256,9 +233,7 @@ const ManageUsers: React.FC = () => {
         }
     ];
 
-    const getRowId = (row: any) => {
-        return row.registrarId; // Sử dụng một thuộc tính duy nhất làm id cho mỗi hàng
-    };
+    const getRowId = (row: any) => `${row.expertTailoringID}-${row.expertTailoringName}-${row.sizeImageUrl}`;
 
     return (
         <Box m="20px">
@@ -338,7 +313,7 @@ const ManageUsers: React.FC = () => {
                                 p: 4,
                                 borderRadius: "20px"
                             }}>
-                                <AddEachUsersWithHand closeCard={_handleAddClose} addNewUser={_handleAddUser} />
+                                <AddEachExpertTailoringWithHand closeCard={_handleAddClose} addNewExpertTailoring={_handleAddExpertTailoring} />
                             </Box>
                         </Modal>
                     </MenuItem>
@@ -362,7 +337,7 @@ const ManageUsers: React.FC = () => {
                                 p: 4,
                                 borderRadius: "20px"
                             }}>
-                                <AddMultipleComponentWithExcel closeMultipleCard={_handleAddMultipleClose} addNewUser={_handleAddUser} />
+                                <AddMultipleExpertTailoringComponentWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddExpertTailoring} />
                             </Box>
                         </Modal>
 
@@ -373,7 +348,6 @@ const ManageUsers: React.FC = () => {
                     rows={data}
                     columns={columns}
                     slots={{ toolbar: GridToolbar }}
-                    // checkboxSelection
                     disableRowSelectionOnClick
                     getRowId={getRowId}
                 />
@@ -384,10 +358,10 @@ const ManageUsers: React.FC = () => {
                 >
                     <Box sx={style}>
                         {formId !== null && (
-                            <EditUserPopUpScreens
+                            <EditExpertTailoringPopUpScreens
                                 editClose={_handleEditClose}
                                 fid={formId}
-                                updateUser={_handleUpdateUser}
+                                updateExpertTailoring={_handleUpdateMaterial}
                             />
                         )}
                     </Box>
@@ -397,4 +371,4 @@ const ManageUsers: React.FC = () => {
     );
 };
 
-export default ManageUsers;
+export default ManageExpertTailoring;

@@ -11,7 +11,6 @@ import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import Rating from '@mui/material/Rating';
 import { motion, useInView } from 'framer-motion';
-import { TokenRefreshDialogComponent } from '../Authentication';
 
 const products = [
     {

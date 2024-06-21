@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Button, TextField, Box, Typography, IconButton, Grid } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { ExcelData } from '../../../../../models/BrandMaterialExcelModel';
+import { ExcelData } from '../../../../../models/AdminMaterialExcelModel';
 
-interface EditMultipleMaterialInExcelTableProps {
+interface EditMultipleMaterialsInExcelTableProps {
     open: boolean;
     onClose: () => void;
     data: ExcelData;
@@ -11,8 +11,8 @@ interface EditMultipleMaterialInExcelTableProps {
     updateData: (editedData: ExcelData, index: number) => void;
 }
 
-const EditMultipleMaterialInExcelTable: React.FC<EditMultipleMaterialInExcelTableProps> = ({ open, onClose, data, index, updateData }) => {
-    const [editedData, setEditedData] = useState<any>(data);
+const EditMultipleMaterialsInExcelTable: React.FC<EditMultipleMaterialsInExcelTableProps> = ({ open, onClose, data, index, updateData }) => {
+    const [editedData, setEditedData] = useState(data);
 
     const _handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -29,7 +29,7 @@ const EditMultipleMaterialInExcelTable: React.FC<EditMultipleMaterialInExcelTabl
 
         <Box style={{ height: '500px', overflowY: 'auto' }}>
             <Typography variant="h5" align="left">
-                Edit Material
+                Edit Category and Material
             </Typography>
             <IconButton
                 style={{ position: "absolute", top: 0, right: 0 }}
@@ -40,18 +40,22 @@ const EditMultipleMaterialInExcelTable: React.FC<EditMultipleMaterialInExcelTabl
             <Box height={50} />
             <Grid container spacing={4}>
                 <Grid item xs={11}>
-                    <TextField name="Category_Name" label="Category Name" value={editedData?.Category_Name} fullWidth />
+                    <TextField name="Category_Name" label="Category_Name" value={editedData?.Category_Name} onChange={_handleChange} fullWidth />
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField name="Material_Name" label="Material Name" value={editedData?.Material_Name} fullWidth />
+                    <TextField name="Material_Name" label="Material_Name" value={editedData?.Material_Name} onChange={_handleChange} fullWidth />
 
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField name="Price" label="Price" value={editedData?.Price} type='number' onChange={_handleChange} fullWidth />
+                    <TextField name="HS_Code" label="HS_Code" value={editedData?.HS_Code} onChange={_handleChange} fullWidth />
 
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField name="unit" label="Unit" value={editedData?.Unit} fullWidth />
+                    <TextField name="Unit" label="Unit" value={editedData?.Unit} onChange={_handleChange} fullWidth />
+
+                </Grid>
+                <Grid item xs={11}>
+                    <TextField name="Base_Price" label="Base_Price" value={editedData?.Base_Price} onChange={_handleChange} fullWidth />
 
                 </Grid>
             </Grid>
@@ -64,4 +68,4 @@ const EditMultipleMaterialInExcelTable: React.FC<EditMultipleMaterialInExcelTabl
     );
 };
 
-export default EditMultipleMaterialInExcelTable;
+export default EditMultipleMaterialsInExcelTable;
