@@ -182,7 +182,7 @@ const ProfileSettings: React.FC = () => {
 
         // Make API call to update the profile using PUT method
         try {
-            const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0YW1tdHNlMTYxMDg3QGZwdC5lZHUudm4iLCJpYXQiOjE3MTgyODUyMTMsImV4cCI6MTcxODM3MTYxM30.UUpy2s9SwYGF_TyIru6VASQ-ZzGTOqx7mkWkcSR2__0'; // Replace with the actual bearer token
+            const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0YW1tdHNlMTYxMDg3QGZwdC5lZHUudm4iLCJpYXQiOjE3MTkwNTg3MTEsImV4cCI6MTcxOTE0NTExMX0.rAT-emVV8BJUd5cNGbQm7tAw-8uIj5_PD3c8v_HBuWQ'; // Replace with the actual bearer token
             const response = await axios.put(
                 `${baseURL + versionEndpoints.v1 + featuresEndpoints.customer + functionEndpoints.customer.updateProfile}`,
                 updatedProfileData,

@@ -362,7 +362,7 @@ const ManageCategories: React.FC = () => {
                             <EditMaterialPopUpScreens
                                 editClose={_handleEditClose}
                                 fid={formId}
-                                updateMaterial={_handleUpdateCategory}
+                                updateCategory={_handleUpdateCategory}
                             />
                         )}
                     </Box>

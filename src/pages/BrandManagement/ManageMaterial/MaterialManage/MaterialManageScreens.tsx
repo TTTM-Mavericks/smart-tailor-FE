@@ -10,16 +10,10 @@ import EditIcon from '@mui/icons-material/Edit';
 import Swal from "sweetalert2";
 import EditMaterialPopUpScreens from "./EditMaterial/EditMaterialPopUpScreens";
 import AddEachMaterialWithHand from "../AddEachWithHand/AddEachMaterialWithHandScreens";
+import { AddMaterial, ExcelData } from "../../../../models/BrandMaterialExcelModel";
+import { Material } from "../../../../models/BrandMaterialExcelModel";
 import AddMultipleMaterialWithExcel from "../CRUDMaterialWithExcelTable/AddMultipleInExcelTable/AddMultipleMaterialComponent";
-
-interface Material {
-    id: number,
-    categoryName: string,
-    materialName: string,
-    price: number,
-    unit: string
-}
-
+import { UpdateMaterial } from "../../../../models/BrandMaterialExcelModel";
 const brand_name = "LV"
 
 // Make Style of popup
@@ -44,7 +38,7 @@ const ManageMaterialComponent: React.FC = () => {
     const [data, setData] = React.useState<Material[]>([]);
 
     // set formid to pass it to component edit user
-    const [formId, setFormId] = React.useState<Material | null>(null);
+    const [formId, setFormId] = React.useState<AddMaterial | null>(null);
 
     // Open Edit PopUp when clicking on the edit icon
     const [editopen, setEditOpen] = React.useState<boolean>(false);
@@ -117,28 +111,40 @@ const ManageMaterialComponent: React.FC = () => {
     }, []);
 
     // Thêm người dùng mới vào danh sách
-    const _handleAddMaterial = (newMaterial: Material) => {
-        setData(prevData => [...prevData, newMaterial]);
+    const _handleAddMaterial = (newMaterial: AddMaterial) => {
+        setData((prevData: any) => [...prevData, newMaterial]);
     }
 
+    const _handleAddMultipleMaterial = (newMaterial: ExcelData) => {
+        setData((prevData: any) => [...prevData, newMaterial]);
+    }
+
+
     // Cập nhật người dùng trong danh sách
-    const _handleUpdateMaterial = (updatedMaterial: Material) => {
-        setData(prevData => prevData.map(material => material.id === updatedMaterial.id ? updatedMaterial : material));
+    const _handleUpdateMaterial = (updatedMaterial: UpdateMaterial) => {
+        setData(prevData => prevData.map((material: any) => material.id === updatedMaterial.id ? updatedMaterial : material));
     }
 
     // EDIT 
-    const _handleEditClick = (id: number,
+    const _handleEditClick = (
+        id: number,
+        brandName: string,
         categoryName: string,
         materialName: string,
-        price: number,
-        unit: string) => {
+        hsCode: number,
+        unit: string,
+        basePrice: number,
+        brandPrice: number) => {
         // Handle edit action
-        const materialDataToEdit: Material = {
+        const materialDataToEdit: UpdateMaterial = {
             id: id,
+            brandName: brandName,
             categoryName: categoryName,
             materialName: materialName,
-            price: price,
-            unit: unit
+            hsCode: hsCode,
+            unit: unit,
+            basePrice: basePrice,
+            brandPrice: brandPrice
         }
         setFormId(materialDataToEdit);
         _handleEditOpen();
@@ -210,7 +216,7 @@ const ManageMaterialComponent: React.FC = () => {
             flex: 1,
         },
         {
-            field: "price",
+            field: "brandPrice",
             headerName: "Price",
             type: "number",
             headerAlign: "left",
@@ -233,7 +239,7 @@ const ManageMaterialComponent: React.FC = () => {
             sortable: false,
             renderCell: (params) => (
                 <Box>
-                    <IconButton onClick={() => _handleEditClick(params.row.id, params.row.category_name, params.row.material_name, params.row.price, params.row.unit)}>
+                    <IconButton onClick={() => _handleEditClick(params.row.id, params.row.categoryName, params.row.materialName, params.row.hsCode, params.row.unit, params.row.brandPrice, params.row.basePrice, params.row.brandName)}>
                         <EditIcon />
                     </IconButton>
                     <IconButton onClick={() => _hanldeConfirmDelete(params.row.id)}>
@@ -244,7 +250,7 @@ const ManageMaterialComponent: React.FC = () => {
         }
     ];
 
-    const getRowId = (row: any) => `${row.brandName}-${row.materialName}-${row.createDate}`;
+    const getRowId = (row: any) => `${row.id}-${row.materialName}`;
 
     return (
         <Box m="20px">
@@ -348,7 +354,7 @@ const ManageMaterialComponent: React.FC = () => {
                                 p: 4,
                                 borderRadius: "20px"
                             }}>
-                                <AddMultipleMaterialWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddMaterial} />
+                                <AddMultipleMaterialWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddMultipleMaterial} />
                             </Box>
                         </Modal>
 

@@ -211,7 +211,6 @@ const ManageMaterials: React.FC = () => {
         {
             field: "basePrice",
             headerName: "basePrice",
-            type: "number",
             headerAlign: "left",
             align: "left",
         },
