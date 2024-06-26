@@ -151,8 +151,9 @@ const Shirt = ({isDefault}) => {
                             rotation={[0, 0, -degreesToEuler(item.rotate)]}
                             scale={__handleScale(item)}
                             map={item.texture}
-                            depthTest={true}
+                            // depthTest={true}
                             depthWrite={true}
+                            dispose={true}
                         />
                     ))
                 ))}

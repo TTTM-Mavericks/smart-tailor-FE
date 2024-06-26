@@ -100,7 +100,7 @@ const ImageDraggableComponent: React.FC<props> = ({
      */
     useEffect(() => {
         __handleSetNewPartOfDesignData();
-    }, [itemPositions, itemZIndices, size.width, size.height, selectedItemDrag, data]);
+    }, [itemPositions, itemZIndices, size.width, size.height, selectedItemDrag]);
 
     /**
      * Set size of resizable
@@ -190,6 +190,7 @@ const ImageDraggableComponent: React.FC<props> = ({
         setSelectedItemDrag(item);
         if (onSetIsOtherItemSelected) {
             onSetIsOtherItemSelected(item.itemMaskID);
+            
         }
     };
 
@@ -203,8 +204,7 @@ const ImageDraggableComponent: React.FC<props> = ({
         const target = e.target as HTMLElement;
         if (target) {
             e.preventDefault();
-            // setSelectedItemDrag(item);
-
+            setSelectedItemDrag(item);
         }
     };
 
@@ -261,14 +261,12 @@ const ImageDraggableComponent: React.FC<props> = ({
      */
     const __handleResizeStart = () => {
         setResizing(true);
-        setResizing(true);
     };
 
     /**
      * Handle logic when onResize trigger
      */
     const __handleOnResize = (e: any) => {
-        console.log('__handleOnResize');
         setResizing(true);
     };
 
@@ -276,8 +274,6 @@ const ImageDraggableComponent: React.FC<props> = ({
      * Handle logic when onResizeEnd trigger
      */
     const __handleResizeEnd: ResizeCallback = (e, direction, refToElement, delta) => {
-        console.log('__handleResizeEnd');
-
         const target = refToElement as HTMLElement;
         if (target) {
             target.style.cursor = 'grab';
@@ -414,7 +410,7 @@ const ImageDraggableComponent: React.FC<props> = ({
                             handleWrapperStyle={{ pointerEvents: 'auto' }}
                             className={`${styles.resizeable__element}`}
                         >
-                            {selectedItemDrag === item && (
+                            {selectedItemDrag?.itemMaskID === item.itemMaskID && (
                                 <>
                                     <div className={`${styles.resizeable__element__resizeIcon__icon1}`} ></div>
                                     <div className={`${styles.resizeable__element__resizeIcon__icon2}`} ></div>
@@ -430,7 +426,7 @@ const ImageDraggableComponent: React.FC<props> = ({
                                     />
                                 </>
                             )}
-                            <img src={item.imageUrl} className={`${styles.item__img__resizeable}`} style={{ border: selectedItemDrag === item ? '1px solid black' : 'none', pointerEvents: 'auto' }} onClick={() => __handleSelectedIteamDrag(item)} alt="Draggable Image" />
+                            <img src={item.imageUrl} className={`${styles.item__img__resizeable}`} style={{ border: selectedItemDrag?.itemMaskID === item.itemMaskID ? '1px solid black' : 'none', pointerEvents: 'auto' }} onClick={() => __handleSelectedIteamDrag(item)} alt="Draggable Image" />
                         </Resizable>
                     </div>
                 </Draggable>

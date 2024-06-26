@@ -73,18 +73,33 @@ const CustomPopper = (props: any) => {
 
 const CustomTextField = styled(TextField)(({ theme }) => ({
     '& .MuiInputBase-root': {
-        height: '35px',
-        width: '150px',
-        borderRadius: '8px',
-        outLine: 'none'
+      height: '35px',
+      width: '150px',
+      borderRadius: '8px',
+      outline: 'none',
     },
     '& .MuiOutlinedInput-input': {
-        fontSize: '12px',
+      fontSize: '12px',
     },
     '& .MuiInputLabel-root': {
-        fontSize: '12px', // Adjust font size of the label
+      fontSize: '12px', // Adjust font size of the label
     },
-}));
+    '& .MuiInputLabel-root.Mui-focused': {
+        color: primaryColor, // Label color when focused
+      },
+    '& .MuiOutlinedInput-root': {
+      '& fieldset': {
+        border: `1.5px solid ${primaryColor}`, // Initial border color
+      },
+      '&:hover fieldset': {
+        border: `1.5px solid ${primaryColor}`, // Border color on hover,
+        color: primaryColor
+      },
+      '&.Mui-focused fieldset': {
+        border: `1.5px solid ${primaryColor}`, // Border color when focused
+      },
+    },
+  }));
 
 
 const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesigndata, primaryKey }) => {
@@ -391,6 +406,7 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                                         <label
                                             htmlFor={`filter-mobile-${type.value}`}
                                             className="ml-2 min-w-0 flex-1 text-gray-500"
+                                            style={{fontSize: 11}}
                                         >
                                             {type.lable}
                                         </label>
