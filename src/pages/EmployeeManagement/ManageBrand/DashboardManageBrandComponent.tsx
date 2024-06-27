@@ -1,7 +1,7 @@
 import { Box, CssBaseline, useMediaQuery, useTheme } from "@mui/material";
 import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
 import theme, { tokens } from '../../../theme';
-import styles from "./DashBoardUserStyle.module.scss"
+import styles from "./DashboardManagerBrandStyles.module.scss"
 import NotFound from '../GlobalComponent/Error404/Error404Component';
 import SideBarEmployeeComponent from '../GlobalComponent/SideBar/SideBarEmployeeComponent';
 import TopbarEmployeeComponent from '../GlobalComponent/TopBar/TopBarEmployeeComponent';

@@ -3,27 +3,26 @@ import DownloadIcon from '@mui/icons-material/CloudDownload';
 import { Box, Button, IconButton, Modal, Typography } from '@mui/material';
 import { Cancel, CheckCircleRounded, Close, ErrorOutline } from '@mui/icons-material';
 import * as XLSX from "xlsx-js-style";
-import { tokens } from '../../../../../theme';
+import { tokens } from '../../../../theme';
 import { useTheme } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import EditMultipleMaterialInExcelTable from '../EditMaterialInExcelTable/EditMultipleUsersInExcelTable';
+import EditMultipleUsersInExcelTable from './CRUDWithExcelTable/EditMultipleMaterialInExcelTable';
+const ADDUSERWITHFILEEXCELS = 'http://localhost:3000/Import_Brand_Material.xlsx';
 import { useTranslation } from 'react-i18next';
-import { ExcelData } from '../../../../../models/BrandMaterialExcelModel';
-import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
+import { ExcelData } from '../../../../models/ManagerExpertTailoringModel';
 import axios from 'axios';
-const brand_name = "LA LA LISA BRAND"
+import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import ExcelJS from 'exceljs';
 import { toast, ToastContainer } from 'react-toastify';
+import { swatch } from '../../../../assets';
 import Swal from 'sweetalert2';
-import Cookies from 'js-cookie';
 
-// const BRANDNAME = localStorage.getItem('brandName')
-
-interface AddMaterialWithMultipleExcelFormProps {
+interface AddExpertTailoringWithMultipleExcelFormProps {
     closeMultipleCard: () => void;
-    addNewMaterial: (addNewMaterial: ExcelData) => void
+    addNewMaterial: (addedNewMaterial: ExcelData) => void
 }
+
 
 // Make Style of popup
 const style = {
@@ -37,10 +36,10 @@ const style = {
     boxShadow: 24,
     p: 4,
     borderRadius: "20px"
-
 };
 
-const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormProps> = ({ closeMultipleCard }) => {
+const AddMultipleExpertTailoringComponentWithExcel: React.FC<AddExpertTailoringWithMultipleExcelFormProps> = ({ closeMultipleCard }) => {
+
     // ---------------UseState Variable---------------//
     const [error, setError] = React.useState<string>('');
     const [excelData, setExcelData] = React.useState<ExcelData[]>([]);
@@ -49,13 +48,16 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
     const [editingData, setEditingData] = React.useState<ExcelData | null>(null);
     const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
     const [editOpen, setEditOpen] = React.useState<boolean>(false);
-
-
-
-    // ---------------Usable Variable---------------//
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
+    // ---------------Usable Variable---------------//
+    // Get language in local storage
+    const selectedLanguage = localStorage.getItem('language');
+    const codeLanguage = selectedLanguage?.toUpperCase();
+
+    // Using i18n
+    const { t, i18n } = useTranslation();
 
     const hasDataChanged = () => {
         if (JSON.stringify(originalData) !== JSON.stringify(excelData)) {
@@ -97,14 +99,6 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
         _handleEditClose()
     };
 
-
-    // Get language in local storage
-    const selectedLanguage = localStorage.getItem('language');
-    const codeLanguage = selectedLanguage?.toUpperCase();
-
-    // Using i18n
-    const { t, i18n } = useTranslation();
-
     // ---------------UseEffect---------------//
     React.useEffect(() => {
         if (selectedLanguage !== null) {
@@ -115,12 +109,12 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
     // ---------------FunctionHandler---------------//
 
     /**
-     * 
-     * @param e 
-     * @returns 
-     * Check Validate With The File
-     * If file not excel then show error
-     */
+    * 
+    * @param e 
+    * @returns 
+    * Check Validate With The File
+    * If file not excel then show error
+    */
     const _handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             const file = e.target.files[0];
@@ -143,7 +137,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
 
                         // Update error property for duplicate entries
                         const updatedData = jsonData.map(item => {
-                            const hasNullName = !item.materialName;
+                            const hasNullName = !item.expertTailoringName;
                             return { ...item, error: hasNullName };
                         });
 
@@ -151,7 +145,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                         setExcelData(updatedData)
                         setOriginalData(updatedData);
                         updatedData.forEach(item => {
-                            console.log(`Category: ${item.Category_Name}, Material Name: ${item.Material_Name}, Unit: ${item.Unit}`);
+                            console.log(`Category: ${item.Expert_Tailoring_Name}, Material Name: ${item.Size_Image_Url}`);
                         });
                         console.log(updatedData);
                     }
@@ -165,7 +159,6 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
         }
     };
 
-
     /**
      * Upload The File and Brand Name to Back End
      * If one field Error or dupplicate then it throw error
@@ -178,7 +171,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
 
         const formData = new FormData();
         formData.append('file', selectedFile);
-        formData.append('brandName', 'LA LA LISA BRAND');
+        // formData.append('brandName', 'LA LA LISA BRAND');
 
         // Log information about the file
         console.log('File name:', selectedFile.name);
@@ -186,13 +179,14 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
         console.log('File type:', selectedFile.type);
 
         try {
-            const token = Cookies.get('token');
-            const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_material + functionEndpoints.brand.addExcel}`, formData,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                }
+            // const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0YW1tdHNlMTYxMDg3QGZwdC5lZHUudm4iLCJpYXQiOjE3MTkwNTgwNDcsImV4cCI6MTcxOTE0NDQ0N30.Fg4vSWnTy71sWQfulQbhVzn3BuIaRQ5cI-dRKF7FSmo'; // Replace with the actual bearer token
+            const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.addNewExpertTailoringByExcelFile}`, formData,
+
+                // {
+                //     headers: {
+                //         'Authorization': `Bearer ${token}`
+                //     }
+                // }
             );
 
             // Handle successful response
@@ -205,6 +199,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                 });
                 closeMultipleCard();
             }
+
         } catch (error: any) {
             // Check for specific error status codes
             if (error.response) {
@@ -217,189 +212,241 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                 }
             } else {
                 console.error('Error uploading data:', error.message);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Update Failed',
+                    text: 'There was an error updating your profile. Please try again later.',
+                });
             }
+            setError('An error occurred while uploading data');
         }
     };
-
 
     /**
      * When User click on Ok Button It will check
      * Check the data change (update or delete)
-     * Chekc the validate of the price (null, undefine, < 0)
-     * if have validate then move to _handleDownloadErrorData
-     * If not then upload data
+     * Check if categoryName and materialName are duplicate
+     * Check if categoryName, materialName, hscode, basePrice, and unit are null
+     * If there are validation errors, download the error data
+     * If not, upload data
      */
     const _handleConfirm = async () => {
-        // Check if any price is less than 0 or null
-        const invalidPrice = excelData.some(item => item.Brand_Price === null || item.Brand_Price < 0 || item.Brand_Price === undefined);
+        // Function to check if a value is a number and greater than 0
+        const isValidExpertTailoringName = (basePrice: any): boolean => {
+            return typeof basePrice === 'string'
+        };
 
-        if (invalidPrice) {
-            setError('Price must be greater than or equal to 0 for all items');
+        const isValidSizeImageURL = (hsCode: any): boolean => {
+            return typeof hsCode === 'string'
+        };
+
+        // Check for duplicates based on Category_Name and Material_Name
+        const duplicates = checkForDuplicates(excelData, ['Expert_Tailoring_Name', 'Size_Image_Url']);
+
+        // Check for invalid entries
+        const invalidEntries = excelData.some(item =>
+            !item.Expert_Tailoring_Name ||
+            !item.Size_Image_Url ||
+            !isValidExpertTailoringName(item.Size_Image_Url) ||
+            !isValidSizeImageURL(item.Expert_Tailoring_Name)
+        );
+
+        if (invalidEntries || duplicates.size > 0) {
+            setError('There are duplicate values or missing required fields!');
         }
         if (!hasDataChanged()) {
-            setError('The data of file excel have change please download and push again!')
+            setError('Data have changing')
         }
         else {
-            // Proceed with upload if all prices are valid
             await _handleUploadData();
         }
     };
 
-    /**
-     * Download Error Data When One Fields Error or Dupplicate
-     * If Error then download all data in CSV and fill color yellow to the fields
-     * The columns Material, Category, Hs Code, Unit, Base Price is view only and can not edit
-     * Download CSV File for the Brand to save in the local computer
-     */
+
+    // ---------------Handle Modal---------------//
+
+    // Open Modal
+    const _handleEditOpen = () => setEditOpen(true);
+
+    // Close Modal
+    const _handleEditClose = () => setEditOpen(false);
+
+    // Define a custom type for your data structure
+    interface ExcelRowData {
+        [key: string]: any;
+    }
+
+    // Function to check for duplicate values in specific columns
+    const checkForDuplicates = (data: ExcelRowData[], columns: string[]) => {
+        const duplicates: Set<string> = new Set();
+        const seen: Set<string> = new Set();
+
+        data.forEach(row => {
+            const key = columns.map(column => row[column]).join('|');
+            if (seen.has(key)) {
+                duplicates.add(key);
+            } else {
+                seen.add(key);
+            }
+        });
+
+        return duplicates;
+    };
+
     const _handleDownloadErrorData = async () => {
-        try {
-            const dataToDownload = excelData.map(({ error, ...item }) => item);
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Brand Material');
+        const workBook = new ExcelJS.Workbook();
+        const worksheet = workBook.addWorksheet('Expert Tailoring');
 
-            // Add headers
-            const headers = Object.keys(dataToDownload[0] || {});
-            worksheet.addRow(headers);
+        worksheet.columns = [
+            { header: 'Expert_Tailoring_Name', key: 'Expert_Tailoring_Name', width: 20 },
+            { header: 'Size_Image_Url', key: 'Size_Image_Url', width: 20 },
+        ];
 
-            // Insert a custom header row above the defined columns
-            worksheet.insertRow(1, ['Brand Price Material']);
+        // Insert a custom header row above the defined columns
+        worksheet.insertRow(1, ['EXPERT TAILORING']);
 
-            // Merge cells for the custom header row
-            worksheet.mergeCells('A1:F1');
+        // Merge cells for the custom header row
+        worksheet.mergeCells('A1:B1');
 
-            // Set styles for the custom header row
-            const customHeaderRow = worksheet.getRow(1);
-            customHeaderRow.height = 30; // Optional: adjust row height
-            customHeaderRow.eachCell(cell => {
-                cell.font = { bold: true, size: 16 };
-                cell.alignment = { vertical: 'middle', horizontal: 'center' };
-                cell.border = {
-                    top: { style: 'thin' },
-                    left: { style: 'thin' },
-                    bottom: { style: 'thin' },
-                    right: { style: 'thin' },
-                };
-            });
+        // Set styles for the custom header row
+        const customHeaderRow = worksheet.getRow(1);
+        customHeaderRow.height = 30; // Optional: adjust row height
+        customHeaderRow.eachCell(cell => {
+            cell.font = { bold: true, size: 16 };
+            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+            cell.border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' },
+            };
+        });
 
-            // Add data rows
-            dataToDownload.forEach(data => {
-                worksheet.addRow(Object.values(data));
-            });
+        const rows = excelData.map(item => ({
+            Expert_Tailoring_Name: item.Expert_Tailoring_Name,
+            Size_Image_Url: item.Size_Image_Url,
+            error: item.error
+        }));
 
-            // Unprotect all cells in the worksheet
-            worksheet.eachRow((row: any) => {
-                row.eachCell((cell: any) => {
-                    cell.protection = {
-                        locked: false
-                    };
-                });
-            });
+        // Identify and sort rows with errors
+        const rowsWithError = rows.filter(row => {
+            const hasNullValues = Object.values(row).some(value => value === null || value === '' || value === undefined);
+            const isExpertTailoringName = row.Expert_Tailoring_Name === null || row.Expert_Tailoring_Name === undefined || typeof row.Expert_Tailoring_Name === 'number';
+            const isSizeImageUrl = row.Size_Image_Url === null || row.Size_Image_Url === undefined || typeof row.Size_Image_Url === 'number';
+            return hasNullValues || isExpertTailoringName || isSizeImageUrl;
+        });
 
-            // Protect specified columns
-            const lastColumnIndex = worksheet.columns.length;
-            const protectedColumns = [1, 2, 3, 4, 5]; // ExcelJS uses 1-based indexing
+        const rowsWithoutError = rows.filter(row => !rowsWithError.includes(row));
 
-            worksheet.columns.forEach((column: any, columnIndex: any) => {
-                if (protectedColumns.includes(columnIndex + 1)) {
-                    column.eachCell((cell: any) => {
-                        cell.protection = {
-                            locked: true,
+        // Concatenate rows with errors first
+        const sortedRows = [...rowsWithError, ...rowsWithoutError];
+
+        // Add rows to the worksheet
+        worksheet.addRows(sortedRows);
+
+        // Set styles for header row
+        worksheet.getRow(1).eachCell(cell => {
+            cell.font = { bold: true };
+            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+            cell.border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' },
+            };
+        });
+
+        // Apply validation and coloring for errors
+        const duplicates = checkForDuplicates(sortedRows, ['Expert_Tailoring_Name', 'Size_Image_Url']);
+
+        sortedRows.forEach((row, rowIndex) => {
+            const excelRow = worksheet.getRow(rowIndex + 2); // +2 to account for header row and 1-based index
+            excelRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+                const columnName = worksheet.getColumn(colNumber).key as string;
+                const value = row[columnName];
+
+                if (columnName === 'Expert_Tailoring_Name' || columnName === 'Size_Image_Url') {
+                    if (duplicates.has(`${row.Expert_Tailoring_Name}|${row.Size_Image_Url}`)) {
+                        const duplicateRowNumber = sortedRows.findIndex(r => r.Expert_Tailoring_Name === row.Expert_Tailoring_Name && r.Size_Image_Url === row.Size_Image_Url && r !== row) + 2;
+                        cell.fill = {
+                            type: 'pattern',
+                            pattern: 'solid',
+                            fgColor: { argb: 'FFFF00' }, // Yellow fill for errors
                         };
-                    });
-                } else if (columnIndex + 1 === 6) {
-                    column.eachCell((cell: any) => {
-                        if (cell.value === null) { // Only lock non-null cells
-                            cell.protection = {
-                                locked: false,
-                            };
-                            cell.fill = {
-                                type: 'pattern',
-                                pattern: 'solid',
-                                fgColor: { argb: 'FFFF00' } // Yellow fill color
-                            };
-                            cell.value = 'Null Value';
-                            cell.font = { // Set font color
-                                color: { argb: 'FF0000' }, // Red font color
-                                bold: true
-                            };
-                        }
-                    });
+                        cell.value = `${value} #Duplicate with row ${duplicateRowNumber}`;
+                    } else if (!value) {
+                        cell.fill = {
+                            type: 'pattern',
+                            pattern: 'solid',
+                            fgColor: { argb: 'FFFF00' }, // Yellow fill for errors
+                        };
+                        cell.value = 'Null Value';
+                    }
+                } else if (columnName === 'Expert_Tailoring_Name' || columnName === 'Size_Image_Url' || columnName === 'Unit') {
+                    if (!value) {
+                        cell.fill = {
+                            type: 'pattern',
+                            pattern: 'solid',
+                            fgColor: { argb: 'FFFF00' }, // Yellow fill for errors
+                        };
+                        cell.value = 'null value';
+                    } else if (columnName === 'Unit' && typeof value === 'number') {
+                        cell.fill = {
+                            type: 'pattern',
+                            pattern: 'solid',
+                            fgColor: { argb: 'FFFF00' }, // Red fill for numeric Unit
+                        };
+                        cell.value = `${value} (Invalid Type)`;
+                    } else if (columnName === 'Expert_Tailoring_Name' && typeof value === 'string') {
+                        cell.fill = {
+                            type: 'pattern',
+                            pattern: 'solid',
+                            fgColor: { argb: 'FFFF00' }, // Red fill for invalid Expert_Tailoring_Name
+                        };
+                        cell.value = `${value} (Invalid HS Code)`;
+                    } else if (columnName === 'Expert_Tailoring_Name' && parseFloat(value) <= 0) {
+                        cell.fill = {
+                            type: 'pattern',
+                            pattern: 'solid',
+                            fgColor: { argb: 'FFFF00' }, // Red fill for invalid Expert_Tailoring_Name
+                        };
+                        cell.value = `${value} (Invalid HS Code)`;
+                    } else if (columnName === 'Size_Image_Url' && typeof value === 'string') {
+                        cell.fill = {
+                            type: 'pattern',
+                            pattern: 'solid',
+                            fgColor: { argb: 'FFFF00' }, // Red fill for invalid Size_Image_Url
+                        };
+                        cell.value = `${value} (Invalid Base Price)`;
+                    } else if (columnName === 'Size_Image_Url' && parseFloat(value) <= 0) {
+                        cell.fill = {
+                            type: 'pattern',
+                            pattern: 'solid',
+                            fgColor: { argb: 'FFFF00' }, // Red fill for invalid Expert_Tailoring_Name
+                        };
+                        cell.value = `${value} (Invalid HS Code)`;
+                    }
                 }
             });
+        });
 
-            // Protect header row
-            worksheet.getRow(1).eachCell((cell: any) => {
-                cell.protection = {
-                    locked: true,
-                };
-            });
+        const buf = await workBook.xlsx.writeBuffer();
 
-            const columnWidths = headers.map((take, index) => {
-                const maxLength = Math.max(...dataToDownload.map(data => `${data[take]}`.length));
-                return Math.max(10, Math.min(maxLength + 2, 50)); // Adjust min and max widths as needed
-            });
+        const blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+        const url = window.URL.createObjectURL(blob);
 
-            // Set column widths
-            worksheet.columns.forEach((column, index) => {
-                column.width = columnWidths[index];
-            });
-
-            // Set the sheet protection property
-            worksheet.protect('DMLOLTU123@', { selectLockedCells: true, selectUnlockedCells: true });
-
-            // Set fill color for cells where Price < 0 or null 
-            worksheet.eachRow((row, rowIndex) => {
-                row.eachCell((cell, colIndex) => {
-                    if (headers[colIndex - 1] === 'Brand_Price') {
-                        const value = cell.value as number | undefined;
-                        if (value === undefined || value < 0) {
-                            cell.fill = {
-                                type: 'pattern',
-                                pattern: 'solid',
-                                fgColor: { argb: 'FFFF00' } // Yellow fill color
-                            };
-                            cell.value = `${value}  #Price must more than 0`,
-                                cell.font = {
-                                    color: { argb: 'FF0000' }, // Red font color
-                                    bold: true
-                                };
-                        }
-                    }
-                });
-            });
-
-            // Generate and save the file
-            const buffer = await workbook.xlsx.writeBuffer();
-            const blob = new Blob([buffer], { type: "application/octet-stream" });
-            saveAs(blob, "BrandMaterialData.xlsx");
-        } catch (error) {
-            console.error("Error generating Excel file:", error);
-            alert("Error generating Excel file. Please try again.");
-        }
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "Exper_Tailoring_Edit.xlsx";
+        a.click();
+        window.URL.revokeObjectURL(url);
     };
 
     /**
-     * Saves the blob as a file with the given fileName.
-     * @param blob The Blob data to save.
-     * @param fileName The name of the file to save as.
-     */
-    function saveAs(blob: Blob, fileName: string): void {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-    }
-
-    /**
-    * Download the sample data
-    */
+        * Download the sample data
+        */
     const _handleDownloadSampleExcelFile = () => {
-        const url = `${baseURL + versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.downloadSampleBrandPriceExcelData}`; // Replace with your API endpoint
+        const url = `${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.downloadSampleExcelExpertTailoring}`; // Replace with your API endpoint
 
         axios({
             url: url,
@@ -411,7 +458,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                 const a = document.createElement('a');
                 a.style.display = 'none';
                 a.href = url;
-                a.download = 'Brand_Price_Sample_File.xlsx'; // Replace with your desired file name
+                a.download = 'Expert_Tailoring_Sample_File.xlsx'; // Replace with your desired file name
                 document.body.appendChild(a);
                 a.click();
                 window.URL.revokeObjectURL(url);
@@ -421,24 +468,10 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
             });
     };
 
-    /**
-     * 
-     * @returns 
-     * Open the edit pop up
-     */
-    const _handleEditOpen = () => setEditOpen(true);
-
-    /**
-     * 
-     * @returns 
-     * Close the Edit Popup
-     */
-    const _handleEditClose = () => setEditOpen(false);
-
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px', maxHeight: '80vh', overflowY: 'auto', position: "relative" }}>
             <Typography variant="h5" align="center" marginBottom={"20px"}>
-                {t(codeLanguage + '000216')}
+                {t(codeLanguage + '000052')}
             </Typography>
             <IconButton
                 style={{
@@ -511,35 +544,36 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <thead>
                                 <tr style={{ backgroundColor: colors.primary[100] }}>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Category Name</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Material Name</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>HS CODE</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Unit</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Base Price</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Brand Price</th>
+                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Expert Tailoring Name</th>
+                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Size Image Url</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Error Check</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {excelData.map((data, index) => (
-                                    <tr key={data.id}>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Category_Name ? colors.primary[200] : 'red' }} >{data.Category_Name || 'Null Category Name'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Material_Name ? colors.primary[200] : 'red' }}>{data.Material_Name || 'Null Material Name'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.HS_Code ? colors.primary[200] : 'red' }}>{data.HS_Code || 'Null'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Unit ? colors.primary[200] : 'red' }}>{data.Unit || 'Null Unit'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Base_Price ? colors.primary[200] : 'red' }}>{data.Base_Price || 'Null Base Price'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Brand_Price ? colors.primary[200] : 'red' }}>{data.Brand_Price || 'Null Price'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>
+                                    <tr key={index}>
+                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Expert_Tailoring_Name ? colors.primary[200] : 'red' }} >{data.Expert_Tailoring_Name || 'Null Category Name'}</td>
+                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Size_Image_Url ? colors.primary[200] : 'red' }}>{data.Size_Image_Url || 'Null Material Name'}</td>
+                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.error ? 'red' : 'green' }}>
                                             {(() => {
-                                                const hasNullValues = Object.values(data).some(value => value === null || value === '' || value === undefined);
-                                                const isPriceInvalid = data.Brand_Price <= 0;
-                                                const isPriceNull = data.Brand_Price === null || data.Brand_Price === undefined
-                                                if (hasNullValues || isPriceInvalid || isPriceNull) {
+                                                const hasNullValues = Object.values(data).some(value => value === null || value === undefined);
+                                                const isExpertTailoringNameNullOrNumber = data.Expert_Tailoring_Name === null || data.Expert_Tailoring_Name === undefined || typeof data.Expert_Tailoring_Name !== 'string';
+                                                const isSizeImageURLNullOrNumber = data.Size_Image_Url === null || data.Size_Image_Url === undefined || typeof data.Size_Image_Url !== 'string';
+
+                                                const isDuplicate = excelData.some((item, i) => {
+                                                    if (i !== index) {
+                                                        return item.Expert_Tailoring_Name === data.Expert_Tailoring_Name && item.Size_Image_Url === data.Size_Image_Url;
+                                                    }
+                                                    return false;
+                                                });
+
+                                                if (hasNullValues || isExpertTailoringNameNullOrNumber || isSizeImageURLNullOrNumber || isDuplicate) {
                                                     const errorMessage = [];
                                                     if (hasNullValues) errorMessage.push('Null Values');
-                                                    if (isPriceInvalid) errorMessage.push('Price must be greater than 0');
-                                                    if (isPriceNull) errorMessage.push('Price Is Null')
+                                                    if (isSizeImageURLNullOrNumber) errorMessage.push('Size Image URL Is Invalid');
+                                                    if (isExpertTailoringNameNullOrNumber) errorMessage.push('Expert Tailoring Name Is Invalid');
+                                                    if (isDuplicate) errorMessage.push('Duplicate Entry');
 
                                                     return (
                                                         <div style={{ color: 'red' }}>
@@ -551,8 +585,8 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                                                     return <CheckCircleRounded style={{ color: 'green' }} />;
                                                 }
                                             })()}
-                                        </td>
 
+                                        </td>
                                         <td style={{ border: '1px solid #ddd', padding: '8px' }}>
                                             <div style={{ display: "flex" }}>
                                                 <EditIcon style={{ color: "blue", cursor: "pointer" }} onClick={() => confirmEdit(index)} />
@@ -566,6 +600,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                     </div>
                 )
             }
+
             <Modal
                 open={editOpen}
                 aria-labelledby="modal-modal-title"
@@ -573,7 +608,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
             >
                 <Box sx={style}>
                     {editingData !== null && (
-                        <EditMultipleMaterialInExcelTable
+                        <EditMultipleUsersInExcelTable
                             data={editingData} index={editingIndex} updateData={updateData} onClose={cancelEdit}
                         />
                     )}
@@ -608,4 +643,4 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
     );
 };
 
-export default AddMultipleMaterialWithExcel;
+export default AddMultipleExpertTailoringComponentWithExcel;

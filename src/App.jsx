@@ -61,8 +61,16 @@ import {
   OrderHistory,
   OrderProductScreen
 } from './pages/Order';
+
 import Brand from './pages/BrandManagement/DashboardBrand/BrandDashboardScreen';
-import TestManager from './pages/AdminManagement/ExpertTailoring/TestDash';
+
+import {
+  DashboardManagerMangeBrand,
+  DashboardManagerMangeCustomer,
+  DashboardManagerMangeEmployee,
+  DashboardManagerMangeExpertTailoring,
+  DashboardManagerMangeTask
+} from './pages/ManagerManagement';
 
 
 const tokenIsValid = (token) => {
@@ -185,8 +193,12 @@ function App() {
           <Route path='/order' element={<OrderProductScreen></OrderProductScreen>} />
 
 
-          {/* Employee dashboard route */}
-          <Route path='/manager' element={<TestManager />} />
+          {/* Manager dashboard route */}
+          <Route path='/manager_manage_expert_tailoring' element={<DashboardManagerMangeExpertTailoring />} />
+          <Route path='/manager_manage_employee' element={<DashboardManagerMangeEmployee />} />
+          <Route path='/manager_manage_customer' element={<DashboardManagerMangeCustomer />} />
+          <Route path='/manager_manage_brand' element={<DashboardManagerMangeBrand />} />
+          <Route path='/manager_manage_task' element={<DashboardManagerMangeTask />} />
 
 
           <Route path='*' element={<Screen404 />} />
