@@ -7,7 +7,7 @@ import { TextureLoader } from "three";
 import state from "../store";
 
 
-const Shirt = ({isDefault}) => {
+const Shirt = ({ isDefault }) => {
 
     /** @type {[PartOfDesignInterface[], React.Dispatch<React.SetStateAction<PartOfDesignInterface[]>>]} */
     const [modelData, setModelData] = useState();
@@ -24,7 +24,7 @@ const Shirt = ({isDefault}) => {
 
 
     useEffect(() => {
-        if(isDefault) return;
+        if (isDefault) return;
         if (snap.modelData) {
             setModelData(snap.modelData);
 
@@ -101,8 +101,15 @@ const Shirt = ({isDefault}) => {
             const offsetY = (A_height / 2) - (B_height / 2) - (firstItemMask.scaleY / A_height);
             let pos;
             pos = [
-                (firstItemMask.position.x - 130 + (firstItemMask.scaleX / 230) + (firstItemMask.scaleX-230)/2) / 1000 ,
-                -(firstItemMask.position.y - 80 + (firstItemMask.scaleY / 230) + (firstItemMask.scaleY-230)/2) / 1000 ,
+                // x =
+                key === 'LOGO_PART' || key === 'FRONT_CLOTH_PART' ? (firstItemMask.position.x - 130 + (firstItemMask.scaleX / 230) + (firstItemMask.scaleX - 230) / 2) / 1000
+                    : key === 'BACK_CLOTH_PART' ? -(firstItemMask.position.x - 130 + (firstItemMask.scaleX / 230) + (firstItemMask.scaleX - 230) / 2) / 1000 : 0
+                ,
+                // y=
+                key === 'LOGO_PART' || key === 'FRONT_CLOTH_PART' ? -(firstItemMask.position.y - 80 + (firstItemMask.scaleY / 230) + (firstItemMask.scaleY - 230) / 2) / 1000
+                    : key === 'BACK_CLOTH_PART' ? -(firstItemMask.position.y - 80 + (firstItemMask.scaleY / 230) + (firstItemMask.scaleY - 230) / 2) / 1000 : 0
+                ,
+                // z=
                 key === 'LOGO_PART' || key === 'FRONT_CLOTH_PART' ? 0.15
                     :
                     key === 'BACK_CLOTH_PART' ? -0.25
@@ -123,7 +130,7 @@ const Shirt = ({isDefault}) => {
 
     const degreesToEuler = (degrees) => {
         const radians = degrees * (Math.PI / 180);
-        return  radians;
+        return radians;
     };
 
 
@@ -153,7 +160,7 @@ const Shirt = ({isDefault}) => {
                             map={item.texture}
                             // depthTest={true}
                             depthWrite={true}
-                            dispose={true}
+                            // dispose={true}
                         />
                     ))
                 ))}

@@ -1,5 +1,5 @@
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import CanvasModel from '../../canvas/CanvasModel'
 import Designer from './Designer/Designer'
 import ImageEditor from './Designer/ImageEditor'
@@ -26,6 +26,7 @@ import ItemEditorToolsComponent from './Components/ItemEditorTools/ItemEditorToo
 import MaterialDetailComponent from './Components/MaterialDetail/MaterialDetailComponent';
 import { FaCloudUploadAlt, FaRegEdit } from "react-icons/fa";
 import state from '../../store';
+import LoadingComponent from '../../components/Loading/LoadingComponent';
 
 
 
@@ -62,6 +63,7 @@ function CustomDesignScreen() {
   const [isOpenMaterialDialog, setIsOpenMaterialDiaglog] = useState<boolean>(false);
   const [changeUploadPartOfDesignTool, setChangeUploadPartOfDesignTool] = useState<boolean>(false);
   const [isOpenNotiChangeUpdateImageDesignTool, setIsOpenNotiChangeUpdateImageDesignTool] = useState<boolean>(false);
+  const [isLoadingPage, setIsLoadingPage] = useState<boolean>(false);
 
 
 
@@ -175,39 +177,17 @@ function CustomDesignScreen() {
     setRedoStack([]);
   };
 
+  const imageDraggableRef = useRef<any>(null);
+
   const __handleUndoFlow = () => {
-    if (undoStack.length > 0) {
-      const lastState = undoStack.pop()!;
-      setRedoStack(prev => [
-        ...prev,
-        {
-          itemPositions: { ...itemPositions },
-          itemZIndices: { ...itemZIndices },
-          highestZIndex,
-        },
-      ]);
-      setItemPositions(lastState.itemPositions);
-      setItemZIndices(lastState.itemZIndices);
-      setHighestZIndex(lastState.highestZIndex);
-      setUndoStack([...undoStack]);
+    if (imageDraggableRef.current) {
+      imageDraggableRef.current.undo();
     }
   };
 
   const __handleRedoFlow = () => {
-    if (redoStack.length > 0) {
-      const lastState = redoStack.pop()!;
-      setUndoStack(prev => [
-        ...prev,
-        {
-          itemPositions: { ...itemPositions },
-          itemZIndices: { ...itemZIndices },
-          highestZIndex,
-        },
-      ]);
-      setItemPositions(lastState.itemPositions);
-      setItemZIndices(lastState.itemZIndices);
-      setHighestZIndex(lastState.highestZIndex);
-      setRedoStack([...redoStack]);
+    if (imageDraggableRef.current) {
+      imageDraggableRef.current.redo();
     }
   };
 
@@ -235,6 +215,7 @@ function CustomDesignScreen() {
    */
   const __handleFetchSystemItemData = async () => {
     setIsCurrentItemListLoading(true);
+    setIsLoadingPage(true);
     try {
       // const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.design.systemItem}`);
       const response = await api.get(`https://665dc0c3e88051d604081de3.mockapi.io/api/v1/stamps`);
@@ -242,11 +223,12 @@ function CustomDesignScreen() {
       if (response) {
         setCurrentItemList(response);
         setIsCurrentItemListLoading(false);
+        setIsLoadingPage(false);
       }
     } catch (error) {
       console.error('Error checking verification status:', error);
       setIsCurrentItemListLoading(false);
-
+      setIsLoadingPage(false);
     }
   }
 
@@ -305,7 +287,8 @@ function CustomDesignScreen() {
         imageUrl: txtBase64,
         position: { x: 150, y: 170 },
         positionX: 150,
-        positionY: 170
+        positionY: 170,
+        zIndex: 0
       };
 
       if (prev && prev.length > 0) {
@@ -422,6 +405,10 @@ function CustomDesignScreen() {
 
   return (
     <div className={styles.customDesign__container}>
+
+      {/* Loading page */}
+      <LoadingComponent isLoading={isLoadingPage}></LoadingComponent>
+
       {/* Dialog area */}
       <ProductDialogComponent onItemSelect={__handleItemSelect} isOpen={isOpenProductDialog} onClose={() => __handleCloseDialog()} />
 
@@ -523,23 +510,14 @@ function CustomDesignScreen() {
                   partOfCloth={selectedPartOfCloth}
                   partOfClothData={partOfClothData}
                   itemPositions={itemPositions}
-                  setItemPositions={(positions) => {
-                    __handleSaveStateToUndoStack();
-                    setItemPositions(positions);
-                  }}
                   itemZIndices={itemZIndices}
-                  setItemZIndices={(zIndices) => {
-                    __handleSaveStateToUndoStack();
-                    setItemZIndices(zIndices);
-                  }}
-                  highestZIndex={highestZIndex}
-                  setHighestZIndex={setHighestZIndex}
                   onDeleteItem={__handleRemoveStamp}
-                  setNewItemData={(items) => __handleSetNewPartOfDesignData(items)}
                   onUpdatePart={__handleUpdatePart}
                   stamps={selectedStamp}
                   rotate={angle}
                   onSetIsOtherItemSelected={(itemId) => __handleOnSetIsOtherItemSelected(itemId)}
+                  onUndo={__handleUndoFlow}
+                  onRedo={__handleRedoFlow}
                 ></ImageDraggableComponent>
               </div>
             </>
