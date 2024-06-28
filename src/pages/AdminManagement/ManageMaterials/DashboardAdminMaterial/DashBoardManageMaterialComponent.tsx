@@ -1,45 +1,68 @@
-import TopbarComponent from '../../GlobalComponent/TopBar/TopBarComponent';
-import SideBarComponent from '../../GlobalComponent/SideBar/SideBarComponent';
-import { Box, CssBaseline, useMediaQuery, useTheme } from "@mui/material";
-import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
-import theme, { tokens } from '../../../../theme';
-import styles from "./DashBoardMaterialStyle.module.scss"
+import React, { useState } from 'react';
+import Sidebar from '../../GlobalComponent/SidebarComponent/SidebarComponent';
+import Navbar from '../../GlobalComponent/NavbarComponent/NavbarComponent';
 import ManageMaterials from '../AdminMaterialManagerment/AdminManagerScreen/ManageMaterialScreens';
-import NotFound from '../../GlobalComponent/Error404/Error404Component';
+import { IconButton } from '@mui/material';
+import { ArrowUpward } from '@mui/icons-material';
 
-export default function DashboardAdminManageMaterialScreen() {
-    const theme1 = useTheme();
-    const smScreen = useMediaQuery(theme1.breakpoints.up("sm"));
-    const colors = tokens(theme1.palette.mode)
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+const DashboardAdminManageMaterialScreen = () => {
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [activeMenu, setActiveMenu] = useState('admin_manage_material');
+    const [showScrollButton, setShowScrollButton] = React.useState<boolean>(false);
+    const toggleMenu = () => {
+        setMenuOpen(!menuOpen);
+    };
 
-    if (isMobile) {
-        return (
-            <NotFound />
-        );
-    }
+    const handleMenuClick = (menu: any) => {
+        setActiveMenu(menu);
+    };
+
+    React.useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 200) {
+                setShowScrollButton(true);
+            } else {
+                setShowScrollButton(false);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
+
+    const _handleScrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
     return (
-        <CssVarsProvider theme={theme}>
-            <CssBaseline />
-            <div className={`${styles.dashboard}`}>
-                <SideBarComponent />
-                <main className={`${styles.content}`}>
-                    <TopbarComponent />
-                    <Box
-                        display="grid"
-                        gridTemplateColumns="repeat(12, 1fr)"
-                        gridAutoRows="140px"
-                        gap="20px"
-                    >
-                        <Box
-                            gridColumn="span 12"
-                            gridRow="span 2"
-                        >
-                            <ManageMaterials />
-                        </Box>
-                    </Box>
+        <div className="flex">
+            <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
+            <div className="flex flex-col w-full">
+                <Navbar toggleMenu={toggleMenu} />
+                <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
+                    <ManageMaterials />
                 </main>
+                {showScrollButton && (
+                    <IconButton
+                        style={{
+                            position: 'fixed',
+                            bottom: '20px',
+                            right: '20px',
+                            zIndex: 100,
+                            backgroundColor: "#E96208",
+                            color: "white"
+                        }}
+                        onClick={_handleScrollToTop}
+                    >
+                        <ArrowUpward />
+                    </IconButton>
+                )}
             </div>
-        </CssVarsProvider>
+        </div>
     );
-}
+};
+
+export default DashboardAdminManageMaterialScreen;

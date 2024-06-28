@@ -9,7 +9,7 @@ import DashboardBarChartScreens from "./BarChart/DashboardBarChartComponent";
 import DashboardAdminScreens from "./DashboardAdmin/DashboardAdminScreens";
 import DashboardAdminProfileScreens from "./AdminProfile/AdminProfileComponent";
 import FileUpload from "./UploadExcelSampleInPublic/UploadExcelSampleInPublicComponent";
-import DashboardAdminManageCategoryScreen from "./ManageCategory/DashboardAdminCategory/DashBoardManageMaterialComponent";
+import DashboardAdminManageCategoryScreen from "./ManageCategory/DashboardAdminCategory/DashBoardManageCategoryComponent";
 
 export {
     DashboardAdminManageCategoryScreen,

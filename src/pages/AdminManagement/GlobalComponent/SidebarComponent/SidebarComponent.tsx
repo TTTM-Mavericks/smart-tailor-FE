@@ -1,160 +1,122 @@
 import React from 'react';
-import {
-    HomeIcon,
-    UserIcon,
-    ListBulletIcon,
-    ChevronDownIcon,
-    BellIcon,
-    EnvelopeIcon,
-} from '@heroicons/react/20/solid';
+import { Link } from 'react-router-dom';
 
 interface SidebarProps {
-    sidebarOpen: boolean;
-    toggleSidebar: () => void;
-    dropdownOpen: Record<string, boolean>;
-    toggleDropdown: (key: string) => void;
+    menuOpen: boolean;
+    toggleMenu: () => void;
+    activeMenu: string;
+    handleMenuClick: (menu: string) => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, toggleSidebar, dropdownOpen, toggleDropdown }) => {
+const Sidebar: React.FC<SidebarProps> = ({ menuOpen, toggleMenu, activeMenu, handleMenuClick }) => {
     return (
-        <>
-            <div
-                className={`fixed left-0 top-0 w-64 h-full bg-[#f8f4f3] p-4 z-50 transition-transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-                    } md:translate-x-0`}
-            >
-                <a href="#" className="flex items-center pb-4 border-b border-b-gray-800">
-                    <h2 className="font-bold text-2xl">
-                        ROLE <span className="bg-[#f84525] text-white px-2 rounded-md">ADMIN</span>
-                    </h2>
+        <aside className={`bg-gradient-to-br from-gray-800 to-gray-900 ${menuOpen ? 'translate-x-0' : '-translate-x-80'} fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0`}>
+            <div className="relative border-b border-white/20">
+                <a className="flex items-center gap-4 py-6 px-8" href="#/">
+                    <h6 className="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-white">Admin Dashboard</h6>
                 </a>
-                <ul className="mt-4">
-                    <span className="text-gray-400 font-bold">ADMIN</span>
-                    <li className="mb-1">
-                        <a
-                            href="#"
-                            className="flex items-center py-2 px-4 text-gray-900 hover:bg-gray-200 rounded-md transition-colors"
-                        >
-                            <HomeIcon className="h-5 w-5 mr-3" />
-                            <span className="text-sm">Dashboard</span>
-                        </a>
-                    </li>
-                    <li className="mb-1">
-                        <a
-                            href="#"
-                            className="flex items-center py-2 px-4 text-gray-900 hover:bg-gray-200 rounded-md transition-colors"
-                            onClick={() => toggleDropdown('users')}
-                        >
-                            <UserIcon className="h-5 w-5 mr-3" />
-                            <span className="text-sm">Users</span>
-                            <ChevronDownIcon className={`ml-auto h-5 w-5 transform ${dropdownOpen['users'] ? 'rotate-180' : ''}`} />
-                        </a>
-                        <ul className={`pl-7 mt-2 ${dropdownOpen['users'] ? 'block' : 'hidden'}`}>
-                            <li className="mb-4 flex items-center">
-                                <span className="h-2 w-2 bg-gray-900 rounded-full mr-2"></span>
-                                <a
-                                    href="#"
-                                    className="text-gray-900 text-sm hover:text-[#f84525]"
-                                >
-                                    All
-                                </a>
-                            </li>
-                            <li className="mb-4 flex items-center">
-                                <span className="h-2 w-2 bg-gray-900 rounded-full mr-2"></span>
-                                <a
-                                    href="#"
-                                    className="text-gray-900 text-sm hover:text-[#f84525]"
-                                >
-                                    Roles
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li className="mb-1">
-                        <a
-                            href="#"
-                            className="flex items-center py-2 px-4 text-gray-900 hover:bg-gray-200 rounded-md transition-colors"
-                        >
-                            <ListBulletIcon className="h-5 w-5 mr-3" />
-                            <span className="text-sm">Activities</span>
-                        </a>
-                    </li>
-                    <span className="text-gray-400 font-bold mt-4">BLOG</span>
-                    <li className="mb-1">
-                        <a
-                            href="#"
-                            className="flex items-center py-2 px-4 text-gray-900 hover:bg-gray-200 rounded-md transition-colors"
-                            onClick={() => toggleDropdown('post')}
-                        >
-                            <svg className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 10c0 7.7-7 13-9 13-2 0-9-5.3-9-13a9 9 0 1118 0z" />
+                <button onClick={toggleMenu} className="middle none font-sans font-medium text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none w-8 max-w-[32px] h-8 max-h-[32px] rounded-lg text-xs text-white hover:bg-white/10 active:bg-white/30 absolute right-0 top-0 grid rounded-br-none rounded-tl-none xl:hidden" type="button">
+                    <span className="absolute top-1/2 left-1/2 transform -translate-y-1/2 -translate-x-1/2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" aria-hidden="true" className="h-5 w-5 text-white" style={{ marginTop: "35px", marginRight: "20px" }}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </span>
+                </button>
+            </div>
+            <div className="m-4">
+                <ul className="mb-4 flex flex-col gap-1">
+                    <li>
+                        <Link to="/admin" onClick={() => handleMenuClick('admin_dashboard')} className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'admin_dashboard' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                                <path d="M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 101.06-1.06l-8.689-8.69a2.25 2.25 0 00-3.182 0l-8.69 8.69a.75.75 0 001.061 1.06l8.69-8.69z"></path>
+                                <path d="M12 5.432l8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 01-.75-.75v-4.5a.75.75 0 00-.75-.75h-3a.75.75 0 00-.75.75V21a.75.75 0 01-.75.75H5.625a1.875 1.875 0 01-1.875-1.875v-6.198a2.29 2.29 0 00.091-.086L12 5.43z"></path>
                             </svg>
-                            <span className="text-sm">Post</span>
-                            <ChevronDownIcon className={`ml-auto h-5 w-5 transform ${dropdownOpen['post'] ? 'rotate-180' : ''}`} />
-                        </a>
-                        <ul className={`pl-7 mt-2 ${dropdownOpen['post'] ? 'block' : 'hidden'}`}>
-                            <li className="mb-4 flex items-center">
-                                <span className="h-2 w-2 bg-gray-900 rounded-full mr-2"></span>
-                                <a
-                                    href="#"
-                                    className="text-gray-900 text-sm hover:text-[#f84525]"
-                                >
-                                    All
-                                </a>
-                            </li>
-                            <li className="mb-4 flex items-center">
-                                <span className="h-2 w-2 bg-gray-900 rounded-full mr-2"></span>
-                                <a
-                                    href="#"
-                                    className="text-gray-900 text-sm hover:text-[#f84525]"
-                                >
-                                    Categories
-                                </a>
-                            </li>
-                        </ul>
+                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">Dashboard</p>
+                        </Link>
                     </li>
-                    <li className="mb-1">
-                        <a
-                            href="#"
-                            className="flex items-center py-2 px-4 text-gray-900 hover:bg-gray-200 rounded-md transition-colors"
-                        >
-                            <BellIcon className="h-5 w-5 mr-3" />
-                            <span className="text-sm">Archive</span>
-                        </a>
+                    <li>
+                        <Link to="/admin_manage_material" onClick={() => handleMenuClick('admin_manage_material')} className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'admin_manage_material' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                                <path fillRule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clipRule="evenodd"></path>
+                            </svg>
+                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">Manage Material</p>
+                        </Link>
                     </li>
-                    <span className="text-gray-400 font-bold mt-4">PERSONAL</span>
-                    <li className="mb-1">
-                        <a
-                            href="#"
-                            className="flex items-center py-2 px-4 text-gray-900 hover:bg-gray-200 rounded-md transition-colors"
-                        >
-                            <BellIcon className="h-5 w-5 mr-3" />
-                            <span className="text-sm">Notifications</span>
-                            <span className="ml-auto text-xs font-medium tracking-wide text-red-600 bg-red-200 rounded-full px-2 py-0.5">
-                                5
-                            </span>
-                        </a>
+                    <li>
+                        <Link to="/admin_manage_category" onClick={() => handleMenuClick('admin_manage_category')} className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'admin_manage_category' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                                <path fillRule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clipRule="evenodd"></path>
+                            </svg>
+                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">Manage Category</p>
+                        </Link>
                     </li>
-                    <li className="mb-1">
-                        <a
-                            href="#"
-                            className="flex items-center py-2 px-4 text-gray-900 hover:bg-gray-200 rounded-md transition-colors"
-                        >
-                            <EnvelopeIcon className="h-5 w-5 mr-3" />
-                            <span className="text-sm">Messages</span>
-                            <span className="ml-auto text-xs font-medium tracking-wide text-green-600 bg-green-200 rounded-full px-2 py-0.5">
-                                2 New
-                            </span>
-                        </a>
+                    {/* <li>
+                        <Link to="/admin_manage_revenue" onClick={() => handleMenuClick('admin_manage_revenue')} className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'admin_manage_revenue' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                                <path fillRule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clipRule="evenodd"></path>
+                            </svg>
+                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">Manage Revenue</p>
+                        </Link>
+                    </li>
+                    <li>
+                        <Link to="/admin_manage_invoice" onClick={() => handleMenuClick('admin_manage_invoice')} className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'admin_manage_invoice' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                                <path fillRule="evenodd" d="M1.5 5.625c0-1.036.84-1.875 1.875-1.875h17.25c1.035 0 1.875.84 1.875 1.875v12.75c0 1.035-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 011.5 18.375V5.625zM21 9.375A.375.375 0 0020.625 9h-7.5a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375h7.5a.375.375 0 00.375-.375v-1.5zm-9 0A.375.375 0 0011.625 9h-7.5a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375h7.5a.375.375 0 00.375-.375v-1.5zM4.5 14.25a.75.75 0 000 1.5h15a.75.75 0 000-1.5h-15z" clipRule="evenodd"></path>
+                            </svg>
+                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">Manage Invoice</p>
+                        </Link>
+                    </li> */}
+                    {/* <li>
+                        <Link to="/admin_faq" onClick={() => handleMenuClick('admin_faq')} className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'admin_faq' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                                <path fillRule="evenodd" d="M1.5 5.625c0-1.036.84-1.875 1.875-1.875h17.25c1.035 0 1.875.84 1.875 1.875v12.75c0 1.035-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 011.5 18.375V5.625zM21 9.375A.375.375 0 0020.625 9h-7.5a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375h7.5a.375.375 0 00.375-.375v-1.5zm-9 0A.375.375 0 0011.625 9h-7.5a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375h7.5a.375.375 0 00.375-.375v-1.5zM4.5 14.25a.75.75 0 000 1.5h15a.75.75 0 000-1.5h-15z" clipRule="evenodd"></path>
+                            </svg>
+                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">FAQ</p>
+                        </Link>
+                    </li> */}
+                    <li>
+                        <Link to="/admin_profile" onClick={() => handleMenuClick('admin_profile')} className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'admin_profile' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                                <path fillRule="evenodd" d="M1.5 5.625c0-1.036.84-1.875 1.875-1.875h17.25c1.035 0 1.875.84 1.875 1.875v12.75c0 1.035-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 011.5 18.375V5.625zM21 9.375A.375.375 0 0020.625 9h-7.5a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375h7.5a.375.375 0 00.375-.375v-1.5zm-9 0A.375.375 0 0011.625 9h-7.5a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375h7.5a.375.375 0 00.375-.375v-1.5zM4.5 14.25a.75.75 0 000 1.5h15a.75.75 0 000-1.5h-15z" clipRule="evenodd"></path>
+                            </svg>
+                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">Profile Setting</p>
+                        </Link>
+                    </li>
+                    <li>
+                        <Link to="/pie_chart" onClick={() => handleMenuClick('pie_chart')} className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'pie_chart' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                                <path fillRule="evenodd" d="M1.5 5.625c0-1.036.84-1.875 1.875-1.875h17.25c1.035 0 1.875.84 1.875 1.875v12.75c0 1.035-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 011.5 18.375V5.625zM21 9.375A.375.375 0 0020.625 9h-7.5a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375h7.5a.375.375 0 00.375-.375v-1.5zm-9 0A.375.375 0 0011.625 9h-7.5a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375h7.5a.375.375 0 00.375-.375v-1.5zM4.5 14.25a.75.75 0 000 1.5h15a.75.75 0 000-1.5h-15z" clipRule="evenodd"></path>
+                            </svg>
+                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">Pie Chart</p>
+                        </Link>
+                    </li>
+                    <li>
+                        <Link to="/geography_chart" onClick={() => handleMenuClick('geography_chart')} className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'geography_chart' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                                <path fillRule="evenodd" d="M1.5 5.625c0-1.036.84-1.875 1.875-1.875h17.25c1.035 0 1.875.84 1.875 1.875v12.75c0 1.035-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 011.5 18.375V5.625zM21 9.375A.375.375 0 0020.625 9h-7.5a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375h7.5a.375.375 0 00.375-.375v-1.5zm-9 0A.375.375 0 0011.625 9h-7.5a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375h7.5a.375.375 0 00.375-.375v-1.5zM4.5 14.25a.75.75 0 000 1.5h15a.75.75 0 000-1.5h-15z" clipRule="evenodd"></path>
+                            </svg>
+                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">Geography Chart</p>
+                        </Link>
+                    </li>
+                    <li>
+                        <Link to="/line_chart" onClick={() => handleMenuClick('line_chart')} className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'line_chart' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                                <path fillRule="evenodd" d="M1.5 5.625c0-1.036.84-1.875 1.875-1.875h17.25c1.035 0 1.875.84 1.875 1.875v12.75c0 1.035-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 011.5 18.375V5.625zM21 9.375A.375.375 0 0020.625 9h-7.5a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375h7.5a.375.375 0 00.375-.375v-1.5zm-9 0A.375.375 0 0011.625 9h-7.5a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375h7.5a.375.375 0 00.375-.375v-1.5zM4.5 14.25a.75.75 0 000 1.5h15a.75.75 0 000-1.5h-15z" clipRule="evenodd"></path>
+                            </svg>
+                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">Line Chart</p>
+                        </Link>
+                    </li>
+                    <li>
+                        <Link to="/bar_chart" onClick={() => handleMenuClick('bar_chart')} className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'bar_chart' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                                <path fillRule="evenodd" d="M1.5 5.625c0-1.036.84-1.875 1.875-1.875h17.25c1.035 0 1.875.84 1.875 1.875v12.75c0 1.035-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 011.5 18.375V5.625zM21 9.375A.375.375 0 0020.625 9h-7.5a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375h7.5a.375.375 0 00.375-.375v-1.5zm-9 0A.375.375 0 0011.625 9h-7.5a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375h7.5a.375.375 0 00.375-.375v-1.5zM4.5 14.25a.75.75 0 000 1.5h15a.75.75 0 000-1.5h-15z" clipRule="evenodd"></path>
+                            </svg>
+                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">Bar Chart</p>
+                        </Link>
                     </li>
                 </ul>
             </div>
-            <div
-                className={`fixed top-0 left-0 w-full h-full bg-black/50 z-40 md:hidden ${sidebarOpen ? 'block' : 'hidden'
-                    }`}
-                onClick={toggleSidebar}
-            >
-            </div>
-        </>
+        </aside>
     );
 };
 

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import Sidebar from '../GlobalComponent/SidebarComponent/SidebarComponent';
-import Navbar from '../GlobalComponent/NavbarComponent/NavbarComponent';
+import Sidebar from '../../GlobalComponent/SidebarComponent/SidebarComponent';
+import Navbar from '../../GlobalComponent/NavbarComponent/NavbarComponent';
 import { IconButton } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
-import LineChartComponent from './LineChartComponent';
+import ManageCategories from '../AdminCategoryManagement/AdminManagerScreen/ManageMaterialScreens';
 
-const DashboardLineChartScreens = () => {
+const DashboardAdminManageCategoryScreen = () => {
     const [menuOpen, setMenuOpen] = useState(false);
-    const [activeMenu, setActiveMenu] = useState('line_chart');
+    const [activeMenu, setActiveMenu] = useState('admin_manage_category');
     const [showScrollButton, setShowScrollButton] = React.useState<boolean>(false);
     const toggleMenu = () => {
         setMenuOpen(!menuOpen);
@@ -43,7 +43,7 @@ const DashboardLineChartScreens = () => {
             <div className="flex flex-col w-full">
                 <Navbar toggleMenu={toggleMenu} />
                 <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
-                    <LineChartComponent />
+                    <ManageCategories />
                 </main>
                 {showScrollButton && (
                     <IconButton
@@ -65,4 +65,4 @@ const DashboardLineChartScreens = () => {
     );
 };
 
-export default DashboardLineChartScreens;
+export default DashboardAdminManageCategoryScreen;

@@ -156,10 +156,10 @@ function App() {
           <Route path='/admin_profile' element={<DashboardAdminProfileScreens></DashboardAdminProfileScreens>} />
           <Route path='/about' element={<AboutUsPage></AboutUsPage>} />
           <Route path='/contact' element={<ContactUsPage></ContactUsPage>} />
-          <Route path='/admin_manager_material' element={<DashboardAdminManageMaterialScreen></DashboardAdminManageMaterialScreen>} />
-          <Route path='/admin_manager_category' element={<DashboardAdminManageCategoryScreen></DashboardAdminManageCategoryScreen>} />
-          <Route path='/manage_revenue' element={<DashboardRecentTransactionScreen></DashboardRecentTransactionScreen>} />
-          <Route path='/manage_invoice' element={<DashboardManageInvoiceScreen></DashboardManageInvoiceScreen>} />
+          <Route path='/admin_manage_material' element={<DashboardAdminManageMaterialScreen></DashboardAdminManageMaterialScreen>} />
+          <Route path='/admin_manage_category' element={<DashboardAdminManageCategoryScreen></DashboardAdminManageCategoryScreen>} />
+          <Route path='/admin_manage_revenue' element={<DashboardRecentTransactionScreen></DashboardRecentTransactionScreen>} />
+          <Route path='/admin_manage_invoice' element={<DashboardManageInvoiceScreen></DashboardManageInvoiceScreen>} />
           <Route path='/admin_faq' element={<DashboardFAQScreens></DashboardFAQScreens>} />
           <Route path='/pie_chart' element={<DashboardPieChartScreens></DashboardPieChartScreens>} />
           <Route path='/geography_chart' element={<DashboardGeographyChartScreens></DashboardGeographyChartScreens>} />
