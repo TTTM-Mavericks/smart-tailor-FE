@@ -1,4 +1,4 @@
-import { Box, Button, IconButton, Menu, MenuItem, Modal } from "@mui/material";
+import { Box, Button, IconButton, Menu, MenuItem, Modal, Typography } from "@mui/material";
 import { DataGrid, GridToolbar, GridColDef } from "@mui/x-data-grid";
 import { tokens } from "../../../../../theme";
 import { useTheme } from "@mui/material";
@@ -12,6 +12,7 @@ import axios from "axios";
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { ExpertTailoring } from "../../../../../models/ManagerExpertTailoringModel";
 import { ExpertTailoringEdit } from "../../../../../models/ManagerExpertTailoringModel";
+import { useNavigate } from "react-router-dom";
 
 // Make Style of popup
 const style = {
@@ -27,6 +28,11 @@ const style = {
     borderRadius: "20px"
 };
 
+interface FeedbackModalProps {
+    selectedRow: ExpertTailoring | null; // Define the type of selectedRow
+    onClose: () => void; // Function to close the modal
+}
+
 const ManageEmployee: React.FC = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
@@ -40,37 +46,6 @@ const ManageEmployee: React.FC = () => {
     const _handleEditOpen = () => setEditOpen(true);
     const _handleEditClose = () => setEditOpen(false);
 
-    // open or close the add modal
-    const [anchorEl, setAnchorEl] = React.useState(null);
-    const open = Boolean(anchorEl);
-    const _handleClick = (event: any) => {
-        setAnchorEl(event.currentTarget);
-    };
-    const _handleClose = () => {
-        setAnchorEl(null);
-    };
-
-    // close open pop up
-    const [addOpenOrClose, setAddOpenOrClose] = React.useState<boolean>(false)
-
-    const _handleAddOpen = () => {
-        setAddOpenOrClose(true);
-    }
-
-    const _handleAddClose = () => {
-        setAddOpenOrClose(false)
-    }
-
-    // close open pop up
-    const [addMultiple, setAddMultiple] = React.useState<boolean>(false)
-
-    const _handleAddMultipleOpen = () => {
-        setAddMultiple(true);
-    }
-
-    const _handleAddMultipleClose = () => {
-        setAddMultiple(false)
-    }
 
     // Get language in local storage
     const selectedLanguage = localStorage.getItem('language');
@@ -195,10 +170,46 @@ const ManageEmployee: React.FC = () => {
         }
     };
 
+    const [selectedRow, setSelectedRow] = React.useState<ExpertTailoring | null>(null);
+    const [modalOpen, setModalOpen] = React.useState<boolean>(false);
+
+    const _handleRowClick = (params: any, event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        const target = event.currentTarget as HTMLDivElement;
+        if (target.tagName === 'svg' || target.tagName === 'path') {
+            return;
+        }
+
+        setSelectedRow(params.row);
+        setModalOpen(true);
+    };
+    const navigate = useNavigate();
+
+    const _handleFeedbackClick = (params: any, event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        const target = event.currentTarget as HTMLDivElement;
+        if (target.tagName === 'svg' || target.tagName === 'path') {
+            return;
+        }
+        const rowData = params.row;
+        navigate('/manager_manage_employee_report', { state: rowData });
+    };
+
+    // const _handleFeedbackClick = (params: any) => {
+    //     const target = params.event.target;
+    //     if (!(target.tagName === 'BUTTON' || target.tagName === 'svg' || target.tagName === 'path')) {
+    //         const rowData = params.row;
+    //         navigate('/manager_manage_employee_report', { state: rowData });
+    //     }
+    // };
+
+    const _handleModalClose = () => {
+        setModalOpen(false);
+    };
+
+
     const columns: GridColDef[] = [
         {
             field: "expertTailoringName",
-            headerName: "ExpertTailoring Name",
+            headerName: "Employee Name",
             flex: 1,
         },
         {
@@ -231,6 +242,7 @@ const ManageEmployee: React.FC = () => {
     ];
 
     const getRowId = (row: any) => `${row.expertTailoringID}-${row.expertTailoringName}-${row.sizeImageUrl}`;
+
 
     return (
         <Box m="20px">
@@ -276,7 +288,33 @@ const ManageEmployee: React.FC = () => {
                     slots={{ toolbar: GridToolbar }}
                     disableRowSelectionOnClick
                     getRowId={getRowId}
+                    onRowClick={_handleFeedbackClick}
                 />
+
+                {/* Open Model Information */}
+                <Modal
+                    open={modalOpen}
+                    onClose={_handleModalClose}
+                    aria-labelledby="modal-title"
+                    aria-describedby="modal-description"
+                >
+                    <Box sx={style}>
+                        {selectedRow && (
+                            <>
+                                <Typography variant="h5" gutterBottom>
+                                    {selectedRow.expertTailoringName}
+                                </Typography>
+                                <Typography variant="body1" gutterBottom>
+                                    Size Image URL: {selectedRow.sizeImageUrl}
+                                </Typography>
+                                <Button onClick={_handleFeedbackClick} variant="contained" color="primary">
+                                    Provide Feedback
+                                </Button>
+                            </>
+                        )}
+                    </Box>
+                </Modal>
+
                 <Modal
                     open={editopen}
                     aria-labelledby="modal-modal-title"

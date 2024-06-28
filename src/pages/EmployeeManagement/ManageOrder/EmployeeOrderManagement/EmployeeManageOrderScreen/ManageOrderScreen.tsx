@@ -1,12 +1,12 @@
 import { Box, IconButton, Modal } from "@mui/material";
 import { DataGrid, GridToolbar, GridColDef } from "@mui/x-data-grid";
-import { tokens } from "../../../theme";
+import { tokens } from "../../../../../theme";
 import { useTheme } from "@mui/material";
 import * as React from "react";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Swal from "sweetalert2";
-import EditCustomerPopUpScreens from "./EditOrderPopUpScreen";
+import EditCustomerPopUpScreens from "../EmployeeEditOrder/EditOrderPopUpScreen";
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from "react-router-dom";
 

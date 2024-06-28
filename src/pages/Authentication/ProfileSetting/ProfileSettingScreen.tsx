@@ -8,20 +8,29 @@ import VNLocationData from '../../../locationData.json';
 import { CustomerProfile } from '../../../models/CustomerProfileModel';
 import { Location, District, Ward } from '../../../models/CustomerProfileModel';
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
+import Cookies from 'js-cookie';
+import { useNavigate } from 'react-router-dom';
 
 const ProfileSettings: React.FC = () => {
     // ---------------UseState Variable---------------//
+    const navigate = useNavigate();
+    const userAuthData = localStorage.getItem('userAuth') as string;
+
+    const userAuth = JSON.parse(userAuthData);
+    // Access specific fields
+    const { userID, email, fullName, language, phoneNumber, roleName, imageUrl } = userAuth;
+
     const [locations, setLocations] = useState<any[]>([]);
     const [selectedProvince, setSelectedProvince] = useState<Location | null>(null);
     const [selectedDistrict, setSelectedDistrict] = useState<District | null>(null);
     const [selectedWard, setSelectedWard] = useState<Ward | null>(null);
     const [profileData, setProfileData] = useState<CustomerProfile>({
-        email: "tammtse161087@fpt.edu.vn",
-        fullName: 'Tam',
-        phoneNumber: '0919477712',
-        imageUrl: '',
+        email: email,
+        fullName: fullName,
+        phoneNumber: phoneNumber,
+        imageUrl: imageUrl,
         gender: true,
-        dateOfBirth: '14-01-2002',
+        dateOfBirth: new Date('2002-12-01'),
         address: '',
         province: '',
         district: '',
@@ -156,6 +165,14 @@ const ProfileSettings: React.FC = () => {
      */
     const _handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
+        if (name === 'phoneNumber' && !validatePhoneNumber(value)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Phone Number',
+                text: 'Phone number must be 10 digits long.',
+            });
+            return;
+        }
         const fieldValue = name === 'gender' ? (value === 'true') : name === 'dateOfBirth' ? formatDateString(value) : value;
         setProfileData({ ...profileData, [name]: fieldValue });
     };
@@ -182,7 +199,11 @@ const ProfileSettings: React.FC = () => {
 
         // Make API call to update the profile using PUT method
         try {
-            const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0YW1tdHNlMTYxMDg3QGZwdC5lZHUudm4iLCJpYXQiOjE3MTkwNTg3MTEsImV4cCI6MTcxOTE0NTExMX0.rAT-emVV8BJUd5cNGbQm7tAw-8uIj5_PD3c8v_HBuWQ'; // Replace with the actual bearer token
+            const token = Cookies.get("token");
+            if (!token) {
+                throw new Error('Token not found'); // Handle case where token is missing
+            }
+
             const response = await axios.put(
                 `${baseURL + versionEndpoints.v1 + featuresEndpoints.customer + functionEndpoints.customer.updateProfile}`,
                 updatedProfileData,
@@ -199,10 +220,14 @@ const ProfileSettings: React.FC = () => {
                     title: 'Profile Updated',
                     text: 'Your profile has been updated successfully!',
                 });
+                // setTimeout(() => {
+                //     navigate('/');
+                // }, 3000);
             } else {
-                throw new Error('Update failed');
+                throw new Error('Update failed with status: ' + response.status);
             }
         } catch (error) {
+            console.error('Error updating profile:', error);
             Swal.fire({
                 icon: 'error',
                 title: 'Update Failed',
@@ -210,6 +235,7 @@ const ProfileSettings: React.FC = () => {
             });
         }
     };
+
 
 
 
@@ -301,6 +327,17 @@ const ProfileSettings: React.FC = () => {
         return age >= 1;
     };
 
+    /**
+     * 
+     * @param phone 
+     * @returns 
+     * Validate the lenght of phone
+     */
+    const validatePhoneNumber = (phone: string): boolean => {
+        const phoneRegex = /^\d{10}$/;
+        return phoneRegex.test(phone);
+    };
+
     return (
         <div className="min-h-screen flex flex-col">
             <HeaderComponent />
@@ -372,13 +409,13 @@ const ProfileSettings: React.FC = () => {
                             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                                 <div>
                                     <label htmlFor="full_name" className="block text-sm font-medium text-gray-700">
-                                        Your first name
+                                        Your full name
                                     </label>
                                     <input
                                         type="text"
                                         id="full_name"
                                         className="mt-1 block w-full px-3 py-2 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500"
-                                        placeholder="Your first name"
+                                        placeholder="Your full name"
                                         name="fullName"
                                         value={profileData.fullName}
                                         onChange={_handleChange}
@@ -448,14 +485,14 @@ const ProfileSettings: React.FC = () => {
                                 <input
                                     type="date"
                                     name="dateOfBirth"
-                                    value={formatDateString(profileData.dateOfBirth)}
+                                    value={formatDateString(profileData.dateOfBirth.toString())}
                                     onChange={_handleChange}
                                     className="mt-2 px-3 py-2 border rounded-lg w-full"
                                     required
                                 />
-                                {!validateAge(profileData.dateOfBirth) && (
+                                {!validateAge(profileData.dateOfBirth.toString()) && (
                                     <span className="text-red-500 text-xs mt-1">
-                                        You must be at least 18 years old.
+                                        You must be at least 1 years old to use this service.
                                     </span>
                                 )}
                             </div>

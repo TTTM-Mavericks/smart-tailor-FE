@@ -1,21 +1,31 @@
-import { CssBaseline } from "@mui/material";
-import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
-import theme from '../../../theme';
-import styles from "./BrandProfileStyles.module.scss"
-import TopbarBrandComponent from '../GlobalComponent/TopBar/TopBarBrandComponent';
-import SideBarBrandComponent from '../GlobalComponent/SideBar/SideBarBrandComponent';
-import BrandProfileSetup from "./BrandProfileComponent";
-export default function DashboardBrandProfileScreens() {
+import React, { useState } from 'react';
+import Sidebar from '../GlobalComponent/SideBarComponent/SideBarComponent';
+import Navbar from '../GlobalComponent/NavBarComponent/NavbarComponent';
+import BrandProfileSetup from './BrandProfileComponent';
+
+const DashboardBrandProfileScreens = () => {
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [activeMenu, setActiveMenu] = useState('brand_profile');
+
+    const toggleMenu = () => {
+        setMenuOpen(!menuOpen);
+    };
+
+    const handleMenuClick = (menu: any) => {
+        setActiveMenu(menu);
+    };
+
     return (
-        <CssVarsProvider theme={theme}>
-            <CssBaseline />
-            <div className={`${styles.dashboard}`}>
-                <SideBarBrandComponent />
-                <main className={`${styles.content}`}>
-                    <TopbarBrandComponent />
+        <div className="flex">
+            <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
+            <div className="flex flex-col w-full">
+                <Navbar toggleMenu={toggleMenu} />
+                <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
                     <BrandProfileSetup />
                 </main>
             </div>
-        </CssVarsProvider>
+        </div>
     );
-}
+};
+
+export default DashboardBrandProfileScreens;

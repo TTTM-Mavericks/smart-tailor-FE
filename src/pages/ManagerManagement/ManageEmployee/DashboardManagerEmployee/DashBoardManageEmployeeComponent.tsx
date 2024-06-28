@@ -5,7 +5,7 @@ import ManageEmployee from '../ManagerEmployeeManagement/ManagerManageEmployeeSc
 
 const DashboardManagerMangeEmployee = () => {
     const [menuOpen, setMenuOpen] = useState(false);
-    const [activeMenu, setActiveMenu] = useState('expert_tailoring');
+    const [activeMenu, setActiveMenu] = useState('manage_employee');
 
     const toggleMenu = () => {
         setMenuOpen(!menuOpen);

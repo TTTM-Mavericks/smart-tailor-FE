@@ -5,7 +5,7 @@ import ManageBrand from '../ManagerBrandManagement/ManagerManageBrandScreen/Mana
 
 const DashboardManagerMangeBrand = () => {
     const [menuOpen, setMenuOpen] = useState(false);
-    const [activeMenu, setActiveMenu] = useState('expert_tailoring');
+    const [activeMenu, setActiveMenu] = useState('manage_brand');
 
     const toggleMenu = () => {
         setMenuOpen(!menuOpen);

@@ -69,7 +69,8 @@ import {
   DashboardManagerMangeCustomer,
   DashboardManagerMangeEmployee,
   DashboardManagerMangeExpertTailoring,
-  DashboardManagerMangeTask
+  DashboardManagerMangeTask,
+  FeedbackComponent
 } from './pages/ManagerManagement';
 
 
@@ -167,14 +168,14 @@ function App() {
 
           {/* Employee dashboard route */}
           <Route path='/employee' element={<DashboardEmployeeScreens></DashboardEmployeeScreens>} />
-          <Route path='/manager_customer' element={<DashboardEmployeeManageUserScreens></DashboardEmployeeManageUserScreens>} />
+          <Route path='/employee_manage_customer' element={<DashboardEmployeeManageUserScreens></DashboardEmployeeManageUserScreens>} />
+          <Route path='/employee_manage_brand' element={<DashboardEmployeeManageBrandScreens></DashboardEmployeeManageBrandScreens>} />
+          <Route path='/employee_manage_report' element={<DashboardManageReportScreen></DashboardManageReportScreen>} />
+          <Route path='/employee_manage_order' element={<DashboardManageOrderScreen></DashboardManageOrderScreen>} />
+          <Route path='/employee_manage_transaction' element={<DashboardManageTransactionScreen></DashboardManageTransactionScreen>} />
+          <Route path="/employee_manage_notification" element={<DashboardManageNotification></DashboardManageNotification>} />
           <Route path='/employee_profile' element={<DashboardEmployeeProfileScreens></DashboardEmployeeProfileScreens>} />
-          <Route path='/manage_brand' element={<DashboardEmployeeManageBrandScreens></DashboardEmployeeManageBrandScreens>} />
-          <Route path='/manage_report' element={<DashboardManageReportScreen></DashboardManageReportScreen>} />
-          <Route path='/manager_order' element={<DashboardManageOrderScreen></DashboardManageOrderScreen>} />
-          <Route path='/manage_transaction' element={<DashboardManageTransactionScreen></DashboardManageTransactionScreen>} />
           <Route path="/row-details" element={<DashboardEmployeeOrderDetailScreen></DashboardEmployeeOrderDetailScreen>} />
-          <Route path="/manage_notification" element={<DashboardManageNotification></DashboardManageNotification>} />
 
           {/* Brand Dashboard Route */}
           <Route path='/brand' element={<DashboardBrandScreens></DashboardBrandScreens>} />
@@ -194,11 +195,12 @@ function App() {
 
 
           {/* Manager dashboard route */}
-          <Route path='/manager_manage_expert_tailoring' element={<DashboardManagerMangeExpertTailoring />} />
+          <Route path='/manager' element={<DashboardManagerMangeExpertTailoring />} />
           <Route path='/manager_manage_employee' element={<DashboardManagerMangeEmployee />} />
           <Route path='/manager_manage_customer' element={<DashboardManagerMangeCustomer />} />
           <Route path='/manager_manage_brand' element={<DashboardManagerMangeBrand />} />
           <Route path='/manager_manage_task' element={<DashboardManagerMangeTask />} />
+          <Route path='/manager_manage_employee_report' element={<FeedbackComponent />} />
 
 
           <Route path='*' element={<Screen404 />} />

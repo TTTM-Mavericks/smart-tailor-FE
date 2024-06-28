@@ -1,14 +1,12 @@
-import { Box, Button, IconButton, Menu, MenuItem, Modal } from "@mui/material";
+import { Box, IconButton, Modal } from "@mui/material";
 import { DataGrid, GridToolbar, GridColDef } from "@mui/x-data-grid";
-import { tokens } from "../../../theme";
+import { tokens } from "../../../../../theme";
 import { useTheme } from "@mui/material";
 import * as React from "react";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Swal from "sweetalert2";
-import EditCustomerPopUpScreens from "./EditBrandPopUpScreen";
-import { Add } from "@mui/icons-material";
-import AddEachBrandsWithHand from "./AddEachWithHand/AddEachBrandWithHandScreens";
+import EditCustomerPopUpScreens from "../EmployeeEditTransaction/EditTransactionPopUpScreen";
 import { useTranslation } from 'react-i18next';
 
 interface User {
@@ -37,7 +35,7 @@ const style = {
     borderRadius: "20px"
 };
 
-const EmployeeManageBrand: React.FC = () => {
+const EmployeeManageTransaction: React.FC = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [data, setData] = React.useState<User[]>([]);
@@ -52,25 +50,6 @@ const EmployeeManageBrand: React.FC = () => {
 
     // open or close the add modal
     const [anchorEl, setAnchorEl] = React.useState(null);
-    const open = Boolean(anchorEl);
-    const _handleClick = (event: any) => {
-        setAnchorEl(event.currentTarget);
-    };
-    const _handleClose = () => {
-        setAnchorEl(null);
-    };
-    console.log("anchorEl" + anchorEl);
-
-    // close open pop up
-    const [addOpenOrClose, setAddOpenOrClose] = React.useState<boolean>(false)
-
-    const _handleAddOpen = () => {
-        setAddOpenOrClose(true);
-    }
-
-    const _handleAddClose = () => {
-        setAddOpenOrClose(false)
-    }
 
     // Get language in local storage
     const selectedLanguage = localStorage.getItem('language');
@@ -104,11 +83,6 @@ const EmployeeManageBrand: React.FC = () => {
             })
             .catch(error => console.error('Error fetching data:', error));
     }, []);
-
-    // Thêm người dùng mới vào danh sách
-    const _handleAddUser = (newUser: User) => {
-        setData(prevData => [...prevData, newUser]);
-    }
 
     // Cập nhật người dùng trong danh sách
     const _handleUpdateUser = (updatedUser: User) => {
@@ -152,7 +126,7 @@ const EmployeeManageBrand: React.FC = () => {
     }
 
     // confirm 
-    const _handleConfirmDelete = async (id: number) => {
+    const confirmDelete = async (id: number) => {
         try {
             const result = await Swal.fire({
                 title: `${t(codeLanguage + '000061')}`,
@@ -236,7 +210,7 @@ const EmployeeManageBrand: React.FC = () => {
                     <IconButton onClick={() => _handleEditClick(params.row.id, params.row.registrarId, params.row.name, params.row.age, params.row.email, params.row.phone, params.row.address, params.row.city, params.row.zipCode)}>
                         <EditIcon />
                     </IconButton>
-                    <IconButton onClick={() => _handleConfirmDelete(params.row.id)}>
+                    <IconButton onClick={() => confirmDelete(params.row.id)}>
                         <DeleteIcon htmlColor={colors.primary[300]} />
                     </IconButton>
                 </Box>
@@ -247,6 +221,8 @@ const EmployeeManageBrand: React.FC = () => {
     const getRowId = (row: any) => {
         return row.registrarId; // Sử dụng một thuộc tính duy nhất làm id cho mỗi hàng
     };
+
+
 
     return (
         <Box m="20px">
@@ -285,78 +261,6 @@ const EmployeeManageBrand: React.FC = () => {
                     }
                 }}
             >
-                <Button
-                    id="basic-button"
-                    aria-controls={open ? 'basic-menu' : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={open ? 'true' : undefined}
-                    onClick={_handleClick}
-                    endIcon={<Add />}
-                    variant="contained"
-                    color="primary"
-                    style={{ backgroundColor: `${colors.primary[300]} !important`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
-                >
-                    {t(codeLanguage + '000048')}
-                </Button>
-                <Menu
-                    id="basic-menu"
-                    anchorEl={anchorEl}
-                    open={open}
-                    onClose={_handleClose}
-                    MenuListProps={{
-                        'aria-labelledby': 'basic-button',
-                    }}
-                >
-                    <MenuItem >
-                        <div onClick={_handleAddOpen}>{t(codeLanguage + '000049')}</div>
-                        <Modal
-                            open={addOpenOrClose}
-                            aria-labelledby="modal-modal-title"
-                            aria-describedby="modal-modal-description"
-                        >
-                            <Box sx={{
-                                backgroundColor: colors.primary[100], position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: "50%",
-                                bgcolor: 'background.paper',
-                                border: '2px solid #000',
-                                boxShadow: 24,
-                                p: 4,
-                                borderRadius: "20px"
-                            }}>
-                                <AddEachBrandsWithHand closeCard={_handleAddClose} addNewUser={_handleAddUser} />
-                            </Box>
-                        </Modal>
-                    </MenuItem>
-
-                    {/* <MenuItem>
-                        <div onClick={handleAddMultipleOpen}>{t(codeLanguage + '000050')}</div>
-                        <Modal
-                            open={addMultiple}
-                            aria-labelledby="modal-modal-title"
-                            aria-describedby="modal-modal-description"
-                        >
-                            <Box sx={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: "70%",
-                                bgcolor: colors.primary[100],
-                                border: '2px solid #000',
-                                boxShadow: 24,
-                                p: 4,
-                                borderRadius: "20px"
-                            }}>
-                                <AddMultipleComponentWithExcel closeMultipleCard={handleAddMultipleClose} addNewUser={_handleAddUser} />
-                            </Box>
-                        </Modal>
-
-                    </MenuItem> */}
-                </Menu>
-
                 <DataGrid
                     rows={data}
                     columns={columns}
@@ -385,4 +289,4 @@ const EmployeeManageBrand: React.FC = () => {
     );
 };
 
-export default EmployeeManageBrand;
+export default EmployeeManageTransaction;
