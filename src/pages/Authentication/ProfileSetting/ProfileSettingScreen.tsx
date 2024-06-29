@@ -17,6 +17,27 @@ const ProfileSettings: React.FC = () => {
     const userAuthData = localStorage.getItem('userAuth') as string;
 
     const userAuth = JSON.parse(userAuthData);
+
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    // ---------------UseEffect---------------//
+    /**
+     * If not login then go back to the auth/signin screen
+     */
+    useEffect(() => {
+        const userAuth = JSON.parse(userAuthData);
+        if (userAuth) {
+            setIsAuthenticated(true);
+        } else {
+            navigate('/auth/signin'); // Redirect to login page if user is not authenticated
+        }
+    }, [navigate, userAuthData]);
+
+    if (!isAuthenticated) {
+        return null; // Render nothing if not authenticated or redirecting
+    }
+
+
     // Access specific fields
     const { userID, email, fullName, language, phoneNumber, roleName, imageUrl } = userAuth;
 
@@ -47,6 +68,7 @@ const ProfileSettings: React.FC = () => {
     const { t, i18n } = useTranslation();
 
     // ---------------UseEffect---------------//
+
     /**
      * Get the location of the api and set it to dropdown
      */

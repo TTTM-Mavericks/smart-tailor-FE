@@ -42,7 +42,7 @@ const DashboardAdminManageMaterialScreen = () => {
             <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
             <div className="flex flex-col w-full">
                 <Navbar toggleMenu={toggleMenu} />
-                <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
+                <main className="p-6 flex-grow ml-0 xl:ml-[20%] mt-[-3%]">
                     <ManageMaterials />
                 </main>
                 {showScrollButton && (

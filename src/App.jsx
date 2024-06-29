@@ -19,7 +19,6 @@ import {
   DashboardGeographyChartScreens,
   DashboardLineChartScreens,
   DashboardBarChartScreens,
-  FileUpload,
   DashboardAdminManageCategoryScreen,
 } from './pages/AdminManagement';
 
