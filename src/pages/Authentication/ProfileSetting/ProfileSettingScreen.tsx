@@ -144,7 +144,7 @@ const ProfileSettings: React.FC = () => {
      * @param dateString
      * Format the date string from dd-MM-yyyy to yyyy-MM-dd
      */
-    const formatDateString = (dateString: string): string => {
+    const formatDateString = (dateString: any): any => {
         const [dd, MM, yyyy] = dateString.split('-');
         return `${yyyy}-${MM}-${dd}`;
     };
@@ -289,7 +289,7 @@ const ProfileSettings: React.FC = () => {
      * @returns 
      * Validate the date of birth is not under 18 year old
      */
-    const validateAge = (date: string) => {
+    const validateAge = (date: any) => {
         const today = new Date();
         const [dd, MM, yyyy] = date.split('-'); // Split the date string into day, month, and year
         const birthDate = new Date(`${MM}/${dd}/${yyyy}`); // Format the date as MM/dd/yyyy

@@ -1,5 +1,5 @@
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import CanvasModel from '../../canvas/CanvasModel'
 import Designer from './Designer/Designer'
 import ImageEditor from './Designer/ImageEditor'
@@ -8,12 +8,11 @@ import ImageDraggableComponent from './Components/Draggable/ImageDraggableCompon
 import { __downloadCanvasToImage, __handleChangeImageToBase64, __handleGenerateItemId, reader } from '../../utils/DesignerUtils';
 import { ChooseMaterialDialogComponent, ColorPicker, FilePicker, TextEditor } from '../../components';
 import { shirtFrontDesign } from '../../assets';
-// import { ColorPicker, FilePicker } from '../../components';
 import { shirtModel, systemLogo } from '../../assets';
 import { HiOutlineDownload, HiShoppingCart, HiOutlineLogin } from 'react-icons/hi';
 import { FaSave, FaTshirt, FaPen, FaIcons, FaRegHeart, FaFileCode, FaHeart } from "react-icons/fa";
 import { useTranslation } from 'react-i18next';
-import { blackColor, primaryColor, whiteColor } from '../../root/ColorSystem';
+import { blackColor, primaryColor, redColor, whiteColor } from '../../root/ColorSystem';
 import { IoMdColorPalette } from "react-icons/io";
 import { IoText } from "react-icons/io5";
 import { GiClothes } from "react-icons/gi";
@@ -22,9 +21,12 @@ import { TbHomeHeart } from "react-icons/tb";
 import ProductDialogComponent from './Components/Dialog/ProductDialogComponent';
 import api from '../../api/ApiConfig';
 import { DesignInterface, ItemMaskInterface, PartOfDesignInterface, PartOfHoodieDesignData, PartOfShirtDesignData } from '../../models/DesignModel';
-import { Skeleton, Slider, Tooltip } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Skeleton, Slider, Tooltip } from '@mui/material';
 import ItemEditorToolsComponent from './Components/ItemEditorTools/ItemEditorToolsComponent';
 import MaterialDetailComponent from './Components/MaterialDetail/MaterialDetailComponent';
+import { FaCloudUploadAlt, FaRegEdit } from "react-icons/fa";
+import state from '../../store';
+import LoadingComponent from '../../components/Loading/LoadingComponent';
 
 
 
@@ -55,10 +57,13 @@ function CustomDesignScreen() {
   const [undoStack, setUndoStack] = useState<any[]>([]);
   const [redoStack, setRedoStack] = useState<any[]>([]);
   const [newPartOfDesignData, setNewPartOfDeignData] = useState<PartOfDesignInterface[]>();
-  const [updatePartData, setUpdatePartData] = useState<any>(null); // Replace `any` with the appropriate type
+  const [updatePartData, setUpdatePartData] = useState<any>(null);
   const [angle, setAngle] = useState<number>(0);
   const [itemIdToChangeRotate, setItemIdToChangeRotate] = useState<any>();
   const [isOpenMaterialDialog, setIsOpenMaterialDiaglog] = useState<boolean>(false);
+  const [changeUploadPartOfDesignTool, setChangeUploadPartOfDesignTool] = useState<boolean>(false);
+  const [isOpenNotiChangeUpdateImageDesignTool, setIsOpenNotiChangeUpdateImageDesignTool] = useState<boolean>(false);
+  const [isLoadingPage, setIsLoadingPage] = useState<boolean>(false);
 
 
 
@@ -67,7 +72,7 @@ function CustomDesignScreen() {
   // ---------------Usable Variable---------------//
   const { t, i18n } = useTranslation();
 
-  const __handleUpdatePart = useCallback((updatePart: any) => { // Replace `any` with the appropriate type
+  const __handleUpdatePart = useCallback((updatePart: any) => {
     console.log('Received updatePart from child: ', updatePart);
     setUpdatePartData(updatePart);
     setPartOfClothData(updatePart);
@@ -153,6 +158,7 @@ function CustomDesignScreen() {
 
   const __handleSetNewPartOfDesignData = (items: PartOfDesignInterface[] | undefined) => {
     setNewPartOfDeignData(items);
+    setPartOfClothData(partOfClothData);
   }
 
   const __handleRemoveStamp = (itemId: string) => {
@@ -171,39 +177,17 @@ function CustomDesignScreen() {
     setRedoStack([]);
   };
 
+  const imageDraggableRef = useRef<any>(null);
+
   const __handleUndoFlow = () => {
-    if (undoStack.length > 0) {
-      const lastState = undoStack.pop()!;
-      setRedoStack(prev => [
-        ...prev,
-        {
-          itemPositions: { ...itemPositions },
-          itemZIndices: { ...itemZIndices },
-          highestZIndex,
-        },
-      ]);
-      setItemPositions(lastState.itemPositions);
-      setItemZIndices(lastState.itemZIndices);
-      setHighestZIndex(lastState.highestZIndex);
-      setUndoStack([...undoStack]);
+    if (imageDraggableRef.current) {
+      imageDraggableRef.current.undo();
     }
   };
 
   const __handleRedoFlow = () => {
-    if (redoStack.length > 0) {
-      const lastState = redoStack.pop()!;
-      setUndoStack(prev => [
-        ...prev,
-        {
-          itemPositions: { ...itemPositions },
-          itemZIndices: { ...itemZIndices },
-          highestZIndex,
-        },
-      ]);
-      setItemPositions(lastState.itemPositions);
-      setItemZIndices(lastState.itemZIndices);
-      setHighestZIndex(lastState.highestZIndex);
-      setRedoStack([...redoStack]);
+    if (imageDraggableRef.current) {
+      imageDraggableRef.current.redo();
     }
   };
 
@@ -231,6 +215,7 @@ function CustomDesignScreen() {
    */
   const __handleFetchSystemItemData = async () => {
     setIsCurrentItemListLoading(true);
+    setIsLoadingPage(true);
     try {
       // const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.design.systemItem}`);
       const response = await api.get(`https://665dc0c3e88051d604081de3.mockapi.io/api/v1/stamps`);
@@ -238,11 +223,12 @@ function CustomDesignScreen() {
       if (response) {
         setCurrentItemList(response);
         setIsCurrentItemListLoading(false);
+        setIsLoadingPage(false);
       }
     } catch (error) {
       console.error('Error checking verification status:', error);
       setIsCurrentItemListLoading(false);
-
+      setIsLoadingPage(false);
     }
   }
 
@@ -279,6 +265,20 @@ function CustomDesignScreen() {
       })
   }
 
+  const __handleReadFileUploadImageTool = (type: any) => {
+    reader(file)
+      .then((result) => {
+        setSelectedStamp((prev) => {
+          const newItem: ItemMaskInterface = {
+            itemMaskID: __handleGenerateItemId(),
+            typeOfItem: 'IMAGE',
+            imageUrl: result,
+          };
+          return [newItem];
+        });
+      })
+  }
+
   const __handleAddTextToDesign = (txtBase64: any) => {
     setSelectedStamp((prev) => {
       const newItem: ItemMaskInterface = {
@@ -287,7 +287,8 @@ function CustomDesignScreen() {
         imageUrl: txtBase64,
         position: { x: 150, y: 170 },
         positionX: 150,
-        positionY: 170
+        positionY: 170,
+        zIndex: 0
       };
 
       if (prev && prev.length > 0) {
@@ -395,8 +396,19 @@ function CustomDesignScreen() {
     setIsOpenMaterialDiaglog(false);
   }
 
+  const __handleChangeUploadPartOfDesignTool = (isUploadImage: boolean) => {
+    setChangeUploadPartOfDesignTool(isUploadImage);
+    setSelectedStamp([]);
+    setIsOpenNotiChangeUpdateImageDesignTool(false);
+
+  }
+
   return (
     <div className={styles.customDesign__container}>
+
+      {/* Loading page */}
+      <LoadingComponent isLoading={isLoadingPage}></LoadingComponent>
+
       {/* Dialog area */}
       <ProductDialogComponent onItemSelect={__handleItemSelect} isOpen={isOpenProductDialog} onClose={() => __handleCloseDialog()} />
 
@@ -436,7 +448,6 @@ function CustomDesignScreen() {
 
       <div className={styles.customDesign__container__editorArea}>
 
-
         {/* Part of cloth of Model */}
         <div className={styles.customDesign__container__editorArea__partOfCloth}>
           {partOfClothData?.map((item: PartOfDesignInterface, key: any) => (
@@ -454,46 +465,79 @@ function CustomDesignScreen() {
           {/* Menu Bar of editor area */}
           <div className={styles.customDesign__container__editorArea__display__menuBar} >
             <div className={styles.customDesign__container__editorArea__display__menuBar__buttonGroup}>
+              {/* TODO */}
+              <button onClick={() => setIsOpenNotiChangeUpdateImageDesignTool(true)}>
+                {changeUploadPartOfDesignTool ? (
+                  <>
+                    <FaRegEdit size={20} style={{ float: 'left' }} />
+                    <span>
+                      Editor
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <FaCloudUploadAlt size={20} style={{ float: 'left' }} />
+                    <span>
+                      Upload image
+                    </span>
+                  </>
+                )}
+
+              </button>
+
               <button onClick={__handleUndoFlow}>
                 <IoMdUndo size={20} style={{ float: 'left' }} />
                 <span>
                   Undo
                 </span>
               </button>
+
               <button onClick={__handleRedoFlow}>
                 <span>
                   Redo
                 </span>
                 <IoMdRedo size={20} style={{ float: 'right' }} />
               </button>
+
+
             </div>
           </div>
 
-          {selectedPartOfCloth && (
+          {selectedPartOfCloth && !changeUploadPartOfDesignTool && (
             <>
               <div className={`${styles.customDesign__container__editorArea__display__displayDesign} editorArea__display__displayDesign`} >
                 <ImageDraggableComponent
                   partOfCloth={selectedPartOfCloth}
                   partOfClothData={partOfClothData}
                   itemPositions={itemPositions}
-                  setItemPositions={(positions) => {
-                    __handleSaveStateToUndoStack();
-                    setItemPositions(positions);
-                  }}
                   itemZIndices={itemZIndices}
-                  setItemZIndices={(zIndices) => {
-                    __handleSaveStateToUndoStack();
-                    setItemZIndices(zIndices);
-                  }}
-                  highestZIndex={highestZIndex}
-                  setHighestZIndex={setHighestZIndex}
                   onDeleteItem={__handleRemoveStamp}
-                  setNewItemData={(items) => __handleSetNewPartOfDesignData(items)}
                   onUpdatePart={__handleUpdatePart}
                   stamps={selectedStamp}
                   rotate={angle}
                   onSetIsOtherItemSelected={(itemId) => __handleOnSetIsOtherItemSelected(itemId)}
+                  onUndo={__handleUndoFlow}
+                  onRedo={__handleRedoFlow}
                 ></ImageDraggableComponent>
+              </div>
+            </>
+          )}
+
+          {selectedPartOfCloth && changeUploadPartOfDesignTool && (
+            <>
+              <div className={`${styles.customDesign__container__editorArea__display__displayDesign}`} style={{ pointerEvents: 'auto' }} >
+                <div className="flex items-center justify-center w-full">
+                  <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 light:hover:bg-bray-800 light:bg-gray-700 hover:bg-gray-100 light:border-gray-600 light:hover:border-gray-500 light:hover:bg-gray-600">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <svg className="w-8 h-8 mb-4 text-gray-500 light:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
+                      </svg>
+                      <p className="mb-2 text-sm text-gray-500 light:text-gray-400"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                      <p className="text-xs text-gray-500 light:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
+                    </div>
+                    <FilePicker file={file} setFile={setFile} readFile={__handleReadFileUploadImageTool} partOfCloth={selectedItem} />
+                  </label>
+                </div>
               </div>
             </>
           )}
@@ -558,30 +602,6 @@ function CustomDesignScreen() {
                 >
                   <IoText color={toolSelected === 'textEditorTool' ? primaryColor : blackColor} size={25} className={`${styles.menuEditor__icon}`}></IoText>
                 </button>
-
-                {/* <div
-                  key="custom"
-                  className={styles.customDesign__container__editorArea__menu}
-
-                  {...slideAnimation('left')}
-                >
-                  {__generateTabContent()}
-
-                  <div className={styles.customDesign__container__editorArea__menu__tab}>
-                    {EditorTabs.map((tab: any, index: any) => (
-                      <Tab
-                        isActiveTab={true}
-                        isFilterTab={true}
-                        key={tab.name}
-                        tab={tab}
-                        handleClick={() => { setActiveEditorTab(tab.name) }}
-                      >
-
-                      </Tab>
-                    ))}
-
-                  </div>
-                </div> */}
               </div>
 
               {/* Menu bar tab colection */}
@@ -764,13 +784,29 @@ function CustomDesignScreen() {
         isOpen={isOpenMaterialDialog}
         onClose={() => __handleCloseMaterialDialog()}
         child={(
-          <MaterialDetailComponent primaryKey={'DIALOG'}  partOfDesigndata={partOfClothData}></MaterialDetailComponent>
+          <MaterialDetailComponent primaryKey={'DIALOG'} partOfDesigndata={partOfClothData}></MaterialDetailComponent>
         )}
         model={(
           <CanvasModel typeOfModel={typeOfModel} isDefault={true} is3D={true} />
         )}
       ></ChooseMaterialDialogComponent>
 
+      <Dialog open={isOpenNotiChangeUpdateImageDesignTool} style={{ position: 'absolute', top: 0 }}>
+        <DialogTitle>Warning</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Your design will be lost. Do you want to continue?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsOpenNotiChangeUpdateImageDesignTool(false)} style={{ color: primaryColor }}  >
+            No
+          </Button>
+          <Button onClick={() => __handleChangeUploadPartOfDesignTool(!changeUploadPartOfDesignTool)} style={{ backgroundColor: redColor, color: whiteColor }}>
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div >
   )
 }

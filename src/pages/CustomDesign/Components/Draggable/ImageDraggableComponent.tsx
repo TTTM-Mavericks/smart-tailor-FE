@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { Ref, forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import styles from './ImageDraggableStyle.module.scss';
 import { useSnapshot } from 'valtio';
@@ -7,40 +7,35 @@ import { Resizable, ResizableProps, ResizeCallback } from 're-resizable';
 import { ItemMaskInterface, PartOfDesignInterface } from '../../../../models/DesignModel';
 import { Menu, MenuItem } from '@mui/material';
 import { IoTrashOutline } from "react-icons/io5";
+import zIndex from '@mui/material/styles/zIndex';
 
 type props = {
     partOfCloth?: PartOfDesignInterface,
     partOfClothData?: PartOfDesignInterface[],
     itemPositions: any;
-    setItemPositions: (positions: { [key: string]: any }) => void;
     itemZIndices: { [key: string]: number };
-    setItemZIndices: (zIndices: { [key: string]: any }) => void;
-    highestZIndex: number;
-    setHighestZIndex: (zIndex: any) => void;
     onDeleteItem: (item: any) => void;
-    setNewItemData: (items: PartOfDesignInterface[] | undefined) => void;
     onUpdatePart: (updatePart: PartOfDesignInterface[]) => void;
     stamps?: ItemMaskInterface[] | undefined;
     rotate?: any;
     onSetIsOtherItemSelected?: (itemId: any) => void;
+    onUndo?: () => void;
+    onRedo?: () => void;
 }
 
 const ImageDraggableComponent: React.FC<props> = ({
     partOfCloth,
     partOfClothData,
     itemPositions,
-    setItemPositions,
     itemZIndices,
-    setItemZIndices,
-    highestZIndex,
-    setHighestZIndex,
     onDeleteItem,
-    setNewItemData,
     onUpdatePart,
     stamps,
     rotate,
-    onSetIsOtherItemSelected
-}) => {
+    onSetIsOtherItemSelected,
+    onUndo,
+    onRedo,
+},  ref: Ref<any>) => {
 
     // TODO MUTIL LANGUAGE
 
@@ -55,6 +50,8 @@ const ImageDraggableComponent: React.FC<props> = ({
     } | null>(null);
     const [selectedItemForContext, setSelectedItemForContext] = useState<ItemMaskInterface | null>(null);
     const [oldPartOfClothData, setOldPartOfClothData] = useState<PartOfDesignInterface[]>();
+    const [history, setHistory] = useState<ItemMaskInterface[][]>([]);
+    const [historyIndex, setHistoryIndex] = useState<number>(-1);
 
     // ---------------Usable Variable---------------//
     const snap = useSnapshot(state);
@@ -72,7 +69,6 @@ const ImageDraggableComponent: React.FC<props> = ({
             if (result && result.length > 0) {
                 const itemMasks = result.find((item: PartOfDesignInterface) => item.partOfDesignID === partOfCloth?.partOfDesignID);
                 if (itemMasks) {
-                    console.log('itemMasks: ', itemMasks);
                     setData(itemMasks.itemMasks);
                     setOldPartOfClothData(partOfClothData);
                 }
@@ -100,7 +96,8 @@ const ImageDraggableComponent: React.FC<props> = ({
      */
     useEffect(() => {
         __handleSetNewPartOfDesignData();
-    }, [itemPositions, itemZIndices, size.width, size.height, selectedItemDrag, data]);
+    }, [itemPositions, itemZIndices, size.width, size.height, selectedItemDrag]);
+
 
     /**
      * Set size of resizable
@@ -142,10 +139,34 @@ const ImageDraggableComponent: React.FC<props> = ({
             });
         });
         console.log(`${rotate}deg`);
-    }, [rotate, selectedItemDrag])
+    }, [rotate, selectedItemDrag]);
+
+    // useEffect(()=>{
+    //     console.log('history: ', history);
+    //     state.modelData = data;
+    // },[data])
+
 
 
     // ---------------FunctionHandler---------------//
+
+    const __handleUndo = () => {
+        if (historyIndex > 0) {
+          const prevState = history[historyIndex - 1];
+          setData(prevState);
+          setHistoryIndex(historyIndex - 1);
+        }
+      };
+    
+      const __handleRedo = () => {
+        if (historyIndex < history.length - 1) {
+          const nextState = history[historyIndex + 1];
+          setData(nextState);
+          setHistoryIndex(historyIndex + 1);
+
+        }
+      };
+
 
     /**
      * Save PartOfClothData while edit and response to customDesign
@@ -173,11 +194,19 @@ const ImageDraggableComponent: React.FC<props> = ({
                 onUpdatePart(updatePart)
                 state.modelData = updatePart;
             }
+            state.modelData = updatePart;
 
             if (JSON.stringify(updateItemData) !== JSON.stringify(data)) {
                 console.log('updateItemData: ', updateItemData);
                 setData(updateItemData);
             }
+
+            // Save the current state to history
+            setHistory((prevHistory: any) => {
+                const newHistory = [...prevHistory.slice(0, historyIndex + 1), data];
+                setHistoryIndex(newHistory.length - 1);
+                return newHistory;
+            });
         }
     }
 
@@ -190,6 +219,7 @@ const ImageDraggableComponent: React.FC<props> = ({
         setSelectedItemDrag(item);
         if (onSetIsOtherItemSelected) {
             onSetIsOtherItemSelected(item.itemMaskID);
+
         }
     };
 
@@ -203,8 +233,7 @@ const ImageDraggableComponent: React.FC<props> = ({
         const target = e.target as HTMLElement;
         if (target) {
             e.preventDefault();
-            // setSelectedItemDrag(item);
-
+            setSelectedItemDrag(item);
         }
     };
 
@@ -261,14 +290,12 @@ const ImageDraggableComponent: React.FC<props> = ({
      */
     const __handleResizeStart = () => {
         setResizing(true);
-        setResizing(true);
     };
 
     /**
      * Handle logic when onResize trigger
      */
     const __handleOnResize = (e: any) => {
-        console.log('__handleOnResize');
         setResizing(true);
     };
 
@@ -276,8 +303,6 @@ const ImageDraggableComponent: React.FC<props> = ({
      * Handle logic when onResizeEnd trigger
      */
     const __handleResizeEnd: ResizeCallback = (e, direction, refToElement, delta) => {
-        console.log('__handleResizeEnd');
-
         const target = refToElement as HTMLElement;
         if (target) {
             target.style.cursor = 'grab';
@@ -329,27 +354,41 @@ const ImageDraggableComponent: React.FC<props> = ({
     const __handleClose = () => {
         setContextMenu(null);
         setSelectedItemForContext(null);
+        setSelectedItemDrag(selectedItemDrag);
     };
 
     /**
      * Handle make item move to above another
      */
     const __handleMoveToAbove = () => {
-        if (selectedItemForContext) {
-            const currentZIndex = itemZIndices[selectedItemForContext.itemMaskID];
-            const newZIndex = currentZIndex + 1;
+        // if (selectedItemForContext) {
+        //     const currentZIndex = itemZIndices[selectedItemForContext.itemMaskID];
+        //     const newZIndex = currentZIndex + 1;
+        //     console.log('newZIndex: ', newZIndex);
 
-            setItemZIndices((prevZIndices: any) => {
-                const updatedZIndices = { ...prevZIndices };
-                Object.keys(updatedZIndices).forEach(key => {
-                    if (updatedZIndices[key] === newZIndex) {
-                        updatedZIndices[key] = currentZIndex;
+        //     setItemZIndices((prevZIndices: any) => {
+        //         const updatedZIndices = { ...prevZIndices };
+        //         Object.keys(updatedZIndices).forEach(key => {
+        //             if (updatedZIndices[key] === newZIndex) {
+        //                 updatedZIndices[key] = currentZIndex;
+        //             }
+        //         });
+        //         updatedZIndices[selectedItemForContext.itemMaskID] = newZIndex;
+        //         return updatedZIndices;
+        //     });
+        if (selectedItemDrag) {
+            setData((prevData) => {
+                if (!prevData) return prevData;
+                return prevData.map((dataItem: ItemMaskInterface) => {
+                    if (dataItem.itemMaskID === selectedItemDrag.itemMaskID) {
+                        return {
+                            ...dataItem,
+                            zIndex: selectedItemDrag.zIndex + 10
+                        };
                     }
+                    return dataItem;
                 });
-                updatedZIndices[selectedItemForContext.itemMaskID] = newZIndex;
-                return updatedZIndices;
             });
-
             __handleClose();
         }
     };
@@ -358,23 +397,23 @@ const ImageDraggableComponent: React.FC<props> = ({
      * Handle make item move to below another
      */
     const __handleMoveToBelow = () => {
-        if (selectedItemForContext) {
-            const currentZIndex = itemZIndices[selectedItemForContext.itemMaskID];
-            const newZIndex = currentZIndex - 1;
-
-            setItemZIndices((prevZIndices: any) => {
-                const updatedZIndices = { ...prevZIndices };
-                Object.keys(updatedZIndices).forEach(key => {
-                    if (updatedZIndices[key] === newZIndex) {
-                        updatedZIndices[key] = currentZIndex;
+        if (selectedItemDrag) {
+            setData((prevData) => {
+                if (!prevData) return prevData;
+                return prevData.map((dataItem: ItemMaskInterface) => {
+                    if (dataItem.itemMaskID === selectedItemDrag.itemMaskID) {
+                        return {
+                            ...dataItem,
+                            zIndex: selectedItemDrag.zIndex - 10
+                        };
                     }
+                    return dataItem;
                 });
-                updatedZIndices[selectedItemForContext.itemMaskID] = newZIndex;
-                return updatedZIndices;
             });
-
             __handleClose();
         }
+
+
     };
 
 
@@ -395,7 +434,7 @@ const ImageDraggableComponent: React.FC<props> = ({
                     defaultClassNameDragged={`${styles.imageDraggable__resizeable} imageDraggable__resizeable`}
 
                 >
-                    <div key={item.itemMaskID} style={{ position: 'absolute', zIndex: itemZIndices[item.itemMaskID] ?? 1 }} onContextMenu={(e: any) => __handleContextMenu(e, item)}>
+                    <div key={item.itemMaskID} style={{ position: 'absolute', zIndex: item.zIndex }} onContextMenu={(e: any) => __handleContextMenu(e, item)}>
                         <Resizable
                             key={item.itemMaskID}
                             style={{
@@ -410,11 +449,11 @@ const ImageDraggableComponent: React.FC<props> = ({
                             onResizeStart={__handleResizeStart}
                             onResize={__handleOnResize}
                             onResizeStop={(e, direction, refToElement, delta) => __handleResizeEnd(e, direction, refToElement, delta)}
-                            defaultSize={{ width: 230, height: 230 }}
+                            defaultSize={item.typeOfItem !== 'TEXT' ? { width: 230, height: 230 } : { width: 230 }}
                             handleWrapperStyle={{ pointerEvents: 'auto' }}
                             className={`${styles.resizeable__element}`}
                         >
-                            {selectedItemDrag === item && (
+                            {selectedItemDrag?.itemMaskID === item.itemMaskID && (
                                 <>
                                     <div className={`${styles.resizeable__element__resizeIcon__icon1}`} ></div>
                                     <div className={`${styles.resizeable__element__resizeIcon__icon2}`} ></div>
@@ -430,7 +469,7 @@ const ImageDraggableComponent: React.FC<props> = ({
                                     />
                                 </>
                             )}
-                            <img src={item.imageUrl} className={`${styles.item__img__resizeable}`} style={{ border: selectedItemDrag === item ? '1px solid black' : 'none', pointerEvents: 'auto' }} onClick={() => __handleSelectedIteamDrag(item)} alt="Draggable Image" />
+                            <img src={item.imageUrl} className={`${styles.item__img__resizeable}`} style={{ border: selectedItemDrag?.itemMaskID === item.itemMaskID ? '1px solid black' : 'none', pointerEvents: 'auto' }} onClick={() => __handleSelectedIteamDrag(item)} alt="Draggable Image" />
                         </Resizable>
                     </div>
                 </Draggable>
@@ -457,6 +496,8 @@ const ImageDraggableComponent: React.FC<props> = ({
                         >
                             <MenuItem onClick={__handleMoveToAbove}>Move to Above</MenuItem>
                             <MenuItem onClick={__handleMoveToBelow}>Move to Below</MenuItem>
+                            <MenuItem onClick={__handleUndo}>Undo</MenuItem>
+                            <MenuItem onClick={__handleRedo}>Redo</MenuItem>
                         </Menu>
                     </div>
 

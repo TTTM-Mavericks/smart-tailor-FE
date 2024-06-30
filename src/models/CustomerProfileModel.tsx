@@ -4,7 +4,7 @@ export interface CustomerProfile {
     phoneNumber: string,
     imageUrl: string,
     gender: boolean,
-    dateOfBirth: Date,
+    dateOfBirth: Date | string,
     address: string,
     province: string,
     district: string,

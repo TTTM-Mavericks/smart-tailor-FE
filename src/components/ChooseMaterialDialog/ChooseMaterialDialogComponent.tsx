@@ -74,17 +74,30 @@ const CustomPopper = (props: any) => {
 const CustomTextField = styled(TextField)(({ theme }) => ({
     '& .MuiInputBase-root': {
         height: '35px',
-        width: '200px',
+        width: '150px',
         borderRadius: '8px',
-        outLine: 'none'
-    },
-    '& .MuiOutlinedInput-input': {
+      },
+      '& .MuiOutlinedInput-input': {
         fontSize: '12px',
-    },
-    '& .MuiInputLabel-root': {
+      },
+      '& .MuiInputLabel-root': {
         fontSize: '12px', // Adjust font size of the label
-    },
-}));
+      },
+      '& .MuiInputLabel-root.Mui-focused': {
+          color: primaryColor, // Label color when focused
+        },
+      '& .MuiOutlinedInput-root': {
+        '& fieldset': {
+        },
+        '&:hover fieldset': {
+          border: `1.5px solid ${primaryColor}`, // Border color on hover,
+          color: primaryColor
+        },
+        '&.Mui-focused fieldset': {
+          border: `1.5px solid ${primaryColor}`, // Border color when focused
+        },
+      },
+    }));
 
 const stylesInputField = {
     input1: {
