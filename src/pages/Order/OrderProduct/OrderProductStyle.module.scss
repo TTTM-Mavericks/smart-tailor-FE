@@ -1,0 +1,152 @@
+@import '../../../index.module.scss';
+
+.changeAddressDialogContainer {
+    width: 700px;
+    height: 700px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.changeAddressDialogContent {
+    // height: 700px;
+    // width: 500px;
+
+    &__addAddressBtn {
+        position: relative;
+        width: 90%;
+        border: 2px dashed $grayColor;
+        padding: 5% 25px 5% 25px;
+        border-radius: 8px;
+        margin: 10px 5% 10px 5%;
+
+        &:hover {
+            cursor: pointer;
+        }
+
+        &__iconAdd {
+            position: absolute;
+            align-items: center;
+            justify-content: center;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            span{
+                font-size: 13px;
+                font-weight: 500;
+            }
+        }
+    }
+
+    &__adressItem {
+        position: relative;
+        width: 90%;
+        border: 2px dashed $grayColor;
+        padding: 5% 25px 5% 25px;
+        border-radius: 8px;
+        margin: 10px 5% 10px 5%;
+
+        &:hover {
+            background-color: rgba($color: $grayColor, $alpha: 1);
+            cursor: pointer;
+
+            .changeAddressDialogContent__adressItem__iconGroup {
+                display: flex;
+            }
+        }
+
+        &__title {
+            font-size: 14px;
+            font-weight: bold;
+
+        }
+
+        span {
+            font-size: 13px;
+        }
+
+        &__iconGroup {
+            position: absolute;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+
+            &__icon {
+                width: 35px;
+                height: 35px;
+                border-radius: 90px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 5px;
+
+                &:hover {
+                    scale: 1.2;
+                }
+
+            }
+        }
+
+        &__noHover {
+            .changeAddressDialogContent__adressItem__iconGroup {
+                display: none !important;
+            }
+
+            &:hover {
+                background-color: initial !important;
+                cursor: default !important;
+            }
+        }
+    }
+
+    &::-webkit-scrollbar {
+        width: 3px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: $grayColor1;
+        border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #7b7b7b;
+        border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: #7b7b7b;
+        /* Color when hovering over the scrollbar thumb */
+    }
+}
+
+/* Add this to your CSS or SCSS file */
+
+.custom-scrollbar {
+    overflow-y: auto;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    /* Width of the scrollbar */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    /* Background of the scrollbar track */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #888;
+    /* Color of the scrollbar thumb */
+    border-radius: 4px;
+    /* Rounding the edges of the thumb */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #555;
+    /* Color of the thumb when hovered */
+}

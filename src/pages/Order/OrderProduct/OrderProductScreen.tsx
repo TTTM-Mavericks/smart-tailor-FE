@@ -1,8 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import style from './OrderProductStyle.module.scss'
 import HeaderComponent from '../../../components/Header/HeaderComponent';
 import FooterComponent from '../../../components/Footer/FooterComponent';
+import ChangeAddressDialogComponent from './ChangeAddressDialogComponent';
 const OrderProductScreen = () => {
+    // TODO MULTI LANGUAGE\
+    // ---------------UseState Variable---------------//
+    const [isChangeAddressDialogOpen, setIsChangeAddressDialogOpen] = useState<boolean>(false);
+    // ---------------Usable Variable---------------//
+    // ---------------UseEffect---------------//
+    // ---------------FunctionHandler---------------//
+    const __handleOpenChangeAddressDialog = (isOpen: boolean) => {
+        setIsChangeAddressDialogOpen(isOpen);
+        console.log(isOpen);
+    }
+
     return (
         <div className={`${style.orderProduct_container}`}>
             <HeaderComponent></HeaderComponent>
@@ -122,14 +134,14 @@ const OrderProductScreen = () => {
                                             <p className="text-base light:text-white font-semibold leading-4 text-center md:text-left text-gray-800">Shipping Address</p>
                                             <p className="w-48 lg:w-full light:text-gray-300 xl:w-48 text-center md:text-left text-sm leading-5 text-gray-600">180 North King Street, Northhampton MA 1060</p>
                                         </div>
-                                        <div className="flex justify-center md:justify-start items-center md:items-start flex-col space-y-4">
-                                            <p className="text-base light:text-white font-semibold leading-4 text-center md:text-left text-gray-800">Billing Address</p>
-                                            <p className="w-48 lg:w-full light:text-gray-300 xl:w-48 text-center md:text-left text-sm leading-5 text-gray-600">180 North King Street, Northhampton MA 1060</p>
+                                        
+                                        <div className="flex w-full justify-center items-center md:justify-start md:items-start">
+                                            <button onClick={() => __handleOpenChangeAddressDialog(true)} className="mt-6 md:mt-0 light:border-white light:hover:bg-gray-900 light:bg-transparent light:text-white py-5 hover:bg-gray-200 focus:outline-none  focus:ring-gray-800 border border-gray-800  w-96 2xl:w-full text-base font-medium leading-4 text-gray-800">
+                                                <span>Change address</span>
+                                            </button>
                                         </div>
                                     </div>
-                                    <div className="flex w-full justify-center items-center md:justify-start md:items-start">
-                                        <button className="mt-6 md:mt-0 light:border-white light:hover:bg-gray-900 light:bg-transparent light:text-white py-5 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 border border-gray-800  w-96 2xl:w-full text-base font-medium leading-4 text-gray-800">Edit Details</button>
-                                    </div>
+                                    <ChangeAddressDialogComponent isOpen={isChangeAddressDialogOpen} onClose = {()=> __handleOpenChangeAddressDialog(false)}></ChangeAddressDialogComponent>
                                 </div>
                             </div>
                         </div>
@@ -137,7 +149,7 @@ const OrderProductScreen = () => {
                 </div>
             </div>
             <FooterComponent></FooterComponent>
-        </div>
+        </div >
     );
 };
 

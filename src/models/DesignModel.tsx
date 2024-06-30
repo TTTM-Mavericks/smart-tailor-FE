@@ -57,6 +57,19 @@ export interface ItemMaterialInterface {
 
 }
 
+export interface MaterialInterface {
+  materialID: string;
+  materialName: string;
+  categoryName: string;
+  hsCode: number;
+  unit: string;
+  basePrice: number;
+  status: boolean;
+  createDate: string;
+  lastModifiedDate: string | null;
+}
+
+
 
 export const PartOfShirtDesignData = [
   {
