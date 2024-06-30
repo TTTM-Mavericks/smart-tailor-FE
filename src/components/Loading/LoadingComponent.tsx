@@ -4,11 +4,12 @@ type LoadingProps = {
     isLoading: boolean,
     time?: number;
     ringStyle?: React.CSSProperties
-    containerStyle?: React.CSSProperties
+    containerStyle?: React.CSSProperties,
+    title?: string
 }
-const LoadingComponent: React.FC<LoadingProps> = ({ isLoading, time, containerStyle, ringStyle }) => {
+const LoadingComponent: React.FC<LoadingProps> = ({ isLoading, time, containerStyle, ringStyle, title }) => {
     // ---------------UseState Variable---------------//
-    const [isHide, setIsHide] = useState<boolean> (false);
+    const [isHide, setIsHide] = useState<boolean>(false);
     // ---------------Usable Variable---------------//
     // ---------------UseEffect---------------//
     // ---------------FunctionHandler---------------//
@@ -20,7 +21,7 @@ const LoadingComponent: React.FC<LoadingProps> = ({ isLoading, time, containerSt
                 <div style={ringStyle} className={`${style.ring}`}></div>
                 <div style={ringStyle} className={`${style.ring}`}></div>
                 <div style={ringStyle} className={`${style.ring}`}></div>
-                <div className={`${style.text}`}>Loading</div>
+                <div className={`${style.text}`}>{title ? title : 'Loading'}</div>
             </div>
         </div>
     );

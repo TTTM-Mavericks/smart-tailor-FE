@@ -76,13 +76,28 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
         height: '35px',
         width: '150px',
         borderRadius: '8px',
-        outLine: 'none'
+        outline: 'none',
     },
     '& .MuiOutlinedInput-input': {
         fontSize: '12px',
     },
     '& .MuiInputLabel-root': {
         fontSize: '12px', // Adjust font size of the label
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+        color: primaryColor, // Label color when focused
+    },
+    '& .MuiOutlinedInput-root': {
+        '& fieldset': {
+            border: `1.5px solid ${primaryColor}`, // Initial border color
+        },
+        '&:hover fieldset': {
+            border: `1.5px solid ${primaryColor}`, // Border color on hover,
+            color: primaryColor
+        },
+        '&.Mui-focused fieldset': {
+            border: `1.5px solid ${primaryColor}`, // Border color when focused
+        },
     },
 }));
 
@@ -101,6 +116,8 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
     const [printTypeMaterial, setPriTypeMaterial] = useState<{ type: string, material: string }>();
     const [selectedItemMask, setSelectedItemMask] = useState<ItemMaskInterface>();
     const [selectedPartOfDesign, setSelectedPartOfDesign] = useState<PartOfDesignInterface | undefined>();
+    const [inputValueFabric, setInputValueFabric] = React.useState<string>('');
+    const [fabric, setFabric] = React.useState<string>('');
 
     // ---------------Usable Variable---------------//
     const { t, i18n } = useTranslation();
@@ -373,11 +390,44 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                 {primaryKey === 'DIALOG' && selectedItemMask ? (
                     <div style={{ paddingLeft: 20, marginTop: 20 }}>
                         <div style={{ marginBottom: 10, marginTop: -40 }} >
+                            <span style={{ fontSize: 12, fontWeight: '500' }}>Material</span>
+                        </div>
+
+                        <Autocomplete
+                            id="tags-outlined"
+                            options={names}
+                            getOptionLabel={(option) => option}
+                            filterSelectedOptions
+                            value={fabric}
+                            onChange={(event, newValue) => {
+                                newValue && setFabric(newValue);
+                            }}
+                            inputValue={inputValueFabric}
+                            onInputChange={(event, newValue) => {
+                                setInputValueFabric(newValue);
+                            }}
+                            style={{ height: '10px !important' }}
+                            size='small'
+                            renderInput={(params) => (
+                                <CustomTextField
+                                    {...params}
+                                    variant="outlined"
+                                    label="Fabric"
+                                    size='small'
+                                    className={`${style.dialog__content__modelMaterialArea__material__formControl__textField}`}
+                                />
+                            )}
+                            PaperComponent={({ children }) => <CustomPaper>{children}</CustomPaper>}
+                            PopperComponent={CustomPopper}
+
+                        />
+
+                        <div style={{ marginBottom: 10, marginTop: 20 }} >
                             <span style={{ fontSize: 12, fontWeight: '500' }}>Print type</span>
                             <a onClick={() => __handleApplyAllMaterialForItemMask()} style={{ fontSize: 11, fontWeight: '500', justifyContent: 'flex-end', color: secondaryColor, paddingLeft: 120, cursor: 'pointer' }}>Apply all items</a>
                         </div>
                         {printType.map((type) => (
-                            <div className={`flex ${style.materialDetail__content__itemMask} `}>
+                            <div className={`${style.materialDetail__content__itemMask} `}>
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
                                     <input
                                         id={`filter-mobile-${type.value}`}
@@ -391,6 +441,7 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                                         <label
                                             htmlFor={`filter-mobile-${type.value}`}
                                             className="ml-2 min-w-0 flex-1 text-gray-500"
+                                            style={{ fontSize: 11 }}
                                         >
                                             {type.lable}
                                         </label>

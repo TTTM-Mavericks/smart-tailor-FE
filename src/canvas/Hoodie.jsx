@@ -149,7 +149,7 @@ const Hoodie = () => {
                 scale={[1, 1, 1]}
 
             >
-                <meshBasicMaterial attach="material" map={text}/>
+                {/* <meshBasicMaterial attach="material" map={text}/> */}
                 {/* <meshStandardMaterial map={text} depthTest={true} depthWrite={true} /> */}
                 {/* {deCalData && deCalData.map((decalGroup) =>
                     decalGroup.items.map((item) => (
