@@ -144,3 +144,36 @@
         /* Color when hovering over the scrollbar thumb */
     }
 }
+
+.orderProduct__container {
+    width: 100%;
+
+    &__content {
+        display: flex;
+    }
+
+    &__detail {
+        align-items: center;
+        width: 100%;
+        display: flex;
+
+        &__sizeDetail {
+            display: inline;
+            float: right;
+
+
+            &__quantity {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+        }
+    }
+
+    &__information {
+        width: 70%;
+        p {
+            padding: 5px;
+        }
+    }
+}
