@@ -20,7 +20,8 @@ export interface ItemMaskInterface {
   zIndex?: any;
   printType?: string,
   rotate?: any;
-  itemMaterial?: ItemMaterialInterface
+  itemMaterial?: ItemMaterialInterface,
+  materialID?: string
 
 
 }
@@ -34,6 +35,7 @@ export interface PartOfDesignInterface {
   imgUrl?: string;
   successImageUrl?: string;
   itemMasks?: ItemMaskInterface[];
+  materialID?: any;
 }
 
 export interface DesignInterface {
@@ -81,7 +83,7 @@ export const PartOfShirtDesignData = [
     imgUrl: shirtFrontDesign,
     successImageUrl: '',
     itemMasks: [],
-    rotate: 0
+    rotate: 0,
 
   },
   {
@@ -92,7 +94,7 @@ export const PartOfShirtDesignData = [
     lastModifiedDate: '',
     imgUrl: shirtFrontDesign,
     itemMasks: [],
-    rotate: 0
+    rotate: 0,
   },
   {
     partOfDesignID: '3',
@@ -102,7 +104,7 @@ export const PartOfShirtDesignData = [
     lastModifiedDate: '',
     imgUrl: shirtBackDesign,
     itemMasks: [],
-    rotate: 0
+    rotate: 0,
   },
   {
     partOfDesignID: '4',
@@ -112,7 +114,7 @@ export const PartOfShirtDesignData = [
     lastModifiedDate: '',
     imgUrl: shirtFrontDesign,
     itemMasks: [],
-    rotate: 0
+    rotate: 0,
   },
 
 ]

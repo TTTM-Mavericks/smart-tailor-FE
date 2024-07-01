@@ -172,7 +172,7 @@ const OrderHistory: React.FC = () => {
     return (
         <div>
             <HeaderComponent />
-            <div className="max-w-6xl mx-auto p-4 md:p-6 min-h-screen" style={{ marginTop: "12%", marginBottom: "5%" }}>
+            <div className="max-w-6xl mx-auto p-4 md:p-6 min-h-screen" style={{ marginTop: "2%", marginBottom: "5%" }}>
                 <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 md:mb-8">{t(codeLanguage + '000198')}</h1>
                 <p className="text-base sm:text-lg text-gray-700 mb-4 md:mb-8">{t(codeLanguage + '000199')}</p>
                 {orders.map((order, index) => (

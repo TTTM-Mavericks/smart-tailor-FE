@@ -74,7 +74,7 @@ const CustomPopper = (props: any) => {
 const CustomTextField = styled(TextField)(({ theme }) => ({
     '& .MuiInputBase-root': {
         height: '35px',
-        width: '150px',
+        width: '250px',
         borderRadius: '8px',
         outline: 'none',
     },
@@ -113,11 +113,13 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
     const [materialItem, setMaterialItem] = useState<string>('');
     const [inputValueMaterialItem, setInputValueMaterialItem] = useState<string>('');
     const [data, setData] = useState<PartOfDesignInterface[]>();
-    const [printTypeMaterial, setPriTypeMaterial] = useState<{ type: string, material: string }>();
-    const [selectedItemMask, setSelectedItemMask] = useState<ItemMaskInterface>();
+    const [printTypeMaterial, setPrintTypeMaterial] = useState<{ itemId: string, partName: string, type: string, material: string }[]>([]);
+    const [selectedItemMask, setSelectedItemMask] = useState<{ partOfDesignId: any, itemMask: ItemMaskInterface }>();
     const [selectedPartOfDesign, setSelectedPartOfDesign] = useState<PartOfDesignInterface | undefined>();
     const [inputValueFabric, setInputValueFabric] = React.useState<string>('');
-    const [fabric, setFabric] = React.useState<string>('');
+    const [fabric, setFabric] = React.useState<{ partId: any, fabric: string }[]>([]);
+    const [thread, setThread] = React.useState<string>('');
+    const [inputValueThread, setInputValueThread] = React.useState<string>('');
 
     // ---------------Usable Variable---------------//
     const { t, i18n } = useTranslation();
@@ -138,6 +140,15 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
 
     ]
     // ---------------UseEffect---------------//
+
+    React.useEffect(() => {
+        console.log(selectedItemMask, ' - ', selectedPartOfDesign);
+    }, [selectedItemMask, selectedPartOfDesign]);
+
+    useEffect(() => {
+        partOfDesigndata && setSelectedPartOfDesign(partOfDesigndata[0]);
+    }, [partOfDesigndata])
+
     React.useEffect(() => {
         i18n.changeLanguage(selectedLanguage);
         localStorage.setItem('language', selectedLanguage);
@@ -162,20 +173,24 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
             if (!prevData) return prevData;
             return prevData.map((partItem: PartOfDesignInterface) => {
                 if (partItem.partOfDesignID === selectedPartOfDesign?.partOfDesignID) {
+                    const itemData = partItem.itemMasks?.map((itemMask: ItemMaskInterface) => {
+                        if (itemMask.itemMaskID === selectedItemMask?.itemMask.itemMaskID) {
+                            return {
+                                ...itemMask,
+                                itemMaterial: {
+                                    itemMaterialID: printTypeMaterial?.find((item) => item.itemId === selectedItemMask?.itemMask.itemMaskID)?.material
+                                },
+                                materialID: printTypeMaterial?.find((item) => item.itemId === selectedItemMask?.itemMask.itemMaskID)?.material
+                            };
+                        }
+                        return itemMask;
+                    });
+                    setItemMaskData(itemData);
                     return {
                         ...partItem,
-                        itemMasks: partItem.itemMasks?.map((itemMask: ItemMaskInterface) => {
-                            if (itemMask.itemMaskID === selectedItemMask?.itemMaskID) {
-                                return {
-                                    ...itemMask,
-                                    itemMaterial: {
-                                        itemMaterialID: inputValueMaterialItem
-                                    }
-                                };
-                            }
-                            return itemMask;
-                        })
+                        itemMasks: itemData,
                     };
+
                 }
                 return partItem;
             });
@@ -184,7 +199,38 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
 
     useEffect(() => {
         console.log('11111111111111', data);
-    }, [data])
+    }, [data]);
+
+    useEffect(() => {
+        if (!selectedPartOfDesign) return;
+
+        setData((prevData) => {
+            if (!prevData) return prevData;
+
+            return prevData.map((partItem: PartOfDesignInterface) => {
+                if (partItem.partOfDesignID === selectedPartOfDesign.partOfDesignID) {
+                    return {
+                        ...partItem,
+                        materialID: fabric.find((item) => item.partId === selectedPartOfDesign.partOfDesignID)?.fabric || '',
+                    };
+                }
+                return partItem;
+            });
+        });
+    }, [selectedPartOfDesign, fabric]);
+
+    useEffect(() => {
+        setPrintTypeMaterial((prevFabric) => {
+            const existingPart = prevFabric.find((item) => item.itemId === selectedItemMask?.itemMask.itemMaskID);
+            if (existingPart) {
+                return prevFabric.map((item) =>
+                    item.itemId === selectedItemMask?.itemMask.itemMaskID ? { ...item, material: materialItem } : item
+                );
+            } else {
+                return [...prevFabric];
+            }
+        });
+    }, [materialItem])
 
     // ---------------FunctionHandler---------------//
 
@@ -197,10 +243,6 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
         value: any,
         part: PartOfDesignInterface | undefined
     ) => {
-        console.log('value: ', value);
-        console.log('itemMask: ', item);
-        console.log('part: ', part);
-
         setData((prevData) => {
             if (!prevData) return prevData;
 
@@ -222,14 +264,26 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                 return partItem;
             });
         });
-        setPriTypeMaterial({ type: value, material: '' });
+        const prinTypeMaterialData = { itemId: item.itemMaskID, partName: part?.partOfDesignName, type: value, material: materialItem }
+        __handleUpdatePrintTypeMaterial(prinTypeMaterialData);
     };
 
+    const __handleUpdatePrintTypeMaterial = (printTypeData: any) => {
+        setPrintTypeMaterial((prevFabric) => {
+            const existingPart = prevFabric.find((item) => item.itemId === selectedItemMask?.itemMask.itemMaskID);
+            if (existingPart) {
+                return prevFabric.map((item) =>
+                    item.itemId === selectedItemMask?.itemMask.itemMaskID ? { ...item, type: printTypeData.type } : item
+                );
+            } else {
+                return [...prevFabric, printTypeData];
+            }
+        });
+    }
 
     const __handleSetlectedItemMask = (item: ItemMaskInterface, part: PartOfDesignInterface) => {
-        setSelectedItemMask(item);
+        setSelectedItemMask({ itemMask: item, partOfDesignId: part.partOfDesignID });
         setSelectedPartOfDesign(part);
-        console.log(item);
     }
 
     const __handleApplyAllMaterialForItemMask = () => {
@@ -242,28 +296,59 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                         itemMasks: partItem.itemMasks?.map((itemMask: ItemMaskInterface) => {
                             return {
                                 ...itemMask,
-                                printType: printTypeMaterial?.type,
+                                printType: printTypeMaterial.find((item) => item.itemId === itemMask.itemMaskID)?.type || selectedItemMask?.itemMask.printType,
                                 itemMaterial: {
-                                    itemMaterialID: inputValueMaterialItem
-                                }
+                                    itemMaterialID: inputValueMaterialItem,
+                                },
                             };
-                        })
+                        }),
                     };
                 });
             });
             toast.success(`Apply all successfully`, { autoClose: 3000 });
         } catch (error) {
-            toast.error(`${error}`, { autoClose: 3000 });
+            toast.error(`Error: ${error}`, { autoClose: 3000 });
         }
 
+    }
+
+    const __handleApplyAllMaterialForPartOfDesign = () => {
+
+    }
+
+    const __handleChangeFabric = (value: string) => {
+        setFabric((prevFabric) => {
+            const existingPart = prevFabric.find((item) => item.partId === selectedPartOfDesign?.partOfDesignID);
+
+            if (existingPart) {
+                return prevFabric.map((item) =>
+                    item.partId === selectedPartOfDesign?.partOfDesignID ? { ...item, fabric: value } : item
+                );
+            } else {
+                return [...prevFabric, { partId: selectedPartOfDesign?.partOfDesignID, fabric: value }];
+            }
+        });
+    }
+
+    const __handleChangeMaterialPrintType = (value: string) => {
+        setPrintTypeMaterial((prevFabric) => {
+            const existingPart = prevFabric.find((item) => item.itemId === selectedItemMask?.itemMask.itemMaskID);
+            if (existingPart) {
+                return prevFabric.map((item) =>
+                    item.itemId === selectedItemMask?.itemMask.itemMaskID ? { ...item, material: value } : item
+                );
+            } else {
+                return [...prevFabric];
+            }
+        });
     }
     return (
         <div>
             <ToastContainer />
             <form className={`${style.materialDetail__container}`} style={primaryKey === 'DIALOG' ? { display: 'flex' } : {}} >
-                <div className={`${style.materialDetail__container__itemMaskArea}`} style={primaryKey === 'DIALOG' ? { paddingRight: '10px', height: 280, overflow: 'auto' } : {}}>
+                <div className={`${style.materialDetail__container__itemMaskArea}`} style={primaryKey === 'DIALOG' ? { paddingRight: '10px', height: 350, overflow: 'auto' } : {}}>
                     {data?.map((part: PartOfDesignInterface, key) => (
-                        <Disclosure key={key} as="div" className={`border-t border-gray-200 px-4 py-6 ${style.materialDetail__content} `}>
+                        <Disclosure onClick={() => setSelectedPartOfDesign(part)} key={key} as="div" className={`border-t border-gray-200 px-4 py-6 ${style.materialDetail__content} `}>
                             {({ open }) => (
                                 <>
                                     <h3 className="-mx-2 -my-6 flow-root">
@@ -285,7 +370,8 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                                         <div >
                                             {part?.itemMasks?.map((item, optionIdx) => (
                                                 <Disclosure
-                                                    style={{ border: item.itemMaskID === selectedItemMask?.itemMaskID ? `1.5px solid ${primaryColor}` : 'none', borderRadius: 8 }}
+                                                    key={optionIdx}
+                                                    style={{ border: item.itemMaskID === selectedItemMask?.itemMask.itemMaskID && selectedItemMask?.partOfDesignId === selectedPartOfDesign?.partOfDesignID ? `1.5px solid ${primaryColor}` : 'none', borderRadius: 8 }}
                                                     onClick={() => __handleSetlectedItemMask(item, part)}
                                                     as="div"
                                                     className={`py-1 border-t border-gray-200 px-4 ${style.materialDetail__content}`}>
@@ -294,8 +380,6 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                                                             <h3 className="-mx-2 flow-root">
                                                                 <Disclosure.Button
                                                                     className={`flex w-full items-center px-2 text-gray-400 ${style.materialDetail__content__button}`}
-
-
                                                                 >
                                                                     <img src={item.imageUrl}></img>
                                                                     <div style={{ width: '90%', textAlign: 'left', marginLeft: 20 }}>
@@ -342,11 +426,11 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                                                                                         options={names}
                                                                                         getOptionLabel={(option) => option}
                                                                                         filterSelectedOptions
-                                                                                        value={materialItem}
+                                                                                        value={printTypeMaterial?.find((item) => item.itemId === selectedItemMask?.itemMask.itemMaskID)?.material === materialItem ? materialItem : 'Material'}
                                                                                         onChange={(event, newValue) => {
                                                                                             newValue && setMaterialItem(newValue);
                                                                                         }}
-                                                                                        inputValue={inputValueMaterialItem}
+                                                                                        inputValue={printTypeMaterial?.find((item) => item.itemId === selectedItemMask?.itemMask.itemMaskID)?.material === materialItem ? materialItem : 'Material'}
                                                                                         onInputChange={(event, newValue) => {
                                                                                             setInputValueMaterialItem(newValue);
                                                                                         }}
@@ -387,108 +471,124 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                     ))}
                 </div>
 
-                {primaryKey === 'DIALOG' && selectedItemMask ? (
-                    <div style={{ paddingLeft: 20, marginTop: 20 }}>
-                        <div style={{ marginBottom: 10, marginTop: -40 }} >
-                            <span style={{ fontSize: 12, fontWeight: '500' }}>Material</span>
-                        </div>
-
-                        <Autocomplete
-                            id="tags-outlined"
-                            options={names}
-                            getOptionLabel={(option) => option}
-                            filterSelectedOptions
-                            value={fabric}
-                            onChange={(event, newValue) => {
-                                newValue && setFabric(newValue);
-                            }}
-                            inputValue={inputValueFabric}
-                            onInputChange={(event, newValue) => {
-                                setInputValueFabric(newValue);
-                            }}
-                            style={{ height: '10px !important' }}
-                            size='small'
-                            renderInput={(params) => (
-                                <CustomTextField
-                                    {...params}
-                                    variant="outlined"
-                                    label="Fabric"
-                                    size='small'
-                                    className={`${style.dialog__content__modelMaterialArea__material__formControl__textField}`}
-                                />
-                            )}
-                            PaperComponent={({ children }) => <CustomPaper>{children}</CustomPaper>}
-                            PopperComponent={CustomPopper}
-
-                        />
-
-                        <div style={{ marginBottom: 10, marginTop: 20 }} >
-                            <span style={{ fontSize: 12, fontWeight: '500' }}>Print type</span>
-                            <a onClick={() => __handleApplyAllMaterialForItemMask()} style={{ fontSize: 11, fontWeight: '500', justifyContent: 'flex-end', color: secondaryColor, paddingLeft: 120, cursor: 'pointer' }}>Apply all items</a>
-                        </div>
-                        {printType.map((type) => (
-                            <div className={`${style.materialDetail__content__itemMask} `}>
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
-                                    <input
-                                        id={`filter-mobile-${type.value}`}
-                                        name={`${type.lable}[]`}
-                                        defaultValue={type.value}
-                                        type="checkbox"
-                                        checked={printTypeMaterial?.type === type.value}
-                                        onChange={() => __handleCheckboxChange(selectedItemMask, type.value, selectedPartOfDesign)}
-                                    />
-                                    <div style={{ width: 100, fontSize: 14 }}>
-                                        <label
-                                            htmlFor={`filter-mobile-${type.value}`}
-                                            className="ml-2 min-w-0 flex-1 text-gray-500"
-                                            style={{ fontSize: 11 }}
-                                        >
-                                            {type.lable}
-                                        </label>
-                                    </div>
-
-                                    <div>
-                                        <Autocomplete
-                                            id="tags-outlined"
-                                            options={names}
-                                            // hidden={printTypeMaterial?.type !== type.value}
-                                            getOptionLabel={(option) => option}
-                                            filterSelectedOptions
-                                            value={printTypeMaterial?.type === type.value ? materialItem : 'Material'}
-                                            onChange={(event, newValue) => {
-                                                newValue && setMaterialItem(newValue);
-                                            }}
-                                            inputValue={printTypeMaterial?.type === type.value ? inputValueMaterialItem : 'Material'}
-                                            onInputChange={(event, newValue) => {
-                                                setInputValueMaterialItem(newValue);
-                                            }}
-                                            disabled={printTypeMaterial?.type !== type.value}
-                                            renderInput={(params) => (
-                                                <CustomTextField
-                                                    {...params}
-                                                    variant="outlined"
-                                                    label="Material"
-                                                    size='small'
-                                                    InputLabelProps={{ size: 'small' }}
-                                                    disabled={printTypeMaterial?.type !== type.value}
-                                                />
-                                            )}
-                                            PaperComponent={({ children }) => <CustomPaper>{children}</CustomPaper>}
-                                            PopperComponent={CustomPopper}
-
-                                        />
-                                    </div>
+                <div style={{ marginTop: -20 }}>
+                    {selectedPartOfDesign ? (
+                        <div style={{ paddingLeft: 20 }}>
+                            <span style={{ fontSize: 12, fontWeight: '500' }}>{selectedPartOfDesign.partOfDesignName}</span>
+                            <a onClick={() => __handleApplyAllMaterialForItemMask()} style={{ fontSize: 11, fontWeight: '500', color: secondaryColor, cursor: 'pointer', float: 'right' }}>Apply all items</a>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 0 }}>
+                                <div style={{ width: 100, fontSize: 14 }}>
+                                    <label
+                                        className="ml-2 min-w-0 flex-1 text-gray-500"
+                                        style={{ fontSize: 11 }}
+                                    >
+                                        Fabric
+                                    </label>
                                 </div>
+                                <Autocomplete
+                                    id="tags-outlined"
+                                    options={names}
+                                    getOptionLabel={(option) => option}
+                                    filterSelectedOptions
+                                    value={fabric.find((item) => item.partId === selectedPartOfDesign.partOfDesignID)?.fabric || 'Fabric'}
+                                    onChange={(event, newValue) => {
+                                        newValue && __handleChangeFabric(newValue);
+                                    }}
+                                    inputValue={fabric?.find((item) => item.partId === selectedPartOfDesign.partOfDesignID)?.fabric}
+                                    onInputChange={(event, newValue) => {
+                                        setInputValueFabric(newValue);
+                                    }}
+                                    style={{ marginBottom: 10, marginTop: 5, marginLeft: 10 }}
+                                    size='small'
+                                    renderInput={(params) => (
+                                        <CustomTextField
+                                            {...params}
+                                            variant="outlined"
+                                            label="Fabric"
+                                            size='small'
+                                            className={`${style.dialog__content__modelMaterialArea__material__formControl__textField}`}
+                                        />
+                                    )}
+                                    PaperComponent={({ children }) => <CustomPaper>{children}</CustomPaper>}
+                                    PopperComponent={CustomPopper}
+
+                                />
                             </div>
 
-                        ))}
-                    </div>
-                )
-                    : (
+                        </div>
+                    ) : (
                         <div style={{ paddingLeft: 20, marginTop: 20 }}>
                             <span style={{ fontSize: 12, fontWeight: '500', textAlign: 'center', color: redColor }}>Select an item mask</span>
                         </div>
                     )}
+
+                    {primaryKey === 'DIALOG' && selectedItemMask && (
+                        <div style={{ paddingLeft: 20, marginTop: 20 }}>
+
+                            <div style={{ marginBottom: 10, marginTop: 20 }} >
+                                <span style={{ fontSize: 12, fontWeight: '500' }}>Print type</span>
+                                <a onClick={() => __handleApplyAllMaterialForItemMask()} style={{ fontSize: 11, fontWeight: '500', float: 'right', color: secondaryColor, paddingLeft: 120, cursor: 'pointer' }}>Apply all items</a>
+                            </div>
+                            {printType.map((type) => (
+                                <div className={`${style.materialDetail__content__itemMask} `}>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
+                                        <input
+                                            id={`filter-mobile-${type.value}`}
+                                            name={`${type.lable}[]`}
+                                            defaultValue={type.value}
+                                            type="checkbox"
+                                            checked={printTypeMaterial.find((item) => item.itemId === selectedItemMask.itemMask.itemMaskID)?.type === type.value}
+                                            onChange={() => __handleCheckboxChange(selectedItemMask.itemMask, type.value, selectedPartOfDesign)}
+                                        />
+                                        <div style={{ width: 100, fontSize: 14 }}>
+                                            <label
+                                                htmlFor={`filter-mobile-${type.value}`}
+                                                className="ml-2 min-w-0 flex-1 text-gray-500"
+                                                style={{ fontSize: 11 }}
+                                            >
+                                                {type.lable}
+                                            </label>
+                                        </div>
+
+                                        <div>
+                                            <Autocomplete
+                                                id="tags-outlined"
+                                                options={names}
+                                                // hidden={printTypeMaterial?.type !== type.value}
+                                                getOptionLabel={(option) => option}
+                                                filterSelectedOptions
+                                                value={printTypeMaterial.find((item) => item.itemId === selectedItemMask.itemMask.itemMaskID)?.type === type.value ? printTypeMaterial?.find((item) => item.itemId === selectedItemMask?.itemMask.itemMaskID)?.material : 'Material'}
+                                                onChange={(event, newValue) => {
+                                                    newValue && __handleChangeMaterialPrintType(newValue);
+                                                }}
+                                                inputValue={printTypeMaterial.find((item) => item.itemId === selectedItemMask.itemMask.itemMaskID)?.type === type.value ? printTypeMaterial?.find((item) => item.itemId === selectedItemMask?.itemMask.itemMaskID)?.material : 'Material'}
+                                                onInputChange={(event, newValue) => {
+                                                    setInputValueMaterialItem(newValue);
+                                                }}
+                                                disabled={printTypeMaterial.find((item) => item.itemId === selectedItemMask.itemMask.itemMaskID)?.type !== type.value}
+                                                renderInput={(params) => (
+                                                    <CustomTextField
+                                                        {...params}
+                                                        variant="outlined"
+                                                        label="Material"
+                                                        size='small'
+                                                        InputLabelProps={{ size: 'small' }}
+                                                        disabled={printTypeMaterial.find((item) => item.itemId === selectedItemMask.itemMask.itemMaskID)?.type !== type.value}
+                                                    />
+                                                )}
+                                                PaperComponent={({ children }) => <CustomPaper>{children}</CustomPaper>}
+                                                PopperComponent={CustomPopper}
+
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                            ))}
+                        </div>
+                    )
+                    }
+                </div>
             </form>
         </div >
     );

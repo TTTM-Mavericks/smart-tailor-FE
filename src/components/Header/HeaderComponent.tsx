@@ -252,7 +252,7 @@ export default function HeaderComponent() {
   };
 
   return (
-    <div className={`${styles.header__container} bg-white mb-200`}>
+    <div className={`${styles.header__container} bg-white`}>
       <ToastContainer></ToastContainer>
       {/* Mobile menu */}
       <Transition.Root show={open} as={Fragment}>
@@ -294,7 +294,7 @@ export default function HeaderComponent() {
 
                 {/* Links */}
                 <Tab.Group as="div" className="mt-2">
-                  <div className="border-b border-gray-200">
+                  <div className="">
                     <Tab.List className="-mb-px flex space-x-8 px-4">
                       {navigation.categories.map((category) => (
                         <Tab
@@ -408,7 +408,7 @@ export default function HeaderComponent() {
         </p>
 
         <nav aria-label="Top" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="border-b border-gray-200">
+          <div className="">
             <div className="flex h-16 items-center">
               <button
                 type="button"
@@ -422,7 +422,7 @@ export default function HeaderComponent() {
 
               {/* Logo */}
               <div className="ml-4 flex lg:ml-0">
-                <a href="#">
+                <a href="/">
                   <img className={`${styles.logo}`} src={systemLogo} alt="" />
                 </a>
               </div>

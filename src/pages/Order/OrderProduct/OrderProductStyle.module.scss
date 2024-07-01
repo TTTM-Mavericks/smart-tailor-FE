@@ -12,6 +12,8 @@
 .changeAddressDialogContent {
     // height: 700px;
     // width: 500px;
+    overflow: auto;
+
 
     &__addAddressBtn {
         position: relative;
@@ -32,7 +34,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            span{
+
+            span {
                 font-size: 13px;
                 font-weight: 500;
             }
@@ -46,6 +49,25 @@
         padding: 5% 25px 5% 25px;
         border-radius: 8px;
         margin: 10px 5% 10px 5%;
+
+        &__adressItem::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        &__adressItem::-webkit-scrollbar-track {
+            background: $grayColor1;
+            border-radius: 10px;
+        }
+
+        &__adressItem::-webkit-scrollbar-thumb {
+            background: #7b7b7b;
+            border-radius: 10px;
+        }
+
+        &__adressItem::-webkit-scrollbar-thumb:hover {
+            background: #7b7b7b;
+            /* Color when hovering over the scrollbar thumb */
+        }
 
         &:hover {
             background-color: rgba($color: $grayColor, $alpha: 1);
@@ -103,50 +125,22 @@
         }
     }
 
-    &::-webkit-scrollbar {
+    ::-webkit-scrollbar {
         width: 3px;
     }
 
-    &::-webkit-scrollbar-track {
+    ::-webkit-scrollbar-track {
         background: $grayColor1;
         border-radius: 10px;
     }
 
-    &::-webkit-scrollbar-thumb {
+    ::-webkit-scrollbar-thumb {
         background: #7b7b7b;
         border-radius: 10px;
     }
 
-    &::-webkit-scrollbar-thumb:hover {
+    ::-webkit-scrollbar-thumb:hover {
         background: #7b7b7b;
         /* Color when hovering over the scrollbar thumb */
     }
-}
-
-/* Add this to your CSS or SCSS file */
-
-.custom-scrollbar {
-    overflow-y: auto;
-}
-
-.custom-scrollbar::-webkit-scrollbar {
-    width: 8px;
-    /* Width of the scrollbar */
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    /* Background of the scrollbar track */
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #888;
-    /* Color of the scrollbar thumb */
-    border-radius: 4px;
-    /* Rounding the edges of the thumb */
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #555;
-    /* Color of the thumb when hovered */
 }

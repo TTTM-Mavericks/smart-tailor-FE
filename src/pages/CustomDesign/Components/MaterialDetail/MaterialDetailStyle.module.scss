@@ -3,6 +3,10 @@
 .materialDetail__container {
     overflow: none;
 
+    &__itemMaskArea{
+        width: 50%;
+    }
+
     &__itemMaskArea::-webkit-scrollbar {
         width: 3px;
         height: 20px;
