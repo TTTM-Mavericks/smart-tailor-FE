@@ -52,17 +52,17 @@ const CustomPaper = styled('div')(({ theme }) => ({
         fontSize: '12px',
         '&::-webkit-scrollbar': {
             width: '0.3em',
-            borderRadius: '5px',
+            borderRadius: '4px',
             backgroundColor: grayColor1
         },
         '&::-webkit-scrollbar-track': {
             webkitBoxShadow: 'inset 0 0 6px rgba(0,0,0,0.1)',
-            borderRadius: '5px',
+            borderRadius: '4px',
             backGroundColor: grayColor1
         },
         '&::-webkit-scrollbar-thumb': {
             backgroundColor: '#7b7b7b',
-            borderRadius: '5px'
+            borderRadius: '4px'
         },
     },
 }));
@@ -75,7 +75,7 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
     '& .MuiInputBase-root': {
         height: '35px',
         width: '150px',
-        borderRadius: '8px',
+        borderRadius: '4px',
       },
       '& .MuiOutlinedInput-input': {
         fontSize: '12px',

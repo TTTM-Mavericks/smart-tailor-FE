@@ -37,7 +37,7 @@ export default function ImageMasonry() {
               alt={item.title}
               loading="lazy"
               style={{
-                borderRadius: 8,
+                borderRadius: 4,
                 display: 'block',
                 width: '100%',
               }}

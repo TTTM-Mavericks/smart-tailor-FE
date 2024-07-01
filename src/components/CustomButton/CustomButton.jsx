@@ -10,14 +10,14 @@ const CustomButton = ({ type, title, customStyles, handleClick }) => {
       return {
         backgroundColor: primaryColor,
         color: whiteColor,
-        borderRadius: '5px'
+        borderRadius: '4px'
       }
     } else if(type === "outline") {
       return {
         borderWidth: '1px',
         borderColor:  "black",
         color: "white",
-        borderRadius: '8px'
+        borderRadius: '4px'
       }
     }
   }

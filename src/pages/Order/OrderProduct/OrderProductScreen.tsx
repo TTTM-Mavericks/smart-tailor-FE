@@ -3,10 +3,85 @@ import style from './OrderProductStyle.module.scss'
 import HeaderComponent from '../../../components/Header/HeaderComponent';
 import FooterComponent from '../../../components/Footer/FooterComponent';
 import ChangeAddressDialogComponent from './ChangeAddressDialogComponent';
+import { TextField, IconButton, Button, Box, Grid, Container, Autocomplete } from '@mui/material';
+import { Add as AddIcon, Remove as RemoveIcon } from '@mui/icons-material';
+import { styled } from '@mui/system';
+import { primaryColor } from '../../../root/ColorSystem';
+
+
+interface SizeQuantity {
+    size: string;
+    quantity: number;
+}
+
+const sizes = ['Small', 'Medium', 'Large', 'X-Large'];
+
+const CustomTextField = styled(TextField)(({ theme }) => ({
+    '& .MuiInputBase-root': {
+        height: '35px',
+        width: '150px',
+        borderRadius: '4px',
+        outline: 'none',
+    },
+    '& .MuiOutlinedInput-input': {
+        fontSize: '12px',
+    },
+    '& .MuiInputLabel-root': {
+        fontSize: '12px', // Adjust font size of the label
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+        color: primaryColor, // Label color when focused
+    },
+    '& .MuiOutlinedInput-root': {
+        '& fieldset': {
+            border: `1.5px solid ${primaryColor}`, // Initial border color
+        },
+        '&:hover fieldset': {
+            border: `1.5px solid ${primaryColor}`, // Border color on hover,
+            color: primaryColor
+        },
+        '&.Mui-focused fieldset': {
+            border: `1.5px solid ${primaryColor}`, // Border color when focused
+        },
+    },
+}));
+
+const CustomTextFieldQuantity = styled(TextField)(({ theme }) => ({
+    '& .MuiInputBase-root': {
+        height: '35px',
+        width: '100px',
+        borderRadius: '4px',
+        outline: 'none',
+    },
+    '& .MuiOutlinedInput-input': {
+        fontSize: '12px',
+    },
+    '& .MuiInputLabel-root': {
+        fontSize: '12px', // Adjust font size of the label
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+        color: primaryColor, // Label color when focused
+    },
+    '& .MuiOutlinedInput-root': {
+        '& fieldset': {
+            border: `1.5px solid ${primaryColor}`, // Initial border color
+        },
+        '&:hover fieldset': {
+            border: `1.5px solid ${primaryColor}`, // Border color on hover,
+            color: primaryColor
+        },
+        '&.Mui-focused fieldset': {
+            border: `1.5px solid ${primaryColor}`, // Border color when focused
+        },
+    },
+}));
+
 const OrderProductScreen = () => {
     // TODO MULTI LANGUAGE\
     // ---------------UseState Variable---------------//
     const [isChangeAddressDialogOpen, setIsChangeAddressDialogOpen] = useState<boolean>(false);
+    const [sizeQuantities, setSizeQuantities] = useState<SizeQuantity[]>([{ size: 'L', quantity: 1 }]);
+
     // ---------------Usable Variable---------------//
     // ---------------UseEffect---------------//
     // ---------------FunctionHandler---------------//
@@ -14,6 +89,31 @@ const OrderProductScreen = () => {
         setIsChangeAddressDialogOpen(isOpen);
         console.log(isOpen);
     }
+
+    const __handleAddSizeQuantity = () => {
+        setSizeQuantities([...sizeQuantities, { size: 'L', quantity: 1 }]);
+    };
+
+    const __handleRemoveSizeQuantity = (index: number) => {
+        setSizeQuantities(sizeQuantities.filter((_, i) => i !== index));
+    };
+
+    const __handleSizeChange = (index: number, newSize: string) => {
+        const updatedSizeQuantities = [...sizeQuantities];
+        updatedSizeQuantities[index].size = newSize;
+        setSizeQuantities(updatedSizeQuantities);
+    };
+
+    const __handleQuantityChange = (index: number, newQuantity: number) => {
+        const updatedSizeQuantities = [...sizeQuantities];
+        updatedSizeQuantities[index].quantity = newQuantity;
+        setSizeQuantities(updatedSizeQuantities);
+    };
+
+    const __handleSubmit = () => {
+        // Process the sizeQuantities data
+        console.log(sizeQuantities);
+    };
 
     return (
         <div className={`${style.orderProduct_container}`}>
@@ -23,19 +123,50 @@ const OrderProductScreen = () => {
                     <div className="mt-10 flex flex-col xl:flex-row jusitfy-center items-stretch w-full xl:space-x-8 space-y-4 md:space-y-6 xl:space-y-0">
                         <div className="flex flex-col justify-start items-start w-full space-y-4 md:space-y-6 xl:space-y-8">
                             <p className="text-md md:text-xl light:text-white font-semibold leading-6 xl:leading-5 text-gray-800">Order details</p>
-                            <div className="flex flex-col justify-start items-start light:bg-gray-800 bg-gray-50 px-4 py-4 md:py-6 md:p-6 xl:p-8 w-full">
+                            <div className="flex justify-start items-start light:bg-gray-800 bg-gray-50 px-4 py-4 md:py-6 md:p-6 xl:p-8 w-full">
+                                <div className="pb-4 mr-10 md:pb-8 w-full md:w-40">
+                                    <img className="w-full hidden md:block" src="https://i.ibb.co/84qQR4p/Rectangle-10.png" alt="dress" />
+                                    <img className="w-full md:hidden" src="https://i.ibb.co/L039qbN/Rectangle-10.png" alt="dress" />
+                                </div>
                                 <div className="mt-4 md:mt-6 flex flex-col md:flex-row justify-start items-start md:items-center md:space-x-6 xl:space-x-8 w-full">
-                                    <div className="pb-4 md:pb-8 w-full md:w-40">
-                                        <img className="w-full hidden md:block" src="https://i.ibb.co/84qQR4p/Rectangle-10.png" alt="dress" />
-                                        <img className="w-full md:hidden" src="https://i.ibb.co/L039qbN/Rectangle-10.png" alt="dress" />
-                                    </div>
                                     <div className="border-b border-gray-200 md:flex-row flex-col flex justify-between items-start w-full pb-8 space-y-4 md:space-y-0">
-                                        <div className="w-full flex flex-col justify-start items-start space-y-8">
+                                        <div className="w-full flex flex-col justify-start items-start space-y-8" >
                                             <h3 className="text-md light:text-white xl:text-1xl font-semibold leading-6 text-gray-800">Premium Quaility Dress</h3>
                                             <div className="flex justify-start items-start flex-col space-y-2">
-                                                <p className="text-sm light:text-white leading-none text-gray-800"><span className="light:text-gray-400 text-gray-300">Style: </span> Italic Minimal Design</p>
-                                                <p className="text-sm light:text-white leading-none text-gray-800"><span className="light:text-gray-400 text-gray-300">Size: </span> Small</p>
-                                                <p className="text-sm light:text-white leading-none text-gray-800"><span className="light:text-gray-400 text-gray-300">Color: </span> Light Blue</p>
+                                                <div>
+                                                    {sizeQuantities.map((sq, index) => (
+                                                        <Grid container spacing={5} alignItems="center" key={index}>
+                                                            <Grid item>
+                                                                <Autocomplete
+                                                                    options={sizes}
+                                                                    value={sq.size}
+                                                                    onChange={(event, newValue) => newValue && __handleSizeChange(index, newValue)}
+                                                                    renderInput={(params) => <CustomTextField {...params} label="Size" variant="outlined" />}
+                                                                />
+                                                            </Grid>
+                                                            <Grid item>
+                                                                <CustomTextFieldQuantity
+                                                                    fullWidth
+                                                                    type="number"
+                                                                    label="Quantity"
+                                                                    value={sq.quantity}
+                                                                    onChange={(e) => __handleQuantityChange(index, Number(e.target.value))}
+                                                                    inputProps={{ min: 1 }}
+                                                                />
+                                                            </Grid>
+                                                            <Grid item xs={2}>
+                                                                <IconButton onClick={() => __handleRemoveSizeQuantity(index)} disabled={sizeQuantities.length === 1}>
+                                                                    <RemoveIcon />
+                                                                </IconButton>
+                                                            </Grid>
+                                                        </Grid>
+                                                    ))}
+                                                    <div>
+                                                        <IconButton onClick={__handleAddSizeQuantity}>
+                                                            <AddIcon />
+                                                        </IconButton>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div className="flex justify-between space-x-8 items-start w-full">
@@ -45,7 +176,7 @@ const OrderProductScreen = () => {
                                         </div>
                                     </div>
                                 </div>
-                                
+
                             </div>
                             <div className="flex justify-center  md:flex-row flex-col items-stretch w-full space-y-4 md:space-y-0 md:space-x-6 xl:space-x-8">
                                 <div className="flex flex-col px-4 py-6 md:p-6 xl:p-8 w-full bg-gray-50 light:bg-gray-800 space-y-6">

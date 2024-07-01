@@ -196,7 +196,7 @@ const ProductDialogComponent: React.FC<Props> = ({ isOpen, onClose, onItemSelect
                                 onClick={() => __handleSelectItem(item)}
                                 key={key}
                                 object={item}
-                                style={itemSelected === item.title ? { border: `2px solid ${primaryColor}`, borderRadius: 8 } : {}}
+                                style={itemSelected === item.title ? { border: `2px solid ${primaryColor}`, borderRadius: 4 } : {}}
                             ></ProductCard>
                         ))}
                     </div>

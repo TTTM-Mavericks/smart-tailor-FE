@@ -382,7 +382,7 @@
                         padding: 5px 10px 5px 10px;
                         margin-left: 5px;
                         margin-right: 5px;
-                        border-radius: 8px;
+                        border-radius: 4px;
                         display: flex;
                         align-items: center;
                         justify-content: center;
@@ -417,7 +417,7 @@
     align-content: center;
     margin: 0 auto;
     margin-top: 20px;
-    border-radius: 8px;
+    border-radius: 4px;
 
 
     &__img {
@@ -428,7 +428,7 @@
         align-items: center;
         align-content: center;
         margin: 0 auto;
-        border-radius: 8px;
+        border-radius: 4px;
 
     }
 
@@ -453,7 +453,7 @@
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    border-radius: 8px;
+    border-radius: 4px;
 
     &__icon {
         position: absolute;

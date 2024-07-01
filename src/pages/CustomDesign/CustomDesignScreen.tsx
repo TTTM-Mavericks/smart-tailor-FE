@@ -638,7 +638,7 @@ function CustomDesignScreen() {
                           className={styles.sampleItemCard}
                           onClick={() => __handleSetSelectedStamp(item)}
                         >
-                          <img src={item.imageUrl} style={{ width: '90%', height: '90%', borderRadius: 8 }} />
+                          <img src={item.imageUrl} style={{ width: '90%', height: '90%', borderRadius: 4 }} />
                           <button onClick={() => __toggleCollectionItem(item)}>
                             {collection.some((collectionItem: ItemMaskInterface) => collectionItem.itemMaskID === item.itemMaskID) ? (
                               <FaHeart color='red' size={20} className={styles.sampleItemCard__icon} />
@@ -679,7 +679,7 @@ function CustomDesignScreen() {
                             className={`${styles.sampleItemCard}`}
                             onClick={() => __handleSetSelectedStamp(item)}
                           >
-                            <img src={item.imageUrl} style={{ width: '90%', height: '90%', borderRadius: 8 }}></img>
+                            <img src={item.imageUrl} style={{ width: '90%', height: '90%', borderRadius: 4 }}></img>
                             <button onClick={() => __toggleCollectionItem(item)}>
                               {collection.some((collectionItem: ItemMaskInterface) => collectionItem.itemMaskID === item.itemMaskID) ? (
                                 <FaHeart color='red' size={20} className={styles.sampleItemCard__icon} />

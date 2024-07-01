@@ -268,7 +268,7 @@ const ManageInvoiceScreen: React.FC = () => {
                         color: params.value === true ? 'white' : 'white',
                         backgroundColor: params.value === true ? 'lightgreen' : 'lightcoral',
                         fontSize: '16px',
-                        borderRadius: '5px',
+                        borderRadius: '4px',
                         padding: "10px"
                     }}
                 >
@@ -366,7 +366,7 @@ const ManageInvoiceScreen: React.FC = () => {
                         border: '2px solid #000',
                         boxShadow: 24,
                         p: 4,
-                        borderRadius: 8,
+                        borderRadius: 4,
                         maxHeight: '90vh',
                         overflowY: 'auto',
                         '&::-webkit-scrollbar': {

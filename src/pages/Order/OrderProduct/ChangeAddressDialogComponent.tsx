@@ -336,7 +336,7 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
                                                 padding: '10px',
                                                 marginTop: '10px',
                                                 width: '100%',
-                                                borderRadius: '5px',
+                                                borderRadius: '4px',
                                                 border: '1px solid #ccc',
                                             }}
                                         >
@@ -356,7 +356,7 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
                                                     padding: '10px',
                                                     marginTop: '10px',
                                                     width: '100%',
-                                                    borderRadius: '5px',
+                                                    borderRadius: '4px',
                                                     border: '1px solid #ccc',
                                                 }}
                                             >
@@ -377,7 +377,7 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
                                                     padding: '10px',
                                                     marginTop: '10px',
                                                     width: '100%',
-                                                    borderRadius: '5px',
+                                                    borderRadius: '4px',
                                                     border: '1px solid #ccc',
                                                 }}
                                             >
@@ -477,7 +477,7 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
                                             padding: '10px',
                                             marginTop: '10px',
                                             width: '100%',
-                                            borderRadius: '5px',
+                                            borderRadius: '4px',
                                             border: '1px solid #ccc',
                                         }}
                                     >
@@ -497,7 +497,7 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
                                                 padding: '10px',
                                                 marginTop: '10px',
                                                 width: '100%',
-                                                borderRadius: '5px',
+                                                borderRadius: '4px',
                                                 border: '1px solid #ccc',
                                             }}
                                         >
@@ -518,7 +518,7 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
                                                 padding: '10px',
                                                 marginTop: '10px',
                                                 width: '100%',
-                                                borderRadius: '5px',
+                                                borderRadius: '4px',
                                                 border: '1px solid #ccc',
                                             }}
                                         >
@@ -537,7 +537,7 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
                             <button
                                 type="submit"
                                 className="px-5 py-2.5 text-sm font-medium text-white"
-                                style={{ backgroundColor: primaryColor, borderRadius: 8, alignItems: 'flex-end' }}
+                                style={{ backgroundColor: primaryColor, borderRadius: 4, alignItems: 'flex-end' }}
                             >
                                 Accept
                             </button>
@@ -560,7 +560,7 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
                     <button
                         type="submit"
                         className="px-5 py-2.5 text-sm font-medium text-white"
-                        style={{ backgroundColor: primaryColor, borderRadius: 8 }}
+                        style={{ backgroundColor: primaryColor, borderRadius: 4 }}
                     >
                         Accept
                     </button>

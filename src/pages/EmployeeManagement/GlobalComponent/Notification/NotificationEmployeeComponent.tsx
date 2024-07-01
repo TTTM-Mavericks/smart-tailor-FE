@@ -184,7 +184,7 @@ const NotificationEmployeeComponent = () => {
                     style={{ height: "70%", minWidth: "200px", borderRadius: "10px" }}
                 >
                     {data.map((item) => (
-                        <div key={item.notiID} style={{ borderRadius: '8px', marginBottom: '8px', position: 'relative', backgroundColor: item.status ? 'rgba(162,222,82,0.1)' : 'rgba(234,49,62,0.1)' }} onClick={_handleMarkIsRead} >
+                        <div key={item.notiID} style={{ borderRadius: '4px', marginBottom: '8px', position: 'relative', backgroundColor: item.status ? 'rgba(162,222,82,0.1)' : 'rgba(234,49,62,0.1)' }} onClick={_handleMarkIsRead} >
                             <div onClick={() => _handleMarkIsRead(item)} style={{ padding: '12px', cursor: 'pointer' }}>
                                 <div style={{ position: 'absolute', top: '12px', right: '12px', borderRadius: '4px', padding: '4px 8px', backgroundColor: item.status ? 'rgba(162,222,82,0.6)' : 'rgba(234,49,62,0.6)', color: '#fff' }}>
                                     <span>{item.status ? 'Readed' : 'News'}</span>
@@ -215,7 +215,7 @@ const NotificationEmployeeComponent = () => {
                     <DialogTitle>All Notifications</DialogTitle>
                     <DialogContent>
                         {data.map((item) => (
-                            <div key={item.notiID} style={{ borderRadius: '8px', marginBottom: '8px', position: 'relative', backgroundColor: item.status ? 'rgba(162,222,82,0.1)' : 'rgba(234,49,62,0.1)' }}>
+                            <div key={item.notiID} style={{ borderRadius: '4px', marginBottom: '8px', position: 'relative', backgroundColor: item.status ? 'rgba(162,222,82,0.1)' : 'rgba(234,49,62,0.1)' }}>
                                 <div onClick={() => _handleMarkIsRead(item)} style={{ padding: '12px', cursor: 'pointer' }}>
                                     <div style={{ position: 'absolute', top: '12px', right: '12px', borderRadius: '4px', padding: '4px 8px', backgroundColor: item.status ? 'rgba(162,222,82,0.6)' : 'rgba(234,49,62,0.6)', color: '#fff' }}>
                                         <span>{item.status ? 'Readed' : 'News'}</span>

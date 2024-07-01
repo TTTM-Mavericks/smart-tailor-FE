@@ -273,7 +273,7 @@ function SignInScreen() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    borderRadius: 5
+                    borderRadius: 4
                   },
                 }}
                 cancel_on_tap_outside
