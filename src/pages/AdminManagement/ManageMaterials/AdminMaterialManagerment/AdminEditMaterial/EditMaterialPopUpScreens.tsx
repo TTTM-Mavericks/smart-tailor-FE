@@ -61,15 +61,25 @@ const EditMaterialPopUpScreens: React.FC<EditMaterialPopUpScreenFormProps> = ({ 
                 throw new Error('Error updating material');
             }
 
-            updateMaterial(response.data.data);
+            if (response.data.status === 200) {
+                updateMaterial(response.data.data);
+                Swal.fire(
+                    `${t(codeLanguage + '000069')}`,
+                    `${t(codeLanguage + '000070')}`,
+                    'success'
+                );
+            }
+            if (response.data.status === 400) {
+                Swal.fire(
+                    `${t(codeLanguage + '000071')}`,
+                    `${t(codeLanguage + '000072')}`,
+                    'error'
+                );
+            }
 
             sessionStorage.setItem("obj", JSON.stringify(formData));
 
-            Swal.fire(
-                `${t(codeLanguage + '000069')}`,
-                `${t(codeLanguage + '000070')}`,
-                'success'
-            );
+
 
             editClose(); // Close the edit modal after successful update
         } catch (error) {

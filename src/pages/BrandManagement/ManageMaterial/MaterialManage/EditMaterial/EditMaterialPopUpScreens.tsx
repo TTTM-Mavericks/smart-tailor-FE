@@ -3,25 +3,21 @@ import { Box, Button, Grid, IconButton, TextField, Typography } from "@mui/mater
 import CloseIcon from '@mui/icons-material/Close';
 import Swal from "sweetalert2";
 import { useTranslation } from 'react-i18next';
-
-interface Material {
-    id: number,
-    category_name: string,
-    material_name: string,
-    price: number,
-    unit: string
-}
+import { UpdateMaterial } from "../../../../../models/BrandMaterialExcelModel";
 
 interface EditMaterialPopUpScreenFormProps {
     fid: {
         id: number,
-        category_name: string,
-        material_name: string,
-        price: number,
-        unit: string
+        brandName: string,
+        categoryName: string,
+        materialName: string,
+        hsCode: number,
+        unit: string,
+        basePrice: number,
+        brandPrice: number
     };
     editClose: () => void;
-    updateMaterial: (updatedMaterial: Material) => void;
+    updateMaterial: (updatedMaterial: UpdateMaterial) => void;
 }
 
 const EditMaterialPopUpScreens: React.FC<EditMaterialPopUpScreenFormProps> = ({ fid, editClose, updateMaterial }) => {
@@ -33,10 +29,14 @@ const EditMaterialPopUpScreens: React.FC<EditMaterialPopUpScreenFormProps> = ({ 
     const [unit, setUnit] = React.useState("");
 
     React.useEffect(() => {
-        setCategoryName(fid.category_name);
-        setMaterialName(fid.material_name);
-        setPrice(fid.price);
+        setCategoryName(fid.categoryName);
+        setMaterialName(fid.materialName);
+        setPrice(fid.basePrice);
         setUnit(fid.unit)
+        // setUnit(fid.hsCode)
+        // setUnit(fid.brandName)
+        // setUnit(fid.unit)
+        // setUnit(fid.unit)
     }, [fid]);
 
     const _handleCategoryNamehange = (e: React.ChangeEvent<HTMLInputElement>) => {

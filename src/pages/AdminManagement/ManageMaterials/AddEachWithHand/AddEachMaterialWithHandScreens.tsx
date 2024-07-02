@@ -70,7 +70,7 @@ const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
             .then((responseData) => {
                 if (responseData && Array.isArray(responseData.data)) {
                     // Extract only the categoryName values from the objects
-                    const categoryNames = responseData.data.map(category => category.categoryName);
+                    const categoryNames = responseData.data.map((category: any) => category.categoryName);
                     setCategoryData(categoryNames);
                     console.log("Data received:", categoryNames);
                 } else {
