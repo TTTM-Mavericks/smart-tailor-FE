@@ -166,12 +166,22 @@
                 display: flex;
                 justify-content: center;
                 align-items: center;
+
+                &__button {
+                    width: 150px;
+                    float: left;
+                    border: 1px solid $greenColor;
+                    background-color: $greenColor;
+                    color: $whiteColor;
+                }
             }
+
         }
     }
 
     &__information {
         width: 70%;
+
         p {
             padding: 5px;
         }
