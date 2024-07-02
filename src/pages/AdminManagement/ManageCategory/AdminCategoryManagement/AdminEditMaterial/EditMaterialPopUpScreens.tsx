@@ -46,7 +46,7 @@ const EditMCategoryPopUpScreens: React.FC<EditCategoryPopUpScreenFormProps> = ({
         try {
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.updateCategory}`;
             const response = await axios.put(apiUrl, {
-                formData
+                ...formData
             });
 
             console.log("formData" + formData);
@@ -55,15 +55,32 @@ const EditMCategoryPopUpScreens: React.FC<EditCategoryPopUpScreenFormProps> = ({
                 throw new Error('Error updating material');
             }
 
-            updateCategory(response.data);
+            if (response.data.status === 200) {
+                updateCategory(response.data.data);
+                Swal.fire(
+                    `${t(codeLanguage + '000069')}`,
+                    `${t(codeLanguage + '000070')}`,
+                    'success'
+                );
+            }
 
+            if (response.data.status === 409) {
+                Swal.fire(
+                    `${t(codeLanguage + '000071')}`,
+                    `${t(codeLanguage + '000072')}`,
+                    'error'
+                );
+            }
+
+            if (response.data.status === 400) {
+                Swal.fire(
+                    `${t(codeLanguage + '000071')}`,
+                    `${t(codeLanguage + '000072')}`,
+                    'error'
+                );
+            }
             sessionStorage.setItem("obj", JSON.stringify(formData));
 
-            Swal.fire(
-                `${t(codeLanguage + '000069')}`,
-                `${t(codeLanguage + '000070')}`,
-                'success'
-            );
 
             editClose(); // Close the edit modal after successful update
         } catch (error) {

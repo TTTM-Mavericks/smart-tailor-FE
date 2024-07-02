@@ -13,6 +13,7 @@ import AddUserModalInExcelTable from './CRUDWithExcelTable/AddMaterialInExcelTab
 const ADDUSERWITHFILEEXCELS = 'https://smart-tailor-fe.pages.dev/Add_New_Users_Sample_Files.xlsx';
 import { useTranslation } from 'react-i18next';
 import { ExcelData } from '../../../../models/AdminMaterialExcelModel';
+import { Category } from '../../../../models/AdminCategoryExcelModel';
 
 interface AddMaterialWithMultipleExcelFormProps {
     closeMultipleCard: () => void;
