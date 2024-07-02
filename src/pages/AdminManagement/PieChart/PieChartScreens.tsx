@@ -34,7 +34,7 @@ const PieChart = () => {
                 <Typography variant="h5">
                     Pie Chart
                 </Typography>
-                <Card sx={{ backgroundColor: `${colors.primary[100]} !important`, width: "18%", color: `${colors.primary[100]}`, marginTop: "2%", marginLeft: "60%" }}>
+                <Card sx={{ backgroundColor: `${colors.primary[100]} !important`, width: "19%", color: `${colors.primary[100]}`, marginTop: "2%", marginLeft: "60%" }}>
                     <ToggleButtonGroup
                         color="primary"
                         value={option}

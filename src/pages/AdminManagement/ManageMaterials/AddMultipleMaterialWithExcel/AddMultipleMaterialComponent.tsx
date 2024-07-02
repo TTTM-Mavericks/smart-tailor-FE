@@ -134,7 +134,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                         const workbook = XLSX.read(data, { type: 'array' });
                         const sheetName = workbook.SheetNames[0];
                         const sheet = workbook.Sheets[sheetName];
-                        const jsonData = XLSX.utils.sheet_to_json<ExcelData>(sheet);
+                        const jsonData = XLSX.utils.sheet_to_json<ExcelData>(sheet, { range: 1 });
 
                         // Update error property for duplicate entries
                         const updatedData = jsonData.map(item => {
@@ -192,11 +192,23 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
 
             // Handle successful response
             console.log('Data uploaded successfully:', response);
-            Swal.fire({
-                icon: 'success',
-                title: 'Profile Updated',
-                text: 'Your profile has been updated successfully!',
-            });
+            if (response.data.status === 200) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Profile Updated',
+                    text: 'Your profile has been updated successfully!',
+                });
+                closeMultipleCard();
+            }
+            if (response.data.status === 400) {
+                Swal.fire(
+                    `${t(codeLanguage + '000071')}`,
+                    `${t(codeLanguage + '000072')}`,
+                    'error'
+                );
+                closeMultipleCard();
+
+            }
         } catch (error: any) {
             // Check for specific error status codes
             if (error.response) {
@@ -257,7 +269,6 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
         }
         else {
             await _handleUploadData();
-            closeMultipleCard();
         }
     };
 
@@ -321,6 +332,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
         const workBook = new ExcelJS.Workbook();
         const worksheet = workBook.addWorksheet('Category and Material');
 
+        // Define the columns and headers
         worksheet.columns = [
             { header: 'Category_Name', key: 'Category_Name', width: 25 },
             { header: 'Material_Name', key: 'Material_Name', width: 25 },
@@ -328,6 +340,26 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
             { header: 'Unit', key: 'Unit', width: 20 },
             { header: 'Base_Price', key: 'Base_Price', width: 20 },
         ];
+
+        // Insert a custom header row above the defined columns
+        worksheet.insertRow(1, ['CATEGORY AND MATERIAL']);
+
+        // Merge cells for the custom header row
+        worksheet.mergeCells('A1:E1');
+
+        // Set styles for the custom header row
+        const customHeaderRow = worksheet.getRow(1);
+        customHeaderRow.height = 30; // Optional: adjust row height
+        customHeaderRow.eachCell(cell => {
+            cell.font = { bold: true, size: 16 };
+            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+            cell.border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' },
+            };
+        });
 
         const rows = excelData.map(item => ({
             Category_Name: item.Category_Name,
@@ -357,8 +389,8 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
         // Add rows to the worksheet
         worksheet.addRows(sortedRows);
 
-        // Set styles for header row
-        worksheet.getRow(1).eachCell(cell => {
+        // Set styles for column header row
+        worksheet.getRow(2).eachCell(cell => {
             cell.font = { bold: true };
             cell.alignment = { vertical: 'middle', horizontal: 'center' };
             cell.border = {
@@ -373,14 +405,14 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
         const duplicates = checkForDuplicates(sortedRows, ['Category_Name', 'Material_Name']);
 
         sortedRows.forEach((row, rowIndex) => {
-            const excelRow = worksheet.getRow(rowIndex + 2); // +2 to account for header row and 1-based index
+            const excelRow = worksheet.getRow(rowIndex + 3); // +3 to account for the custom header row and column header row
             excelRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
                 const columnName = worksheet.getColumn(colNumber).key as string;
                 const value = row[columnName];
 
                 if (columnName === 'Category_Name' || columnName === 'Material_Name') {
                     if (duplicates.has(`${row.Category_Name}|${row.Material_Name}`)) {
-                        const duplicateRowNumber = sortedRows.findIndex(r => r.Category_Name === row.Category_Name && r.Material_Name === row.Material_Name && r !== row) + 2;
+                        const duplicateRowNumber = sortedRows.findIndex(r => r.Category_Name === row.Category_Name && r.Material_Name === row.Material_Name && r !== row) + 3;
                         cell.fill = {
                             type: 'pattern',
                             pattern: 'solid',

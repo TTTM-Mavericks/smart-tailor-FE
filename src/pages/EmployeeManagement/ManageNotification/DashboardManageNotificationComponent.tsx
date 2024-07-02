@@ -1,45 +1,31 @@
-import { Box, CssBaseline, useMediaQuery, useTheme } from "@mui/material";
-import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
-import theme, { tokens } from '../../../theme';
-import styles from "./DashboardManageNotificationStyle.module.scss"
-import NotFound from '../GlobalComponent/Error404/Error404Component';
-import SideBarEmployeeComponent from '../GlobalComponent/SideBar/SideBarEmployeeComponent';
-import TopbarEmployeeComponent from '../GlobalComponent/TopBar/TopBarEmployeeComponent';
-import ManageNotificationScreens from "./ManageNotificationScreens";
+import React, { useState } from 'react';
+import Sidebar from '../GlobalComponent/SideBarComponent/SideBarComponent';
+import Navbar from '../GlobalComponent/NavBarComponent/NavbarComponent';
+import ManageNotificationScreens from './ManageNotificationScreens';
 
-export default function DashboardManageNotification() {
-    const theme1 = useTheme();
-    const smScreen = useMediaQuery(theme1.breakpoints.up("sm"));
-    const colors = tokens(theme1.palette.mode)
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+const DashboardManageNotification = () => {
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [activeMenu, setActiveMenu] = useState('employee_manage_notification');
 
-    if (isMobile) {
-        return (
-            <NotFound />
-        );
-    }
+    const toggleMenu = () => {
+        setMenuOpen(!menuOpen);
+    };
+
+    const handleMenuClick = (menu: any) => {
+        setActiveMenu(menu);
+    };
+
     return (
-        <CssVarsProvider theme={theme}>
-            <CssBaseline />
-            <div className={`${styles.dashboard}`}>
-                <SideBarEmployeeComponent />
-                <main className={`${styles.content}`}>
-                    <TopbarEmployeeComponent />
-                    <Box
-                        display="grid"
-                        gridTemplateColumns="repeat(12, 1fr)"
-                        gridAutoRows="140px"
-                        gap="20px"
-                    >
-                        <Box
-                            gridColumn="span 12"
-                            gridRow="span 2"
-                        >
-                            <ManageNotificationScreens />
-                        </Box>
-                    </Box>
+        <div className="flex">
+            <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
+            <div className="flex flex-col w-full">
+                <Navbar toggleMenu={toggleMenu} />
+                <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
+                    {/* <ManageNotificationScreens /> */}
                 </main>
             </div>
-        </CssVarsProvider>
+        </div>
     );
-}
+};
+
+export default DashboardManageNotification;

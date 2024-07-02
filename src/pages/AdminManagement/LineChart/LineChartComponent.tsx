@@ -5,7 +5,7 @@ const LineChartComponent = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     return (
-        <Card style={{ height: "100vh", backgroundColor: colors.primary[600], margin: "2%", marginTop: "-8%" }}>
+        <Card style={{ height: "100vh", backgroundColor: colors.primary[600], margin: "2%" }}>
             <Box height="70vh">
                 <LineChart />
             </Box>

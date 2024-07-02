@@ -1,22 +1,45 @@
-import * as React from 'react';
-import TopbarComponent from '../GlobalComponent/TopBar/TopBarComponent';
-import SideBarComponent from '../GlobalComponent/SideBar/SideBarComponent';
-import { Box, CssBaseline, useMediaQuery, useTheme, IconButton } from "@mui/material";
-import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
+import React, { useEffect, useState } from 'react';
+import Sidebar from '../GlobalComponent/SidebarComponent/SidebarComponent';
+import Navbar from '../GlobalComponent/NavbarComponent/NavbarComponent';
+import { IconButton } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
-import theme from '../../../theme';
-import styles from "./DashboardGeographyChartStyles.module.scss"
-import GeographyChartComponent from '../GeographyChart/GeographyChartComponent';
-import { tokens } from "../../../theme";
-import NotFound from '../GlobalComponent/Error404/Error404Component';
+import GeographyChartComponent from './GeographyChartComponent';
 
 const DashboardGeographyChartScreens = () => {
-    const themeColor = useTheme();
-    const colors = tokens(themeColor.palette.mode);
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [activeMenu, setActiveMenu] = useState('geography_chart');
     const [showScrollButton, setShowScrollButton] = React.useState<boolean>(false);
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const [popperOpen, setPopperOpen] = useState<Record<string, boolean>>({});
 
-    React.useEffect(() => {
+    const toggleMenu = () => {
+        setMenuOpen(!menuOpen);
+    };
+
+    const handleMenuClick = (menu: any) => {
+        setActiveMenu(menu);
+    };
+
+    // Effect to close popper on outside click
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (event.target instanceof Element) {
+                if (!event.target.closest('.popover')) {
+                    setPopperOpen({
+                        notification: false,
+                        user: false,
+                    });
+                }
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    useEffect(() => {
         const handleScroll = () => {
             if (window.scrollY > 200) {
                 setShowScrollButton(true);
@@ -36,48 +59,39 @@ const DashboardGeographyChartScreens = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    const checkDarkOrLightMode = localStorage.getItem("mui-mode")
-
-    console.log("checkDarkOrLightMode" + checkDarkOrLightMode);
-
-    if (isMobile) {
-        return (
-            <NotFound />
-        );
-    }
-
+    const togglePopper = (key: any) => {
+        setPopperOpen((prev) => ({
+            notification: key === 'notification' ? !prev.notification : false,
+            user: key === 'user' ? !prev.user : false,
+        }));
+    };
 
     return (
-        <CssVarsProvider theme={theme}>
-            <CssBaseline />
-            <div className={`${styles.dashboard}`}>
-                <SideBarComponent />
-                <div className={`${styles.content}`}>
-                    <TopbarComponent />
-                    <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="140px" gap="20px">
-                        <Box gridColumn="span 12" gridRow="span 5">
-                            <GeographyChartComponent />
-                        </Box>
-                    </Box>
-                    {showScrollButton && (
-                        <IconButton
-                            style={{
-                                position: 'fixed',
-                                bottom: '20px',
-                                right: '20px',
-                                zIndex: 100,
-                                backgroundColor: "#E96208",
-                                color: "white"
-                            }}
-                            onClick={_handleScrollToTop}
-                        >
-                            <ArrowUpward />
-                        </IconButton>
-                    )}
-                </div>
+        <div className="flex">
+            <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
+            <div className="flex flex-col w-full">
+                <Navbar toggleMenu={toggleMenu} menu="Geography Chart" popperOpen={popperOpen} togglePopper={togglePopper} />
+                <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
+                    <GeographyChartComponent />
+                </main>
+                {showScrollButton && (
+                    <IconButton
+                        style={{
+                            position: 'fixed',
+                            bottom: '20px',
+                            right: '20px',
+                            zIndex: 100,
+                            backgroundColor: "#E96208",
+                            color: "white"
+                        }}
+                        onClick={_handleScrollToTop}
+                    >
+                        <ArrowUpward />
+                    </IconButton>
+                )}
             </div>
-        </CssVarsProvider >
+        </div>
     );
-}
+};
 
 export default DashboardGeographyChartScreens;
