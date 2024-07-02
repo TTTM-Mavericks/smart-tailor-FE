@@ -1,45 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import Sidebar from '../GlobalComponent/SidebarComponent/SidebarComponent';
-import Navbar from '../GlobalComponent/NavbarComponent/NavbarComponent';
-import { IconButton } from '@mui/material';
+import * as React from 'react';
+import TopbarComponent from '../GlobalComponent/TopBar/TopBarComponent';
+import SideBarComponent from '../GlobalComponent/SideBar/SideBarComponent';
+import { Box, CssBaseline, useMediaQuery, useTheme, IconButton } from "@mui/material";
+import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
 import { ArrowUpward } from '@mui/icons-material';
-import LineChartComponent from './LineChartComponent';
+import theme from '../../../theme';
+import styles from "./DashboardLineChartStyles.module.scss"
+import LineChartComponent from '../LineChart/LineChartComponent';
+import { tokens } from "../../../theme";
+import NotFound from '../GlobalComponent/Error404/Error404Component';
 
 const DashboardLineChartScreens = () => {
-    const [menuOpen, setMenuOpen] = useState(false);
-    const [activeMenu, setActiveMenu] = useState('line_chart');
+    const themeColor = useTheme();
+    const colors = tokens(themeColor.palette.mode);
     const [showScrollButton, setShowScrollButton] = React.useState<boolean>(false);
-    const [popperOpen, setPopperOpen] = useState<Record<string, boolean>>({});
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-    const toggleMenu = () => {
-        setMenuOpen(!menuOpen);
-    };
-
-    const handleMenuClick = (menu: any) => {
-        setActiveMenu(menu);
-    };
-
-    // Effect to close popper on outside click
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (event.target instanceof Element) {
-                if (!event.target.closest('.popover')) {
-                    setPopperOpen({
-                        notification: false,
-                        user: false,
-                    });
-                }
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
-
-    useEffect(() => {
+    React.useEffect(() => {
         const handleScroll = () => {
             if (window.scrollY > 200) {
                 setShowScrollButton(true);
@@ -59,40 +36,48 @@ const DashboardLineChartScreens = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    const togglePopper = (key: any) => {
-        setPopperOpen((prev) => ({
-            notification: key === 'notification' ? !prev.notification : false,
-            user: key === 'user' ? !prev.user : false,
-        }));
-    };
+    const checkDarkOrLightMode = localStorage.getItem("mui-mode")
+
+    console.log("checkDarkOrLightMode" + checkDarkOrLightMode);
+
+    if (isMobile) {
+        return (
+            <NotFound />
+        );
+    }
 
 
     return (
-        <div className="flex">
-            <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
-            <div className="flex flex-col w-full">
-                <Navbar toggleMenu={toggleMenu} menu="Line Chart" popperOpen={popperOpen} togglePopper={togglePopper} />
-                <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
-                    <LineChartComponent />
-                </main>
-                {showScrollButton && (
-                    <IconButton
-                        style={{
-                            position: 'fixed',
-                            bottom: '20px',
-                            right: '20px',
-                            zIndex: 100,
-                            backgroundColor: "#E96208",
-                            color: "white"
-                        }}
-                        onClick={_handleScrollToTop}
-                    >
-                        <ArrowUpward />
-                    </IconButton>
-                )}
+        <CssVarsProvider theme={theme}>
+            <CssBaseline />
+            <div className={`${styles.dashboard}`}>
+                <SideBarComponent />
+                <div className={`${styles.content}`}>
+                    <TopbarComponent />
+                    <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="140px" gap="20px">
+                        <Box gridColumn="span 12" gridRow="span 5">
+                            <LineChartComponent />
+                        </Box>
+                    </Box>
+                    {showScrollButton && (
+                        <IconButton
+                            style={{
+                                position: 'fixed',
+                                bottom: '20px',
+                                right: '20px',
+                                zIndex: 100,
+                                backgroundColor: "#E96208",
+                                color: "white"
+                            }}
+                            onClick={_handleScrollToTop}
+                        >
+                            <ArrowUpward />
+                        </IconButton>
+                    )}
+                </div>
             </div>
-        </div>
+        </CssVarsProvider >
     );
-};
+}
 
 export default DashboardLineChartScreens;

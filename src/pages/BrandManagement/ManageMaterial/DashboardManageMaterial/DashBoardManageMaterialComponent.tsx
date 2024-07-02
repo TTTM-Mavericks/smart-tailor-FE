@@ -1,79 +1,45 @@
-import React, { useEffect, useState } from 'react';
-import Sidebar from '../../GlobalComponent/SideBarComponent/SideBarComponent';
-import Navbar from '../../GlobalComponent/NavBarComponent/NavbarComponent';
+import TopbarBrandComponent from '../../GlobalComponent/TopBar/TopBarBrandComponent';
+import SideBarBrandComponent from '../../GlobalComponent/SideBar/SideBarBrandComponent';
+import { Box, CssBaseline, useMediaQuery, useTheme } from "@mui/material";
+import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
+import theme, { tokens } from '../../../../theme';
+import styles from "./DashBoardMaterialStyle.module.scss"
+import NotFound from '../../GlobalComponent/Error404/Error404Component';
 import ManageMaterialComponent from '../MaterialManage/MaterialManageScreens';
 
-const DashboardManageMaterialScreen = () => {
-    const [menuOpen, setMenuOpen] = useState(false);
-    const [activeMenu, setActiveMenu] = useState('manage_material');
-    const [showScrollButton, setShowScrollButton] = React.useState<boolean>(false);
-    const [popperOpen, setPopperOpen] = useState<Record<string, boolean>>({});
+export default function DashboardManageMaterialScreen() {
+    const theme1 = useTheme();
+    const smScreen = useMediaQuery(theme1.breakpoints.up("sm"));
+    const colors = tokens(theme1.palette.mode)
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-    const toggleMenu = () => {
-        setMenuOpen(!menuOpen);
-    };
-
-    const handleMenuClick = (menu: any) => {
-        setActiveMenu(menu);
-    };
-
-    // Effect to close popper on outside click
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (event.target instanceof Element) {
-                if (!event.target.closest('.popover')) {
-                    setPopperOpen({
-                        notification: false,
-                        user: false,
-                    });
-                }
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
-
-    React.useEffect(() => {
-        const handleScroll = () => {
-            if (window.scrollY > 200) {
-                setShowScrollButton(true);
-            } else {
-                setShowScrollButton(false);
-            }
-        };
-
-        window.addEventListener('scroll', handleScroll);
-
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-        };
-    }, []);
-
-    const _handleScrollToTop = () => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    };
-
-    const togglePopper = (key: any) => {
-        setPopperOpen((prev) => ({
-            notification: key === 'notification' ? !prev.notification : false,
-            user: key === 'user' ? !prev.user : false,
-        }));
-    };
+    if (isMobile) {
+        return (
+            <NotFound />
+        );
+    }
     return (
-        <div className="flex">
-            <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
-            <div className="flex flex-col w-full">
-                <Navbar toggleMenu={toggleMenu} menu="Mangage Brand Price" popperOpen={popperOpen} togglePopper={togglePopper} />
-                <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
-                    <ManageMaterialComponent />
+        <CssVarsProvider theme={theme}>
+            <CssBaseline />
+            <div className={`${styles.dashboard}`}>
+                <SideBarBrandComponent />
+                <main className={`${styles.content}`}>
+                    <TopbarBrandComponent />
+                    <Box
+                        display="grid"
+                        gridTemplateColumns="repeat(12, 1fr)"
+                        gridAutoRows="140px"
+                        gap="20px"
+                    >
+                        <Box
+                            gridColumn="span 12"
+                            gridRow="span 2"
+                        >
+                            <ManageMaterialComponent />
+                        </Box>
+                    </Box>
                 </main>
             </div>
-        </div>
+        </CssVarsProvider>
     );
-};
-
-export default DashboardManageMaterialScreen;
+}

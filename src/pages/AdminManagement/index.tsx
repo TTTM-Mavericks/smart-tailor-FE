@@ -8,7 +8,8 @@ import DashboardLineChartScreens from "./LineChart/DashboardLineChartComponent";
 import DashboardBarChartScreens from "./BarChart/DashboardBarChartComponent";
 import DashboardAdminScreens from "./DashboardAdmin/DashboardAdminScreens";
 import DashboardAdminProfileScreens from "./AdminProfile/AdminProfileComponent";
-import DashboardAdminManageCategoryScreen from "./ManageCategory/DashboardAdminCategory/DashBoardManageCategoryComponent";
+import FileUpload from "./UploadExcelSampleInPublic/UploadExcelSampleInPublicComponent";
+import DashboardAdminManageCategoryScreen from "./ManageCategory/DashboardAdminCategory/DashBoardManageMaterialComponent";
 
 export {
     DashboardAdminManageCategoryScreen,
@@ -21,5 +22,6 @@ export {
     DashboardLineChartScreens,
     DashboardBarChartScreens,
     DashboardAdminScreens,
-    DashboardAdminProfileScreens
+    DashboardAdminProfileScreens,
+    FileUpload
 }

@@ -6,181 +6,109 @@ import {
     TextField,
     Grid,
     Typography,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
-    SelectChangeEvent,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useTranslation } from 'react-i18next';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { styled } from '@mui/system';
+import { Material } from '../../../../models/BrandMaterialExcelModel';
 import axios from 'axios';
-import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
-import { AddMaterial } from '../../../../models/BrandMaterialExcelModel';
-import Swal from 'sweetalert2';
+import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 
 const brandName = "LA LA LISA BRAND";
 
 interface AddMaterialWithHandsFormProps {
     closeCard: () => void;
-    addNewMaterial: (addNewMaterial: AddMaterial) => void;
+    addNewMaterial: (addNewMaterial: Material) => void;
 }
 
+const AnimatedTextField = styled(TextField)(({ theme }) => ({
+    transition: theme.transitions.create(['border-color', 'box-shadow']),
+    '&:hover': {
+        borderColor: theme.palette.primary.main,
+    },
+    '&:focus': {
+        boxShadow: `${theme.palette.primary.main} 0px 0px 0px 2px`,
+    },
+}));
+
+const StyledButton = styled(Button)(({ theme }) => ({
+    margin: theme.spacing(0.5),
+}));
+
 const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ closeCard, addNewMaterial }) => {
-    const [data, setData] = useState<any[]>([]);
     const [formData, setFormData] = useState({
-        categoryName: '',
-        materialName: '',
+        categoryName: 'Category',
+        materialName: 'mATERIAL',
         price: 110000000,
-        unit: '',
-        hsCode: '',
-        brandPrice: 110000000,
-        basePrice: 110000000,
+        unit: 'm'
     });
 
-    const [categoryData, setCategoryData] = useState<string[]>([]);
-    const [materialData, setMaterialData] = useState<string[]>([]);
-    const [hsCodeData, setHsCodeData] = useState<number[]>([]);
-    const [unitData, setUnitData] = useState<string[]>([]);
-    const [basePriceData, setBasePriceData] = useState<number[]>([]);
-
-    const _handleCategoryChange = (event: SelectChangeEvent<string>) => {
-        const category = event.target.value;
-        setFormData(prev => ({
-            ...prev,
-            categoryName: category,
-            materialName: '',
-            hsCode: '',
-            unit: '',
-            basePrice: 0,
+    const _handleFormChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData(prevFormData => ({
+            ...prevFormData,
+            [name]: value,
         }));
-        const filteredMaterials = Array.from(
-            new Set(data.filter(item => item.categoryName === category).map(item => item.materialName))
-        );
-        setMaterialData(filteredMaterials);
     };
-
-    const _handleMaterialChange = (event: SelectChangeEvent<string>) => {
-        const material = event.target.value;
-        setFormData(prev => ({
-            ...prev,
-            materialName: material,
-            hsCode: '',
-            unit: '',
-            basePrice: 0,
-        }));
-        const filteredHsCodes = Array.from(
-            new Set(
-                data
-                    .filter(item => item.categoryName === formData.categoryName && item.materialName === material)
-                    .map(item => item.hsCode)
-            )
-        );
-        setHsCodeData(filteredHsCodes);
-    };
-
-    const _handleHsCodeChange = (event: SelectChangeEvent<string>) => {
-        const hsCode = event.target.value;
-        setFormData(prev => ({
-            ...prev,
-            hsCode,
-            unit: '',
-            basePrice: 0,
-        }));
-
-        const filteredUnits = Array.from(
-            new Set(
-                data
-                    .filter(
-                        item =>
-                            item.categoryName === formData.categoryName &&
-                            item.materialName === formData.materialName &&
-                            item.hsCode === Number(hsCode)
-                    )
-                    .map(item => item.unit)
-            )
-        );
-        setUnitData(filteredUnits);
-    };
-
-    const _handleUnitChange = (event: SelectChangeEvent<string>) => {
-        const unit = event.target.value;
-        setFormData(prev => ({ ...prev, unit, basePrice: 0 }));
-        const filteredBasePrices = data
-            .filter(
-                item =>
-                    item.categoryName === formData.categoryName &&
-                    item.materialName === formData.materialName &&
-                    item.hsCode === Number(formData.hsCode) &&
-                    item.unit === unit
-            )
-            .map(item => item.basePrice);
-        setBasePriceData(filteredBasePrices);
-    };
-
-    const _handleBasePriceChange = (event: SelectChangeEvent<string>) => {
-        const basePrice = Number(event.target.value);
-        setFormData(prev => ({ ...prev, basePrice }));
-    };
-
-    const _handleBrandPriceChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const brandPrice = Number(event.target.value);
-        setFormData(prev => ({ ...prev, brandPrice }));
-    };
-
-    useEffect(() => {
-        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_material + functionEndpoints.material.getAllMaterialByBrandName + `?brandName=${brandName}`}`;
-        axios
-            .get(apiUrl)
-            .then(response => {
-                if (response.status !== 200) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.data;
-            })
-            .then(responseData => {
-                if (responseData && Array.isArray(responseData.data)) {
-                    setData(responseData.data);
-                    const categoryNames = [...new Set(responseData.data.map((category: any) => category.categoryName))];
-                    setCategoryData(categoryNames);
-                } else {
-                    console.error('Invalid data format:', responseData);
-                }
-            })
-            .catch(error => console.error('Error fetching data:', error));
-    }, []);
 
     const _handleSubmit = async () => {
         try {
-            const response = await axios.post(
-                `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_material + functionEndpoints.brand.addManual}`,
-                { ...formData, brandName },
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                }
-            );
+            if (!validateFormData()) return;
 
-            if (response.data) {
-                addNewMaterial(response.data.data);
-                Swal.fire('Add Success!', 'Material has been added!', 'success');
+            console.log('Form Data:', JSON.stringify(formData));
+
+            const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_material + functionEndpoints.brand.addManual}`, {
+                ...formData,
+                brandName
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            const responseData = response.data;
+            console.log('Response:', responseData);
+
+            if (responseData) {
+                addNewMaterial(responseData);
+                toast.success('Material added successfully');
             } else {
-                Swal.fire('Add Material failed!', 'Please check the information!', 'error');
+                toast.error('Failed to add material. Please check the information.');
             }
         } catch (err: any) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Add Failed',
-                text: 'There was an error adding the material. Please try again later.',
-            });
+            console.error('Error:', err);
+            toast.error(`Failed to add material. ${err.message || 'Unknown error'}`);
         }
+    };
+
+    const validateFormData = () => {
+        const { categoryName, materialName, price, unit } = formData;
+
+        const specialCharsRegex = /[!@#$%^&*(),.?":{}|<>0-9]/;
+        if (specialCharsRegex.test(categoryName) || specialCharsRegex.test(materialName)) {
+            toast.error('Category Name and Material Name should not contain special characters or numbers');
+            return false;
+        }
+
+        if (price <= 10000) {
+            toast.error('Price should be more than 10000');
+            return false;
+        }
+
+        const unitRegex = /^[a-zA-Z]+$/;
+        if (!unitRegex.test(unit) || !['m', 'kg', 'l', 'mg'].includes(unit)) {
+            toast.error('Unit should only contain "m", "kg", "l", or "mg"');
+            return false;
+        }
+
+        return true;
     };
 
     const { t, i18n } = useTranslation();
     const selectedLanguage = localStorage.getItem('language');
+    const codeLanguage = selectedLanguage?.toUpperCase();
 
     useEffect(() => {
         if (selectedLanguage !== null) {
@@ -200,130 +128,70 @@ const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
                 </IconButton>
                 <Grid container spacing={3} justifyContent="center">
                     <Grid item xs={10}>
-                        <FormControl fullWidth>
-                            <InputLabel id="category-select-label">Category Name</InputLabel>
-                            <Select
-                                labelId="category-select-label"
-                                id="category-select"
-                                name="categoryName"
-                                value={formData.categoryName}
-                                onChange={_handleCategoryChange}
-                                label="Category Name"
-                            >
-                                {categoryData.map((category, index) => (
-                                    <MenuItem key={index} value={category}>
-                                        {category}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Grid>
-                    {formData.categoryName && (
-                        <Grid item xs={10}>
-                            <FormControl fullWidth>
-                                <InputLabel id="material-select-label">Material Name</InputLabel>
-                                <Select
-                                    labelId="material-select-label"
-                                    id="material-select"
-                                    name="materialName"
-                                    value={formData.materialName}
-                                    onChange={_handleMaterialChange}
-                                    label="Material Name"
-                                >
-                                    {materialData.map((material, index) => (
-                                        <MenuItem key={index} value={material}>
-                                            {material}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                    )}
-                    {formData.materialName && (
-                        <Grid item xs={10}>
-                            <FormControl fullWidth>
-                                <InputLabel id="hsCode-select-label">HS CODE</InputLabel>
-                                <Select
-                                    labelId="hsCode-select-label"
-                                    id="hsCode-select"
-                                    name="hsCode"
-                                    value={formData.hsCode}
-                                    onChange={_handleHsCodeChange}
-                                    label="HS CODE"
-                                >
-                                    {hsCodeData.map((hsCode, index) => (
-                                        <MenuItem key={index} value={hsCode.toString()}>
-                                            {hsCode}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                    )}
-                    {formData.hsCode && (
-                        <Grid item xs={10}>
-                            <FormControl fullWidth>
-                                <InputLabel id="unit-select-label">Unit</InputLabel>
-                                <Select
-                                    labelId="unit-select-label"
-                                    id="unit-select"
-                                    name="unit"
-                                    value={formData.unit}
-                                    onChange={_handleUnitChange}
-                                    label="Unit"
-                                >
-                                    {unitData.map((unit, index) => (
-                                        <MenuItem key={index} value={unit}>
-                                            {unit}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                    )}
-                    {formData.unit && (
-                        <Grid item xs={10}>
-                            <FormControl fullWidth>
-                                <InputLabel id="basePrice-select-label">Base Price</InputLabel>
-                                <Select
-                                    labelId="basePrice-select-label"
-                                    id="basePrice-select"
-                                    name="basePrice"
-                                    value={formData.basePrice.toString()}
-                                    onChange={_handleBasePriceChange}
-                                    label="Base Price"
-                                >
-                                    {basePriceData.map((basePrice, index) => (
-                                        <MenuItem key={index} value={basePrice.toString()}>
-                                            {basePrice}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                    )}
-                    <Grid item xs={10}>
-                        <TextField
+                        <AnimatedTextField
                             fullWidth
-                            label="Brand Price"
+                            label="Category Name"
                             variant="outlined"
                             size="small"
-                            name="brandPrice"
-                            type="number"
-                            value={formData.brandPrice}
-                            onChange={_handleBrandPriceChange}
+                            name="category_name"
+                            value={formData.categoryName}
+                            onChange={_handleFormChange}
                         />
                     </Grid>
+                    <Grid item xs={10}>
+                        <AnimatedTextField
+                            fullWidth
+                            label="Material Name"
+                            variant="outlined"
+                            size="small"
+                            name="material_name"
+                            value={formData.materialName}
+                            onChange={_handleFormChange}
+                        />
+                    </Grid>
+                    <Grid item xs={10}>
+                        <AnimatedTextField
+                            fullWidth
+                            label="Price"
+                            variant="outlined"
+                            size="small"
+                            name="price"
+                            value={formData.price}
+                            onChange={_handleFormChange}
+                        />
+                    </Grid>
+                    <Grid item xs={10}>
+                        <AnimatedTextField
+                            fullWidth
+                            label="Unit"
+                            variant="outlined"
+                            size="small"
+                            name="unit"
+                            value={formData.unit}
+                            onChange={_handleFormChange}
+                        />
+                    </Grid>
+                    {/* <Grid item xs={10}>
+                        <AnimatedTextField
+                            fullWidth
+                            label="HS Code"
+                            variant="outlined"
+                            size="small"
+                            name="hsCode"
+                            value={formData.hsCode}
+                            onChange={_handleFormChange}
+                        />
+                    </Grid> */}
                 </Grid>
             </Box>
-            <div
-                onClick={closeCard}
-                style={{ textAlign: 'center', alignItems: 'center', marginTop: '3rem' }}
-            >
-                <Button onClick={_handleSubmit} style={{ backgroundColor: '#EC6208', color: 'white' }}>
-                    Submit
-                </Button>
-            </div>
+            <Box sx={{ p: 2, textAlign: 'center' }}>
+                <StyledButton onClick={_handleSubmit} variant="contained" color="primary">
+                    {t('Submit')}
+                </StyledButton>
+                <StyledButton onClick={closeCard} variant="contained" color="info">
+                    {t('Cancel')}
+                </StyledButton>
+            </Box>
         </Box>
     );
 };

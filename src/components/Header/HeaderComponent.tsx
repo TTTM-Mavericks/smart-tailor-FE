@@ -685,8 +685,8 @@ export default function HeaderComponent() {
                       anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                     >
                       <MenuItem>
-                        <a href={"/auth/profilesetting"} style={{ display: "flex", textDecoration: "none" }}>
-                          <Avatar src={userLogined?.imageUrl} /> <p style={{ color: "black", marginTop: "4px" }}>{t(codeLanguage + '000045')}</p>
+                        <a href={"/profile"} style={{ display: "flex", textDecoration: "none" }}>
+                          <Avatar /> <p style={{ color: "black", marginTop: "4px" }}>{t(codeLanguage + '000045')}</p>
                         </a>
                       </MenuItem>
                       <Divider />

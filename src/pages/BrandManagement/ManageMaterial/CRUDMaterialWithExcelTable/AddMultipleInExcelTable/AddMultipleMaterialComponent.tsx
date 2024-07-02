@@ -15,8 +15,6 @@ import axios from 'axios';
 const brand_name = "LA LA LISA BRAND"
 import ExcelJS from 'exceljs';
 import { toast, ToastContainer } from 'react-toastify';
-import Swal from 'sweetalert2';
-import Cookies from 'js-cookie';
 
 // const BRANDNAME = localStorage.getItem('brandName')
 
@@ -40,7 +38,7 @@ const style = {
 
 };
 
-const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormProps> = ({ closeMultipleCard }) => {
+const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormProps> = ({ closeMultipleCard, addNewMaterial }) => {
     // ---------------UseState Variable---------------//
     const [error, setError] = React.useState<string>('');
     const [excelData, setExcelData] = React.useState<ExcelData[]>([]);
@@ -139,7 +137,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                         const workbook = XLSX.read(data, { type: 'array' });
                         const sheetName = workbook.SheetNames[0];
                         const sheet = workbook.Sheets[sheetName];
-                        const jsonData = XLSX.utils.sheet_to_json<ExcelData>(sheet, { range: 1 });
+                        const jsonData = XLSX.utils.sheet_to_json<ExcelData>(sheet);
 
                         // Update error property for duplicate entries
                         const updatedData = jsonData.map(item => {
@@ -165,7 +163,6 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
         }
     };
 
-
     /**
      * Upload The File and Brand Name to Back End
      * If one field Error or dupplicate then it throw error
@@ -186,7 +183,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
         console.log('File type:', selectedFile.type);
 
         try {
-            const token = Cookies.get('token');
+            const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0YW1tdHNlMTYxMDg3QGZwdC5lZHUudm4iLCJpYXQiOjE3MTgyODUyMTMsImV4cCI6MTcxODM3MTYxM30.UUpy2s9SwYGF_TyIru6VASQ-ZzGTOqx7mkWkcSR2__0'; // Replace with the actual bearer token
             const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_material + functionEndpoints.brand.addExcel}`, formData,
                 {
                     headers: {
@@ -197,14 +194,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
 
             // Handle successful response
             console.log('Data uploaded successfully:', response);
-            if (response.data.status === 200) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Profile Updated',
-                    text: 'Your profile has been updated successfully!',
-                });
-                closeMultipleCard();
-            }
+            closeMultipleCard();
         } catch (error: any) {
             // Check for specific error status codes
             if (error.response) {
@@ -218,6 +208,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
             } else {
                 console.error('Error uploading data:', error.message);
             }
+            setError('The Price is null or Price is must be greater than 0');
         }
     };
 
@@ -231,7 +222,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
      */
     const _handleConfirm = async () => {
         // Check if any price is less than 0 or null
-        const invalidPrice = excelData.some(item => item.Brand_Price === null || item.Brand_Price < 0 || item.Brand_Price === undefined);
+        const invalidPrice = excelData.some(item => item.Price === null || item.Price < 0 || item.Price === undefined);
 
         if (invalidPrice) {
             setError('Price must be greater than or equal to 0 for all items');
@@ -260,26 +251,6 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
             // Add headers
             const headers = Object.keys(dataToDownload[0] || {});
             worksheet.addRow(headers);
-
-            // Insert a custom header row above the defined columns
-            worksheet.insertRow(1, ['Brand Price Material']);
-
-            // Merge cells for the custom header row
-            worksheet.mergeCells('A1:F1');
-
-            // Set styles for the custom header row
-            const customHeaderRow = worksheet.getRow(1);
-            customHeaderRow.height = 30; // Optional: adjust row height
-            customHeaderRow.eachCell(cell => {
-                cell.font = { bold: true, size: 16 };
-                cell.alignment = { vertical: 'middle', horizontal: 'center' };
-                cell.border = {
-                    top: { style: 'thin' },
-                    left: { style: 'thin' },
-                    bottom: { style: 'thin' },
-                    right: { style: 'thin' },
-                };
-            });
 
             // Add data rows
             dataToDownload.forEach(data => {
@@ -350,7 +321,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
             // Set fill color for cells where Price < 0 or null 
             worksheet.eachRow((row, rowIndex) => {
                 row.eachCell((cell, colIndex) => {
-                    if (headers[colIndex - 1] === 'Brand_Price') {
+                    if (headers[colIndex - 1] === 'Price') {
                         const value = cell.value as number | undefined;
                         if (value === undefined || value < 0) {
                             cell.fill = {
@@ -516,7 +487,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>HS CODE</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Unit</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Base Price</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Brand Price</th>
+                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Price</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Error Check</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Action</th>
                                 </tr>
@@ -529,12 +500,12 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                                         <td style={{ border: '1px solid #ddd', padding: '8px', color: data.HS_Code ? colors.primary[200] : 'red' }}>{data.HS_Code || 'Null'}</td>
                                         <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Unit ? colors.primary[200] : 'red' }}>{data.Unit || 'Null Unit'}</td>
                                         <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Base_Price ? colors.primary[200] : 'red' }}>{data.Base_Price || 'Null Base Price'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Brand_Price ? colors.primary[200] : 'red' }}>{data.Brand_Price || 'Null Price'}</td>
+                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Price ? colors.primary[200] : 'red' }}>{data.Price || 'Null Material Name'}</td>
                                         <td style={{ border: '1px solid #ddd', padding: '8px' }}>
                                             {(() => {
                                                 const hasNullValues = Object.values(data).some(value => value === null || value === '' || value === undefined);
-                                                const isPriceInvalid = data.Brand_Price <= 0;
-                                                const isPriceNull = data.Brand_Price === null || data.Brand_Price === undefined
+                                                const isPriceInvalid = data.Price <= 0;
+                                                const isPriceNull = data.Price === null || data.Price === undefined
                                                 if (hasNullValues || isPriceInvalid || isPriceNull) {
                                                     const errorMessage = [];
                                                     if (hasNullValues) errorMessage.push('Null Values');

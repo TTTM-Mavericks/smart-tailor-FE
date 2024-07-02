@@ -133,7 +133,7 @@ const AddMultipleExpertTailoringComponentWithExcel: React.FC<AddExpertTailoringW
                         const workbook = XLSX.read(data, { type: 'array' });
                         const sheetName = workbook.SheetNames[0];
                         const sheet = workbook.Sheets[sheetName];
-                        const jsonData = XLSX.utils.sheet_to_json<ExcelData>(sheet, { range: 1 });
+                        const jsonData = XLSX.utils.sheet_to_json<ExcelData>(sheet);
 
                         // Update error property for duplicate entries
                         const updatedData = jsonData.map(item => {
@@ -179,7 +179,7 @@ const AddMultipleExpertTailoringComponentWithExcel: React.FC<AddExpertTailoringW
         console.log('File type:', selectedFile.type);
 
         try {
-            // const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0YW1tdHNlMTYxMDg3QGZwdC5lZHUudm4iLCJpYXQiOjE3MTkwNTgwNDcsImV4cCI6MTcxOTE0NDQ0N30.Fg4vSWnTy71sWQfulQbhVzn3BuIaRQ5cI-dRKF7FSmo'; // Replace with the actual bearer token
+            // const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0YW1tdHNlMTYxMDg3QGZwdC5lZHUudm4iLCJpYXQiOjE3MTgyODUyMTMsImV4cCI6MTcxODM3MTYxM30.UUpy2s9SwYGF_TyIru6VASQ-ZzGTOqx7mkWkcSR2__0'; // Replace with the actual bearer token
             const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.addNewExpertTailoringByExcelFile}`, formData,
 
                 // {
@@ -301,26 +301,6 @@ const AddMultipleExpertTailoringComponentWithExcel: React.FC<AddExpertTailoringW
             { header: 'Expert_Tailoring_Name', key: 'Expert_Tailoring_Name', width: 20 },
             { header: 'Size_Image_Url', key: 'Size_Image_Url', width: 20 },
         ];
-
-        // Insert a custom header row above the defined columns
-        worksheet.insertRow(1, ['EXPERT TAILORING']);
-
-        // Merge cells for the custom header row
-        worksheet.mergeCells('A1:B1');
-
-        // Set styles for the custom header row
-        const customHeaderRow = worksheet.getRow(1);
-        customHeaderRow.height = 30; // Optional: adjust row height
-        customHeaderRow.eachCell(cell => {
-            cell.font = { bold: true, size: 16 };
-            cell.alignment = { vertical: 'middle', horizontal: 'center' };
-            cell.border = {
-                top: { style: 'thin' },
-                left: { style: 'thin' },
-                bottom: { style: 'thin' },
-                right: { style: 'thin' },
-            };
-        });
 
         const rows = excelData.map(item => ({
             Expert_Tailoring_Name: item.Expert_Tailoring_Name,

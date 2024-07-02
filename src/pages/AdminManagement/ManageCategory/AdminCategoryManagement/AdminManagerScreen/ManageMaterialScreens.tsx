@@ -319,7 +319,7 @@ const ManageCategories: React.FC = () => {
                         </Modal>
                     </MenuItem>
 
-                    {/* <MenuItem>
+                    <MenuItem>
                         <div onClick={_handleAddMultipleOpen}>{t(codeLanguage + '000050')}</div>
                         <Modal
                             open={addMultiple}
@@ -342,7 +342,7 @@ const ManageCategories: React.FC = () => {
                             </Box>
                         </Modal>
 
-                    </MenuItem> */}
+                    </MenuItem>
                 </Menu>
 
                 <DataGrid
@@ -362,7 +362,7 @@ const ManageCategories: React.FC = () => {
                             <EditMaterialPopUpScreens
                                 editClose={_handleEditClose}
                                 fid={formId}
-                                updateCategory={_handleUpdateCategory}
+                                updateMaterial={_handleUpdateCategory}
                             />
                         )}
                     </Box>

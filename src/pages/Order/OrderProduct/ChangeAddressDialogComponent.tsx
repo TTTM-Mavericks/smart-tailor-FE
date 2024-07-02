@@ -5,9 +5,9 @@ import { CustomerProfile, District, Location, Ward } from '../../../models/Custo
 import style from './OrderProductStyle.module.scss'
 import { MdDelete } from "react-icons/md";
 import { MdEdit } from "react-icons/md";
-import { greenColor, primaryColor, redColor, whiteColor } from '../../../root/ColorSystem';
+import { greenColor, primaryColor, redColor, secondaryColor, whiteColor } from '../../../root/ColorSystem';
 import { FaCheckCircle } from "react-icons/fa";
-import VNLocationData from '../../../locationData.json'
+import { IoIosAddCircle } from "react-icons/io";
 const sampleAddressData = [
     {
         id: 1,
@@ -73,12 +73,12 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
     // TODO MUTIL LANGUAGE
     // ---------------UseState Variable---------------//
     const [open, setOpen] = React.useState(false);
-
-    const [locations, setLocations] = React.useState<any[]>([]);
+    const [files, setFiles] = React.useState<FileList | null>(null);
+    const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
     const [selectedProvince, setSelectedProvince] = React.useState<Location | null>(null);
     const [selectedDistrict, setSelectedDistrict] = React.useState<District | null>(null);
     const [selectedWard, setSelectedWard] = React.useState<Ward | null>(null);
-
+    const [locations, setLocations] = React.useState<any[]>([]);
     const [selectedAddressEditor, setSelectedAddressEditor] = React.useState<any>();
     const [selectedAddress, setSelectedAddress] = React.useState<any>();
     const [addressList, setAddressList] = React.useState<any>([]);
@@ -106,28 +106,6 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
         setOpen(isOpen);
     }, [isOpen])
 
-    /**
-     * Get the location of the api and set it to dropdown
-     */
-    React.useEffect(() => {
-        if (VNLocationData) {
-            setLocations(VNLocationData);
-            const initialProvince = VNLocationData.find(location => location.Name === profileData.province) as Location;
-            setSelectedProvince(initialProvince || null);
-
-            if (initialProvince) {
-                const initialDistrict = initialProvince.Districts.find(district => district.Name === profileData.district) as District;
-                setSelectedDistrict(initialDistrict || null);
-
-                if (initialDistrict) {
-                    const initialWard = initialDistrict.Wards.find(ward => ward.Name === profileData.ward) as Ward;
-                    setSelectedWard(initialWard || null);
-                }
-            }
-        } else {
-            console.error("Không tìm thấy dữ liệu địa chỉ");
-        }
-    }, [profileData]);
 
     // ---------------FunctionHandler---------------//
 
@@ -138,17 +116,40 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
      */
     const _handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        const fieldValue = name === 'gender' ? (value === 'true') : value;
-
+        const fieldValue = name === 'gender' ? (value === 'true') : name === 'dateOfBirth' ? formatDateString(value) : value;
         setProfileData({ ...profileData, [name]: fieldValue });
+    };
+
+    /**
+     * 
+     * @param e 
+     * Make a change in the code
+     */
+    const _handleChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFiles = e.target.files;
+        setFiles(selectedFiles);
+        if (selectedFiles && selectedFiles.length > 0) {
+            const file = selectedFiles[0];
+            const url = URL.createObjectURL(file);
+            setPreviewUrl(url);
+        }
     };
 
 
     /**
-       * 
-       * @param event 
-       * Update The province change
-       */
+     * @param dateString
+     * Format the date string from dd-MM-yyyy to yyyy-MM-dd
+     */
+    const formatDateString = (dateString: any): any => {
+        const [dd, MM, yyyy] = dateString.split('-');
+        return `${yyyy}-${MM}-${dd}`;
+    };
+
+    /**
+     * 
+     * @param event 
+     * Update The province change
+     */
     const _handleProvinceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const provinceName = event.target.value;
         const selectedProvince = locations.find((location) => location.Name === provinceName);

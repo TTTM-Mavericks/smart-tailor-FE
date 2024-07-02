@@ -1,13 +1,13 @@
 import { Box, CssBaseline, useMediaQuery, useTheme } from "@mui/material";
 import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
 import theme, { tokens } from '../../../theme';
-import styles from "./DashboardManageNotificationStyle.module.scss"
+import styles from "./DashboardEmployeeComponent.module.scss"
 import NotFound from '../GlobalComponent/Error404/Error404Component';
-import SideBarEmployeeComponent from '../GlobalComponent/SideBar/SideBarBrandComponent';
-import TopbarEmployeeComponent from '../GlobalComponent/TopBar/TopBarBrandComponent';
-import ManageNotificationScreens from "./ManageNotificationScreens";
+import SideBarEmployeeComponent from '../GlobalComponent/SideBar/SideBarEmployeeComponent';
+import TopbarEmployeeComponent from '../GlobalComponent/TopBar/TopBarEmployeeComponent';
+import EmployeeManageOrder from './ManageOrderScreen';
 
-export default function DashboardBrandManageNotification() {
+export default function DashboardManageOrderScreen() {
     const theme1 = useTheme();
     const smScreen = useMediaQuery(theme1.breakpoints.up("sm"));
     const colors = tokens(theme1.palette.mode)
@@ -35,7 +35,7 @@ export default function DashboardBrandManageNotification() {
                             gridColumn="span 12"
                             gridRow="span 2"
                         >
-                            {/* <ManageNotificationScreens /> */}
+                            <EmployeeManageOrder />
                         </Box>
                     </Box>
                 </main>

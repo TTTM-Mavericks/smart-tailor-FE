@@ -1,26 +1,27 @@
-import * as React from "react";
 import { Box, Button, IconButton, Menu, MenuItem, Modal } from "@mui/material";
 import { DataGrid, GridToolbar, GridColDef } from "@mui/x-data-grid";
-import { tokens } from "../../../../theme";
+import { tokens } from "../../../theme";
 import { useTheme } from "@mui/material";
-import { Add } from "@mui/icons-material";
-import { useTranslation } from 'react-i18next';
+import * as React from "react";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Swal from "sweetalert2";
-import EditMaterialPopUpScreens from "./EditMaterial/EditMaterialPopUpScreens";
-import AddEachMaterialWithHand from "../AddEachWithHand/AddEachMaterialWithHandScreens";
-import AddMultipleMaterialWithExcel from "../CRUDMaterialWithExcelTable/AddMultipleInExcelTable/AddMultipleMaterialComponent";
+import EditCustomerPopUpScreens from "./EditReportPopUpScreen";
+import { Add } from "@mui/icons-material";
+import AddEachUsersWithHand from "./AddEachWithHand/AddEachReportWithHandScreens";
+import { useTranslation } from 'react-i18next';
 
-interface Material {
-    id: number,
-    categoryName: string,
-    materialName: string,
-    price: number,
-    unit: string
+interface User {
+    id: number;
+    registrarId: string;
+    name: string;
+    age: number;
+    phone: string;
+    email: string;
+    address: string;
+    city: string;
+    zipCode: string;
 }
-
-const brand_name = "LV"
 
 // Make Style of popup
 const style = {
@@ -36,15 +37,13 @@ const style = {
     borderRadius: "20px"
 };
 
-const ManageMaterialComponent: React.FC = () => {
-
-
+const EmployeeManageReport: React.FC = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [data, setData] = React.useState<Material[]>([]);
+    const [data, setData] = React.useState<User[]>([]);
 
     // set formid to pass it to component edit user
-    const [formId, setFormId] = React.useState<Material | null>(null);
+    const [formId, setFormId] = React.useState<User | null>(null);
 
     // Open Edit PopUp when clicking on the edit icon
     const [editopen, setEditOpen] = React.useState<boolean>(false);
@@ -60,6 +59,7 @@ const ManageMaterialComponent: React.FC = () => {
     const _handleClose = () => {
         setAnchorEl(null);
     };
+    console.log("anchorEl" + anchorEl);
 
     // close open pop up
     const [addOpenOrClose, setAddOpenOrClose] = React.useState<boolean>(false)
@@ -70,17 +70,6 @@ const ManageMaterialComponent: React.FC = () => {
 
     const _handleAddClose = () => {
         setAddOpenOrClose(false)
-    }
-
-    // close open pop up
-    const [addMultiple, setAddMultiple] = React.useState<boolean>(false)
-
-    const _handleAddMultipleOpen = () => {
-        setAddMultiple(true);
-    }
-
-    const _handleAddMultipleClose = () => {
-        setAddMultiple(false)
     }
 
     // Get language in local storage
@@ -96,7 +85,7 @@ const ManageMaterialComponent: React.FC = () => {
     }, [selectedLanguage, i18n]);
 
     React.useEffect(() => {
-        const apiUrl = 'http://localhost:6969/api/v1/brand-material/get-all-brand-material-by-brand-name?brandName=LA LA LISA BRAND';
+        const apiUrl = 'https://66080c21a2a5dd477b13eae5.mockapi.io/CPSE_DATA_TEST';
         fetch(apiUrl)
             .then(response => {
                 if (!response.ok) {
@@ -105,8 +94,8 @@ const ManageMaterialComponent: React.FC = () => {
                 return response.json();
             })
             .then((responseData) => {
-                if (responseData && Array.isArray(responseData.data)) {
-                    setData(responseData.data);
+                if (responseData && Array.isArray(responseData)) {
+                    setData(responseData);
                     console.log("Data received:", responseData);
 
                 } else {
@@ -117,30 +106,30 @@ const ManageMaterialComponent: React.FC = () => {
     }, []);
 
     // Thêm người dùng mới vào danh sách
-    const _handleAddMaterial = (newMaterial: Material) => {
-        setData(prevData => [...prevData, newMaterial]);
+    const _handleAddUser = (newUser: User) => {
+        setData(prevData => [...prevData, newUser]);
     }
 
     // Cập nhật người dùng trong danh sách
-    const _handleUpdateMaterial = (updatedMaterial: Material) => {
-        setData(prevData => prevData.map(material => material.id === updatedMaterial.id ? updatedMaterial : material));
+    const _handleUpdateUser = (updatedUser: User) => {
+        setData(prevData => prevData.map(user => user.id === updatedUser.id ? updatedUser : user));
     }
 
     // EDIT 
-    const _handleEditClick = (id: number,
-        categoryName: string,
-        materialName: string,
-        price: number,
-        unit: string) => {
+    const _handleEditClick = (id: number, registrarId: string, name: string, age: number, phone: string, email: string, address: string, city: string, zipCode: string) => {
         // Handle edit action
-        const materialDataToEdit: Material = {
+        const userDataToEdit: User = {
             id: id,
-            categoryName: categoryName,
-            materialName: materialName,
-            price: price,
-            unit: unit
+            registrarId: registrarId,
+            name: name,
+            age: age,
+            phone: phone,
+            email: email,
+            address: address,
+            city: city,
+            zipCode: zipCode
         }
-        setFormId(materialDataToEdit);
+        setFormId(userDataToEdit);
         _handleEditOpen();
     };
 
@@ -148,11 +137,11 @@ const ManageMaterialComponent: React.FC = () => {
     const _handleDeleteClick = async (id: number) => {
         // Handle delete action
         try {
-            const response = await fetch(`http://localhost:6969/api/v1/brand-material/get-all-brand-material-by-brand-name?brandName=LA LA LISA BRAND`, {
+            const response = await fetch(`https://66080c21a2a5dd477b13eae5.mockapi.io/CPSE_DATA_TEST/${id}`, {
                 method: 'DELETE',
             });
             if (!response.ok) {
-                throw new Error('Error deleting material');
+                throw new Error('Error deleting user');
             }
             const data = await response.json();
             return data;
@@ -163,7 +152,7 @@ const ManageMaterialComponent: React.FC = () => {
     }
 
     // confirm 
-    const _hanldeConfirmDelete = async (id: number) => {
+    const confirmDelete = async (id: number) => {
         try {
             const result = await Swal.fire({
                 title: `${t(codeLanguage + '000061')}`,
@@ -183,7 +172,7 @@ const ManageMaterialComponent: React.FC = () => {
                     'success'
                 )
                 // Loại bỏ người dùng khỏi danh sách hiện tại
-                setData(prevData => prevData.filter(material => material.id !== id));
+                setData(prevData => prevData.filter(user => user.id !== id));
             } else {
                 Swal.fire(
                     `${t(codeLanguage + '000066')}`,
@@ -198,32 +187,43 @@ const ManageMaterialComponent: React.FC = () => {
 
 
     const columns: GridColDef[] = [
-        // { field: "id", headerName: "ID", flex: 0.5 },
+        { field: "id", headerName: "ID", flex: 0.5 },
+        { field: "registrarId", headerName: "Registrar ID" },
         {
-            field: "categoryName",
-            headerName: "Category Name",
+            field: "name",
+            headerName: "Name",
             flex: 1,
         },
         {
-            field: "materialName",
-            headerName: "Material Name",
-            flex: 1,
-        },
-        {
-            field: "price",
-            headerName: "Price",
+            field: "age",
+            headerName: "Age",
             type: "number",
             headerAlign: "left",
             align: "left",
         },
         {
-            field: "unit",
-            headerName: "Unit",
+            field: "phone",
+            headerName: "Phone Number",
             flex: 1,
         },
         {
-            field: "brandName",
-            headerName: "Brand Name",
+            field: "email",
+            headerName: "Email",
+            flex: 1,
+        },
+        {
+            field: "address",
+            headerName: "Address",
+            flex: 1,
+        },
+        {
+            field: "city",
+            headerName: "City",
+            flex: 1,
+        },
+        {
+            field: "zipCode",
+            headerName: "Zip Code",
             flex: 1,
         },
         {
@@ -233,10 +233,10 @@ const ManageMaterialComponent: React.FC = () => {
             sortable: false,
             renderCell: (params) => (
                 <Box>
-                    <IconButton onClick={() => _handleEditClick(params.row.id, params.row.category_name, params.row.material_name, params.row.price, params.row.unit)}>
+                    <IconButton onClick={() => _handleEditClick(params.row.id, params.row.registrarId, params.row.name, params.row.age, params.row.email, params.row.phone, params.row.address, params.row.city, params.row.zipCode)}>
                         <EditIcon />
                     </IconButton>
-                    <IconButton onClick={() => _hanldeConfirmDelete(params.row.id)}>
+                    <IconButton onClick={() => confirmDelete(params.row.id)}>
                         <DeleteIcon htmlColor={colors.primary[300]} />
                     </IconButton>
                 </Box>
@@ -244,7 +244,9 @@ const ManageMaterialComponent: React.FC = () => {
         }
     ];
 
-    const getRowId = (row: any) => `${row.brandName}-${row.materialName}-${row.createDate}`;
+    const getRowId = (row: any) => {
+        return row.registrarId; // Sử dụng một thuộc tính duy nhất làm id cho mỗi hàng
+    };
 
     return (
         <Box m="20px">
@@ -317,20 +319,20 @@ const ManageMaterialComponent: React.FC = () => {
                                 top: '50%',
                                 left: '50%',
                                 transform: 'translate(-50%, -50%)',
-                                width: "40%",
+                                width: "50%",
                                 bgcolor: 'background.paper',
                                 border: '2px solid #000',
                                 boxShadow: 24,
                                 p: 4,
                                 borderRadius: "20px"
                             }}>
-                                <AddEachMaterialWithHand closeCard={_handleAddClose} addNewMaterial={_handleAddMaterial} />
+                                <AddEachUsersWithHand closeCard={_handleAddClose} addNewUser={_handleAddUser} />
                             </Box>
                         </Modal>
                     </MenuItem>
 
-                    <MenuItem>
-                        <div onClick={_handleAddMultipleOpen}>{t(codeLanguage + '000050')}</div>
+                    {/* <MenuItem>
+                        <div onClick={handleAddMultipleOpen}>{t(codeLanguage + '000050')}</div>
                         <Modal
                             open={addMultiple}
                             aria-labelledby="modal-modal-title"
@@ -348,11 +350,11 @@ const ManageMaterialComponent: React.FC = () => {
                                 p: 4,
                                 borderRadius: "20px"
                             }}>
-                                <AddMultipleMaterialWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddMaterial} />
+                                <AddMultipleComponentWithExcel closeMultipleCard={handleAddMultipleClose} addNewUser={_handleAddUser} />
                             </Box>
                         </Modal>
 
-                    </MenuItem>
+                    </MenuItem> */}
                 </Menu>
 
                 <DataGrid
@@ -370,10 +372,10 @@ const ManageMaterialComponent: React.FC = () => {
                 >
                     <Box sx={style}>
                         {formId !== null && (
-                            <EditMaterialPopUpScreens
+                            <EditCustomerPopUpScreens
                                 editClose={_handleEditClose}
                                 fid={formId}
-                                updateMaterial={_handleUpdateMaterial}
+                                updateUser={_handleUpdateUser}
                             />
                         )}
                     </Box>
@@ -383,4 +385,4 @@ const ManageMaterialComponent: React.FC = () => {
     );
 };
 
-export default ManageMaterialComponent;
+export default EmployeeManageReport;

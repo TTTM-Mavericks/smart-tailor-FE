@@ -11,8 +11,7 @@ export interface ExcelData {
     Unit: String,
     Price: number,
     HS_Code: number,
-    Base_Price: number,
-    Brand_Price: number
+    Base_Price: number
 }
 
 export interface DuplicateCheckResponse {
@@ -27,26 +26,4 @@ export interface Material {
     price: number,
     unit: string,
     hsCode: number
-}
-
-export interface AddMaterial {
-    id: number,
-    brandName: string,
-    categoryName: string,
-    materialName: string,
-    hsCode: number,
-    unit: string,
-    basePrice: number,
-    brandPrice: number
-}
-
-export interface UpdateMaterial {
-    id: number,
-    brandName: string,
-    categoryName: string,
-    materialName: string,
-    hsCode: number,
-    unit: string,
-    basePrice: number,
-    brandPrice: number
 }

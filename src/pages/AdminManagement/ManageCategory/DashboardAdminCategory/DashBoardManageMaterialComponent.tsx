@@ -1,13 +1,13 @@
+import TopbarComponent from '../../GlobalComponent/TopBar/TopBarComponent';
+import SideBarComponent from '../../GlobalComponent/SideBar/SideBarComponent';
 import { Box, CssBaseline, useMediaQuery, useTheme } from "@mui/material";
 import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
-import theme, { tokens } from '../../../theme';
-import styles from "./DashboardManageNotificationStyle.module.scss"
-import NotFound from '../GlobalComponent/Error404/Error404Component';
-import SideBarEmployeeComponent from '../GlobalComponent/SideBar/SideBarBrandComponent';
-import TopbarEmployeeComponent from '../GlobalComponent/TopBar/TopBarBrandComponent';
-import ManageNotificationScreens from "./ManageNotificationScreens";
+import theme, { tokens } from '../../../../theme';
+import styles from "./DashBoardMaterialStyle.module.scss"
+import ManageCategories from '../AdminCategoryManagement/AdminManagerScreen/ManageMaterialScreens';
+import NotFound from '../../GlobalComponent/Error404/Error404Component';
 
-export default function DashboardBrandManageNotification() {
+export default function DashboardAdminManageCategoryScreen() {
     const theme1 = useTheme();
     const smScreen = useMediaQuery(theme1.breakpoints.up("sm"));
     const colors = tokens(theme1.palette.mode)
@@ -22,9 +22,9 @@ export default function DashboardBrandManageNotification() {
         <CssVarsProvider theme={theme}>
             <CssBaseline />
             <div className={`${styles.dashboard}`}>
-                <SideBarEmployeeComponent />
+                <SideBarComponent />
                 <main className={`${styles.content}`}>
-                    <TopbarEmployeeComponent />
+                    <TopbarComponent />
                     <Box
                         display="grid"
                         gridTemplateColumns="repeat(12, 1fr)"
@@ -35,7 +35,7 @@ export default function DashboardBrandManageNotification() {
                             gridColumn="span 12"
                             gridRow="span 2"
                         >
-                            {/* <ManageNotificationScreens /> */}
+                            <ManageCategories />
                         </Box>
                     </Box>
                 </main>

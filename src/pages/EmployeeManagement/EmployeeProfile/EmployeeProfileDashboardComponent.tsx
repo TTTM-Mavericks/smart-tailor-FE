@@ -1,31 +1,21 @@
-import React, { useState } from 'react';
-import Sidebar from '../GlobalComponent/SideBarComponent/SideBarComponent';
-import Navbar from '../GlobalComponent/NavBarComponent/NavbarComponent';
+import { CssBaseline } from "@mui/material";
+import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
+import theme from '../../../theme';
+import styles from "./EmployeeProfileStyles.module.scss"
 import EmployeeProfileSetup from './EmployeeProfileComponent';
-
-const DashboardEmployeeProfileScreens = () => {
-    const [menuOpen, setMenuOpen] = useState(false);
-    const [activeMenu, setActiveMenu] = useState('employee_profile');
-
-    const toggleMenu = () => {
-        setMenuOpen(!menuOpen);
-    };
-
-    const handleMenuClick = (menu: any) => {
-        setActiveMenu(menu);
-    };
-
+import SideBarEmployeeComponent from '../GlobalComponent/SideBar/SideBarEmployeeComponent';
+import TopbarEmployeeComponent from '../GlobalComponent/TopBar/TopBarEmployeeComponent';
+export default function DashboardEmployeeProfileScreens() {
     return (
-        <div className="flex">
-            <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
-            <div className="flex flex-col w-full">
-                <Navbar toggleMenu={toggleMenu} />
-                <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
+        <CssVarsProvider theme={theme}>
+            <CssBaseline />
+            <div className={`${styles.dashboard}`}>
+                <SideBarEmployeeComponent />
+                <main className={`${styles.content}`}>
+                    <TopbarEmployeeComponent />
                     <EmployeeProfileSetup />
                 </main>
             </div>
-        </div>
+        </CssVarsProvider>
     );
-};
-
-export default DashboardEmployeeProfileScreens;
+}

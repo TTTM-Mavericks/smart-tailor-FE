@@ -8,7 +8,7 @@ import EditMultipleMaterialInExcelTable from "./ManageMaterial/CRUDMaterialWithE
 import DashboardManageMaterialScreen from "./ManageMaterial/DashboardManageMaterial/DashBoardManageMaterialComponent";
 import ManageMaterialComponent from "./ManageMaterial/MaterialManage/MaterialManageScreens";
 import EditMaterialPopUpScreens from "./ManageMaterial/MaterialManage/EditMaterial/EditMaterialPopUpScreens";
-import DashboardBrandManagePriceQuantityScreen from "./ManagePrice/BrandPriceManagement/DashboardBrandPrice/DashboardBrandPriceComponent";
+
 export {
     DashboardBrandScreens,
     DashboardBrandManageNotification,
@@ -19,7 +19,5 @@ export {
     AddMultipleMaterialWithExcel,
     EditMultipleMaterialInExcelTable,
     ManageMaterialComponent,
-    EditMaterialPopUpScreens,
-    DashboardBrandManagePriceQuantityScreen
-
+    EditMaterialPopUpScreens
 }

@@ -1,31 +1,45 @@
-import React, { useState } from 'react';
-import Sidebar from '../../GlobalComponent/SideBarComponent/SideBarComponent';
-import Navbar from '../../GlobalComponent/NavBarComponent/NavbarComponent';
-import RowDetails from './RowDetailsComponent';
+import { Box, CssBaseline, useMediaQuery, useTheme } from "@mui/material";
+import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
+import theme, { tokens } from '../../../../theme';
+import styles from "./DashboardOrderDetailStyle.module.scss"
+import NotFound from '../../GlobalComponent/Error404/Error404Component';
+import SideBarEmployeeComponent from '../../GlobalComponent/SideBar/SideBarEmployeeComponent';
+import TopbarEmployeeComponent from '../../GlobalComponent/TopBar/TopBarEmployeeComponent';
+import RowDetails from "./RowDetailsComponent";
 
-const DashboardEmployeeOrderDetailScreen = () => {
-    const [menuOpen, setMenuOpen] = useState(false);
-    const [activeMenu, setActiveMenu] = useState('employee_manage_order');
+export default function DashboardEmployeeOrderDetailScreen() {
+    const theme1 = useTheme();
+    const smScreen = useMediaQuery(theme1.breakpoints.up("sm"));
+    const colors = tokens(theme1.palette.mode)
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-    const toggleMenu = () => {
-        setMenuOpen(!menuOpen);
-    };
-
-    const handleMenuClick = (menu: any) => {
-        setActiveMenu(menu);
-    };
-
+    if (isMobile) {
+        return (
+            <NotFound />
+        );
+    }
     return (
-        <div className="flex">
-            <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
-            <div className="flex flex-col w-full">
-                <Navbar toggleMenu={toggleMenu} />
-                <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
-                    <RowDetails />
+        <CssVarsProvider theme={theme}>
+            <CssBaseline />
+            <div className={`${styles.dashboard}`}>
+                <SideBarEmployeeComponent />
+                <main className={`${styles.content}`}>
+                    <TopbarEmployeeComponent />
+                    <Box
+                        display="grid"
+                        gridTemplateColumns="repeat(12, 1fr)"
+                        gridAutoRows="140px"
+                        gap="20px"
+                    >
+                        <Box
+                            gridColumn="span 12"
+                            gridRow="span 2"
+                        >
+                            <RowDetails />
+                        </Box>
+                    </Box>
                 </main>
             </div>
-        </div>
+        </CssVarsProvider>
     );
-};
-
-export default DashboardEmployeeOrderDetailScreen;
+}
