@@ -70,12 +70,9 @@
         }
 
         &:hover {
-            background-color: rgba($color: $grayColor, $alpha: 1);
+            // background-color: rgba($color: $grayColor, $alpha: 1);
             cursor: pointer;
 
-            .changeAddressDialogContent__adressItem__iconGroup {
-                display: flex;
-            }
         }
 
         &__title {
@@ -90,16 +87,15 @@
 
         &__iconGroup {
             position: absolute;
-            display: none;
+            display: flex;
             align-items: center;
             justify-content: center;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            top: 2px;
+            right: 50px;
 
             &__icon {
-                width: 35px;
-                height: 35px;
+                width: 25px;
+                height: 25px;
                 border-radius: 90px;
                 display: flex;
                 align-items: center;
@@ -114,9 +110,6 @@
         }
 
         &__noHover {
-            .changeAddressDialogContent__adressItem__iconGroup {
-                display: none !important;
-            }
 
             &:hover {
                 background-color: initial !important;
@@ -125,21 +118,21 @@
         }
     }
 
-    ::-webkit-scrollbar {
+    &::-webkit-scrollbar {
         width: 3px;
     }
 
-    ::-webkit-scrollbar-track {
+    &::-webkit-scrollbar-track {
         background: $grayColor1;
         border-radius: 10px;
     }
 
-    ::-webkit-scrollbar-thumb {
+    &::-webkit-scrollbar-thumb {
         background: #7b7b7b;
         border-radius: 10px;
     }
 
-    ::-webkit-scrollbar-thumb:hover {
+    &::-webkit-scrollbar-thumb:hover {
         background: #7b7b7b;
         /* Color when hovering over the scrollbar thumb */
     }
@@ -170,9 +163,18 @@
                 &__button {
                     width: 150px;
                     float: left;
-                    border: 1px solid $greenColor;
-                    background-color: $greenColor;
-                    color: $whiteColor;
+                    border: 1px solid $primaryColor;
+                    color: $primaryColor;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    font-size: 13px;
+
+                    &:hover {
+                        background-color: $primaryColor;
+                        color: $whiteColor;
+                        transition: 0.4s;
+                    }
                 }
             }
 

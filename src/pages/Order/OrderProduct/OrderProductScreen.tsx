@@ -9,6 +9,7 @@ import { primaryColor } from '../../../root/ColorSystem';
 import { FaPlusCircle } from "react-icons/fa";
 import { FaMinusCircle } from "react-icons/fa";
 import MaterialDetailTableComponent from '../Components/Table/MaterialDetailTableComponent';
+import { RiBodyScanLine } from "react-icons/ri";
 
 
 interface SizeQuantity {
@@ -22,11 +23,11 @@ interface SizeQuantity {
 }
 
 
-const sizes = ['Small', 'Medium', 'Large', 'X-Large'];
+const sizes = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
 
 const CustomTextField = styled(TextField)(({ theme }) => ({
     '& .MuiInputBase-root': {
-        height: '35px',
+        height: '30px',
         width: '150px',
         borderRadius: '4px',
         outline: 'none',
@@ -56,7 +57,7 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
 
 const CustomTextFieldSizeCustom = styled(TextField)(({ theme }) => ({
     '& .MuiInputBase-root': {
-        height: '35px',
+        height: '30px',
         width: '100%',
         borderRadius: '4px',
         outline: 'none',
@@ -87,7 +88,7 @@ const CustomTextFieldSizeCustom = styled(TextField)(({ theme }) => ({
 
 const CustomTextFieldQuantity = styled(TextField)(({ theme }) => ({
     '& .MuiInputBase-root': {
-        height: '35px',
+        height: '30px',
         width: '100px',
         borderRadius: '4px',
         outline: 'none',
@@ -186,16 +187,17 @@ const OrderProductScreen = () => {
         setSizeQuantitiesCustom(newSizeQuantities);
     };
 
-    const toggleExpand = (index: number) => {
+    const __handleToggleExpand = (index: number) => {
+        // __handleClickOpen();
+        setOpen(true);
         setExpandedIndex(expandedIndex === index ? null : index);
-        handleClickOpen();
     };
 
-    const handleClickOpen = () => {
+    const __handleClickOpen = () => {
         setOpen(true);
     };
 
-    const handleClose = () => {
+    const __handleClose = () => {
         setOpen(false);
     };
 
@@ -206,14 +208,14 @@ const OrderProductScreen = () => {
             <div>
                 <div className="py-0 md:px-6 2xl:px-20 2xl:container 2xl:mx-auto">
                     <div className="mt-10 flex flex-col xl:flex-row jusitfy-center items-stretch w-full xl:space-x-8 space-y-4 md:space-y-6 xl:space-y-0">
-                        <div className="flex flex-col justify-start items-start w-full space-y-4 md:space-y-6 xl:space-y-8">
-                            <p className="text-md md:text-xl light:text-white font-semibold leading-6 xl:leading-5 text-gray-800">Order details</p>
-                            <div className="flex justify-start items-start light:bg-gray-800 px-4 py-4 md:py-6 md:p-6 xl:p-8 w-full">
+                        <div className="flex flex-col justify-start items-start bg-gray-50 w-full space-y-4 md:space-y-6 xl:space-y-8">
+                            <p className=" pt-10 pl-10 text-md md:text-xl light:text-white font-semibold leading-6 xl:leading-5 text-gray-800">Order details</p>
+                            <div className="flex justify-start items-start bg-gray-50 light:bg-gray-800 px-4 py-4 md:py-6 md:p-6 xl:p-8 w-full">
                                 <div className="pb-4 mr-10 md:pb-8 w-full md:w-40">
                                     <img className="w-full hidden md:block" src="https://i.ibb.co/84qQR4p/Rectangle-10.png" alt="dress" />
                                     <img className="w-full md:hidden" src="https://i.ibb.co/L039qbN/Rectangle-10.png" alt="dress" />
                                 </div>
-                                <div className="mt-4 md:mt-6 flex flex-col md:flex-row justify-start items-start md:items-center md:space-x-6 xl:space-x-8 w-full">
+                                <div className="mt-4 md:mt-6 flex flex-col md:flex-row justify-start  items-start md:items-center md:space-x-6 xl:space-x-8 w-full">
                                     <div className="border-b border-gray-200 md:flex-row flex-col flex justify-between items-start w-full pb-8 space-y-4 md:space-y-0" >
                                         <div className="w-full justify-start items-start space-y-8" >
                                             <div className="flex justify-between space-x-8 items-start w-full">
@@ -236,11 +238,12 @@ const OrderProductScreen = () => {
                                                             exclusive
                                                             onChange={__handleInputModeChange}
                                                             aria-label="text alignment"
-                                                            sx={{ display: 'flex', justifyContent: 'center', marginBottom: 2 }}
+                                                            sx={{ display: 'block', justifyContent: 'center', marginBottom: 2 }}
+                                                            style={{ marginLeft: 10 }}
                                                         >
                                                             <ToggleButton
                                                                 value="predefined"
-                                                                aria-label="left aligned"
+                                                                aria-label="centered"
                                                                 sx={{ width: 150, height: 30, fontSize: 12, '&.Mui-selected': { backgroundColor: primaryColor, color: 'white' } }}
                                                             >
                                                                 Predefined Sizes
@@ -257,7 +260,7 @@ const OrderProductScreen = () => {
                                                         {inputMode === 'predefined' ? (
                                                             <div>
                                                                 {sizeQuantities.map((sq, index) => (
-                                                                    <div style={{ display: 'flex', margin: 10 }}>
+                                                                    <div key={index} style={{ display: 'flex', margin: 10 }}>
                                                                         <Grid item>
                                                                             <Autocomplete
                                                                                 options={sizes}
@@ -287,14 +290,15 @@ const OrderProductScreen = () => {
                                                         ) : (
                                                             <div style={{ marginTop: 10, marginLeft: 10 }}>
                                                                 {sizeQuantitiesCustom.map((sq, index) => (
-                                                                    <div style={{ marginBottom: 10 }}>
-                                                                        <button className={`${style.orderProduct__container__detail__sizeDetail__quantity__button} py-1 px-4 rounded inline-flex items-cente1`} onClick={() => toggleExpand(index)}>
+                                                                    <div key={index} style={{ marginBottom: 10 }}>
+                                                                        <button className={`${style.orderProduct__container__detail__sizeDetail__quantity__button} py-1 px-4 rounded inline-flex items-cente1`} onClick={() => __handleToggleExpand(index)}>
                                                                             {`Size ${index + 1}`}
+                                                                            <RiBodyScanLine style={{ marginLeft: 10 }} size={20} />
                                                                         </button>
                                                                         {expandedIndex === index && (
                                                                             <Dialog
                                                                                 open={open}
-                                                                                onClose={handleClose}
+                                                                                onClose={__handleClose}
                                                                                 aria-labelledby="alert-dialog-title"
                                                                                 aria-describedby="alert-dialog-description"
                                                                             >
@@ -359,10 +363,10 @@ const OrderProductScreen = () => {
                                                                                 </div>
 
                                                                                 <DialogActions>
-                                                                                    <Button onClick={handleClose}>Disagree</Button>
-                                                                                    <Button onClick={handleClose} autoFocus>
-                                                                                        Agree
-                                                                                    </Button>
+                                                                                    <Button onClick={__handleClose}>Disagree</Button>
+                                                                                    <button autoFocus onClick={__handleClose} style={{ width: '150px', backgroundColor: primaryColor }} >
+                                                                                        Accept
+                                                                                    </button>
                                                                                 </DialogActions>
                                                                             </Dialog>
                                                                         )}
@@ -374,7 +378,7 @@ const OrderProductScreen = () => {
                                                                                 value={sq.quantity}
                                                                                 onChange={(e) => __handleQuantityChange(index, Number(e.target.value))}
                                                                                 inputProps={{ min: 1 }}
-                                                                                style={{ marginLeft: 10, marginRight: 20 }}
+                                                                                style={{ marginLeft: 10, marginRight: 20, }}
 
                                                                             />
                                                                             <FaMinusCircle size={25} color={primaryColor} onClick={() => __handleRemoveSizeQuantity(index)} style={{ display: sizeQuantities.length === 1 ? 'none' : 'flex', cursor: 'pointer' }}>
@@ -385,7 +389,7 @@ const OrderProductScreen = () => {
                                                             </div>
                                                         )}
                                                         <div>
-                                                            <FaPlusCircle size={20} style={{ cursor: 'pointer' }} color={primaryColor} onClick={__handleAddSizeQuantity}>
+                                                            <FaPlusCircle size={20} style={{ cursor: 'pointer', marginLeft: 10 }} color={primaryColor} onClick={__handleAddSizeQuantity}>
                                                             </FaPlusCircle>
                                                         </div>
                                                     </div>
@@ -395,16 +399,15 @@ const OrderProductScreen = () => {
                                             <div className="flex justify-between space-x-8 items-start w-full">
                                                 <h3 className="text-sm light:text-white xl:text-1xl font-semibold leading-6 text-gray-800">Material price</h3>
                                             </div>
-                                            <MaterialDetailTableComponent></MaterialDetailTableComponent>
 
+                                            <MaterialDetailTableComponent></MaterialDetailTableComponent>
                                         </div>
 
                                     </div>
                                 </div>
 
                             </div>
-                            <div className="flex justify-center  md:flex-row flex-col items-stretch w-full space-y-4 md:space-y-0 md:space-x-6 xl:space-x-8">
-
+                            {/* <div className="flex justify-center  md:flex-row flex-col items-stretch w-full space-y-4 md:space-y-0 md:space-x-6 xl:space-x-8">
                                 <div className="flex flex-col justify-center px-4 py-6 md:p-6 xl:p-8 w-full bg-gray-50 light:bg-gray-800 space-y-6">
                                     <h3 className="text-xl light:text-white font-semibold leading-5 text-gray-800">Shipping</h3>
                                     <div className="flex justify-between items-start w-full">
@@ -420,31 +423,33 @@ const OrderProductScreen = () => {
                                     </div>
 
                                 </div>
+                            </div> */}
+                        </div>
 
-                                <div className="flex flex-col px-4 py-6 md:p-6 xl:p-8 w-full bg-gray-50 light:bg-gray-800 space-y-6">
-                                    <h3 className="text-xl light:text-white font-semibold leading-5 text-gray-800">Summary</h3>
-                                    <div className="flex justify-center items-center w-full space-y-4 flex-col border-gray-200 border-b pb-4">
-                                        <div className="flex justify-between w-full">
-                                            <p className="text-base light:text-white leading-4 text-gray-800">Subtotal</p>
-                                            <p className="text-base light:text-gray-300 leading-4 text-gray-600">$56.00</p>
-                                        </div>
-                                        <div className="flex justify-between items-center w-full">
-                                            <p className="text-base light:text-white leading-4 text-gray-800">Discount <span className="bg-gray-200 p-1 text-xs font-medium light:bg-white light:text-gray-800 leading-3 text-gray-800">STUDENT</span></p>
-                                            <p className="text-base light:text-gray-300 leading-4 text-gray-600">-$28.00 (50%)</p>
-                                        </div>
-                                        <div className="flex justify-between items-center w-full">
-                                            <p className="text-base light:text-white leading-4 text-gray-800">Shipping</p>
-                                            <p className="text-base light:text-gray-300 leading-4 text-gray-600">$8.00</p>
-                                        </div>
+                        {/* Order summary */}
+                        <div className="bg-gray-50 light:bg-gray-800 w-full xl:w-2/5 flex justify-between items-center md:items-start px-4 py-6 md:p-6 xl:p-8 flex-col">
+                            <div className="flex flex-col w-full bg-gray-50 light:bg-gray-800 space-y-6 mb-10">
+                                <h3 className="text-xl light:text-white font-semibold leading-5 text-gray-800">Summary</h3>
+                                <div className="flex justify-center items-center w-full space-y-4 flex-col border-gray-200 border-b pb-4">
+                                    <div className="flex justify-between w-full">
+                                        <p className="text-base light:text-white leading-4 text-gray-800">Subtotal</p>
+                                        <p className="text-base light:text-gray-300 leading-4 text-gray-600">$56.00</p>
                                     </div>
                                     <div className="flex justify-between items-center w-full">
-                                        <p className="text-base light:text-white font-semibold leading-4 text-gray-800">Total</p>
-                                        <p className="text-base light:text-gray-300 font-semibold leading-4 text-gray-600">$36.00</p>
+                                        <p className="text-base light:text-white leading-4 text-gray-800">Discount <span className="bg-gray-200 p-1 text-xs font-medium light:bg-white light:text-gray-800 leading-3 text-gray-800">STUDENT</span></p>
+                                        <p className="text-base light:text-gray-300 leading-4 text-gray-600">-$28.00 (50%)</p>
+                                    </div>
+                                    <div className="flex justify-between items-center w-full">
+                                        <p className="text-base light:text-white leading-4 text-gray-800">Shipping</p>
+                                        <p className="text-base light:text-gray-300 leading-4 text-gray-600">$8.00</p>
                                     </div>
                                 </div>
+                                <div className="flex justify-between items-center w-full">
+                                    <p className="text-base light:text-white font-semibold leading-4 text-gray-800">Total</p>
+                                    <p className="text-base light:text-gray-300 font-semibold leading-4 text-gray-600">$36.00</p>
+                                </div>
                             </div>
-                        </div>
-                        <div className="bg-gray-50 light:bg-gray-800 w-full xl:w-96 flex justify-between items-center md:items-start px-4 py-6 md:p-6 xl:p-8 flex-col">
+
                             <h3 className="text-xl light:text-white font-semibold leading-5 text-gray-800">Customer</h3>
                             <div className="flex flex-col md:flex-row xl:flex-col justify-start items-stretch h-full w-full md:space-x-6 lg:space-x-8 xl:space-x-0">
                                 <div className="flex flex-col justify-start items-start flex-shrink-0">
@@ -480,6 +485,7 @@ const OrderProductScreen = () => {
                                     <ChangeAddressDialogComponent isOpen={isChangeAddressDialogOpen} onClose={() => __handleOpenChangeAddressDialog(false)}></ChangeAddressDialogComponent>
                                 </div>
                             </div>
+
                         </div>
                     </div>
                 </div>

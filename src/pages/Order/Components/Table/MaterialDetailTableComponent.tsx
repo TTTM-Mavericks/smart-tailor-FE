@@ -101,14 +101,14 @@ const VirtuosoTableComponents: TableComponents<Data> = {
         <TableContainer component={Paper} {...props} ref={ref} sx={customScrollbarStyles} />
     )),
     Table: (props) => (
-        <Table {...props} sx={{ borderCollapse: 'separate', tableLayout: 'fixed' }} />
+        <Table {...props} sx={{ borderCollapse: 'separate', tableLayout: 'fixed', fontSize: 12 }} />
     ),
     TableHead: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
-        <TableHead {...props} ref={ref} />
+        <TableHead {...props} ref={ref} sx={{fontSize: 12}} />
     )),
-    TableRow: ({ item: _item, ...props }) => <TableRow {...props} />,
+    TableRow: ({ item: _item, ...props }) => <TableRow {...props} sx={{fontSize: 12}}/>,
     TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
-        <TableBody {...props} ref={ref} />
+        <TableBody {...props} ref={ref} sx={{fontSize: 12}}/>
     )),
 };
 
@@ -153,21 +153,21 @@ type MaterialDetailTableProps = {
 
 const customScrollbarStyles = {
     '&::-webkit-scrollbar': {
-        width: '0.3em',
-        height: '1em',
-        borderRadius: '4px',
-        backgroundColor: grayColor1
+      width: '0.3em',
+      height: '0.3em', // Horizontal scrollbar height
+      borderRadius: '4px',
+      backgroundColor: grayColor1,
     },
     '&::-webkit-scrollbar-track': {
-        webkitBoxShadow: 'inset 0 0 6px rgba(0,0,0,0.1)',
-        borderRadius: '4px',
-        backGroundColor: grayColor1
+      boxShadow: 'inset 0 0 6px rgba(0,0,0,0.1)',
+      borderRadius: '4px',
+      backgroundColor: grayColor1,
     },
     '&::-webkit-scrollbar-thumb': {
-        backgroundColor: '#7b7b7b',
-        borderRadius: '4px'
+      backgroundColor: '#7b7b7b',
+      borderRadius: '4px',
     },
-};
+  };
 
 
 const MaterialDetailTableComponent: React.FC<MaterialDetailTableProps> = ({ }) => {
