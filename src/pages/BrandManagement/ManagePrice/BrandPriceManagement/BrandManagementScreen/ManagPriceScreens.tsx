@@ -6,10 +6,9 @@ import * as React from "react";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Swal from "sweetalert2";
-import EditMaterialPopUpScreens from "../AdminEditMaterial/EditMaterialPopUpScreens";
+import EditPricePopUpScreens from "../BrandEditPrice/EditPricePopUpScreens";
 import { Add } from "@mui/icons-material";
-import AddEachCategoryWithHand from "../../AddEachWithHand/AddEachCategoryWithHandScreens";
-import AddMultipleComponentWithExcel from "../../AddMultipleCategoryWithExcel/AddMultipleMaterialComponent";
+import AddPriceManual from "../../AddManualPrice/AddPriceScreens";
 import { useTranslation } from 'react-i18next';
 import { Category } from "../../../../../models/AdminCategoryExcelModel";
 import axios from "axios";
@@ -29,7 +28,7 @@ const style = {
     borderRadius: "20px"
 };
 
-const ManageCategories: React.FC = () => {
+const ManagePrice: React.FC = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [data, setData] = React.useState<Category[]>([]);
@@ -314,35 +313,10 @@ const ManageCategories: React.FC = () => {
                                 p: 4,
                                 borderRadius: "20px"
                             }}>
-                                <AddEachCategoryWithHand closeCard={_handleAddClose} addNewCategory={_handleAddCategory} />
+                                <AddPriceManual closeCard={_handleAddClose} addNewCategory={_handleAddCategory} />
                             </Box>
                         </Modal>
                     </MenuItem>
-
-                    {/* <MenuItem>
-                        <div onClick={_handleAddMultipleOpen}>{t(codeLanguage + '000050')}</div>
-                        <Modal
-                            open={addMultiple}
-                            aria-labelledby="modal-modal-title"
-                            aria-describedby="modal-modal-description"
-                        >
-                            <Box sx={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: "70%",
-                                bgcolor: colors.primary[100],
-                                border: '2px solid #000',
-                                boxShadow: 24,
-                                p: 4,
-                                borderRadius: "20px"
-                            }}>
-                                <AddMultipleComponentWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddCategory} />
-                            </Box>
-                        </Modal>
-
-                    </MenuItem> */}
                 </Menu>
 
                 <DataGrid
@@ -359,7 +333,7 @@ const ManageCategories: React.FC = () => {
                 >
                     <Box sx={style}>
                         {formId !== null && (
-                            <EditMaterialPopUpScreens
+                            <EditPricePopUpScreens
                                 editClose={_handleEditClose}
                                 fid={formId}
                                 updateCategory={_handleUpdateCategory}
@@ -372,4 +346,4 @@ const ManageCategories: React.FC = () => {
     );
 };
 
-export default ManageCategories;
+export default ManagePrice;

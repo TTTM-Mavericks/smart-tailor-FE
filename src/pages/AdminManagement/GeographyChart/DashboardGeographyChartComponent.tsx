@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Sidebar from '../GlobalComponent/SidebarComponent/SidebarComponent';
 import Navbar from '../GlobalComponent/NavbarComponent/NavbarComponent';
 import { IconButton } from '@mui/material';
@@ -9,6 +9,8 @@ const DashboardGeographyChartScreens = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [activeMenu, setActiveMenu] = useState('geography_chart');
     const [showScrollButton, setShowScrollButton] = React.useState<boolean>(false);
+    const [popperOpen, setPopperOpen] = useState<Record<string, boolean>>({});
+
     const toggleMenu = () => {
         setMenuOpen(!menuOpen);
     };
@@ -17,7 +19,27 @@ const DashboardGeographyChartScreens = () => {
         setActiveMenu(menu);
     };
 
-    React.useEffect(() => {
+    // Effect to close popper on outside click
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (event.target instanceof Element) {
+                if (!event.target.closest('.popover')) {
+                    setPopperOpen({
+                        notification: false,
+                        user: false,
+                    });
+                }
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    useEffect(() => {
         const handleScroll = () => {
             if (window.scrollY > 200) {
                 setShowScrollButton(true);
@@ -37,11 +59,18 @@ const DashboardGeographyChartScreens = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
+    const togglePopper = (key: any) => {
+        setPopperOpen((prev) => ({
+            notification: key === 'notification' ? !prev.notification : false,
+            user: key === 'user' ? !prev.user : false,
+        }));
+    };
+
     return (
         <div className="flex">
             <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
             <div className="flex flex-col w-full">
-                <Navbar toggleMenu={toggleMenu} />
+                <Navbar toggleMenu={toggleMenu} menu="Geography Chart" popperOpen={popperOpen} togglePopper={togglePopper} />
                 <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
                     <GeographyChartComponent />
                 </main>

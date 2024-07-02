@@ -258,9 +258,6 @@ const ProfileSettings: React.FC = () => {
         }
     };
 
-
-
-
     /**
      * Delete The image to get another image
      */

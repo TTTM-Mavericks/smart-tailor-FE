@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import Sidebar from '../../GlobalComponent/SidebarComponent/SidebarComponent';
-import Navbar from '../../GlobalComponent/NavbarComponent/NavbarComponent';
-import ManageMaterials from '../AdminMaterialManagerment/AdminManagerScreen/ManageMaterialScreens';
+import Sidebar from '../../../GlobalComponent/SideBarComponent/SideBarComponent';
+import Navbar from '../../../GlobalComponent/NavBarComponent/NavbarComponent';
 import { IconButton } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
-import ManageCategories from '../../ManageCategory/AdminCategoryManagement/AdminManagerScreen/ManageMaterialScreens';
-import ManageSizes from '../../ManageSize/AdminSizeManagement/AdminManagerScreen/ManageSizeScreens';
+import ManagePrice from '../BrandManagementScreen/ManagPriceScreens';
 
-const DashboardAdminManageMaterialScreen = () => {
+const DashboardBrandManagePriceQuantityScreen = () => {
     const [menuOpen, setMenuOpen] = useState(false);
-    const [activeMenu, setActiveMenu] = useState('admin_manage_material');
+    const [activeMenu, setActiveMenu] = useState('manage_price');
     const [showScrollButton, setShowScrollButton] = React.useState<boolean>(false);
     const [popperOpen, setPopperOpen] = useState<Record<string, boolean>>({});
 
@@ -41,7 +39,7 @@ const DashboardAdminManageMaterialScreen = () => {
         };
     }, []);
 
-    useEffect(() => {
+    React.useEffect(() => {
         const handleScroll = () => {
             if (window.scrollY > 200) {
                 setShowScrollButton(true);
@@ -73,17 +71,9 @@ const DashboardAdminManageMaterialScreen = () => {
         <div className="flex">
             <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
             <div className="flex flex-col w-full">
-                <Navbar toggleMenu={toggleMenu} menu="Mangage Material & Category & Size" popperOpen={popperOpen} togglePopper={togglePopper} />
-                <main className="p-6 flex-grow ml-0 xl:ml-[20%] mt-[-3%]">
-                    <div>
-                        <ManageMaterials />
-                    </div>
-                    <div style={{ marginTop: "10%" }}>
-                        <ManageCategories />
-                    </div>
-                    <div style={{ marginTop: "10%" }}>
-                        <ManageSizes />
-                    </div>
+                <Navbar toggleMenu={toggleMenu} menu="Mangage Brand Price" popperOpen={popperOpen} togglePopper={togglePopper} />
+                <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
+                    <ManagePrice />
                 </main>
                 {showScrollButton && (
                     <IconButton
@@ -105,4 +95,4 @@ const DashboardAdminManageMaterialScreen = () => {
     );
 };
 
-export default DashboardAdminManageMaterialScreen;
+export default DashboardBrandManagePriceQuantityScreen;

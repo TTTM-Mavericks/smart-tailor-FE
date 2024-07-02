@@ -46,6 +46,7 @@ import {
 
 import {
   DashboardBrandManageNotification,
+  DashboardBrandManagePriceQuantityScreen,
   DashboardBrandProfileScreens,
   DashboardBrandScreens,
   DashboardManageMaterialScreen
@@ -177,11 +178,12 @@ function App() {
           <Route path="/row-details" element={<DashboardEmployeeOrderDetailScreen></DashboardEmployeeOrderDetailScreen>} />
 
           {/* Brand Dashboard Route */}
-          <Route path='/brand' element={<DashboardBrandScreens></DashboardBrandScreens>} />
+          <Route path='/brand' element={<DashboardManageMaterialScreen></DashboardManageMaterialScreen>} />
           <Route path='/brands' element={<Brand />} />
           <Route path="/brand_manage_notification" element={<DashboardBrandManageNotification></DashboardBrandManageNotification>} />
           <Route path='/brand_profile' element={<DashboardBrandProfileScreens></DashboardBrandProfileScreens>} />
           <Route path='/manage_material' element={<DashboardManageMaterialScreen></DashboardManageMaterialScreen>} />
+          <Route path='/manage_price' element={<DashboardBrandManagePriceQuantityScreen></DashboardBrandManagePriceQuantityScreen>} />
 
           {/* Detail Product Route */}
           <Route path='/detail_product/:id' element={<ProductDetailScreens></ProductDetailScreens>} />
