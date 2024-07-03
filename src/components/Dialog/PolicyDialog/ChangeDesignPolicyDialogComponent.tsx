@@ -45,7 +45,7 @@ const ChangeDesignPolicyDialogComponent: React.FC<ChangeDesignPolicyDialogProps>
     return (
         <Dialog open={isOpen}>
             <DialogTitle>
-                Order Cancellation Policy
+                Order Change Policy
                 <IoMdCloseCircleOutline
                     cursor={'pointer'}
                     size={20}
@@ -55,50 +55,46 @@ const ChangeDesignPolicyDialogComponent: React.FC<ChangeDesignPolicyDialogProps>
                 />
             </DialogTitle>
             <DialogContent className={styles.orderPolicyDialog__content}>
-                <Typography variant="body1" className={styles.orderPolicyDialog__content__section}>
-                    <strong>General Provisions</strong><br />
-                    <li>This order cancellation policy applies to all custom orders placed through our platform.</li>
-                    <li>Customers must agree to the terms and conditions of this cancellation policy when placing an order.</li>
+            <Typography variant="body1" className={styles.orderPolicyDialog__content__section}>
+                    <strong>General Regulations</strong><br />
+                    <li>This order change policy applies to all custom orders made through our platform.</li>
+                    <li>By placing an order, customers agree to the terms and conditions of this order change policy.</li>
                 </Typography>
                 <Typography variant="body1" className={styles.orderPolicyDialog__content__section}>
-                    <strong>Order Cancellation Period</strong><br />
-                    <li>Customers can cancel their order within X hours from the time the order is created.</li>
-                    <li>After X hours, the order will be considered non-cancellable without incurring compensation costs.</li>
+                    <strong>Order Change Timeframe</strong><br />
+                    <li>Customers can request an order change within A hours from the time they receive the order confirmation notice.</li>
+                    <li>After A hours, the system will not allow any order changes.</li>
                 </Typography>
                 <Typography variant="body1" className={styles.orderPolicyDialog__content__section}>
-                    <strong>Order Cancellation Procedure</strong><br />
-                    <li>To cancel an order, customers must submit a cancellation request through our website or contact our customer service directly.</li>
-                    <li>The cancellation notice must include the order number and the reason for cancellation.</li>
-                </Typography>
-                <Typography variant="body1" className={styles.orderPolicyDialog__content__section}>
-                    <strong>Compensation Costs</strong><br />
-                    <li>If the cancellation request is submitted after the allowed period (X hours from the brand confirmation), customers will incur compensation costs.</li>
-                    <li>Compensation costs include expenses incurred for fulfilling the order up to the time the cancellation request is received.</li>
-                    <li>Specifically, compensation costs may include:</li>
+                    <strong>Order Change Process</strong><br />
+                    <li>Step 1: Customers submit an order change request through our website or contact our customer service directly.</li>
+                    <li>Step 2: The system will check if the order change request is within A hours from the order confirmation.</li>
                     <ul>
-                        <p>- Material costs: Costs of materials that have been used for the order.</p>
-                        <p>- Labor costs: Labor costs for work done on the order.</p>
-                        <p>- Other costs: Other expenses related to the fulfillment of the order.</p>
+                        <li>If the request is within A hours, the system will allow the change and verify the order with the customer's modified request.</li>
+                        <li>If the request exceeds A hours, the system will not allow the order change and will notify the customer.</li>
                     </ul>
-                    <li>The total compensation amount will be specifically notified to the customer after checking the order's progress with the brand.</li>
                 </Typography>
                 <Typography variant="body1" className={styles.orderPolicyDialog__content__section}>
-                    <strong>Handling Cancellation Requests</strong><br />
-                    <li>Upon receiving a cancellation request, we will check the progress of the order.</li>
-                    <li>If the order has already started, we will inform the customer of the compensation costs to be incurred.</li>
-                    <li>After the customer agrees to pay the compensation costs, the order will be canceled.</li>
+                    <strong>Order Change Costs</strong><br />
+                    <li>Within A hours, there will be no additional cost for changing the order.</li>
+                    <li>After A hours, customers will not be able to change their order and must follow the initial terms or the order cancellation policy if they wish to cancel.</li>
                 </Typography>
                 <Typography variant="body1" className={styles.orderPolicyDialog__content__section}>
-                    <strong>Contract Enforcement</strong><br />
-                    <li>In the event that the customer does not pay the compensation costs as required, we reserve the right to take legal action to request payment.</li>
+                    <strong>Post-Change Handling</strong><br />
+                    <li>After an order change request is accepted, we will update the order and notify the customer with the details, the estimated completion time, and any changes in cost (if any).</li>
+                </Typography>
+                <Typography variant="body1" className={styles.orderPolicyDialog__content__section}>
+                    <strong>Refunds and Additional Payments</strong><br />
+                    <li>If the order change results in a cost change, customers will be notified and must make additional payments (if any) before the order processing continues.</li>
+                    <li>If the new cost is lower than the original cost, we will refund the difference to the customer.</li>
                 </Typography>
                 <Typography variant="body1" className={styles.orderPolicyDialog__content__section}>
                     <strong>Contact</strong><br />
-                    <li>For any questions and support requests related to the order cancellation policy, please contact our customer service via email: zzz@zzzz.com or phone: 0123-456-789.</li>
+                    <li>For any questions or support related to the order change policy, please contact our customer service via email: support@yourplatform.com or phone: 0123-456-789.</li>
                 </Typography>
                 <Typography variant="body1" className={styles.orderPolicyDialog__content__section}>
                     <strong>Policy Changes</strong><br />
-                    <li>We reserve the right to change this order cancellation policy at any time. Any changes will be updated on our website and notified to customers via email.</li>
+                    <li>We reserve the right to change this order change policy at any time. All changes will be updated on our website and notified to customers via email.</li>
                 </Typography>
             </DialogContent>
             <FormControlLabel
