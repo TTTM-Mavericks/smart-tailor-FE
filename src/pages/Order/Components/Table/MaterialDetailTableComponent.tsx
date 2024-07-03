@@ -98,10 +98,10 @@ const rows: Data[] = Array.from({ length: 20 }, (_, index) => {
 
 const VirtuosoTableComponents: TableComponents<Data> = {
     Scroller: React.forwardRef<HTMLDivElement>((props, ref) => (
-        <TableContainer component={Paper} {...props} ref={ref} sx={customScrollbarStyles} />
+        <TableContainer component={Paper} {...props} ref={ref} sx={customScrollbarStyles}/>
     )),
     Table: (props) => (
-        <Table {...props} sx={{ borderCollapse: 'separate', tableLayout: 'fixed', fontSize: 12 }} />
+        <Table {...props} sx={{ borderCollapse: 'separate', tableLayout: 'fixed', fontSize: 12, border: 'none' }} />
     ),
     TableHead: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
         <TableHead {...props} ref={ref} sx={{fontSize: 12}} />
@@ -172,7 +172,7 @@ const customScrollbarStyles = {
 
 const MaterialDetailTableComponent: React.FC<MaterialDetailTableProps> = ({ }) => {
     return (
-        <Paper style={{ height: 400, width: '100%' }}>
+        <Paper style={{ height: 400, width: '100%', boxShadow: 'none', border: 'none' }}>
             <TableVirtuoso
                 data={rows}
                 components={VirtuosoTableComponents}

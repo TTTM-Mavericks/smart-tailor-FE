@@ -3,7 +3,7 @@ export interface UserInterface {
     email: string;
     fullName: string;
     language: string | null;
-    phoneNumber: string | null;
+    phoneNumber: string;
     provider: string;
     roleName: string;
     userID: string;

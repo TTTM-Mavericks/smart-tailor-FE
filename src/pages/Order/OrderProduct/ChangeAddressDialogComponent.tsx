@@ -9,6 +9,8 @@ import { greenColor, primaryColor, redColor, secondaryColor, whiteColor } from '
 import { FaCheckCircle } from "react-icons/fa";
 import VNLocationData from '../../../locationData.json'
 import { ToastContainer, toast } from 'react-toastify';
+import Cookies from 'js-cookie';
+import { UserInterface } from '../../../models/UserModel';
 const sampleAddressData = [
     {
         id: 1,
@@ -62,17 +64,26 @@ const sampleAddressData = [
         district: "District K",
         ward: "Ward L"
     }
-]
+];
 
+const isProfileDataComplete = (profileData: CustomerProfile): boolean => {
+    return Object.values(profileData).every(value => value !== '');
+}
 
 type ChangeAddressDialogComponentProps = {
     isOpen: boolean;
     onClose: () => void;
+    onSelectedAddressData: (adress: any) => void;
 }
 
-const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> = ({ isOpen, onClose }) => {
+const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> = ({ isOpen, onClose, onSelectedAddressData }) => {
     // TODO MUTIL LANGUAGE
     // ---------------UseState Variable---------------//
+    const user = Cookies.get('userAuth');
+    let userParse: UserInterface | null = null;
+    if (user) {
+        userParse = JSON.parse(user);
+    }
     const [open, setOpen] = React.useState(false);
 
     const [locations, setLocations] = React.useState<any[]>([]);
@@ -81,13 +92,13 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
     const [selectedWard, setSelectedWard] = React.useState<Ward | null>(null);
 
     const [selectedAddressEditor, setSelectedAddressEditor] = React.useState<any>();
-    const [selectedAddress, setSelectedAddress] = React.useState<any>();
+    const [selectedAddress, setSelectedAddress] = React.useState<any>(1);
     const [addressList, setAddressList] = React.useState<any>([]);
     const [selectAddIcon, setSelectAddicon] = React.useState<boolean>(false);
     const [profileData, setProfileData] = React.useState<CustomerProfile>({
-        email: "",
-        fullName: '',
-        phoneNumber: '',
+        email: userParse ? userParse.email : '',
+        fullName: userParse ? userParse.fullName : '',
+        phoneNumber: userParse ? userParse.phoneNumber : '',
         imageUrl: '',
         gender: true,
         dateOfBirth: '',
@@ -100,20 +111,41 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
     // ---------------UseEffect---------------//
 
     React.useEffect(() => {
+        console.log(isOpen);
         setAddressList(sampleAddressData);
-    }, [sampleAddressData])
+        const address = sampleAddressData.find((item: any) => item.id === selectedAddress);
+        if (address) {
+            setProfileData(address);
+            onSelectedAddressData(address);
+            console.log(address);
 
-    React.useEffect(() => {
-        console.log(addressList);
-    }, [addressList])
-
-    React.useEffect(() => {
-        setOpen(isOpen);
+        }
     }, [isOpen])
 
     React.useEffect(() => {
+        if (!onSelectedAddressData) return;
+        const address = addressList.find((item: any) => item.id === selectedAddress);
+        if (address) {
+            onSelectedAddressData(address);
+        }
+    }, [selectedAddress])
+
+    React.useEffect(() => {
+        setAddressList(sampleAddressData);
+    }, [sampleAddressData]);
+
+    React.useEffect(() => {
+        console.log(addressList);
+    }, [addressList]);
+
+    React.useEffect(() => {
+        setOpen(isOpen);
+    }, [isOpen]);
+
+    React.useEffect(() => {
+
         if (selectAddIcon) setProfileData({
-            email: "",
+            email: userParse ? userParse.email : '',
             fullName: '',
             phoneNumber: '',
             imageUrl: '',
@@ -245,10 +277,15 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
     }
 
     const __handleAddToAddressList = () => {
-        const updatedList = [...addressList, { ...profileData, id: addressList.length + 1 }];
-        setAddressList(updatedList);
-        setSelectAddicon(false);
-        toast.success(`Add new successfull`, { autoClose: 4000 });
+        if (isProfileDataComplete(profileData)) {
+            const updatedList = [...addressList, { ...profileData, id: addressList.length + 1 }];
+            setAddressList(updatedList);
+            setSelectedAddress(addressList.length + 1);
+            toast.success(`Add new successful`, { autoClose: 4000 });
+            setSelectAddicon(false);
+        } else {
+            toast.error('Please fill in all fields before adding the address.', { autoClose: 4000 });
+        }
     };
 
     const __handleUpdateAddress = (id: any) => {
@@ -262,9 +299,7 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
 
     }
 
-    const __handleClose = () => {
-        setOpen(false);
-    };
+
 
     return (
         <>
@@ -452,15 +487,15 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
                             )}
                         </div>
                     ))}
-                    <div onClick={() => setSelectAddicon(true)} className={`${style.changeAddressDialogContent__addAddressBtn} `}>
-                        {!selectAddIcon && (
-                            <div className={`${style.changeAddressDialogContent__addAddressBtn__iconAdd}`}>
+                    <div className={`${style.changeAddressDialogContent__addAddressBtn} `}>
+                        {selectAddIcon === false && (
+                            <div onClick={() => setSelectAddicon(true)} className={`${style.changeAddressDialogContent__addAddressBtn__iconAdd}`}>
                                 <span>
                                     Add new
                                 </span>
                             </div>
                         )}
-                        {selectAddIcon && (
+                        {selectAddIcon === true && (
                             <div >
                                 <form className="mb-4" style={{ backgroundColor: 'transparent' }}>
                                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -608,15 +643,8 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
                         <button
                             type="submit"
                             className="px-5 py-2.5 text-sm font-medium text-white"
-                            style={{ color: redColor }}
-                            onClick={() => onClose()}
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            className="px-5 py-2.5 text-sm font-medium text-white"
                             style={{ backgroundColor: primaryColor, borderRadius: 4 }}
+                            onClick={onClose}
                         >
                             Accept
                         </button>

@@ -5,11 +5,13 @@ import FooterComponent from '../../../components/Footer/FooterComponent';
 import ChangeAddressDialogComponent from './ChangeAddressDialogComponent';
 import { TextField, Grid, Autocomplete, ToggleButtonGroup, ToggleButton, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import { styled } from '@mui/system';
-import { primaryColor } from '../../../root/ColorSystem';
+import { primaryColor, secondaryColor, whiteColor } from '../../../root/ColorSystem';
 import { FaPlusCircle } from "react-icons/fa";
 import { FaMinusCircle } from "react-icons/fa";
 import MaterialDetailTableComponent from '../Components/Table/MaterialDetailTableComponent';
 import { RiBodyScanLine } from "react-icons/ri";
+import SizeDialogComponent from '../../../components/Dialog/SizeDialog/SizeDialogComponent';
+import { useTranslation } from 'react-i18next';
 
 
 interface SizeQuantity {
@@ -28,7 +30,7 @@ const sizes = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
 const CustomTextField = styled(TextField)(({ theme }) => ({
     '& .MuiInputBase-root': {
         height: '30px',
-        width: '150px',
+        width: '140px',
         borderRadius: '4px',
         outline: 'none',
     },
@@ -89,9 +91,10 @@ const CustomTextFieldSizeCustom = styled(TextField)(({ theme }) => ({
 const CustomTextFieldQuantity = styled(TextField)(({ theme }) => ({
     '& .MuiInputBase-root': {
         height: '30px',
-        width: '100px',
+        width: '140px',
         borderRadius: '4px',
         outline: 'none',
+
     },
     '& .MuiOutlinedInput-input': {
         fontSize: '12px',
@@ -126,10 +129,23 @@ const OrderProductScreen = () => {
     const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
     const [selectedCustomIndex, setSelectedCustomIndex] = useState<number | null>();
     const [open, setOpen] = useState(false);
+    const [isOpenSizeDialog, setIsOpenSizeDialog] = useState<boolean>(false);
+    const [selectedAddress, setSelectedAddress] = useState<any>();
 
 
 
     // ---------------Usable Variable---------------//
+    // Get language in local storage
+    const selectedLanguage = localStorage.getItem('language');
+    const codeLanguage = selectedLanguage?.toUpperCase();
+
+    // Using i18n
+    const { t, i18n } = useTranslation();
+    useEffect(() => {
+        if (selectedLanguage !== null) {
+            i18n.changeLanguage(selectedLanguage);
+        }
+    }, [selectedLanguage, i18n]);
     // ---------------UseEffect---------------//
 
     useEffect(() => {
@@ -193,13 +209,17 @@ const OrderProductScreen = () => {
         setExpandedIndex(expandedIndex === index ? null : index);
     };
 
-    const __handleClickOpen = () => {
-        setOpen(true);
+    const __handleCloseSizeDilog = () => {
+        setIsOpenSizeDialog(false);
     };
 
     const __handleClose = () => {
         setOpen(false);
     };
+
+    const __handleGetSelectedAdress = (address: any) => {
+        setSelectedAddress(address);
+    }
 
 
     return (
@@ -207,191 +227,193 @@ const OrderProductScreen = () => {
             <HeaderComponent></HeaderComponent>
             <div>
                 <div className="py-0 md:px-6 2xl:px-20 2xl:container 2xl:mx-auto">
-                    <div className="mt-10 flex flex-col xl:flex-row jusitfy-center items-stretch w-full xl:space-x-8 space-y-4 md:space-y-6 xl:space-y-0">
+                    <div className="mt-2 flex flex-col xl:flex-row jusitfy-center items-stretch w-full xl:space-x-8 space-y-4 md:space-y-6 xl:space-y-0">
                         <div className="flex flex-col justify-start items-start bg-gray-50 w-full space-y-4 md:space-y-6 xl:space-y-8">
-                            <p className=" pt-10 pl-10 text-md md:text-xl light:text-white font-semibold leading-6 xl:leading-5 text-gray-800">Order details</p>
-                            <div className="flex justify-start items-start bg-gray-50 light:bg-gray-800 px-4 py-4 md:py-6 md:p-6 xl:p-8 w-full">
+                            <div style={{ display: 'flex', position: 'relative', width: '100%' }}>
+                                <p className=" pt-10 pl-10 text-md md:text-xl light:text-white font-semibold leading-6 xl:leading-5 text-gray-800" style={{ float: 'left' }}>Order details</p>
+                                <p className=" pt-10 pl-10" onClick={() => setIsOpenSizeDialog(true)} style={{ position: 'absolute', right: 10, color: secondaryColor, fontSize: 13, textDecorationLine: 'underline', cursor: 'pointer' }}>Size reference</p>
+                                <SizeDialogComponent data='shirtModel' isOpen={isOpenSizeDialog} onClose={__handleCloseSizeDilog}></SizeDialogComponent>
+                            </div>
+                            <div className="flex justify-start items-start bg-gray-50 light:bg-gray-800 px-4 md:py-6 md:p-6 xl:pl-8 xl:pt-0 w-full">
                                 <div className="pb-4 mr-10 md:pb-8 w-full md:w-40">
                                     <img className="w-full hidden md:block" src="https://i.ibb.co/84qQR4p/Rectangle-10.png" alt="dress" />
                                     <img className="w-full md:hidden" src="https://i.ibb.co/L039qbN/Rectangle-10.png" alt="dress" />
                                 </div>
                                 <div className="mt-4 md:mt-6 flex flex-col md:flex-row justify-start  items-start md:items-center md:space-x-6 xl:space-x-8 w-full">
                                     <div className="border-b border-gray-200 md:flex-row flex-col flex justify-between items-start w-full pb-8 space-y-4 md:space-y-0" >
-                                        <div className="w-full justify-start items-start space-y-8" >
-                                            <div className="flex justify-between space-x-8 items-start w-full">
-                                                <h3 className="text-md light:text-white xl:text-1xl font-semibold leading-6 text-gray-800">Premium Quaility Dress</h3>
-                                                <p className="text-base light:text-white xl:text-lg leading-6">$36.00 <span className="text-red-300 line-through"> $45.00</span></p>
-                                                <p className="text-base light:text-white xl:text-lg leading-6 text-gray-800">01</p>
-                                                <p className="text-base light:text-white xl:text-lg font-semibold leading-6 text-gray-800">$36.00</p>
-                                            </div>
-
-                                            <div className={`${style.orderProduct__container__content}`}>
-                                                <div className={`${style.orderProduct__container__information}`}>
-                                                    <p className="text-sm light:text-white leading-none text-gray-800"><span className="light:text-gray-400 text-gray-300">Style: </span> Italic Minimal Design</p>
-                                                    <p className="text-sm light:text-white leading-none text-gray-800"><span className="light:text-gray-400 text-gray-300">Size: </span> Small</p>
-                                                    <p className="text-sm light:text-white leading-none text-gray-800"><span className="light:text-gray-400 text-gray-300">Color: </span> Light Blue</p>
-                                                </div>
-                                                <div className={`${style.orderProduct__container__detail}`}>
-                                                    <div className={`${style.orderProduct__container__detail__sizeDetail}`}>
-                                                        <ToggleButtonGroup
-                                                            value={inputMode}
-                                                            exclusive
-                                                            onChange={__handleInputModeChange}
-                                                            aria-label="text alignment"
-                                                            sx={{ display: 'block', justifyContent: 'center', marginBottom: 2 }}
-                                                            style={{ marginLeft: 10 }}
-                                                        >
-                                                            <ToggleButton
-                                                                value="predefined"
-                                                                aria-label="centered"
-                                                                sx={{ width: 150, height: 30, fontSize: 12, '&.Mui-selected': { backgroundColor: primaryColor, color: 'white' } }}
-                                                            >
-                                                                Predefined Sizes
-                                                            </ToggleButton>
-                                                            <ToggleButton
-                                                                value="custom"
-                                                                aria-label="centered"
-                                                                sx={{ width: 150, height: 30, fontSize: 12, '&.Mui-selected': { backgroundColor: primaryColor, color: 'white' } }}
-                                                            >
-                                                                Custom Sizes
-                                                            </ToggleButton>
-                                                        </ToggleButtonGroup>
-
-                                                        {inputMode === 'predefined' ? (
-                                                            <div>
-                                                                {sizeQuantities.map((sq, index) => (
-                                                                    <div key={index} style={{ display: 'flex', margin: 10 }}>
-                                                                        <Grid item>
-                                                                            <Autocomplete
-                                                                                options={sizes}
-                                                                                value={sq.size}
-                                                                                onChange={(event, newValue) => newValue && __handleSizeChange(index, newValue)}
-                                                                                renderInput={(params) => <CustomTextField {...params} label="Size" variant="outlined" />}
-                                                                            />
-                                                                        </Grid>
-                                                                        <Grid className={`${style.orderProduct__container__detail__sizeDetail__quantity}`} item>
-                                                                            <CustomTextFieldQuantity
-                                                                                fullWidth
-                                                                                type="number"
-                                                                                label="Quantity"
-                                                                                value={sq.quantity}
-                                                                                onChange={(e) => __handleQuantityChange(index, Number(e.target.value))}
-                                                                                inputProps={{ min: 1 }}
-                                                                                style={{ marginLeft: 10, marginRight: 10 }}
-
-                                                                            />
-                                                                            <FaMinusCircle size={25} color={primaryColor} onClick={() => __handleRemoveSizeQuantity(index)} style={{ display: sizeQuantities.length === 1 ? 'none' : 'flex', cursor: 'pointer' }}>
-                                                                            </FaMinusCircle>
-                                                                        </Grid>
-                                                                    </div>
-                                                                ))}
-
-                                                            </div>
-                                                        ) : (
-                                                            <div style={{ marginTop: 10, marginLeft: 10 }}>
-                                                                {sizeQuantitiesCustom.map((sq, index) => (
-                                                                    <div key={index} style={{ marginBottom: 10 }}>
-                                                                        <button className={`${style.orderProduct__container__detail__sizeDetail__quantity__button} py-1 px-4 rounded inline-flex items-cente1`} onClick={() => __handleToggleExpand(index)}>
-                                                                            {`Size ${index + 1}`}
-                                                                            <RiBodyScanLine style={{ marginLeft: 10 }} size={20} />
-                                                                        </button>
-                                                                        {expandedIndex === index && (
-                                                                            <Dialog
-                                                                                open={open}
-                                                                                onClose={__handleClose}
-                                                                                aria-labelledby="alert-dialog-title"
-                                                                                aria-describedby="alert-dialog-description"
-                                                                            >
-                                                                                <DialogTitle id="alert-dialog-title">
-                                                                                    {'Enter your body information'}
-                                                                                </DialogTitle>
-                                                                                <div style={{ margin: '0 auto' }}>
-                                                                                    <Grid item>
-                                                                                        <CustomTextFieldSizeCustom
-                                                                                            label="Width (cm)"
-                                                                                            variant="outlined"
-                                                                                            type="number"
-                                                                                            value={sq.width || 1}
-                                                                                            onChange={(e) => __handleCustomSizeChange(index, 'width', Number(e.target.value))}
-                                                                                            style={{ marginBottom: 15 }}
-
-                                                                                        />
-                                                                                    </Grid>
-                                                                                    <Grid item>
-                                                                                        <CustomTextFieldSizeCustom
-                                                                                            label="Height (cm)"
-                                                                                            variant="outlined"
-                                                                                            type="number"
-                                                                                            value={sq.height || 1}
-                                                                                            onChange={(e) => __handleCustomSizeChange(index, 'height', Number(e.target.value))}
-                                                                                            style={{ marginBottom: 15 }}
-                                                                                        />
-                                                                                    </Grid>
-                                                                                    <Grid item>
-                                                                                        <CustomTextFieldSizeCustom
-                                                                                            label="Ring 1 (cm)"
-                                                                                            variant="outlined"
-                                                                                            type="number"
-                                                                                            value={sq.ring1 || 1}
-                                                                                            onChange={(e) => __handleCustomSizeChange(index, 'ring1', Number(e.target.value))}
-                                                                                            style={{ marginBottom: 15 }}
-
-                                                                                        />
-                                                                                    </Grid>
-                                                                                    <Grid item>
-                                                                                        <CustomTextFieldSizeCustom
-                                                                                            label="Ring 2 (cm)"
-                                                                                            variant="outlined"
-                                                                                            type="number"
-                                                                                            value={sq.ring2 || 1}
-                                                                                            onChange={(e) => __handleCustomSizeChange(index, 'ring2', Number(e.target.value))}
-                                                                                            style={{ marginBottom: 15 }}
-
-                                                                                        />
-                                                                                    </Grid>
-                                                                                    <Grid item>
-                                                                                        <CustomTextFieldSizeCustom
-                                                                                            label="Ring 3 (cm)"
-                                                                                            variant="outlined"
-                                                                                            type="number"
-                                                                                            value={sq.ring3 || 1}
-                                                                                            onChange={(e) => __handleCustomSizeChange(index, 'ring3', Number(e.target.value))}
-                                                                                            style={{ marginBottom: 15 }}
-
-                                                                                        />
-                                                                                    </Grid>
-                                                                                </div>
-
-                                                                                <DialogActions>
-                                                                                    <Button onClick={__handleClose}>Disagree</Button>
-                                                                                    <button autoFocus onClick={__handleClose} style={{ width: '150px', backgroundColor: primaryColor }} >
-                                                                                        Accept
-                                                                                    </button>
-                                                                                </DialogActions>
-                                                                            </Dialog>
-                                                                        )}
-                                                                        <Grid className={`${style.orderProduct__container__detail__sizeDetail__quantity}`} item>
-                                                                            <CustomTextFieldQuantity
-                                                                                fullWidth
-                                                                                type="number"
-                                                                                label="Quantity"
-                                                                                value={sq.quantity}
-                                                                                onChange={(e) => __handleQuantityChange(index, Number(e.target.value))}
-                                                                                inputProps={{ min: 1 }}
-                                                                                style={{ marginLeft: 10, marginRight: 20, }}
-
-                                                                            />
-                                                                            <FaMinusCircle size={25} color={primaryColor} onClick={() => __handleRemoveSizeQuantity(index)} style={{ display: sizeQuantities.length === 1 ? 'none' : 'flex', cursor: 'pointer' }}>
-                                                                            </FaMinusCircle>
-                                                                        </Grid>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        )}
-                                                        <div>
-                                                            <FaPlusCircle size={20} style={{ cursor: 'pointer', marginLeft: 10 }} color={primaryColor} onClick={__handleAddSizeQuantity}>
-                                                            </FaPlusCircle>
+                                        <div className="w-full justify-start items-start space-y-8">
+                                            <div style={{ display: 'flex', width: '100%' }}>
+                                                <div style={{ width: '100%' }}>
+                                                    <div style={{ width: '100%' }} className="flex pb-5 justify-between space-x-8 items-start w-full">
+                                                        <h3 className="text-md light:text-white xl:text-1xl font-semibold leading-6 text-gray-800">Premium Quaility Dress</h3>
+                                                    </div>
+                                                    <div className={`${style.orderProduct__container__content}`}>
+                                                        <div className={`${style.orderProduct__container__information}`}>
+                                                            <p className="text-sm light:text-white leading-none text-gray-800"><span className="light:text-gray-400 text-gray-300">Style: </span> Italic Minimal Design</p>
+                                                            <p className="text-sm light:text-white leading-none text-gray-800"><span className="light:text-gray-400 text-gray-300">Size: </span> Small</p>
+                                                            <p className="text-sm light:text-white leading-none text-gray-800"><span className="light:text-gray-400 text-gray-300">Color: </span> Light Blue</p>
                                                         </div>
+                                                    </div>
+                                                </div>
+                                                <div className={`${style.orderProduct__container__detail__sizeDetail}`}>
+                                                    <ToggleButtonGroup
+                                                        value={inputMode}
+                                                        exclusive
+                                                        onChange={__handleInputModeChange}
+                                                        aria-label="text alignment"
+                                                        sx={{ display: 'block', justifyContent: 'center', marginBottom: 2 }}
+                                                        style={{ marginLeft: 10 }}
+                                                    >
+                                                        <ToggleButton
+                                                            value="predefined"
+                                                            aria-label="centered"
+                                                            sx={{ width: 150, height: 30, fontSize: 12, '&.Mui-selected': { backgroundColor: primaryColor, color: 'white' } }}
+                                                        >
+                                                            Predefined Sizes
+                                                        </ToggleButton>
+                                                        <ToggleButton
+                                                            value="custom"
+                                                            aria-label="centered"
+                                                            sx={{ width: 150, height: 30, fontSize: 12, '&.Mui-selected': { backgroundColor: primaryColor, color: 'white' } }}
+                                                        >
+                                                            Custom Sizes
+                                                        </ToggleButton>
+                                                    </ToggleButtonGroup>
+
+                                                    {inputMode === 'predefined' ? (
+                                                        <div>
+                                                            {sizeQuantities.map((sq, index) => (
+                                                                <div key={index} style={{ display: 'flex', margin: 10 }}>
+                                                                    <Grid item>
+                                                                        <Autocomplete
+                                                                            options={sizes}
+                                                                            value={sq.size}
+                                                                            onChange={(event, newValue) => newValue && __handleSizeChange(index, newValue)}
+                                                                            renderInput={(params) => <CustomTextField {...params} label="Size" variant="outlined" />}
+                                                                        />
+                                                                    </Grid>
+                                                                    <Grid className={`${style.orderProduct__container__detail__sizeDetail__quantity}`} item>
+                                                                        <CustomTextFieldQuantity
+                                                                            fullWidth
+                                                                            type="number"
+                                                                            label="Quantity"
+                                                                            value={sq.quantity}
+                                                                            onChange={(e) => __handleQuantityChange(index, Number(e.target.value))}
+                                                                            inputProps={{ min: 1 }}
+                                                                            style={{ marginLeft: 20, marginRight: 10 }}
+
+                                                                        />
+                                                                        <FaMinusCircle size={25} color={primaryColor} onClick={() => __handleRemoveSizeQuantity(index)} style={{ display: sizeQuantities.length === 1 ? 'none' : 'flex', cursor: 'pointer' }}>
+                                                                        </FaMinusCircle>
+                                                                    </Grid>
+                                                                </div>
+                                                            ))}
+
+                                                        </div>
+                                                    ) : (
+                                                        <div style={{ marginTop: 10, marginLeft: 10 }}>
+                                                            {sizeQuantitiesCustom.map((sq, index) => (
+                                                                <div key={index} style={{ marginBottom: 10 }}>
+                                                                    <button className={`${style.orderProduct__container__detail__sizeDetail__quantity__button} py-1 px-4 rounded inline-flex items-cente1`} onClick={() => __handleToggleExpand(index)}>
+                                                                        {`Size ${index + 1}`}
+                                                                        <RiBodyScanLine style={{ marginLeft: 10 }} size={20} />
+                                                                    </button>
+                                                                    {expandedIndex === index && (
+                                                                        <Dialog
+                                                                            open={open}
+                                                                            onClose={__handleClose}
+                                                                            aria-labelledby="alert-dialog-title"
+                                                                            aria-describedby="alert-dialog-description"
+                                                                        >
+                                                                            <DialogTitle id="alert-dialog-title">
+                                                                                {'Enter your body information'}
+                                                                            </DialogTitle>
+                                                                            <div style={{ margin: '0 auto' }}>
+                                                                                <Grid item>
+                                                                                    <CustomTextFieldSizeCustom
+                                                                                        label="Width (cm)"
+                                                                                        variant="outlined"
+                                                                                        type="number"
+                                                                                        value={sq.width || 1}
+                                                                                        onChange={(e) => __handleCustomSizeChange(index, 'width', Number(e.target.value))}
+                                                                                        style={{ marginBottom: 15 }}
+
+                                                                                    />
+                                                                                </Grid>
+                                                                                <Grid item>
+                                                                                    <CustomTextFieldSizeCustom
+                                                                                        label="Height (cm)"
+                                                                                        variant="outlined"
+                                                                                        type="number"
+                                                                                        value={sq.height || 1}
+                                                                                        onChange={(e) => __handleCustomSizeChange(index, 'height', Number(e.target.value))}
+                                                                                        style={{ marginBottom: 15 }}
+                                                                                    />
+                                                                                </Grid>
+                                                                                <Grid item>
+                                                                                    <CustomTextFieldSizeCustom
+                                                                                        label="Ring 1 (cm)"
+                                                                                        variant="outlined"
+                                                                                        type="number"
+                                                                                        value={sq.ring1 || 1}
+                                                                                        onChange={(e) => __handleCustomSizeChange(index, 'ring1', Number(e.target.value))}
+                                                                                        style={{ marginBottom: 15 }}
+
+                                                                                    />
+                                                                                </Grid>
+                                                                                <Grid item>
+                                                                                    <CustomTextFieldSizeCustom
+                                                                                        label="Ring 2 (cm)"
+                                                                                        variant="outlined"
+                                                                                        type="number"
+                                                                                        value={sq.ring2 || 1}
+                                                                                        onChange={(e) => __handleCustomSizeChange(index, 'ring2', Number(e.target.value))}
+                                                                                        style={{ marginBottom: 15 }}
+
+                                                                                    />
+                                                                                </Grid>
+                                                                                <Grid item>
+                                                                                    <CustomTextFieldSizeCustom
+                                                                                        label="Ring 3 (cm)"
+                                                                                        variant="outlined"
+                                                                                        type="number"
+                                                                                        value={sq.ring3 || 1}
+                                                                                        onChange={(e) => __handleCustomSizeChange(index, 'ring3', Number(e.target.value))}
+                                                                                        style={{ marginBottom: 15 }}
+
+                                                                                    />
+                                                                                </Grid>
+                                                                            </div>
+
+                                                                            <DialogActions>
+                                                                                <Button onClick={__handleClose}>Disagree</Button>
+                                                                                <button autoFocus onClick={__handleClose} style={{ width: '150px', backgroundColor: primaryColor }} >
+                                                                                    Accept
+                                                                                </button>
+                                                                            </DialogActions>
+                                                                        </Dialog>
+                                                                    )}
+                                                                    <Grid className={`${style.orderProduct__container__detail__sizeDetail__quantity}`} item>
+                                                                        <CustomTextFieldQuantity
+                                                                            fullWidth
+                                                                            type="number"
+                                                                            label="Quantity"
+                                                                            value={sq.quantity}
+                                                                            onChange={(e) => __handleQuantityChange(index, Number(e.target.value))}
+                                                                            inputProps={{ min: 1 }}
+                                                                            style={{ marginLeft: 10 }}
+
+                                                                        />
+                                                                        <FaMinusCircle size={22} color={primaryColor} onClick={() => __handleRemoveSizeQuantity(index)} style={{ display: sizeQuantities.length === 1 ? 'none' : 'flex', cursor: 'pointer' }}>
+                                                                        </FaMinusCircle>
+                                                                    </Grid>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                    <div>
+                                                        <FaPlusCircle size={20} style={{ cursor: 'pointer', marginLeft: 10 }} color={primaryColor} onClick={__handleAddSizeQuantity}>
+                                                        </FaPlusCircle>
                                                     </div>
                                                 </div>
                                             </div>
@@ -432,16 +454,16 @@ const OrderProductScreen = () => {
                                 <h3 className="text-xl light:text-white font-semibold leading-5 text-gray-800">Summary</h3>
                                 <div className="flex justify-center items-center w-full space-y-4 flex-col border-gray-200 border-b pb-4">
                                     <div className="flex justify-between w-full">
-                                        <p className="text-base light:text-white leading-4 text-gray-800">Subtotal</p>
-                                        <p className="text-base light:text-gray-300 leading-4 text-gray-600">$56.00</p>
+                                        <p className="text-sm light:text-white leading-4 text-gray-800">Subtotal</p>
+                                        <p className="text-sm light:text-gray-300 leading-4 text-gray-600">$56.00</p>
                                     </div>
                                     <div className="flex justify-between items-center w-full">
-                                        <p className="text-base light:text-white leading-4 text-gray-800">Discount <span className="bg-gray-200 p-1 text-xs font-medium light:bg-white light:text-gray-800 leading-3 text-gray-800">STUDENT</span></p>
-                                        <p className="text-base light:text-gray-300 leading-4 text-gray-600">-$28.00 (50%)</p>
+                                        <p className="text-sm light:text-white leading-4 text-gray-800">Discount <span className="bg-gray-200 p-1 text-xs font-medium light:bg-white light:text-gray-800 leading-3 text-gray-800">STUDENT</span></p>
+                                        <p className="text-sm light:text-gray-300 leading-4 text-gray-600">-$28.00 (50%)</p>
                                     </div>
                                     <div className="flex justify-between items-center w-full">
-                                        <p className="text-base light:text-white leading-4 text-gray-800">Shipping</p>
-                                        <p className="text-base light:text-gray-300 leading-4 text-gray-600">$8.00</p>
+                                        <p className="text-sm light:text-white leading-4 text-gray-800">Shipping</p>
+                                        <p className="text-sm light:text-gray-300 leading-4 text-gray-600">$8.00</p>
                                     </div>
                                 </div>
                                 <div className="flex justify-between items-center w-full">
@@ -450,39 +472,67 @@ const OrderProductScreen = () => {
                                 </div>
                             </div>
 
-                            <h3 className="text-xl light:text-white font-semibold leading-5 text-gray-800">Customer</h3>
+                            <h3 className="text-md light:text-white font-semibold leading-5 text-gray-800">Customer</h3>
                             <div className="flex flex-col md:flex-row xl:flex-col justify-start items-stretch h-full w-full md:space-x-6 lg:space-x-8 xl:space-x-0">
-                                <div className="flex flex-col justify-start items-start flex-shrink-0">
-                                    <div className="flex justify-center w-full md:justify-start items-center space-x-4 py-8 border-b border-gray-200">
+                                <div className="flex flex-col justify-start items-start flex-shrink-0" >
+                                    {/* <div className=" justify-center w-full md:justify-start items-center space-x-4 py-8 border-b border-gray-200">
                                         <img src="https://i.ibb.co/5TSg7f6/Rectangle-18.png" alt="avatar" />
-                                        <div className="flex justify-start items-start flex-col space-y-2">
-                                            <p className="text-base light:text-white font-semibold leading-4 text-left text-gray-800">David Kent</p>
-                                            <p className="text-sm light:text-gray-300 leading-5 text-gray-600">10 Previous Orders</p>
+
+                                    </div> */}
+                                    <div style={{ display: 'flex' }} className='border-b border-gray-200 w-full'>
+                                        <div className="flex justify-center text-gray-800 light:text-white md:justify-start items-center space-x-4 py-4  w-full" style={{width: '100%'}}>
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+                                                <path d="M4 20c0-2.21 1.79-4 4-4h8c2.21 0 4 1.79 4 4" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+                                            </svg>
+                                            <p className="cursor-pointer leading-5 " style={{fontSize: 13}}>{selectedAddress?.fullName}</p>
+                                        </div>
+                                        <div className="flex justify-center text-gray-800 light:text-white md:justify-start items-center space-x-4 py-4  w-full" style={{width: '50%'}}>
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M22 16.92V20a2 2 0 01-2.18 2A19.81 19.81 0 013 4.18 2 2 0 015 2h3.09a2 2 0 012 1.72 12.66 12.66 0 00.64 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006.41 6.41l1.27-1.27a2 2 0 012.11-.45 12.66 12.66 0 002.81.64 2 2 0 011.72 2.01z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+                                            </svg>
+
+                                            <p className="cursor-pointer text-xs leading-5 " style={{fontSize: 13}}>{selectedAddress?.phoneNumber}</p>
                                         </div>
                                     </div>
-
                                     <div className="flex justify-center text-gray-800 light:text-white md:justify-start items-center space-x-4 py-4 border-b border-gray-200 w-full">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M19 5H5C3.89543 5 3 5.89543 3 7V17C3 18.1046 3.89543 19 5 19H19C20.1046 19 21 18.1046 21 17V7C21 5.89543 20.1046 5 19 5Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
                                             <path d="M3 7L12 13L21 7" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
                                         </svg>
-                                        <p className="cursor-pointer text-sm leading-5 ">david89@gmail.com</p>
+                                        <p className="cursor-pointer text-xs leading-5 " style={{fontSize: 13}}>{selectedAddress?.email}</p>
                                     </div>
                                 </div>
-                                <div className="flex justify-between xl:h-full items-stretch w-full flex-col mt-6 md:mt-0">
+                                <div className="flex justify-between xl:h-full items-stretch w-full flex-col mt-0 sm:mt-0" style={{marginTop: -15}}>
                                     <div className="flex justify-center md:justify-start xl:flex-col flex-col md:space-x-6 lg:space-x-8 xl:space-x-0 space-y-4 xl:space-y-12 md:space-y-0 md:flex-row items-center md:items-start">
-                                        <div className="flex justify-center md:justify-start items-center md:items-start flex-col space-y-4 xl:mt-8">
+                                        <div className="flex justify-center md:justify-start items-center md:items-start  flex-col space-y-4 xl:mt-8 w-full">
                                             <p className="text-base light:text-white font-semibold leading-4 text-center md:text-left text-gray-800">Shipping Address</p>
-                                            <p className="w-48 lg:w-full light:text-gray-300 xl:w-48 text-center md:text-left text-sm leading-5 text-gray-600">180 North King Street, Northhampton MA 1060</p>
+                                            <p className="w-full light:text-gray-300 text-center md:text-left  text-sm leading-5 text-gray-600" style={{fontSize: 13}}>{selectedAddress?.address}, {selectedAddress?.ward}, {selectedAddress?.district}, {selectedAddress?.province} </p>
                                         </div>
 
-                                        <div className="flex w-full justify-center items-center md:justify-start md:items-start">
-                                            <button onClick={() => __handleOpenChangeAddressDialog(true)} className="mt-6 md:mt-0 light:border-white light:hover:bg-gray-900 light:bg-transparent light:text-white py-5 hover:bg-gray-200 focus:outline-none  focus:ring-gray-800 border border-gray-800  w-96 2xl:w-full text-base font-medium leading-4 text-gray-800">
+                                        <div className=" w-full justify-center items-center md:justify-start md:items-start" style={{marginTop: 15}}>
+                                            {/* <button  className="mt-6 md:mt-0 light:border-white light:hover:bg-gray-900 light:bg-transparent light:text-white py-5 hover:bg-gray-200 focus:outline-none  focus:ring-gray-800 border border-gray-800  w-96 2xl:w-full text-base font-medium leading-4 text-gray-800"> */}
+                                            <button
+                                                type="submit"
+                                                className="px-5 py-2.5 text-sm font-medium text-white"
+                                                style={{ border: `1px solid ${primaryColor}`, borderRadius: 4, margin: '0 auto', color: primaryColor, width: '100%', marginBottom: 10 }}
+                                                onClick={() => __handleOpenChangeAddressDialog(true)}
+                                            >
                                                 <span>Change address</span>
                                             </button>
+                                            <button
+                                                type="submit"
+                                                className="px-5 py-2.5 text-sm font-medium text-white"
+                                                style={{ backgroundColor: primaryColor, borderRadius: 4, margin: '0 auto', color: whiteColor, width: '100%' }}
+                                                onClick={() => __handleOpenChangeAddressDialog(true)}
+                                            >
+                                                <span>Deposit</span>
+                                            </button>
                                         </div>
+                                        {/* <button  className="mt-6 md:mt-0 light:border-white light:hover:bg-gray-900 light:bg-transparent light:text-white py-5 hover:bg-gray-200 focus:outline-none  focus:ring-gray-800 border border-gray-800  w-96 2xl:w-full text-base font-medium leading-4 text-gray-800"> */}
+
                                     </div>
-                                    <ChangeAddressDialogComponent isOpen={isChangeAddressDialogOpen} onClose={() => __handleOpenChangeAddressDialog(false)}></ChangeAddressDialogComponent>
+                                    <ChangeAddressDialogComponent onSelectedAddressData={(address) => __handleGetSelectedAdress(address)} isOpen={isChangeAddressDialogOpen} onClose={() => __handleOpenChangeAddressDialog(false)}></ChangeAddressDialogComponent>
                                 </div>
                             </div>
 
