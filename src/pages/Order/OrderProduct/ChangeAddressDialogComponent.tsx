@@ -85,12 +85,10 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
         userParse = JSON.parse(user);
     }
     const [open, setOpen] = React.useState(false);
-
     const [locations, setLocations] = React.useState<any[]>([]);
     const [selectedProvince, setSelectedProvince] = React.useState<Location | null>(null);
     const [selectedDistrict, setSelectedDistrict] = React.useState<District | null>(null);
     const [selectedWard, setSelectedWard] = React.useState<Ward | null>(null);
-
     const [selectedAddressEditor, setSelectedAddressEditor] = React.useState<any>();
     const [selectedAddress, setSelectedAddress] = React.useState<any>(1);
     const [addressList, setAddressList] = React.useState<any>([]);
@@ -110,6 +108,9 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
     // ---------------Usable Variable---------------//
     // ---------------UseEffect---------------//
 
+    /**
+     * Set default address when dialog init
+     */
     React.useEffect(() => {
         console.log(isOpen);
         setAddressList(sampleAddressData);
@@ -122,6 +123,9 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
         }
     }, [isOpen])
 
+    /**
+     * Binding selected address
+     */
     React.useEffect(() => {
         if (!onSelectedAddressData) return;
         const address = addressList.find((item: any) => item.id === selectedAddress);
@@ -130,20 +134,24 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
         }
     }, [selectedAddress])
 
+    /**
+     * Set address list
+     */
     React.useEffect(() => {
         setAddressList(sampleAddressData);
     }, [sampleAddressData]);
 
-    React.useEffect(() => {
-        console.log(addressList);
-    }, [addressList]);
-
+    /**
+     * Set change open dialog state
+     */
     React.useEffect(() => {
         setOpen(isOpen);
     }, [isOpen]);
 
+    /**
+     * Init adding address data
+     */
     React.useEffect(() => {
-
         if (selectAddIcon) setProfileData({
             email: userParse ? userParse.email : '',
             fullName: '',
@@ -251,6 +259,10 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
         }
     };
 
+    /**
+     * Handle edit address
+     * @param id 
+     */
     const __handleEditAddress = (id: any) => {
         setSelectedAddressEditor(id);
         if (selectedAddressEditor === id) {
@@ -267,15 +279,26 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
     const __handleClearSelected = () => {
     }
 
+    /**
+     * Handle selected address
+     * @param id 
+     */
     const __handleSelectedAddress = (id: any) => {
         setSelectedAddress(id);
     }
 
+    /**
+     * Handle remove a address from list
+     * @param id 
+     */
     const __handleRemoveOutAddressList = (id: any) => {
         const updatedList = addressList.filter((address: any) => address.id !== id);
         setAddressList(updatedList);
     }
 
+    /**
+     * Handle add new address into list
+     */
     const __handleAddToAddressList = () => {
         if (isProfileDataComplete(profileData)) {
             const updatedList = [...addressList, { ...profileData, id: addressList.length + 1 }];
@@ -288,6 +311,10 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
         }
     };
 
+    /**
+     * Handle update an address
+     * @param id 
+     */
     const __handleUpdateAddress = (id: any) => {
         console.log(id);
 
@@ -296,10 +323,7 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
         );
         setAddressList(updatedList);
         toast.success(`Update successfull`, { autoClose: 4000 });
-
     }
-
-
 
     return (
         <>

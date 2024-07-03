@@ -12,6 +12,7 @@ import MaterialDetailTableComponent from '../Components/Table/MaterialDetailTabl
 import { RiBodyScanLine } from "react-icons/ri";
 import SizeDialogComponent from '../../../components/Dialog/SizeDialog/SizeDialogComponent';
 import { useTranslation } from 'react-i18next';
+import OrderPolicyDialogComponent from '../../../components/Dialog/PolicyDialog/OrderPolicyDialogComponent';
 
 
 interface SizeQuantity {
@@ -131,6 +132,7 @@ const OrderProductScreen = () => {
     const [open, setOpen] = useState(false);
     const [isOpenSizeDialog, setIsOpenSizeDialog] = useState<boolean>(false);
     const [selectedAddress, setSelectedAddress] = useState<any>();
+    const [isOpenOrderPolicyDialog, setIsOpenOrderPolicyDialog] = useState<boolean>(false);
 
 
 
@@ -156,21 +158,38 @@ const OrderProductScreen = () => {
         console.log(sizeQuantitiesCustom);
     }, [sizeQuantitiesCustom])
     // ---------------FunctionHandler---------------//
+
+    /**
+     * Open dialog address
+     * @param isOpen 
+     */
     const __handleOpenChangeAddressDialog = (isOpen: boolean) => {
         setIsChangeAddressDialogOpen(isOpen);
         console.log(isOpen);
     }
 
+    /**
+     * Add more size and quantity
+     */
     const __handleAddSizeQuantity = () => {
         setSizeQuantities([...sizeQuantities, { size: 'L', quantity: 1 }]);
         setSizeQuantitiesCustom([...sizeQuantitiesCustom, { quantity: 1, height: 0, ring1: 0, ring2: 0, ring3: 0, width: 0 }])
     };
 
+    /**
+     * Remove out size or quantity 
+     * @param index 
+     */
     const __handleRemoveSizeQuantity = (index: number) => {
         setSizeQuantities(sizeQuantities.filter((_, i) => i !== index));
         setSizeQuantitiesCustom(sizeQuantitiesCustom.filter((_, i) => i !== index));
     };
 
+    /**
+     * Update state change of size 
+     * @param index 
+     * @param newSize 
+     */
     const __handleSizeChange = (index: number, newSize: string) => {
         const updatedSizeQuantities = [...sizeQuantities];
         updatedSizeQuantities[index].size = newSize;
@@ -178,6 +197,11 @@ const OrderProductScreen = () => {
         setSizeQuantitiesCustom(updatedSizeQuantities)
     };
 
+    /**
+     * Update state change of quantity
+     * @param index 
+     * @param newQuantity 
+     */
     const __handleQuantityChange = (index: number, newQuantity: number) => {
         const updatedSizeQuantities = [...sizeQuantities];
         updatedSizeQuantities[index].quantity = newQuantity;
@@ -186,37 +210,64 @@ const OrderProductScreen = () => {
 
     };
 
-    const __handleSubmit = () => {
-        // Process the sizeQuantities data
-        console.log(sizeQuantities);
-    };
-
+    /**
+     * Change between predefined or custom mode
+     * @param _event 
+     * @param newMode 
+     */
     const __handleInputModeChange = (_event: React.MouseEvent<HTMLElement>, newMode: 'predefined' | 'custom') => {
         if (newMode !== null) {
             setInputMode(newMode);
         }
     };
 
+    /**
+     * Custom customer size
+     * @param index 
+     * @param field 
+     * @param value 
+     */
     const __handleCustomSizeChange = (index: number, field: keyof SizeQuantity, value: number) => {
         const newSizeQuantities = [...sizeQuantitiesCustom];
         (newSizeQuantities[index][field] as number) = value;
         setSizeQuantitiesCustom(newSizeQuantities);
     };
 
+    /**
+     * Open size detail dialog
+     * @param index 
+     */
     const __handleToggleExpand = (index: number) => {
         // __handleClickOpen();
         setOpen(true);
         setExpandedIndex(expandedIndex === index ? null : index);
     };
 
+    /**
+     * Close size dialog
+     */
     const __handleCloseSizeDilog = () => {
         setIsOpenSizeDialog(false);
     };
 
+    /**
+     * Close order policy dialog
+     */
+    const __handleCloseOrderPolicyDilog = () => {
+        setIsOpenOrderPolicyDialog(false);
+    };
+
+    /**
+     * Close custom size dialog
+     */
     const __handleClose = () => {
         setOpen(false);
     };
 
+    /**
+     * Add selected address
+     * @param address 
+     */
     const __handleGetSelectedAdress = (address: any) => {
         setSelectedAddress(address);
     }
@@ -524,10 +575,11 @@ const OrderProductScreen = () => {
                                                 type="submit"
                                                 className="px-5 py-2.5 text-sm font-medium text-white"
                                                 style={{ backgroundColor: primaryColor, borderRadius: 4, margin: '0 auto', color: whiteColor, width: '100%' }}
-                                                onClick={() => __handleOpenChangeAddressDialog(true)}
+                                                onClick={() => setIsOpenOrderPolicyDialog(true)}
                                             >
                                                 <span>Deposit</span>
                                             </button>
+                                            <OrderPolicyDialogComponent onClose={__handleCloseOrderPolicyDilog} isOpen={isOpenOrderPolicyDialog} ></OrderPolicyDialogComponent>
                                         </div>
                                         {/* <button  className="mt-6 md:mt-0 light:border-white light:hover:bg-gray-900 light:bg-transparent light:text-white py-5 hover:bg-gray-200 focus:outline-none  focus:ring-gray-800 border border-gray-800  w-96 2xl:w-full text-base font-medium leading-4 text-gray-800"> */}
 
