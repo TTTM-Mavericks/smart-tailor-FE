@@ -52,7 +52,7 @@ function SignInScreen() {
       const isValid = isAuthenticated(token);
       if (isValid) {
         navigate('/')
-      } 
+      }
     }
   }, []);
 
@@ -119,6 +119,8 @@ function SignInScreen() {
           const refreshToken = response.data.refresh_token;
           Cookies.set('token', authToken);
           Cookies.set('refreshToken', refreshToken);
+          Cookies.set('userAuth', JSON.stringify(response.data.user));
+
           setTimeout(() => {
             window.location.href = '/'
           }, 2000)
@@ -161,6 +163,8 @@ function SignInScreen() {
             Cookies.set('refreshToken', refreshToken);
             axios.defaults.headers.common.Authorization = `Bearer ${authToken}`;
             localStorage.setItem('userAuth', JSON.stringify(resp.data.user));
+            // Cookies.set('userAuth', JSON.stringify(response.data.user));
+
           }
           setIsloading(true);
           setTimeout(() => {
@@ -273,7 +277,7 @@ function SignInScreen() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    borderRadius: 5
+                    borderRadius: 4
                   },
                 }}
                 cancel_on_tap_outside

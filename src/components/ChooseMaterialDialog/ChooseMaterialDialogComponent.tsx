@@ -52,17 +52,17 @@ const CustomPaper = styled('div')(({ theme }) => ({
         fontSize: '12px',
         '&::-webkit-scrollbar': {
             width: '0.3em',
-            borderRadius: '5px',
+            borderRadius: '4px',
             backgroundColor: grayColor1
         },
         '&::-webkit-scrollbar-track': {
             webkitBoxShadow: 'inset 0 0 6px rgba(0,0,0,0.1)',
-            borderRadius: '5px',
+            borderRadius: '4px',
             backGroundColor: grayColor1
         },
         '&::-webkit-scrollbar-thumb': {
             backgroundColor: '#7b7b7b',
-            borderRadius: '5px'
+            borderRadius: '4px'
         },
     },
 }));
@@ -75,7 +75,7 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
     '& .MuiInputBase-root': {
         height: '35px',
         width: '150px',
-        borderRadius: '8px',
+        borderRadius: '4px',
       },
       '& .MuiOutlinedInput-input': {
         fontSize: '12px',
@@ -260,7 +260,7 @@ const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child
 
 
     return (
-        <Dialog className={`${styles.dialog__container}`} fullWidth maxWidth={'sm'} open={isOpen}>
+        <Dialog className={`${styles.dialog__container}`} maxWidth={'md'} open={isOpen}>
             <DialogTitle >
                 <IoMdCloseCircleOutline
                     cursor={'pointer'}
@@ -273,7 +273,7 @@ const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child
             </DialogTitle>
             <DialogContent className={`${styles.dialog__content}`}>
                 <div className="mt-0" style={{ height: '100%' }}>
-                    <div className={styles.dialog__content__lableGroup}>
+                    {/* <div className={styles.dialog__content__lableGroup}>
                         <div >
                             <span className={styles.dialog__content__span__text}>For model</span>
                         </div>
@@ -283,10 +283,9 @@ const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child
                             <span style={{ color: greenColor }}>2.000.000</span>
                             <span> VNĐ</span>
                         </div>
-                    </div>
-                    <div className={`${styles.dialog__content__modelMaterialArea}`}>
+                    </div> */}
+                    {/* <div className={`${styles.dialog__content__modelMaterialArea}`}>
                         <main className={`${styles.dialog__content__modelMaterialArea__model}`}>
-                            {/* {model && model} */}
                             <img src={modelImg}></img>
                         </main>
                         <div className={`${styles.dialog__content__modelMaterialArea__material}`}>
@@ -356,7 +355,7 @@ const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child
                             </div>
 
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className={styles.dialog__content__lableGroup} style={{ width: '50%' }} >
                         <div>

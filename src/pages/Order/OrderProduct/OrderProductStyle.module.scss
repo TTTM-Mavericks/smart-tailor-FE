@@ -12,13 +12,15 @@
 .changeAddressDialogContent {
     // height: 700px;
     // width: 500px;
+    overflow: auto;
+
 
     &__addAddressBtn {
         position: relative;
         width: 90%;
         border: 2px dashed $grayColor;
-        padding: 5% 25px 5% 25px;
-        border-radius: 8px;
+        padding: 10px 25px 10px 25px;
+        border-radius: 4px;
         margin: 10px 5% 10px 5%;
 
         &:hover {
@@ -26,13 +28,13 @@
         }
 
         &__iconAdd {
-            position: absolute;
             align-items: center;
             justify-content: center;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            span{
+            width: 100%;
+            text-align: center;
+            margin: 0 auto;
+
+            span {
                 font-size: 13px;
                 font-weight: 500;
             }
@@ -44,16 +46,32 @@
         width: 90%;
         border: 2px dashed $grayColor;
         padding: 5% 25px 5% 25px;
-        border-radius: 8px;
+        border-radius: 4px;
         margin: 10px 5% 10px 5%;
 
+        &__adressItem::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        &__adressItem::-webkit-scrollbar-track {
+            background: $grayColor1;
+            border-radius: 10px;
+        }
+
+        &__adressItem::-webkit-scrollbar-thumb {
+            background: #7b7b7b;
+            border-radius: 10px;
+        }
+
+        &__adressItem::-webkit-scrollbar-thumb:hover {
+            background: #7b7b7b;
+            /* Color when hovering over the scrollbar thumb */
+        }
+
         &:hover {
-            background-color: rgba($color: $grayColor, $alpha: 1);
+            // background-color: rgba($color: $grayColor, $alpha: 1);
             cursor: pointer;
 
-            .changeAddressDialogContent__adressItem__iconGroup {
-                display: flex;
-            }
         }
 
         &__title {
@@ -68,16 +86,15 @@
 
         &__iconGroup {
             position: absolute;
-            display: none;
+            display: flex;
             align-items: center;
             justify-content: center;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            top: 2px;
+            right: 50px;
 
             &__icon {
-                width: 35px;
-                height: 35px;
+                width: 25px;
+                height: 25px;
                 border-radius: 90px;
                 display: flex;
                 align-items: center;
@@ -92,9 +109,6 @@
         }
 
         &__noHover {
-            .changeAddressDialogContent__adressItem__iconGroup {
-                display: none !important;
-            }
 
             &:hover {
                 background-color: initial !important;
@@ -123,30 +137,56 @@
     }
 }
 
-/* Add this to your CSS or SCSS file */
+.orderProduct__container {
+    width: 100%;
 
-.custom-scrollbar {
-    overflow-y: auto;
-}
+    &__content {
+        display: flex;
+    }
 
-.custom-scrollbar::-webkit-scrollbar {
-    width: 8px;
-    /* Width of the scrollbar */
-}
+    &__detail {
+        align-items: center;
+        width: 100%;
+        display: flex;
 
-.custom-scrollbar::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    /* Background of the scrollbar track */
-}
+        &__sizeDetail {
+            // display: inline;
+            // float: right;
+            width: 110%;
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #888;
-    /* Color of the scrollbar thumb */
-    border-radius: 4px;
-    /* Rounding the edges of the thumb */
-}
 
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #555;
-    /* Color of the thumb when hovered */
+            &__quantity {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                &__button {
+                    width: 140px;
+                    float: left;
+                    border: 1px solid $primaryColor;
+                    color: $primaryColor;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    font-size: 13px;
+                    margin-right: 10px;
+
+                    &:hover {
+                        background-color: $primaryColor;
+                        color: $whiteColor;
+                        transition: 0.4s;
+                    }
+                }
+            }
+
+        }
+    }
+
+    &__information {
+        width: 100%;
+
+        p {
+            padding: 5px;
+        }
+    }
 }

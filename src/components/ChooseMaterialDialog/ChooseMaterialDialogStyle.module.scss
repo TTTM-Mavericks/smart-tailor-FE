@@ -8,6 +8,7 @@
 }
 
 .dialog__content {
+    width: 700px;
     height: 550px;
     background-color: $whiteColor;
     transition: all 0.3s ease;
@@ -91,7 +92,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        border-radius: 8px;
+        border-radius: 4px;
         opacity: 0.9;
 
         div {

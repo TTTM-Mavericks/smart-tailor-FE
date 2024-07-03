@@ -537,7 +537,7 @@ const ProfileSettings: React.FC = () => {
                                         padding: '10px',
                                         marginTop: '10px',
                                         width: '100%',
-                                        borderRadius: '5px',
+                                        borderRadius: '4px',
                                         border: '1px solid #ccc',
                                     }}
                                 >
@@ -557,7 +557,7 @@ const ProfileSettings: React.FC = () => {
                                             padding: '10px',
                                             marginTop: '10px',
                                             width: '100%',
-                                            borderRadius: '5px',
+                                            borderRadius: '4px',
                                             border: '1px solid #ccc',
                                         }}
                                     >
@@ -578,7 +578,7 @@ const ProfileSettings: React.FC = () => {
                                             padding: '10px',
                                             marginTop: '10px',
                                             width: '100%',
-                                            borderRadius: '5px',
+                                            borderRadius: '4px',
                                             border: '1px solid #ccc',
                                         }}
                                     >
