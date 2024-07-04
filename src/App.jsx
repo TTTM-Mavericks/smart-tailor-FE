@@ -49,7 +49,8 @@ import {
   DashboardBrandManagePriceQuantityScreen,
   DashboardBrandProfileScreens,
   DashboardBrandScreens,
-  DashboardManageMaterialScreen
+  DashboardManageMaterialScreen,
+  OrderRequestScreen
 } from './pages/BrandManagement';
 
 import Screen404 from './pages/Error/Screen404';
@@ -184,6 +185,7 @@ function App() {
           <Route path='/brand_profile' element={<DashboardBrandProfileScreens></DashboardBrandProfileScreens>} />
           <Route path='/manage_material' element={<DashboardManageMaterialScreen></DashboardManageMaterialScreen>} />
           <Route path='/manage_price' element={<DashboardBrandManagePriceQuantityScreen></DashboardBrandManagePriceQuantityScreen>} />
+          <Route path='/manage_order_request' element={<OrderRequestScreen></OrderRequestScreen>} />
 
           {/* Detail Product Route */}
           <Route path='/detail_product/:id' element={<ProductDetailScreens></ProductDetailScreens>} />

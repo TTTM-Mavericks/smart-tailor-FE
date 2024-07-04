@@ -5,11 +5,13 @@ import FooterComponent from '../../../components/Footer/FooterComponent';
 import { IconButton } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { primaryColor } from '../../../root/ColorSystem';
+import { greenColor, primaryColor, redColor } from '../../../root/ColorSystem';
 import VerticalLinearStepperComponent from '../Components/ProgressBar/VerticalStepperComponent';
 import style from './OrderDetailStyles.module.scss'
+import CancelOrderPolicyDialogComponent from '../../../components/Dialog/PolicyDialog/CancelOrderPolicyDialogComponent';
 
 const OrderDetailScreen: React.FC = () => {
+    // TODO MUTIL LANGUAGE
 
     // ---------------UseState---------------//
     const orderDetails = {
@@ -46,6 +48,8 @@ const OrderDetailScreen: React.FC = () => {
     };
 
     const [showScrollButton, setShowScrollButton] = useState<boolean>(false);
+    const [isOpenCancelOrderPolicyDialog, setIsOpenCancelOrderPolicyDialog] = useState<boolean>(false);
+
 
     // ---------------UseEffect---------------//
 
@@ -70,6 +74,14 @@ const OrderDetailScreen: React.FC = () => {
 
     // ---------------FunctionHandler---------------//
 
+
+    /**
+     * Close order policy dialog
+     */
+    const __handleCloseCancelOrderPolicyDilog = () => {
+        setIsOpenCancelOrderPolicyDialog(false);
+    };
+
     /**
      * Scrolls the window to the top smoothly.
      */
@@ -88,7 +100,10 @@ const OrderDetailScreen: React.FC = () => {
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, cancel it!'
+            confirmButtonText: 'Yes, cancel it!',
+            customClass: {
+                popup: style.high__zindex,
+            }
         }).then((result) => {
             if (result.isConfirmed) {
                 Swal.fire(
@@ -115,7 +130,7 @@ const OrderDetailScreen: React.FC = () => {
     return (
         <div className={`${style.orderDetail__container}`} >
             <HeaderComponent />
-            <div className={`${style.orderDetail__container__group}`} style={{marginTop: '2%', marginBottom: '10%'}}>
+            <div className={`${style.orderDetail__container__group}`} style={{ marginTop: '2%', marginBottom: '10%' }}>
                 <div className={`${style.orderDetail__container__group__stepper}`}>
                     <VerticalLinearStepperComponent></VerticalLinearStepperComponent>
                 </div>
@@ -163,39 +178,7 @@ const OrderDetailScreen: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="flex flex-col md:flex-row items-start mb-6">
-                        <img src='https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-02.jpg' alt={orderDetails.items[0].name} className="w-40 h-50 object-cover rounded-md shadow-md mb-4 md:mb-0" />
-                        <div className="md:ml-6">
-                            <h2 className="text-2xl font-semibold text-gray-900">{orderDetails.items[0].name}</h2>
-                            <p className="text-lg text-gray-700">{orderDetails.items[0].price}</p>
-                            <p className="text-gray-600 mb-4">{orderDetails.items[0].description}</p>
-                            <div className="flex flex-col md:flex-row md:space-x-10 mt-4">
-                                <div className="md:w-1/2">
-                                    <p className="font-medium text-gray-600">Delivery address</p>
-                                    <p className="text-gray-600 whitespace-pre-line">{orderDetails.billingAddress}</p>
-                                </div>
-                                <div className="md:w-1/2 mt-4 md:mt-0">
-                                    <p className="font-medium text-gray-600">Shipping updates</p>
-                                    <p className="text-gray-600">{orderDetails.shippingUpdates.email}</p>
-                                    <p className="text-gray-600">{orderDetails.shippingUpdates.phone}</p>
-                                    <a href="#" className="text-indigo-600 hover:text-indigo-800 transition duration-200">Edit</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
-                    {/* Progress Bar */}
-                    <div className="border-t pt-4 mb-20">
-                        <p className="text-sm text-gray-600 mb-2">Processing on {orderDetails.progressDate}</p>
-                        <div className="relative w-full h-2 bg-gray-200 rounded-full mb-4">
-                            <div className="absolute top-0 left-0 h-2 bg-indigo-600 rounded-full" style={{ width: `${(orderDetails.currentStep1 / (orderDetails.progressSteps.length - 1)) * 100}%` }}></div>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                            {orderDetails.progressSteps.map((step, index) => (
-                                <p key={index} className={`text-center ${index <= orderDetails.currentStep1 ? 'text-indigo-600' : 'text-gray-400'}`}>{step}</p>
-                            ))}
-                        </div>
-                    </div>
 
                     {/* Billing and Payment Information Section */}
                     <div className="mt-10 border-t pt-4">
@@ -240,11 +223,22 @@ const OrderDetailScreen: React.FC = () => {
                     {/* Cancel Order Button */}
                     <div className="flex justify-end mt-4">
                         <button
-                            onClick={_handleCancelOrder}
-                            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-200"
+                            onClick={() => setIsOpenCancelOrderPolicyDialog(true)}
+                            className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200 mr-4"
+                            style={{ backgroundColor: redColor }}
                         >
                             {t(codeLanguage + '000205')}
                         </button>
+
+                        <button
+                            onClick={() => setIsOpenCancelOrderPolicyDialog(true)}
+                            className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200"
+                            style={{ backgroundColor: greenColor }}
+                        >
+                            Payment
+                        </button>
+                        <CancelOrderPolicyDialogComponent onClick={_handleCancelOrder} onClose={__handleCloseCancelOrderPolicyDilog} isOpen={isOpenCancelOrderPolicyDialog}></CancelOrderPolicyDialogComponent>
+
                     </div>
 
                     {showScrollButton && (
