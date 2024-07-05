@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import Sidebar from '../../GlobalComponent/SideBarComponent/SideBarComponent';
 import Navbar from '../../GlobalComponent/NavBarComponent/NavbarComponent';
 import ManageMaterialComponent from '../MaterialManage/MaterialManageScreens';
+import BrandProfileSetup from '../../BrandProfile/BrandProfileComponent';
+import ManagePrice from '../../ManagePrice/BrandPriceManagement/BrandManagementScreen/ManagePriceScreens';
 
 const DashboardManageMaterialScreen = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -63,13 +65,32 @@ const DashboardManageMaterialScreen = () => {
             user: key === 'user' ? !prev.user : false,
         }));
     };
+
+    const renderComponent = () => {
+        switch (activeMenu) {
+            case 'manage_notification':
+                return <></>;
+            case 'brand_profile':
+                return <BrandProfileSetup />;
+            case 'manage_order':
+                return <></>;
+            case 'manage_price':
+                return <ManagePrice />;
+            case 'manage_material':
+                return <ManageMaterialComponent />;
+            default:
+                return (
+                    <ManageMaterialComponent />
+                );
+        }
+    };
     return (
         <div className="flex">
             <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
             <div className="flex flex-col w-full">
-                <Navbar toggleMenu={toggleMenu} menu="Mangage Brand Price" popperOpen={popperOpen} togglePopper={togglePopper} />
+                <Navbar toggleMenu={toggleMenu} menu={activeMenu} popperOpen={popperOpen} togglePopper={togglePopper} />
                 <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
-                    <ManageMaterialComponent />
+                    {renderComponent()}
                 </main>
             </div>
         </div>

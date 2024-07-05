@@ -9,7 +9,7 @@ import DashboardBarChartScreens from "./BarChart/DashboardBarChartComponent";
 import DashboardAdminScreens from "./DashboardAdmin/DashboardAdminScreens";
 import DashboardAdminProfileScreens from "./AdminProfile/AdminProfileComponent";
 import DashboardAdminManageCategoryScreen from "./ManageCategory/DashboardAdminCategory/DashBoardManageCategoryComponent";
-
+import DashboardAdminManagePriceQuantityScreen from "./ManagePrice/AdminPriceManagement/DashboardBrandPrice/DashboardBrandPriceComponent";
 export {
     DashboardAdminManageCategoryScreen,
     DashboardAdminManageMaterialScreen,
@@ -21,5 +21,6 @@ export {
     DashboardLineChartScreens,
     DashboardBarChartScreens,
     DashboardAdminScreens,
-    DashboardAdminProfileScreens
+    DashboardAdminProfileScreens,
+    DashboardAdminManagePriceQuantityScreen
 }

@@ -22,7 +22,10 @@ export const featuresEndpoints = {
   admin: '/admin',
   material: '/material',
   category: '/category',
-  manager: '/expert-tailoring'
+  manager: '/expert-tailoring',
+  labor_quantity: '/labor-quantity',
+  size: '/size',
+  brand_labor_quantity: '/brand-labor-quantity'
 }
 export const functionEndpoints = {
   auth: {
@@ -75,6 +78,21 @@ export const functionEndpoints = {
     updateCategory: '/update-category',
     getCategoryById: '/get-category-by-id',
     getAllCategory: '/get-all-category'
+  },
+  laborQantity: {
+    getAllLaborQuantity: '/get-all-labor-quantity',
+    addNewLaborQuantity: '/add-new-labor-quantity',
+    updateLaborQuantity: '/update-labor-quantity'
+  },
+  size: {
+    getAllSize: '/get-all-size',
+    addNewSize: '/add-new-size',
+    updateSize: '/update-size'
+  },
+  brandLaborQuantity: {
+    getAllBrandLaborQuantity: '/get-all-brand-labor-quantity-by-brand-id',
+    addNewBrandLaborQuantity: '/add-new-brand-labor-quantity',
+    updateBrandLaborQuantity: '/update-brand-labor-quantity'
   }
 }
 

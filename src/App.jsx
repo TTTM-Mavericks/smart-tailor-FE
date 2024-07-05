@@ -20,6 +20,7 @@ import {
   DashboardLineChartScreens,
   DashboardBarChartScreens,
   DashboardAdminManageCategoryScreen,
+  DashboardAdminManagePriceQuantityScreen,
 } from './pages/AdminManagement';
 
 import {
@@ -154,38 +155,14 @@ function App() {
 
           {/* Admin dashboard route */}
           <Route path='/admin' element={<DashboardAdminScreens></DashboardAdminScreens>} />
-          <Route path='/admin_profile' element={<DashboardAdminProfileScreens></DashboardAdminProfileScreens>} />
-          <Route path='/about' element={<AboutUsPage></AboutUsPage>} />
-          <Route path='/contact' element={<ContactUsPage></ContactUsPage>} />
-          <Route path='/admin_manage_material' element={<DashboardAdminManageMaterialScreen></DashboardAdminManageMaterialScreen>} />
-          <Route path='/admin_manage_category' element={<DashboardAdminManageCategoryScreen></DashboardAdminManageCategoryScreen>} />
-          <Route path='/admin_manage_revenue' element={<DashboardRecentTransactionScreen></DashboardRecentTransactionScreen>} />
-          <Route path='/admin_manage_invoice' element={<DashboardManageInvoiceScreen></DashboardManageInvoiceScreen>} />
-          <Route path='/admin_faq' element={<DashboardFAQScreens></DashboardFAQScreens>} />
-          <Route path='/pie_chart' element={<DashboardPieChartScreens></DashboardPieChartScreens>} />
-          <Route path='/geography_chart' element={<DashboardGeographyChartScreens></DashboardGeographyChartScreens>} />
-          <Route path='/line_chart' element={<DashboardLineChartScreens></DashboardLineChartScreens>} />
-          <Route path='/bar_chart' element={<DashboardBarChartScreens></DashboardBarChartScreens>} />
 
           {/* Employee dashboard route */}
           <Route path='/employee' element={<DashboardEmployeeScreens></DashboardEmployeeScreens>} />
-          <Route path='/employee_manage_customer' element={<DashboardEmployeeManageUserScreens></DashboardEmployeeManageUserScreens>} />
-          <Route path='/employee_manage_brand' element={<DashboardEmployeeManageBrandScreens></DashboardEmployeeManageBrandScreens>} />
-          <Route path='/employee_manage_report' element={<DashboardManageReportScreen></DashboardManageReportScreen>} />
-          <Route path='/employee_manage_order' element={<DashboardManageOrderScreen></DashboardManageOrderScreen>} />
-          <Route path='/employee_manage_transaction' element={<DashboardManageTransactionScreen></DashboardManageTransactionScreen>} />
-          <Route path="/employee_manage_notification" element={<DashboardManageNotification></DashboardManageNotification>} />
-          <Route path='/employee_profile' element={<DashboardEmployeeProfileScreens></DashboardEmployeeProfileScreens>} />
           <Route path="/row-details" element={<DashboardEmployeeOrderDetailScreen></DashboardEmployeeOrderDetailScreen>} />
 
           {/* Brand Dashboard Route */}
           <Route path='/brand' element={<DashboardManageMaterialScreen></DashboardManageMaterialScreen>} />
-          <Route path='/brands' element={<Brand />} />
-          <Route path="/brand_manage_notification" element={<DashboardBrandManageNotification></DashboardBrandManageNotification>} />
-          <Route path='/brand_profile' element={<DashboardBrandProfileScreens></DashboardBrandProfileScreens>} />
-          <Route path='/manage_material' element={<DashboardManageMaterialScreen></DashboardManageMaterialScreen>} />
-          <Route path='/manage_price' element={<DashboardBrandManagePriceQuantityScreen></DashboardBrandManagePriceQuantityScreen>} />
-          <Route path='/manage_order_request' element={<OrderRequestScreen></OrderRequestScreen>} />
+          <Route path='/brand/manage_order_request' element={<OrderRequestScreen></OrderRequestScreen>} />
 
           {/* Detail Product Route */}
           <Route path='/detail_product/:id' element={<ProductDetailScreens></ProductDetailScreens>} />
@@ -199,12 +176,6 @@ function App() {
 
           {/* Manager dashboard route */}
           <Route path='/manager' element={<DashboardManagerMangeExpertTailoring />} />
-          <Route path='/manager_manage_employee' element={<DashboardManagerMangeEmployee />} />
-          <Route path='/manager_manage_customer' element={<DashboardManagerMangeCustomer />} />
-          <Route path='/manager_manage_brand' element={<DashboardManagerMangeBrand />} />
-          <Route path='/manager_manage_task' element={<DashboardManagerMangeTask />} />
-          <Route path='/manager_manage_employee_report' element={<FeedbackComponent />} />
-
 
           <Route path='*' element={<Screen404 />} />
         </Routes>

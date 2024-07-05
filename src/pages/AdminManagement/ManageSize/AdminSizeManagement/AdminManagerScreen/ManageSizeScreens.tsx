@@ -10,9 +10,9 @@ import EditSizePopUpScreens from "../AdminEditSize/EditSizePopUpScreens";
 import { Add } from "@mui/icons-material";
 import AddSizeManual from "../../AddManualSize/AddSizeScreens";
 import { useTranslation } from 'react-i18next';
-import { Category } from "../../../../../models/AdminCategoryExcelModel";
 import axios from "axios";
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
+import { Sizes } from "../../../../../models/AdminManageSizeModel";
 
 // Make Style of popup
 const style = {
@@ -31,54 +31,34 @@ const style = {
 const ManageSizes: React.FC = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [data, setData] = React.useState<Category[]>([]);
+    const [data, setData] = React.useState<Sizes[]>([]);
 
-    // set formid to pass it to component edit Material
-    const [formId, setFormId] = React.useState<Category | null>(null);
+    const [formId, setFormId] = React.useState<Sizes | null>(null);
 
-    // Open Edit PopUp when clicking on the edit icon
-    const [editopen, setEditOpen] = React.useState<boolean>(false);
+    const [editOpen, setEditOpen] = React.useState<boolean>(false);
     const _handleEditOpen = () => setEditOpen(true);
     const _handleEditClose = () => setEditOpen(false);
 
-    // open or close the add modal
-    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
-    const _handleClick = (event: any) => {
+    const _handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
     const _handleClose = () => {
         setAnchorEl(null);
     };
-    console.log("anchorEl" + anchorEl);
 
-    // close open pop up
-    const [addOpenOrClose, setAddOpenOrClose] = React.useState<boolean>(false)
+    const [addOpen, setAddOpen] = React.useState<boolean>(false);
+    const _handleAddOpen = () => setAddOpen(true);
+    const _handleAddClose = () => setAddOpen(false);
 
-    const _handleAddOpen = () => {
-        setAddOpenOrClose(true);
-    }
+    const [addMultiple, setAddMultiple] = React.useState<boolean>(false);
+    const _handleAddMultipleOpen = () => setAddMultiple(true);
+    const _handleAddMultipleClose = () => setAddMultiple(false);
 
-    const _handleAddClose = () => {
-        setAddOpenOrClose(false)
-    }
-
-    // close open pop up
-    const [addMultiple, setAddMultiple] = React.useState<boolean>(false)
-
-    const _handleAddMultipleOpen = () => {
-        setAddMultiple(true);
-    }
-
-    const _handleAddMultipleClose = () => {
-        setAddMultiple(false)
-    }
-
-    // Get language in local storage
     const selectedLanguage = localStorage.getItem('language');
     const codeLanguage = selectedLanguage?.toUpperCase();
 
-    // Using i18n
     const { t, i18n } = useTranslation();
     React.useEffect(() => {
         if (selectedLanguage !== null) {
@@ -87,7 +67,7 @@ const ManageSizes: React.FC = () => {
     }, [selectedLanguage, i18n]);
 
     React.useEffect(() => {
-        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.getAllCategory}`;
+        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.size + functionEndpoints.size.getAllSize}`;
 
         axios.get(apiUrl)
             .then(response => {
@@ -107,49 +87,44 @@ const ManageSizes: React.FC = () => {
             .catch(error => console.error('Error fetching data:', error));
     }, []);
 
-    // Thêm người dùng mới vào danh sách
-    const _handleAddCategory = (newCategory: Category) => {
-        setData(prevData => [...prevData, newCategory]);
+    const _handleAddSize = (newSize: Sizes) => {
+        setData((prevData) => [...prevData, newSize]);
     }
 
-    // Cập nhật người dùng trong danh sách
-    const _handleUpdateCategory = (updateCategory: Category) => {
-        setData(prevData => prevData.map(Category => Category.categoryID === updateCategory.categoryID ? updateCategory : Category));
+    const _handleUpdateSize = (updatedSize: Sizes) => {
+        console.log("Updating size:", updatedSize); // Debugging log
+        setData(prevData => prevData.map(size => {
+            if (size.sizeID === updatedSize.sizeID) {
+                console.log("Size matched for update:", size);
+                return updatedSize;
+            }
+            return size;
+        }));
     }
 
-    // EDIT 
-    const _handleEditClick = (
-        categoryID: string,
-        categoryName: string,
-    ) => {
-        // Handle edit action
-        const CategoryDataToEdit: Category = {
-            categoryID: categoryID,
-            categoryName: categoryName
-        }
-        setFormId(CategoryDataToEdit);
+    const _handleEditClick = (sizeID: string, sizeName: string) => {
+        const sizeDataToEdit: Sizes = { sizeID: sizeID, sizeName: sizeName };
+        setFormId(sizeDataToEdit);
         _handleEditOpen();
     };
 
-    //DELETE OR UPDATE
-    const _handleDeleteClick = async (categoryID: string) => {
+    const _handleDeleteClick = async (sizeName: string) => {
         try {
-            const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.updateCategory}`;
-
-            const response = await axios.put(apiUrl + `/${categoryID}`)
+            const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.size + functionEndpoints.size.updateSize}`;
+            const response = await axios.delete(apiUrl + `/${sizeName}`);
 
             if (!response.data) {
-                throw new Error('Error deleting material');
+                throw new Error('Error deleting size');
             }
 
+            setData(prevData => prevData.filter((size) => size.sizeName !== sizeName));
             return response.data;
         } catch (error) {
             throw error;
         }
     };
 
-    // confirm 
-    const _hanldeConfirmDelete = async (id: number) => {
+    const _handleConfirmDelete = async (sizeName: string) => {
         try {
             const result = await Swal.fire({
                 title: `${t(codeLanguage + '000061')}`,
@@ -163,15 +138,12 @@ const ManageSizes: React.FC = () => {
             });
 
             if (result.isConfirmed) {
-                await _handleDeleteClick(id.toString()); // Ensure id is converted to string if necessary
+                await _handleDeleteClick(sizeName);
                 Swal.fire(
                     `${t(codeLanguage + '000064')}`,
                     `${t(codeLanguage + '000065')}`,
                     'success'
                 );
-
-                // Remove the deleted material from the current data list
-                setData(prevData => prevData.filter(Material => Material.materialID !== id));
             } else {
                 Swal.fire(
                     `${t(codeLanguage + '000066')}`,
@@ -190,30 +162,8 @@ const ManageSizes: React.FC = () => {
     };
 
     const columns: GridColDef[] = [
-        // { field: "id", headerName: "ID", flex: 0.5 },
-        {
-            field: "categoryName",
-            headerName: "Category Name",
-            flex: 1,
-        },
-        // {
-        //     field: "create_date",
-        //     headerName: "Create Date",
-        //     flex: 1,
-        // },
-        // {
-        //     field: "last_modifidate",
-        //     headerName: "Last Modify Date",
-        //     type: "number",
-        //     headerAlign: "left",
-        //     align: "left",
-        // },
-        // {
-        //     field: "status",
-        //     headerName: "status",
-        //     flex: 1,
-        // },
-
+        { field: "sizeID", headerName: "Size ID", flex: 1 },
+        { field: "sizeName", headerName: "Size Name", flex: 1 },
         {
             field: "actions",
             headerName: "Actions",
@@ -221,20 +171,18 @@ const ManageSizes: React.FC = () => {
             sortable: false,
             renderCell: (params) => (
                 <Box>
-                    <IconButton onClick={() => _handleEditClick(params.row.categoryID, params.row.categoryName)}>
+                    <IconButton onClick={() => _handleEditClick(params.row.sizeID, params.row.sizeName)}>
                         <EditIcon />
                     </IconButton>
-                    <IconButton onClick={() => _hanldeConfirmDelete(params.row.categoryID)}>
+                    {/* <IconButton onClick={() => _handleConfirmDelete(params.row.sizeName)}>
                         <DeleteIcon htmlColor={colors.primary[300]} />
-                    </IconButton>
+                    </IconButton> */}
                 </Box>
             )
         }
     ];
 
-    const getRowId = (row: any) => `${row.categoryID}-${row.categoryName}`;
-
-
+    const getRowId = (row: Sizes) => `${row.sizeID}-${row.sizeName}`;
     return (
         <Box m="20px">
             <Box
@@ -294,31 +242,20 @@ const ManageSizes: React.FC = () => {
                         'aria-labelledby': 'basic-button',
                     }}
                 >
-                    <MenuItem >
-                        <div onClick={_handleAddOpen}>{t(codeLanguage + '000049')}</div>
-                        <Modal
-                            open={addOpenOrClose}
-                            aria-labelledby="modal-modal-title"
-                            aria-describedby="modal-modal-description"
-                        >
-                            <Box sx={{
-                                backgroundColor: colors.primary[100], position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: "50%",
-                                bgcolor: 'background.paper',
-                                border: '2px solid #000',
-                                boxShadow: 24,
-                                p: 4,
-                                borderRadius: "20px"
-                            }}>
-                                <AddSizeManual closeCard={_handleAddClose} addNewCategory={_handleAddCategory} />
-                            </Box>
-                        </Modal>
+                    <MenuItem onClick={_handleAddOpen}>
+                        {t(codeLanguage + '000049')}
                     </MenuItem>
                 </Menu>
-
+                <Modal
+                    open={addOpen}
+                    onClose={_handleAddClose}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                >
+                    <Box sx={style}>
+                        <AddSizeManual closeCard={_handleAddClose} addNewSizes={_handleAddSize} />
+                    </Box>
+                </Modal>
                 <DataGrid
                     rows={data}
                     columns={columns}
@@ -327,7 +264,8 @@ const ManageSizes: React.FC = () => {
                     getRowId={getRowId}
                 />
                 <Modal
-                    open={editopen}
+                    open={editOpen}
+                    onClose={_handleEditClose}
                     aria-labelledby="modal-modal-title"
                     aria-describedby="modal-modal-description"
                 >
@@ -336,7 +274,7 @@ const ManageSizes: React.FC = () => {
                             <EditSizePopUpScreens
                                 editClose={_handleEditClose}
                                 fid={formId}
-                                updateCategory={_handleUpdateCategory}
+                                updateSize={_handleUpdateSize}
                             />
                         )}
                     </Box>

@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import Sidebar from '../../../GlobalComponent/SideBarComponent/SideBarComponent';
-import Navbar from '../../../GlobalComponent/NavBarComponent/NavbarComponent';
+import Sidebar from '../../../GlobalComponent/SidebarComponent/SidebarComponent';
+import Navbar from '../../../GlobalComponent/NavbarComponent/NavbarComponent';
 import { IconButton } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
-import ManagePrice from '../BrandManagementScreen/ManagePriceScreens';
+import AdminManagePrice from '../AdminManagementScreen/ManagePriceScreens';
 
-const DashboardBrandManagePriceQuantityScreen = () => {
+const DashboardAdminManagePriceQuantityScreen = () => {
     const [menuOpen, setMenuOpen] = useState(false);
-    const [activeMenu, setActiveMenu] = useState('manage_price');
+    const [activeMenu, setActiveMenu] = useState('admin_manage_price');
     const [showScrollButton, setShowScrollButton] = React.useState<boolean>(false);
     const [popperOpen, setPopperOpen] = useState<Record<string, boolean>>({});
 
@@ -73,7 +73,7 @@ const DashboardBrandManagePriceQuantityScreen = () => {
             <div className="flex flex-col w-full">
                 <Navbar toggleMenu={toggleMenu} menu="Mangage Brand Price" popperOpen={popperOpen} togglePopper={togglePopper} />
                 <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
-                    <ManagePrice />
+                    <AdminManagePrice />
                 </main>
                 {showScrollButton && (
                     <IconButton
@@ -95,4 +95,4 @@ const DashboardBrandManagePriceQuantityScreen = () => {
     );
 };
 
-export default DashboardBrandManagePriceQuantityScreen;
+export default DashboardAdminManagePriceQuantityScreen;

@@ -7,7 +7,7 @@ import FooterComponent from '../../../components/Footer/FooterComponent';
 import VNLocationData from '../../../locationData.json';
 import { CustomerProfile } from '../../../models/CustomerProfileModel';
 import { Location, District, Ward } from '../../../models/CustomerProfileModel';
-import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
+import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 
@@ -32,11 +32,6 @@ const ProfileSettings: React.FC = () => {
     //         navigate('/auth/signin'); // Redirect to login page if user is not authenticated
     //     }
     // }, [navigate, userAuthData]);
-
-    if (!isAuthenticated) {
-        return null; // Render nothing if not authenticated or redirecting
-    }
-
 
     // Access specific fields
     const { userID, email, fullName, language, phoneNumber, roleName, imageUrl } = userAuth;

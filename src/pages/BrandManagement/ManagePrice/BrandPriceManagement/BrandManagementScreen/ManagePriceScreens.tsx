@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { Category } from "../../../../../models/AdminCategoryExcelModel";
 import axios from "axios";
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
+import { LaborQuantity } from "../../../../../models/LaborQuantityModel";
 
 // Make Style of popup
 const style = {
@@ -31,7 +32,7 @@ const style = {
 const ManagePrice: React.FC = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [data, setData] = React.useState<Category[]>([]);
+    const [data, setData] = React.useState<LaborQuantity[]>([]);
 
     // set formid to pass it to component edit Material
     const [formId, setFormId] = React.useState<Category | null>(null);
@@ -87,7 +88,7 @@ const ManagePrice: React.FC = () => {
     }, [selectedLanguage, i18n]);
 
     React.useEffect(() => {
-        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.getAllCategory}`;
+        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.labor_quantity + functionEndpoints.laborQantity.getAllLaborQuantity}`;
 
         axios.get(apiUrl)
             .then(response => {
@@ -108,8 +109,8 @@ const ManagePrice: React.FC = () => {
     }, []);
 
     // Thêm người dùng mới vào danh sách
-    const _handleAddCategory = (newCategory: Category) => {
-        setData(prevData => [...prevData, newCategory]);
+    const _handleAddLaborQuantity = (newLaborQuantity: LaborQuantity) => {
+        setData(prevData => [...prevData, newLaborQuantity]);
     }
 
     // Cập nhật người dùng trong danh sách
@@ -119,101 +120,109 @@ const ManagePrice: React.FC = () => {
 
     // EDIT 
     const _handleEditClick = (
-        categoryID: string,
-        categoryName: string,
+        laborQuantityID: string,
+        laborQuantityMinQuantity: number,
+        laborQuantityMaxQuantity: number,
+        laborQuantityMinPrice: number,
+        laborQuantityMaxPrice: number
     ) => {
         // Handle edit action
-        const CategoryDataToEdit: Category = {
-            categoryID: categoryID,
-            categoryName: categoryName
+        const LaborQuantityDataToEdit: LaborQuantity = {
+            laborQuantityID: laborQuantityID,
+            laborQuantityMinQuantity: laborQuantityMinQuantity,
+            laborQuantityMaxQuantity: laborQuantityMaxQuantity,
+            laborQuantityMinPrice: laborQuantityMinPrice,
+            laborQuantityMaxPrice: laborQuantityMaxPrice,
         }
-        setFormId(CategoryDataToEdit);
+        setFormId(LaborQuantityDataToEdit);
         _handleEditOpen();
     };
 
     //DELETE OR UPDATE
-    const _handleDeleteClick = async (categoryID: string) => {
-        try {
-            const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.updateCategory}`;
+    // const _handleDeleteClick = async (categoryID: string) => {
+    //     try {
+    //         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.updateCategory}`;
 
-            const response = await axios.put(apiUrl + `/${categoryID}`)
+    //         const response = await axios.put(apiUrl + `/${categoryID}`)
 
-            if (!response.data) {
-                throw new Error('Error deleting material');
-            }
+    //         if (!response.data) {
+    //             throw new Error('Error deleting material');
+    //         }
 
-            return response.data;
-        } catch (error) {
-            throw error;
-        }
-    };
+    //         return response.data;
+    //     } catch (error) {
+    //         throw error;
+    //     }
+    // };
 
-    // confirm 
-    const _hanldeConfirmDelete = async (id: number) => {
-        try {
-            const result = await Swal.fire({
-                title: `${t(codeLanguage + '000061')}`,
-                text: `${t(codeLanguage + '000062')}`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: `${t(codeLanguage + '000063')}`,
-                cancelButtonText: `${t(codeLanguage + '000055')}`
-            });
+    // // confirm 
+    // const _hanldeConfirmDelete = async (id: number) => {
+    //     try {
+    //         const result = await Swal.fire({
+    //             title: `${t(codeLanguage + '000061')}`,
+    //             text: `${t(codeLanguage + '000062')}`,
+    //             icon: 'warning',
+    //             showCancelButton: true,
+    //             confirmButtonColor: '#3085d6',
+    //             cancelButtonColor: '#d33',
+    //             confirmButtonText: `${t(codeLanguage + '000063')}`,
+    //             cancelButtonText: `${t(codeLanguage + '000055')}`
+    //         });
 
-            if (result.isConfirmed) {
-                await _handleDeleteClick(id.toString()); // Ensure id is converted to string if necessary
-                Swal.fire(
-                    `${t(codeLanguage + '000064')}`,
-                    `${t(codeLanguage + '000065')}`,
-                    'success'
-                );
+    //         if (result.isConfirmed) {
+    //             await _handleDeleteClick(id.toString()); // Ensure id is converted to string if necessary
+    //             Swal.fire(
+    //                 `${t(codeLanguage + '000064')}`,
+    //                 `${t(codeLanguage + '000065')}`,
+    //                 'success'
+    //             );
 
-                // Remove the deleted material from the current data list
-                setData(prevData => prevData.filter(Material => Material.materialID !== id));
-            } else {
-                Swal.fire(
-                    `${t(codeLanguage + '000066')}`,
-                    `${t(codeLanguage + '000067')}`,
-                    'error'
-                );
-            }
-        } catch (error: any) {
-            console.error('Error:', error);
-            Swal.fire(
-                'Error',
-                `${error.message || 'Unknown error'}`,
-                'error'
-            );
-        }
-    };
+    //             // Remove the deleted material from the current data list
+    //             setData(prevData => prevData.filter(Material => Material.materialID !== id));
+    //         } else {
+    //             Swal.fire(
+    //                 `${t(codeLanguage + '000066')}`,
+    //                 `${t(codeLanguage + '000067')}`,
+    //                 'error'
+    //             );
+    //         }
+    //     } catch (error: any) {
+    //         console.error('Error:', error);
+    //         Swal.fire(
+    //             'Error',
+    //             `${error.message || 'Unknown error'}`,
+    //             'error'
+    //         );
+    //     }
+    // };
 
     const columns: GridColDef[] = [
         // { field: "id", headerName: "ID", flex: 0.5 },
         {
-            field: "categoryName",
-            headerName: "Category Name",
+            field: "laborQuantityMinQuantity",
+            headerName: "Min Quantity",
             flex: 1,
         },
-        // {
-        //     field: "create_date",
-        //     headerName: "Create Date",
-        //     flex: 1,
-        // },
-        // {
-        //     field: "last_modifidate",
-        //     headerName: "Last Modify Date",
-        //     type: "number",
-        //     headerAlign: "left",
-        //     align: "left",
-        // },
-        // {
-        //     field: "status",
-        //     headerName: "status",
-        //     flex: 1,
-        // },
-
+        {
+            field: "laborQuantityMaxQuantity",
+            headerName: "Max Quantity",
+            flex: 1,
+        },
+        {
+            field: "laborQuantityMinPrice",
+            headerName: "Min Price",
+            flex: 1,
+        },
+        {
+            field: "laborQuantityMaxPrice",
+            headerName: "Max Price",
+            flex: 1,
+        },
+        {
+            field: "status",
+            headerName: "status",
+            flex: 1,
+        },
         {
             field: "actions",
             headerName: "Actions",
@@ -221,18 +230,18 @@ const ManagePrice: React.FC = () => {
             sortable: false,
             renderCell: (params) => (
                 <Box>
-                    <IconButton onClick={() => _handleEditClick(params.row.categoryID, params.row.categoryName)}>
+                    <IconButton onClick={() => _handleEditClick(params.row.laborQuantityID, params.row.laborQuantityMinQuantity, params.row.laborQuantityMaxQuantity, params.row.laborQuantityMinPrice, params.row.laborQuantityMaxPrice)}>
                         <EditIcon />
                     </IconButton>
-                    <IconButton onClick={() => _hanldeConfirmDelete(params.row.categoryID)}>
+                    {/* <IconButton onClick={() => _hanldeConfirmDelete(params.row.categoryID)}>
                         <DeleteIcon htmlColor={colors.primary[300]} />
-                    </IconButton>
+                    </IconButton> */}
                 </Box>
             )
         }
     ];
 
-    const getRowId = (row: any) => `${row.categoryID}-${row.categoryName}`;
+    const getRowId = (row: any) => `${row.laborQuantityID}-${row.laborQuantityMinQuantity}`;
 
 
     return (
@@ -313,7 +322,7 @@ const ManagePrice: React.FC = () => {
                                 p: 4,
                                 borderRadius: "20px"
                             }}>
-                                <AddPriceManual closeCard={_handleAddClose} addNewCategory={_handleAddCategory} />
+                                <AddPriceManual closeCard={_handleAddClose} addNewLaborQuantity={_handleAddLaborQuantity} />
                             </Box>
                         </Modal>
                     </MenuItem>
