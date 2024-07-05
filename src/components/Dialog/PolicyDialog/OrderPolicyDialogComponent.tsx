@@ -10,7 +10,7 @@ import {
     Typography
 } from '@mui/material';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
-import { redColor } from '../../../root/ColorSystem';
+import { primaryColor, redColor, whiteColor } from '../../../root/ColorSystem';
 import styles from './OrderPolicyDialogComponentStyle.module.scss'
 
 type OrderPolicyDialogProps = {
@@ -113,19 +113,33 @@ const OrderPolicyDialogComponent: React.FC<OrderPolicyDialogProps> = ({ isOpen, 
                 </Typography>
             </DialogContent>
             <FormControlLabel
-                control={<Checkbox checked={isChecked} onChange={__handleCheckboxChange} />}
-                label="I agree to the order cancellation policy"
+                control={<Checkbox color={'error'} checked={isChecked} onChange={__handleCheckboxChange} />}
+                label={(<span style={{ fontSize: 14 }}>I agree to the order cancellation policy</span>)}
                 className='px-5 py-5'
+                style={{ fontSize: '1px', fontWeight: 500 }}
+                sx={{ fontSize: 12 }}
+
+
             />
             <DialogActions>
-                <Button
+                <button
+                    type="submit"
+                    className="px-5 py-2.5 text-sm font-medium text-white"
+                    style={
+                        {
+                            border: `1px solid ${primaryColor}`,
+                            borderRadius: 4,
+                            color: isChecked ? whiteColor : primaryColor,
+                            marginBottom: 10,
+                            marginRight: 10,
+                            backgroundColor: isChecked ? primaryColor : whiteColor
+                        }
+                    }
                     onClick={__handleButtonClick}
                     disabled={!isChecked}
-                    variant="contained"
-                    color="primary"
                 >
                     Confirm
-                </Button>
+                </button>
             </DialogActions>
         </Dialog>
     );

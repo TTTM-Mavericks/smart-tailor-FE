@@ -1,0 +1,70 @@
+@import '../../../index.module.scss';
+
+.orderHistory__container {
+    width: 90%;
+    display: flex;
+    margin: 0 auto;
+
+    &__menuBar {
+        width: 30%;
+    }
+}
+
+.orderHistory__payment__button {
+    background-color: $primaryColor;
+    color: $whiteColor;
+    border-radius: 4px;
+
+    &:hover {
+        scale: 1.05;
+        transition: 0.5s;
+    }
+}
+
+.orderHistory__viewInvoice__button {
+    color: $secondaryColor;
+    text-decoration: underline;
+    border-radius: 4px;
+    position: absolute;
+    top: 0;
+    right: 0px;
+    font-size: 14px;
+
+    &:hover {
+        scale: 1.05;
+        transition: 0.5s;
+        cursor: pointer;
+    }
+}
+
+.orderHistory__viewOrder__button {
+    color: $secondaryColor;
+    text-decoration: underline;
+    border-radius: 4px;
+    position: absolute;
+    top: 0;
+    right: 0px;
+    font-size: 14px;
+
+    &:hover {
+        scale: 1.05;
+        transition: 0.5s;
+    }
+}
+
+.orderHistory__reOrder__button {
+    background-color: $redColor;
+    color: $whiteColor;
+    border-radius: 4px;
+    width: 150px;
+
+    &:hover {
+        scale: 1.05;
+        transition: 0.5s;
+    }
+}
+
+.orderHistory__transactionLable {
+    display: flex;
+    align-items: center;
+}

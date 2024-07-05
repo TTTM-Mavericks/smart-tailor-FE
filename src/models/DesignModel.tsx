@@ -40,6 +40,7 @@ export interface PartOfDesignInterface {
 
 export interface DesignInterface {
   designID?: any;
+  userID?: any;
   user?: UserInterface;
   expertTailoringName?: string;
   titleDesign?: string;
@@ -48,7 +49,8 @@ export interface DesignInterface {
   lastModifiedDate?: string;
   partOfDesigns?: PartOfDesignInterface[];
   typeOfDesign?: string;
-  imgUrl?: string,
+  imgUrl?: string;
+  color?: string;
 }
 
 export interface ItemMaterialInterface {

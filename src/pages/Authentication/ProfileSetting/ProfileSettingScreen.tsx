@@ -18,20 +18,20 @@ const ProfileSettings: React.FC = () => {
 
     const userAuth = JSON.parse(userAuthData);
 
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(true);
 
     // ---------------UseEffect---------------//
     /**
      * If not login then go back to the auth/signin screen
      */
-    useEffect(() => {
-        const userAuth = JSON.parse(userAuthData);
-        if (userAuth) {
-            setIsAuthenticated(true);
-        } else {
-            navigate('/auth/signin'); // Redirect to login page if user is not authenticated
-        }
-    }, [navigate, userAuthData]);
+    // useEffect(() => {
+    //     const userAuth = JSON.parse(userAuthData);
+    //     if (userAuth) {
+    //         setIsAuthenticated(true);
+    //     } else {
+    //         navigate('/auth/signin'); // Redirect to login page if user is not authenticated
+    //     }
+    // }, [navigate, userAuthData]);
 
     if (!isAuthenticated) {
         return null; // Render nothing if not authenticated or redirecting
