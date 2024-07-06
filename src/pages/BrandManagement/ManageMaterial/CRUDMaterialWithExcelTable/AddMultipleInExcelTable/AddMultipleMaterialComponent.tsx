@@ -186,13 +186,13 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
         console.log('File type:', selectedFile.type);
 
         try {
-            const token = Cookies.get('token');
+            // const token = Cookies.get('token');
             const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_material + functionEndpoints.brand.addExcel}`, formData,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                }
+                // {
+                //     headers: {
+                //         'Authorization': `Bearer ${token}`
+                //     }
+                // }
             );
 
             // Handle successful response

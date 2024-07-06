@@ -24,8 +24,8 @@ const EditExpertTailoringPopUpScreens: React.FC<EditExpertTailoringPopUpScreenFo
     const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
 
     const [formData, setFormData] = React.useState({
-        expertTailoringName: '',
-        sizeImageUrl: '',
+        expertTailoringName: fid.expertTailoringName,
+        sizeImageUrl: fid.sizeImageUrl,
     });
 
     const [categoryData, setCategoryData] = React.useState<string[]>([])

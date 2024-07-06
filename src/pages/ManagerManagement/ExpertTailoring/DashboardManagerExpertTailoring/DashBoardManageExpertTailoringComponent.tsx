@@ -80,7 +80,7 @@ const DashboardManagerMangeExpertTailoring = () => {
                 return <ManageCustomer />;
             default:
                 return (
-                    <ManageBrand />
+                    <ManageExpertTailoring />
                 );
         }
     };

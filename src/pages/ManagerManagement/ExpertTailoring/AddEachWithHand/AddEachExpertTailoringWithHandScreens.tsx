@@ -184,8 +184,6 @@ const AddEachExpertTailoringWithHand: React.FC<AddExpertTailoringWithHandsFormPr
             ...formData,
             sizeImageUrl: sizeImageUrls.length > 0 ? sizeImageUrls[0] : formData.sizeImageUrl,
         };
-        console.log("bebe " + addNewExpertTailorings);
-
 
         // Make API call to update the profile using PUT method
         try {
