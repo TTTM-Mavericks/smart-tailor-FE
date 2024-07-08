@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { Category } from "../../../../../models/AdminCategoryExcelModel";
 import axios from "axios";
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
-import { LaborQuantity } from "../../../../../models/LaborQuantityModel";
+import { EditLaborQuantity, LaborQuantity } from "../../../../../models/LaborQuantityModel";
 import EditPricePopUpScreens from "../AdminEditPrice/EditPricePopUpScreens";
 
 // Make Style of popup
@@ -35,7 +35,7 @@ const AdminManagePrice: React.FC = () => {
     const [data, setData] = React.useState<LaborQuantity[]>([]);
 
     // set formid to pass it to component edit Material
-    const [formId, setFormId] = React.useState<Category | null>(null);
+    const [formId, setFormId] = React.useState<LaborQuantity | null>(null);
 
     // Open Edit PopUp when clicking on the edit icon
     const [editopen, setEditOpen] = React.useState<boolean>(false);
@@ -109,13 +109,13 @@ const AdminManagePrice: React.FC = () => {
     }, []);
 
     // Thêm người dùng mới vào danh sách
-    const _handleAddLaborQuantity = (newLaborQuantity: LaborQuantity) => {
-        setData(prevData => [...prevData, newLaborQuantity]);
+    const _handleAddLaborQuantity = (newLaborQuantity: EditLaborQuantity[]) => {
+        setData((prevData: any) => [...prevData, newLaborQuantity]);
     }
 
     // Cập nhật người dùng trong danh sách
-    const _handleUpdateCategory = (updateCategory: Category) => {
-        setData(prevData => prevData.map(Category => Category.categoryID === updateCategory.categoryID ? updateCategory : Category));
+    const _handleUpdateLaborQuantity = (updatedLaborquantity: LaborQuantity) => {
+        setData(prevData => prevData.map((LaborQuantity: any) => LaborQuantity.laborQuantityID === updatedLaborquantity.laborQuantityID ? updatedLaborquantity : LaborQuantity));
     }
 
     // EDIT 
@@ -216,11 +216,6 @@ const AdminManagePrice: React.FC = () => {
         {
             field: "laborQuantityMaxPrice",
             headerName: "Max Price",
-            flex: 1,
-        },
-        {
-            field: "status",
-            headerName: "status",
             flex: 1,
         },
         {
@@ -335,7 +330,7 @@ const AdminManagePrice: React.FC = () => {
                     disableRowSelectionOnClick
                     getRowId={getRowId}
                 />
-                {/* <Modal
+                <Modal
                     open={editopen}
                     aria-labelledby="modal-modal-title"
                     aria-describedby="modal-modal-description"
@@ -345,11 +340,11 @@ const AdminManagePrice: React.FC = () => {
                             <EditPricePopUpScreens
                                 editClose={_handleEditClose}
                                 fid={formId}
-                                updateCategory={_handleUpdateCategory}
+                                updateLaborQuantity={_handleUpdateLaborQuantity}
                             />
                         )}
                     </Box>
-                </Modal> */}
+                </Modal>
             </Box>
         </Box>
     );

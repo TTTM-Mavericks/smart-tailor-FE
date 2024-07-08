@@ -29,6 +29,12 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
         categoryName: 'Vải',
     });
 
+    const userAuthData = localStorage.getItem('userAuth') as string;
+
+    const userAuth = JSON.parse(userAuthData);
+
+    const { userID, email, fullName, language, phoneNumber, roleName, imageUrl } = userAuth;
+
 
     // ---------------Usable Variable---------------//
 
@@ -148,7 +154,7 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
         try {
             console.log('Form Data:', JSON.stringify(formData));
 
-            const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_labor_quantity + functionEndpoints.brandLaborQuantity.addNewBrandLaborQuantity}`, formData, {
+            const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_labor_quantity + functionEndpoints.brandLaborQuantity.addNewBrandLaborQuantity + `/${userID}`}`, formData, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -188,7 +194,7 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
             >
                 <CloseIcon />
             </IconButton>
-            <form onSubmit={handleSubmit}>
+            <div>
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr>
@@ -215,13 +221,16 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
                         ))}
                     </tbody>
                 </table>
-                <button
-                    type="submit"
-                    className="mt-4 w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-                >
-                    Submit
-                </button>
-            </form>
+                <div onClick={closeCard}>
+                    <button
+                        type="submit"
+                        onClick={handleSubmit}
+                        className="mt-4 w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                    >
+                        Submit
+                    </button>
+                </div>
+            </div>
         </div>
     );
 };

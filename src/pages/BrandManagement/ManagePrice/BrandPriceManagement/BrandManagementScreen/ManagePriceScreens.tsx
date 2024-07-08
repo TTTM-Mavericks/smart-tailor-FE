@@ -34,6 +34,12 @@ const ManagePrice: React.FC = () => {
     const colors = tokens(theme.palette.mode);
     const [data, setData] = React.useState<LaborQuantity[]>([]);
 
+    const userAuthData = localStorage.getItem('userAuth') as string;
+
+    const userAuth = JSON.parse(userAuthData);
+
+    const { userID, email, fullName, language, phoneNumber, roleName, imageUrl } = userAuth;
+
     // set formid to pass it to component edit Material
     const [formId, setFormId] = React.useState<Category | null>(null);
 
@@ -88,7 +94,8 @@ const ManagePrice: React.FC = () => {
     }, [selectedLanguage, i18n]);
 
     React.useEffect(() => {
-        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.labor_quantity + functionEndpoints.laborQantity.getAllLaborQuantity}`;
+        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_labor_quantity + functionEndpoints.laborQantity.getAllLaborQuantityByBrandID + `/${userID}`}`;
+        console.log(userID + "that bebe hehe");
 
         axios.get(apiUrl)
             .then(response => {

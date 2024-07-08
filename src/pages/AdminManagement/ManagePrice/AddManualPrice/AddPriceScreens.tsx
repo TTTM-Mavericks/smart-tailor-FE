@@ -5,11 +5,11 @@ import Swal from 'sweetalert2';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
-import { LaborQuantity } from '../../../../models/LaborQuantityModel';
+import { EditLaborQuantity, LaborQuantity } from '../../../../models/LaborQuantityModel';
 
 interface AddLaborQuantityWithHandsFormProps {
     closeCard: () => void;
-    addNewLaborQuantity: (addedNewCategory: LaborQuantity) => void
+    addNewLaborQuantity: (addedNewCategory: EditLaborQuantity[]) => void
 }
 
 const AddPriceManual: React.FC<AddLaborQuantityWithHandsFormProps> = ({ closeCard, addNewLaborQuantity }) => {
@@ -134,6 +134,7 @@ const AddPriceManual: React.FC<AddLaborQuantityWithHandsFormProps> = ({ closeCar
                     'Size has been added!',
                     'success'
                 );
+                addNewLaborQuantity(prices)
             } else {
                 Swal.fire(
                     'Add Size Failed!',

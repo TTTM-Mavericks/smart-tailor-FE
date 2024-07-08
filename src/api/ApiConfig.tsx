@@ -82,7 +82,8 @@ export const functionEndpoints = {
   laborQantity: {
     getAllLaborQuantity: '/get-all-labor-quantity',
     addNewLaborQuantity: '/add-new-labor-quantity',
-    updateLaborQuantity: '/update-labor-quantity'
+    updateLaborQuantity: '/update-labor-quantity',
+    getAllLaborQuantityByBrandID: '/get-all-brand-labor-quantity-by-brand-id'
   },
   size: {
     getAllSize: '/get-all-size',

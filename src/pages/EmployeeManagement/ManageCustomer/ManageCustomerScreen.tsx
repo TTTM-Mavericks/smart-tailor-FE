@@ -111,8 +111,8 @@ const EmployeeManageCustomer: React.FC = () => {
     }
 
     // Cập nhật người dùng trong danh sách
-    const _handleUpdateUser = (updatedUser: User) => {
-        setData(prevData => prevData.map(user => user.id === updatedUser.id ? updatedUser : user));
+    const _handleUpdateUser = (updatedUsers: User) => {
+        setData(prevData => prevData.map(user => user.id === updatedUsers.id ? updatedUsers : user));
     }
 
     // EDIT 

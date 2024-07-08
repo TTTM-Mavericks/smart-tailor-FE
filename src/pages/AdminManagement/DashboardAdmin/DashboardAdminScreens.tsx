@@ -114,9 +114,11 @@ const DashboardAdminScreens = () => {
                     <>
                         <CardInformationDetailComponent />
                         <GeographyChartComponent />
+                        <div style={{ display: "flex" }}>
+                            <BarChartComponent />
+                            <PieChartComponent />
+                        </div>
                         <LineChartComponent />
-                        <BarChartComponent />
-                        <PieChartComponent />
                     </>
                 );
         }
