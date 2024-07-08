@@ -57,7 +57,7 @@ const EditSizePopUpScreens: React.FC<EditSizePopUpScreenFormProps> = ({ fid, edi
             }
 
             if (response.data.status === 200) {
-                updateSize(response.data.data);
+                updateSize({ ...formData, sizeID });
                 Swal.fire(
                     `${t(codeLanguage + '000069')}`,
                     `${t(codeLanguage + '000070')}`,

@@ -13,9 +13,8 @@ import AddMultipleComponentWithExcel from "../../AddMultipleMaterialWithExcel/Ad
 import { useTranslation } from 'react-i18next';
 import { Material } from "../../../../../models/AdminMaterialExcelModel";
 import axios from "axios";
-import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
+import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 
-// Make Style of popup
 const style = {
     position: 'absolute',
     top: '50%',
@@ -30,62 +29,32 @@ const style = {
 };
 
 const ManageMaterials: React.FC = () => {
+    // ---------------UseState Variable---------------//
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [data, setData] = React.useState<Material[]>([]);
-
-    // set formid to pass it to component edit Material
     const [formId, setFormId] = React.useState<Material | null>(null);
-
-    // Open Edit PopUp when clicking on the edit icon
     const [editopen, setEditOpen] = React.useState<boolean>(false);
-    const _handleEditOpen = () => setEditOpen(true);
-    const _handleEditClose = () => setEditOpen(false);
-
-    // open or close the add modal
     const [anchorEl, setAnchorEl] = React.useState(null);
-    const open = Boolean(anchorEl);
-    const _handleClick = (event: any) => {
-        setAnchorEl(event.currentTarget);
-    };
-    const _handleClose = () => {
-        setAnchorEl(null);
-    };
-
-    // close open pop up
     const [addOpenOrClose, setAddOpenOrClose] = React.useState<boolean>(false)
-
-    const _handleAddOpen = () => {
-        setAddOpenOrClose(true);
-    }
-
-    const _handleAddClose = () => {
-        setAddOpenOrClose(false)
-    }
-
-    // close open pop up
     const [addMultiple, setAddMultiple] = React.useState<boolean>(false)
+    const { t, i18n } = useTranslation();
 
-    const _handleAddMultipleOpen = () => {
-        setAddMultiple(true);
-    }
-
-    const _handleAddMultipleClose = () => {
-        setAddMultiple(false)
-    }
-
-    // Get language in local storage
+    // ---------------Usable Variable---------------//
+    const open = Boolean(anchorEl);
     const selectedLanguage = localStorage.getItem('language');
     const codeLanguage = selectedLanguage?.toUpperCase();
 
-    // Using i18n
-    const { t, i18n } = useTranslation();
+    // ---------------UseEffect---------------//
     React.useEffect(() => {
         if (selectedLanguage !== null) {
             i18n.changeLanguage(selectedLanguage);
         }
     }, [selectedLanguage, i18n]);
 
+    /**
+     * Get All Material
+     */
     React.useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.getAllMaterial}`;
 
@@ -107,17 +76,88 @@ const ManageMaterials: React.FC = () => {
             .catch(error => console.error('Error fetching data:', error));
     }, []);
 
-    // Thêm người dùng mới vào danh sách
+    // ---------------FunctionHandler---------------//
+
+    /**
+     * Open
+     * @returns 
+     */
+    const _handleEditOpen = () => setEditOpen(true);
+
+    /**
+     * Close
+     * @returns 
+     */
+    const _handleEditClose = () => setEditOpen(false);
+
+    /**
+     * Open Dialog
+     * @param event 
+     */
+    const _handleClick = (event: any) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    /**
+     * Close Model
+     */
+    const _handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    /**
+     * Open Dialog
+     */
+    const _handleAddOpen = () => {
+        setAddOpenOrClose(true);
+    }
+
+    /**
+     * Close Dialog
+     */
+    const _handleAddClose = () => {
+        setAddOpenOrClose(false)
+    }
+
+    /**
+     * Open Dialog Add With Excel
+     */
+    const _handleAddMultipleOpen = () => {
+        setAddMultiple(true);
+    }
+
+    /**
+     * Close Dialog Add With Excel
+     */
+    const _handleAddMultipleClose = () => {
+        setAddMultiple(false)
+    }
+
+    /**
+     * 
+     * @param newMaterial 
+     */
     const _handleAddMaterial = (newMaterial: Material) => {
         setData(prevData => [...prevData, newMaterial]);
     }
 
-    // Cập nhật người dùng trong danh sách
+    /**
+     * 
+     * @param updatedMaterial 
+     */
     const _handleUpdateMaterial = (updatedMaterial: Material) => {
         setData(prevData => prevData.map(Material => Material.materialID === updatedMaterial.materialID ? updatedMaterial : Material));
     }
 
-    // EDIT 
+    /**
+     * 
+     * @param materialID 
+     * @param categoryName 
+     * @param materialName 
+     * @param hsCode 
+     * @param basePrice 
+     * @param unit 
+     */
     const _handleEditClick = (
         materialID: string,
         categoryName: string,
@@ -137,8 +177,12 @@ const ManageMaterials: React.FC = () => {
         _handleEditOpen();
     };
 
-    //DELETE OR UPDATE
-    const _handleDeleteClick = async (materialID: string) => {
+    /**
+     * 
+     * @param materialID 
+     * @returns 
+     */
+    const _handleUpdateStatus = async (materialID: string) => {
         try {
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.updateStatusMaterial}`;
 
@@ -154,8 +198,11 @@ const ManageMaterials: React.FC = () => {
         }
     };
 
-    // confirm 
-    const _hanldeConfirmDelete = async (id: number) => {
+    /**
+     * 
+     * @param id 
+     */
+    const _hanldeConfirmUpdateStatus = async (id: number) => {
         try {
             const result = await Swal.fire({
                 title: `${t(codeLanguage + '000061')}`,
@@ -169,7 +216,7 @@ const ManageMaterials: React.FC = () => {
             });
 
             if (result.isConfirmed) {
-                await _handleDeleteClick(id.toString()); // Ensure id is converted to string if necessary
+                await _handleUpdateStatus(id.toString()); // Ensure id is converted to string if necessary
                 Swal.fire(
                     `${t(codeLanguage + '000064')}`,
                     `${t(codeLanguage + '000065')}`,
@@ -196,8 +243,10 @@ const ManageMaterials: React.FC = () => {
         }
     };
 
+    /**
+     * Create A Grid For Table
+     */
     const columns: GridColDef[] = [
-        // { field: "id", headerName: "ID", flex: 0.5 },
         {
             field: "categoryName",
             headerName: "Category Name",
@@ -240,7 +289,7 @@ const ManageMaterials: React.FC = () => {
                     <IconButton onClick={() => _handleEditClick(params.row.materialID, params.row.categoryName, params.row.materialName, params.row.hsCode, params.row.basePrice, params.row.unit)}>
                         <EditIcon />
                     </IconButton>
-                    <IconButton onClick={() => _hanldeConfirmDelete(params.row.materialID)}>
+                    <IconButton onClick={() => _hanldeConfirmUpdateStatus(params.row.materialID)}>
                         <DeleteIcon htmlColor={colors.primary[300]} />
                     </IconButton>
                 </Box>
@@ -248,6 +297,11 @@ const ManageMaterials: React.FC = () => {
         }
     ];
 
+    /**
+     * 
+     * @param row 
+     * @returns 
+     */
     const getRowId = (row: any) => `${row.materialID}-${row.categoryName}-${row.materialName}`;
 
     return (

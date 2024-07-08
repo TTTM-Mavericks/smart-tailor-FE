@@ -110,7 +110,7 @@ const AdminManagePrice: React.FC = () => {
 
     // Thêm người dùng mới vào danh sách
     const _handleAddLaborQuantity = (newLaborQuantity: EditLaborQuantity[]) => {
-        setData((prevData: any) => [...prevData, newLaborQuantity]);
+        setData((prevData: any) => [...prevData, ...newLaborQuantity]);
     }
 
     // Cập nhật người dùng trong danh sách

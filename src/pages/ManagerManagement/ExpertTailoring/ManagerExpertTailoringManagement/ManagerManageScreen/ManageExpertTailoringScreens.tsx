@@ -225,9 +225,15 @@ const ManageExpertTailoring: React.FC = () => {
                     <IconButton onClick={() => _handleEditClick(params.row.expertTailoringID, params.row.expertTailoringName, params.row.sizeImageUrl)}>
                         <EditIcon />
                     </IconButton>
-                    <IconButton onClick={() => _hanldeConfirmDelete(params.row.expertTailoringID)}>
-                        <DeleteIcon htmlColor={colors.primary[300]} />
-                    </IconButton>
+                    {params.row.status ? (
+                        <IconButton onClick={() => _hanldeConfirmDelete(params.row.expertTailoringID)}>
+                            <DeleteIcon htmlColor={colors.primary[300]} />
+                        </IconButton>
+                    ) : (
+                        <IconButton onClick={() => _hanldeConfirmDelete(params.row.expertTailoringID)}>
+                            <EditIcon htmlColor={colors.primary[300]} />
+                        </IconButton>
+                    )}
                 </Box>
             )
         }

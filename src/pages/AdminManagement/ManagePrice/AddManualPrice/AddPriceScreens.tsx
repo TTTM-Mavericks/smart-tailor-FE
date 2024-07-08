@@ -1,109 +1,21 @@
-import React, { ChangeEvent, useState, useEffect } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import Swal from 'sweetalert2';
-import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
-import { EditLaborQuantity, LaborQuantity } from '../../../../models/LaborQuantityModel';
+import { EditLaborQuantity } from '../../../../models/LaborQuantityModel';
 
 interface AddLaborQuantityWithHandsFormProps {
     closeCard: () => void;
-    addNewLaborQuantity: (addedNewCategory: EditLaborQuantity[]) => void
+    addNewLaborQuantity: (addedNewCategory: EditLaborQuantity[]) => void;
 }
 
 const AddPriceManual: React.FC<AddLaborQuantityWithHandsFormProps> = ({ closeCard, addNewLaborQuantity }) => {
-
-    // const [formData, setFormData] = useState({
-    //     categoryName: 'Vải',
-    // });
-
-    // const selectedLanguage = localStorage.getItem('language');
-    // const codeLanguage = selectedLanguage?.toUpperCase();
-
-    // const { t, i18n } = useTranslation();
-
-    // useEffect(() => {
-    //     if (selectedLanguage !== null) {
-    //         i18n.changeLanguage(selectedLanguage);
-    //     }
-    // }, [selectedLanguage, i18n]);
-
-    // const _handleFormChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    //     const { name, value } = e.target;
-    //     setFormData(prevFormData => ({
-    //         ...prevFormData,
-    //         [name]: value,
-    //     }));
-    // };
-
-    // const _handleSubmit = async () => {
-    //     try {
-    //         console.log('Form Data:', JSON.stringify(formData));
-
-    //         const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.addNewCategory + `?categoryName=${formData.categoryName}`}`, {
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //         });
-
-    //         console.log('Response:', response.data);
-
-    //         if (response.data.status === 200) {
-    //             addNewLaborQuantity(response.data);
-    //             Swal.fire(
-    //                 'Add Success!',
-    //                 'User has been updated!',
-    //                 'success'
-    //             );
-
-    //         } else {
-    //             Swal.fire(
-    //                 'Add User fail!',
-    //                 'Please check information!',
-    //                 'error'
-    //             );
-    //         }
-    //     } catch (err: any) {
-    //         console.error('Error:', err);
-    //         Swal.fire(
-    //             'Add fail!',
-    //             `${err.message || 'Unknown error'} `,
-    //             'error'
-    //         );
-    //     }
-    // };
-
-    // const [prices, setPrices] = useState<LaborQuantity[]>([]);
-
-    // useEffect(() => {
-    //     const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.labor_quantity + functionEndpoints.laborQantity.getAllLaborQuantity}`;
-
-    //     axios.get(apiUrl)
-    //         .then(response => {
-    //             if (response.status !== 200) {
-    //                 throw new Error('Network response was not ok');
-    //             }
-    //             return response.data;
-    //         })
-    //         .then((responseData) => {
-    //             if (responseData && Array.isArray(responseData.data)) {
-    //                 setPrices(responseData.data);
-    //                 console.log("Data received:", responseData);
-    //             } else {
-    //                 console.error('Invalid data format:', responseData);
-    //             }
-    //         })
-    //         .catch(error => console.error('Error fetching data:', error));
-    // }, []);
-
-    const [prices, setPrices] = useState(
-        [{ laborQuantityMinQuantity: 1, laborQuantityMaxQuantity: 10, laborQuantityMinPrice: 140, laborQuantityMaxPrice: 160 },
+    const [prices, setPrices] = useState<EditLaborQuantity[]>([
+        { laborQuantityMinQuantity: 1, laborQuantityMaxQuantity: 10, laborQuantityMinPrice: 140, laborQuantityMaxPrice: 160 },
         { laborQuantityMinQuantity: 11, laborQuantityMaxQuantity: 20, laborQuantityMinPrice: 160, laborQuantityMaxPrice: 180 }
-        ]
-    );
-
-    console.log("oric" + prices);
+    ]);
 
     const handlePriceChange = (index: number, event: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
@@ -127,17 +39,17 @@ const AddPriceManual: React.FC<AddLaborQuantityWithHandsFormProps> = ({ closeCar
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.labor_quantity + functionEndpoints.laborQantity.addNewLaborQuantity}`;
         try {
             const response = await axios.post(apiUrl, { laborQuantityRequests: prices });
-            console.log('Response:', response.data);
+
             if (response.data.status === 200) {
                 Swal.fire(
                     'Add Success!',
-                    'Size has been added!',
+                    'Labor quantity has been added!',
                     'success'
                 );
-                addNewLaborQuantity(prices)
+                addNewLaborQuantity(prices);
             } else {
                 Swal.fire(
-                    'Add Size Failed!',
+                    'Add Labor Quantity Failed!',
                     'Please check the information!',
                     'error'
                 ).then(() => {
@@ -239,9 +151,7 @@ const AddPriceManual: React.FC<AddLaborQuantityWithHandsFormProps> = ({ closeCar
                     >
                         Add More
                     </button>
-                    <div
-                        onClick={closeCard}
-                    >
+                    <div onClick={closeCard}>
                         <button
                             type="submit"
                             onClick={handleSubmit}

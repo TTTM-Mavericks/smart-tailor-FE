@@ -12,7 +12,7 @@ import AddSizeManual from "../../AddManualSize/AddSizeScreens";
 import { useTranslation } from 'react-i18next';
 import axios from "axios";
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
-import { Sizes } from "../../../../../models/AdminManageSizeModel";
+import { AddSize, Sizes } from "../../../../../models/AdminManageSizeModel";
 
 // Make Style of popup
 const style = {
@@ -87,12 +87,11 @@ const ManageSizes: React.FC = () => {
             .catch(error => console.error('Error fetching data:', error));
     }, []);
 
-    const _handleAddSize = (newSize: Sizes) => {
-        setData((prevData) => [...prevData, newSize]);
-    }
+    const _handleAddSize = (newSizes: AddSize[]) => {
+        setData((prevData: any) => [...prevData, ...newSizes]);
+    };
 
     const _handleUpdateSize = (updatedSize: Sizes) => {
-        console.log("Updating size:", updatedSize); // Debugging log
         setData(prevData => prevData.map(size => {
             if (size.sizeID === updatedSize.sizeID) {
                 console.log("Size matched for update:", size);
@@ -162,7 +161,6 @@ const ManageSizes: React.FC = () => {
     };
 
     const columns: GridColDef[] = [
-        { field: "sizeID", headerName: "Size ID", flex: 1 },
         { field: "sizeName", headerName: "Size Name", flex: 1 },
         {
             field: "actions",
