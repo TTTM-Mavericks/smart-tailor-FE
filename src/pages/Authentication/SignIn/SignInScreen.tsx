@@ -163,7 +163,7 @@ function SignInScreen() {
             Cookies.set('refreshToken', refreshToken);
             axios.defaults.headers.common.Authorization = `Bearer ${authToken}`;
             localStorage.setItem('userAuth', JSON.stringify(resp.data.user));
-            // Cookies.set('userAuth', JSON.stringify(response.data.user));
+            Cookies.set('userAuth', JSON.stringify(resp.data.user));
 
           }
           setIsloading(true);

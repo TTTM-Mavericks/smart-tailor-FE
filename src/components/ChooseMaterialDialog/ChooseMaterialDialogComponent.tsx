@@ -39,6 +39,7 @@ type Props = {
     model?: ReactElement;
     typeOfModel?: any;
     key?: any;
+    onCreateDesign?: () => void;
 }
 
 const ITEM_HEIGHT = 40;
@@ -76,28 +77,28 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
         height: '35px',
         width: '150px',
         borderRadius: '4px',
-      },
-      '& .MuiOutlinedInput-input': {
+    },
+    '& .MuiOutlinedInput-input': {
         fontSize: '12px',
-      },
-      '& .MuiInputLabel-root': {
+    },
+    '& .MuiInputLabel-root': {
         fontSize: '12px', // Adjust font size of the label
-      },
-      '& .MuiInputLabel-root.Mui-focused': {
-          color: primaryColor, // Label color when focused
-        },
-      '& .MuiOutlinedInput-root': {
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+        color: primaryColor, // Label color when focused
+    },
+    '& .MuiOutlinedInput-root': {
         '& fieldset': {
         },
         '&:hover fieldset': {
-          border: `1.5px solid ${primaryColor}`, // Border color on hover,
-          color: primaryColor
+            border: `1.5px solid ${primaryColor}`, // Border color on hover,
+            color: primaryColor
         },
         '&.Mui-focused fieldset': {
-          border: `1.5px solid ${primaryColor}`, // Border color when focused
+            border: `1.5px solid ${primaryColor}`, // Border color when focused
         },
-      },
-    }));
+    },
+}));
 
 const stylesInputField = {
     input1: {
@@ -189,7 +190,7 @@ const productData = [
     },
 ]
 
-const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child, model, typeOfModel, key }) => {
+const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child, model, typeOfModel, key, onCreateDesign }) => {
     // TODO MUTIL LANGUAGE
     // ---------------UseState Variable---------------//
     const [selectedLanguage, setSelectedLanguage] = useState<string>(localStorage.getItem('language') || 'en');
@@ -255,7 +256,10 @@ const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child
 
     const __handleSaveMaterialInformation = () => {
         setIsOpenSaveMaterialDialog(false);
-        __handleClose();
+        if (onCreateDesign) {
+            onCreateDesign();
+        }
+        // __handleClose();
     }
 
 
@@ -424,7 +428,7 @@ const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child
                 <Button onClick={() => __handleOpenMaterialSavingDialog()} style={{ color: primaryColor, padding: '5px 20px 5px 20px' }}  >
                     Cancel
                 </Button>
-                <Button style={{ backgroundColor: redColor, color: whiteColor, padding: '5px 20px 5px 20px' }}>
+                <Button onClick={() => __handleSaveMaterialInformation()} style={{ backgroundColor: redColor, color: whiteColor, padding: '5px 20px 5px 20px' }}>
                     Order
                 </Button>
             </DialogActions>

@@ -37,7 +37,8 @@ export const functionEndpoints = {
     refreshToken: '/refresh-token'
   },
   design: {
-    systemItem: '/systemItem'
+    systemItem: '/systemItem',
+    addNewDesign: '/add-new-design'
   },
   brand: {
     addExcel: '/add-new-brand-material-by-excel-file',
@@ -68,7 +69,9 @@ export const functionEndpoints = {
     updateStatusMaterial: '/update-status-material',
     addNewMaterialByExcelFile: '/add-new-category-material-by-excel-file',
     downloadSampleDataExcelFile: '/generate-sample-category-material-by-excel-file',
-    downloadSampleBrandPriceExcelData: '/export-category-material-for-brand-by-excel'
+    downloadSampleBrandPriceExcelData: '/export-category-material-for-brand-by-excel',
+    getListMaterialByCategoryByID: '/get-list-material-by-category-id',
+    getListMaterialByCategoryByName: '/get-list-material-by-category-name'
   },
   category: {
     addNewCategory: '/add-new-category',

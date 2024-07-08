@@ -19,7 +19,7 @@ import { GiClothes } from "react-icons/gi";
 import { IoMdUndo, IoMdRedo } from "react-icons/io";
 import { TbHomeHeart } from "react-icons/tb";
 import ProductDialogComponent from './Components/Dialog/ProductDialogComponent';
-import api from '../../api/ApiConfig';
+import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../api/ApiConfig';
 import { DesignInterface, ItemMaskInterface, PartOfDesignInterface, PartOfHoodieDesignData, PartOfShirtDesignData } from '../../models/DesignModel';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Skeleton, Slider, Tooltip } from '@mui/material';
 import ItemEditorToolsComponent from './Components/ItemEditorTools/ItemEditorToolsComponent';
@@ -27,6 +27,42 @@ import MaterialDetailComponent from './Components/MaterialDetail/MaterialDetailC
 import { FaCloudUploadAlt, FaRegEdit } from "react-icons/fa";
 import state from '../../store';
 import LoadingComponent from '../../components/Loading/LoadingComponent';
+import { UserInterface } from '../../models/UserModel';
+import Cookies from 'js-cookie';
+import { toast, ToastContainer } from 'react-toastify';
+
+
+interface ItemMask {
+  itemMaskName: string;
+  typeOfItem: string;
+  materialID: string;
+  isSystemItem: boolean;
+  positionX: number;
+  positionY: number;
+  scaleX: number;
+  scaleY: number;
+  indexZ: number;
+  imageUrl: string;
+  printType: string;
+}
+
+interface PartOfDesign {
+  partOfDesignName: string;
+  imageUrl: string;
+  successImageUrl: string;
+  materialID: string;
+  itemMask: ItemMask[];
+}
+
+interface Design {
+  userID: string;
+  expertTailoringID: string;
+  titleDesign: string;
+  publicStatus: boolean;
+  imageUrl: string;
+  color: string;
+  partOfDesign: PartOfDesign[];
+}
 
 
 
@@ -64,6 +100,8 @@ function CustomDesignScreen() {
   const [changeUploadPartOfDesignTool, setChangeUploadPartOfDesignTool] = useState<boolean>(false);
   const [isOpenNotiChangeUpdateImageDesignTool, setIsOpenNotiChangeUpdateImageDesignTool] = useState<boolean>(false);
   const [isLoadingPage, setIsLoadingPage] = useState<boolean>(false);
+  const [userAuth, setUserAuth] = useState<UserInterface>();
+  const [mainDesign, setMainDesign] = useState<DesignInterface>();
 
 
 
@@ -88,6 +126,14 @@ function CustomDesignScreen() {
 
     __handleFetchSystemItemData();
     __handleFetchDesignModelData();
+
+    const userCookie = Cookies.get('userAuth');
+    if (userCookie) {
+      const userParse: UserInterface = JSON.parse(userCookie);
+      setUserAuth(userParse);
+    }
+
+
 
   }, []);
 
@@ -403,6 +449,91 @@ function CustomDesignScreen() {
 
   }
 
+  /**
+   * Change body response
+   * @param itemMasks 
+   * @returns 
+   */
+  const transformItemMasks = (itemMasks: any[]): ItemMask[] => {
+    return itemMasks.map(mask => ({
+      itemMaskName: mask.itemMaskName || "",
+      typeOfItem: mask.typeOfItem || "",
+      materialID: mask.materialID,
+      isSystemItem: mask.isSystemItem || false,
+      positionX: mask.positionX || 0,
+      positionY: mask.positionY || 0,
+      scaleX: mask.scaleX || 1,
+      scaleY: mask.scaleY || 1,
+      indexZ: mask.zIndex || 0,
+      imageUrl: mask.imageUrl || "",
+      printType: mask.printType || "EMBROIDER"
+    }));
+  };
+
+  /**
+   * Change body response
+   * @param parts 
+   * @returns 
+   */
+  const transformPartOfDesign = (parts: PartOfDesignInterface[]): PartOfDesign[] => {
+    return parts.map(part => ({
+      partOfDesignName: part.partOfDesignName || "",
+      imageUrl: part.imageUrl || "",
+      successImageUrl: part.successImageUrl || "",
+      materialID: part.materialID,
+      itemMask: transformItemMasks(part.itemMasks || [])
+    }));
+  };
+
+
+
+  /**
+   * Get Design data after choose material
+   * @param item 
+   */
+  const __handleGetMaterialInformation = (item: PartOfDesignInterface[]) => {
+    const bodyRequest: Design = {
+      userID: userAuth?.userID || '',
+      expertTailoringID: "52a3f999-66dd-44c3-b3e6-7a9989bc3b17",
+      titleDesign: "test TitleDesign",
+      publicStatus: true,
+      imageUrl: transformPartOfDesign(item)[1].successImageUrl,
+      color: "BLACK",
+      partOfDesign: transformPartOfDesign(item)
+    };
+
+    console.log('main screen: ', bodyRequest);
+    setMainDesign(bodyRequest);
+  }
+
+  /**
+  * Handle Create design
+  * @param item 
+  */
+  const __handleCreateDesign = async () => {
+    if (!mainDesign) return;
+    try {
+      const response = await api.post(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.addNewDesign}`, mainDesign);
+      if (response.status === 200) {
+        console.log('response.message: ', response.message);
+        toast.success(`${response.message}`, { autoClose: 4000 });
+
+      } else {
+        toast.error(`${response.message}`, { autoClose: 4000 });
+        console.log('response.message: ', response.message);
+
+        return;
+      }
+    } catch (error) {
+      toast.error(`${error}`, { autoClose: 4000 });
+      console.log('error: ', error);
+
+      return;
+    }
+
+
+  }
+
   return (
     <div className={styles.customDesign__container}>
 
@@ -453,7 +584,7 @@ function CustomDesignScreen() {
           {partOfClothData?.map((item: PartOfDesignInterface, key: any) => (
             <Tooltip key={key} title={item.partOfDesignName} placement="bottom" arrow style={{ marginTop: -10 }}>
               <div key={key} className={styles.partOfClothSellector} style={selectedItem === item.partOfDesignName ? { border: `2px solid ${primaryColor}` } : {}} onClick={() => __handleSetSelectedItem(item)}>
-                <img src={item.imgUrl} className={styles.partOfClothSellector__img}></img>
+                <img src={item.imageUrl} className={styles.partOfClothSellector__img}></img>
               </div>
             </Tooltip>
           ))}
@@ -760,9 +891,9 @@ function CustomDesignScreen() {
 
                   {/* Sample Item list area */}
 
-                  <div className={styles.customDesign__container__editorArea__itemSelector__itemGroup__modelProductList}>
+                  {/* <div className={styles.customDesign__container__editorArea__itemSelector__itemGroup__modelProductList}>
                     <MaterialDetailComponent primaryKey={2468} partOfDesigndata={partOfClothData}></MaterialDetailComponent>
-                  </div>
+                  </div> */}
                 </>
               )}
             </div>
@@ -779,18 +910,24 @@ function CustomDesignScreen() {
         <ItemEditorToolsComponent itemIdSelected={itemIdToChangeRotate} onValueChange={setAngle}></ItemEditorToolsComponent>
       </div>
 
+
+      {/* DIALOG */}
+
+      {/* Choose Material Dialog */}
       <ChooseMaterialDialogComponent
         typeOfModel={typeOfModel}
         isOpen={isOpenMaterialDialog}
         onClose={() => __handleCloseMaterialDialog()}
         child={(
-          <MaterialDetailComponent primaryKey={'DIALOG'} partOfDesigndata={partOfClothData}></MaterialDetailComponent>
+          <MaterialDetailComponent primaryKey={'DIALOG'} partOfDesigndata={partOfClothData} onGetMaterial={(item) => __handleGetMaterialInformation(item)}></MaterialDetailComponent>
         )}
         model={(
           <CanvasModel typeOfModel={typeOfModel} isDefault={true} is3D={true} />
         )}
+        onCreateDesign={__handleCreateDesign}
       ></ChooseMaterialDialogComponent>
 
+      {/* Update design tool Dialog */}
       <Dialog open={isOpenNotiChangeUpdateImageDesignTool} style={{ position: 'absolute', top: 0 }}>
         <DialogTitle>Warning</DialogTitle>
         <DialogContent>
@@ -807,6 +944,9 @@ function CustomDesignScreen() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <ToastContainer></ToastContainer>
+
     </div >
   )
 }
