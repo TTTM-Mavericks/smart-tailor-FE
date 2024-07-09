@@ -38,7 +38,8 @@ export const functionEndpoints = {
   },
   design: {
     systemItem: '/systemItem',
-    addNewDesign: '/add-new-design'
+    addNewDesign: '/add-new-design',
+    getDesignByID : '/get-design-by-id'
   },
   brand: {
     addExcel: '/add-new-brand-material-by-excel-file',

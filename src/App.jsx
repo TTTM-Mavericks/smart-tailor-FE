@@ -194,7 +194,7 @@ function App() {
           {/* Order Detail Route */}
           <Route path='/order_detail' element={<OrderDetailScreen></OrderDetailScreen>} />
           <Route path='/order_history' element={<OrderHistory></OrderHistory>} />
-          <Route path='/order' element={<OrderProductScreen></OrderProductScreen>} />
+          <Route path='/design_detail/:id' element={<OrderProductScreen></OrderProductScreen>} />
 
 
           {/* Manager dashboard route */}

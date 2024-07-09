@@ -5,7 +5,7 @@ import Designer from './Designer/Designer'
 import ImageEditor from './Designer/ImageEditor'
 import styles from './CustomDesign.module.scss';
 import ImageDraggableComponent from './Components/Draggable/ImageDraggableComponent';
-import { __downloadCanvasToImage, __handleChangeImageToBase64, __handleGenerateItemId, reader } from '../../utils/DesignerUtils';
+import { __downloadCanvasToImage, __getDownloadCanvasToImage, __handleChangeImageToBase64, __handleGenerateItemId, reader, } from '../../utils/DesignerUtils';
 import { ChooseMaterialDialogComponent, ColorPicker, FilePicker, TextEditor } from '../../components';
 import { shirtFrontDesign } from '../../assets';
 import { shirtModel, systemLogo } from '../../assets';
@@ -20,7 +20,7 @@ import { IoMdUndo, IoMdRedo } from "react-icons/io";
 import { TbHomeHeart } from "react-icons/tb";
 import ProductDialogComponent from './Components/Dialog/ProductDialogComponent';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../api/ApiConfig';
-import { DesignInterface, ItemMaskInterface, PartOfDesignInterface, PartOfHoodieDesignData, PartOfShirtDesignData } from '../../models/DesignModel';
+import { DesignInterface, ItemMaskInterface, MaterialInterface, PartOfDesignInterface, PartOfHoodieDesignData, PartOfShirtDesignData } from '../../models/DesignModel';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Skeleton, Slider, Tooltip } from '@mui/material';
 import ItemEditorToolsComponent from './Components/ItemEditorTools/ItemEditorToolsComponent';
 import MaterialDetailComponent from './Components/MaterialDetail/MaterialDetailComponent';
@@ -30,6 +30,7 @@ import LoadingComponent from '../../components/Loading/LoadingComponent';
 import { UserInterface } from '../../models/UserModel';
 import Cookies from 'js-cookie';
 import { toast, ToastContainer } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 
 interface ItemMask {
@@ -102,6 +103,7 @@ function CustomDesignScreen() {
   const [isLoadingPage, setIsLoadingPage] = useState<boolean>(false);
   const [userAuth, setUserAuth] = useState<UserInterface>();
   const [mainDesign, setMainDesign] = useState<DesignInterface>();
+  const [usedMaterial, setUsedMaterial] = useState<MaterialInterface[]>();
 
 
 
@@ -109,7 +111,7 @@ function CustomDesignScreen() {
 
   // ---------------Usable Variable---------------//
   const { t, i18n } = useTranslation();
-
+  const navigate = useNavigate();
   const __handleUpdatePart = useCallback((updatePart: any) => {
     console.log('Received updatePart from child: ', updatePart);
     setUpdatePartData(updatePart);
@@ -479,7 +481,7 @@ function CustomDesignScreen() {
     return parts.map(part => ({
       partOfDesignName: part.partOfDesignName || "",
       imageUrl: part.imageUrl || "",
-      successImageUrl: part.successImageUrl || "",
+      successImageUrl: __getDownloadCanvasToImage() || "",
       materialID: part.materialID,
       itemMask: transformItemMasks(part.itemMasks || [])
     }));
@@ -494,7 +496,7 @@ function CustomDesignScreen() {
   const __handleGetMaterialInformation = (item: PartOfDesignInterface[]) => {
     const bodyRequest: Design = {
       userID: userAuth?.userID || '',
-      expertTailoringID: "52a3f999-66dd-44c3-b3e6-7a9989bc3b17",
+      expertTailoringID: "06a5bb35-2e5c-4944-875f-0717b113eaba",
       titleDesign: "test TitleDesign",
       publicStatus: true,
       imageUrl: transformPartOfDesign(item)[1].successImageUrl,
@@ -502,7 +504,9 @@ function CustomDesignScreen() {
       partOfDesign: transformPartOfDesign(item)
     };
 
-    console.log('main screen: ', bodyRequest);
+    console.log('main screen: ', transformPartOfDesign(item)[1].successImageUrl);
+
+
     setMainDesign(bodyRequest);
   }
 
@@ -511,22 +515,28 @@ function CustomDesignScreen() {
   * @param item 
   */
   const __handleCreateDesign = async () => {
+
     if (!mainDesign) return;
+    setIsLoadingPage(true);
     try {
       const response = await api.post(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.addNewDesign}`, mainDesign);
       if (response.status === 200) {
-        console.log('response.message: ', response.message);
         toast.success(`${response.message}`, { autoClose: 4000 });
+        setIsLoadingPage(false);
+        setTimeout(() => {
+          navigate(`/design_detail/${response.data.designID}`);
+        }, 3000)
 
       } else {
         toast.error(`${response.message}`, { autoClose: 4000 });
-        console.log('response.message: ', response.message);
-
+        setIsLoadingPage(false);
         return;
       }
     } catch (error) {
       toast.error(`${error}`, { autoClose: 4000 });
       console.log('error: ', error);
+      setIsLoadingPage(false);
+
 
       return;
     }

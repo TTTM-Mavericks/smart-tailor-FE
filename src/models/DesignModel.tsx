@@ -6,7 +6,7 @@ import { UserInterface } from "./UserModel";
 export interface MaterialCategoryInterface {
   categoryID: string,
   categoryName: string,
-  createDate: string, 
+  createDate: string,
   lastModifiedDate: string
 }
 export interface ItemMaskInterface {
@@ -58,7 +58,8 @@ export interface DesignInterface {
   typeOfDesign?: string;
   imageUrl?: string;
   color?: string;
-  expertTailoringID?: string
+  expertTailoringID?: string;
+  expertTailoring?: ExpertTailoringInterface;
 
 }
 
@@ -81,6 +82,16 @@ export interface MaterialInterface {
   createDate: string;
   lastModifiedDate: string | null;
 }
+
+export interface ExpertTailoringInterface {
+  expertTailoringID: string; // UUID can be represented as a string in TypeScript
+  expertTailoringName: string;
+  sizeImageUrl: string;
+  status: boolean;
+  createDate: string; // LocalDateTime can be represented as a string in ISO format
+  lastModifiedDate: string; // LocalDateTime can be represented as a string in ISO format
+}
+
 
 
 
