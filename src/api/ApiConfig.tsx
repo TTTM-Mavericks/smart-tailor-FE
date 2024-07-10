@@ -17,12 +17,15 @@ export const versionEndpoints = {
 export const featuresEndpoints = {
   auth: '/auth',
   design: 'design',
+  designDetail: '/design-detail',
   brand_material: '/brand-material',
   customer: '/customer',
   admin: '/admin',
   material: '/material',
   category: '/category',
-  manager: '/expert-tailoring'
+  manager: '/expert-tailoring',
+  order: '/order',
+  sizeExpertTailoring:'/size-expert-tailoring'
 }
 export const functionEndpoints = {
   auth: {
@@ -40,6 +43,9 @@ export const functionEndpoints = {
     systemItem: '/systemItem',
     addNewDesign: '/add-new-design',
     getDesignByID : '/get-design-by-id'
+  },
+  designDetail : {
+    addNewDesignDetail: '/add-new-design-detail'
   },
   brand: {
     addExcel: '/add-new-brand-material-by-excel-file',
@@ -79,6 +85,12 @@ export const functionEndpoints = {
     updateCategory: '/update-category',
     getCategoryById: '/get-category-by-id',
     getAllCategory: '/get-all-category'
+  },
+  order: {
+    createOrder: '/create-order'
+  },
+  sizeExpertTailoring: {
+    getAllSizeExpertTailoringByExperId:'/get-all-size-by-expert-tailoring-id'
   }
 }
 

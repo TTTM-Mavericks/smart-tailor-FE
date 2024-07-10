@@ -192,7 +192,7 @@ function App() {
           <Route path='/product' element={<FilterProductScreen></FilterProductScreen>} />
 
           {/* Order Detail Route */}
-          <Route path='/order_detail' element={<OrderDetailScreen></OrderDetailScreen>} />
+          <Route path='/order_detail/:id' element={<OrderDetailScreen></OrderDetailScreen>} />
           <Route path='/order_history' element={<OrderHistory></OrderHistory>} />
           <Route path='/design_detail/:id' element={<OrderProductScreen></OrderProductScreen>} />
 

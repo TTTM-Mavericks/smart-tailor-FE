@@ -154,7 +154,6 @@ function CustomDesignScreen() {
   }, [selectedLanguage]);
 
   useEffect(() => {
-    console.log('selectedPartOfCloth: ', partOfClothData);
     setSelectedPartOfCloth(selectedPartOfCloth);
     const result = partOfClothData?.find((item: PartOfDesignInterface) => item.partOfDesignName === selectedPartOfCloth.partOfDesignName);
     if (result) {
@@ -172,9 +171,11 @@ function CustomDesignScreen() {
     setPartOfClothData(partOfClothData);
   }, [partOfClothData])
 
+
   useEffect(() => {
     if (typeOfModel === 'shirtModel') {
       setPartOfClothData(PartOfShirtDesignData);
+    // __handleGetDesignDatabyId()
       setSelectedPartOfCloth(PartOfShirtDesignData[0]);
     }
 
@@ -203,6 +204,32 @@ function CustomDesignScreen() {
     setSelectedStamp(selectedStamp);
   }, [selectedStamp])
   // ---------------FunctionHandler---------------//
+
+  //+++++ FETCH API +++++//
+
+  /**
+   * Handle get design by ID
+   * @returns 
+   */
+  const __handleGetDesignDatabyId = async () => {
+    setIsLoadingPage(true);
+    try {
+      const response = await api.get(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.getDesignByID}/15962d3e-8fde-49fc-b061-6c02b14efa80`);
+      if (response.status === 200) {
+        setPartOfClothData(response.data.partOfDesign);
+        setSelectedPartOfCloth(response.data.partOfDesign[0]);
+      }
+      else {
+        toast.error(`${response.message}`, { autoClose: 4000 });
+        setIsLoadingPage(false);
+        return;
+      }
+    } catch (error) {
+      toast.error(`${error}`, { autoClose: 4000 });
+      console.log('error: ', error);
+      setIsLoadingPage(false);
+    }
+  }
 
   const __handleSetNewPartOfDesignData = (items: PartOfDesignInterface[] | undefined) => {
     setNewPartOfDeignData(items);
@@ -487,8 +514,6 @@ function CustomDesignScreen() {
     }));
   };
 
-
-
   /**
    * Get Design data after choose material
    * @param item 
@@ -496,7 +521,7 @@ function CustomDesignScreen() {
   const __handleGetMaterialInformation = (item: PartOfDesignInterface[]) => {
     const bodyRequest: Design = {
       userID: userAuth?.userID || '',
-      expertTailoringID: "06a5bb35-2e5c-4944-875f-0717b113eaba",
+      expertTailoringID: "9bf4d809-afb0-4ca1-9a8a-ca8e95284d13",
       titleDesign: "test TitleDesign",
       publicStatus: true,
       imageUrl: transformPartOfDesign(item)[1].successImageUrl,

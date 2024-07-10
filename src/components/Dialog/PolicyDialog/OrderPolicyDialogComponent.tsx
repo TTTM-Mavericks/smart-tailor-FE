@@ -135,7 +135,7 @@ const OrderPolicyDialogComponent: React.FC<OrderPolicyDialogProps> = ({ isOpen, 
                             backgroundColor: isChecked ? primaryColor : whiteColor
                         }
                     }
-                    onClick={__handleButtonClick}
+                    onClick={onOrderProduct}
                     disabled={!isChecked}
                 >
                     Confirm

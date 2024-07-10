@@ -93,6 +93,19 @@ export interface ExpertTailoringInterface {
 }
 
 
+export interface ExpertTailoringSizeInterface {
+  expertTailoringID: string;
+  expertTailoringName: string;
+  sizeID: string;
+  sizeName: string;
+  minFabric: number;
+  maxFabric: number;
+  unit: string;
+  createDate: string;
+  lastModifiedDate: string | null;
+}
+
+
 
 
 export const PartOfShirtDesignData: PartOfDesignInterface[] = [
