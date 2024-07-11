@@ -46,4 +46,28 @@ export interface OrderInterface {
     payment?: PaymentInterface[];
 }
 
+export interface OrderDetailInterface {
+    discountResponse: any | null;
+    district: string;
+    estimatedDeliveryDate: string | null;
+    expectedProductCompletionDate: string | null;
+    expectedStartDate: string | null;
+    orderID: string;
+    orderStatus: string;
+    orderType: string;
+    parentOrderID: string | null;
+    phone: string | null;
+    productionCompletionDate: string | null;
+    productionStartDate: string | null;
+    province: string;
+    quantity: number;
+    totalPrice: number | null;
+    ward: string;
+    address: string;
+    brandResponse: any | null;
+    buyerName: string | null;
+    designResponse: DesignInterface
+}
+
+
 

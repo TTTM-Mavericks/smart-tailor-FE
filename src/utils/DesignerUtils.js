@@ -5,10 +5,18 @@ const __downloadCanvasToImage = () => {
 
   link.href = dataURL;
   link.download = "canvas.png";
-  console.log(link);
+  console.log(dataURL);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+};
+
+const __getDownloadCanvasToImage = () => {
+  const canvas = document.querySelector("canvas");
+  const dataURL = canvas.toDataURL();
+  const link = document.createElement("a");
+
+  return dataURL
 };
 
 const reader = (file) =>
@@ -71,4 +79,10 @@ const __handleGenerateItemId = () => {
 };
 
 
-export { __downloadCanvasToImage, reader, __urlToBase64, __handleChangeImageToBase64, __handleGenerateItemId };
+export {
+  __downloadCanvasToImage,
+  reader, __urlToBase64,
+  __handleChangeImageToBase64,
+  __handleGenerateItemId,
+  __getDownloadCanvasToImage
+};

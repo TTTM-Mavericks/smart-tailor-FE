@@ -13,9 +13,15 @@ import { RiBodyScanLine } from "react-icons/ri";
 import SizeDialogComponent from '../../../components/Dialog/SizeDialog/SizeDialogComponent';
 import { useTranslation } from 'react-i18next';
 import OrderPolicyDialogComponent from '../../../components/Dialog/PolicyDialog/OrderPolicyDialogComponent';
+import { useNavigate, useParams } from 'react-router-dom';
+import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
+import { DesignInterface, ExpertTailoringSizeInterface } from '../../../models/DesignModel';
+import { toast, ToastContainer } from 'react-toastify';
+import LoadingComponent from '../../../components/Loading/LoadingComponent';
 
 
 interface SizeQuantity {
+    sizeID?: any;
     size?: string;
     quantity: number;
     width?: number;
@@ -23,10 +29,64 @@ interface SizeQuantity {
     ring1?: number;
     ring2?: number;
     ring3?: number;
+    expertTailoringID?: string;
+    expertTailoringName?: string;
+    sizeName?: string;
+    minFabric?: number;
+    maxFabric?: number;
+    unit?: string;
+    createDate?: string;
+    lastModifiedDate?: null;
 }
 
 
-const sizes = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+// const sizes = [
+//     {
+//         "expertTailoringID": "ef21c4fc-3fad-4e01-8c90-21a50c285406",
+//         "expertTailoringName": "shirtModel",
+//         "sizeID": "0f32c620-4a05-4479-822f-b66c639ccc98",
+//         "sizeName": "S",
+//         "minFabric": 1.5,
+//         "maxFabric": 2,
+//         "unit": "meters",
+//         "createDate": "2024-07-10 12:31:31",
+//         "lastModifiedDate": null
+//     },
+//     {
+//         "expertTailoringID": "ef21c4fc-3fad-4e01-8c90-21a50c285406",
+//         "expertTailoringName": "shirtModel",
+//         "sizeID": "446646cc-9091-433a-a428-3c465930adf5",
+//         "sizeName": "M",
+//         "minFabric": 1.5,
+//         "maxFabric": 2,
+//         "unit": "meters",
+//         "createDate": "2024-07-10 12:31:35",
+//         "lastModifiedDate": null
+//     },
+//     {
+//         "expertTailoringID": "ef21c4fc-3fad-4e01-8c90-21a50c285406",
+//         "expertTailoringName": "shirtModel",
+//         "sizeID": "a1022ebd-91af-4e2f-b231-11dd09edc3e4",
+//         "sizeName": "XL",
+//         "minFabric": 1.5,
+//         "maxFabric": 2,
+//         "unit": "meters",
+//         "createDate": "2024-07-10 12:31:02",
+//         "lastModifiedDate": null
+//     },
+//     {
+//         "expertTailoringID": "ef21c4fc-3fad-4e01-8c90-21a50c285406",
+//         "expertTailoringName": "shirtModel",
+//         "sizeID": "da685126-fdaf-4147-9fda-94c72d7796cf",
+//         "sizeName": "L",
+//         "minFabric": 1.5,
+//         "maxFabric": 2,
+//         "unit": "meters",
+//         "createDate": "2024-07-10 12:31:11",
+//         "lastModifiedDate": null
+//     }
+// ];
+
 
 const CustomTextField = styled(TextField)(({ theme }) => ({
     '& .MuiInputBase-root': {
@@ -34,15 +94,19 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
         width: '140px',
         borderRadius: '4px',
         outline: 'none',
+        paddingTop: '-100px'
     },
     '& .MuiOutlinedInput-input': {
         fontSize: '12px',
     },
     '& .MuiInputLabel-root': {
         fontSize: '12px', // Adjust font size of the label
+        marginTop: '-10px'
     },
     '& .MuiInputLabel-root.Mui-focused': {
         color: primaryColor, // Label color when focused
+        marginTop: '0px'
+
     },
     '& .MuiOutlinedInput-root': {
         '& fieldset': {
@@ -124,7 +188,7 @@ const OrderProductScreen = () => {
     // TODO MULTI LANGUAGE\
     // ---------------UseState Variable---------------//
     const [isChangeAddressDialogOpen, setIsChangeAddressDialogOpen] = useState<boolean>(false);
-    const [sizeQuantities, setSizeQuantities] = useState<SizeQuantity[]>([{ size: 'L', quantity: 1 }]);
+    const [sizeQuantities, setSizeQuantities] = useState<SizeQuantity[]>([{ size: 'L', quantity: 1, sizeID: 'dsfsdfds' }]);
     const [sizeQuantitiesCustom, setSizeQuantitiesCustom] = useState<SizeQuantity[]>([{ quantity: 1, height: 0, ring1: 0, ring2: 0, ring3: 0, width: 0 }]);
     const [inputMode, setInputMode] = useState<'predefined' | 'custom'>('predefined');
     const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
@@ -133,6 +197,9 @@ const OrderProductScreen = () => {
     const [isOpenSizeDialog, setIsOpenSizeDialog] = useState<boolean>(false);
     const [selectedAddress, setSelectedAddress] = useState<any>();
     const [isOpenOrderPolicyDialog, setIsOpenOrderPolicyDialog] = useState<boolean>(false);
+    const [designData, setDesignData] = useState<DesignInterface>();
+    const [isLoadingPage, setIsLoadingPage] = useState<boolean>(false);
+    const [sizes, setSizes] = useState<ExpertTailoringSizeInterface[]>();
 
 
 
@@ -140,6 +207,8 @@ const OrderProductScreen = () => {
     // Get language in local storage
     const selectedLanguage = localStorage.getItem('language');
     const codeLanguage = selectedLanguage?.toUpperCase();
+    const { id } = useParams();
+    const navigate = useNavigate()
 
     // Using i18n
     const { t, i18n } = useTranslation();
@@ -151,13 +220,143 @@ const OrderProductScreen = () => {
     // ---------------UseEffect---------------//
 
     useEffect(() => {
-        console.log(sizeQuantities);
+        __handleFetchDesignDetailData();
+    }, [id])
+
+    useEffect(() => {
+
     }, [sizeQuantities])
 
     useEffect(() => {
         console.log(sizeQuantitiesCustom);
     }, [sizeQuantitiesCustom])
     // ---------------FunctionHandler---------------//
+
+    //+++++ API +++++//
+
+    /**
+     * Handle fetch data to get design information
+     */
+    const __handleFetchDesignDetailData = async () => {
+        setIsLoadingPage(true);
+        try {
+            const response = await api.get(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.getDesignByID}/${id}`);
+            if (response.status === 200) {
+                setDesignData(response.data);
+                __handleGetExpertTailoringSize(response.data.expertTailoring.expertTailoringID)
+            }
+            else {
+                toast.error(`${response.message}`, { autoClose: 4000 });
+                setIsLoadingPage(false);
+                return;
+            }
+        } catch (error) {
+            toast.error(`${error}`, { autoClose: 4000 });
+            console.log('error: ', error);
+            setIsLoadingPage(false);
+        }
+    }
+
+    /**
+     * Handle fetch expert tailoring size
+     */
+    const __handleGetExpertTailoringSize = async (expertId: any) => {
+        setIsLoadingPage(true);
+        try {
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.sizeExpertTailoring + functionEndpoints.sizeExpertTailoring.getAllSizeExpertTailoringByExperId}/${expertId}`);
+            if (response.status === 200) {
+                console.log('size: ', response);
+                setSizes(response.data)
+            }
+            else {
+                return;
+            }
+        } catch (error) {
+            console.log('error: ', error);
+        }
+    }
+
+    /**
+     * Handle fetch data to get design information
+     */
+    const __handlePostSizeAndQuatity = async () => {
+        setIsLoadingPage(true);
+        try {
+            const sizeList = sizeQuantities
+                .map(({ quantity, sizeID }) => {
+                    if (sizeID) {
+                        return { quantity, sizeID };
+                    }
+                    return null; // Return null for invalid sizeID
+                })
+                .filter(item => item !== null); // Filter out null items
+
+
+            const bodyRequest = {
+                designId: designData?.designID,
+                sizeList: sizeList,
+                // address: selectedAddress.address,
+                // province: selectedAddress.province,
+                // district: selectedAddress.district,
+                // ward: selectedAddress.ward,
+                // phone: selectedAddress.phoneNumber,
+                // buyerName: selectedAddress.fullName,
+            }
+            console.log('bodyRequest: ', bodyRequest);
+            const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.designDetail + functionEndpoints.designDetail.addNewDesignDetail}`, bodyRequest);
+            if (response.status === 200) {
+                // await __handleCreateOrder();
+                toast.success(`${response.message}`, { autoClose: 4000 });
+                setTimeout(() => {
+                    navigate(`/order_detail/${response.data.orderID}`);
+                }, 1000);
+            }
+            else {
+                setIsLoadingPage(false);
+                console.log(`${response.message}`);
+                return;
+            }
+        } catch (error) {
+            console.log('error: ', error);
+            setIsLoadingPage(false);
+        }
+    }
+
+    /**
+     * Handle fetch data to get design information
+     */
+    // const __handleCreateOrder = async () => {
+    //     try {
+    //         const totalQuantity = sizeQuantities.reduce((sum, item) => sum + item.quantity, 0);
+
+    //         const bodyRequest = {
+    //             designID: designData?.designID,
+    //             quantity: totalQuantity,
+    //             orderType: 'ORDER',
+    //             address: selectedAddress.address,
+    //             province: selectedAddress.province,
+    //             district: selectedAddress.district,
+    //             ward: selectedAddress.ward,
+    //             phone: selectedAddress.phoneNumber,
+    //             buyerName: selectedAddress.fullName,
+    //         }
+    //         console.log(bodyRequest);
+    //         const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.createOrder}`, bodyRequest);
+    //         if (response.status === 200) {
+    //             navigate(`/order_detail/${response.data.orderID}`);
+    //         }
+    //         else {
+    //             console.log(`${response.message}`);
+    //             setIsLoadingPage(false);
+    //             return;
+    //         }
+    //     } catch (error) {
+    //         console.log('error: ', error);
+    //         setIsLoadingPage(false);
+    //     }
+    // }
+
+    //+++++ Function +++++//
 
     /**
      * Open dialog address
@@ -172,7 +371,7 @@ const OrderProductScreen = () => {
      * Add more size and quantity
      */
     const __handleAddSizeQuantity = () => {
-        setSizeQuantities([...sizeQuantities, { size: 'L', quantity: 1 }]);
+        setSizeQuantities([...sizeQuantities, { size: '', quantity: 1 }]);
         setSizeQuantitiesCustom([...sizeQuantitiesCustom, { quantity: 1, height: 0, ring1: 0, ring2: 0, ring3: 0, width: 0 }])
     };
 
@@ -190,11 +389,12 @@ const OrderProductScreen = () => {
      * @param index 
      * @param newSize 
      */
-    const __handleSizeChange = (index: number, newSize: string) => {
+    const __handleSizeChange = (index: number, newSizeID: string, nameSize: string) => {
+        if (!newSizeID || !nameSize) return;
         const updatedSizeQuantities = [...sizeQuantities];
-        updatedSizeQuantities[index].size = newSize;
+        updatedSizeQuantities[index] = { ...updatedSizeQuantities[index], sizeID: newSizeID, size: nameSize };
         setSizeQuantities(updatedSizeQuantities);
-        setSizeQuantitiesCustom(updatedSizeQuantities)
+        setSizeQuantitiesCustom(updatedSizeQuantities);
     };
 
     /**
@@ -276,6 +476,7 @@ const OrderProductScreen = () => {
     return (
         <div className={`${style.orderProduct__container}`}>
             <HeaderComponent></HeaderComponent>
+
             <div>
                 <div className="py-0 md:px-6 2xl:px-20 2xl:container 2xl:mx-auto">
                     <div className="mt-2 flex flex-col xl:flex-row jusitfy-center items-stretch w-full xl:space-x-8 space-y-4 md:space-y-6 xl:space-y-0">
@@ -286,9 +487,8 @@ const OrderProductScreen = () => {
                                 <SizeDialogComponent data='shirtModel' isOpen={isOpenSizeDialog} onClose={__handleCloseSizeDilog}></SizeDialogComponent>
                             </div>
                             <div className="flex justify-start items-start bg-gray-50 light:bg-gray-800 px-4 md:py-6 md:p-6 xl:pl-8 xl:pt-0 w-full">
-                                <div className="pb-4 mr-10 md:pb-8 w-full md:w-40">
-                                    <img className="w-full hidden md:block" src="https://i.ibb.co/84qQR4p/Rectangle-10.png" alt="dress" />
-                                    <img className="w-full md:hidden" src="https://i.ibb.co/L039qbN/Rectangle-10.png" alt="dress" />
+                                <div className="mr-10 w-full md:w-40" style={{ width: 250, height: 260, marginTop: -50 }}>
+                                    <img className="w-full h-full" src={designData?.imageUrl} alt="dress" />
                                 </div>
                                 <div className="mt-4 md:mt-6 flex flex-col md:flex-row justify-start  items-start md:items-center md:space-x-6 xl:space-x-8 w-full">
                                     <div className="border-b border-gray-200 md:flex-row flex-col flex justify-between items-start w-full pb-8 space-y-4 md:space-y-0" >
@@ -296,13 +496,12 @@ const OrderProductScreen = () => {
                                             <div style={{ display: 'flex', width: '100%' }}>
                                                 <div style={{ width: '100%' }}>
                                                     <div style={{ width: '100%' }} className="flex pb-5 justify-between space-x-8 items-start w-full">
-                                                        <h3 className="text-md light:text-white xl:text-1xl font-semibold leading-6 text-gray-800">Premium Quaility Dress</h3>
+                                                        <h3 className="text-md light:text-white xl:text-1xl font-semibold leading-6 text-gray-800">{designData?.titleDesign}</h3>
                                                     </div>
                                                     <div className={`${style.orderProduct__container__content}`}>
                                                         <div className={`${style.orderProduct__container__information}`}>
-                                                            <p className="text-sm light:text-white leading-none text-gray-800"><span className="light:text-gray-400 text-gray-300">Style: </span> Italic Minimal Design</p>
-                                                            <p className="text-sm light:text-white leading-none text-gray-800"><span className="light:text-gray-400 text-gray-300">Size: </span> Small</p>
-                                                            <p className="text-sm light:text-white leading-none text-gray-800"><span className="light:text-gray-400 text-gray-300">Color: </span> Light Blue</p>
+                                                            <p className="text-sm light:text-white leading-none text-gray-800"><span className="light:text-gray-400 text-gray-300">Exper tailoring: </span> {designData?.expertTailoring?.expertTailoringName}</p>
+                                                            <p className="text-sm light:text-white leading-none text-gray-800"><span className="light:text-gray-400 text-gray-300">Color: </span> {designData?.color}</p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -333,32 +532,43 @@ const OrderProductScreen = () => {
 
                                                     {inputMode === 'predefined' ? (
                                                         <div>
-                                                            {sizeQuantities.map((sq, index) => (
-                                                                <div key={index} style={{ display: 'flex', margin: 10 }}>
-                                                                    <Grid item>
-                                                                        <Autocomplete
-                                                                            options={sizes}
-                                                                            value={sq.size}
-                                                                            onChange={(event, newValue) => newValue && __handleSizeChange(index, newValue)}
-                                                                            renderInput={(params) => <CustomTextField {...params} label="Size" variant="outlined" />}
-                                                                        />
-                                                                    </Grid>
-                                                                    <Grid className={`${style.orderProduct__container__detail__sizeDetail__quantity}`} item>
-                                                                        <CustomTextFieldQuantity
-                                                                            fullWidth
-                                                                            type="number"
-                                                                            label="Quantity"
-                                                                            value={sq.quantity}
-                                                                            onChange={(e) => __handleQuantityChange(index, Number(e.target.value))}
-                                                                            inputProps={{ min: 1 }}
-                                                                            style={{ marginLeft: 20, marginRight: 10 }}
+                                                            {sizeQuantities.map((sq, index) => {
+                                                                const selectedSize = sizes?.find(size => size.sizeID === sq.sizeID) || null;
 
-                                                                        />
-                                                                        <FaMinusCircle size={25} color={primaryColor} onClick={() => __handleRemoveSizeQuantity(index)} style={{ display: sizeQuantities.length === 1 ? 'none' : 'flex', cursor: 'pointer' }}>
-                                                                        </FaMinusCircle>
-                                                                    </Grid>
-                                                                </div>
-                                                            ))}
+                                                                // Filter out selected sizes
+                                                                const filteredSizes = sizes ? sizes.filter(size => !sizeQuantities.some(sq => sq.sizeID === size.sizeID)) : [];
+
+                                                                return (
+                                                                    <div key={index} style={{ display: 'flex', margin: 10 }}>
+                                                                        <Grid item>
+                                                                            <Autocomplete
+                                                                                options={filteredSizes}
+                                                                                getOptionLabel={(option) => option.sizeName}
+                                                                                value={selectedSize}
+                                                                                onChange={(event, newValue) => {
+                                                                                    if (newValue) {
+                                                                                        __handleSizeChange(index, newValue.sizeID, newValue.sizeName);
+                                                                                    }
+                                                                                }}
+                                                                                renderInput={(params) => <CustomTextField {...params} label="Size" variant="outlined" sx={{ paddingTop: -20 }} />}
+                                                                            />
+                                                                        </Grid>
+                                                                        <Grid className={`${style.orderProduct__container__detail__sizeDetail__quantity}`} item>
+                                                                            <CustomTextFieldQuantity
+                                                                                fullWidth
+                                                                                type="number"
+                                                                                label="Quantity"
+                                                                                value={sq.quantity}
+                                                                                onChange={(e) => __handleQuantityChange(index, Number(e.target.value))}
+                                                                                inputProps={{ min: 1 }}
+                                                                                style={{ marginLeft: 20, marginRight: 10 }}
+                                                                            />
+                                                                            <FaMinusCircle size={25} color={primaryColor} onClick={() => __handleRemoveSizeQuantity(index)} style={{ display: sizeQuantities.length === 1 ? 'none' : 'flex', cursor: 'pointer' }}>
+                                                                            </FaMinusCircle>
+                                                                        </Grid>
+                                                                    </div>
+                                                                );
+                                                            })}
 
                                                         </div>
                                                     ) : (
@@ -531,19 +741,19 @@ const OrderProductScreen = () => {
 
                                     </div> */}
                                     <div style={{ display: 'flex' }} className='border-b border-gray-200 w-full'>
-                                        <div className="flex justify-center text-gray-800 light:text-white md:justify-start items-center space-x-4 py-4  w-full" style={{width: '100%'}}>
+                                        <div className="flex justify-center text-gray-800 light:text-white md:justify-start items-center space-x-4 py-4  w-full" style={{ width: '100%' }}>
                                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
                                                 <path d="M4 20c0-2.21 1.79-4 4-4h8c2.21 0 4 1.79 4 4" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
                                             </svg>
-                                            <p className="cursor-pointer leading-5 " style={{fontSize: 13}}>{selectedAddress?.fullName}</p>
+                                            <p className="cursor-pointer leading-5 " style={{ fontSize: 13 }}>{selectedAddress?.fullName}</p>
                                         </div>
-                                        <div className="flex justify-center text-gray-800 light:text-white md:justify-start items-center space-x-4 py-4  w-full" style={{width: '50%'}}>
+                                        <div className="flex justify-center text-gray-800 light:text-white md:justify-start items-center space-x-4 py-4  w-full" style={{ width: '50%' }}>
                                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <path d="M22 16.92V20a2 2 0 01-2.18 2A19.81 19.81 0 013 4.18 2 2 0 015 2h3.09a2 2 0 012 1.72 12.66 12.66 0 00.64 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006.41 6.41l1.27-1.27a2 2 0 012.11-.45 12.66 12.66 0 002.81.64 2 2 0 011.72 2.01z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
                                             </svg>
 
-                                            <p className="cursor-pointer text-xs leading-5 " style={{fontSize: 13}}>{selectedAddress?.phoneNumber}</p>
+                                            <p className="cursor-pointer text-xs leading-5 " style={{ fontSize: 13 }}>{selectedAddress?.phoneNumber}</p>
                                         </div>
                                     </div>
                                     <div className="flex justify-center text-gray-800 light:text-white md:justify-start items-center space-x-4 py-4 border-b border-gray-200 w-full">
@@ -551,17 +761,17 @@ const OrderProductScreen = () => {
                                             <path d="M19 5H5C3.89543 5 3 5.89543 3 7V17C3 18.1046 3.89543 19 5 19H19C20.1046 19 21 18.1046 21 17V7C21 5.89543 20.1046 5 19 5Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
                                             <path d="M3 7L12 13L21 7" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
                                         </svg>
-                                        <p className="cursor-pointer text-xs leading-5 " style={{fontSize: 13}}>{selectedAddress?.email}</p>
+                                        <p className="cursor-pointer text-xs leading-5 " style={{ fontSize: 13 }}>{selectedAddress?.email}</p>
                                     </div>
                                 </div>
-                                <div className="flex justify-between xl:h-full items-stretch w-full flex-col mt-0 sm:mt-0" style={{marginTop: -15}}>
+                                <div className="flex justify-between xl:h-full items-stretch w-full flex-col mt-0 sm:mt-0" style={{ marginTop: -15 }}>
                                     <div className="flex justify-center md:justify-start xl:flex-col flex-col md:space-x-6 lg:space-x-8 xl:space-x-0 space-y-4 xl:space-y-12 md:space-y-0 md:flex-row items-center md:items-start">
                                         <div className="flex justify-center md:justify-start items-center md:items-start  flex-col space-y-4 xl:mt-8 w-full">
                                             <p className="text-base light:text-white font-semibold leading-4 text-center md:text-left text-gray-800">Shipping Address</p>
-                                            <p className="w-full light:text-gray-300 text-center md:text-left  text-sm leading-5 text-gray-600" style={{fontSize: 13}}>{selectedAddress?.address}, {selectedAddress?.ward}, {selectedAddress?.district}, {selectedAddress?.province} </p>
+                                            <p className="w-full light:text-gray-300 text-center md:text-left  text-sm leading-5 text-gray-600" style={{ fontSize: 13 }}>{selectedAddress?.address}, {selectedAddress?.ward}, {selectedAddress?.district}, {selectedAddress?.province} </p>
                                         </div>
 
-                                        <div className=" w-full justify-center items-center md:justify-start md:items-start" style={{marginTop: 15}}>
+                                        <div className=" w-full justify-center items-center md:justify-start md:items-start" style={{ marginTop: 15 }}>
                                             {/* <button  className="mt-6 md:mt-0 light:border-white light:hover:bg-gray-900 light:bg-transparent light:text-white py-5 hover:bg-gray-200 focus:outline-none  focus:ring-gray-800 border border-gray-800  w-96 2xl:w-full text-base font-medium leading-4 text-gray-800"> */}
                                             <button
                                                 type="submit"
@@ -577,14 +787,12 @@ const OrderProductScreen = () => {
                                                 style={{ backgroundColor: primaryColor, borderRadius: 4, margin: '0 auto', color: whiteColor, width: '100%' }}
                                                 onClick={() => setIsOpenOrderPolicyDialog(true)}
                                             >
-                                                <span>Deposit</span>
+                                                <span>Order</span>
                                             </button>
-                                            <OrderPolicyDialogComponent onClose={__handleCloseOrderPolicyDilog} isOpen={isOpenOrderPolicyDialog} ></OrderPolicyDialogComponent>
                                         </div>
                                         {/* <button  className="mt-6 md:mt-0 light:border-white light:hover:bg-gray-900 light:bg-transparent light:text-white py-5 hover:bg-gray-200 focus:outline-none  focus:ring-gray-800 border border-gray-800  w-96 2xl:w-full text-base font-medium leading-4 text-gray-800"> */}
 
                                     </div>
-                                    <ChangeAddressDialogComponent onSelectedAddressData={(address) => __handleGetSelectedAdress(address)} isOpen={isChangeAddressDialogOpen} onClose={() => __handleOpenChangeAddressDialog(false)}></ChangeAddressDialogComponent>
                                 </div>
                             </div>
 
@@ -593,6 +801,12 @@ const OrderProductScreen = () => {
                 </div>
             </div>
             <FooterComponent></FooterComponent>
+
+            {/* DIALOG */}
+            <OrderPolicyDialogComponent onClose={__handleCloseOrderPolicyDilog} isOpen={isOpenOrderPolicyDialog} onOrderProduct={__handlePostSizeAndQuatity}></OrderPolicyDialogComponent>
+            <ChangeAddressDialogComponent onSelectedAddressData={(address) => __handleGetSelectedAdress(address)} isOpen={isChangeAddressDialogOpen} onClose={() => __handleOpenChangeAddressDialog(false)}></ChangeAddressDialogComponent>
+            <ToastContainer></ToastContainer>
+
         </div >
     );
 };
