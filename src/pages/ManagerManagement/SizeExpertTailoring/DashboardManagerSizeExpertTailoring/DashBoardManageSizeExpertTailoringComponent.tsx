@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import Sidebar from '../../GlobalComponent/SideBarComponent/SideBarComponent';
 import Navbar from '../../GlobalComponent/NavBarComponent/NavbarComponent';
-import ManageExpertTailoring from '../ManagerExpertTailoringManagement/ManagerManageScreen/ManageExpertTailoringScreens';
+import ManageExpertTailoring from '../ManagerSizeExpertTailoringManagement/ManagerManageScreen/ManageExpertTailoringScreens';
 import ManageBrand from '../../ManageBrand/ManagerBrandManagement/ManagerManageBrandScreen/ManageBrandScreens';
 import ManageTask from '../../ManageTask/ManagerTaskManagement/ManagerManageTaskScreen/ManageTaskScreens';
 import ManageEmployee from '../../ManageEmployee/ManagerEmployeeManagement/ManagerManageEmployeeScreen/ManageEmployeeScreens';
 import ManageCustomer from '../../ManageCustomer/ManageCustomerManagement/ManagerManageCustomerScreen/ManageCustomerScreens';
-import ManageSizeExpertTailoring from '../../SizeExpertTailoring/ManagerSizeExpertTailoringManagement/ManagerManageScreen/ManageExpertTailoringScreens';
 
 const DashboardManagerMangeExpertTailoring = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -71,8 +70,6 @@ const DashboardManagerMangeExpertTailoring = () => {
 
     const renderComponent = () => {
         switch (activeMenu) {
-            case 'size_expert_tailoring':
-                return <ManageSizeExpertTailoring />;
             case 'manager_manage_brand':
                 return <ManageBrand />;
             case 'manager_manage_task':

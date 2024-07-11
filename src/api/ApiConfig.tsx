@@ -113,7 +113,12 @@ export const functionEndpoints = {
     getOrderById: '/get-order-by-id'
   },
   sizeExpertTailoring: {
-    getAllSizeExpertTailoringByExperId: '/get-all-size-by-expert-tailoring-id'
+    getAllSizeExpertTailoringByExperId: '/get-all-size-by-expert-tailoring-id',
+    getAllSizeExpertTailoring: '/get-all-size-expert-tailoring',
+    generateSizeExpertTailoringSample: '/generate-sample-size-expert-tailoring-by-excel-file',
+    addNewSizeExpertTailoring: '/add-new-size-expert-tailoring',
+    addNewSizeExpertTailoringByExcel: '/add-new-size-expert-tailoring-by-excel-file',
+    updateSizeExpertTailoring: '/update-size-expert-tailoring',
   },
   expertTailoring: {
     getAllExpertTailoring: '/get-all-expert-tailoring',
