@@ -294,8 +294,15 @@ const OrderProductScreen = () => {
 
             const bodyRequest = {
                 designId: designData?.designID,
-                sizeList: sizeList
+                sizeList: sizeList,
+                // address: selectedAddress.address,
+                // province: selectedAddress.province,
+                // district: selectedAddress.district,
+                // ward: selectedAddress.ward,
+                // phone: selectedAddress.phoneNumber,
+                // buyerName: selectedAddress.fullName,
             }
+            console.log('bodyRequest: ', bodyRequest);
             const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.designDetail + functionEndpoints.designDetail.addNewDesignDetail}`, bodyRequest);
             if (response.status === 200) {
                 // await __handleCreateOrder();

@@ -9,6 +9,9 @@ import { greenColor, primaryColor, redColor } from '../../../root/ColorSystem';
 import VerticalLinearStepperComponent from '../Components/ProgressBar/VerticalStepperComponent';
 import style from './OrderDetailStyles.module.scss'
 import CancelOrderPolicyDialogComponent from '../../../components/Dialog/PolicyDialog/CancelOrderPolicyDialogComponent';
+import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
+import { useNavigate, useParams } from 'react-router-dom';
+import { OrderDetailInterface, OrderInterface } from '../../../models/OrderModel';
 
 const OrderDetailScreen: React.FC = () => {
     // TODO MUTIL LANGUAGE
@@ -49,6 +52,13 @@ const OrderDetailScreen: React.FC = () => {
 
     const [showScrollButton, setShowScrollButton] = useState<boolean>(false);
     const [isOpenCancelOrderPolicyDialog, setIsOpenCancelOrderPolicyDialog] = useState<boolean>(false);
+    const [isLoadingPage, setIsLoadingPage] = useState<boolean>(false);
+    const [orderDetail, setOrderDetail] = useState<OrderDetailInterface>();
+
+
+
+    const { id } = useParams();
+    const navigate = useNavigate();
 
 
     // ---------------UseEffect---------------//
@@ -70,9 +80,38 @@ const OrderDetailScreen: React.FC = () => {
         return () => {
             window.removeEventListener('scroll', handleScroll);
         };
+
+
     }, []);
 
+    useEffect(() => {
+        __handleGetExpertTailoringSize();
+    }, [])
+
     // ---------------FunctionHandler---------------//
+
+    //+++++ API +++++//
+    /**
+     * Handle get order detail data
+     */
+    const __handleGetExpertTailoringSize = async () => {
+        setIsLoadingPage(true);
+        try {
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderById}/${id}`);
+            if (response.status === 200) {
+                console.log('detail order: ', response.data);
+                setOrderDetail(response.data);
+            }
+            else {
+                console.log('detail order: ', response.message);
+
+                navigate('/error404');
+            }
+        } catch (error) {
+            console.log('error: ', error);
+            navigate('/error404');
+        }
+    }
 
 
     /**
@@ -141,15 +180,19 @@ const OrderDetailScreen: React.FC = () => {
                     </div>
                     <div className="border-b pb-4 mb-6">
                         <p className="text-sm text-gray-700">
-                            <span className="font-normal text-gray-600">{t(codeLanguage + '000193')}:</span> <span style={{ fontWeight: "bolder" }}>{orderDetails.orderNumber}</span> &middot; {orderDetails.date}
+                            <span style={{ fontWeight: "bolder" }}>#{orderDetail?.orderID}</span>
+                        </p>
+                        <p className="text-sm text-gray-700">
+                            <span style={{ fontWeight: "normal" }}>{orderDetail?.expectedStartDate}</span>
                         </p>
                     </div>
                     <div className="flex flex-col md:flex-row items-start mb-6">
-                        <img src='https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg' alt={orderDetails.items[0].name} className="w-40 h-50 object-cover rounded-md shadow-md mb-4 md:mb-0" />
+                        <img src={orderDetail?.designResponse.imageUrl} alt={orderDetail?.designResponse.imageUrl} className="w-40 h-50 object-cover rounded-md shadow-md mb-4 md:mb-0" />
                         <div className="md:ml-6">
-                            <h2 className="text-1xl font-semibold text-gray-900">{orderDetails.items[0].name}</h2>
-                            <p className="text-sm text-gray-700">{orderDetails.items[0].price}</p>
-                            <p className="text-sm text-gray-600 mb-4">{orderDetails.items[0].description}</p>
+                            <h2 className="text-1xl font-semibold text-gray-900">{orderDetail?.designResponse.titleDesign}</h2>
+                            <p className="text-sm text-gray-700">{orderDetail?.totalPrice}</p>
+                            <p className="text-sm text-gray-600 mb-1 mt-1 w-full"><span style={{ fontWeight: "normal" }}>Expert tailoring: </span>{orderDetail?.designResponse.expertTailoring?.expertTailoringName}</p>
+                            <p className="text-sm text-gray-600 mb-1 mt-1 w-full"><span style={{ fontWeight: "normal" }}>Quantity: </span>{orderDetail?.quantity}</p>
                             <div className="flex flex-col md:flex-row md:space-x-10 mt-4">
                                 <div className="md:w-1/2">
                                     <p className="font-medium text-gray-600">{t(codeLanguage + '000194')}</p>
@@ -160,6 +203,11 @@ const OrderDetailScreen: React.FC = () => {
                                     <p className="text-sm text-gray-600">{orderDetails.shippingUpdates.email}</p>
                                     <p className="text-sm text-gray-600">{orderDetails.shippingUpdates.phone}</p>
                                     <a href="#" className="text-indigo-600 hover:text-indigo-800 transition duration-200">Edit</a>
+                                </div>
+                            </div>
+                            <div className="flex flex-col md:flex-row md:space-x-10 mt-4">
+                                <div className="md:w-1/2">
+                                    <div className={style.orderDetail__orderStatus__tag}>{orderDetail?.orderStatus}</div>
                                 </div>
                             </div>
                         </div>

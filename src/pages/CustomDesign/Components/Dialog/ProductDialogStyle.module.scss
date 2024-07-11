@@ -42,10 +42,10 @@
             }
         }
 
-        .searchBar{
+        .searchBar {
             width: 50%;
-            
-            input{
+
+            input {
                 outline: none
             }
         }
@@ -72,32 +72,33 @@
     &__filter__container {
         width: 20%;
         height: 100%;
-        // border-right: 2px solid $grayColor;
         overflow-y: auto;
         display: inline-block;
         flex-wrap: wrap;
         display: flex;
-    }
+        
+        &::-webkit-scrollbar {
+            width: 5px;
+            height: 12px;
+        }
     
-    &__filter__containert::-webkit-scrollbar {
-        width: 5px;
-        height: 12px;
+        &::-webkit-scrollbar-track {
+            background: #f7f7f7;
+            border-radius: 10px;
+        }
+    
+        &::-webkit-scrollbar-thumb {
+            background: $grayColor;
+            border-radius: 10px;
+        }
+    
+        &::-webkit-scrollbar-thumb:hover {
+            background: #888787;
+            /* Color when hovering over the scrollbar thumb */
+        }
     }
 
-    &__filter__containert::-webkit-scrollbar-track {
-        background: #55151577;
-        border-radius: 10px;
-    }
 
-    &__filter__containert::-webkit-scrollbar-thumb {
-        background: $grayColor;
-        border-radius: 10px;
-    }
-
-    &__filter__containert::-webkit-scrollbar-thumb:hover {
-        background: #888787;
-        /* Color when hovering over the scrollbar thumb */
-    }
 
     &__result__list {
         width: calc(80% - 2px);
@@ -128,4 +129,10 @@
     &__result__list::-webkit-scrollbar-thumb:hover {
         background: #888787;
     }
+}
+
+.active {
+    border-bottom: 2px solid $primaryColor;
+    border-radius: none;
+    /* or border-bottom: 2px solid; */
 }

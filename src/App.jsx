@@ -207,6 +207,7 @@ function App() {
 
 
           <Route path='*' element={<Screen404 />} />
+          <Route path='error404' element={<Screen404 />} />
         </Routes>
       </BrowserRouter>
     </div>

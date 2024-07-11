@@ -175,7 +175,7 @@ function CustomDesignScreen() {
   useEffect(() => {
     if (typeOfModel === 'shirtModel') {
       setPartOfClothData(PartOfShirtDesignData);
-    // __handleGetDesignDatabyId()
+      // __handleGetDesignDatabyId()
       setSelectedPartOfCloth(PartOfShirtDesignData[0]);
     }
 
@@ -521,7 +521,7 @@ function CustomDesignScreen() {
   const __handleGetMaterialInformation = (item: PartOfDesignInterface[]) => {
     const bodyRequest: Design = {
       userID: userAuth?.userID || '',
-      expertTailoringID: "9bf4d809-afb0-4ca1-9a8a-ca8e95284d13",
+      expertTailoringID: "92a889fc-2f33-4cc1-9a76-1144b8636e25",
       titleDesign: "test TitleDesign",
       publicStatus: true,
       imageUrl: transformPartOfDesign(item)[1].successImageUrl,
@@ -576,7 +576,43 @@ function CustomDesignScreen() {
       <LoadingComponent isLoading={isLoadingPage}></LoadingComponent>
 
       {/* Dialog area */}
+
+      {/* Prouct list dialog */}
       <ProductDialogComponent onItemSelect={__handleItemSelect} isOpen={isOpenProductDialog} onClose={() => __handleCloseDialog()} />
+
+      {/* Choose Material Dialog */}
+      <ChooseMaterialDialogComponent
+        typeOfModel={typeOfModel}
+        isOpen={isOpenMaterialDialog}
+        onClose={() => __handleCloseMaterialDialog()}
+        child={(
+          <MaterialDetailComponent primaryKey={'DIALOG'} partOfDesigndata={partOfClothData} onGetMaterial={(item) => __handleGetMaterialInformation(item)}></MaterialDetailComponent>
+        )}
+        model={(
+          <CanvasModel typeOfModel={typeOfModel} isDefault={true} is3D={true} />
+        )}
+        onCreateDesign={__handleCreateDesign}
+      ></ChooseMaterialDialogComponent>
+
+      {/* Update design tool Dialog */}
+      <Dialog open={isOpenNotiChangeUpdateImageDesignTool} style={{ position: 'absolute', top: 0 }}>
+        <DialogTitle>Warning</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Your design will be lost. Do you want to continue?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsOpenNotiChangeUpdateImageDesignTool(false)} style={{ color: primaryColor }}  >
+            No
+          </Button>
+          <Button onClick={() => __handleChangeUploadPartOfDesignTool(!changeUploadPartOfDesignTool)} style={{ backgroundColor: redColor, color: whiteColor }}>
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <ToastContainer></ToastContainer>
 
       {/* Header */}
       <div className={styles.customDesign__container__header}>
@@ -949,38 +985,7 @@ function CustomDesignScreen() {
       {/* DIALOG */}
 
       {/* Choose Material Dialog */}
-      <ChooseMaterialDialogComponent
-        typeOfModel={typeOfModel}
-        isOpen={isOpenMaterialDialog}
-        onClose={() => __handleCloseMaterialDialog()}
-        child={(
-          <MaterialDetailComponent primaryKey={'DIALOG'} partOfDesigndata={partOfClothData} onGetMaterial={(item) => __handleGetMaterialInformation(item)}></MaterialDetailComponent>
-        )}
-        model={(
-          <CanvasModel typeOfModel={typeOfModel} isDefault={true} is3D={true} />
-        )}
-        onCreateDesign={__handleCreateDesign}
-      ></ChooseMaterialDialogComponent>
 
-      {/* Update design tool Dialog */}
-      <Dialog open={isOpenNotiChangeUpdateImageDesignTool} style={{ position: 'absolute', top: 0 }}>
-        <DialogTitle>Warning</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Your design will be lost. Do you want to continue?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setIsOpenNotiChangeUpdateImageDesignTool(false)} style={{ color: primaryColor }}  >
-            No
-          </Button>
-          <Button onClick={() => __handleChangeUploadPartOfDesignTool(!changeUploadPartOfDesignTool)} style={{ backgroundColor: redColor, color: whiteColor }}>
-            Yes
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <ToastContainer></ToastContainer>
 
     </div >
   )

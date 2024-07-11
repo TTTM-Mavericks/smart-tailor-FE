@@ -84,12 +84,13 @@ export interface MaterialInterface {
 }
 
 export interface ExpertTailoringInterface {
-  expertTailoringID: string; // UUID can be represented as a string in TypeScript
+  expertTailoringID: string;
   expertTailoringName: string;
   sizeImageUrl: string;
   status: boolean;
-  createDate: string; // LocalDateTime can be represented as a string in ISO format
-  lastModifiedDate: string; // LocalDateTime can be represented as a string in ISO format
+  createDate: string; 
+  lastModifiedDate: string;
+  modelImageUrl: string;
 }
 
 
