@@ -480,9 +480,9 @@ const ImageDraggableComponent: React.FC<props> = ({
         <>
 
             {partOfCloth ? (
-                <div className={styles.imageDraggable__boundary} style={{ backgroundImage: partOfCloth?.imgUrl }}>
+                <div className={styles.imageDraggable__boundary} style={{ backgroundImage: partOfCloth?.imageUrl }}>
                     <div className={styles.imageDraggable__img}>
-                        <img src={partOfCloth.imgUrl} className={styles.imageDraggable__img} ></img>
+                        <img src={partOfCloth.imageUrl} className={styles.imageDraggable__img} ></img>
                         {resizableItems}
                         <Menu
                             open={contextMenu !== null}

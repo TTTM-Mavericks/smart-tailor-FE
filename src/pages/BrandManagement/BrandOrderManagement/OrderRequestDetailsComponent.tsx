@@ -168,7 +168,7 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order }) =>
                     <div className="p-6 mb-6 shadow-md rounded-lg">
                         <Grid container spacing={4}>
                             <Grid item xs={12} sm={2}>
-                                <img src={order.design.imgUrl} alt="Design Image" style={{ width: 170, height: 210, borderRadius: 5 }} />
+                                <img src={order.design.imageUrl} alt="Design Image" style={{ width: 170, height: 210, borderRadius: 5 }} />
                             </Grid>
                             <Grid item xs={12} sm={7} >
                                 <Typography variant="body2" className={`${style.orderRequest__typoraphy}`}><strong>Order ID:</strong> {order.orderID}</Typography>
@@ -249,11 +249,11 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order }) =>
 
                         {/* Part of Designs */}
                         <Typography variant="h6" style={{fontSize: 15, fontWeight: 'bold', padding: 10}}>Part of Designs</Typography>
-                        {order.design.partOfDesigns && order.design.partOfDesigns.map((part) => (
+                        {order.design.partOfDesign && order.design.partOfDesign.map((part) => (
                             <Grid container key={part.partOfDesignID} className="mb-6 p-4 bg-white rounded shadow-md">
                                 <Grid item xs={12} sm={1}>
                                     <IconButton onClick={() => handleOpenDialog(part)}>
-                                        <img src={part.imgUrl} alt="Part Image" style={{ width: 50, height: 70 }} />
+                                        <img src={part.imageUrl} alt="Part Image" style={{ width: 50, height: 70 }} />
                                     </IconButton>
                                 </Grid>
                                 <Grid item xs={12} sm={10} className=" justify-between items-center">

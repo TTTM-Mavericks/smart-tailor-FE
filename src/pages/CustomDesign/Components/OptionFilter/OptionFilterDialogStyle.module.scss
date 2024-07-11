@@ -1,0 +1,22 @@
+@import '../../../../index.module.scss';
+.filter__container{
+    &::-webkit-scrollbar {
+        width: 5px;
+        height: 12px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #55151577;
+        border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: $grayColor;
+        border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: #888787;
+        /* Color when hovering over the scrollbar thumb */
+    }
+}

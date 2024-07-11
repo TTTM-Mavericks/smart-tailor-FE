@@ -2,6 +2,13 @@ import { shirtBackDesign, shirtFrontDesign } from "../assets";
 import { BACK_CLOTH_PART, FRONT_CLOTH_PART, LOGO_PART, SLEEVE_CLOTH_PART } from "./ClothModel";
 import { UserInterface } from "./UserModel";
 
+
+export interface MaterialCategoryInterface {
+  categoryID: string,
+  categoryName: string,
+  createDate: string,
+  lastModifiedDate: string
+}
 export interface ItemMaskInterface {
   itemMaskID: any;
   partOfDesignID?: any;
@@ -32,7 +39,7 @@ export interface PartOfDesignInterface {
   partOfDesignName?: any;
   createDate?: string;
   lastModifiedDate?: string;
-  imgUrl?: string;
+  imageUrl?: string;
   successImageUrl?: string;
   itemMasks?: ItemMaskInterface[];
   materialID?: any;
@@ -47,10 +54,13 @@ export interface DesignInterface {
   publicStatus?: boolean;
   createDate?: string;
   lastModifiedDate?: string;
-  partOfDesigns?: PartOfDesignInterface[];
+  partOfDesign?: PartOfDesignInterface[];
   typeOfDesign?: string;
-  imgUrl?: string;
+  imageUrl?: string;
   color?: string;
+  expertTailoringID?: string;
+  expertTailoring?: ExpertTailoringInterface;
+
 }
 
 export interface ItemMaterialInterface {
@@ -73,19 +83,42 @@ export interface MaterialInterface {
   lastModifiedDate: string | null;
 }
 
+export interface ExpertTailoringInterface {
+  expertTailoringID: string;
+  expertTailoringName: string;
+  sizeImageUrl: string;
+  status: boolean;
+  createDate: string; 
+  lastModifiedDate: string;
+  modelImageUrl: string;
+}
 
 
-export const PartOfShirtDesignData = [
+export interface ExpertTailoringSizeInterface {
+  expertTailoringID: string;
+  expertTailoringName: string;
+  sizeID: string;
+  sizeName: string;
+  minFabric: number;
+  maxFabric: number;
+  unit: string;
+  createDate: string;
+  lastModifiedDate: string | null;
+}
+
+
+
+
+export const PartOfShirtDesignData: PartOfDesignInterface[] = [
   {
     partOfDesignID: '1',
     designID: '1',
     partOfDesignName: LOGO_PART,
     createDate: '',
     lastModifiedDate: '',
-    imgUrl: shirtFrontDesign,
+    imageUrl: shirtFrontDesign,
     successImageUrl: '',
     itemMasks: [],
-    rotate: 0,
 
   },
   {
@@ -94,9 +127,8 @@ export const PartOfShirtDesignData = [
     partOfDesignName: FRONT_CLOTH_PART,
     createDate: '',
     lastModifiedDate: '',
-    imgUrl: shirtFrontDesign,
+    imageUrl: shirtFrontDesign,
     itemMasks: [],
-    rotate: 0,
   },
   {
     partOfDesignID: '3',
@@ -104,9 +136,8 @@ export const PartOfShirtDesignData = [
     partOfDesignName: BACK_CLOTH_PART,
     createDate: '',
     lastModifiedDate: '',
-    imgUrl: shirtBackDesign,
+    imageUrl: shirtBackDesign,
     itemMasks: [],
-    rotate: 0,
   },
   {
     partOfDesignID: '4',
@@ -114,9 +145,8 @@ export const PartOfShirtDesignData = [
     partOfDesignName: SLEEVE_CLOTH_PART,
     createDate: '',
     lastModifiedDate: '',
-    imgUrl: shirtFrontDesign,
+    imageUrl: shirtFrontDesign,
     itemMasks: [],
-    rotate: 0,
   },
 
 ]

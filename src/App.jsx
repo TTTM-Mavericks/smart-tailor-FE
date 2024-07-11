@@ -192,9 +192,9 @@ function App() {
           <Route path='/product' element={<FilterProductScreen></FilterProductScreen>} />
 
           {/* Order Detail Route */}
-          <Route path='/order_detail' element={<OrderDetailScreen></OrderDetailScreen>} />
+          <Route path='/order_detail/:id' element={<OrderDetailScreen></OrderDetailScreen>} />
           <Route path='/order_history' element={<OrderHistory></OrderHistory>} />
-          <Route path='/order' element={<OrderProductScreen></OrderProductScreen>} />
+          <Route path='/design_detail/:id' element={<OrderProductScreen></OrderProductScreen>} />
 
 
           {/* Manager dashboard route */}
@@ -207,6 +207,7 @@ function App() {
 
 
           <Route path='*' element={<Screen404 />} />
+          <Route path='error404' element={<Screen404 />} />
         </Routes>
       </BrowserRouter>
     </div>

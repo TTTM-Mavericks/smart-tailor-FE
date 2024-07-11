@@ -17,12 +17,16 @@ export const versionEndpoints = {
 export const featuresEndpoints = {
   auth: '/auth',
   design: 'design',
+  designDetail: '/design-detail',
   brand_material: '/brand-material',
   customer: '/customer',
   admin: '/admin',
   material: '/material',
   category: '/category',
-  manager: '/expert-tailoring'
+  manager: '/expert-tailoring',
+  order: '/order',
+  sizeExpertTailoring: '/size-expert-tailoring',
+  expertTailoring: '/expert-tailoring',
 }
 export const functionEndpoints = {
   auth: {
@@ -37,7 +41,13 @@ export const functionEndpoints = {
     refreshToken: '/refresh-token'
   },
   design: {
-    systemItem: '/systemItem'
+    systemItem: '/systemItem',
+    addNewDesign: '/add-new-design',
+    getDesignByID: '/get-design-by-id',
+    getAllDesign: '/get-all-design'
+  },
+  designDetail: {
+    addNewDesignDetail: '/add-new-design-detail'
   },
   brand: {
     addExcel: '/add-new-brand-material-by-excel-file',
@@ -68,13 +78,25 @@ export const functionEndpoints = {
     updateStatusMaterial: '/update-status-material',
     addNewMaterialByExcelFile: '/add-new-category-material-by-excel-file',
     downloadSampleDataExcelFile: '/generate-sample-category-material-by-excel-file',
-    downloadSampleBrandPriceExcelData: '/export-category-material-for-brand-by-excel'
+    downloadSampleBrandPriceExcelData: '/export-category-material-for-brand-by-excel',
+    getListMaterialByCategoryByID: '/get-list-material-by-category-id',
+    getListMaterialByCategoryByName: '/get-list-material-by-category-name'
   },
   category: {
     addNewCategory: '/add-new-category',
     updateCategory: '/update-category',
     getCategoryById: '/get-category-by-id',
     getAllCategory: '/get-all-category'
+  },
+  order: {
+    createOrder: '/create-order',
+    getOrderById: '/get-order-by-id'
+  },
+  sizeExpertTailoring: {
+    getAllSizeExpertTailoringByExperId: '/get-all-size-by-expert-tailoring-id'
+  },
+  expertTailoring: {
+    getAllExpertTailoring: '/get-all-expert-tailoring',
   }
 }
 
