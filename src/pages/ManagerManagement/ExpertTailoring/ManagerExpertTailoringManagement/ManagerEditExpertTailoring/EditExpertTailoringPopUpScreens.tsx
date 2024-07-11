@@ -193,10 +193,10 @@ const EditExpertTailoringPopUpScreens: React.FC<EditExpertTailoringPopUpScreenFo
             if (response.status === 200) {
                 Swal.fire({
                     icon: 'success',
-                    title: 'Add New Expertailoring',
-                    text: 'Your expert tailoring have been add!',
+                    title: 'Updated Expert Tailoring Success!',
+                    text: 'Expert tailoring have been Updated!',
                 });
-                updateExpertTailoring(response.data.data)
+                updateExpertTailoring({ ...addNewExpertTailorings, expertTailoringID: fid.expertTailoringID })
                 editClose()
             } else {
                 throw new Error('Update failed');
@@ -204,8 +204,8 @@ const EditExpertTailoringPopUpScreens: React.FC<EditExpertTailoringPopUpScreenFo
         } catch (error) {
             Swal.fire({
                 icon: 'error',
-                title: 'Add Failed',
-                text: 'There was an error adding new expert tailoring. Please try again later.',
+                title: 'Updated Expert Tailoring Failed!',
+                text: 'Expert tailoring have been Updated!',
             });
             editClose()
         }
@@ -217,7 +217,7 @@ const EditExpertTailoringPopUpScreens: React.FC<EditExpertTailoringPopUpScreenFo
                 <div className="relative w-full p-8 bg-white rounded-xl z-10">
                     <div className="text-center relative">
                         <Typography variant="h6" align="center" gutterBottom>
-                            {t(codeLanguage + '000051')}
+                            Add New Expert Tailoring
                         </Typography>
                         <p className="mt-1 text-xs text-gray-400">Add a new expert tailoring below</p>
                         <IconButton style={{ position: 'absolute', top: '10px', right: '10px' }} onClick={editClose}>
@@ -279,19 +279,11 @@ const EditExpertTailoringPopUpScreens: React.FC<EditExpertTailoringPopUpScreenFo
                         <p className="text-xs text-gray-300">
                             <span style={{ color: 'red', fontWeight: "bolder" }}>File type: Images</span>
                         </p>
-                        {/* <Button
-                            type="submit"
-                            className="my-4 w-full flex justify-center bg-blue-500 text-gray-100 p-3 rounded-full tracking-wide font-semibold focus:outline-none focus:shadow-outline hover:bg-blue-600 shadow-lg cursor-pointer transition ease-in duration-300"
-                            onClick={_handleAdd}
-                            style={{ backgroundColor: '#EC6208', color: 'white' }}
-                        >
-                            Upload
-                        </Button> */}
                     </form>
                 </div>
             </div>
-            <div style={{ textAlign: "center", alignItems: "center", marginTop: "3rem" }}>
-                <Button onClick={_handleSubmit} style={{ backgroundColor: "#5858FA", width: "60%", borderRadius: "8px", color: "#FFFFFF" }}>{t(codeLanguage + '000060')}</Button>
+            <div style={{ textAlign: "center", alignItems: "center", marginTop: 0, bottom: 0 }}>
+                <Button onClick={_handleSubmit} style={{ backgroundColor: "#E96208", width: "78%", borderRadius: "8px", color: "#FFFFFF" }}>{t(codeLanguage + '000060')}</Button>
                 <Button onClick={editClose} style={{ borderRadius: "8px", border: "1px solid black", color: "black", marginLeft: "1rem" }}>{t(codeLanguage + '000055')}</Button>
             </div>
         </Box>

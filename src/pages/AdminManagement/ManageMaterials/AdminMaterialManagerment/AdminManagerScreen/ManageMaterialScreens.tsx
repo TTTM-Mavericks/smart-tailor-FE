@@ -7,14 +7,13 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Swal from "sweetalert2";
 import EditMaterialPopUpScreens from "../AdminEditMaterial/EditMaterialPopUpScreens";
-import { Add } from "@mui/icons-material";
+import { Add, RestoreFromTrashOutlined, RestoreFromTrashSharp, UndoOutlined } from "@mui/icons-material";
 import AddEachMaterialsWithHand from "../../AddEachWithHand/AddEachMaterialWithHandScreens";
 import AddMultipleComponentWithExcel from "../../AddMultipleMaterialWithExcel/AddMultipleMaterialComponent";
 import { useTranslation } from 'react-i18next';
-import { Material } from "../../../../../models/AdminMaterialExcelModel";
+import { AddExcelMaterial, AddMaterial, ExcelData, Material } from "../../../../../models/AdminMaterialExcelModel";
 import axios from "axios";
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
-
 const style = {
     position: 'absolute',
     top: '50%',
@@ -137,9 +136,18 @@ const ManageMaterials: React.FC = () => {
      * 
      * @param newMaterial 
      */
-    const _handleAddMaterial = (newMaterial: Material) => {
-        setData(prevData => [...prevData, newMaterial]);
+    const _handleAddMaterial = (newMaterial: AddMaterial) => {
+        setData((prevData: any) => [...prevData, newMaterial]);
     }
+
+    /**
+ * Add Excel Material to State
+ * @param newMaterial Array of ExcelData objects
+ */
+    const _handleAddExcelMaterial = (newMaterial: AddExcelMaterial[]) => {
+        setData((prevData: any) => [...prevData, ...newMaterial]);
+    };
+
 
     /**
      * 
@@ -205,39 +213,42 @@ const ManageMaterials: React.FC = () => {
     const _hanldeConfirmUpdateStatus = async (id: number) => {
         try {
             const result = await Swal.fire({
-                title: `${t(codeLanguage + '000061')}`,
-                text: `${t(codeLanguage + '000062')}`,
+                title: `Are you sure to update status of material`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: `${t(codeLanguage + '000063')}`,
+                confirmButtonText: `Yes I want to update status!`,
                 cancelButtonText: `${t(codeLanguage + '000055')}`
             });
 
             if (result.isConfirmed) {
                 await _handleUpdateStatus(id.toString()); // Ensure id is converted to string if necessary
                 Swal.fire(
-                    `${t(codeLanguage + '000064')}`,
-                    `${t(codeLanguage + '000065')}`,
+                    `Update status of material success`,
+                    `Material status update success`,
                     'success'
                 );
-
-                // Remove the deleted material from the current data list
-
-                setData(prevData => prevData.map(Material => Material.materialID === id));
+                // Update the deleted material from the current data list
+                setData((prevData: any) =>
+                    prevData.map((materialID: any) =>
+                        materialID.materialID === id
+                            ? { ...materialID, status: !materialID.status }
+                            : materialID
+                    )
+                );
             } else {
                 Swal.fire(
-                    `${t(codeLanguage + '000066')}`,
-                    `${t(codeLanguage + '000067')}`,
+                    `Update status of material fail!`,
+                    `Material status update fail!`,
                     'error'
                 );
             }
         } catch (error: any) {
             console.error('Error:', error);
             Swal.fire(
-                'Error',
-                `${error.message || 'Unknown error'}`,
+                `Update status of material fail!`,
+                `Material status update fail!`,
                 'error'
             );
         }
@@ -289,9 +300,15 @@ const ManageMaterials: React.FC = () => {
                     <IconButton onClick={() => _handleEditClick(params.row.materialID, params.row.categoryName, params.row.materialName, params.row.hsCode, params.row.basePrice, params.row.unit)}>
                         <EditIcon />
                     </IconButton>
-                    <IconButton onClick={() => _hanldeConfirmUpdateStatus(params.row.materialID)}>
-                        <DeleteIcon htmlColor={colors.primary[300]} />
-                    </IconButton>
+                    {params.row.status ? (
+                        <IconButton onClick={() => _hanldeConfirmUpdateStatus(params.row.materialID)}>
+                            <DeleteIcon htmlColor={colors.primary[300]} />
+                        </IconButton>
+                    ) : (
+                        <IconButton onClick={() => _hanldeConfirmUpdateStatus(params.row.materialID)}>
+                            <UndoOutlined htmlColor="green" />
+                        </IconButton>
+                    )}
                 </Box>
             )
         }
@@ -350,9 +367,9 @@ const ManageMaterials: React.FC = () => {
                     endIcon={<Add />}
                     variant="contained"
                     color="primary"
-                    style={{ backgroundColor: `${colors.primary[300]} !important`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
+                    style={{ backgroundColor: `#E96208`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
                 >
-                    {t(codeLanguage + '000048')}
+                    ADD
                 </Button>
                 <Menu
                     id="basic-menu"
@@ -364,7 +381,7 @@ const ManageMaterials: React.FC = () => {
                     }}
                 >
                     <MenuItem >
-                        <div onClick={_handleAddOpen}>{t(codeLanguage + '000049')}</div>
+                        <div onClick={_handleAddOpen}>ADD MANUAL</div>
                         <Modal
                             open={addOpenOrClose}
                             aria-labelledby="modal-modal-title"
@@ -406,7 +423,7 @@ const ManageMaterials: React.FC = () => {
                                 p: 4,
                                 borderRadius: "20px"
                             }}>
-                                <AddMultipleComponentWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddMaterial} />
+                                <AddMultipleComponentWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddExcelMaterial} />
                             </Box>
                         </Modal>
 

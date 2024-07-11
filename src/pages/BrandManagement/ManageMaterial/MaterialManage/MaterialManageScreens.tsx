@@ -10,11 +10,12 @@ import EditIcon from '@mui/icons-material/Edit';
 import Swal from "sweetalert2";
 import EditMaterialPopUpScreens from "./EditMaterial/EditMaterialPopUpScreens";
 import AddEachMaterialWithHand from "../AddEachWithHand/AddEachMaterialWithHandScreens";
-import { AddMaterial, ExcelData } from "../../../../models/BrandMaterialExcelModel";
+import { AddExcelMultiple, AddMaterial, ExcelData } from "../../../../models/BrandMaterialExcelModel";
 import { Material } from "../../../../models/BrandMaterialExcelModel";
 import AddMultipleMaterialWithExcel from "../CRUDMaterialWithExcelTable/AddMultipleInExcelTable/AddMultipleMaterialComponent";
 import { UpdateMaterial } from "../../../../models/BrandMaterialExcelModel";
-const brand_name = "LV"
+import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
+const brand_name = "LA LA LISA BRAND"
 
 // Make Style of popup
 const style = {
@@ -90,7 +91,7 @@ const ManageMaterialComponent: React.FC = () => {
     }, [selectedLanguage, i18n]);
 
     React.useEffect(() => {
-        const apiUrl = 'http://localhost:6969/api/v1/brand-material/get-all-brand-material-by-brand-name?brandName=LA LA LISA BRAND';
+        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_material + functionEndpoints.material.getAllMaterialByBrandName + `?brandName=${brand_name}`}`;
         fetch(apiUrl)
             .then(response => {
                 if (!response.ok) {
@@ -115,29 +116,32 @@ const ManageMaterialComponent: React.FC = () => {
         setData((prevData: any) => [...prevData, newMaterial]);
     }
 
-    const _handleAddMultipleMaterial = (newMaterial: ExcelData) => {
-        setData((prevData: any) => [...prevData, newMaterial]);
+    const _handleAddMultipleMaterial = (newMaterial: AddExcelMultiple[]) => {
+        setData((prevData: any) => [...prevData, ...newMaterial]);
     }
 
 
     // Cập nhật người dùng trong danh sách
     const _handleUpdateMaterial = (updatedMaterial: UpdateMaterial) => {
-        setData(prevData => prevData.map((material: any) => material.id === updatedMaterial.id ? updatedMaterial : material));
+        setData(prevData => prevData.map((material: any) =>
+            material.categoryName === updatedMaterial.categoryName &&
+                material.materialName === updatedMaterial.materialName &&
+                material.hsCode === updatedMaterial.hsCode ? updatedMaterial : material
+        ));
     }
 
     // EDIT 
     const _handleEditClick = (
-        id: number,
-        brandName: string,
         categoryName: string,
         materialName: string,
         hsCode: number,
         unit: string,
         basePrice: number,
-        brandPrice: number) => {
+        brandPrice: number,
+        brandName: string,
+    ) => {
         // Handle edit action
         const materialDataToEdit: UpdateMaterial = {
-            id: id,
             brandName: brandName,
             categoryName: categoryName,
             materialName: materialName,
@@ -146,6 +150,13 @@ const ManageMaterialComponent: React.FC = () => {
             basePrice: basePrice,
             brandPrice: brandPrice
         }
+        console.log('Category Name:', categoryName);
+        console.log('Material Name:', materialName);
+        console.log('HS Code:', hsCode);
+        console.log('Unit:', unit);
+        console.log('Brand Price:', brandPrice);
+        console.log('Base Price:', basePrice);
+        console.log('Brand Name:', brandName);
         setFormId(materialDataToEdit);
         _handleEditOpen();
     };
@@ -216,8 +227,20 @@ const ManageMaterialComponent: React.FC = () => {
             flex: 1,
         },
         {
+            field: "hsCode",
+            headerName: "HS Code",
+            flex: 1,
+        },
+        {
+            field: "basePrice",
+            headerName: "Base Price",
+            type: "number",
+            headerAlign: "left",
+            align: "left",
+        },
+        {
             field: "brandPrice",
-            headerName: "Price",
+            headerName: "Brand Price",
             type: "number",
             headerAlign: "left",
             align: "left",
@@ -228,23 +251,18 @@ const ManageMaterialComponent: React.FC = () => {
             flex: 1,
         },
         {
-            field: "brandName",
-            headerName: "Brand Name",
-            flex: 1,
-        },
-        {
             field: "actions",
             headerName: "Actions",
             flex: 1,
             sortable: false,
             renderCell: (params) => (
                 <Box>
-                    <IconButton onClick={() => _handleEditClick(params.row.id, params.row.categoryName, params.row.materialName, params.row.hsCode, params.row.unit, params.row.brandPrice, params.row.basePrice, params.row.brandName)}>
+                    <IconButton onClick={() => _handleEditClick(params.row.categoryName, params.row.materialName, params.row.hsCode, params.row.unit, params.row.brandPrice, params.row.basePrice, params.row.brandName)}>
                         <EditIcon />
                     </IconButton>
-                    <IconButton onClick={() => _hanldeConfirmDelete(params.row.id)}>
+                    {/* <IconButton onClick={() => _hanldeConfirmDelete(params.row.id)}>
                         <DeleteIcon htmlColor={colors.primary[300]} />
-                    </IconButton>
+                    </IconButton> */}
                 </Box>
             )
         }

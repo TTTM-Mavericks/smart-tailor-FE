@@ -44,7 +44,8 @@ export const functionEndpoints = {
   },
   brand: {
     addExcel: '/add-new-brand-material-by-excel-file',
-    addManual: '/add-new-brand-material'
+    addManual: '/add-new-brand-material',
+    updateBrandMaterial: '/update-brand-material',
   },
   customer: {
     updateProfile: '/update-customer-profile'

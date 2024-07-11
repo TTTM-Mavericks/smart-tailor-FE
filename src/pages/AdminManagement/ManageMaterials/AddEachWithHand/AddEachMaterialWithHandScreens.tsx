@@ -15,13 +15,13 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import Swal from 'sweetalert2';
 import { useTranslation } from 'react-i18next';
-import { Material } from '../../../../models/AdminMaterialExcelModel';
+import { AddMaterial, Material } from '../../../../models/AdminMaterialExcelModel';
 import axios from 'axios';
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 
 interface AddMaterialWithHandsFormProps {
     closeCard: () => void;
-    addNewMaterial: (addedNewMaterial: Material) => void
+    addNewMaterial: (addedNewMaterial: AddMaterial) => void
 }
 
 const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ closeCard, addNewMaterial }) => {
@@ -103,27 +103,23 @@ const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
      */
     const _handleSubmit = async () => {
         try {
-            console.log('Form Data:', JSON.stringify(formData));
-
             const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.addNewMaterial}`, formData, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
             });
 
-            console.log('Response laf:', response.data.data);
-
             if (response.data) {
-                addNewMaterial(response.data.data);
+                addNewMaterial(formData);
                 Swal.fire(
-                    'Add Success!',
-                    'User has been updated!',
+                    'Add Material Success!',
+                    'Material has been Added!',
                     'success'
                 );
 
             } else {
                 Swal.fire(
-                    'Add User fail!',
+                    'Add Material fail!',
                     'Please check information!',
                     'error'
                 );
@@ -131,8 +127,8 @@ const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
         } catch (err: any) {
             console.error('Error:', err);
             Swal.fire(
-                'Add fail!',
-                `${err.message || 'Unknown error'}`,
+                'Add Material fail!',
+                'Please check information!',
                 'error'
             );
         }

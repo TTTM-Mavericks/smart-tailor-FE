@@ -59,16 +59,18 @@ const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, e
             if (response.status === 200) {
                 updateLaborQuantity({ ...formData, laborQuantityID });
                 Swal.fire(
-                    t(codeLanguage + '000069'),
-                    t(codeLanguage + '000070'),
+                    'Edit Price Failed!',
+                    'Please check the information!',
                     'success'
                 );
+                editClose();
             } else {
                 Swal.fire(
-                    t(codeLanguage + '000071'),
-                    t(codeLanguage + '000072'),
+                    'Edit Price Failed!',
+                    'Please check the information!',
                     'error'
                 );
+                editClose();
             }
 
             sessionStorage.setItem("obj", JSON.stringify(formData));
@@ -76,10 +78,11 @@ const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, e
         } catch (error) {
             console.error('Update Error:', error);
             Swal.fire(
-                t(codeLanguage + '000071'),
-                t(codeLanguage + '000072'),
+                'Edit Price Failed!',
+                'Please check the information!',
                 'error'
             );
+            editClose();
         }
     };
 

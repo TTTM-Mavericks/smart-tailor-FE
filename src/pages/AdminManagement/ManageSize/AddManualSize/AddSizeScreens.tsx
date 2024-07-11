@@ -68,7 +68,7 @@ const AddSizeManual: React.FC<AddSizeManualProps> = ({ closeCard, addNewSizes })
 
             if (response.data.status === 200) {
                 Swal.fire(
-                    'Add Success!',
+                    'Add Size Success!',
                     'Size has been added!',
                     'success'
                 );
@@ -85,8 +85,8 @@ const AddSizeManual: React.FC<AddSizeManualProps> = ({ closeCard, addNewSizes })
         } catch (err: any) {
             console.error('Error:', err);
             Swal.fire(
-                'Add Failed!',
-                `${err.message || 'Unknown error'}`,
+                'Add Size Failed!',
+                'Please check the information!',
                 'error'
             ).then(() => {
                 closeCard();

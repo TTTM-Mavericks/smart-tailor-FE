@@ -9,7 +9,7 @@ export interface ExcelData {
     error: boolean,
     Category_Name: string,
     Material_Name: string,
-    Unit: String,
+    Unit: string,
     Price: number,
     HS_Code: number,
     Base_Price: number,
@@ -24,6 +24,22 @@ export interface DuplicateCheckResponse {
 
 export interface Material {
     materialID: string,
+    categoryName: string,
+    materialName: string,
+    unit: string,
+    hsCode: number,
+    basePrice: number,
+}
+
+export interface AddMaterial {
+    categoryName: string,
+    materialName: string,
+    unit: string,
+    hsCode: number,
+    basePrice: number,
+}
+
+export interface AddExcelMaterial {
     categoryName: string,
     materialName: string,
     unit: string,

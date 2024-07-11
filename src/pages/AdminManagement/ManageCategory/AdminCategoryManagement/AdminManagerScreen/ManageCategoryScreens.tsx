@@ -225,9 +225,9 @@ const ManageCategories: React.FC = () => {
                     <IconButton onClick={() => _handleEditClick(params.row.categoryID, params.row.categoryName)}>
                         <EditIcon />
                     </IconButton>
-                    <IconButton onClick={() => _hanldeConfirmDelete(params.row.categoryID)}>
+                    {/* <IconButton onClick={() => _hanldeConfirmDelete(params.row.categoryID)}>
                         <DeleteIcon htmlColor={colors.primary[300]} />
-                    </IconButton>
+                    </IconButton> */}
                 </Box>
             )
         }
@@ -237,7 +237,7 @@ const ManageCategories: React.FC = () => {
 
 
     return (
-        <Box m="20px">
+        <Box m="20px" flex="1">
             <Box
                 m="40px 0 0 0"
                 height="75vh"
@@ -282,9 +282,9 @@ const ManageCategories: React.FC = () => {
                     endIcon={<Add />}
                     variant="contained"
                     color="primary"
-                    style={{ backgroundColor: `${colors.primary[300]} !important`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
+                    style={{ backgroundColor: `#E96208`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
                 >
-                    {t(codeLanguage + '000048')}
+                    ADD
                 </Button>
                 <Menu
                     id="basic-menu"
@@ -296,7 +296,7 @@ const ManageCategories: React.FC = () => {
                     }}
                 >
                     <MenuItem >
-                        <div onClick={_handleAddOpen}>{t(codeLanguage + '000049')}</div>
+                        <div onClick={_handleAddOpen}>ADD MANUAL</div>
                         <Modal
                             open={addOpenOrClose}
                             aria-labelledby="modal-modal-title"

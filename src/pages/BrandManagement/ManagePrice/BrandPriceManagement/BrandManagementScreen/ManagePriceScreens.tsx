@@ -41,7 +41,7 @@ const ManagePrice: React.FC = () => {
     const { userID, email, fullName, language, phoneNumber, roleName, imageUrl } = userAuth;
 
     // set formid to pass it to component edit Material
-    const [formId, setFormId] = React.useState<Category | null>(null);
+    const [formId, setFormId] = React.useState<LaborQuantity | null>(null);
 
     // Open Edit PopUp when clicking on the edit icon
     const [editopen, setEditOpen] = React.useState<boolean>(false);
@@ -95,8 +95,6 @@ const ManagePrice: React.FC = () => {
 
     React.useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_labor_quantity + functionEndpoints.laborQantity.getAllLaborQuantityByBrandID + `/${userID}`}`;
-        console.log(userID + "that bebe hehe");
-
         axios.get(apiUrl)
             .then(response => {
                 if (response.status !== 200) {
@@ -107,7 +105,6 @@ const ManagePrice: React.FC = () => {
             .then((responseData) => {
                 if (responseData && Array.isArray(responseData.data)) {
                     setData(responseData.data);
-                    console.log("Data received:", responseData);
                 } else {
                     console.error('Invalid data format:', responseData);
                 }
@@ -121,8 +118,8 @@ const ManagePrice: React.FC = () => {
     }
 
     // Cập nhật người dùng trong danh sách
-    const _handleUpdateCategory = (updateCategory: Category) => {
-        setData(prevData => prevData.map(Category => Category.categoryID === updateCategory.categoryID ? updateCategory : Category));
+    const _handleUpdateCategory = (updateCategory: LaborQuantity) => {
+        setData(prevData => prevData.map(Category => Category.laborQuantityID === updateCategory.laborQuantityID ? updateCategory : Category));
     }
 
     // EDIT 
@@ -131,7 +128,8 @@ const ManagePrice: React.FC = () => {
         laborQuantityMinQuantity: number,
         laborQuantityMaxQuantity: number,
         laborQuantityMinPrice: number,
-        laborQuantityMaxPrice: number
+        laborQuantityMaxPrice: number,
+        laborCostPerQuantity: number
     ) => {
         // Handle edit action
         const LaborQuantityDataToEdit: LaborQuantity = {
@@ -140,13 +138,14 @@ const ManagePrice: React.FC = () => {
             laborQuantityMaxQuantity: laborQuantityMaxQuantity,
             laborQuantityMinPrice: laborQuantityMinPrice,
             laborQuantityMaxPrice: laborQuantityMaxPrice,
+            laborCostPerQuantity: laborCostPerQuantity
         }
         setFormId(LaborQuantityDataToEdit);
         _handleEditOpen();
     };
 
     //DELETE OR UPDATE
-    // const _handleDeleteClick = async (categoryID: string) => {
+    // const _handleDeleteClick = async (laborQuantityID: string) => {
     //     try {
     //         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.updateCategory}`;
 
@@ -221,12 +220,17 @@ const ManagePrice: React.FC = () => {
             flex: 1,
         },
         {
+            field: "laborCostPerQuantity",
+            headerName: "Brand Price",
+            flex: 1,
+        },
+        {
             field: "laborQuantityMaxPrice",
             headerName: "Max Price",
             flex: 1,
         },
         {
-            field: "status",
+            field: "laborQuantityStatus",
             headerName: "status",
             flex: 1,
         },
@@ -237,7 +241,7 @@ const ManagePrice: React.FC = () => {
             sortable: false,
             renderCell: (params) => (
                 <Box>
-                    <IconButton onClick={() => _handleEditClick(params.row.laborQuantityID, params.row.laborQuantityMinQuantity, params.row.laborQuantityMaxQuantity, params.row.laborQuantityMinPrice, params.row.laborQuantityMaxPrice)}>
+                    <IconButton onClick={() => _handleEditClick(params.row.laborQuantityID, params.row.laborQuantityMinQuantity, params.row.laborQuantityMaxQuantity, params.row.laborQuantityMinPrice, params.row.laborQuantityMaxPrice, params.row.laborCostPerQuantity)}>
                         <EditIcon />
                     </IconButton>
                     {/* <IconButton onClick={() => _hanldeConfirmDelete(params.row.categoryID)}>
@@ -352,7 +356,7 @@ const ManagePrice: React.FC = () => {
                             <EditPricePopUpScreens
                                 editClose={_handleEditClose}
                                 fid={formId}
-                                updateCategory={_handleUpdateCategory}
+                                updateCostBrand={_handleUpdateCategory}
                             />
                         )}
                     </Box>

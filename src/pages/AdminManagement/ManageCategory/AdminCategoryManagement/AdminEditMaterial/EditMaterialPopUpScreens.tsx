@@ -56,26 +56,26 @@ const EditMCategoryPopUpScreens: React.FC<EditCategoryPopUpScreenFormProps> = ({
             }
 
             if (response.data.status === 200) {
-                updateCategory(response.data.data);
+                updateCategory({ ...formData });
                 Swal.fire(
-                    `${t(codeLanguage + '000069')}`,
-                    `${t(codeLanguage + '000070')}`,
+                    `Updated Category Success!`,
+                    `Updated Category Success!`,
                     'success'
                 );
             }
 
             if (response.data.status === 409) {
                 Swal.fire(
-                    `${t(codeLanguage + '000071')}`,
-                    `${t(codeLanguage + '000072')}`,
+                    `Updated Category Fail!`,
+                    `Updated Category Fail!`,
                     'error'
                 );
             }
 
             if (response.data.status === 400) {
                 Swal.fire(
-                    `${t(codeLanguage + '000071')}`,
-                    `${t(codeLanguage + '000072')}`,
+                    `Updated Category Fail!`,
+                    `Updated Category Fail!`,
                     'error'
                 );
             }
@@ -86,8 +86,8 @@ const EditMCategoryPopUpScreens: React.FC<EditCategoryPopUpScreenFormProps> = ({
         } catch (error) {
             console.error('Update Error:', error);
             Swal.fire(
-                `${t(codeLanguage + '000071')}`,
-                `${t(codeLanguage + '000072')}`,
+                `Updated Category Fail!`,
+                `Updated Category Fail!`,
                 'error'
             );
         }

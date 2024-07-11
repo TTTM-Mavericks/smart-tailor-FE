@@ -13,7 +13,7 @@ import ProfileSetup from '../AdminProfile/AdminProfileSettingComponent';
 import ManageMaterials from '../ManageMaterials/AdminMaterialManagerment/AdminManagerScreen/ManageMaterialScreens';
 import AdminManagePrice from '../ManagePrice/AdminPriceManagement/AdminManagementScreen/ManagePriceScreens';
 import ManageSizes from '../ManageSize/AdminSizeManagement/AdminManagerScreen/ManageSizeScreens';
-import ManageCategories from '../ManageCategory/AdminCategoryManagement/AdminManagerScreen/ManageMaterialScreens';
+import ManageCategories from '../ManageCategory/AdminCategoryManagement/AdminManagerScreen/ManageCategoryScreens';
 
 const DashboardAdminScreens = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -93,8 +93,10 @@ const DashboardAdminScreens = () => {
                 return (
                     <>
                         <ManageMaterials />
-                        <ManageCategories />
-                        <ManageSizes />
+                        <div style={{ display: "flex" }}>
+                            <ManageCategories />
+                            <ManageSizes />
+                        </div>
                     </>
                 );
             case 'admin_manage_price':

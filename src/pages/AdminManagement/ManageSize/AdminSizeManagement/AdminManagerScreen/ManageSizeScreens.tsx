@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import axios from "axios";
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { AddSize, Sizes } from "../../../../../models/AdminManageSizeModel";
+import { width } from "@mui/system";
 
 // Make Style of popup
 const style = {
@@ -182,7 +183,7 @@ const ManageSizes: React.FC = () => {
 
     const getRowId = (row: Sizes) => `${row.sizeID}-${row.sizeName}`;
     return (
-        <Box m="20px">
+        <Box m="20px" flex="1">
             <Box
                 m="40px 0 0 0"
                 height="75vh"
@@ -227,9 +228,9 @@ const ManageSizes: React.FC = () => {
                     endIcon={<Add />}
                     variant="contained"
                     color="primary"
-                    style={{ backgroundColor: `${colors.primary[300]} !important`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
+                    style={{ backgroundColor: `#E96208`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
                 >
-                    {t(codeLanguage + '000048')}
+                    ADD
                 </Button>
                 <Menu
                     id="basic-menu"
@@ -241,7 +242,7 @@ const ManageSizes: React.FC = () => {
                     }}
                 >
                     <MenuItem onClick={_handleAddOpen}>
-                        {t(codeLanguage + '000049')}
+                        ADD MANUAL
                     </MenuItem>
                 </Menu>
                 <Modal

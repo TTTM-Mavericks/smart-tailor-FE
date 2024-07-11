@@ -163,7 +163,7 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
             console.log('Response:', response.data.data);
 
             if (response.data.status === 200) {
-                addNewLaborQuantity(response.data);
+                // addNewLaborQuantity(formData);
                 Swal.fire(
                     'Add Success!',
                     'Labor quantity has been added!',
@@ -180,7 +180,7 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
             console.error('Error:', err);
             Swal.fire(
                 'Add Failed!',
-                `${err.message || 'Unknown error'}`,
+                'Please check the information!',
                 'error'
             );
         }

@@ -12,14 +12,14 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import Swal from 'sweetalert2';
 import { useTranslation } from 'react-i18next';
-import { ExpertTailoring } from '../../../../models/ManagerExpertTailoringModel';
+import { AddExpertTailoring, ExpertTailoring } from '../../../../models/ManagerExpertTailoringModel';
 import axios from 'axios';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import { toast, ToastContainer } from 'react-toastify';
 
 interface AddExpertTailoringWithHandsFormProps {
     closeCard: () => void;
-    addNewExpertTailoring: (addedNewExpertTailoring: ExpertTailoring) => void
+    addNewExpertTailoring: (addedNewExpertTailoring: AddExpertTailoring) => void
 }
 
 const AddEachExpertTailoringWithHand: React.FC<AddExpertTailoringWithHandsFormProps> = ({ closeCard, addNewExpertTailoring }) => {
@@ -206,7 +206,7 @@ const AddEachExpertTailoringWithHand: React.FC<AddExpertTailoringWithHandsFormPr
                     title: 'Add New Expertailoring',
                     text: 'Your expert tailoring have been add!',
                 });
-                addNewExpertTailoring(response.data.data)
+                addNewExpertTailoring(addNewExpertTailorings)
                 console.log("addnew " + response.data);
                 closeCard()
             } else {
@@ -218,6 +218,7 @@ const AddEachExpertTailoringWithHand: React.FC<AddExpertTailoringWithHandsFormPr
                 title: 'Add Failed',
                 text: 'There was an error adding new expert tailoring. Please try again later.',
             });
+            closeCard()
         }
     };
 

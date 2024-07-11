@@ -4,8 +4,9 @@ import Navbar from '../../GlobalComponent/NavbarComponent/NavbarComponent';
 import ManageMaterials from '../AdminMaterialManagerment/AdminManagerScreen/ManageMaterialScreens';
 import { IconButton } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
-import ManageCategories from '../../ManageCategory/AdminCategoryManagement/AdminManagerScreen/ManageMaterialScreens';
+import ManageCategories from '../../ManageCategory/AdminCategoryManagement/AdminManagerScreen/ManageCategoryScreens';
 import ManageSizes from '../../ManageSize/AdminSizeManagement/AdminManagerScreen/ManageSizeScreens';
+import { Box } from '@mui/system';
 
 const DashboardAdminManageMaterialScreen = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -76,14 +77,17 @@ const DashboardAdminManageMaterialScreen = () => {
                 <Navbar toggleMenu={toggleMenu} menu="Mangage Material & Category & Size" popperOpen={popperOpen} togglePopper={togglePopper} />
                 <main className="p-6 flex-grow ml-0 xl:ml-[20%] mt-[-3%]">
                     <div>
+                        <p>bebe</p>
                         <ManageMaterials />
                     </div>
-                    <div style={{ marginTop: "10%" }}>
-                        <ManageCategories />
-                    </div>
-                    <div style={{ marginTop: "10%" }}>
-                        <ManageSizes />
-                    </div>
+                    <Box display="flex" justifyContent="space-between" m="20px" width="100%">
+                        <Box flex="1" m="10px">
+                            <ManageSizes />
+                        </Box>
+                        <Box flex="1" m="10px">
+                            <ManageCategories />
+                        </Box>
+                    </Box>
                 </main>
                 {showScrollButton && (
                     <IconButton

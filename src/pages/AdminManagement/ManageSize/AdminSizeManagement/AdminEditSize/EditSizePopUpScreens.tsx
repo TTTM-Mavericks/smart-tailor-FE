@@ -23,6 +23,8 @@ const EditSizePopUpScreens: React.FC<EditSizePopUpScreenFormProps> = ({ fid, edi
 
     const sizeID = fid.sizeID
 
+    console.log(sizeID + ": size id");
+
     const _handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData(prevState => ({
@@ -59,26 +61,29 @@ const EditSizePopUpScreens: React.FC<EditSizePopUpScreenFormProps> = ({ fid, edi
             if (response.data.status === 200) {
                 updateSize({ ...formData, sizeID });
                 Swal.fire(
-                    `${t(codeLanguage + '000069')}`,
-                    `${t(codeLanguage + '000070')}`,
+                    'Edit Size Success!',
+                    'Size has been Edited!',
                     'success'
                 );
+                editClose()
             }
 
             if (response.data.status === 409) {
                 Swal.fire(
-                    `${t(codeLanguage + '000071')}`,
-                    `${t(codeLanguage + '000072')}`,
+                    'Edit Size Failed!',
+                    'Please check the information!',
                     'error'
                 );
+                editClose()
             }
 
             if (response.data.status === 400) {
                 Swal.fire(
-                    `${t(codeLanguage + '000071')}`,
-                    `${t(codeLanguage + '000072')}`,
+                    'Edit Size Failed!',
+                    'Please check the information!',
                     'error'
                 );
+                editClose()
             }
             sessionStorage.setItem("obj", JSON.stringify(formData));
 
@@ -87,10 +92,11 @@ const EditSizePopUpScreens: React.FC<EditSizePopUpScreenFormProps> = ({ fid, edi
         } catch (error) {
             console.error('Update Error:', error);
             Swal.fire(
-                `${t(codeLanguage + '000071')}`,
-                `${t(codeLanguage + '000072')}`,
+                'Edit Size Failed!',
+                'Please check the information!',
                 'error'
             );
+            editClose()
         }
     };
 

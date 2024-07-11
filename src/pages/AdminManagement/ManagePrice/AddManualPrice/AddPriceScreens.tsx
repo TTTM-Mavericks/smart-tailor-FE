@@ -35,7 +35,6 @@ const AddPriceManual: React.FC<AddLaborQuantityWithHandsFormProps> = ({ closeCar
     };
 
     const handleSubmit = async () => {
-        console.log('Prices:', prices);
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.labor_quantity + functionEndpoints.laborQantity.addNewLaborQuantity}`;
         try {
             const response = await axios.post(apiUrl, { laborQuantityRequests: prices });
@@ -59,8 +58,8 @@ const AddPriceManual: React.FC<AddLaborQuantityWithHandsFormProps> = ({ closeCar
         } catch (err: any) {
             console.error('Error:', err);
             Swal.fire(
-                'Add Failed!',
-                `${err.message || 'Unknown error'}`,
+                'Add Labor Quantity Failed!',
+                'Please check the information!',
                 'error'
             ).then(() => {
                 closeCard();

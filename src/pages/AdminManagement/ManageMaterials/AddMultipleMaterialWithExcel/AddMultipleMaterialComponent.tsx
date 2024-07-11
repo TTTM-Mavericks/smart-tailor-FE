@@ -8,22 +8,18 @@ import { useTheme } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import EditMultipleUsersInExcelTable from './CRUDWithExcelTable/EditMultipleMaterialInExcelTable';
-import AddUserModalInExcelTable from './CRUDWithExcelTable/AddMaterialInExcelTable';
-const ADDUSERWITHFILEEXCELS = 'http://localhost:3000/Import_Brand_Material.xlsx';
 import { useTranslation } from 'react-i18next';
-import { ExcelData } from '../../../../models/AdminMaterialExcelModel';
+import { AddExcelMaterial, ExcelData, Material } from '../../../../models/AdminMaterialExcelModel';
 import axios from 'axios';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import ExcelJS from 'exceljs';
 import { toast, ToastContainer } from 'react-toastify';
-import { swatch } from '../../../../assets';
 import Swal from 'sweetalert2';
 
 interface AddMaterialWithMultipleExcelFormProps {
     closeMultipleCard: () => void;
-    addNewMaterial: (addedNewMaterial: ExcelData) => void
+    addNewMaterial: (addedNewMaterial: AddExcelMaterial[]) => void
 }
-
 
 // Make Style of popup
 const style = {
@@ -49,6 +45,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
     const [editingData, setEditingData] = React.useState<ExcelData | null>(null);
     const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
     const [editOpen, setEditOpen] = React.useState<boolean>(false);
+    const [addData, setAddData] = React.useState<ExcelData[]>([])
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
@@ -145,6 +142,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                         setSelectedFile(file);
                         setExcelData(updatedData)
                         setOriginalData(updatedData);
+                        setAddData(updatedData);
                         updatedData.forEach(item => {
                             console.log(`Category: ${item.Category_Name}, Material Name: ${item.Material_Name}, Unit: ${item.Unit}`);
                         });
@@ -179,6 +177,14 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
         console.log('File size:', selectedFile.size);
         console.log('File type:', selectedFile.type);
 
+        const transformedData = addData.map(item => ({
+            basePrice: item.Base_Price,
+            categoryName: item.Category_Name,
+            materialName: item.Material_Name,
+            unit: item.Unit,
+            hsCode: item.HS_Code
+        }));
+
         try {
             // const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0YW1tdHNlMTYxMDg3QGZwdC5lZHUudm4iLCJpYXQiOjE3MTgyODUyMTMsImV4cCI6MTcxODM3MTYxM30.UUpy2s9SwYGF_TyIru6VASQ-ZzGTOqx7mkWkcSR2__0'; // Replace with the actual bearer token
             const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.addNewMaterialByExcelFile}`, formData,
@@ -190,24 +196,23 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                 // }
             );
 
-            // Handle successful response
-            console.log('Data uploaded successfully:', response);
             if (response.data.status === 200) {
                 Swal.fire({
                     icon: 'success',
-                    title: 'Profile Updated',
-                    text: 'Your profile has been updated successfully!',
+                    title: 'Add Excel Material Success',
+                    text: 'Excel Material has been added successfully!',
                 });
+
+                addNewMaterial(transformedData)
                 closeMultipleCard();
             }
             if (response.data.status === 400) {
                 Swal.fire(
-                    `${t(codeLanguage + '000071')}`,
-                    `${t(codeLanguage + '000072')}`,
+                    'Add Excel Material fail!',
+                    'Please check information!',
                     'error'
                 );
                 closeMultipleCard();
-
             }
         } catch (error: any) {
             // Check for specific error status codes
@@ -223,13 +228,14 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                 console.error('Error uploading data:', error.message);
                 Swal.fire({
                     icon: 'error',
-                    title: 'Update Failed',
-                    text: 'There was an error updating your profile. Please try again later.',
+                    title: 'Added Failed',
+                    text: 'There was an error Added Material. Please try again later.',
                 });
             }
-            setError('An error occurred while uploading data');
+            setError('The category is not existed or something error!');
         }
     };
+
 
     /**
      * When User click on Ok Button It will check
@@ -328,6 +334,12 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
         return duplicates;
     };
 
+    /**
+     * Dowload the Excel If
+     * Change in data (update, delete)
+     * Error in Data
+     * Color the yellow in excel file
+     */
     const _handleDownloadErrorData = async () => {
         const workBook = new ExcelJS.Workbook();
         const worksheet = workBook.addWorksheet('Category and Material');
