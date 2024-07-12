@@ -4,23 +4,26 @@ import CloseIcon from '@mui/icons-material/Close';
 import Swal from "sweetalert2";
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
-import { Category } from "../../../../../models/AdminCategoryExcelModel";
-import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
+import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
+import { Sizes } from "../../../../../models/AdminManageSizeModel";
 
 interface EditSizePopUpScreenFormProps {
     fid: {
-        categoryID: string
-        categoryName: string;
+        sizeID: string,
+        sizeName: string;
     };
     editClose: () => void;
-    updateCategory: (updatedCategory: Category) => void;
+    updateSize: (updatedSizes: Sizes) => void;
 }
 
-const EditSizePopUpScreens: React.FC<EditSizePopUpScreenFormProps> = ({ fid, editClose, updateCategory }) => {
+const EditSizePopUpScreens: React.FC<EditSizePopUpScreenFormProps> = ({ fid, editClose, updateSize }) => {
     const [formData, setFormData] = React.useState({
-        categoryID: fid.categoryID,
-        categoryName: fid.categoryName
+        sizeName: fid.sizeName
     });
+
+    const sizeID = fid.sizeID
+
+    console.log(sizeID + ": size id");
 
     const _handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -44,7 +47,7 @@ const EditSizePopUpScreens: React.FC<EditSizePopUpScreenFormProps> = ({ fid, edi
 
     const _handleSubmit = async () => {
         try {
-            const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.updateCategory}`;
+            const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.size + functionEndpoints.size.updateSize + `/${sizeID}`}`;
             const response = await axios.put(apiUrl, {
                 ...formData
             });
@@ -56,28 +59,31 @@ const EditSizePopUpScreens: React.FC<EditSizePopUpScreenFormProps> = ({ fid, edi
             }
 
             if (response.data.status === 200) {
-                updateCategory(response.data.data);
+                updateSize({ ...formData, sizeID });
                 Swal.fire(
-                    `${t(codeLanguage + '000069')}`,
-                    `${t(codeLanguage + '000070')}`,
+                    'Edit Size Success!',
+                    'Size has been Edited!',
                     'success'
                 );
+                editClose()
             }
 
             if (response.data.status === 409) {
                 Swal.fire(
-                    `${t(codeLanguage + '000071')}`,
-                    `${t(codeLanguage + '000072')}`,
+                    'Edit Size Failed!',
+                    'Please check the information!',
                     'error'
                 );
+                editClose()
             }
 
             if (response.data.status === 400) {
                 Swal.fire(
-                    `${t(codeLanguage + '000071')}`,
-                    `${t(codeLanguage + '000072')}`,
+                    'Edit Size Failed!',
+                    'Please check the information!',
                     'error'
                 );
+                editClose()
             }
             sessionStorage.setItem("obj", JSON.stringify(formData));
 
@@ -86,15 +92,16 @@ const EditSizePopUpScreens: React.FC<EditSizePopUpScreenFormProps> = ({ fid, edi
         } catch (error) {
             console.error('Update Error:', error);
             Swal.fire(
-                `${t(codeLanguage + '000071')}`,
-                `${t(codeLanguage + '000072')}`,
+                'Edit Size Failed!',
+                'Please check the information!',
                 'error'
             );
+            editClose()
         }
     };
 
     return (
-        <Box style={{ height: '500px', overflowY: 'auto' }}>
+        <Box style={{ height: '222px', overflowY: 'auto' }}>
             <Typography variant="h5" align="left">
                 {t(codeLanguage + '000068')}
             </Typography>
@@ -107,11 +114,11 @@ const EditSizePopUpScreens: React.FC<EditSizePopUpScreenFormProps> = ({ fid, edi
             <Box height={50} />
             <Grid container spacing={4}>
                 <Grid item xs={11}>
-                    <TextField name="categoryName" id="categoryName" label="Category Name" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={formData.categoryName} onChange={_handleChange} />
+                    <TextField name="sizeName" id="sizeName" label="Size Name" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={formData.sizeName} onChange={_handleChange} />
                 </Grid>
             </Grid>
             <div style={{ textAlign: "center", alignItems: "center", marginTop: "3rem" }}>
-                <Button onClick={_handleSubmit} style={{ backgroundColor: "#5858FA", width: "60%", borderRadius: "8px", color: "#FFFFFF" }}>{t(codeLanguage + '000060')}</Button>
+                <Button onClick={_handleSubmit} style={{ backgroundColor: "#E96208", width: "80%", borderRadius: "8px", color: "#FFFFFF" }}>{t(codeLanguage + '000060')}</Button>
                 <Button onClick={editClose} style={{ borderRadius: "8px", border: "1px solid black", color: "black", marginLeft: "1rem" }}>{t(codeLanguage + '000055')}</Button>
             </div>
         </Box>

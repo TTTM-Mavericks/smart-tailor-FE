@@ -8,12 +8,26 @@ import GeographyChartComponent from '../GeographyChart/GeographyChartComponent';
 import BarChartComponent from '../BarChart/BarChartComponent';
 import LineChartComponent from '../LineChart/LineChartComponent';
 import PieChartComponent from '../PieChart/PieChartComponent';
+import DashboardFAQScreens from '../GlobalComponent/FAQ/DashboardFAQComponent';
+import ProfileSetup from '../AdminProfile/AdminProfileSettingComponent';
+import ManageMaterials from '../ManageMaterials/AdminMaterialManagerment/AdminManagerScreen/ManageMaterialScreens';
+import AdminManagePrice from '../ManagePrice/AdminPriceManagement/AdminManagementScreen/ManagePriceScreens';
+import ManageSizes from '../ManageSize/AdminSizeManagement/AdminManagerScreen/ManageSizeScreens';
+import ManageCategories from '../ManageCategory/AdminCategoryManagement/AdminManagerScreen/ManageCategoryScreens';
 
 const DashboardAdminScreens = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [activeMenu, setActiveMenu] = useState('admin_dashboard');
-    const [showScrollButton, setShowScrollButton] = React.useState<boolean>(false);
-    const [popperOpen, setPopperOpen] = useState<Record<string, boolean>>({});
+    const [showScrollButton, setShowScrollButton] = useState(false);
+    const [popperOpen, setPopperOpen] = useState({});
+
+    useEffect(() => {
+        // Get the active tab from localStorage on component mount
+        const savedActiveMenu = localStorage.getItem('activeMenu');
+        if (savedActiveMenu) {
+            setActiveMenu(savedActiveMenu);
+        }
+    }, []);
 
     const toggleMenu = () => {
         setMenuOpen(!menuOpen);
@@ -21,11 +35,12 @@ const DashboardAdminScreens = () => {
 
     const handleMenuClick = (menu: any) => {
         setActiveMenu(menu);
+        // Save the active tab to localStorage
+        localStorage.setItem('activeMenu', menu);
     };
 
-    // Effect to close popper on outside click
     useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
+        const handleClickOutside = (event: any) => {
             if (event.target instanceof Element) {
                 if (!event.target.closest('.popover')) {
                     setPopperOpen({
@@ -43,7 +58,7 @@ const DashboardAdminScreens = () => {
         };
     }, []);
 
-    React.useEffect(() => {
+    useEffect(() => {
         const handleScroll = () => {
             if (window.scrollY > 200) {
                 setShowScrollButton(true);
@@ -70,17 +85,54 @@ const DashboardAdminScreens = () => {
         }));
     };
 
+    const renderComponent = () => {
+        switch (activeMenu) {
+            case 'admin_profile':
+                return <ProfileSetup />;
+            case 'admin_manage_material':
+                return (
+                    <>
+                        <ManageMaterials />
+                        <div style={{ display: "flex" }}>
+                            <ManageCategories />
+                            <ManageSizes />
+                        </div>
+                    </>
+                );
+            case 'admin_manage_price':
+                return <AdminManagePrice />;
+            case 'admin_faq':
+                return <DashboardFAQScreens />;
+            case 'geography_chart':
+                return <GeographyChartComponent />;
+            case 'line_chart':
+                return <LineChartComponent />;
+            case 'bar_chart':
+                return <BarChartComponent />;
+            case 'pie_chart':
+                return <PieChartComponent />;
+            default:
+                return (
+                    <>
+                        <CardInformationDetailComponent />
+                        <GeographyChartComponent />
+                        <div style={{ display: "flex" }}>
+                            <BarChartComponent />
+                            <PieChartComponent />
+                        </div>
+                        <LineChartComponent />
+                    </>
+                );
+        }
+    };
+
     return (
         <div className="flex">
             <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
             <div className="flex flex-col w-full">
                 <Navbar toggleMenu={toggleMenu} menu="Dashboard" popperOpen={popperOpen} togglePopper={togglePopper} />
                 <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
-                    <CardInformationDetailComponent />
-                    <GeographyChartComponent />
-                    <BarChartComponent />
-                    <LineChartComponent />
-                    <PieChartComponent />
+                    {renderComponent()}
                 </main>
                 {showScrollButton && (
                     <IconButton

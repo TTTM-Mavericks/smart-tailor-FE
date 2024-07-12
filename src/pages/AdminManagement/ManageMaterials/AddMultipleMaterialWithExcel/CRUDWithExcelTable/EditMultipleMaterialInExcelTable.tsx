@@ -16,8 +16,16 @@ const EditMultipleMaterialsInExcelTable: React.FC<EditMultipleMaterialsInExcelTa
 
     const _handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setEditedData({ ...editedData, [name]: value });
+
+        // Parse numeric fields to numbers if necessary
+        let parsedValue: string | number = value;
+        if (name === 'HS_Code' || name === 'Base_Price') {
+            parsedValue = parseFloat(value); // Use parseFloat or parseInt based on your needs
+        }
+
+        setEditedData({ ...editedData, [name]: parsedValue });
     };
+
 
     const _handleSave = () => {
         updateData(editedData, index);
@@ -26,7 +34,6 @@ const EditMultipleMaterialsInExcelTable: React.FC<EditMultipleMaterialsInExcelTa
 
 
     return (
-
         <Box style={{ height: '500px', overflowY: 'auto' }}>
             <Typography variant="h5" align="left">
                 Edit Category and Material
@@ -40,29 +47,24 @@ const EditMultipleMaterialsInExcelTable: React.FC<EditMultipleMaterialsInExcelTa
             <Box height={50} />
             <Grid container spacing={4}>
                 <Grid item xs={11}>
-                    <TextField name="Category_Name" label="Category_Name" value={editedData?.Category_Name} onChange={_handleChange} fullWidth />
+                    <TextField name="Category_Name" label="Category_Name" value={editedData?.Category_Name} type="text" onChange={_handleChange} fullWidth />
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField name="Material_Name" label="Material_Name" value={editedData?.Material_Name} onChange={_handleChange} fullWidth />
-
+                    <TextField name="Material_Name" label="Material_Name" value={editedData?.Material_Name} type="text" onChange={_handleChange} fullWidth />
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField name="HS_Code" label="HS_Code" value={editedData?.HS_Code} onChange={_handleChange} fullWidth />
-
+                    <TextField name="HS_Code" label="HS_Code" value={editedData?.HS_Code} type="number" onChange={_handleChange} fullWidth />
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField name="Unit" label="Unit" value={editedData?.Unit} onChange={_handleChange} fullWidth />
-
+                    <TextField name="Unit" label="Unit" value={editedData?.Unit} type="text" onChange={_handleChange} fullWidth />
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField name="Base_Price" label="Base_Price" value={editedData?.Base_Price} onChange={_handleChange} fullWidth />
-
+                    <TextField name="Base_Price" label="Base_Price" value={editedData?.Base_Price} type="number" onChange={_handleChange} fullWidth />
                 </Grid>
             </Grid>
             <div onClick={onClose} style={{ textAlign: "center", alignItems: "center", marginTop: "3rem" }}>
                 <Button onClick={_handleSave} style={{ backgroundColor: "#EC6208", width: "60%", borderRadius: "8px", marginLeft: "-10%", marginRight: "10%", color: "#FFFFFF" }}>Update</Button>
                 <Button style={{ borderRadius: "8px", border: "1px solid black", color: "black" }}>Cancel</Button>
-
             </div>
         </Box>
     );

@@ -3,7 +3,7 @@ import Sidebar from '../../GlobalComponent/SidebarComponent/SidebarComponent';
 import Navbar from '../../GlobalComponent/NavbarComponent/NavbarComponent';
 import { IconButton } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
-import ManageCategories from '../AdminCategoryManagement/AdminManagerScreen/ManageMaterialScreens';
+import ManageCategories from '../AdminCategoryManagement/AdminManagerScreen/ManageCategoryScreens';
 
 const DashboardAdminManageCategoryScreen = () => {
     const [menuOpen, setMenuOpen] = useState(false);

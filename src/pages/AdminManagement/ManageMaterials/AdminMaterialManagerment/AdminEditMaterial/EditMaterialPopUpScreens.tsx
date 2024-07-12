@@ -24,11 +24,17 @@ const EditMaterialPopUpScreens: React.FC<EditMaterialPopUpScreenFormProps> = ({ 
     const [formData, setFormData] = React.useState({
         categoryName: fid.categoryName,
         materialName: fid.materialName,
-        hsCode: fid.hsCode.toString(),
-        basePrice: fid.basePrice.toString(),
+        hsCode: fid.hsCode,
+        basePrice: fid.basePrice,
         unit: fid.unit,
     });
 
+    const MATERIALID = fid.materialID
+
+    /**
+     * Tracking Change of Each Fields
+     * @param e 
+     */
     const _handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData(prevState => ({
@@ -49,11 +55,14 @@ const EditMaterialPopUpScreens: React.FC<EditMaterialPopUpScreenFormProps> = ({ 
         }
     }, [selectedLanguage, i18n]);
 
+    /**
+     * Update The Material
+     */
     const _handleSubmit = async () => {
         try {
-            const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.updateMaterial}`;
+            const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.updateMaterial + `/${MATERIALID}`}`;
 
-            const response = await axios.put(apiUrl + `/${fid.materialID}`, {
+            const response = await axios.put(apiUrl, {
                 ...formData
             });
 
@@ -62,7 +71,7 @@ const EditMaterialPopUpScreens: React.FC<EditMaterialPopUpScreenFormProps> = ({ 
             }
 
             if (response.data.status === 200) {
-                updateMaterial(response.data.data);
+                updateMaterial({ ...formData, materialID: MATERIALID });
                 Swal.fire(
                     `${t(codeLanguage + '000069')}`,
                     `${t(codeLanguage + '000070')}`,

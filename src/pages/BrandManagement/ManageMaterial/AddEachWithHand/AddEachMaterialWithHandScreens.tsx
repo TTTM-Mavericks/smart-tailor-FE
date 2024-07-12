@@ -165,7 +165,7 @@ const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
             );
 
             if (response.data) {
-                addNewMaterial(response.data.data);
+                // addNewMaterial({ ...formData, brandName });
                 Swal.fire('Add Success!', 'Material has been added!', 'success');
             } else {
                 Swal.fire('Add Material failed!', 'Please check the information!', 'error');

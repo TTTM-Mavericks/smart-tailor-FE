@@ -102,7 +102,6 @@ const AddEachCategoryWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
 
     return (
         <Box style={{
-            height: '500px',
             overflowY: 'auto',
             overflowX: 'hidden',
             scrollbarWidth: 'none',
@@ -114,14 +113,14 @@ const AddEachCategoryWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
         }}>
             <div>
                 <Typography variant="h5" align="center">
-                    {t(codeLanguage + '000051')}
+                    ADD NEW CATEGORY
                 </Typography>
                 <IconButton style={{ position: 'absolute', top: 0, right: 0 }} onClick={closeCard}>
                     <CloseIcon />
                 </IconButton>
                 <Box height={50} />
                 <Grid container spacing={3}>
-                    <Grid item xs={12}>
+                    <Grid item xs={6}>
                         <TextField
                             fullWidth
                             label="Category Name"

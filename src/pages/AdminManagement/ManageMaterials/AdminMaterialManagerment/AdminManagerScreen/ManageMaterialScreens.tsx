@@ -7,15 +7,14 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Swal from "sweetalert2";
 import EditMaterialPopUpScreens from "../AdminEditMaterial/EditMaterialPopUpScreens";
-import { Add } from "@mui/icons-material";
+import { Add, RestoreFromTrashOutlined, RestoreFromTrashSharp, UndoOutlined } from "@mui/icons-material";
 import AddEachMaterialsWithHand from "../../AddEachWithHand/AddEachMaterialWithHandScreens";
 import AddMultipleComponentWithExcel from "../../AddMultipleMaterialWithExcel/AddMultipleMaterialComponent";
 import { useTranslation } from 'react-i18next';
-import { Material } from "../../../../../models/AdminMaterialExcelModel";
+import { AddExcelMaterial, AddMaterial, ExcelData, Material } from "../../../../../models/AdminMaterialExcelModel";
 import axios from "axios";
-import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
-
-// Make Style of popup
+import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
+import { margin } from "@mui/system";
 const style = {
     position: 'absolute',
     top: '50%',
@@ -30,62 +29,32 @@ const style = {
 };
 
 const ManageMaterials: React.FC = () => {
+    // ---------------UseState Variable---------------//
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [data, setData] = React.useState<Material[]>([]);
-
-    // set formid to pass it to component edit Material
     const [formId, setFormId] = React.useState<Material | null>(null);
-
-    // Open Edit PopUp when clicking on the edit icon
     const [editopen, setEditOpen] = React.useState<boolean>(false);
-    const _handleEditOpen = () => setEditOpen(true);
-    const _handleEditClose = () => setEditOpen(false);
-
-    // open or close the add modal
     const [anchorEl, setAnchorEl] = React.useState(null);
-    const open = Boolean(anchorEl);
-    const _handleClick = (event: any) => {
-        setAnchorEl(event.currentTarget);
-    };
-    const _handleClose = () => {
-        setAnchorEl(null);
-    };
-
-    // close open pop up
     const [addOpenOrClose, setAddOpenOrClose] = React.useState<boolean>(false)
-
-    const _handleAddOpen = () => {
-        setAddOpenOrClose(true);
-    }
-
-    const _handleAddClose = () => {
-        setAddOpenOrClose(false)
-    }
-
-    // close open pop up
     const [addMultiple, setAddMultiple] = React.useState<boolean>(false)
+    const { t, i18n } = useTranslation();
 
-    const _handleAddMultipleOpen = () => {
-        setAddMultiple(true);
-    }
-
-    const _handleAddMultipleClose = () => {
-        setAddMultiple(false)
-    }
-
-    // Get language in local storage
+    // ---------------Usable Variable---------------//
+    const open = Boolean(anchorEl);
     const selectedLanguage = localStorage.getItem('language');
     const codeLanguage = selectedLanguage?.toUpperCase();
 
-    // Using i18n
-    const { t, i18n } = useTranslation();
+    // ---------------UseEffect---------------//
     React.useEffect(() => {
         if (selectedLanguage !== null) {
             i18n.changeLanguage(selectedLanguage);
         }
     }, [selectedLanguage, i18n]);
 
+    /**
+     * Get All Material
+     */
     React.useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.getAllMaterial}`;
 
@@ -107,17 +76,97 @@ const ManageMaterials: React.FC = () => {
             .catch(error => console.error('Error fetching data:', error));
     }, []);
 
-    // Thêm người dùng mới vào danh sách
-    const _handleAddMaterial = (newMaterial: Material) => {
-        setData(prevData => [...prevData, newMaterial]);
+    // ---------------FunctionHandler---------------//
+
+    /**
+     * Open
+     * @returns 
+     */
+    const _handleEditOpen = () => setEditOpen(true);
+
+    /**
+     * Close
+     * @returns 
+     */
+    const _handleEditClose = () => setEditOpen(false);
+
+    /**
+     * Open Dialog
+     * @param event 
+     */
+    const _handleClick = (event: any) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    /**
+     * Close Model
+     */
+    const _handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    /**
+     * Open Dialog
+     */
+    const _handleAddOpen = () => {
+        setAddOpenOrClose(true);
     }
 
-    // Cập nhật người dùng trong danh sách
+    /**
+     * Close Dialog
+     */
+    const _handleAddClose = () => {
+        setAddOpenOrClose(false)
+    }
+
+    /**
+     * Open Dialog Add With Excel
+     */
+    const _handleAddMultipleOpen = () => {
+        setAddMultiple(true);
+    }
+
+    /**
+     * Close Dialog Add With Excel
+     */
+    const _handleAddMultipleClose = () => {
+        setAddMultiple(false)
+    }
+
+    /**
+     * 
+     * @param newMaterial 
+     */
+    const _handleAddMaterial = (newMaterial: AddMaterial) => {
+        setData((prevData: any) => [...prevData, newMaterial]);
+    }
+
+    /**
+ * Add Excel Material to State
+ * @param newMaterial Array of ExcelData objects
+ */
+    const _handleAddExcelMaterial = (newMaterial: AddExcelMaterial[]) => {
+        setData((prevData: any) => [...prevData, ...newMaterial]);
+    };
+
+
+    /**
+     * 
+     * @param updatedMaterial 
+     */
     const _handleUpdateMaterial = (updatedMaterial: Material) => {
         setData(prevData => prevData.map(Material => Material.materialID === updatedMaterial.materialID ? updatedMaterial : Material));
     }
 
-    // EDIT 
+    /**
+     * 
+     * @param materialID 
+     * @param categoryName 
+     * @param materialName 
+     * @param hsCode 
+     * @param basePrice 
+     * @param unit 
+     */
     const _handleEditClick = (
         materialID: string,
         categoryName: string,
@@ -137,8 +186,12 @@ const ManageMaterials: React.FC = () => {
         _handleEditOpen();
     };
 
-    //DELETE OR UPDATE
-    const _handleDeleteClick = async (materialID: string) => {
+    /**
+     * 
+     * @param materialID 
+     * @returns 
+     */
+    const _handleUpdateStatus = async (materialID: string) => {
         try {
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.updateStatusMaterial}`;
 
@@ -154,50 +207,58 @@ const ManageMaterials: React.FC = () => {
         }
     };
 
-    // confirm 
-    const _hanldeConfirmDelete = async (id: number) => {
+    /**
+     * 
+     * @param id 
+     */
+    const _hanldeConfirmUpdateStatus = async (id: number) => {
         try {
             const result = await Swal.fire({
-                title: `${t(codeLanguage + '000061')}`,
-                text: `${t(codeLanguage + '000062')}`,
+                title: `Are you sure to update status of material`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: `${t(codeLanguage + '000063')}`,
+                confirmButtonText: `Yes I want to update status!`,
                 cancelButtonText: `${t(codeLanguage + '000055')}`
             });
 
             if (result.isConfirmed) {
-                await _handleDeleteClick(id.toString()); // Ensure id is converted to string if necessary
+                await _handleUpdateStatus(id.toString()); // Ensure id is converted to string if necessary
                 Swal.fire(
-                    `${t(codeLanguage + '000064')}`,
-                    `${t(codeLanguage + '000065')}`,
+                    `Update status of material success`,
+                    `Material status update success`,
                     'success'
                 );
-
-                // Remove the deleted material from the current data list
-
-                setData(prevData => prevData.map(Material => Material.materialID === id));
+                // Update the deleted material from the current data list
+                setData((prevData: any) =>
+                    prevData.map((materialID: any) =>
+                        materialID.materialID === id
+                            ? { ...materialID, status: !materialID.status }
+                            : materialID
+                    )
+                );
             } else {
                 Swal.fire(
-                    `${t(codeLanguage + '000066')}`,
-                    `${t(codeLanguage + '000067')}`,
+                    `Update status of material fail!`,
+                    `Material status update fail!`,
                     'error'
                 );
             }
         } catch (error: any) {
             console.error('Error:', error);
             Swal.fire(
-                'Error',
-                `${error.message || 'Unknown error'}`,
+                `Update status of material fail!`,
+                `Material status update fail!`,
                 'error'
             );
         }
     };
 
+    /**
+     * Create A Grid For Table
+     */
     const columns: GridColDef[] = [
-        // { field: "id", headerName: "ID", flex: 0.5 },
         {
             field: "categoryName",
             headerName: "Category Name",
@@ -210,7 +271,7 @@ const ManageMaterials: React.FC = () => {
         },
         {
             field: "basePrice",
-            headerName: "basePrice",
+            headerName: "Base Price",
             headerAlign: "left",
             align: "left",
         },
@@ -240,14 +301,25 @@ const ManageMaterials: React.FC = () => {
                     <IconButton onClick={() => _handleEditClick(params.row.materialID, params.row.categoryName, params.row.materialName, params.row.hsCode, params.row.basePrice, params.row.unit)}>
                         <EditIcon />
                     </IconButton>
-                    <IconButton onClick={() => _hanldeConfirmDelete(params.row.materialID)}>
-                        <DeleteIcon htmlColor={colors.primary[300]} />
-                    </IconButton>
+                    {params.row.status ? (
+                        <IconButton onClick={() => _hanldeConfirmUpdateStatus(params.row.materialID)}>
+                            <DeleteIcon htmlColor={colors.primary[300]} />
+                        </IconButton>
+                    ) : (
+                        <IconButton onClick={() => _hanldeConfirmUpdateStatus(params.row.materialID)}>
+                            <UndoOutlined htmlColor="green" />
+                        </IconButton>
+                    )}
                 </Box>
             )
         }
     ];
 
+    /**
+     * 
+     * @param row 
+     * @returns 
+     */
     const getRowId = (row: any) => `${row.materialID}-${row.categoryName}-${row.materialName}`;
 
     return (
@@ -284,88 +356,114 @@ const ManageMaterials: React.FC = () => {
                     },
                     "& .MuiBadge-badge": {
                         display: "none !important"
+                    },
+                    '& .MuiDataGrid-toolbarContainer': {
+                        padding: '10px',
+                        marginLeft: '60%'
                     }
                 }}
             >
-                <Button
-                    id="basic-button"
-                    aria-controls={open ? 'basic-menu' : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={open ? 'true' : undefined}
-                    onClick={_handleClick}
-                    endIcon={<Add />}
-                    variant="contained"
-                    color="primary"
-                    style={{ backgroundColor: `${colors.primary[300]} !important`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
-                >
-                    {t(codeLanguage + '000048')}
-                </Button>
-                <Menu
-                    id="basic-menu"
-                    anchorEl={anchorEl}
-                    open={open}
-                    onClose={_handleClose}
-                    MenuListProps={{
-                        'aria-labelledby': 'basic-button',
+                <div className="container" style={{ display: "flex", marginTop: "-5%" }}>
+                    <h1 style={{ fontWeight: "bolder", fontSize: "20px" }}>
+                        Manage Material Table
+                    </h1>
+                    <div>
+                        <Button
+                            id="basic-button"
+                            aria-controls={open ? 'basic-menu' : undefined}
+                            aria-haspopup="true"
+                            aria-expanded={open ? 'true' : undefined}
+                            onClick={_handleClick}
+                            endIcon={<Add />}
+                            variant="contained"
+                            color="primary"
+                            style={{ backgroundColor: `#E96208`, color: `${colors.primary[200]} !important`, marginLeft: "20%" }}
+                        >
+                            ADD
+                        </Button>
+                        <Menu
+                            id="basic-menu"
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={_handleClose}
+                            MenuListProps={{
+                                'aria-labelledby': 'basic-button',
+                            }}
+                        >
+                            <MenuItem >
+                                <div onClick={_handleAddOpen}>ADD MANUAL</div>
+                                <Modal
+                                    open={addOpenOrClose}
+                                    aria-labelledby="modal-modal-title"
+                                    aria-describedby="modal-modal-description"
+                                >
+                                    <Box sx={{
+                                        backgroundColor: colors.primary[100], position: 'absolute',
+                                        top: '50%',
+                                        left: '50%',
+                                        transform: 'translate(-50%, -50%)',
+                                        width: "50%",
+                                        bgcolor: 'background.paper',
+                                        border: '2px solid #000',
+                                        boxShadow: 24,
+                                        p: 4,
+                                        borderRadius: "20px"
+                                    }}>
+                                        <AddEachMaterialsWithHand closeCard={_handleAddClose} addNewMaterial={_handleAddMaterial} />
+                                    </Box>
+                                </Modal>
+                            </MenuItem>
+
+                            <MenuItem>
+                                <div onClick={_handleAddMultipleOpen}>{t(codeLanguage + '000050')}</div>
+                                <Modal
+                                    open={addMultiple}
+                                    aria-labelledby="modal-modal-title"
+                                    aria-describedby="modal-modal-description"
+                                >
+                                    <Box sx={{
+                                        position: 'absolute',
+                                        top: '50%',
+                                        left: '50%',
+                                        transform: 'translate(-50%, -50%)',
+                                        width: "70%",
+                                        bgcolor: colors.primary[100],
+                                        border: '2px solid #000',
+                                        boxShadow: 24,
+                                        p: 4,
+                                        borderRadius: "20px"
+                                    }}>
+                                        <AddMultipleComponentWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddExcelMaterial} />
+                                    </Box>
+                                </Modal>
+
+                            </MenuItem>
+                        </Menu>
+                    </div>
+                </div>
+                <Box
+                    sx={{
+                        height: "100%",  // Adjust height as needed
+                        width: '100%',  // Adjust width as needed
+                        '& .MuiDataGrid-row:nth-of-type(odd)': {
+                            backgroundColor: '#D7E7FF !important',  // Change background color to blue for odd rows
+                        },
+                        '& .MuiDataGrid-row:nth-of-type(even)': {
+                            backgroundColor: '#FFFFFF !important',  // Change background color to red for even rows
+                        },
+                        '& .MuiDataGrid-columnHeaderTitle': {
+                            fontWeight: 'bolder',  // Make header text bolder
+                        }
                     }}
                 >
-                    <MenuItem >
-                        <div onClick={_handleAddOpen}>{t(codeLanguage + '000049')}</div>
-                        <Modal
-                            open={addOpenOrClose}
-                            aria-labelledby="modal-modal-title"
-                            aria-describedby="modal-modal-description"
-                        >
-                            <Box sx={{
-                                backgroundColor: colors.primary[100], position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: "50%",
-                                bgcolor: 'background.paper',
-                                border: '2px solid #000',
-                                boxShadow: 24,
-                                p: 4,
-                                borderRadius: "20px"
-                            }}>
-                                <AddEachMaterialsWithHand closeCard={_handleAddClose} addNewMaterial={_handleAddMaterial} />
-                            </Box>
-                        </Modal>
-                    </MenuItem>
-
-                    <MenuItem>
-                        <div onClick={_handleAddMultipleOpen}>{t(codeLanguage + '000050')}</div>
-                        <Modal
-                            open={addMultiple}
-                            aria-labelledby="modal-modal-title"
-                            aria-describedby="modal-modal-description"
-                        >
-                            <Box sx={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: "70%",
-                                bgcolor: colors.primary[100],
-                                border: '2px solid #000',
-                                boxShadow: 24,
-                                p: 4,
-                                borderRadius: "20px"
-                            }}>
-                                <AddMultipleComponentWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddMaterial} />
-                            </Box>
-                        </Modal>
-
-                    </MenuItem>
-                </Menu>
-
-                <DataGrid
-                    rows={data}
-                    columns={columns}
-                    slots={{ toolbar: GridToolbar }}
-                    disableRowSelectionOnClick
-                    getRowId={getRowId}
-                />
+                    <DataGrid
+                        rows={data}
+                        columns={columns}
+                        slots={{ toolbar: GridToolbar }}
+                        disableRowSelectionOnClick
+                        getRowId={getRowId}
+                    />
+                </Box>
                 <Modal
                     open={editopen}
                     aria-labelledby="modal-modal-title"

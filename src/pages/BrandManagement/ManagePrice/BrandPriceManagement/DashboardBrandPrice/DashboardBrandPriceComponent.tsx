@@ -3,7 +3,7 @@ import Sidebar from '../../../GlobalComponent/SideBarComponent/SideBarComponent'
 import Navbar from '../../../GlobalComponent/NavBarComponent/NavbarComponent';
 import { IconButton } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
-import ManagePrice from '../BrandManagementScreen/ManagPriceScreens';
+import ManagePrice from '../BrandManagementScreen/ManagePriceScreens';
 
 const DashboardBrandManagePriceQuantityScreen = () => {
     const [menuOpen, setMenuOpen] = useState(false);

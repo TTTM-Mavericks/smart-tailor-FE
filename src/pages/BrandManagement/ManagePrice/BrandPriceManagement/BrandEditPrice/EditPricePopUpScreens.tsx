@@ -4,22 +4,26 @@ import CloseIcon from '@mui/icons-material/Close';
 import Swal from "sweetalert2";
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
-import { Category } from "../../../../../models/AdminCategoryExcelModel";
-import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
+import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
+import { LaborQuantity } from "../../../../../models/LaborQuantityModel";
 
 interface EditPricePopUpScreenFormProps {
     fid: {
-        categoryID: string
-        categoryName: string;
+        laborQuantityID: string,
+        laborQuantityMinQuantity: number,
+        laborQuantityMaxQuantity: number,
+        laborQuantityMinPrice: number,
+        laborQuantityMaxPrice: number,
+        laborCostPerQuantity: number
     };
     editClose: () => void;
-    updateCategory: (updatedCategory: Category) => void;
+    updateCostBrand: (updatedCategory: LaborQuantity) => void;
 }
 
-const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, editClose, updateCategory }) => {
+const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, editClose, updateCostBrand }) => {
     const [formData, setFormData] = React.useState({
-        categoryID: fid.categoryID,
-        categoryName: fid.categoryName
+        laborQuantityID: fid.laborQuantityID,
+        brandLaborCostPerQuantity: fid.laborCostPerQuantity
     });
 
     const _handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,6 +34,13 @@ const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, e
         }));
     }
 
+    const userAuthData = localStorage.getItem('userAuth') as string;
+
+    const userAuth = JSON.parse(userAuthData);
+
+    const { userID, email, fullName, language, phoneNumber, roleName, imageUrl } = userAuth;
+
+    const LABORQUANTITYID = fid.laborQuantityID
     // Get language in local storage
     const selectedLanguage = localStorage.getItem('language');
     const codeLanguage = selectedLanguage?.toUpperCase();
@@ -42,54 +53,58 @@ const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, e
         }
     }, [selectedLanguage, i18n]);
 
+    console.log("formData" + formData.laborQuantityID);
     const _handleSubmit = async () => {
         try {
-            const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.updateCategory}`;
+            const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_labor_quantity + functionEndpoints.brandLaborQuantity.updateBrandLaborQuantity + `/${userID}`}`;
             const response = await axios.put(apiUrl, {
                 ...formData
             });
-
-            console.log("formData" + formData);
 
             if (!response.data) {
                 throw new Error('Error updating material');
             }
 
             if (response.data.status === 200) {
-                updateCategory(response.data.data);
+                updateCostBrand(response.data.data);
                 Swal.fire(
-                    `${t(codeLanguage + '000069')}`,
-                    `${t(codeLanguage + '000070')}`,
+                    'Update Success!',
+                    'Price Labor quantity has been update!',
                     'success'
                 );
+                editClose()
             }
 
             if (response.data.status === 409) {
                 Swal.fire(
-                    `${t(codeLanguage + '000071')}`,
-                    `${t(codeLanguage + '000072')}`,
+                    'Update Fail!',
+                    'Price Labor quantity has been updated fail!',
                     'error'
                 );
+                editClose()
+
             }
 
             if (response.data.status === 400) {
                 Swal.fire(
-                    `${t(codeLanguage + '000071')}`,
-                    `${t(codeLanguage + '000072')}`,
+                    'Update Fail!',
+                    'Price Labor quantity has been updated fail!',
                     'error'
                 );
+                editClose()
             }
-            sessionStorage.setItem("obj", JSON.stringify(formData));
 
 
             editClose(); // Close the edit modal after successful update
         } catch (error) {
             console.error('Update Error:', error);
             Swal.fire(
-                `${t(codeLanguage + '000071')}`,
-                `${t(codeLanguage + '000072')}`,
+                'Update Fail!',
+                'Price Labor quantity has been updated fail!',
                 'error'
             );
+            editClose()
+
         }
     };
 
@@ -107,7 +122,7 @@ const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, e
             <Box height={50} />
             <Grid container spacing={4}>
                 <Grid item xs={11}>
-                    <TextField name="categoryName" id="categoryName" label="Category Name" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={formData.categoryName} onChange={_handleChange} />
+                    <TextField name="brandLaborCostPerQuantity" id="brandLaborCostPerQuantity" label="Brand Labor Cost Per Quantity" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={formData.brandLaborCostPerQuantity} onChange={_handleChange} />
                 </Grid>
             </Grid>
             <div style={{ textAlign: "center", alignItems: "center", marginTop: "3rem" }}>

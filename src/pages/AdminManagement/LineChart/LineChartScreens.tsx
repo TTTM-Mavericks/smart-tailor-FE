@@ -1,5 +1,5 @@
 import { ResponsiveLine } from "@nivo/line";
-import { Card, ToggleButton, ToggleButtonGroup, Typography, useTheme } from "@mui/material";
+import { FormControl, InputLabel, Select, MenuItem, Box, useTheme } from '@mui/material';
 import { tokens } from "../../../theme";
 import { useEffect, useState } from "react";
 import { mockLineData as dataLineChart } from "./DataTestLineChart";
@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 const LineChart = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+    const color = theme.palette
 
     const [option, setOption] = useState("month");
 
@@ -51,30 +52,31 @@ const LineChart = () => {
 
     return (
         <>
-            <div style={{ display: "flex", margin: "2%" }}>
-                <Typography variant="h5">
-                    Line Chart
-                </Typography>
-                <Card sx={{ backgroundColor: `${colors.primary[600]} !important`, width: "19%", color: `${colors.primary[100]}`, marginTop: "2%", marginLeft: "60%" }}>
-                    <ToggleButtonGroup
-                        color="primary"
+            <Box sx={{ display: 'flex', justifyContent: 'right', alignItems: 'right', margin: '2%' }}>
+                <FormControl variant="outlined" sx={{ minWidth: 200, backgroundColor: color.background.paper, borderRadius: 1 }}>
+                    <InputLabel sx={{ color: color.text.primary }}>Filter by Category</InputLabel>
+                    <Select
                         value={option}
-                        exclusive
                         onChange={_handleChange}
-                        aria-label="Platform"
+                        label="Filter by Category"
+                        sx={{
+                            '& .MuiOutlinedInput-notchedOutline': {
+                                borderColor: color.grey[300],
+                            },
+                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                                borderColor: color.primary.main,
+                            },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                borderColor: color.primary.main,
+                            },
+                        }}
                     >
-                        <ToggleButton value="month" sx={{ color: colors.primary[200], fontWeight: "bold" }}>
-                            {t(codeLanguage + '000041')}
-                        </ToggleButton>
-                        <ToggleButton value="year" sx={{ color: colors.primary[200], fontWeight: "bold" }}>
-                            {t(codeLanguage + '000042')}
-                        </ToggleButton>
-                        <ToggleButton value="week" sx={{ color: colors.primary[200], fontWeight: "bold" }}>
-                            {t(codeLanguage + '000043')}
-                        </ToggleButton>
-                    </ToggleButtonGroup>
-                </Card>
-            </div>
+                        <MenuItem value="month"> {t(`${codeLanguage}000041`)}</MenuItem>
+                        <MenuItem value="week">{t(`${codeLanguage}000042`)}</MenuItem>
+                        <MenuItem value="year">{t(`${codeLanguage}000043`)}</MenuItem>
+                    </Select>
+                </FormControl>
+            </Box>
             <ResponsiveLine
                 data={filteredData}
                 theme={{

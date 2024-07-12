@@ -9,7 +9,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import EditMultipleMaterialInExcelTable from '../EditMaterialInExcelTable/EditMultipleUsersInExcelTable';
 import { useTranslation } from 'react-i18next';
-import { ExcelData } from '../../../../../models/BrandMaterialExcelModel';
+import { AddExcelMultiple, ExcelData } from '../../../../../models/BrandMaterialExcelModel';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import axios from 'axios';
 const brand_name = "LA LA LISA BRAND"
@@ -22,7 +22,7 @@ import Cookies from 'js-cookie';
 
 interface AddMaterialWithMultipleExcelFormProps {
     closeMultipleCard: () => void;
-    addNewMaterial: (addNewMaterial: ExcelData) => void
+    addNewMaterial: (addNewMaterial: AddExcelMultiple[]) => void
 }
 
 // Make Style of popup
@@ -40,7 +40,7 @@ const style = {
 
 };
 
-const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormProps> = ({ closeMultipleCard }) => {
+const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormProps> = ({ closeMultipleCard, addNewMaterial }) => {
     // ---------------UseState Variable---------------//
     const [error, setError] = React.useState<string>('');
     const [excelData, setExcelData] = React.useState<ExcelData[]>([]);
@@ -49,8 +49,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
     const [editingData, setEditingData] = React.useState<ExcelData | null>(null);
     const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
     const [editOpen, setEditOpen] = React.useState<boolean>(false);
-
-
+    const [addData, setAddData] = React.useState<ExcelData[]>([])
 
     // ---------------Usable Variable---------------//
     const theme = useTheme();
@@ -150,6 +149,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                         setSelectedFile(file);
                         setExcelData(updatedData)
                         setOriginalData(updatedData);
+                        setAddData(updatedData);
                         updatedData.forEach(item => {
                             console.log(`Category: ${item.Category_Name}, Material Name: ${item.Material_Name}, Unit: ${item.Unit}`);
                         });
@@ -185,37 +185,72 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
         console.log('File size:', selectedFile.size);
         console.log('File type:', selectedFile.type);
 
+
+        const transformedData = addData.map(item => ({
+            basePrice: item.Base_Price,
+            categoryName: item.Category_Name,
+            materialName: item.Material_Name,
+            unit: item.Unit,
+            hsCode: item.HS_Code,
+            brandPrice: item.Brand_Price
+        }));
+
+        const brandName = 'LA LA LISA BRAND'
         try {
-            const token = Cookies.get('token');
+            // const token = Cookies.get('token');
             const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_material + functionEndpoints.brand.addExcel}`, formData,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                }
+                // {
+                //     headers: {
+                //         'Authorization': `Bearer ${token}`
+                //     }
+                // }
             );
 
             // Handle successful response
-            console.log('Data uploaded successfully:', response);
             if (response.data.status === 200) {
                 Swal.fire({
                     icon: 'success',
-                    title: 'Profile Updated',
-                    text: 'Your profile has been updated successfully!',
+                    title: 'Add Brand Price Success!',
+                    text: 'Add Brand Price Success!'
                 });
+                addNewMaterial(transformedData)
                 closeMultipleCard();
             }
         } catch (error: any) {
             // Check for specific error status codes
             if (error.response) {
                 if (error.response.status === 400) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Add Brand Price Fail!',
+                        text: 'Add Brand Price Fail!'
+                    });
                     console.error('Failed to upload data: Bad Request');
+                    closeMultipleCard();
                 } else if (error.response.status === 401) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Add Brand Price Fail!',
+                        text: 'Add Brand Price Fail!'
+                    });
+                    closeMultipleCard();
                     console.error('Failed to upload data: Unauthorized');
                 } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Add Brand Price Fail!',
+                        text: 'Add Brand Price Fail!'
+                    });
+                    closeMultipleCard();
                     console.error('Failed to upload data: Unknown Error');
                 }
             } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Add Brand Price Fail!',
+                    text: 'Add Brand Price Fail!'
+                });
+                closeMultipleCard();
                 console.error('Error uploading data:', error.message);
             }
         }

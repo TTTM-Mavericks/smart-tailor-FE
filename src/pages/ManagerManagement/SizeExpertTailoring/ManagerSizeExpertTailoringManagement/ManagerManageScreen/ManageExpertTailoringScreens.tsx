@@ -6,14 +6,16 @@ import * as React from "react";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Swal from "sweetalert2";
-import EditMaterialPopUpScreens from "../AdminEditMaterial/EditMaterialPopUpScreens";
-import { Add } from "@mui/icons-material";
-import AddEachCategoryWithHand from "../../AddEachWithHand/AddEachCategoryWithHandScreens";
-import AddMultipleComponentWithExcel from "../../AddMultipleCategoryWithExcel/AddMultipleMaterialComponent";
+import EditExpertTailoringPopUpScreens from "../ManagerEditSizeExpertTailoring/EditSizeExpertTailoringPopUpScreens";
+import { Add, UndoOutlined } from "@mui/icons-material";
+import AddEachExpertTailoringWithHand from "../../AddEachWithHand/AddEachSizeExpertTailoringWithHandScreens";
+import AddMultipleExpertTailoringComponentWithExcel from "../../AddMultipleSizeExpertTailoring/AddMultipleSizeExpertTailoringComponent";
 import { useTranslation } from 'react-i18next';
-import { Category } from "../../../../../models/AdminCategoryExcelModel";
 import axios from "axios";
-import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
+import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
+import { AddExpertTailoring, ExpertTailoring } from "../../../../../models/ManagerExpertTailoringModel";
+import { ExpertTailoringEdit } from "../../../../../models/ManagerExpertTailoringModel";
+import { AddSizeExpertTailoring, SizeExpertTailoring, SizeExpertTailoringEdit } from "../../../../../models/ManagerSizeExpertTailoringModel";
 
 // Make Style of popup
 const style = {
@@ -29,13 +31,13 @@ const style = {
     borderRadius: "20px"
 };
 
-const ManageCategories: React.FC = () => {
+const ManageSizeExpertTailoring: React.FC = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [data, setData] = React.useState<Category[]>([]);
+    const [data, setData] = React.useState<SizeExpertTailoring[]>([]);
 
     // set formid to pass it to component edit Material
-    const [formId, setFormId] = React.useState<Category | null>(null);
+    const [formId, setFormId] = React.useState<SizeExpertTailoringEdit | null>(null);
 
     // Open Edit PopUp when clicking on the edit icon
     const [editopen, setEditOpen] = React.useState<boolean>(false);
@@ -51,7 +53,6 @@ const ManageCategories: React.FC = () => {
     const _handleClose = () => {
         setAnchorEl(null);
     };
-    console.log("anchorEl" + anchorEl);
 
     // close open pop up
     const [addOpenOrClose, setAddOpenOrClose] = React.useState<boolean>(false)
@@ -88,7 +89,7 @@ const ManageCategories: React.FC = () => {
     }, [selectedLanguage, i18n]);
 
     React.useEffect(() => {
-        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.getAllCategory}`;
+        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.sizeExpertTailoring + functionEndpoints.sizeExpertTailoring.getAllSizeExpertTailoring}`;
 
         axios.get(apiUrl)
             .then(response => {
@@ -109,35 +110,43 @@ const ManageCategories: React.FC = () => {
     }, []);
 
     // Thêm người dùng mới vào danh sách
-    const _handleAddCategory = (newCategory: Category) => {
-        setData(prevData => [...prevData, newCategory]);
+    const _handleAddSizeExpertTailoring = (addNewExpertTailoring: AddSizeExpertTailoring) => {
+        setData((prevData: any) => [...prevData, addNewExpertTailoring]);
     }
 
     // Cập nhật người dùng trong danh sách
-    const _handleUpdateCategory = (updateCategory: Category) => {
-        setData(prevData => prevData.map(Category => Category.categoryID === updateCategory.categoryID ? updateCategory : Category));
+    const _handleUpdateMaterial = (updatedExpertTailoring: ExpertTailoringEdit) => {
+        setData(prevData => prevData.map((ExpertTailoring: any) => ExpertTailoring.expertTailoringID === updatedExpertTailoring.expertTailoringID ? updatedExpertTailoring : ExpertTailoring));
     }
 
     // EDIT 
     const _handleEditClick = (
-        categoryID: string,
-        categoryName: string,
+        expertTailoringID: string,
+        expertTailoringName: string,
+        sizeName: string,
+        minFabric: number,
+        maxFabric: number,
+        unit: string
     ) => {
         // Handle edit action
-        const CategoryDataToEdit: Category = {
-            categoryID: categoryID,
-            categoryName: categoryName
+        const ExpertTailoringDataToEdit: SizeExpertTailoringEdit = {
+            expertTailoringID: expertTailoringID,
+            expertTailoringName: expertTailoringName,
+            sizeName: sizeName,
+            minFabric: minFabric,
+            maxFabric: maxFabric,
+            unit: unit
         }
-        setFormId(CategoryDataToEdit);
+        setFormId(ExpertTailoringDataToEdit);
         _handleEditOpen();
     };
 
     //DELETE OR UPDATE
-    const _handleDeleteClick = async (categoryID: string) => {
+    const _handleDeleteClick = async (expertTailoringID: string) => {
         try {
-            const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.updateCategory}`;
+            const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.updateStatusExpertTailoring}`;
 
-            const response = await axios.put(apiUrl + `/${categoryID}`)
+            const response = await axios.put(apiUrl + `/${expertTailoringID}`)
 
             if (!response.data) {
                 throw new Error('Error deleting material');
@@ -153,68 +162,77 @@ const ManageCategories: React.FC = () => {
     const _hanldeConfirmDelete = async (id: number) => {
         try {
             const result = await Swal.fire({
-                title: `${t(codeLanguage + '000061')}`,
-                text: `${t(codeLanguage + '000062')}`,
+                title: 'Are you sure to update status expert tailoring',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: `${t(codeLanguage + '000063')}`,
+                confirmButtonText: 'Yes, I want to update',
                 cancelButtonText: `${t(codeLanguage + '000055')}`
             });
 
             if (result.isConfirmed) {
                 await _handleDeleteClick(id.toString()); // Ensure id is converted to string if necessary
                 Swal.fire(
-                    `${t(codeLanguage + '000064')}`,
-                    `${t(codeLanguage + '000065')}`,
+                    'Updated status expert tailoring',
+                    'Updated status success',
                     'success'
                 );
 
-                // Remove the deleted material from the current data list
-                setData(prevData => prevData.filter(Material => Material.materialID !== id));
+                // Update the deleted material from the current data list
+                setData((prevData: any) =>
+                    prevData.map((expertTailoring: any) =>
+                        expertTailoring.expertTailoringID === id
+                            ? { ...expertTailoring, status: !expertTailoring.status }
+                            : expertTailoring
+                    )
+                );
             } else {
                 Swal.fire(
-                    `${t(codeLanguage + '000066')}`,
-                    `${t(codeLanguage + '000067')}`,
+                    'Updated status expert tailoring fail!',
+                    'Updated status fail',
                     'error'
                 );
             }
         } catch (error: any) {
             console.error('Error:', error);
             Swal.fire(
-                'Error',
-                `${error.message || 'Unknown error'}`,
+                'Updated status expert tailoring fail!',
+                'Updated status fail',
                 'error'
             );
         }
     };
 
     const columns: GridColDef[] = [
-        // { field: "id", headerName: "ID", flex: 0.5 },
         {
-            field: "categoryName",
-            headerName: "Category Name",
+            field: "expertTailoringName",
+            headerName: "ExpertTailoring Name",
             flex: 1,
         },
-        // {
-        //     field: "create_date",
-        //     headerName: "Create Date",
-        //     flex: 1,
-        // },
-        // {
-        //     field: "last_modifidate",
-        //     headerName: "Last Modify Date",
-        //     type: "number",
-        //     headerAlign: "left",
-        //     align: "left",
-        // },
-        // {
-        //     field: "status",
-        //     headerName: "status",
-        //     flex: 1,
-        // },
-
+        {
+            field: "sizeName",
+            headerName: "Size Name",
+            flex: 1,
+        },
+        {
+            field: "minFabric",
+            headerName: "Min Fabric",
+            headerAlign: "left",
+            align: "left",
+        },
+        {
+            field: "maxFabric",
+            headerName: "Max Fabric",
+            headerAlign: "left",
+            align: "left",
+        },
+        {
+            field: "unit",
+            headerName: "Unit",
+            headerAlign: "left",
+            align: "left",
+        },
         {
             field: "actions",
             headerName: "Actions",
@@ -222,19 +240,24 @@ const ManageCategories: React.FC = () => {
             sortable: false,
             renderCell: (params) => (
                 <Box>
-                    <IconButton onClick={() => _handleEditClick(params.row.categoryID, params.row.categoryName)}>
+                    <IconButton onClick={() => _handleEditClick(params.row.expertTailoringID, params.row.expertTailoringName, params.row.sizeName, params.row.minFabric, params.row.maxFabric, params.row.unit)}>
                         <EditIcon />
                     </IconButton>
-                    <IconButton onClick={() => _hanldeConfirmDelete(params.row.categoryID)}>
-                        <DeleteIcon htmlColor={colors.primary[300]} />
-                    </IconButton>
+                    {params.row.status ? (
+                        <IconButton onClick={() => _hanldeConfirmDelete(params.row.expertTailoringID)}>
+                            <DeleteIcon htmlColor={colors.primary[300]} />
+                        </IconButton>
+                    ) : (
+                        <IconButton onClick={() => _hanldeConfirmDelete(params.row.expertTailoringID)}>
+                            <UndoOutlined htmlColor="green" />
+                        </IconButton>
+                    )}
                 </Box>
             )
         }
     ];
 
-    const getRowId = (row: any) => `${row.categoryID}-${row.categoryName}`;
-
+    const getRowId = (row: any) => `${row.expertTailoringID}-${row.expertTailoringName}-${row.sizeImageUrl}`;
 
     return (
         <Box m="20px">
@@ -314,12 +337,12 @@ const ManageCategories: React.FC = () => {
                                 p: 4,
                                 borderRadius: "20px"
                             }}>
-                                <AddEachCategoryWithHand closeCard={_handleAddClose} addNewCategory={_handleAddCategory} />
+                                <AddEachExpertTailoringWithHand closeCard={_handleAddClose} addNewExpertTailoring={_handleAddSizeExpertTailoring} />
                             </Box>
                         </Modal>
                     </MenuItem>
 
-                    {/* <MenuItem>
+                    <MenuItem>
                         <div onClick={_handleAddMultipleOpen}>{t(codeLanguage + '000050')}</div>
                         <Modal
                             open={addMultiple}
@@ -338,11 +361,11 @@ const ManageCategories: React.FC = () => {
                                 p: 4,
                                 borderRadius: "20px"
                             }}>
-                                <AddMultipleComponentWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddCategory} />
+                                <AddMultipleExpertTailoringComponentWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddSizeExpertTailoring} />
                             </Box>
                         </Modal>
 
-                    </MenuItem> */}
+                    </MenuItem>
                 </Menu>
 
                 <DataGrid
@@ -359,10 +382,10 @@ const ManageCategories: React.FC = () => {
                 >
                     <Box sx={style}>
                         {formId !== null && (
-                            <EditMaterialPopUpScreens
+                            <EditExpertTailoringPopUpScreens
                                 editClose={_handleEditClose}
                                 fid={formId}
-                                updateCategory={_handleUpdateCategory}
+                                updateExpertTailoring={_handleUpdateMaterial}
                             />
                         )}
                     </Box>
@@ -372,4 +395,4 @@ const ManageCategories: React.FC = () => {
     );
 };
 
-export default ManageCategories;
+export default ManageSizeExpertTailoring;

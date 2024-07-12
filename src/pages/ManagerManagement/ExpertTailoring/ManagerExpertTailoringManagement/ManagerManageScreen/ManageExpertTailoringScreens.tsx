@@ -7,13 +7,13 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Swal from "sweetalert2";
 import EditExpertTailoringPopUpScreens from "../ManagerEditExpertTailoring/EditExpertTailoringPopUpScreens";
-import { Add } from "@mui/icons-material";
+import { Add, UndoOutlined } from "@mui/icons-material";
 import AddEachExpertTailoringWithHand from "../../AddEachWithHand/AddEachExpertTailoringWithHandScreens";
 import AddMultipleExpertTailoringComponentWithExcel from "../../AddMultipleExpertTailoringWithExcel/AddMultipleExpertTailoringComponent";
 import { useTranslation } from 'react-i18next';
 import axios from "axios";
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
-import { ExpertTailoring } from "../../../../../models/ManagerExpertTailoringModel";
+import { AddExpertTailoring, ExpertTailoring } from "../../../../../models/ManagerExpertTailoringModel";
 import { ExpertTailoringEdit } from "../../../../../models/ManagerExpertTailoringModel";
 
 // Make Style of popup
@@ -109,8 +109,8 @@ const ManageExpertTailoring: React.FC = () => {
     }, []);
 
     // Thêm người dùng mới vào danh sách
-    const _handleAddExpertTailoring = (addNewExpertTailoring: ExpertTailoring) => {
-        setData(prevData => [...prevData, addNewExpertTailoring]);
+    const _handleAddExpertTailoring = (addNewExpertTailoring: AddExpertTailoring) => {
+        setData((prevData: any) => [...prevData, addNewExpertTailoring]);
     }
 
     // Cập nhật người dùng trong danh sách
@@ -155,21 +155,20 @@ const ManageExpertTailoring: React.FC = () => {
     const _hanldeConfirmDelete = async (id: number) => {
         try {
             const result = await Swal.fire({
-                title: `${t(codeLanguage + '000061')}`,
-                text: `${t(codeLanguage + '000062')}`,
+                title: 'Are you sure to update status expert tailoring',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: `${t(codeLanguage + '000063')}`,
+                confirmButtonText: 'Yes, I want to update',
                 cancelButtonText: `${t(codeLanguage + '000055')}`
             });
 
             if (result.isConfirmed) {
                 await _handleDeleteClick(id.toString()); // Ensure id is converted to string if necessary
                 Swal.fire(
-                    `${t(codeLanguage + '000064')}`,
-                    `${t(codeLanguage + '000065')}`,
+                    'Updated status expert tailoring',
+                    'Updated status success',
                     'success'
                 );
 
@@ -183,16 +182,16 @@ const ManageExpertTailoring: React.FC = () => {
                 );
             } else {
                 Swal.fire(
-                    `${t(codeLanguage + '000066')}`,
-                    `${t(codeLanguage + '000067')}`,
+                    'Updated status expert tailoring fail!',
+                    'Updated status fail',
                     'error'
                 );
             }
         } catch (error: any) {
             console.error('Error:', error);
             Swal.fire(
-                'Error',
-                `${error.message || 'Unknown error'}`,
+                'Updated status expert tailoring fail!',
+                'Updated status fail',
                 'error'
             );
         }
@@ -206,7 +205,7 @@ const ManageExpertTailoring: React.FC = () => {
         },
         {
             field: "sizeImageUrl",
-            headerName: "Size Image Url",
+            headerName: "Size Image Urls",
             flex: 1,
         },
         {
@@ -225,9 +224,15 @@ const ManageExpertTailoring: React.FC = () => {
                     <IconButton onClick={() => _handleEditClick(params.row.expertTailoringID, params.row.expertTailoringName, params.row.sizeImageUrl)}>
                         <EditIcon />
                     </IconButton>
-                    <IconButton onClick={() => _hanldeConfirmDelete(params.row.expertTailoringID)}>
-                        <DeleteIcon htmlColor={colors.primary[300]} />
-                    </IconButton>
+                    {params.row.status ? (
+                        <IconButton onClick={() => _hanldeConfirmDelete(params.row.expertTailoringID)}>
+                            <DeleteIcon htmlColor={colors.primary[300]} />
+                        </IconButton>
+                    ) : (
+                        <IconButton onClick={() => _hanldeConfirmDelete(params.row.expertTailoringID)}>
+                            <UndoOutlined htmlColor="green" />
+                        </IconButton>
+                    )}
                 </Box>
             )
         }

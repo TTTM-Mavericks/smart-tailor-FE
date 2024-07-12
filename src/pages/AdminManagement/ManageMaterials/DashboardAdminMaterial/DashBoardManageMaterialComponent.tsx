@@ -4,8 +4,10 @@ import Navbar from '../../GlobalComponent/NavbarComponent/NavbarComponent';
 import ManageMaterials from '../AdminMaterialManagerment/AdminManagerScreen/ManageMaterialScreens';
 import { IconButton } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
-import ManageCategories from '../../ManageCategory/AdminCategoryManagement/AdminManagerScreen/ManageMaterialScreens';
+import ManageCategories from '../../ManageCategory/AdminCategoryManagement/AdminManagerScreen/ManageCategoryScreens';
 import ManageSizes from '../../ManageSize/AdminSizeManagement/AdminManagerScreen/ManageSizeScreens';
+import { Box } from '@mui/system';
+import './DashBoardMaterialStyle.module.scss'
 
 const DashboardAdminManageMaterialScreen = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -74,16 +76,18 @@ const DashboardAdminManageMaterialScreen = () => {
             <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
             <div className="flex flex-col w-full">
                 <Navbar toggleMenu={toggleMenu} menu="Mangage Material & Category & Size" popperOpen={popperOpen} togglePopper={togglePopper} />
-                <main className="p-6 flex-grow ml-0 xl:ml-[20%] mt-[-3%]">
+                <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
                     <div>
                         <ManageMaterials />
                     </div>
-                    <div style={{ marginTop: "10%" }}>
-                        <ManageCategories />
-                    </div>
-                    <div style={{ marginTop: "10%" }}>
-                        <ManageSizes />
-                    </div>
+                    <Box display="flex" justifyContent="space-between" m="20px" width="100%">
+                        <Box flex="1" m="10px">
+                            <ManageSizes />
+                        </Box>
+                        <Box flex="1" m="10px">
+                            <ManageCategories />
+                        </Box>
+                    </Box>
                 </main>
                 {showScrollButton && (
                     <IconButton

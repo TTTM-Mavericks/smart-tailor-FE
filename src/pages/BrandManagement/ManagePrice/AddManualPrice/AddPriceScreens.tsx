@@ -13,17 +13,27 @@ import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import { Category } from '../../../../models/AdminCategoryExcelModel';
+import { LaborQuantity } from '../../../../models/LaborQuantityModel';
+import { BrandLaborQuantity } from '../../../../models/BrandLaborQuantityModel';
+
 interface AddPriceWithHandsFormProps {
     closeCard: () => void;
-    addNewCategory: (addedNewCategory: Category) => void
+    addNewLaborQuantity: (addedNewCategory: LaborQuantity) => void
 }
 
-const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNewCategory }) => {
+
+const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNewLaborQuantity }) => {
 
     // ---------------UseState Variable---------------//
     const [formData, setFormData] = useState({
         categoryName: 'Vải',
     });
+
+    const userAuthData = localStorage.getItem('userAuth') as string;
+
+    const userAuth = JSON.parse(userAuthData);
+
+    const { userID, email, fullName, language, phoneNumber, roleName, imageUrl } = userAuth;
 
 
     // ---------------Usable Variable---------------//
@@ -76,7 +86,7 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
             console.log('Response:', response.data);
 
             if (response.data.status === 200) {
-                addNewCategory(response.data);
+                addNewLaborQuantity(response.data);
                 Swal.fire(
                     'Add Success!',
                     'User has been updated!',
@@ -100,35 +110,82 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
         }
     };
 
-    const [prices, setPrices] = useState([
-        { quantity: '1 - 10', basePrice: '150000 - 170000', brandPrice: '' },
-        { quantity: '11 - 20', basePrice: '150000 - 170000', brandPrice: '' },
-        { quantity: '11 - 20', basePrice: '150000 - 170000', brandPrice: '' },
-        { quantity: '11 - 20', basePrice: '150000 - 170000', brandPrice: '' },
-        { quantity: '11 - 20', basePrice: '150000 - 170000', brandPrice: '' },
-        // Add more rows as needed
-    ]);
 
-    const handlePriceChange = (index: any, event: any) => {
+    const [prices, setPrices] = useState<LaborQuantity[]>([]);
+
+    useEffect(() => {
+        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.labor_quantity + functionEndpoints.laborQantity.getAllLaborQuantity}`;
+
+        axios.get(apiUrl)
+            .then(response => {
+                if (response.status !== 200) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.data;
+            })
+            .then((responseData) => {
+                if (responseData && Array.isArray(responseData.data)) {
+                    setPrices(responseData.data);
+                    console.log("Data received:", responseData);
+                } else {
+                    console.error('Invalid data format:', responseData);
+                }
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    }, []);
+
+    const handlePriceChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
         const newPrices = prices.slice();
-        newPrices[index].brandPrice = event.target.value;
+        newPrices[index].brandLaborCostPerQuantity = parseFloat(event.target.value);
         setPrices(newPrices);
     };
 
-    const handleSubmit = async (event: any) => {
+    const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         console.log('Prices:', prices);
 
-        // Uncomment and use the following lines to make a POST request
-        // try {
-        //   const response = await axios.post('/your-api-endpoint', { sizes, prices });
-        //   console.log('Response:', response.data);
-        //   // Handle success response
-        // } catch (error) {
-        //   console.error('Error:', error);
-        //   // Handle error response
-        // }
+        const formData = {
+            brandLaborQuantity: prices.map(price => ({
+                laborQuantityID: price.laborQuantityID,
+                brandLaborCostPerQuantity: price.brandLaborCostPerQuantity
+            }))
+        };
+
+        try {
+            console.log('Form Data:', JSON.stringify(formData));
+
+            const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_labor_quantity + functionEndpoints.brandLaborQuantity.addNewBrandLaborQuantity + `/${userID}`}`, formData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            console.log('Response:', response.data.data);
+
+            if (response.data.status === 200) {
+                // addNewLaborQuantity(formData);
+                Swal.fire(
+                    'Add Success!',
+                    'Labor quantity has been added!',
+                    'success'
+                );
+            } else {
+                Swal.fire(
+                    'Add Failed!',
+                    'Please check the information!',
+                    'error'
+                );
+            }
+        } catch (err: any) {
+            console.error('Error:', err);
+            Swal.fire(
+                'Add Failed!',
+                'Please check the information!',
+                'error'
+            );
+        }
     };
+
     return (
         <div>
             <IconButton
@@ -137,7 +194,7 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
             >
                 <CloseIcon />
             </IconButton>
-            <form onSubmit={handleSubmit}>
+            <div>
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr>
@@ -148,13 +205,13 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
                     </thead>
                     <tbody>
                         {prices.map((price, index) => (
-                            <tr key={index} className="odd:bg-gray-50">
-                                <td className="border-b py-2 px-4">{price.quantity}</td>
-                                <td className="border-b py-2 px-4">{price.basePrice}</td>
+                            <tr key={price.laborQuantityID} className="odd:bg-gray-50">
+                                <td className="border-b py-2 px-4">{price.laborQuantityMinQuantity} - {price.laborQuantityMaxQuantity}</td>
+                                <td className="border-b py-2 px-4">{price.laborQuantityMinPrice} - {price.laborQuantityMaxPrice}</td>
                                 <td className="border-b py-2 px-4">
                                     <input
                                         type="number"
-                                        value={price.brandPrice}
+                                        value={price.brandLaborCostPerQuantity || ''}
                                         onChange={(event) => handlePriceChange(index, event)}
                                         placeholder="Enter brand price"
                                         className="w-full border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -164,15 +221,18 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
                         ))}
                     </tbody>
                 </table>
-                <button
-                    type="submit"
-                    className="mt-4 w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-                >
-                    Submit
-                </button>
-            </form>
+                <div onClick={closeCard}>
+                    <button
+                        type="submit"
+                        onClick={handleSubmit}
+                        className="mt-4 w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                    >
+                        Submit
+                    </button>
+                </div>
+            </div>
         </div>
     );
-}
+};
 
 export default AddPriceManual;

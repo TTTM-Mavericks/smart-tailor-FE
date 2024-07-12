@@ -6,9 +6,9 @@ import { jwtDecode } from 'jwt-decode';
 // const baseURL = 'https://whear-app.azurewebsites.net';
 // const baseURL = 'https://tam.mavericks-tttm.studio';
 // export const baseURL = 'https://be.mavericks-tttm.studio';
-// export const baseURL = 'https://dev01.smart-tailor.live';
+export const baseURL = 'https://dev01.smart-tailor.live';
 
-export const baseURL = 'http://localhost:6969';
+// export const baseURL = 'http://localhost:6969';
 export const googleOAuth2 = '/oauth2/authorization/google'
 export const versionEndpoints = {
   v1: '/api/v1',
@@ -24,9 +24,13 @@ export const featuresEndpoints = {
   material: '/material',
   category: '/category',
   manager: '/expert-tailoring',
+  labor_quantity: '/labor-quantity',
+  size: '/size',
+  brand_labor_quantity: '/brand-labor-quantity',
   order: '/order',
   sizeExpertTailoring: '/size-expert-tailoring',
   expertTailoring: '/expert-tailoring',
+  expertTailoringMaterial: '/expert-tailoring-material'
 }
 export const functionEndpoints = {
   auth: {
@@ -51,7 +55,8 @@ export const functionEndpoints = {
   },
   brand: {
     addExcel: '/add-new-brand-material-by-excel-file',
-    addManual: '/add-new-brand-material'
+    addManual: '/add-new-brand-material',
+    updateBrandMaterial: '/update-brand-material',
   },
   customer: {
     updateProfile: '/update-customer-profile'
@@ -88,15 +93,45 @@ export const functionEndpoints = {
     getCategoryById: '/get-category-by-id',
     getAllCategory: '/get-all-category'
   },
+  laborQantity: {
+    getAllLaborQuantity: '/get-all-labor-quantity',
+    addNewLaborQuantity: '/add-new-labor-quantity',
+    updateLaborQuantity: '/update-labor-quantity',
+    getAllLaborQuantityByBrandID: '/get-all-brand-labor-quantity-by-brand-id'
+  },
+  size: {
+    getAllSize: '/get-all-size',
+    addNewSize: '/add-new-size',
+    updateSize: '/update-size'
+  },
+  brandLaborQuantity: {
+    getAllBrandLaborQuantity: '/get-all-brand-labor-quantity-by-brand-id',
+    addNewBrandLaborQuantity: '/add-new-brand-labor-quantity',
+    updateBrandLaborQuantity: '/update-brand-labor-quantity'
+  },
   order: {
     createOrder: '/create-order',
     getOrderById: '/get-order-by-id'
   },
   sizeExpertTailoring: {
-    getAllSizeExpertTailoringByExperId: '/get-all-size-by-expert-tailoring-id'
+    getAllSizeExpertTailoringByExperId: '/get-all-size-by-expert-tailoring-id',
+    getAllSizeExpertTailoring: '/get-all-size-expert-tailoring',
+    generateSizeExpertTailoringSample: '/generate-sample-size-expert-tailoring-by-excel-file',
+    addNewSizeExpertTailoring: '/add-new-size-expert-tailoring',
+    addNewSizeExpertTailoringByExcel: '/add-new-size-expert-tailoring-by-excel-file',
+    updateSizeExpertTailoring: '/update-size-expert-tailoring',
   },
   expertTailoring: {
     getAllExpertTailoring: '/get-all-expert-tailoring',
+  },
+  expertTailoringMaterial: {
+    getAllExpertTailoringMaterial: '/get-all-expert-tailoring-material',
+    getAllExpertTailoringMaterialByExpertTailoringId: '/get-all-expert-tailoring-material-by-expert-tailoring-id',
+    getAllExpertTailoringMaterialByExpertTailoringName: '/get-all-expert-tailoring-material-by-expert-tailoring-name',
+    generateSampleFile: '/generate-sample-category-material-expert-tailoring-by-excel-file',
+    addNewExpertTailoringMaterial: '/add-new-expert-tailoring-material',
+    addNewExpertTailoringByExcelFile: '/add-new-expert-tailoring-material-by-excel-file',
+    updateStatusExpertTailoringMaterial: '/change-status-expert-tailoring-material'
   }
 }
 
