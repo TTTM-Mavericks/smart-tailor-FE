@@ -258,7 +258,7 @@ const ManageMaterialComponent: React.FC = () => {
             renderCell: (params) => (
                 <Box>
                     <IconButton onClick={() => _handleEditClick(params.row.categoryName, params.row.materialName, params.row.hsCode, params.row.unit, params.row.brandPrice, params.row.basePrice, params.row.brandName)}>
-                        <EditIcon />
+                        <EditIcon htmlColor="#E96208" />
                     </IconButton>
                     {/* <IconButton onClick={() => _hanldeConfirmDelete(params.row.id)}>
                         <DeleteIcon htmlColor={colors.primary[300]} />
@@ -271,7 +271,7 @@ const ManageMaterialComponent: React.FC = () => {
     const getRowId = (row: any) => `${row.id}-${row.materialName}`;
 
     return (
-        <Box m="20px">
+        <Box m="20px" sx={{ marginTop: "-5%" }}>
             <Box
                 m="40px 0 0 0"
                 height="75vh"
@@ -316,7 +316,7 @@ const ManageMaterialComponent: React.FC = () => {
                     endIcon={<Add />}
                     variant="contained"
                     color="primary"
-                    style={{ backgroundColor: `${colors.primary[300]} !important`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
+                    style={{ backgroundColor: `#E96208`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
                 >
                     {t(codeLanguage + '000048')}
                 </Button>
@@ -378,15 +378,30 @@ const ManageMaterialComponent: React.FC = () => {
 
                     </MenuItem>
                 </Menu>
-
-                <DataGrid
-                    rows={data}
-                    columns={columns}
-                    slots={{ toolbar: GridToolbar }}
-                    // checkboxSelection
-                    disableRowSelectionOnClick
-                    getRowId={getRowId}
-                />
+                <Box
+                    sx={{
+                        height: "100%",  // Adjust height as needed
+                        width: '100%',  // Adjust width as needed
+                        '& .MuiDataGrid-row:nth-of-type(odd)': {
+                            backgroundColor: '#D7E7FF !important',  // Change background color to blue for odd rows
+                        },
+                        '& .MuiDataGrid-row:nth-of-type(even)': {
+                            backgroundColor: '#FFFFFF !important',  // Change background color to red for even rows
+                        },
+                        '& .MuiDataGrid-columnHeaderTitle': {
+                            fontWeight: 'bolder',  // Make header text bolder
+                        }
+                    }}
+                >
+                    <DataGrid
+                        rows={data}
+                        columns={columns}
+                        slots={{ toolbar: GridToolbar }}
+                        // checkboxSelection
+                        disableRowSelectionOnClick
+                        getRowId={getRowId}
+                    />
+                </Box>
                 <Modal
                     open={editopen}
                     aria-labelledby="modal-modal-title"

@@ -559,7 +559,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                             <tbody>
                                 {excelData.map((data, index) => (
                                     <tr key={data.id}>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Category_Name ? colors.primary[200] : 'red' }} >{data.Category_Name || 'Null Category Name'}</td>
+                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Category_Name ? colors.primary[200] : 'red' }}>{data.Category_Name || 'Null Category Name'}</td>
                                         <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Material_Name ? colors.primary[200] : 'red' }}>{data.Material_Name || 'Null Material Name'}</td>
                                         <td style={{ border: '1px solid #ddd', padding: '8px', color: data.HS_Code ? colors.primary[200] : 'red' }}>{data.HS_Code || 'Null'}</td>
                                         <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Unit ? colors.primary[200] : 'red' }}>{data.Unit || 'Null Unit'}</td>
@@ -568,13 +568,9 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                                         <td style={{ border: '1px solid #ddd', padding: '8px' }}>
                                             {(() => {
                                                 const hasNullValues = Object.values(data).some(value => value === null || value === '' || value === undefined);
-                                                const isPriceInvalid = data.Brand_Price <= 0;
-                                                const isPriceNull = data.Brand_Price === null || data.Brand_Price === undefined
-                                                if (hasNullValues || isPriceInvalid || isPriceNull) {
+                                                if (hasNullValues) {
                                                     const errorMessage = [];
                                                     if (hasNullValues) errorMessage.push('Null Values');
-                                                    if (isPriceInvalid) errorMessage.push('Price must be greater than 0');
-                                                    if (isPriceNull) errorMessage.push('Price Is Null')
 
                                                     return (
                                                         <div style={{ color: 'red' }}>
