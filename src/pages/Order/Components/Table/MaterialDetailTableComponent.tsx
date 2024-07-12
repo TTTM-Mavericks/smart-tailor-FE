@@ -1,23 +1,26 @@
-import * as React from 'react';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
+import React, { useEffect, useState } from 'react';
+import {
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+} from '@mui/material';
 import { TableVirtuoso, TableComponents } from 'react-virtuoso';
 import { grayColor1 } from '../../../../root/ColorSystem';
-import { height } from '@mui/system';
+import { __handleAddCommasToNumber } from '../../../../utils/NumbericUtils';
+import { MaterialDetailInterface } from '../../../../models/DesignModel';
 
 interface Data {
-    hsCode: number,
-    materialName: string,
-    category: string,
-    unit: number,
-    quantity: number,
-    minPrice: number,
-    maxPrice: number
+    hsCode?: number,
+    materialName?: string,
+    category?: string,
+    unit?: string,
+    quantity?: number,
+    minPrice?: number,
+    maxPrice?: number
 }
 
 interface ColumnData {
@@ -27,32 +30,11 @@ interface ColumnData {
     width: number;
 }
 
-type Sample = [number, string, string, number, number, number, number];
-
-const sample: readonly Sample[] = [
-    [1, 'Vải cotton', 'Vải', 6.0, 24, 4.0, 4],
-    [2, 'Vải nỉ', 'Vải', 9.0, 37, 4.3, 5],
-    [3, 'Chỉ alizabet', 'Chỉ', 16.0, 24, 6.0, 6],
-    [4, 'Cúc hoàng kim', 'Chỉ', 3.7, 67, 4.3, 7],
-    [5, 'vải nilon', 'Vải', 16.0, 49, 3.9, 9],
-];
-
-function createData(
-    hsCode: number,
-    materialName: string,
-    category: string,
-    unit: number,
-    quantity: number,
-    minPrice: number,
-    maxPrice: number
-): Data {
-    return { hsCode, materialName, category, unit, quantity, minPrice, maxPrice };
-}
 
 const columns: ColumnData[] = [
     {
         width: 100,
-        label: 'Hs code',
+        label: 'HSCode',
         dataKey: 'hsCode',
     },
     {
@@ -69,7 +51,6 @@ const columns: ColumnData[] = [
         width: 50,
         label: 'Unit',
         dataKey: 'unit',
-        numeric: true,
     },
     {
         width: 50,
@@ -79,36 +60,31 @@ const columns: ColumnData[] = [
     },
     {
         width: 120,
-        label: 'Min price',
+        label: 'Min price (VND)',
         dataKey: 'minPrice',
         numeric: true,
     },
     {
         width: 120,
-        label: 'Max price',
+        label: 'Max price (VND)',
         dataKey: 'maxPrice',
         numeric: true,
     },
 ];
 
-const rows: Data[] = Array.from({ length: 20 }, (_, index) => {
-    const randomSelection: Sample = sample[Math.floor(Math.random() * sample.length)];
-    return createData(...randomSelection);
-});
-
 const VirtuosoTableComponents: TableComponents<Data> = {
     Scroller: React.forwardRef<HTMLDivElement>((props, ref) => (
-        <TableContainer component={Paper} {...props} ref={ref} sx={customScrollbarStyles}/>
+        <TableContainer component={Paper} {...props} ref={ref} sx={customScrollbarStyles} />
     )),
     Table: (props) => (
         <Table {...props} sx={{ borderCollapse: 'separate', tableLayout: 'fixed', fontSize: 12, border: 'none' }} />
     ),
     TableHead: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
-        <TableHead {...props} ref={ref} sx={{fontSize: 12}} />
+        <TableHead {...props} ref={ref} sx={{ fontSize: 12 }} />
     )),
-    TableRow: ({ item: _item, ...props }) => <TableRow {...props} sx={{fontSize: 12}}/>,
+    TableRow: ({ item: _item, ...props }) => <TableRow {...props} sx={{ fontSize: 12 }} />,
     TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
-        <TableBody {...props} ref={ref} sx={{fontSize: 12}}/>
+        <TableBody {...props} ref={ref} sx={{ fontSize: 12 }} />
     )),
 };
 
@@ -120,7 +96,7 @@ function fixedHeaderContent() {
                     key={column.dataKey}
                     variant="head"
                     align={column.numeric ? 'right' : 'left'}
-                    style={{ width: column.width }}
+                    style={{ width: column.width, fontWeight: 'bold' }}
                     sx={{
                         backgroundColor: 'background.paper',
                     }}
@@ -147,32 +123,71 @@ function rowContent(_index: number, row: Data) {
     );
 }
 
-type MaterialDetailTableProps = {
-
-}
-
 const customScrollbarStyles = {
     '&::-webkit-scrollbar': {
-      width: '0.3em',
-      height: '0.3em', // Horizontal scrollbar height
-      borderRadius: '4px',
-      backgroundColor: grayColor1,
+        width: '0.3em',
+        height: '0.3em', // Horizontal scrollbar height
+        borderRadius: '4px',
+        backgroundColor: grayColor1,
     },
     '&::-webkit-scrollbar-track': {
-      boxShadow: 'inset 0 0 6px rgba(0,0,0,0.1)',
-      borderRadius: '4px',
-      backgroundColor: grayColor1,
+        boxShadow: 'inset 0 0 6px rgba(0,0,0,0.1)',
+        borderRadius: '4px',
+        backgroundColor: grayColor1,
     },
     '&::-webkit-scrollbar-thumb': {
-      backgroundColor: '#7b7b7b',
-      borderRadius: '4px',
+        backgroundColor: '#7b7b7b',
+        borderRadius: '4px',
     },
-  };
+};
 
 
-const MaterialDetailTableComponent: React.FC<MaterialDetailTableProps> = ({ }) => {
+type MaterialDetailTableProps = {
+    materialDetailData?: MaterialDetailInterface[];
+    onGetMaterialPrice?: (price: any) => void;
+}
+
+const MaterialDetailTableComponent: React.FC<MaterialDetailTableProps> = ({ materialDetailData, onGetMaterialPrice }) => {
+    const [rows, setRows] = React.useState<Data[]>([]);
+    const [materialTotalPrice, setMaterialTotalPrice] = useState<{ min: number, max: number }>();
+
+    useEffect(() => {
+        if (materialDetailData) {
+            const transformedData = transformMaterialDetailData(materialDetailData);
+            setRows(transformedData);
+    
+            const getTotalMaterialPrice = () => {
+                let totalMin = 0;
+                let totalMax = 0;
+    
+                materialDetailData.forEach(item => {
+                    // Add a check to ensure minPrice and maxPrice are defined
+                    if (item.minPrice !== undefined) {
+                        totalMin += item.minPrice;
+                    }
+                    if (item.maxPrice !== undefined) {
+                        totalMax += item.maxPrice;
+                    }
+                });
+    
+                return { min: totalMin, max: totalMax };
+            };
+    
+            // Update state with the total prices
+            setMaterialTotalPrice(getTotalMaterialPrice());
+        }
+    }, [materialDetailData]);
+    
+
+    useEffect(() => {
+        if (onGetMaterialPrice) {
+            onGetMaterialPrice(materialTotalPrice)
+        }
+    }, [onGetMaterialPrice])
+
+
     return (
-        <Paper style={{ height: 400, width: '100%', boxShadow: 'none', border: 'none' }}>
+        <Paper style={{ height: 400, width: '90%', boxShadow: 'none', border: 'none', margin: '0 auto' }}>
             <TableVirtuoso
                 data={rows}
                 components={VirtuosoTableComponents}
@@ -184,3 +199,15 @@ const MaterialDetailTableComponent: React.FC<MaterialDetailTableProps> = ({ }) =
 }
 
 export default MaterialDetailTableComponent;
+
+const transformMaterialDetailData = (materialDetailData: MaterialDetailInterface[]): Data[] => {
+    return materialDetailData.map((materialDetail) => ({
+        hsCode: materialDetail.materialResponse?.hsCode ?? 0,
+        materialName: materialDetail.materialResponse?.materialName ?? '',
+        category: materialDetail.materialResponse?.categoryName ?? '',
+        unit: materialDetail.materialResponse?.unit, // Assuming unit should be a number
+        quantity: 0, // Placeholder, update this if quantity is available in the data
+        minPrice: __handleAddCommasToNumber(materialDetail?.minPrice) ?? 0,
+        maxPrice: __handleAddCommasToNumber(materialDetail.maxPrice) ?? 0,
+    }));
+};

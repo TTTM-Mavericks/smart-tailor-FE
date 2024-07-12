@@ -10,9 +10,9 @@ import { ChooseMaterialDialogComponent, ColorPicker, FilePicker, TextEditor } fr
 import { shirtFrontDesign } from '../../assets';
 import { shirtModel, systemLogo } from '../../assets';
 import { HiOutlineDownload, HiShoppingCart, HiOutlineLogin } from 'react-icons/hi';
-import { FaSave, FaTshirt, FaPen, FaIcons, FaRegHeart, FaFileCode, FaHeart } from "react-icons/fa";
+import { FaSave, FaTshirt, FaPen, FaIcons, FaRegHeart, FaFileCode, FaHeart, FaCrown } from "react-icons/fa";
 import { useTranslation } from 'react-i18next';
-import { blackColor, primaryColor, redColor, whiteColor } from '../../root/ColorSystem';
+import { blackColor, greenColor, primaryColor, redColor, whiteColor, yellowColor } from '../../root/ColorSystem';
 import { IoMdColorPalette } from "react-icons/io";
 import { IoText } from "react-icons/io5";
 import { GiClothes } from "react-icons/gi";
@@ -31,6 +31,7 @@ import { UserInterface } from '../../models/UserModel';
 import Cookies from 'js-cookie';
 import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { Cloud, UploadCloud } from 'react-feather';
 
 
 interface ItemMask {
@@ -85,6 +86,7 @@ function CustomDesignScreen() {
   const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
   const [isOpenProductDialog, setIsOpenProductDialog] = useState<boolean>(false);
   const [typeOfModel, setTypeOfModel] = useState<string>('shirtModel');
+  const [typeOfModelID, setTypeOfModelID] = useState<string>('');
   const [currentItemList, setCurrentItemList] = useState<ItemMaskInterface[]>();
   const [isCurrentItemListLoading, setIsCurrentItemListLoading] = useState<boolean>(true);
   const [designModelData, setDesignModelData] = useState<DesignInterface>();
@@ -104,6 +106,7 @@ function CustomDesignScreen() {
   const [userAuth, setUserAuth] = useState<UserInterface>();
   const [mainDesign, setMainDesign] = useState<DesignInterface>();
   const [usedMaterial, setUsedMaterial] = useState<MaterialInterface[]>();
+  const [titleDesign, setTitleDesign] = useState<string>('Design sample');
 
 
 
@@ -154,6 +157,7 @@ function CustomDesignScreen() {
   }, [selectedLanguage]);
 
   useEffect(() => {
+    console.log('selectedPartOfCloth.partOfDesignIDselectedPartOfCloth.partOfDesignID: ', selectedPartOfCloth.partOfDesignID);
     setSelectedPartOfCloth(selectedPartOfCloth);
     const result = partOfClothData?.find((item: PartOfDesignInterface) => item.partOfDesignName === selectedPartOfCloth.partOfDesignName);
     if (result) {
@@ -430,7 +434,7 @@ function CustomDesignScreen() {
     if (result) {
       const imgBase64 = await __handleChangeImageToBase64(result.imageUrl);
       result.imageUrl = imgBase64; // Update the imageUrl with base64 string
-
+      result.partOfDesignID === selectedPartOfCloth.partOfDesignID;
       setSelectedStamp((prevSelectedStamp = []) => {
         const existingItemIndex = prevSelectedStamp.findIndex(
           (existingItem: ItemMaskInterface) => existingItem.itemMaskID === item.itemMaskID
@@ -444,7 +448,8 @@ function CustomDesignScreen() {
           return updatedStamps;
         } else {
           // Add new item
-          const addItemArr = [...prevSelectedStamp, result];
+          console.log('adddddddd: ', result);
+          const addItemArr = [...prevSelectedStamp, { ...result, partOfDesignID: selectedPartOfCloth.partOfDesignID }];
           return addItemArr;
         }
       });
@@ -455,8 +460,10 @@ function CustomDesignScreen() {
     setIsOpenProductDialog(false); // Close the dialog
   };
 
-  const __handleItemSelect = (item: string) => {
+  const __handleItemSelect = (item: string, id: any) => {
     setTypeOfModel(item);
+    setTypeOfModelID(id);
+
   };
 
   const __handleOnSetIsOtherItemSelected = (itemId: any) => {
@@ -521,17 +528,14 @@ function CustomDesignScreen() {
   const __handleGetMaterialInformation = (item: PartOfDesignInterface[]) => {
     const bodyRequest: Design = {
       userID: userAuth?.userID || '',
-      expertTailoringID: "92a889fc-2f33-4cc1-9a76-1144b8636e25",
+      expertTailoringID: typeOfModelID,
       titleDesign: "test TitleDesign",
       publicStatus: true,
       imageUrl: transformPartOfDesign(item)[1].successImageUrl,
       color: "BLACK",
       partOfDesign: transformPartOfDesign(item)
     };
-
-    console.log('main screen: ', transformPartOfDesign(item)[1].successImageUrl);
-
-
+    console.log(bodyRequest);
     setMainDesign(bodyRequest);
   }
 
@@ -547,34 +551,32 @@ function CustomDesignScreen() {
       const response = await api.post(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.addNewDesign}`, mainDesign);
       if (response.status === 200) {
         toast.success(`${response.message}`, { autoClose: 4000 });
-        setIsLoadingPage(false);
         setTimeout(() => {
+          setIsLoadingPage(false);
           navigate(`/design_detail/${response.data.designID}`);
         }, 3000)
 
       } else {
         toast.error(`${response.message}`, { autoClose: 4000 });
         setIsLoadingPage(false);
-        return;
       }
     } catch (error) {
-      toast.error(`${error}`, { autoClose: 4000 });
+      toast.error(`${error}`, { autoClose: 3000 });
       console.log('error: ', error);
       setIsLoadingPage(false);
 
 
-      return;
     }
 
 
   }
-
+  const divRef = useRef<HTMLDivElement>(null);
   return (
-    <div className={styles.customDesign__container}>
+    <div ref={divRef} className={styles.customDesign__container}>
 
       {/* Loading page */}
       <LoadingComponent isLoading={isLoadingPage}></LoadingComponent>
-
+      <ToastContainer></ToastContainer>
       {/* Dialog area */}
 
       {/* Prouct list dialog */}
@@ -586,7 +588,7 @@ function CustomDesignScreen() {
         isOpen={isOpenMaterialDialog}
         onClose={() => __handleCloseMaterialDialog()}
         child={(
-          <MaterialDetailComponent primaryKey={'DIALOG'} partOfDesigndata={partOfClothData} onGetMaterial={(item) => __handleGetMaterialInformation(item)}></MaterialDetailComponent>
+          <MaterialDetailComponent expertID={typeOfModelID} primaryKey={'DIALOG'} partOfDesigndata={partOfClothData} onGetMaterial={(item) => __handleGetMaterialInformation(item)}></MaterialDetailComponent>
         )}
         model={(
           <CanvasModel typeOfModel={typeOfModel} isDefault={true} is3D={true} />
@@ -612,14 +614,28 @@ function CustomDesignScreen() {
         </DialogActions>
       </Dialog>
 
-      <ToastContainer></ToastContainer>
 
       {/* Header */}
       <div className={styles.customDesign__container__header}>
         <div className={styles.customDesign__container__header__logo}>
           <img src={systemLogo}></img>
-          <div>
+          <div >
             <h3>{t(codeLanguage + '000001')}</h3>
+          </div>
+          <UploadCloud size={20} style={{ marginTop: 5, marginLeft: 15 }} color={greenColor}> </UploadCloud>
+          <div>
+            <div className="relative rounded-md shadow-sm ml-20">
+              <input
+                type="text"
+                name="price"
+                id="price"
+                className="block h-7 rounded-md border-0 py-1.5 pl-2 text-gray-900 ring-1 ring-inset ring-gray-300"
+                value={titleDesign}
+                onChange={(e) => setTitleDesign(e.target.value)}
+                placeholder='Design title'
+                style={{ outline: 'none', fontSize: 13 }}
+              />
+            </div>
           </div>
         </div>
 
@@ -834,13 +850,18 @@ function CustomDesignScreen() {
                           key={item.itemMaskID}
                           style={
                             selectedStamp?.some((selectedItem) => selectedItem.itemMaskID === item.itemMaskID)
-                              ? { border: `2px solid ${primaryColor}` }
-                              : {}
+                              ? { border: `2px solid ${primaryColor}`, position: 'relative' }
+                              : { position: 'relative' }
                           }
                           className={styles.sampleItemCard}
                           onClick={() => __handleSetSelectedStamp(item)}
                         >
-                          <img src={item.imageUrl} style={{ width: '90%', height: '90%', borderRadius: 4 }} />
+                          {item.isPremium && (
+                            <div style={{ position: 'absolute', top: 5, left: 5, zIndex: 90 }}>
+                              <FaCrown color={yellowColor} size={20} />
+                            </div>
+                          )}
+                          <img src={item.imageUrl} style={{ width: '100%', height: '100%', borderRadius: 4 }} />
                           <button onClick={() => __toggleCollectionItem(item)}>
                             {collection.some((collectionItem: ItemMaskInterface) => collectionItem.itemMaskID === item.itemMaskID) ? (
                               <FaHeart color='red' size={20} className={styles.sampleItemCard__icon} />
@@ -881,7 +902,12 @@ function CustomDesignScreen() {
                             className={`${styles.sampleItemCard}`}
                             onClick={() => __handleSetSelectedStamp(item)}
                           >
-                            <img src={item.imageUrl} style={{ width: '90%', height: '90%', borderRadius: 4 }}></img>
+                            {item.isPremium && (
+                              <div style={{ position: 'absolute', top: 5, left: 5, zIndex: 90 }}>
+                                <FaCrown color={yellowColor} size={20} />
+                              </div>
+                            )}
+                            <img src={item.imageUrl} style={{ width: '100%', height: '100%', borderRadius: 4 }}></img>
                             <button onClick={() => __toggleCollectionItem(item)}>
                               {collection.some((collectionItem: ItemMaskInterface) => collectionItem.itemMaskID === item.itemMaskID) ? (
                                 <FaHeart color='red' size={20} className={styles.sampleItemCard__icon} />
@@ -978,7 +1004,7 @@ function CustomDesignScreen() {
       </main>
 
       <div className={styles.customDesign__container__itemEditor}>
-        <ItemEditorToolsComponent itemIdSelected={itemIdToChangeRotate} onValueChange={setAngle}></ItemEditorToolsComponent>
+        <ItemEditorToolsComponent targetRef={divRef} itemIdSelected={itemIdToChangeRotate} onValueChange={setAngle}></ItemEditorToolsComponent>
       </div>
 
 

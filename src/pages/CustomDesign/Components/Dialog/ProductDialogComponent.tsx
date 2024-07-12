@@ -83,7 +83,7 @@ import OptionFilterCompnentDialog from '../OptionFilter/OptionFilterCompnentDial
 type Props = {
     isOpen: boolean;
     onClose: () => void;
-    onItemSelect: (item: string) => void;
+    onItemSelect: (item: string , id: any) => void;
 }
 
 function classNames(...classes: any) {
@@ -215,7 +215,7 @@ const ProductDialogComponent: React.FC<Props> = ({ isOpen, onClose, onItemSelect
 
     const __handleSelectItem = (item: ExpertTailoringInterface) => {
         setItemSelected(item.expertTailoringName);
-        onItemSelect(item.expertTailoringName);
+        onItemSelect(item.expertTailoringName, item.expertTailoringID);
         __handleClose();
     };
 
