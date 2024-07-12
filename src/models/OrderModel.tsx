@@ -1,4 +1,4 @@
-import { DesignInterface } from "./DesignModel";
+import { DesignDetailInterface, DesignInterface } from "./DesignModel";
 
 export interface PaymentInterface {
     paymentID: string; // UUID
@@ -44,6 +44,7 @@ export interface OrderInterface {
     createDate: string; // LocalDateTime
     lastModifiedDate: string; // LocalDateTime
     payment?: PaymentInterface[];
+    designResponse?: DesignInterface
 }
 
 export interface OrderDetailInterface {
@@ -68,6 +69,12 @@ export interface OrderDetailInterface {
     buyerName: string | null;
     designResponse: DesignInterface
 }
+
+export interface OrderRequestDetailInterface {
+    design: DesignInterface,
+    order: OrderDetailInterface,
+    designDetail: DesignDetailInterface
+  }
 
 
 

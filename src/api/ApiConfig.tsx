@@ -51,7 +51,8 @@ export const functionEndpoints = {
     getAllDesign: '/get-all-design'
   },
   designDetail: {
-    addNewDesignDetail: '/add-new-design-detail'
+    addNewDesignDetail: '/add-new-design-detail',
+    getAllInforOrderDetail: '/get-all-design-detail-by-order-id',
   },
   brand: {
     addExcel: '/add-new-brand-material-by-excel-file',
@@ -85,7 +86,7 @@ export const functionEndpoints = {
     downloadSampleDataExcelFile: '/generate-sample-category-material-by-excel-file',
     downloadSampleBrandPriceExcelData: '/export-category-material-for-brand-by-excel',
     getListMaterialByCategoryByID: '/get-list-material-by-category-id',
-    getListMaterialByCategoryByName: '/get-list-material-by-category-name'
+    getListMaterialByCategoryAndExpert: '/get-list-material-by-expert-tailoring-id-and-category-id'
   },
   category: {
     addNewCategory: '/add-new-category',

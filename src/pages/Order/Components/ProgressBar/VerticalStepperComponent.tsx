@@ -10,18 +10,27 @@ import style from './VerticalStepperStyle.module.scss'
 
 const steps = [
     {
-        label: 'Select campaign settings asd adfsdf sdf sdf fd',
-        description: `For each ad campaign that you create, you can control how much
-              you're willing to spend on clicks and conversions, which networks
-              and geographical locations you want your ads to show on, and more.`,
+        label: 'Waiting to confirm',
+        description: ``,
     },
     {
-        label: 'Create an ad group',
+        label: 'Deposit',
         description:
-            'An ad group contains one or more ads which target a shared set of keywords.',
+            '',
     },
     {
-        label: 'Create an ad',
+        label: 'Working',
+        description: ``,
+    },
+    {
+        label: 'Successfull',
+        description: `Try out different ad text to see what brings in the most customers,
+              and learn how to enhance your ads using features like ad extensions.
+              If you run into any problems with your ads, find out how to tell if
+              they're running and how to resolve approval issues.`,
+    },
+    {
+        label: 'Delivery',
         description: `Try out different ad text to see what brings in the most customers,
               and learn how to enhance your ads using features like ad extensions.
               If you run into any problems with your ads, find out how to tell if
@@ -52,7 +61,7 @@ export default function VerticalLinearStepperComponent() {
                         <StepLabel
                             className={`${style.verticalStepper__container__typography}`}
                             optional={
-                                index === 2 ? (
+                                index === steps.length ? (
                                     <Typography variant="caption">Last step</Typography>
                                 ) : null
                             }

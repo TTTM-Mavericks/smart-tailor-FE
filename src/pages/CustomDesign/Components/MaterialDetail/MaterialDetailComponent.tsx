@@ -9,12 +9,14 @@ import { styled } from '@mui/system';
 import { grayColor1, primaryColor, redColor, secondaryColor, whiteColor } from '../../../../root/ColorSystem';
 import { ToastContainer, toast } from 'react-toastify';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
+import { __handleAddCommasToNumber } from '../../../../utils/NumbericUtils';
 
 
 type materialDetailProps = {
     partOfDesigndata?: PartOfDesignInterface[];
     primaryKey?: any,
     onGetMaterial: (item: PartOfDesignInterface[]) => void;
+    expertID?: any,
 }
 
 interface PrinTypeInterface {
@@ -92,7 +94,7 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
 }));
 
 
-const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesigndata, primaryKey, onGetMaterial }) => {
+const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesigndata, primaryKey, onGetMaterial, expertID }) => {
     // TODO MUTIL LANGUAGE
     // ---------------UseState Variable---------------//
     const [selectedColors, setSelectedColors] = useState<any>([]);
@@ -113,6 +115,7 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
     const [allMaterialCategory, setAllMaterialCategory] = useState<MaterialCategoryInterface[]>();
     const [fabricMaterialList, setFabricMaterialList] = useState<MaterialInterface[]>();
     const [heatInkMaterial, setHeatInkMaterial] = useState<MaterialInterface[]>();
+    const [embroiderMaterial, setEmbroiderMaterial] = useState<MaterialInterface[]>();
 
     // ---------------Usable Variable---------------//
     const { t, i18n } = useTranslation();
@@ -167,7 +170,6 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
 
     useEffect(() => {
         if (!heatInkMaterial?.map((item) => item.materialName.includes(inputValueMaterialItem))) return;
-        console.log('Vô đâyyy');
         setData((prevData) => {
             if (!prevData) return prevData;
             return prevData.map((partItem: PartOfDesignInterface) => {
@@ -249,7 +251,7 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                     item.categoryName === "Fabric"
                 );
                 if (fabricItemResult) {
-                    const materials = await __handleFetchMaterialByCategory(fabricItemResult.categoryName);
+                    const materials = await __handleFetchMaterialByCategory(fabricItemResult.categoryID);
                     if (materials) {
                         setFabricMaterialList(materials);
                     }
@@ -259,7 +261,17 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                     item.categoryName === "Ink"
                 );
                 if (inkItemResult) {
-                    const materials = await __handleFetchMaterialByCategory(inkItemResult.categoryName);
+                    const materials = await __handleFetchMaterialByCategory(inkItemResult.categoryID);
+                    if (materials) {
+                        setHeatInkMaterial(materials);
+                    }
+                }
+
+                const threadItemResult = allMaterialCategory.find((item) =>
+                    item.categoryName === "Thread"
+                );
+                if (threadItemResult) {
+                    const materials = await __handleFetchMaterialByCategory(threadItemResult.categoryID);
                     if (materials) {
                         setHeatInkMaterial(materials);
                     }
@@ -270,6 +282,11 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
         fetchFabricMaterials();
     }, [allMaterialCategory]);
 
+    useEffect(()=>{
+        console.log('embroiderMaterial: ', embroiderMaterial);
+        
+    }, [embroiderMaterial])
+
 
     // ---------------FunctionHandler---------------//
 
@@ -277,20 +294,16 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
     /**
      * Get all material by expert category
      */
-    const __handleFetchMaterialByCategory = async (categoryName: string) => {
-        if (!categoryName) return;
+    const __handleFetchMaterialByCategory = async (categoryID: string) => {
+        if (!categoryID || !expertID) return;
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.getListMaterialByCategoryByName}/${categoryName}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.getListMaterialByCategoryAndExpert}?expertTailoringID=${expertID}&categoryID=${categoryID}`);
             if (response.status === 200) {
                 console.log('material-----------------: ', response.data);
                 return response.data;
             } else {
-                toast.error(`${response.message}`, { autoClose: 4000 });
-                return;
             }
         } catch (error) {
-            toast.error(`${error}`, { autoClose: 4000 });
-            return;
         }
     };
 
@@ -438,7 +451,6 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
     }
     return (
         <div>
-            <ToastContainer />
             <form className={`${style.materialDetail__container}`} style={primaryKey === 'DIALOG' ? { display: 'flex' } : {}} >
                 <div className={`${style.materialDetail__container__itemMaskArea}`} style={primaryKey === 'DIALOG' ? { paddingRight: '10px', height: 350, overflow: 'auto' } : {}}>
                     {data?.map((part: PartOfDesignInterface, key) => (
@@ -583,7 +595,7 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                                 <Autocomplete
                                     id="tags-outlined"
                                     options={fabricMaterialList || []} // Ensure options is always defined
-                                    getOptionLabel={(option) => option.materialName}
+                                    getOptionLabel={(option) => `${option.materialName} (${__handleAddCommasToNumber(option.minPrice)} - ${__handleAddCommasToNumber(option.maxPrice)})` }
                                     filterSelectedOptions
                                     value={fabricMaterialList?.find((item) => item.materialID === fabric.find((fabricItem) => fabricItem.partId === selectedPartOfDesign?.partOfDesignID)?.fabric) || null}
                                     onChange={(event, newValue) => {
@@ -616,7 +628,7 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                         </div>
                     )}
 
-                    {primaryKey === 'DIALOG' && selectedItemMask && (
+                    {primaryKey === 'DIALOG' && (selectedItemMask && selectedPartOfDesign?.partOfDesignID === selectedItemMask.partOfDesignId ) && (
                         <div style={{ paddingLeft: 20, marginTop: 20 }}>
 
                             <div style={{ marginBottom: 10, marginTop: 20 }} >
@@ -652,7 +664,7 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                                                 getOptionLabel={(option) => {
                                                     // Check if the option is not null or undefined
                                                     if (option && typeof option === 'object' && 'materialName' in option) {
-                                                        return option.materialName;
+                                                        return `${option.materialName} (${__handleAddCommasToNumber(option.minPrice)} - ${__handleAddCommasToNumber(option.maxPrice)})`;
                                                     }
                                                     return ''; // Return an empty string if the option is not valid
                                                 }}

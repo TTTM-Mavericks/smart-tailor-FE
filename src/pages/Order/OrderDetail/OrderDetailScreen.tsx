@@ -40,10 +40,10 @@ const OrderDetailScreen: React.FC = () => {
             phone: '9999999999'
         },
         progressSteps: [
-            'Order placed',
-            'Processing',
-            'Shipped',
-            'Delivered'
+            '100 products',
+            '200 products',
+            '300 products',
+            'Successfull'
         ],
         currentStep: 1,
         currentStep1: 2,
@@ -85,7 +85,7 @@ const OrderDetailScreen: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        __handleGetExpertTailoringSize();
+        __handleGetOrderDetail();
     }, [])
 
     // ---------------FunctionHandler---------------//
@@ -94,7 +94,7 @@ const OrderDetailScreen: React.FC = () => {
     /**
      * Handle get order detail data
      */
-    const __handleGetExpertTailoringSize = async () => {
+    const __handleGetOrderDetail = async () => {
         setIsLoadingPage(true);
         try {
             const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderById}/${id}`);
@@ -194,15 +194,15 @@ const OrderDetailScreen: React.FC = () => {
                             <p className="text-sm text-gray-600 mb-1 mt-1 w-full"><span style={{ fontWeight: "normal" }}>Expert tailoring: </span>{orderDetail?.designResponse.expertTailoring?.expertTailoringName}</p>
                             <p className="text-sm text-gray-600 mb-1 mt-1 w-full"><span style={{ fontWeight: "normal" }}>Quantity: </span>{orderDetail?.quantity}</p>
                             <div className="flex flex-col md:flex-row md:space-x-10 mt-4">
+                                <div className="md:w-1/2 mt-4 md:mt-0">
+                                    <p className="font-medium text-gray-600">Buyer</p>
+                                    <p className="text-sm text-gray-600">{orderDetail?.buyerName}</p>
+                                    <p className="text-sm text-gray-600">{orderDetail?.phone}</p>
+                                    <a href="#" className="text-indigo-600 hover:text-indigo-800 transition duration-200">Edit</a>
+                                </div>
                                 <div className="md:w-1/2">
                                     <p className="font-medium text-gray-600">{t(codeLanguage + '000194')}</p>
-                                    <p className="text-sm text-gray-600 whitespace-pre-line">{orderDetails.billingAddress}</p>
-                                </div>
-                                <div className="md:w-1/2 mt-4 md:mt-0">
-                                    <p className="font-medium text-gray-600">Shipping updates</p>
-                                    <p className="text-sm text-gray-600">{orderDetails.shippingUpdates.email}</p>
-                                    <p className="text-sm text-gray-600">{orderDetails.shippingUpdates.phone}</p>
-                                    <a href="#" className="text-indigo-600 hover:text-indigo-800 transition duration-200">Edit</a>
+                                    <p className="text-sm text-gray-600 whitespace-pre-line">{orderDetail?.address}, {orderDetail?.ward}, {orderDetail?.district}, {orderDetail?.province}</p>
                                 </div>
                             </div>
                             <div className="flex flex-col md:flex-row md:space-x-10 mt-4">

@@ -5,7 +5,7 @@ import FooterComponent from '../../../components/Footer/FooterComponent';
 import ChangeAddressDialogComponent from './ChangeAddressDialogComponent';
 import { TextField, Grid, Autocomplete, ToggleButtonGroup, ToggleButton, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import { styled } from '@mui/system';
-import { primaryColor, secondaryColor, whiteColor } from '../../../root/ColorSystem';
+import { greenColor, primaryColor, redColor, secondaryColor, whiteColor } from '../../../root/ColorSystem';
 import { FaPlusCircle } from "react-icons/fa";
 import { FaMinusCircle } from "react-icons/fa";
 import MaterialDetailTableComponent from '../Components/Table/MaterialDetailTableComponent';
@@ -18,6 +18,7 @@ import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../
 import { DesignInterface, ExpertTailoringSizeInterface } from '../../../models/DesignModel';
 import { toast, ToastContainer } from 'react-toastify';
 import LoadingComponent from '../../../components/Loading/LoadingComponent';
+import { __handleAddCommasToNumber, __handleRoundToThreeDecimalPlaces } from '../../../utils/NumbericUtils';
 
 
 interface SizeQuantity {
@@ -40,61 +41,12 @@ interface SizeQuantity {
 }
 
 
-// const sizes = [
-//     {
-//         "expertTailoringID": "ef21c4fc-3fad-4e01-8c90-21a50c285406",
-//         "expertTailoringName": "shirtModel",
-//         "sizeID": "0f32c620-4a05-4479-822f-b66c639ccc98",
-//         "sizeName": "S",
-//         "minFabric": 1.5,
-//         "maxFabric": 2,
-//         "unit": "meters",
-//         "createDate": "2024-07-10 12:31:31",
-//         "lastModifiedDate": null
-//     },
-//     {
-//         "expertTailoringID": "ef21c4fc-3fad-4e01-8c90-21a50c285406",
-//         "expertTailoringName": "shirtModel",
-//         "sizeID": "446646cc-9091-433a-a428-3c465930adf5",
-//         "sizeName": "M",
-//         "minFabric": 1.5,
-//         "maxFabric": 2,
-//         "unit": "meters",
-//         "createDate": "2024-07-10 12:31:35",
-//         "lastModifiedDate": null
-//     },
-//     {
-//         "expertTailoringID": "ef21c4fc-3fad-4e01-8c90-21a50c285406",
-//         "expertTailoringName": "shirtModel",
-//         "sizeID": "a1022ebd-91af-4e2f-b231-11dd09edc3e4",
-//         "sizeName": "XL",
-//         "minFabric": 1.5,
-//         "maxFabric": 2,
-//         "unit": "meters",
-//         "createDate": "2024-07-10 12:31:02",
-//         "lastModifiedDate": null
-//     },
-//     {
-//         "expertTailoringID": "ef21c4fc-3fad-4e01-8c90-21a50c285406",
-//         "expertTailoringName": "shirtModel",
-//         "sizeID": "da685126-fdaf-4147-9fda-94c72d7796cf",
-//         "sizeName": "L",
-//         "minFabric": 1.5,
-//         "maxFabric": 2,
-//         "unit": "meters",
-//         "createDate": "2024-07-10 12:31:11",
-//         "lastModifiedDate": null
-//     }
-// ];
-
-
 const CustomTextField = styled(TextField)(({ theme }) => ({
     '& .MuiInputBase-root': {
         height: '30px',
         width: '140px',
         borderRadius: '4px',
         outline: 'none',
-        paddingTop: '-100px'
     },
     '& .MuiOutlinedInput-input': {
         fontSize: '12px',
@@ -106,7 +58,6 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
     '& .MuiInputLabel-root.Mui-focused': {
         color: primaryColor, // Label color when focused
         marginTop: '0px'
-
     },
     '& .MuiOutlinedInput-root': {
         '& fieldset': {
@@ -200,6 +151,7 @@ const OrderProductScreen = () => {
     const [designData, setDesignData] = useState<DesignInterface>();
     const [isLoadingPage, setIsLoadingPage] = useState<boolean>(false);
     const [sizes, setSizes] = useState<ExpertTailoringSizeInterface[]>();
+    const [materialPrice, setMaterialPrice] = useState<{ min: any, max: any }>();
 
 
 
@@ -295,12 +247,12 @@ const OrderProductScreen = () => {
             const bodyRequest = {
                 designId: designData?.designID,
                 sizeList: sizeList,
-                // address: selectedAddress.address,
-                // province: selectedAddress.province,
-                // district: selectedAddress.district,
-                // ward: selectedAddress.ward,
-                // phone: selectedAddress.phoneNumber,
-                // buyerName: selectedAddress.fullName,
+                address: selectedAddress.address,
+                province: selectedAddress.province,
+                district: selectedAddress.district,
+                ward: selectedAddress.ward,
+                phone: selectedAddress.phoneNumber,
+                buyerName: selectedAddress.fullName,
             }
             console.log('bodyRequest: ', bodyRequest);
             const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.designDetail + functionEndpoints.designDetail.addNewDesignDetail}`, bodyRequest);
@@ -472,6 +424,40 @@ const OrderProductScreen = () => {
         setSelectedAddress(address);
     }
 
+    const __handleGetMaterialPrice = (item: any) => {
+        if (item) {
+
+            setMaterialPrice({
+                min: item.min,
+                max: item.max
+            })
+        }
+    }
+
+    const __handleCalculateDiscount = (min: number, max: number, percent: number): number => {
+        if (min !== undefined && max !== undefined && percent !== undefined) {
+            return ((min + max) / 2) * (percent / 100);
+        }
+        return 0;
+    };
+
+    const __handleCalculateTotalMin = (min: number, max: number, percent: number): number => {
+        if (min !== undefined && max !== undefined && percent !== undefined) {
+            const discount = __handleCalculateDiscount(min, max, percent);
+            return min - discount;
+        }
+        return 0;
+    };
+
+    const __handleCalculateTotalMax = (min: number, max: number, percent: number): number => {
+        if (min !== undefined && max !== undefined && percent !== undefined) {
+            const discount = __handleCalculateDiscount(min, max, percent);
+            return min - discount;
+        }
+        return 0;
+    };
+
+
 
     return (
         <div className={`${style.orderProduct__container}`}>
@@ -550,7 +536,7 @@ const OrderProductScreen = () => {
                                                                                         __handleSizeChange(index, newValue.sizeID, newValue.sizeName);
                                                                                     }
                                                                                 }}
-                                                                                renderInput={(params) => <CustomTextField {...params} label="Size" variant="outlined" sx={{ paddingTop: -20 }} />}
+                                                                                renderInput={(params) => <CustomTextField {...params} label="Size" variant="outlined" />}
                                                                             />
                                                                         </Grid>
                                                                         <Grid className={`${style.orderProduct__container__detail__sizeDetail__quantity}`} item>
@@ -679,17 +665,17 @@ const OrderProductScreen = () => {
                                                 </div>
                                             </div>
 
-                                            <div className="flex justify-between space-x-8 items-start w-full">
-                                                <h3 className="text-sm light:text-white xl:text-1xl font-semibold leading-6 text-gray-800">Material price</h3>
-                                            </div>
 
-                                            <MaterialDetailTableComponent></MaterialDetailTableComponent>
                                         </div>
 
                                     </div>
                                 </div>
 
                             </div>
+                            <div className="flex justify-between space-x-8 items-start w-full ml-11 mb-20">
+                                <h3 className="text-sm light:text-white xl:text-1xl font-semibold leading-6 text-gray-800">Material price</h3>
+                            </div>
+                            <MaterialDetailTableComponent onGetMaterialPrice={__handleGetMaterialPrice} materialDetailData={designData?.materialDetail}></MaterialDetailTableComponent>
                             {/* <div className="flex justify-center  md:flex-row flex-col items-stretch w-full space-y-4 md:space-y-0 md:space-x-6 xl:space-x-8">
                                 <div className="flex flex-col justify-center px-4 py-6 md:p-6 xl:p-8 w-full bg-gray-50 light:bg-gray-800 space-y-6">
                                     <h3 className="text-xl light:text-white font-semibold leading-5 text-gray-800">Shipping</h3>
@@ -715,21 +701,30 @@ const OrderProductScreen = () => {
                                 <h3 className="text-xl light:text-white font-semibold leading-5 text-gray-800">Summary</h3>
                                 <div className="flex justify-center items-center w-full space-y-4 flex-col border-gray-200 border-b pb-4">
                                     <div className="flex justify-between w-full">
-                                        <p className="text-sm light:text-white leading-4 text-gray-800">Subtotal</p>
-                                        <p className="text-sm light:text-gray-300 leading-4 text-gray-600">$56.00</p>
+                                        <p className="text-sm light:text-white leading-4 text-gray-800">Min price</p>
+                                        <p className="text-sm light:text-gray-300 leading-4 text-gray-600">{__handleAddCommasToNumber(materialPrice?.min)} VND</p>
+                                    </div>
+                                    <div className="flex justify-between w-full">
+                                        <p className="text-sm light:text-white leading-4 text-gray-800">Max price</p>
+                                        <p className="text-sm light:text-gray-300 leading-4 text-gray-600">{__handleAddCommasToNumber(materialPrice?.max)} VND</p>
                                     </div>
                                     <div className="flex justify-between items-center w-full">
-                                        <p className="text-sm light:text-white leading-4 text-gray-800">Discount <span className="bg-gray-200 p-1 text-xs font-medium light:bg-white light:text-gray-800 leading-3 text-gray-800">STUDENT</span></p>
-                                        <p className="text-sm light:text-gray-300 leading-4 text-gray-600">-$28.00 (50%)</p>
+                                        <p className="text-sm light:text-white leading-4 text-gray-800">Discount <span className="bg-gray-200 p-1 text-xs font-medium light:bg-white light:text-gray-800 leading-3 text-gray-800">Quantity</span></p>
+                                        <p className="text-sm light:text-gray-300 leading-4 text-gray-600">-{__handleAddCommasToNumber((materialPrice?.min + materialPrice?.max) / 2 * 2 / 100)}(2%) VND</p>
                                     </div>
                                     <div className="flex justify-between items-center w-full">
                                         <p className="text-sm light:text-white leading-4 text-gray-800">Shipping</p>
-                                        <p className="text-sm light:text-gray-300 leading-4 text-gray-600">$8.00</p>
+                                        <p className="text-sm light:text-gray-300 leading-4 text-gray-600">Self-payment</p>
                                     </div>
                                 </div>
                                 <div className="flex justify-between items-center w-full">
                                     <p className="text-base light:text-white font-semibold leading-4 text-gray-800">Total</p>
-                                    <p className="text-base light:text-gray-300 font-semibold leading-4 text-gray-600">$36.00</p>
+                                    <div>
+                                        <span style={{color: greenColor, fontWeight: 400}} className="text-gray-600">{__handleAddCommasToNumber(__handleRoundToThreeDecimalPlaces(__handleCalculateTotalMin(materialPrice?.min, materialPrice?.max, 2)))}</span>
+                                        <span> - </span>
+                                        <span style={{color: redColor, fontWeight: 400}} className="text-gray-600">{__handleAddCommasToNumber(__handleRoundToThreeDecimalPlaces(__handleCalculateTotalMax(materialPrice?.min, materialPrice?.max, 2)))} VND</span>
+                                    </div>
+
                                 </div>
                             </div>
 

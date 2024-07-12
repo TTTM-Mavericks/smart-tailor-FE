@@ -43,6 +43,7 @@ export interface PartOfDesignInterface {
   successImageUrl?: string;
   itemMasks?: ItemMaskInterface[];
   materialID?: any;
+  material?: MaterialInterface;
 }
 
 export interface DesignInterface {
@@ -60,6 +61,21 @@ export interface DesignInterface {
   color?: string;
   expertTailoringID?: string;
   expertTailoring?: ExpertTailoringInterface;
+  materialDetail?: MaterialDetailInterface[];
+
+}
+
+export interface MaterialDetailInterface {
+  materialResponse?: MaterialInterface,
+  minPrice?: number;
+  maxPrice?: number;
+}
+
+export interface DesignDetailInterface {
+  designDetailId?: any;
+  quantity?: number;
+  size?: SizeInterface;
+  detailStatus?: boolean
 
 }
 
@@ -81,6 +97,8 @@ export interface MaterialInterface {
   status: boolean;
   createDate: string;
   lastModifiedDate: string | null;
+  minPrice?: number,
+  maxPrice?: number
 }
 
 export interface ExpertTailoringInterface {
@@ -88,7 +106,7 @@ export interface ExpertTailoringInterface {
   expertTailoringName: string;
   sizeImageUrl: string;
   status: boolean;
-  createDate: string; 
+  createDate: string;
   lastModifiedDate: string;
   modelImageUrl: string;
 }
@@ -104,6 +122,15 @@ export interface ExpertTailoringSizeInterface {
   unit: string;
   createDate: string;
   lastModifiedDate: string | null;
+  quantity?: number;
+}
+
+export interface SizeInterface {
+  sizeID: string;
+  sizeName: string;
+  createDate: string;
+  lastModifiedDate: string | null;
+  status?: boolean
 }
 
 

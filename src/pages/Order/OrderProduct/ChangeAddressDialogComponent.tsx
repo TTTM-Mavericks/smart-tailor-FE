@@ -67,7 +67,8 @@ const sampleAddressData = [
 ];
 
 const isProfileDataComplete = (profileData: CustomerProfile): boolean => {
-    return Object.values(profileData).every(value => value !== '');
+    // return Object.values(profileData).every(value => value !== '');
+    return true;
 }
 
 type ChangeAddressDialogComponentProps = {
@@ -153,7 +154,7 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
      */
     React.useEffect(() => {
         if (selectAddIcon) setProfileData({
-            email: userParse ? userParse.email : '',
+            email: userParse ? userParse.email : 'example@gmail.com',
             fullName: '',
             phoneNumber: '',
             imageUrl: '',
@@ -416,7 +417,7 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
                                                 placeholder="your.email@mail.com"
                                                 name="email"
                                                 value={profileData.email}
-                                                readOnly
+                                                
                                             />
                                         </div>
 
@@ -565,7 +566,7 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
                                             placeholder="your.email@mail.com"
                                             name="email"
                                             value={profileData.email}
-                                            readOnly
+                                            onChange={_handleChange}
                                         />
                                     </div>
 

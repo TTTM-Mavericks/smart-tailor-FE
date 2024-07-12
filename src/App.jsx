@@ -162,7 +162,7 @@ function App() {
 
           {/* Brand Dashboard Route */}
           <Route path='/brand' element={<DashboardManageMaterialScreen></DashboardManageMaterialScreen>} />
-          <Route path='/brand/manage_order_request' element={<OrderRequestScreen></OrderRequestScreen>} />
+          <Route path='/brand/manage_order_request/:id' element={<OrderRequestScreen></OrderRequestScreen>} />
 
           {/* Detail Product Route */}
           <Route path='/detail_product/:id' element={<ProductDetailScreens></ProductDetailScreens>} />

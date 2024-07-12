@@ -1,19 +1,24 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Typography, Grid, IconButton, Divider, Autocomplete, TextField, styled, FormControlLabel, Checkbox } from '@mui/material';
 import { OrderInterface } from '../../../models/OrderModel';
-import { PartOfDesignInterface } from '../../../models/DesignModel';
+import { DesignDetailInterface, DesignInterface, ExpertTailoringSizeInterface, PartOfDesignInterface } from '../../../models/DesignModel';
 import PartOfDesignInformationDialogComponent from './PartOfDesignInformationDialogComponent';
 import { MdOutlineViewCozy } from "react-icons/md";
 import { greenColor, primaryColor, redColor, whiteColor } from '../../../root/ColorSystem';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
 import style from './OrderRequestStyle.module.scss'
 import { FaMinusCircle, FaPlusCircle } from 'react-icons/fa';
+import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 
 interface OrderDetailsProps {
     order: OrderInterface;
+    design: DesignInterface,
+    designDetail: DesignDetailInterface[]
 }
 
+
 interface SizeQuantity {
+    sizeID?: any;
     size?: string;
     quantity: number;
     width?: number;
@@ -21,6 +26,14 @@ interface SizeQuantity {
     ring1?: number;
     ring2?: number;
     ring3?: number;
+    expertTailoringID?: string;
+    expertTailoringName?: string;
+    sizeName?: string;
+    minFabric?: number;
+    maxFabric?: number;
+    unit?: string;
+    createDate?: string;
+    lastModifiedDate?: null;
 }
 
 const sizes = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
@@ -66,9 +79,11 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
     },
     '& .MuiInputLabel-root': {
         fontSize: '12px', // Adjust font size of the label
+        marginTop: '-10px'
     },
     '& .MuiInputLabel-root.Mui-focused': {
         color: primaryColor, // Label color when focused
+        marginTop: '0px'
     },
     '& .MuiOutlinedInput-root': {
         '& fieldset': {
@@ -84,15 +99,70 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
     },
 }));
 
-const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order }) => {
+const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, design, designDetail }) => {
+
+    // TODO MUTIL LANGUAGE
+
     const [expandedPartIds, setExpandedPartIds] = useState<string[]>([]);
     const [selectedPart, setSelectedPart] = useState<PartOfDesignInterface | null>(null);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [size, setSize] = useState<string | null>('L');
     const [quantity, setQuantity] = useState<number | null>(100);
-    const [sizeQuantities, setSizeQuantities] = useState<SizeQuantity[]>([{ size: 'L', quantity: 1 }]);
+    const [sizeQuantities, setSizeQuantities] = useState<SizeQuantity[]>([{ size: 'L', quantity: 1, sizeID: 'dsfsdfds' }]);
     const [isChecked, setIsChecked] = useState(false);
+    const [sizes, setSizes] = useState<ExpertTailoringSizeInterface[]>();
+    const [isLoadingPage, setIsLoadingPage] = useState<boolean>(false);
 
+
+    useEffect(() => {
+        console.log('designDetail: ', designDetail);
+
+        const extractedSizes = designDetail.map((item: any) => (
+            {
+                ...item.size,
+                sizeID: item.size.sizeID,
+                sizeName: item.size.sizeName,
+                quantity: item.quantity
+            }
+        ));
+        console.log('extractedSizes: ', extractedSizes);
+        setSizes(extractedSizes);
+
+    }, [designDetail])
+
+    useEffect(() => {
+        console.log('aaaaaa: ', sizes);
+
+    }, [sizes])
+
+
+    /**
+     * Handle fetch expert tailoring size
+     */
+    const __handleGetExpertTailoringSize = async (designID: any) => {
+        setIsLoadingPage(true);
+        try {
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.designDetail + functionEndpoints.designDetail.getAllInforOrderDetail}/${designID}`);
+            if (response.status === 200) {
+                console.log('size: ', response.data);
+                const extractedSizes = response.data.map((item: any) => (
+                    {
+                        ...item.size,
+                        sizeID: item.size.sizeID,
+                        sizeName: item.size.sizeName,
+                        quantity: item.quantity
+                    }
+                ));
+                console.log(extractedSizes);
+                setSize(extractedSizes);
+            }
+            else {
+                return;
+            }
+        } catch (error) {
+            console.log('error: ', error);
+        }
+    }
 
 
     const handleToggleExpand = (partId: string) => {
@@ -116,9 +186,10 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order }) =>
      * @param index 
      * @param newSize 
      */
-    const __handleSizeChange = (index: number, newSize: string) => {
+    const __handleSizeChange = (index: number, newSizeID: string, nameSize: string) => {
+        if (!newSizeID || !nameSize) return;
         const updatedSizeQuantities = [...sizeQuantities];
-        updatedSizeQuantities[index].size = newSize;
+        updatedSizeQuantities[index] = { ...updatedSizeQuantities[index], sizeID: newSizeID, size: nameSize };
         setSizeQuantities(updatedSizeQuantities);
     };
 
@@ -146,7 +217,7 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order }) =>
      * Add more size and quantity
      */
     const __handleAddSizeQuantity = () => {
-        setSizeQuantities([...sizeQuantities, { size: 'L', quantity: 1 }]);
+        setSizeQuantities([...sizeQuantities, { size: '', quantity: 1 }]);
     };
 
     /**
@@ -160,52 +231,61 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order }) =>
 
     return (
         <div className="container mx-auto p-6 bg-white rounded-lg shadow-lg">
-            <Typography variant="h4" style={{fontSize: 20, fontWeight: 'bold'}}>Order Details</Typography>
+            <Typography variant="h4" style={{ fontSize: 20, fontWeight: 'bold' }}>Order Details</Typography>
 
             {/* Order Information */}
-            {order.design ? (
+            {design ? (
                 <>
                     <div className="p-6 mb-6 shadow-md rounded-lg">
                         <Grid container spacing={4}>
                             <Grid item xs={12} sm={2}>
-                                <img src={order.design.imageUrl} alt="Design Image" style={{ width: 170, height: 210, borderRadius: 5 }} />
+                                <img src={design?.imageUrl} alt="Design Image" style={{ width: 170, height: 210, borderRadius: 5 }} />
                             </Grid>
                             <Grid item xs={12} sm={7} >
                                 <Typography variant="body2" className={`${style.orderRequest__typoraphy}`}><strong>Order ID:</strong> {order.orderID}</Typography>
                                 <Typography variant="body2" className={`${style.orderRequest__typoraphy}`}><strong>Expected Completion Date:</strong> {order.expectedProductCompletionDate}</Typography>
-                                <Typography variant="body2" className={`${style.orderRequest__typoraphy}`}><strong>Title:</strong> {order.design.titleDesign}</Typography>
-                                <Typography variant="body2" className={`${style.orderRequest__typoraphy}`}><strong>Type:</strong> {order.design.typeOfDesign}</Typography>
-                                <Typography variant="body2" className={`${style.orderRequest__typoraphy}`}><strong>Color:</strong> {order.design.color}</Typography>
+                                <Typography variant="body2" className={`${style.orderRequest__typoraphy}`}><strong>Title:</strong> {design.titleDesign}</Typography>
+                                <Typography variant="body2" className={`${style.orderRequest__typoraphy}`}><strong>Type:</strong> {design.typeOfDesign}</Typography>
+                                <Typography variant="body2" className={`${style.orderRequest__typoraphy}`}><strong>Color:</strong> {design.color}</Typography>
                                 <div style={{ position: 'relative', marginTop: 30 }}>
-                                    {sizeQuantities.map((sq, index) => (
-                                        <div key={index} style={{ display: 'flex' }}>
-                                            <Grid item style={{paddingTop: 10}} >
-                                                <Autocomplete
-                                                    options={sizes}
-                                                    value={sq.size}
-                                                    onChange={(event, newValue) => newValue && __handleSizeChange(index, newValue)}
-                                                    renderInput={(params) => <CustomTextField {...params} label="Size" variant="outlined" />}
-                                                />
-                                            </Grid>
-                                            <Grid className={`${style.orderRequest__detail__sizeDetail__quantity}`} item>
-                                                <CustomTextFieldQuantity
-                                                    fullWidth
-                                                    type="number"
-                                                    label="Quantity"
-                                                    value={sq.quantity}
-                                                    onChange={(e) => __handleQuantityChange(index, Number(e.target.value))}
-                                                    inputProps={{ min: 1 }}
-                                                    style={{ marginLeft: 10, marginRight: 0 }}
+                                    {sizeQuantities.map((sq, index) => {
+                                        const selectedSize = sizes?.find(size => size.sizeID === sq.sizeID) || null;
 
-                                                />
-                                                <div style={{display: 'flex', justifyContent:'center', alignItems: 'center', marginLeft: 20}}>
-                                                    <FaMinusCircle size={25} color={primaryColor} onClick={() => __handleRemoveSizeQuantity(index)} style={{ display: sizeQuantities.length === 1 ? 'none' : 'flex', cursor: 'pointer', marginLeft: -10 }}>
+                                        // Filter out selected sizes
+                                        const filteredSizes = sizes ? sizes.filter(size => !sizeQuantities.some(sq => sq.sizeID === size.sizeID)) : [];
+
+                                        return (
+                                            <div key={index} style={{ display: 'flex', margin: 10 }}>
+                                                <Grid item>
+                                                    <Autocomplete
+                                                        options={filteredSizes}
+                                                        getOptionLabel={(option) => `${option.sizeName} (${option.quantity})`}
+                                                        value={selectedSize}
+                                                        onChange={(event, newValue) => {
+                                                            if (newValue) {
+                                                                __handleSizeChange(index, newValue.sizeID, newValue.sizeName);
+                                                            }
+                                                        }}
+                                                        renderInput={(params) => <CustomTextField {...params} label="Size" variant="outlined" sx={{ paddingTop: -20 }} />}
+                                                    />
+                                                </Grid>
+                                                <Grid className={`${style.orderProduct__container__detail__sizeDetail__quantity}`} style={{ position: 'relative' }} item>
+                                                    <CustomTextFieldQuantity
+                                                        fullWidth
+                                                        type="number"
+                                                        label="Quantity"
+                                                        value={sq.quantity}
+                                                        onChange={(e) => __handleQuantityChange(index, Number(e.target.value))}
+                                                        inputProps={{ min: 1 }}
+                                                        style={{ marginLeft: 20, marginRight: 10 }}
+                                                    />
+                                                    <FaMinusCircle size={20} color={primaryColor} onClick={() => __handleRemoveSizeQuantity(index)} style={{ display: sizeQuantities.length === 1 ? 'none' : 'flex', cursor: 'pointer', position: 'absolute', right: -20, top: 5 }}>
                                                     </FaMinusCircle>
-                                                    <p >Size detail</p>
-                                                </div>
-                                            </Grid>
-                                        </div>
-                                    ))}
+                                                </Grid>
+                                            </div>
+                                        );
+                                    })}
+
                                     <div>
                                         <FaPlusCircle size={20} style={{ cursor: 'pointer', marginLeft: 10 }} color={primaryColor} onClick={__handleAddSizeQuantity}>
                                         </FaPlusCircle>
@@ -248,8 +328,8 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order }) =>
                         <Divider className="my-6" />
 
                         {/* Part of Designs */}
-                        <Typography variant="h6" style={{fontSize: 15, fontWeight: 'bold', padding: 10}}>Part of Designs</Typography>
-                        {order.design.partOfDesign && order.design.partOfDesign.map((part) => (
+                        <Typography variant="h6" style={{ fontSize: 15, fontWeight: 'bold', padding: 10 }}>Part of Designs</Typography>
+                        {design.partOfDesign && design.partOfDesign.map((part) => (
                             <Grid container key={part.partOfDesignID} className="mb-6 p-4 bg-white rounded shadow-md">
                                 <Grid item xs={12} sm={1}>
                                     <IconButton onClick={() => handleOpenDialog(part)}>
@@ -257,10 +337,10 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order }) =>
                                     </IconButton>
                                 </Grid>
                                 <Grid item xs={12} sm={10} className=" justify-between items-center">
-                                    <Typography variant="body2" className={`${style.orderRequest__typoraphy}`}><strong>Part Name:</strong> {part.partOfDesignName}</Typography>
-                                    <Typography variant="body2" className={`${style.orderRequest__typoraphy}`}><strong>Material ID:</strong> {part.materialID}</Typography>
-                                    <Typography variant="body2" className={`${style.orderRequest__typoraphy}`}><strong>Created Date:</strong> {part.createDate}</Typography>
-                                    <Typography variant="body2" className={`${style.orderRequest__typoraphy}`}><strong>Last Modified Date:</strong> {part.lastModifiedDate}</Typography>
+                                    <Typography variant="body2" className={`${style.orderRequest__typoraphy}`}><strong>Part name:</strong> {part.partOfDesignName}</Typography>
+                                    <Typography variant="body2" className={`${style.orderRequest__typoraphy}`}><strong>Material name:</strong> {part.material?.materialName}</Typography>
+                                    <Typography variant="body2" className={`${style.orderRequest__typoraphy}`}><strong>HS code:</strong> {part.material?.hsCode}</Typography>
+
                                 </Grid>
                                 <Grid item xs={12} sm={1} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <IconButton onClick={() => handleOpenDialog(part)} style={{ float: 'right' }}>
