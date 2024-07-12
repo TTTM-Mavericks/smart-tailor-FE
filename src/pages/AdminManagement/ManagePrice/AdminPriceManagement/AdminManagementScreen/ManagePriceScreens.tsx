@@ -285,9 +285,9 @@ const AdminManagePrice: React.FC = () => {
                     endIcon={<Add />}
                     variant="contained"
                     color="primary"
-                    style={{ backgroundColor: `${colors.primary[300]} !important`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
+                    style={{ backgroundColor: `#E96208`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
                 >
-                    {t(codeLanguage + '000048')}
+                    ADD
                 </Button>
                 <Menu
                     id="basic-menu"

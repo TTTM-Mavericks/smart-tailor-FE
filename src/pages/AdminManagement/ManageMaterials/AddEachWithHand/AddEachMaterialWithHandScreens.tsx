@@ -148,7 +148,7 @@ const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
         }}>
             <div>
                 <Typography variant="h5" align="center">
-                    {t(codeLanguage + '000051')}
+                    Add New Category And Material Manual
                 </Typography>
                 <IconButton style={{ position: 'absolute', top: 0, right: 0 }} onClick={closeCard}>
                     <CloseIcon />

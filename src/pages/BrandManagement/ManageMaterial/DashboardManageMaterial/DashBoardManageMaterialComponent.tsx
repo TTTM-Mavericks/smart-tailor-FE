@@ -4,6 +4,7 @@ import Navbar from '../../GlobalComponent/NavBarComponent/NavbarComponent';
 import ManageMaterialComponent from '../MaterialManage/MaterialManageScreens';
 import BrandProfileSetup from '../../BrandProfile/BrandProfileComponent';
 import ManagePrice from '../../ManagePrice/BrandPriceManagement/BrandManagementScreen/ManagePriceScreens';
+import OrderRequestScreen from '../../BrandOrderManagement/OrderRequestScreen';
 
 const DashboardManageMaterialScreen = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -78,6 +79,8 @@ const DashboardManageMaterialScreen = () => {
                 return <ManagePrice />;
             case 'manage_material':
                 return <ManageMaterialComponent />;
+            case 'manage_order_request':
+                return <OrderRequestScreen />;
             default:
                 return (
                     <ManageMaterialComponent />

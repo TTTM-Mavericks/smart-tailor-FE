@@ -3,6 +3,9 @@ import { OrderInterface } from '../../../models/OrderModel';
 import OrderRequestDetailsComponent from './OrderRequestDetailsComponent';
 import Sidebar from '../GlobalComponent/SideBarComponent/SideBarComponent';
 import Navbar from '../GlobalComponent/NavBarComponent/NavbarComponent';
+import BrandProfileSetup from '../BrandProfile/BrandProfileComponent';
+import ManagePrice from '../ManagePrice/BrandPriceManagement/BrandManagementScreen/ManagePriceScreens';
+import ManageMaterialComponent from '../ManageMaterial/MaterialManage/MaterialManageScreens';
 
 
 const exampleOrder: OrderInterface = {
@@ -250,7 +253,6 @@ const exampleOrder: OrderInterface = {
 const OrderRequestScreen: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState('manage_order_request');
-  const [showScrollButton, setShowScrollButton] = React.useState<boolean>(false);
   const [popperOpen, setPopperOpen] = useState<Record<string, boolean>>({});
 
   const toggleMenu = () => {
@@ -268,20 +270,36 @@ const OrderRequestScreen: React.FC = () => {
     }));
   };
 
+  const renderComponent = () => {
+    switch (activeMenu) {
+      case 'manage_notification':
+        return <></>;
+      case 'brand_profile':
+        return <BrandProfileSetup />;
+      case 'manage_order':
+        return <></>;
+      case 'manage_price':
+        return <ManagePrice />;
+      case 'manage_material':
+        return <ManageMaterialComponent />;
+      case 'manage_order_request':
+        return <OrderRequestDetailsComponent order={exampleOrder} />
+      default:
+        return (
+          <ManageMaterialComponent />
+        );
+    }
+  }
+
   return (
-    <div>
-
-      <div className="flex">
-        <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
-        <div className="flex flex-col w-full">
-          <Navbar toggleMenu={toggleMenu} menu="Mangage Brand Order" popperOpen={popperOpen} togglePopper={togglePopper} />
-          <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
-            <OrderRequestDetailsComponent order={exampleOrder} />
-          </main>
-        </div>
+    <div className="flex">
+      <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
+      <div className="flex flex-col w-full">
+        <Navbar toggleMenu={toggleMenu} menu={activeMenu} popperOpen={popperOpen} togglePopper={togglePopper} />
+        <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
+          {renderComponent()}
+        </main>
       </div>
-
-
     </div>
   );
 };
