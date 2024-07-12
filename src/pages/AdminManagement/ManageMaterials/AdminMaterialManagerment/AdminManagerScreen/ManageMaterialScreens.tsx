@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { AddExcelMaterial, AddMaterial, ExcelData, Material } from "../../../../../models/AdminMaterialExcelModel";
 import axios from "axios";
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
+import { margin } from "@mui/system";
 const style = {
     position: 'absolute',
     top: '50%',
@@ -270,7 +271,7 @@ const ManageMaterials: React.FC = () => {
         },
         {
             field: "basePrice",
-            headerName: "basePrice",
+            headerName: "Base Price",
             headerAlign: "left",
             align: "left",
         },
@@ -355,88 +356,114 @@ const ManageMaterials: React.FC = () => {
                     },
                     "& .MuiBadge-badge": {
                         display: "none !important"
+                    },
+                    '& .MuiDataGrid-toolbarContainer': {
+                        padding: '10px',
+                        marginLeft: '60%'
                     }
                 }}
             >
-                <Button
-                    id="basic-button"
-                    aria-controls={open ? 'basic-menu' : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={open ? 'true' : undefined}
-                    onClick={_handleClick}
-                    endIcon={<Add />}
-                    variant="contained"
-                    color="primary"
-                    style={{ backgroundColor: `#E96208`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
-                >
-                    ADD
-                </Button>
-                <Menu
-                    id="basic-menu"
-                    anchorEl={anchorEl}
-                    open={open}
-                    onClose={_handleClose}
-                    MenuListProps={{
-                        'aria-labelledby': 'basic-button',
+                <div className="container" style={{ display: "flex", marginTop: "-5%" }}>
+                    <h1 style={{ fontWeight: "bolder", fontSize: "20px" }}>
+                        Manage Material Table
+                    </h1>
+                    <div>
+                        <Button
+                            id="basic-button"
+                            aria-controls={open ? 'basic-menu' : undefined}
+                            aria-haspopup="true"
+                            aria-expanded={open ? 'true' : undefined}
+                            onClick={_handleClick}
+                            endIcon={<Add />}
+                            variant="contained"
+                            color="primary"
+                            style={{ backgroundColor: `#E96208`, color: `${colors.primary[200]} !important`, marginLeft: "20%" }}
+                        >
+                            ADD
+                        </Button>
+                        <Menu
+                            id="basic-menu"
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={_handleClose}
+                            MenuListProps={{
+                                'aria-labelledby': 'basic-button',
+                            }}
+                        >
+                            <MenuItem >
+                                <div onClick={_handleAddOpen}>ADD MANUAL</div>
+                                <Modal
+                                    open={addOpenOrClose}
+                                    aria-labelledby="modal-modal-title"
+                                    aria-describedby="modal-modal-description"
+                                >
+                                    <Box sx={{
+                                        backgroundColor: colors.primary[100], position: 'absolute',
+                                        top: '50%',
+                                        left: '50%',
+                                        transform: 'translate(-50%, -50%)',
+                                        width: "50%",
+                                        bgcolor: 'background.paper',
+                                        border: '2px solid #000',
+                                        boxShadow: 24,
+                                        p: 4,
+                                        borderRadius: "20px"
+                                    }}>
+                                        <AddEachMaterialsWithHand closeCard={_handleAddClose} addNewMaterial={_handleAddMaterial} />
+                                    </Box>
+                                </Modal>
+                            </MenuItem>
+
+                            <MenuItem>
+                                <div onClick={_handleAddMultipleOpen}>{t(codeLanguage + '000050')}</div>
+                                <Modal
+                                    open={addMultiple}
+                                    aria-labelledby="modal-modal-title"
+                                    aria-describedby="modal-modal-description"
+                                >
+                                    <Box sx={{
+                                        position: 'absolute',
+                                        top: '50%',
+                                        left: '50%',
+                                        transform: 'translate(-50%, -50%)',
+                                        width: "70%",
+                                        bgcolor: colors.primary[100],
+                                        border: '2px solid #000',
+                                        boxShadow: 24,
+                                        p: 4,
+                                        borderRadius: "20px"
+                                    }}>
+                                        <AddMultipleComponentWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddExcelMaterial} />
+                                    </Box>
+                                </Modal>
+
+                            </MenuItem>
+                        </Menu>
+                    </div>
+                </div>
+                <Box
+                    sx={{
+                        height: "100%",  // Adjust height as needed
+                        width: '100%',  // Adjust width as needed
+                        '& .MuiDataGrid-row:nth-of-type(odd)': {
+                            backgroundColor: '#D7E7FF !important',  // Change background color to blue for odd rows
+                        },
+                        '& .MuiDataGrid-row:nth-of-type(even)': {
+                            backgroundColor: '#FFFFFF !important',  // Change background color to red for even rows
+                        },
+                        '& .MuiDataGrid-columnHeaderTitle': {
+                            fontWeight: 'bolder',  // Make header text bolder
+                        }
                     }}
                 >
-                    <MenuItem >
-                        <div onClick={_handleAddOpen}>ADD MANUAL</div>
-                        <Modal
-                            open={addOpenOrClose}
-                            aria-labelledby="modal-modal-title"
-                            aria-describedby="modal-modal-description"
-                        >
-                            <Box sx={{
-                                backgroundColor: colors.primary[100], position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: "50%",
-                                bgcolor: 'background.paper',
-                                border: '2px solid #000',
-                                boxShadow: 24,
-                                p: 4,
-                                borderRadius: "20px"
-                            }}>
-                                <AddEachMaterialsWithHand closeCard={_handleAddClose} addNewMaterial={_handleAddMaterial} />
-                            </Box>
-                        </Modal>
-                    </MenuItem>
-
-                    <MenuItem>
-                        <div onClick={_handleAddMultipleOpen}>{t(codeLanguage + '000050')}</div>
-                        <Modal
-                            open={addMultiple}
-                            aria-labelledby="modal-modal-title"
-                            aria-describedby="modal-modal-description"
-                        >
-                            <Box sx={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: "70%",
-                                bgcolor: colors.primary[100],
-                                border: '2px solid #000',
-                                boxShadow: 24,
-                                p: 4,
-                                borderRadius: "20px"
-                            }}>
-                                <AddMultipleComponentWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddExcelMaterial} />
-                            </Box>
-                        </Modal>
-
-                    </MenuItem>
-                </Menu>
-
-                <DataGrid
-                    rows={data}
-                    columns={columns}
-                    slots={{ toolbar: GridToolbar }}
-                    disableRowSelectionOnClick
-                    getRowId={getRowId}
-                />
+                    <DataGrid
+                        rows={data}
+                        columns={columns}
+                        slots={{ toolbar: GridToolbar }}
+                        disableRowSelectionOnClick
+                        getRowId={getRowId}
+                    />
+                </Box>
                 <Modal
                     open={editopen}
                     aria-labelledby="modal-modal-title"

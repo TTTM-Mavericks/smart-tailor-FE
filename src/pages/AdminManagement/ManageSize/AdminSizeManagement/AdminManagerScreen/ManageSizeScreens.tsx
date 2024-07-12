@@ -1,9 +1,8 @@
 import { Box, Button, IconButton, Menu, MenuItem, Modal } from "@mui/material";
-import { DataGrid, GridToolbar, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { tokens } from "../../../../../theme";
 import { useTheme } from "@mui/material";
 import * as React from "react";
-import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Swal from "sweetalert2";
 import EditSizePopUpScreens from "../AdminEditSize/EditSizePopUpScreens";
@@ -11,10 +10,8 @@ import { Add } from "@mui/icons-material";
 import AddSizeManual from "../../AddManualSize/AddSizeScreens";
 import { useTranslation } from 'react-i18next';
 import axios from "axios";
-import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
+import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { AddSize, Sizes } from "../../../../../models/AdminManageSizeModel";
-import { width } from "@mui/system";
-
 // Make Style of popup
 const style = {
     position: 'absolute',
@@ -162,16 +159,17 @@ const ManageSizes: React.FC = () => {
     };
 
     const columns: GridColDef[] = [
-        { field: "sizeName", headerName: "Size Name", flex: 1 },
+        { field: "sizeName", headerName: "Size Name", flex: 1, headerClassName: 'super-app-theme--header' },
         {
             field: "actions",
             headerName: "Actions",
+            headerClassName: 'super-app-theme--header',
             flex: 1,
             sortable: false,
             renderCell: (params) => (
                 <Box>
                     <IconButton onClick={() => _handleEditClick(params.row.sizeID, params.row.sizeName)}>
-                        <EditIcon />
+                        <EditIcon htmlColor="#E96208" />
                     </IconButton>
                     {/* <IconButton onClick={() => _handleConfirmDelete(params.row.sizeName)}>
                         <DeleteIcon htmlColor={colors.primary[300]} />
@@ -219,49 +217,75 @@ const ManageSizes: React.FC = () => {
                     }
                 }}
             >
-                <Button
-                    id="basic-button"
-                    aria-controls={open ? 'basic-menu' : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={open ? 'true' : undefined}
-                    onClick={_handleClick}
-                    endIcon={<Add />}
-                    variant="contained"
-                    color="primary"
-                    style={{ backgroundColor: `#E96208`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
-                >
-                    ADD
-                </Button>
-                <Menu
-                    id="basic-menu"
-                    anchorEl={anchorEl}
-                    open={open}
-                    onClose={_handleClose}
-                    MenuListProps={{
-                        'aria-labelledby': 'basic-button',
+                <div className="container" style={{ display: "flex" }}>
+                    <h1 style={{ fontWeight: "bolder", fontSize: "20px" }}>
+                        Manage Size Table
+                    </h1>
+                    <div style={{ marginLeft: "30%" }}>
+                        <Button
+                            id="basic-button"
+                            aria-controls={open ? 'basic-menu' : undefined}
+                            aria-haspopup="true"
+                            aria-expanded={open ? 'true' : undefined}
+                            onClick={_handleClick}
+                            endIcon={<Add />}
+                            variant="contained"
+                            color="primary"
+                            style={{ backgroundColor: `#E96208`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
+                        >
+                            ADD
+                        </Button>
+                        <Menu
+                            id="basic-menu"
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={_handleClose}
+                            MenuListProps={{
+                                'aria-labelledby': 'basic-button',
+                            }}
+                        >
+                            <MenuItem onClick={_handleAddOpen}>
+                                ADD MANUAL
+                            </MenuItem>
+                        </Menu>
+                        <Modal
+                            open={addOpen}
+                            onClose={_handleAddClose}
+                            aria-labelledby="modal-modal-title"
+                            aria-describedby="modal-modal-description"
+                        >
+                            <Box sx={style}>
+                                <AddSizeManual closeCard={_handleAddClose} addNewSizes={_handleAddSize} />
+                            </Box>
+                        </Modal>
+                    </div>
+                </div>
+                <Box
+                    sx={{
+                        height: "100%",  // Adjust height as needed
+                        width: '100%',  // Adjust width as needed
+                        '& .MuiDataGrid-row:nth-of-type(odd)': {
+                            backgroundColor: '#D7E7FF !important',  // Change background color to blue for odd rows
+                        },
+                        '& .MuiDataGrid-row:nth-of-type(even)': {
+                            backgroundColor: '#FFFFFF !important',  // Change background color to red for even rows
+                        },
+                        '& .MuiDataGrid-columnHeaderTitle': {
+                            fontWeight: 'bolder',  // Make header text bolder
+                        }
                     }}
                 >
-                    <MenuItem onClick={_handleAddOpen}>
-                        ADD MANUAL
-                    </MenuItem>
-                </Menu>
-                <Modal
-                    open={addOpen}
-                    onClose={_handleAddClose}
-                    aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description"
-                >
-                    <Box sx={style}>
-                        <AddSizeManual closeCard={_handleAddClose} addNewSizes={_handleAddSize} />
-                    </Box>
-                </Modal>
-                <DataGrid
-                    rows={data}
-                    columns={columns}
-                    slots={{ toolbar: GridToolbar }}
-                    disableRowSelectionOnClick
-                    getRowId={getRowId}
-                />
+                    <DataGrid
+                        rows={data}
+                        columns={columns}
+                        disableRowSelectionOnClick
+                        getRowId={getRowId}
+                    />
+                </Box>
+
+
+
+
                 <Modal
                     open={editOpen}
                     onClose={_handleEditClose}

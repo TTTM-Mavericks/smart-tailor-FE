@@ -7,6 +7,7 @@ import ManageTask from '../../ManageTask/ManagerTaskManagement/ManagerManageTask
 import ManageEmployee from '../../ManageEmployee/ManagerEmployeeManagement/ManagerManageEmployeeScreen/ManageEmployeeScreens';
 import ManageCustomer from '../../ManageCustomer/ManageCustomerManagement/ManagerManageCustomerScreen/ManageCustomerScreens';
 import ManageSizeExpertTailoring from '../../SizeExpertTailoring/ManagerSizeExpertTailoringManagement/ManagerManageScreen/ManageExpertTailoringScreens';
+import ManageExpertTailoringMaterial from '../../ExpertTailoringMaterial/ManagerExpertTailoringMaterialManagement/ManagerManageExpertTailoringMaterialScreen/ManageExpertTailoringMaterialScreens';
 
 const DashboardManagerMangeExpertTailoring = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -73,6 +74,8 @@ const DashboardManagerMangeExpertTailoring = () => {
         switch (activeMenu) {
             case 'size_expert_tailoring':
                 return <ManageSizeExpertTailoring />;
+            case 'material_expert_tailoring':
+                return <ManageExpertTailoringMaterial />;
             case 'manager_manage_brand':
                 return <ManageBrand />;
             case 'manager_manage_task':

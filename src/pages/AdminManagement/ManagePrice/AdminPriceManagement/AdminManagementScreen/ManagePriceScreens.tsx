@@ -14,6 +14,7 @@ import axios from "axios";
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { EditLaborQuantity, LaborQuantity } from "../../../../../models/LaborQuantityModel";
 import EditPricePopUpScreens from "../AdminEditPrice/EditPricePopUpScreens";
+import { margin } from "@mui/system";
 
 // Make Style of popup
 const style = {
@@ -226,7 +227,7 @@ const AdminManagePrice: React.FC = () => {
             renderCell: (params) => (
                 <Box>
                     <IconButton onClick={() => _handleEditClick(params.row.laborQuantityID, params.row.laborQuantityMinQuantity, params.row.laborQuantityMaxQuantity, params.row.laborQuantityMinPrice, params.row.laborQuantityMaxPrice)}>
-                        <EditIcon />
+                        <EditIcon htmlColor="#E96208" />
                     </IconButton>
                     {/* <IconButton onClick={() => _hanldeConfirmDelete(params.row.categoryID)}>
                         <DeleteIcon htmlColor={colors.primary[300]} />
@@ -240,7 +241,7 @@ const AdminManagePrice: React.FC = () => {
 
 
     return (
-        <Box m="20px">
+        <Box m="20px" sx={{ marginTop: "-5%" }}>
             <Box
                 m="40px 0 0 0"
                 height="75vh"
@@ -276,60 +277,84 @@ const AdminManagePrice: React.FC = () => {
                     }
                 }}
             >
-                <Button
-                    id="basic-button"
-                    aria-controls={open ? 'basic-menu' : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={open ? 'true' : undefined}
-                    onClick={_handleClick}
-                    endIcon={<Add />}
-                    variant="contained"
-                    color="primary"
-                    style={{ backgroundColor: `#E96208`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
-                >
-                    ADD
-                </Button>
-                <Menu
-                    id="basic-menu"
-                    anchorEl={anchorEl}
-                    open={open}
-                    onClose={_handleClose}
-                    MenuListProps={{
-                        'aria-labelledby': 'basic-button',
+                <div className="container" style={{ display: "flex" }}>
+                    <h1 style={{ fontWeight: "bolder", fontSize: "20px", marginLeft: "40%" }}>
+                        Manage Material Table
+                    </h1>
+                    <div style={{ marginLeft: "20%" }}>
+                        <Button
+                            id="basic-button"
+                            aria-controls={open ? 'basic-menu' : undefined}
+                            aria-haspopup="true"
+                            aria-expanded={open ? 'true' : undefined}
+                            onClick={_handleClick}
+                            endIcon={<Add />}
+                            variant="contained"
+                            color="primary"
+                            style={{ backgroundColor: `#E96208`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
+                        >
+                            ADD
+                        </Button>
+                        <Menu
+                            id="basic-menu"
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={_handleClose}
+                            MenuListProps={{
+                                'aria-labelledby': 'basic-button',
+                            }}
+                        >
+                            <MenuItem >
+                                <div onClick={_handleAddOpen}>{t(codeLanguage + '000049')}</div>
+                                <Modal
+                                    open={addOpenOrClose}
+                                    aria-labelledby="modal-modal-title"
+                                    aria-describedby="modal-modal-description"
+                                >
+                                    <Box sx={{
+                                        backgroundColor: colors.primary[100], position: 'absolute',
+                                        top: '50%',
+                                        left: '50%',
+                                        transform: 'translate(-50%, -50%)',
+                                        width: "50%",
+                                        bgcolor: 'background.paper',
+                                        border: '2px solid #000',
+                                        boxShadow: 24,
+                                        p: 4,
+                                        borderRadius: "20px"
+                                    }}>
+                                        <AddPriceManual closeCard={_handleAddClose} addNewLaborQuantity={_handleAddLaborQuantity} />
+                                    </Box>
+                                </Modal>
+                            </MenuItem>
+                        </Menu>
+                    </div>
+                </div>
+
+                <Box
+                    sx={{
+                        height: "100%",  // Adjust height as needed
+                        width: '100%',  // Adjust width as needed
+                        '& .MuiDataGrid-row:nth-of-type(odd)': {
+                            backgroundColor: '#D7E7FF !important',  // Change background color to blue for odd rows
+                        },
+                        '& .MuiDataGrid-row:nth-of-type(even)': {
+                            backgroundColor: '#FFFFFF !important',  // Change background color to red for even rows
+                        },
+                        '& .MuiDataGrid-columnHeaderTitle': {
+                            fontWeight: 'bolder',  // Make header text bolder
+                        }
                     }}
                 >
-                    <MenuItem >
-                        <div onClick={_handleAddOpen}>{t(codeLanguage + '000049')}</div>
-                        <Modal
-                            open={addOpenOrClose}
-                            aria-labelledby="modal-modal-title"
-                            aria-describedby="modal-modal-description"
-                        >
-                            <Box sx={{
-                                backgroundColor: colors.primary[100], position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: "50%",
-                                bgcolor: 'background.paper',
-                                border: '2px solid #000',
-                                boxShadow: 24,
-                                p: 4,
-                                borderRadius: "20px"
-                            }}>
-                                <AddPriceManual closeCard={_handleAddClose} addNewLaborQuantity={_handleAddLaborQuantity} />
-                            </Box>
-                        </Modal>
-                    </MenuItem>
-                </Menu>
+                    <DataGrid
+                        rows={data}
+                        columns={columns}
+                        slots={{ toolbar: GridToolbar }}
+                        disableRowSelectionOnClick
+                        getRowId={getRowId}
+                    />
+                </Box>
 
-                <DataGrid
-                    rows={data}
-                    columns={columns}
-                    slots={{ toolbar: GridToolbar }}
-                    disableRowSelectionOnClick
-                    getRowId={getRowId}
-                />
                 <Modal
                     open={editopen}
                     aria-labelledby="modal-modal-title"
@@ -346,7 +371,7 @@ const AdminManagePrice: React.FC = () => {
                     </Box>
                 </Modal>
             </Box>
-        </Box>
+        </Box >
     );
 };
 

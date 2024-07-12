@@ -6,9 +6,9 @@ import { jwtDecode } from 'jwt-decode';
 // const baseURL = 'https://whear-app.azurewebsites.net';
 // const baseURL = 'https://tam.mavericks-tttm.studio';
 // export const baseURL = 'https://be.mavericks-tttm.studio';
-// export const baseURL = 'https://dev01.smart-tailor.live';
+export const baseURL = 'https://dev01.smart-tailor.live';
 
-export const baseURL = 'http://localhost:6969';
+// export const baseURL = 'http://localhost:6969';
 export const googleOAuth2 = '/oauth2/authorization/google'
 export const versionEndpoints = {
   v1: '/api/v1',
@@ -30,6 +30,7 @@ export const featuresEndpoints = {
   order: '/order',
   sizeExpertTailoring: '/size-expert-tailoring',
   expertTailoring: '/expert-tailoring',
+  expertTailoringMaterial: '/expert-tailoring-material'
 }
 export const functionEndpoints = {
   auth: {
@@ -122,6 +123,15 @@ export const functionEndpoints = {
   },
   expertTailoring: {
     getAllExpertTailoring: '/get-all-expert-tailoring',
+  },
+  expertTailoringMaterial: {
+    getAllExpertTailoringMaterial: '/get-all-expert-tailoring-material',
+    getAllExpertTailoringMaterialByExpertTailoringId: '/get-all-expert-tailoring-material-by-expert-tailoring-id',
+    getAllExpertTailoringMaterialByExpertTailoringName: '/get-all-expert-tailoring-material-by-expert-tailoring-name',
+    generateSampleFile: '/generate-sample-category-material-expert-tailoring-by-excel-file',
+    addNewExpertTailoringMaterial: '/add-new-expert-tailoring-material',
+    addNewExpertTailoringByExcelFile: '/add-new-expert-tailoring-material-by-excel-file',
+    updateStatusExpertTailoringMaterial: '/change-status-expert-tailoring-material'
   }
 }
 

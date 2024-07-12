@@ -1,0 +1,52 @@
+/* CustomDataGrid.scss */
+.custom-data-grid-container {
+    height: 400px;
+    /* Adjust the height as needed */
+
+    .MuiDataGrid-toolbarContainer {
+        background-color: #4caf50;
+        /* Green background for the toolbar */
+        color: white;
+        /* White text color for the toolbar */
+        padding: 10px;
+        /* Padding for the toolbar */
+    }
+
+    .MuiDataGrid-root {
+        border: 1px solid #e0e0e0;
+        /* Border around the DataGrid */
+    }
+
+    .MuiDataGrid-cell {
+        background-color: #f9f9f9;
+        /* Light gray background for cells */
+        color: #333;
+        /* Dark text color for cells */
+    }
+
+    .MuiDataGrid-columnHeaders {
+        background-color: #1976d2;
+        /* Blue background for column headers */
+        color: white;
+        /* White text color for column headers */
+    }
+
+    .MuiDataGrid-row {
+        &:nth-of-type(even) {
+            background-color: #f1f1f1;
+            /* Light gray background for even rows */
+        }
+
+        &:nth-of-type(odd) {
+            background-color: #ffffff;
+            /* White background for odd rows */
+        }
+    }
+
+    .MuiDataGrid-footerContainer {
+        background-color: #4caf50;
+        /* Green background for the footer */
+        color: white;
+        /* White text color for the footer */
+    }
+}

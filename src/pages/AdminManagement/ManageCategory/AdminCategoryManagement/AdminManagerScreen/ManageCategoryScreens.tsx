@@ -172,7 +172,7 @@ const ManageCategories: React.FC = () => {
                 );
 
                 // Remove the deleted material from the current data list
-                setData(prevData => prevData.filter(Material => Material.materialID !== id));
+                setData(prevData => prevData.filter((Material: any) => Material.categoryID !== id));
             } else {
                 Swal.fire(
                     `${t(codeLanguage + '000066')}`,
@@ -191,39 +191,19 @@ const ManageCategories: React.FC = () => {
     };
 
     const columns: GridColDef[] = [
-        // { field: "id", headerName: "ID", flex: 0.5 },
         {
             field: "categoryName",
             headerName: "Category Name",
-            flex: 1,
+            flex: 0.5,
         },
-        // {
-        //     field: "create_date",
-        //     headerName: "Create Date",
-        //     flex: 1,
-        // },
-        // {
-        //     field: "last_modifidate",
-        //     headerName: "Last Modify Date",
-        //     type: "number",
-        //     headerAlign: "left",
-        //     align: "left",
-        // },
-        // {
-        //     field: "status",
-        //     headerName: "status",
-        //     flex: 1,
-        // },
-
         {
-            field: "actions",
-            headerName: "Actions",
+            field: "Actions",
             flex: 1,
             sortable: false,
             renderCell: (params) => (
                 <Box>
                     <IconButton onClick={() => _handleEditClick(params.row.categoryID, params.row.categoryName)}>
-                        <EditIcon />
+                        <EditIcon htmlColor="#E96208" />
                     </IconButton>
                     {/* <IconButton onClick={() => _hanldeConfirmDelete(params.row.categoryID)}>
                         <DeleteIcon htmlColor={colors.primary[300]} />
@@ -273,85 +253,109 @@ const ManageCategories: React.FC = () => {
                     }
                 }}
             >
-                <Button
-                    id="basic-button"
-                    aria-controls={open ? 'basic-menu' : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={open ? 'true' : undefined}
-                    onClick={_handleClick}
-                    endIcon={<Add />}
-                    variant="contained"
-                    color="primary"
-                    style={{ backgroundColor: `#E96208`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
-                >
-                    ADD
-                </Button>
-                <Menu
-                    id="basic-menu"
-                    anchorEl={anchorEl}
-                    open={open}
-                    onClose={_handleClose}
-                    MenuListProps={{
-                        'aria-labelledby': 'basic-button',
-                    }}
-                >
-                    <MenuItem >
-                        <div onClick={_handleAddOpen}>ADD MANUAL</div>
-                        <Modal
-                            open={addOpenOrClose}
-                            aria-labelledby="modal-modal-title"
-                            aria-describedby="modal-modal-description"
+                <div className="container" style={{ display: "flex" }}>
+                    <h1 style={{ fontWeight: "bolder", fontSize: "20px" }}>
+                        Manage Category Table
+                    </h1>
+                    <div style={{ marginLeft: "25%" }}>
+                        <Button
+                            id="basic-button"
+                            aria-controls={open ? 'basic-menu' : undefined}
+                            aria-haspopup="true"
+                            aria-expanded={open ? 'true' : undefined}
+                            onClick={_handleClick}
+                            endIcon={<Add />}
+                            variant="contained"
+                            color="primary"
+                            style={{ backgroundColor: `#E96208`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
                         >
-                            <Box sx={{
-                                backgroundColor: colors.primary[100], position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: "50%",
-                                bgcolor: 'background.paper',
-                                border: '2px solid #000',
-                                boxShadow: 24,
-                                p: 4,
-                                borderRadius: "20px"
-                            }}>
-                                <AddEachCategoryWithHand closeCard={_handleAddClose} addNewCategory={_handleAddCategory} />
-                            </Box>
-                        </Modal>
-                    </MenuItem>
+                            ADD
+                        </Button>
+                        <Menu
+                            id="basic-menu"
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={_handleClose}
+                            MenuListProps={{
+                                'aria-labelledby': 'basic-button',
+                            }}
+                        >
 
-                    {/* <MenuItem>
+                            <MenuItem >
+                                <div onClick={_handleAddOpen}>ADD MANUAL</div>
+                                <Modal
+                                    open={addOpenOrClose}
+                                    aria-labelledby="modal-modal-title"
+                                    aria-describedby="modal-modal-description"
+                                >
+                                    <Box sx={{
+                                        backgroundColor: colors.primary[100], position: 'absolute',
+                                        top: '50%',
+                                        left: '50%',
+                                        transform: 'translate(-50%, -50%)',
+                                        width: "50%",
+                                        bgcolor: 'background.paper',
+                                        border: '2px solid #000',
+                                        boxShadow: 24,
+                                        p: 4,
+                                        borderRadius: "20px"
+                                    }}>
+                                        <AddEachCategoryWithHand closeCard={_handleAddClose} addNewCategory={_handleAddCategory} />
+                                    </Box>
+                                </Modal>
+                            </MenuItem>
+
+                            {/* <MenuItem>
                         <div onClick={_handleAddMultipleOpen}>{t(codeLanguage + '000050')}</div>
                         <Modal
-                            open={addMultiple}
-                            aria-labelledby="modal-modal-title"
-                            aria-describedby="modal-modal-description"
+                        open={addMultiple}
+                        aria-labelledby="modal-modal-title"
+                        aria-describedby="modal-modal-description"
                         >
-                            <Box sx={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: "70%",
-                                bgcolor: colors.primary[100],
-                                border: '2px solid #000',
-                                boxShadow: 24,
-                                p: 4,
-                                borderRadius: "20px"
+                        <Box sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            width: "70%",
+                            bgcolor: colors.primary[100],
+                            border: '2px solid #000',
+                            boxShadow: 24,
+                            p: 4,
+                            borderRadius: "20px"
                             }}>
-                                <AddMultipleComponentWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddCategory} />
+                            <AddMultipleComponentWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddCategory} />
                             </Box>
-                        </Modal>
+                            </Modal>
+                            
+                            </MenuItem> */}
+                        </Menu>
+                    </div>
+                </div>
 
-                    </MenuItem> */}
-                </Menu>
-
-                <DataGrid
-                    rows={data}
-                    columns={columns}
-                    slots={{ toolbar: GridToolbar }}
-                    disableRowSelectionOnClick
-                    getRowId={getRowId}
-                />
+                <Box
+                    sx={{
+                        height: "100%",  // Adjust height as needed
+                        width: '100%',  // Adjust width as needed
+                        '& .MuiDataGrid-row:nth-of-type(odd)': {
+                            backgroundColor: '#D7E7FF !important',  // Change background color to blue for odd rows
+                        },
+                        '& .MuiDataGrid-row:nth-of-type(even)': {
+                            backgroundColor: '#FFFFFF !important',  // Change background color to red for even rows
+                        },
+                        '& .MuiDataGrid-columnHeaderTitle': {
+                            fontWeight: 'bolder',  // Make header text bolder
+                        }
+                    }}
+                >
+                    <DataGrid
+                        rows={data}
+                        columns={columns}
+                        // slots={{ toolbar: GridToolbar }}
+                        disableRowSelectionOnClick
+                        getRowId={getRowId}
+                    />
+                </Box>
                 <Modal
                     open={editopen}
                     aria-labelledby="modal-modal-title"
@@ -368,7 +372,7 @@ const ManageCategories: React.FC = () => {
                     </Box>
                 </Modal>
             </Box>
-        </Box>
+        </Box >
     );
 };
 

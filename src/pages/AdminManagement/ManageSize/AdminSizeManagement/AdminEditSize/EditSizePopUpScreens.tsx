@@ -101,7 +101,7 @@ const EditSizePopUpScreens: React.FC<EditSizePopUpScreenFormProps> = ({ fid, edi
     };
 
     return (
-        <Box style={{ height: '500px', overflowY: 'auto' }}>
+        <Box style={{ height: '222px', overflowY: 'auto' }}>
             <Typography variant="h5" align="left">
                 {t(codeLanguage + '000068')}
             </Typography>
@@ -118,7 +118,7 @@ const EditSizePopUpScreens: React.FC<EditSizePopUpScreenFormProps> = ({ fid, edi
                 </Grid>
             </Grid>
             <div style={{ textAlign: "center", alignItems: "center", marginTop: "3rem" }}>
-                <Button onClick={_handleSubmit} style={{ backgroundColor: "#5858FA", width: "60%", borderRadius: "8px", color: "#FFFFFF" }}>{t(codeLanguage + '000060')}</Button>
+                <Button onClick={_handleSubmit} style={{ backgroundColor: "#E96208", width: "80%", borderRadius: "8px", color: "#FFFFFF" }}>{t(codeLanguage + '000060')}</Button>
                 <Button onClick={editClose} style={{ borderRadius: "8px", border: "1px solid black", color: "black", marginLeft: "1rem" }}>{t(codeLanguage + '000055')}</Button>
             </div>
         </Box>

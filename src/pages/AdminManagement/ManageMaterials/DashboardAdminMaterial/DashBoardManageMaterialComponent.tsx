@@ -7,6 +7,7 @@ import { ArrowUpward } from '@mui/icons-material';
 import ManageCategories from '../../ManageCategory/AdminCategoryManagement/AdminManagerScreen/ManageCategoryScreens';
 import ManageSizes from '../../ManageSize/AdminSizeManagement/AdminManagerScreen/ManageSizeScreens';
 import { Box } from '@mui/system';
+import './DashBoardMaterialStyle.module.scss'
 
 const DashboardAdminManageMaterialScreen = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -75,9 +76,8 @@ const DashboardAdminManageMaterialScreen = () => {
             <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
             <div className="flex flex-col w-full">
                 <Navbar toggleMenu={toggleMenu} menu="Mangage Material & Category & Size" popperOpen={popperOpen} togglePopper={togglePopper} />
-                <main className="p-6 flex-grow ml-0 xl:ml-[20%] mt-[-3%]">
+                <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
                     <div>
-                        <p>bebe</p>
                         <ManageMaterials />
                     </div>
                     <Box display="flex" justifyContent="space-between" m="20px" width="100%">
