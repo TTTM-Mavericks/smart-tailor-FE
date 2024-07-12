@@ -171,7 +171,7 @@ const EditMaterialPopUpScreens: React.FC<EditMaterialPopUpScreenFormProps> = ({ 
             <div onClick={editClose} style={{ textAlign: "center", alignItems: "center", marginTop: "3rem" }}>
                 <Button
                     onClick={_handleSubmit}
-                    style={{ backgroundColor: "#5858FA", width: "60%", borderRadius: "8px", marginLeft: "-10%", marginRight: "10%", color: "#FFFFFF" }}
+                    style={{ backgroundColor: "#E96208", width: "80%", borderRadius: "8px", marginLeft: "-10%", marginRight: "2%", color: "#FFFFFF" }}
                 >
                     {t(codeLanguage + '000060')}
                 </Button>
