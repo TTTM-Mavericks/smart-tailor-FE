@@ -93,7 +93,7 @@ const DashboardAdminScreens = () => {
                 return (
                     <>
                         <ManageMaterials />
-                        <div style={{ display: "flex" }}>
+                        <div style={{ display: "flex", marginBottom: 100 }}>
                             <ManageCategories />
                             <ManageSizes />
                         </div>

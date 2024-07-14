@@ -8,6 +8,7 @@ import { ItemMaskInterface, PartOfDesignInterface } from '../../../../models/Des
 import { Menu, MenuItem } from '@mui/material';
 import { IoTrashOutline } from "react-icons/io5";
 import zIndex from '@mui/material/styles/zIndex';
+import { __handleGetElementAsBase64 } from '../../../../utils/CanvasUtils';
 
 type props = {
     partOfCloth?: PartOfDesignInterface,
@@ -21,6 +22,9 @@ type props = {
     onSetIsOtherItemSelected?: (itemId: any) => void;
     onUndo?: () => void;
     onRedo?: () => void;
+    isOutSideClick?: boolean;
+    onGetStateOuside?: (state: boolean) => void;
+    onTriggerConvertSuccessImg?: () => void;
 }
 
 const ImageDraggableComponent: React.FC<props> = ({
@@ -35,7 +39,10 @@ const ImageDraggableComponent: React.FC<props> = ({
     onSetIsOtherItemSelected,
     onUndo,
     onRedo,
-},  ref: Ref<any>) => {
+    isOutSideClick,
+    onGetStateOuside,
+    onTriggerConvertSuccessImg
+}, ref: Ref<any>) => {
 
     // TODO MUTIL LANGUAGE
 
@@ -52,6 +59,8 @@ const ImageDraggableComponent: React.FC<props> = ({
     const [oldPartOfClothData, setOldPartOfClothData] = useState<PartOfDesignInterface[]>();
     const [history, setHistory] = useState<ItemMaskInterface[][]>([]);
     const [historyIndex, setHistoryIndex] = useState<number>(-1);
+    const [isClickOutSide, setIsClickOutSide] = useState<boolean>(false);
+    const [successImgPartOfDesign, setSuccessImgPartOfDesign] = useState<string>('');
 
     // ---------------Usable Variable---------------//
     const snap = useSnapshot(state);
@@ -152,28 +161,29 @@ const ImageDraggableComponent: React.FC<props> = ({
 
     const __handleUndo = () => {
         if (historyIndex > 0) {
-          const prevState = history[historyIndex - 1];
-          setData(prevState);
-          setHistoryIndex(historyIndex - 1);
+            const prevState = history[historyIndex - 1];
+            setData(prevState);
+            setHistoryIndex(historyIndex - 1);
         }
-      };
-    
-      const __handleRedo = () => {
+    };
+
+    const __handleRedo = () => {
         if (historyIndex < history.length - 1) {
-          const nextState = history[historyIndex + 1];
-          setData(nextState);
-          setHistoryIndex(historyIndex + 1);
+            const nextState = history[historyIndex + 1];
+            setData(nextState);
+            setHistoryIndex(historyIndex + 1);
 
         }
-      };
+    };
 
 
     /**
      * Save PartOfClothData while edit and response to customDesign
      */
-    const __handleSetNewPartOfDesignData = () => {
+    const __handleSetNewPartOfDesignData = async() => {
         const result: ItemMaskInterface[] | undefined = data?.filter((item: ItemMaskInterface) => item.itemMaskID === selectedItemDrag?.itemMaskID);
         if (result) {
+            const url = await __handleGetElementAsBase64('designArea');
             const updateItemData: ItemMaskInterface[] | undefined = data?.map(part =>
                 part.itemMaskID === selectedItemDrag?.itemMaskID
                     ? {
@@ -187,7 +197,7 @@ const ImageDraggableComponent: React.FC<props> = ({
             );
             const updatePart = partOfClothData?.map(part =>
                 part.partOfDesignID === partOfCloth?.partOfDesignID
-                    ? { ...part, itemMasks: !updateItemData ? [] : updateItemData } : part
+                    ? { ...part, itemMasks: !updateItemData ? [] : updateItemData, successImageUrl: url } : part
             );
 
             if (updatePart) {
@@ -216,12 +226,21 @@ const ImageDraggableComponent: React.FC<props> = ({
      * @param item 
      */
     const __handleSelectedIteamDrag = (item: ItemMaskInterface) => {
-        setSelectedItemDrag(item);
-        if (onSetIsOtherItemSelected) {
-            onSetIsOtherItemSelected(item.itemMaskID);
-
-        }
+        setSelectedItemDrag((prevSelectedItem) => {
+            if (prevSelectedItem?.itemMaskID === item.itemMaskID) {
+                if (onSetIsOtherItemSelected) {
+                    onSetIsOtherItemSelected(undefined);
+                }
+                return undefined;
+            } else {
+                if (onSetIsOtherItemSelected) {
+                    onSetIsOtherItemSelected(item.itemMaskID);
+                }
+                return item;
+            }
+        });
     };
+
 
     /**
      * Handle logic when onDragStart trigger
@@ -233,7 +252,7 @@ const ImageDraggableComponent: React.FC<props> = ({
         const target = e.target as HTMLElement;
         if (target) {
             e.preventDefault();
-            setSelectedItemDrag(item);
+            // setSelectedItemDrag(item);
         }
     };
 
@@ -260,6 +279,7 @@ const ImageDraggableComponent: React.FC<props> = ({
      */
     const __handleDragStop = (e: DraggableEvent, ui: DraggableData, item: ItemMaskInterface) => {
         const target = e.target as HTMLElement;
+        e.preventDefault();
         if (target) {
             target.style.cursor = 'grab';
             if (!resizing) {
@@ -416,6 +436,12 @@ const ImageDraggableComponent: React.FC<props> = ({
 
     };
 
+    const __handleDownloadPart = async () => {
+        // __handleDownloadElementAsPng('designArea', 'design.png');
+        const url = await __handleGetElementAsBase64('designArea');
+        url && setSuccessImgPartOfDesign(url);
+
+    };
 
 
     /**
@@ -476,11 +502,13 @@ const ImageDraggableComponent: React.FC<props> = ({
             )), [data, selectedItemDrag, itemPositions, itemZIndices, resizing])
 
 
+
+
     return (
         <>
 
             {partOfCloth ? (
-                <div className={styles.imageDraggable__boundary} style={{ backgroundImage: partOfCloth?.imageUrl }}>
+                <div id="designArea" className={styles.imageDraggable__boundary} style={{ backgroundImage: partOfCloth?.imageUrl }}>
                     <div className={styles.imageDraggable__img}>
                         <img src={partOfCloth.imageUrl} className={styles.imageDraggable__img} ></img>
                         {resizableItems}

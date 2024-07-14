@@ -32,6 +32,7 @@ import Cookies from 'js-cookie';
 import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { Cloud, UploadCloud } from 'react-feather';
+import { __handleDownloadElementAsPng, __handleGetElementAsBase64 } from '../../utils/CanvasUtils';
 
 
 interface ItemMask {
@@ -107,6 +108,8 @@ function CustomDesignScreen() {
   const [mainDesign, setMainDesign] = useState<DesignInterface>();
   const [usedMaterial, setUsedMaterial] = useState<MaterialInterface[]>();
   const [titleDesign, setTitleDesign] = useState<string>('Design sample');
+  const [isClickOutSide, setIsClickOutSize] = useState<boolean>(false);
+  const [successImgPartOfDesign, setSuccessImgPartOfDesign] = useState<string>('');
 
 
 
@@ -120,6 +123,7 @@ function CustomDesignScreen() {
     setUpdatePartData(updatePart);
     setPartOfClothData(updatePart);
   }, []);
+  const divRef = useRef<HTMLDivElement>(null);
   // ---------------UseEffect---------------//
 
   useEffect(() => {
@@ -157,11 +161,9 @@ function CustomDesignScreen() {
   }, [selectedLanguage]);
 
   useEffect(() => {
-    console.log('selectedPartOfCloth.partOfDesignIDselectedPartOfCloth.partOfDesignID: ', selectedPartOfCloth.partOfDesignID);
     setSelectedPartOfCloth(selectedPartOfCloth);
     const result = partOfClothData?.find((item: PartOfDesignInterface) => item.partOfDesignName === selectedPartOfCloth.partOfDesignName);
     if (result) {
-      console.log('result.itemMasks: ', result.itemMasks);
       setSelectedStamp(result.itemMasks)
     }
 
@@ -207,6 +209,10 @@ function CustomDesignScreen() {
   useEffect(() => {
     setSelectedStamp(selectedStamp);
   }, [selectedStamp])
+
+  useEffect(()=>{
+
+  })
   // ---------------FunctionHandler---------------//
 
   //+++++ FETCH API +++++//
@@ -515,7 +521,7 @@ function CustomDesignScreen() {
     return parts.map(part => ({
       partOfDesignName: part.partOfDesignName || "",
       imageUrl: part.imageUrl || "",
-      successImageUrl: __getDownloadCanvasToImage() || "",
+      successImageUrl: part.successImageUrl || "",
       materialID: part.materialID,
       itemMask: transformItemMasks(part.itemMasks || [])
     }));
@@ -525,13 +531,15 @@ function CustomDesignScreen() {
    * Get Design data after choose material
    * @param item 
    */
-  const __handleGetMaterialInformation = (item: PartOfDesignInterface[]) => {
+  const __handleGetMaterialInformation = async(item: PartOfDesignInterface[]) => {
+    const successImaUrl = await __handleGetElementAsBase64('canvas3DElement')
+    console.log(successImaUrl);
     const bodyRequest: Design = {
       userID: userAuth?.userID || '',
       expertTailoringID: typeOfModelID,
       titleDesign: "test TitleDesign",
       publicStatus: true,
-      imageUrl: transformPartOfDesign(item)[1].successImageUrl,
+      imageUrl: successImaUrl ? successImaUrl : '',
       color: "BLACK",
       partOfDesign: transformPartOfDesign(item)
     };
@@ -554,7 +562,7 @@ function CustomDesignScreen() {
         setTimeout(() => {
           setIsLoadingPage(false);
           navigate(`/design_detail/${response.data.designID}`);
-        }, 3000)
+        }, 3000);
 
       } else {
         toast.error(`${response.message}`, { autoClose: 4000 });
@@ -570,7 +578,17 @@ function CustomDesignScreen() {
 
 
   }
-  const divRef = useRef<HTMLDivElement>(null);
+
+  // const __handleClickOutside = () => {
+  //   if (!isClickOutSide)
+  //     setIsClickOutSize(true);
+  //   console.log('click outside');
+  // }
+
+  // const __handleGetStateOutside = (state: boolean) => {
+  //   if (!state) setIsClickOutSize(false);
+  // }
+
   return (
     <div ref={divRef} className={styles.customDesign__container}>
 
@@ -681,7 +699,7 @@ function CustomDesignScreen() {
         <div className={`${styles.customDesign__container__editorArea__display} editorArea__display `}>
 
           {/* Menu Bar of editor area */}
-          <div className={styles.customDesign__container__editorArea__display__menuBar} >
+          <div  className={styles.customDesign__container__editorArea__display__menuBar} >
             <div className={styles.customDesign__container__editorArea__display__menuBar__buttonGroup}>
               {/* TODO */}
               <button onClick={() => setIsOpenNotiChangeUpdateImageDesignTool(true)}>
@@ -721,9 +739,14 @@ function CustomDesignScreen() {
             </div>
           </div>
 
+          {/* MONITOR EDITER */}
           {selectedPartOfCloth && !changeUploadPartOfDesignTool && (
             <>
-              <div className={`${styles.customDesign__container__editorArea__display__displayDesign} editorArea__display__displayDesign`} >
+              <div
+            
+                className={`${styles.customDesign__container__editorArea__display__displayDesign} editorArea__display__displayDesign`}
+                
+              >
                 <ImageDraggableComponent
                   partOfCloth={selectedPartOfCloth}
                   partOfClothData={partOfClothData}
@@ -736,6 +759,7 @@ function CustomDesignScreen() {
                   onSetIsOtherItemSelected={(itemId) => __handleOnSetIsOtherItemSelected(itemId)}
                   onUndo={__handleUndoFlow}
                   onRedo={__handleRedoFlow}
+                  isOutSideClick={isClickOutSide}
                 ></ImageDraggableComponent>
               </div>
             </>
@@ -999,7 +1023,7 @@ function CustomDesignScreen() {
       </div>
 
       <Designer />
-      <main className={styles.customDesign__container__canvas}>
+      <main id='canvas3DElement' className={styles.customDesign__container__canvas}>
         <CanvasModel typeOfModel={typeOfModel} isDefault={false} is3D={true} />
       </main>
 
