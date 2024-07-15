@@ -77,10 +77,15 @@ const ImageDraggableComponent: React.FC<props> = ({
             const result: PartOfDesignInterface[] | undefined = partOfClothData?.filter((item: PartOfDesignInterface) => item.partOfDesignName === partOfCloth?.partOfDesignName);
             if (result && result.length > 0) {
                 const itemMasks = result.find((item: PartOfDesignInterface) => item.partOfDesignID === partOfCloth?.partOfDesignID);
-                if (itemMasks) {
-                    setData(itemMasks.itemMasks);
+                if (itemMasks && itemMasks.itemMasks) {
+                    const setPositionDefault = itemMasks.itemMasks.map((item) => ({
+                        ...item,
+                        position: { x: item.positionX, y: item.positionY }
+                    }));
+                    setData(setPositionDefault as ItemMaskInterface[]);
                     setOldPartOfClothData(partOfClothData);
                 }
+                
             }
         }
     }, [partOfCloth, partOfClothData]);
@@ -180,7 +185,7 @@ const ImageDraggableComponent: React.FC<props> = ({
     /**
      * Save PartOfClothData while edit and response to customDesign
      */
-    const __handleSetNewPartOfDesignData = async() => {
+    const __handleSetNewPartOfDesignData = async () => {
         const result: ItemMaskInterface[] | undefined = data?.filter((item: ItemMaskInterface) => item.itemMaskID === selectedItemDrag?.itemMaskID);
         if (result) {
             const url = await __handleGetElementAsBase64('designArea');
@@ -226,6 +231,7 @@ const ImageDraggableComponent: React.FC<props> = ({
      * @param item 
      */
     const __handleSelectedIteamDrag = (item: ItemMaskInterface) => {
+        console.log('__handleSelectedIteamDrag: ', item);
         setSelectedItemDrag((prevSelectedItem) => {
             if (prevSelectedItem?.itemMaskID === item.itemMaskID) {
                 if (onSetIsOtherItemSelected) {

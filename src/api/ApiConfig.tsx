@@ -32,6 +32,7 @@ export const featuresEndpoints = {
   expertTailoring: '/expert-tailoring',
   expertTailoringMaterial: '/expert-tailoring-material',
   brand: '/brand',
+  systemImage: '/system-image'
 }
 export const functionEndpoints = {
   auth: {
@@ -137,6 +138,9 @@ export const functionEndpoints = {
     addNewExpertTailoringByExcelFile: '/add-new-expert-tailoring-material-by-excel-file',
     updateStatusExpertTailoringMaterial: '/change-status-expert-tailoring-material'
   },
+  systemImage: {
+    getAllSystemIamge: '/get-all-system-image',
+  }
 }
 
 

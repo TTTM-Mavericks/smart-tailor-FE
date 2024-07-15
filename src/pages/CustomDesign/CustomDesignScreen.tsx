@@ -67,6 +67,15 @@ interface Design {
   partOfDesign: PartOfDesign[];
 }
 
+interface ImageSystemData {
+  imageID: string;
+  imageName: string;
+  imageURL: string;
+  imageStatus: boolean;
+  imageType: string;
+  isPremium: boolean;
+}
+
 
 
 function CustomDesignScreen() {
@@ -181,7 +190,7 @@ function CustomDesignScreen() {
   useEffect(() => {
     if (typeOfModel === 'shirtModel') {
       setPartOfClothData(PartOfShirtDesignData);
-      // __handleGetDesignDatabyId()
+      // __handleGetDesignDatabyId();
       setSelectedPartOfCloth(PartOfShirtDesignData[0]);
     }
 
@@ -210,12 +219,63 @@ function CustomDesignScreen() {
     setSelectedStamp(selectedStamp);
   }, [selectedStamp])
 
-  useEffect(()=>{
-
-  })
+  useEffect(() => {
+    __handleGetAllSystemImageStamps()
+  }, [])
   // ---------------FunctionHandler---------------//
 
   //+++++ FETCH API +++++//
+
+  const transformData = (data: ImageSystemData[]): ItemMaskInterface[] => {
+    return data.map((item, index) => ({
+      partOfDesignID: '',
+      itemMaskName: item.imageName,
+      typeOfItem: item.imageType,
+      isSystemItem: false,
+      isPremium: item.isPremium,
+      position: {
+        x: 150,
+        y: 170
+      },
+      positionX: 150,
+      positionY: 170,
+      scaleX: 230,
+      scaleY: 230,
+      imageUrl: item.imageURL,
+      print_type: '',
+      createDate: '',
+      lastModifiedDate: '',
+      zIndex: 80,
+      itemMaskID: item.imageID,
+      rotate: 0
+    }));
+  }
+
+
+  /**
+   * Get all system item stamps
+   * @returns 
+   */
+  const __handleGetAllSystemImageStamps = async () => {
+    try {
+      const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.systemImage + functionEndpoints.systemImage.getAllSystemIamge}`);
+      if (response.status === 200) {
+        console.log(transformData(response.data));
+        setCurrentItemList(transformData(response.data));
+        setIsCurrentItemListLoading(false);
+        setIsLoadingPage(false);
+      }
+      else {
+        toast.error(`${response.message}`, { autoClose: 4000 });
+        setIsLoadingPage(false);
+        return;
+      }
+    } catch (error) {
+      toast.error(`${error}`, { autoClose: 4000 });
+      console.log('error: ', error);
+      setIsLoadingPage(false);
+    }
+  }
 
   /**
    * Handle get design by ID
@@ -224,10 +284,16 @@ function CustomDesignScreen() {
   const __handleGetDesignDatabyId = async () => {
     setIsLoadingPage(true);
     try {
-      const response = await api.get(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.getDesignByID}/15962d3e-8fde-49fc-b061-6c02b14efa80`);
+      const response = await api.get(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.getDesignByID}/30928d49-e5d7-48af-88a0-5bbfaf443ee9`);
       if (response.status === 200) {
         setPartOfClothData(response.data.partOfDesign);
+        console.log(response.data);
+        const order = ["LOGO_PART", "FRONT_CLOTH_PART", "BACK_CLOTH_PART", "SLEEVE_CLOTH_PART"];
+
+        const sortedParts = response.data.partOfDesign.sort((a: PartOfDesignInterface, b: PartOfDesignInterface) => order.indexOf(a.partOfDesignName) - order.indexOf(b.partOfDesignName));
+        console.log(sortedParts);
         setSelectedPartOfCloth(response.data.partOfDesign[0]);
+        // setSelectedStamp(response.data.partOfDesign[0].itemMasks);
       }
       else {
         toast.error(`${response.message}`, { autoClose: 4000 });
@@ -306,7 +372,7 @@ function CustomDesignScreen() {
       const response = await api.get(`https://665dc0c3e88051d604081de3.mockapi.io/api/v1/stamps`);
 
       if (response) {
-        setCurrentItemList(response);
+        // setCurrentItemList(response);
         setIsCurrentItemListLoading(false);
         setIsLoadingPage(false);
       }
@@ -531,7 +597,7 @@ function CustomDesignScreen() {
    * Get Design data after choose material
    * @param item 
    */
-  const __handleGetMaterialInformation = async(item: PartOfDesignInterface[]) => {
+  const __handleGetMaterialInformation = async (item: PartOfDesignInterface[]) => {
     const successImaUrl = await __handleGetElementAsBase64('canvas3DElement')
     console.log(successImaUrl);
     const bodyRequest: Design = {
@@ -699,7 +765,7 @@ function CustomDesignScreen() {
         <div className={`${styles.customDesign__container__editorArea__display} editorArea__display `}>
 
           {/* Menu Bar of editor area */}
-          <div  className={styles.customDesign__container__editorArea__display__menuBar} >
+          <div className={styles.customDesign__container__editorArea__display__menuBar} >
             <div className={styles.customDesign__container__editorArea__display__menuBar__buttonGroup}>
               {/* TODO */}
               <button onClick={() => setIsOpenNotiChangeUpdateImageDesignTool(true)}>
@@ -743,9 +809,9 @@ function CustomDesignScreen() {
           {selectedPartOfCloth && !changeUploadPartOfDesignTool && (
             <>
               <div
-            
+
                 className={`${styles.customDesign__container__editorArea__display__displayDesign} editorArea__display__displayDesign`}
-                
+
               >
                 <ImageDraggableComponent
                   partOfCloth={selectedPartOfCloth}
