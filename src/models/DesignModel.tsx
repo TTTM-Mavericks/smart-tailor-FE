@@ -124,6 +124,7 @@ export interface ExpertTailoringSizeInterface {
   createDate: string;
   lastModifiedDate: string | null;
   quantity?: number;
+  designDetailId?: any;
 }
 
 export interface SizeInterface {

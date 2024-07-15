@@ -173,11 +173,12 @@ const OrderDetailScreen: React.FC = () => {
                 <div className={`${style.orderDetail__container__group__stepper}`}>
                     <VerticalLinearStepperComponent></VerticalLinearStepperComponent>
                 </div>
-                <div className={`${style.orderDetail__container__detail} px-12 bg-white`}>
+                <div className={`${style.orderDetail__container__detail} px-12 bg-white md:flex-row`}>
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
                         <h6 className="text-2xl font-bold text-gray-800 mb-4 md:mb-0">{t(codeLanguage + '000191')}</h6>
                         <a href="/order_history" className="text-sm text-indigo-600 hover:text-indigo-800 transition duration-200">{t(codeLanguage + '000192')} &rarr;</a>
                     </div>
+
                     <div className="border-b pb-4 mb-6">
                         <p className="text-sm text-gray-700">
                             <span style={{ fontWeight: "bolder" }}>#{orderDetail?.orderID}</span>
@@ -186,29 +187,52 @@ const OrderDetailScreen: React.FC = () => {
                             <span style={{ fontWeight: "normal" }}>{orderDetail?.expectedStartDate}</span>
                         </p>
                     </div>
+
                     <div className="flex flex-col md:flex-row items-start mb-6">
-                        <img src={orderDetail?.designResponse.imageUrl} alt={orderDetail?.designResponse.imageUrl} className="w-40 h-50 object-cover rounded-md shadow-md mb-4 md:mb-0" />
-                        <div className="md:ml-6">
+                        <img src={orderDetail?.designResponse.imageUrl} alt={orderDetail?.designResponse.imageUrl} className="w-40 h-52 object-cover rounded-md shadow-md mb-4 md:mb-0" />
+
+                        <div className="md:ml-6 w-1/2">
                             <h2 className="text-1xl font-semibold text-gray-900">{orderDetail?.designResponse.titleDesign}</h2>
                             <p className="text-sm text-gray-700">{orderDetail?.totalPrice}</p>
-                            <p className="text-sm text-gray-600 mb-1 mt-1 w-full"><span style={{ fontWeight: "normal" }}>Expert tailoring: </span>{orderDetail?.designResponse.expertTailoring?.expertTailoringName}</p>
-                            <p className="text-sm text-gray-600 mb-1 mt-1 w-full"><span style={{ fontWeight: "normal" }}>Quantity: </span>{orderDetail?.quantity}</p>
-                            <div className="flex flex-col md:flex-row md:space-x-10 mt-4">
-                                <div className="md:w-1/2 mt-4 md:mt-0">
-                                    <p className="font-medium text-gray-600">Buyer</p>
-                                    <p className="text-sm text-gray-600">{orderDetail?.buyerName}</p>
-                                    <p className="text-sm text-gray-600">{orderDetail?.phone}</p>
-                                    <a href="#" className="text-indigo-600 hover:text-indigo-800 transition duration-200">Edit</a>
-                                </div>
-                                <div className="md:w-1/2">
-                                    <p className="font-medium text-gray-600">{t(codeLanguage + '000194')}</p>
-                                    <p className="text-sm text-gray-600 whitespace-pre-line">{orderDetail?.address}, {orderDetail?.ward}, {orderDetail?.district}, {orderDetail?.province}</p>
-                                </div>
+                            <p className="text-sm text-gray-600 mb-1 mt-3 w-full">
+                                <span className='font-semibold text-gray-600'>Expert tailoring: </span>
+                                <span style={{ fontWeight: "normal" }}>{orderDetail?.designResponse.expertTailoring?.expertTailoringName}</span>
+                            </p>
+
+                            <p className="text-sm text-gray-600 mb-1 mt-3 w-full">
+                                <span className='font-semibold text-gray-600'>Quantity: </span>
+                                <span style={{ fontWeight: "normal" }}>{orderDetail?.quantity}</span>
+                            </p>
+                            <div className="text-sm text-gray-600 mb-1 mt-3 w-1/2">
+                                {orderDetail?.detailList?.map((item, index) => (
+                                    <div key={index} className="grid grid-cols-2 gap-0 mb-2">
+                                        <div className="font-semibold text-gray-600">
+                                            Size: <span className="font-normal">{item?.size?.sizeName}</span>
+                                        </div>
+                                        <div className="font-semibold text-gray-600">
+                                            Quantity: <span className="font-normal">{item?.quantity}</span>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
+
                             <div className="flex flex-col md:flex-row md:space-x-10 mt-4">
                                 <div className="md:w-1/2">
                                     <div className={style.orderDetail__orderStatus__tag}>{orderDetail?.orderStatus}</div>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col md:flex-row md:ml-6 w-1/3">
+                            <div className="md:w-1/2 mt-4 md:mt-0" style={{margin: '0 auto'}}>
+                                <p className="font-medium text-gray-600">Buyer</p>
+                                <p className="text-sm text-gray-600">{orderDetail?.buyerName}</p>
+                                <p className="text-sm text-gray-600">{orderDetail?.phone}</p>
+                                <a href="#" className="text-indigo-600 hover:text-indigo-800 transition duration-200">Edit</a>
+                            </div>
+                            <div className="md:w-1/2 md:mt-0 ">
+                                <p className="font-medium text-gray-600">{t(codeLanguage + '000194')}</p>
+                                <p className="text-sm text-gray-600 whitespace-pre-line">{orderDetail?.address}, {orderDetail?.ward}, {orderDetail?.district}, {orderDetail?.province}</p>
                             </div>
                         </div>
                     </div>

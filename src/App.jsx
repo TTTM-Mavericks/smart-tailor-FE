@@ -62,7 +62,8 @@ import { FilterProductScreen } from './pages/FilterProduct';
 import {
   OrderDetailScreen,
   OrderHistory,
-  OrderProductScreen
+  OrderProductScreen,
+  PickedOrderScreen
 } from './pages/Order';
 
 import Brand from './pages/BrandManagement/DashboardBrand/BrandDashboardScreen';
@@ -163,7 +164,7 @@ function App() {
 
           {/* Brand Dashboard Route */}
           <Route path='/brand' element={<DashboardManageMaterialScreen></DashboardManageMaterialScreen>} />
-          <Route path='/brand/signup' element={<BrandSignUpScreen></BrandSignUpScreen>} />
+          <Route path='/brand/manage_order_request/:id' element={<OrderRequestScreen></OrderRequestScreen>} />
           <Route path='/brand/signup' element={<BrandSignUpScreen></BrandSignUpScreen>} />
           <Route path='/brand/updateProfile/:id' element={<OrderRequestScreen></OrderRequestScreen>} />
 
@@ -182,6 +183,8 @@ function App() {
 
           <Route path='*' element={<Screen404 />} />
           <Route path='error404' element={<Screen404 />} />
+          <Route path='/pickedOrder' element={<PickedOrderScreen />} />
+
         </Routes>
       </BrowserRouter>
     </div>

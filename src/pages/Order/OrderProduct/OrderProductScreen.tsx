@@ -482,7 +482,7 @@ const OrderProductScreen = () => {
                             </div>
                             <div className="flex justify-start items-start bg-gray-50 light:bg-gray-800 px-4 md:py-6 md:p-6 xl:pl-8 xl:pt-0 w-full">
                                 <div className="mr-10 w-full md:w-40" style={{ width: 280, height: 260, marginTop: 0, borderRadius: '5px' }}>
-                                    <img className="w-full h-full" src={designData?.imageUrl} style={{borderRadius: '5px'}} alt="dress" />
+                                    <img className="w-full h-full object-cover rounded-md shadow-md mb-4 md:mb-0" src={designData?.imageUrl} style={{borderRadius: '5px'}} alt="dress" />
                                 </div>
                                 <div className="mt-4 md:mt-6 flex flex-col md:flex-row justify-start  items-start md:items-center md:space-x-6 xl:space-x-8 w-full">
                                     <div className="border-b border-gray-200 md:flex-row flex-col flex justify-between items-start w-full pb-8 space-y-4 md:space-y-0" >
@@ -717,8 +717,8 @@ const OrderProductScreen = () => {
                                         <p className="text-sm light:text-gray-300 leading-4 text-gray-600">{__handleAddCommasToNumber(materialPrice?.max)} VND</p>
                                     </div>
                                     <div className="flex justify-between items-center w-full">
-                                        <p className="text-sm light:text-white leading-4 text-gray-800">Discount <span className="bg-gray-200 p-1 text-xs font-medium light:bg-white light:text-gray-800 leading-3 text-gray-800">Quantity</span></p>
-                                        <p className="text-sm light:text-gray-300 leading-4 text-gray-600">-{__handleAddCommasToNumber((materialPrice?.min + materialPrice?.max) / 2 * 2 / 100)}(2%) VND</p>
+                                        <p className="text-sm light:text-white leading-4 text-gray-800">Discount <span className="bg-gray-200 p-1 text-xs font-medium light:bg-white light:text-gray-800 leading-3 text-gray-800">Quantity (2%) </span></p>
+                                        <p className="text-sm light:text-gray-300 leading-4 text-gray-600">-{__handleAddCommasToNumber((materialPrice?.min + materialPrice?.max) / 2 * 2 / 100)} VND</p>
                                     </div>
                                     <div className="flex justify-between items-center w-full">
                                         <p className="text-sm light:text-white leading-4 text-gray-800">Shipping</p>
