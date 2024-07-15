@@ -76,7 +76,7 @@ const DashboardManagerMangeExpertTailoring = () => {
                 return <ManageSizeExpertTailoring />;
             case 'material_expert_tailoring':
                 return <ManageExpertTailoringMaterial />;
-            case 'manager_manage_brand':
+            case 'manage_brand':
                 return <ManageBrand />;
             case 'manager_manage_task':
                 return <ManageTask />;
