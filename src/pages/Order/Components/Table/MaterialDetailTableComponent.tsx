@@ -206,7 +206,7 @@ const transformMaterialDetailData = (materialDetailData: MaterialDetailInterface
         materialName: materialDetail.materialResponse?.materialName ?? '',
         category: materialDetail.materialResponse?.categoryName ?? '',
         unit: materialDetail.materialResponse?.unit, // Assuming unit should be a number
-        quantity: 0, // Placeholder, update this if quantity is available in the data
+        quantity: materialDetail.quantity, // Placeholder, update this if quantity is available in the data
         minPrice: __handleAddCommasToNumber(materialDetail?.minPrice) ?? 0,
         maxPrice: __handleAddCommasToNumber(materialDetail.maxPrice) ?? 0,
     }));

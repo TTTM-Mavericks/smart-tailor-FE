@@ -434,7 +434,7 @@ export default function HeaderComponent() {
                     <Popover key={category.name} className="flex">
                       {({ open }) => (
                         <>
-                          <div className="relative flex">
+                          <div className="relative flex" style={{zIndex:99}}>
                             <Popover.Button
                               onClick={toggleProposal}
                               className={classNames(

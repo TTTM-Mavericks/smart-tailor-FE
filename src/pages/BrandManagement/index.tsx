@@ -9,7 +9,8 @@ import DashboardManageMaterialScreen from "./ManageMaterial/DashboardManageMater
 import ManageMaterialComponent from "./ManageMaterial/MaterialManage/MaterialManageScreens";
 import EditMaterialPopUpScreens from "./ManageMaterial/MaterialManage/EditMaterial/EditMaterialPopUpScreens";
 import DashboardBrandManagePriceQuantityScreen from "./ManagePrice/BrandPriceManagement/DashboardBrandPrice/DashboardBrandPriceComponent";
-import OrderRequestScreen from './BrandOrderManagement/OrderRequestScreen'
+import OrderRequestScreen from './BrandOrderManagement/OrderRequestScreen';
+import BrandSignUpScreen from './BrandAuth/SignUpBrand/BrandSignUpScreen'
 export {
     DashboardBrandScreens,
     DashboardBrandManageNotification,
@@ -22,6 +23,7 @@ export {
     ManageMaterialComponent,
     EditMaterialPopUpScreens,
     DashboardBrandManagePriceQuantityScreen,
-    OrderRequestScreen
+    OrderRequestScreen,
+    BrandSignUpScreen
 
 }

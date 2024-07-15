@@ -46,6 +46,7 @@ import {
 } from './pages/Authentication';
 
 import {
+  BrandSignUpScreen,
   DashboardBrandManageNotification,
   DashboardBrandManagePriceQuantityScreen,
   DashboardBrandProfileScreens,
@@ -162,7 +163,9 @@ function App() {
 
           {/* Brand Dashboard Route */}
           <Route path='/brand' element={<DashboardManageMaterialScreen></DashboardManageMaterialScreen>} />
-          <Route path='/brand/manage_order_request/:id' element={<OrderRequestScreen></OrderRequestScreen>} />
+          <Route path='/brand/signup' element={<BrandSignUpScreen></BrandSignUpScreen>} />
+          <Route path='/brand/signup' element={<BrandSignUpScreen></BrandSignUpScreen>} />
+          <Route path='/brand/updateProfile/:id' element={<OrderRequestScreen></OrderRequestScreen>} />
 
           {/* Detail Product Route */}
           <Route path='/detail_product/:id' element={<ProductDetailScreens></ProductDetailScreens>} />

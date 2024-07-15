@@ -1,24 +1,32 @@
 import * as React from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import styles from './SignUpStyle.module.scss';
+import styles from './BrandSignUpStyle.module.scss';
 import { HiEye, HiEyeOff } from 'react-icons/hi';
-import './SignUpStyle.css'
-import { systemLogo, usaFlag, vietnamFlag } from '../../../assets';
+import './BrandSignUpStyle.css'
+
 import { useTranslation } from 'react-i18next';
 import { Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
-import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
-import { __validateEmail, __validatePassword } from '../Utils';
+
+
 import { useNavigate } from 'react-router-dom';
-import LoadingComponent from '../../../components/Loading/LoadingComponent';
+
 import { toast, ToastContainer } from 'react-toastify';
-import ImageMasonry from '../../../components/ImageMasonry/ImageMasonryCoponent';
-import { primaryColor } from '../../../root/ColorSystem';
+import { __validateEmail, __validatePassword } from '../../../Authentication/Utils';
+import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
+import ImageMasonry from '../../../../components/ImageMasonry/ImageMasonryCoponent';
+import LoadingComponent from '../../../../components/Loading/LoadingComponent';
+import { signUpBackground, systemLogo, usaFlag, vietnamFlag } from '../../../../assets';
+import { primaryColor } from '../../../../root/ColorSystem';
+
+
 
 const defaultTheme = createTheme();
 
 
-export default function SignUpScreen() {
+export default function BrandSignUpScreen() {
+
+  // TODO MUTIL LANGUGAGE
 
   // ---------------UseState Variable---------------//
   const [selectedLanguage, setSelectedLanguage] = React.useState<string>(localStorage.getItem('language') || 'en');
@@ -135,12 +143,12 @@ export default function SignUpScreen() {
       const requestData = {
         email: email,
         password: password,
-        roleName: 'CUSTOMER'
+        roleName: 'BRAND'
       }
 
-      const response = await api.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.signup}`, requestData);
+      const response = await api.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.brandSignUp}`, requestData);
       if (response.status === 200) {
-        console.log(response.data);
+        sessionStorage.setItem('userRegister', JSON.stringify(response.data.user));
         navigate(`/auth/verify/${email}`);
         setIsloading(false);
       } else {
@@ -187,7 +195,6 @@ export default function SignUpScreen() {
 
   return (
     <ThemeProvider theme={defaultTheme}>
-      <ImageMasonry></ImageMasonry>
       <LoadingComponent isLoading={isLoading} time={5000}></LoadingComponent>
       <ToastContainer />
       <div className={styles.signup__container}>
@@ -237,6 +244,9 @@ export default function SignUpScreen() {
           </Transition>
         </Menu>
 
+        <div className={styles.signup__backGround}>
+          <img src={signUpBackground}></img>
+        </div>
         <div className={styles.signup__box}>
           <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -252,7 +262,7 @@ export default function SignUpScreen() {
             </div>
 
             <div className="sm:mx-auto text-center sm:w-full sm:max-w-sm " style={{ color: primaryColor }}>
-              <h4>{t(codeLanguage + '000017')}</h4>
+              <h4>Become a partner</h4>
             </div>
 
             <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">

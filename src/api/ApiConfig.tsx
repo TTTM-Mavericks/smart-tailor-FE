@@ -30,7 +30,8 @@ export const featuresEndpoints = {
   order: '/order',
   sizeExpertTailoring: '/size-expert-tailoring',
   expertTailoring: '/expert-tailoring',
-  expertTailoringMaterial: '/expert-tailoring-material'
+  expertTailoringMaterial: '/expert-tailoring-material',
+  brand: '/brand',
 }
 export const functionEndpoints = {
   auth: {
@@ -58,6 +59,7 @@ export const functionEndpoints = {
     addExcel: '/add-new-brand-material-by-excel-file',
     addManual: '/add-new-brand-material',
     updateBrandMaterial: '/update-brand-material',
+    brandSignUp: '/add-new-brand'
   },
   customer: {
     updateProfile: '/update-customer-profile'
@@ -133,7 +135,7 @@ export const functionEndpoints = {
     addNewExpertTailoringMaterial: '/add-new-expert-tailoring-material',
     addNewExpertTailoringByExcelFile: '/add-new-expert-tailoring-material-by-excel-file',
     updateStatusExpertTailoringMaterial: '/change-status-expert-tailoring-material'
-  }
+  },
 }
 
 
