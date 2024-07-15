@@ -355,7 +355,7 @@ const ProfileSettings: React.FC = () => {
     return (
         <div className="min-h-screen flex flex-col">
             <HeaderComponent />
-            <div className="flex flex-1 flex-col md:flex-row gap-8 px-6 py-8 md:px-16 lg:px-28 text-gray-800 mt-40">
+            <div className="flex flex-1 flex-col md:flex-row gap-8 px-6 pb-8 md:px-16 lg:px-28 text-gray-800 mt-10">
                 <aside className="hidden md:block md:w-1/3 lg:w-1/4">
                     <div className="sticky top-20 p-4 text-sm border-r border-gray-200 h-full">
                         <h2 className="pl-3 mb-6 text-2xl font-semibold text-orange-900">Settings</h2>

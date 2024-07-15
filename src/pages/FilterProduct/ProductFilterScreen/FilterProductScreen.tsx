@@ -436,7 +436,7 @@ export default function FilterProductScreen() {
 
 
     return (
-        <div className="bg-white" style={{ marginTop: "5%" }}>
+        <div className="bg-white" style={{ marginTop: "0" }}>
             <HeaderComponent />
             <div>
                 <Transition.Root show={mobileFiltersOpen} as={Fragment}>

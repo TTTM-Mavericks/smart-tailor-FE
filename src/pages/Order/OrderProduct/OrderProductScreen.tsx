@@ -139,7 +139,7 @@ const OrderProductScreen = () => {
     // TODO MULTI LANGUAGE\
     // ---------------UseState Variable---------------//
     const [isChangeAddressDialogOpen, setIsChangeAddressDialogOpen] = useState<boolean>(false);
-    const [sizeQuantities, setSizeQuantities] = useState<SizeQuantity[]>([{ size: 'L', quantity: 1, sizeID: 'dsfsdfds' }]);
+    const [sizeQuantities, setSizeQuantities] = useState<SizeQuantity[]>([{ size: '', quantity: 1, sizeID: '' }]);
     const [sizeQuantitiesCustom, setSizeQuantitiesCustom] = useState<SizeQuantity[]>([{ quantity: 1, height: 0, ring1: 0, ring2: 0, ring3: 0, width: 0 }]);
     const [inputMode, setInputMode] = useState<'predefined' | 'custom'>('predefined');
     const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
@@ -232,6 +232,14 @@ const OrderProductScreen = () => {
      * Handle fetch data to get design information
      */
     const __handlePostSizeAndQuatity = async () => {
+        const checkValidSize = sizeQuantities.map((item) => {
+            if(!item.sizeID || !item.sizeName || !item.size) return false;
+            return true;
+        })
+        if(!checkValidSize) {
+            toast.error(`Please enter your size`, { autoClose: 4000 });
+            return;
+        }
         setIsLoadingPage(true);
         try {
             const sizeList = sizeQuantities
@@ -473,8 +481,8 @@ const OrderProductScreen = () => {
                                 <SizeDialogComponent data='shirtModel' isOpen={isOpenSizeDialog} onClose={__handleCloseSizeDilog}></SizeDialogComponent>
                             </div>
                             <div className="flex justify-start items-start bg-gray-50 light:bg-gray-800 px-4 md:py-6 md:p-6 xl:pl-8 xl:pt-0 w-full">
-                                <div className="mr-10 w-full md:w-40" style={{ width: 250, height: 260, marginTop: -50 }}>
-                                    <img className="w-full h-full" src={designData?.imageUrl} alt="dress" />
+                                <div className="mr-10 w-full md:w-40" style={{ width: 280, height: 260, marginTop: 0, borderRadius: '5px' }}>
+                                    <img className="w-full h-full" src={designData?.imageUrl} style={{borderRadius: '5px'}} alt="dress" />
                                 </div>
                                 <div className="mt-4 md:mt-6 flex flex-col md:flex-row justify-start  items-start md:items-center md:space-x-6 xl:space-x-8 w-full">
                                     <div className="border-b border-gray-200 md:flex-row flex-col flex justify-between items-start w-full pb-8 space-y-4 md:space-y-0" >

@@ -69,6 +69,7 @@ export interface MaterialDetailInterface {
   materialResponse?: MaterialInterface,
   minPrice?: number;
   maxPrice?: number;
+  quantity?: number;
 }
 
 export interface DesignDetailInterface {
