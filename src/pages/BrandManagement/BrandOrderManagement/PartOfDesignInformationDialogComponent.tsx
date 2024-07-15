@@ -28,7 +28,7 @@ const PartOfDesignInformationDialogComponent: React.FC<PartDetailsDialogProps> =
             <DialogContent style={{ maxHeight: 700 }} >
                 <Grid container spacing={4}>
                     <Grid item xs={12} sm={6}>
-                        <Typography variant="body1" style={{ fontSize: 14, fontWeight: 'bold' }} className="text-teal-700">Material ID: {part?.materialID}</Typography>
+                        {/* <Typography variant="body1" style={{ fontSize: 14, fontWeight: 'bold' }} className="text-teal-700">Material ID: {part?.material?.materialName}</Typography> */}
                         {part?.imageUrl && <img src={part?.successImageUrl} alt="Part Image" style={{ width: 300, height: 350, marginTop: 20 }} />}
                     </Grid>
                     <Grid item xs={12} sm={6} className={`${style.partOfDesignInfor__dialog__content}`}>

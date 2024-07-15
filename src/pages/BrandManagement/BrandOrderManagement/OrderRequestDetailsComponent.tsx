@@ -342,11 +342,13 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
                                     <Typography variant="body2" className={`${style.orderRequest__typoraphy}`}><strong>HS code:</strong> {part.material?.hsCode}</Typography>
 
                                 </Grid>
-                                <Grid item xs={12} sm={1} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <IconButton onClick={() => handleOpenDialog(part)} style={{ float: 'right' }}>
-                                        <MdOutlineViewCozy color={primaryColor} size={30} />
-                                    </IconButton>
-                                </Grid>
+                                {part?.itemMasks && part?.itemMasks?.length > 0 && (
+                                    <Grid item xs={12} sm={1} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <IconButton onClick={() => handleOpenDialog(part)} style={{ float: 'right' }}>
+                                            <MdOutlineViewCozy color={primaryColor} size={30} />
+                                        </IconButton>
+                                    </Grid>
+                                )}
                             </Grid>
                         ))}
                     </div>
