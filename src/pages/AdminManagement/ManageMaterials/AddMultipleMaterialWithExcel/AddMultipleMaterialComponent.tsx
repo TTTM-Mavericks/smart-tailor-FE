@@ -11,7 +11,7 @@ import EditMultipleUsersInExcelTable from './CRUDWithExcelTable/EditMultipleMate
 import { useTranslation } from 'react-i18next';
 import { AddExcelMaterial, ExcelData } from '../../../../models/AdminMaterialExcelModel';
 import axios from 'axios';
-import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
+import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import ExcelJS from 'exceljs';
 import { toast, ToastContainer } from 'react-toastify';
 import Swal from 'sweetalert2';
@@ -49,6 +49,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
+    const [errorCheckGet, setErrorCheckGet] = React.useState([])
     // ---------------Usable Variable---------------//
     // Get language in local storage
     const selectedLanguage = localStorage.getItem('language');
@@ -165,12 +166,12 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
     const _handleUploadData = async () => {
         if (!selectedFile) {
             console.error('No file selected');
+            toast.error('No file select. Please Select One')
             return;
         }
 
         const formData = new FormData();
         formData.append('file', selectedFile);
-        // formData.append('brandName', 'LA LA LISA BRAND');
 
         // Log information about the file
         console.log('File name:', selectedFile.name);
@@ -186,63 +187,38 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
         }));
 
         try {
-            // const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0YW1tdHNlMTYxMDg3QGZwdC5lZHUudm4iLCJpYXQiOjE3MTgyODUyMTMsImV4cCI6MTcxODM3MTYxM30.UUpy2s9SwYGF_TyIru6VASQ-ZzGTOqx7mkWkcSR2__0'; // Replace with the actual bearer token
-            const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.addNewMaterialByExcelFile}`, formData,
-
-                // {
-                //     headers: {
-                //         'Authorization': `Bearer ${token}`
-                //     }
-                // }
-            );
-
-            if (response.data.message === 'Add New Category And Material By Excel File Successfully!') {
+            const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.addNewMaterialByExcelFile}`, formData);
+            if (response.status === 200) {
                 Swal.fire({
                     icon: 'success',
                     title: 'Add Excel Material Success',
                     text: `${response.data.message}`,
                 });
 
-                addNewMaterial(transformedData)
-                closeMultipleCard();
-            }
-            if (response.data.message === "Invalid Data Type") {
-                Swal.fire(
-                    'Add Excel Material fail!',
-                    'Please check information!',
-                    'error'
-                );
+                addNewMaterial(transformedData);
                 closeMultipleCard();
             }
         } catch (error: any) {
-            // Check for specific error status codes
+            // Add New Category And Material By Excel File Successfully! => Add Correct
+            // Some Data could not be processed correctly => Add File Success Again
+            // Invalid Data Type => Add Worng Excel
             if (error.response) {
-                if (error.response.data.message === "Invalid Data Type") {
-                    console.error('Failed to upload data: Bad Request');
-                } else if (error.response.status === 401) {
-                    console.error('Failed to upload data: Unauthorized');
+                const errorMessage = error.response.data.message;
+                // Check for specific error messages or status codes
+                if (errorMessage === "Invalid Data Type") {
+                    setErrorCheckGet(error.response.data.errors)
+                    console.log(errorCheckGet);
+                    toast.error('Invalid Data Type error');
+                } else if (errorMessage === "Some Data could not be processed correctly") {
+                    setErrorCheckGet(error.response.data.errors);
+                    console.log(errorCheckGet);
+                    toast.error('Some Data could not be processed correctly');
                 } else {
-                    console.error('Failed to upload data: Unknown Error');
+                    toast.error('Unknown Error');
                 }
             } else {
-                console.error('Error uploading data:', error.message);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Added Failed',
-                    text: 'There was an error Added Material. Please try again later.',
-                });
+                toast.error('Error uploading data');
             }
-            // Swal.fire(
-            //     'Add Excel Material fail!',
-            //     'Please check material maybe it duplicate',
-            //     'error'
-            // );
-            // closeMultipleCard();
-            // await _handleDownloadErrorData()
-            // if () {
-            //     toast.error('The category is not existed or something error!');
-            //     return;
-            // }
         }
     };
 
@@ -255,43 +231,46 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
      * If there are validation errors, download the error data
      * If not, upload data
      */
-    const _handleConfirm = async () => {
-        // Function to check if a value is a number and greater than 0
-        const isValidBasePrice = (basePrice: any): boolean => {
-            return typeof basePrice === 'number' && basePrice > 0;
-        };
+    // const _handleConfirm = async () => {
+    //     // Function to check if a value is a number and greater than 0
+    //     const isValidBasePrice = (basePrice: any): boolean => {
+    //         return typeof basePrice === 'number' && basePrice > 0;
+    //     };
 
-        const isValidHSCode = (hsCode: any): boolean => {
-            return typeof hsCode === 'number' && hsCode > 0;
-        };
+    //     const isValidHSCode = (hsCode: any): boolean => {
+    //         return typeof hsCode === 'number' && hsCode > 0;
+    //     };
 
-        // Check for duplicates based on Category_Name and Material_Name
-        const duplicates = checkForDuplicates(excelData, ['Category_Name', 'Material_Name']);
+    //     // Check for duplicates based on Category_Name and Material_Name
+    //     const duplicates = checkForDuplicates(excelData, ['Category_Name', 'Material_Name']);
 
-        // Check for invalid entries
-        const invalidEntries = excelData.some(item =>
-            !item.Category_Name ||
-            !item.Material_Name ||
-            item.Unit === undefined ||
-            item.Base_Price === undefined ||
-            item.HS_Code === undefined ||
-            !isValidBasePrice(item.Base_Price) ||
-            !isValidHSCode(item.HS_Code)
-        );
+    //     // Check for invalid entries
+    //     const invalidEntries = excelData.some(item =>
+    //         !item.Category_Name ||
+    //         !item.Material_Name ||
+    //         item.Unit === undefined ||
+    //         item.Base_Price === undefined ||
+    //         item.HS_Code === undefined ||
+    //         !isValidBasePrice(item.Base_Price) ||
+    //         !isValidHSCode(item.HS_Code)
+    //     );
 
-        if (invalidEntries) {
-            setError('There are duplicate values or missing required fields!');
-        }
-        if (duplicates.size > 0) {
-            setError('Duplicate Please Try Again')
-        }
-        if (!hasDataChanged()) {
-            setError('Data have changing, Please click download button to download and upload again')
-        }
-        else {
-            await _handleUploadData();
-        }
-    };
+    //     if (invalidEntries) {
+    //         _handleUploadData()
+    //         // setError('There are duplicate values or missing required fields!');
+    //     }
+    //     if (duplicates.size > 0) {
+    //         _handleUploadData()
+    //         // setError('Duplicate Please Try Again')
+    //     }
+    //     if (!hasDataChanged()) {
+    //         _handleUploadData()
+    //         // setError('Data have changing, Please click download button to download and upload again')
+    //     }
+    //     else {
+    //         await _handleUploadData();
+    //     }
+    // };
 
     /**
      * Download the sample data
@@ -752,7 +731,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                     <Button
                         variant="contained"
                         color="primary"
-                        onClick={_handleConfirm}
+                        onClick={_handleUploadData}
                         endIcon={<CheckCircleRounded />}
                         style={{ backgroundColor: '#E96208', color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
                     >

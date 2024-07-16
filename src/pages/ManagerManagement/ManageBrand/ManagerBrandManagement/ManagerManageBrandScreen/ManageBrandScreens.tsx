@@ -67,7 +67,7 @@ const ManageBrand: React.FC = () => {
         try {
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.acceptBrand}`;
 
-            const response = await axios.put(apiUrl + `/${brandID}`)
+            const response = await axios.get(apiUrl + `/${brandID}`)
 
             if (!response.data) {
                 throw new Error('Error deleting material');
@@ -84,7 +84,7 @@ const ManageBrand: React.FC = () => {
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.rejectBrand}`;
             console.log("brandid: " + brandID);
 
-            const response = await axios.put(apiUrl + `/${brandID}`)
+            const response = await axios.get(apiUrl + `/${brandID}`)
 
             if (!response.data) {
                 throw new Error('Error deleting material');

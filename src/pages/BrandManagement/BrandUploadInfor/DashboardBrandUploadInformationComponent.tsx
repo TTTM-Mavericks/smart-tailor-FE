@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import Sidebar from '../../GlobalComponent/SideBarComponent/SideBarComponent';
-import Navbar from '../../GlobalComponent/NavBarComponent/NavbarComponent';
-import ManageMaterialComponent from '../MaterialManage/MaterialManageScreens';
-import BrandProfileSetup from '../../BrandProfile/BrandProfileComponent';
-import ManagePrice from '../../ManagePrice/BrandPriceManagement/BrandManagementScreen/ManagePriceScreens';
-import OrderRequestScreen from '../../BrandOrderManagement/OrderRequestScreen';
-import UploadBrandInforForm from '../../BrandUploadInfor/BrandUploadInforComponent';
+import Sidebar from '../GlobalComponent/SideBarComponent/SideBarComponent';
+import Navbar from '../GlobalComponent/NavBarComponent/NavbarComponent';
+import BrandProfileSetup from '../BrandProfile/BrandProfileComponent';
+import ManagePrice from '../ManagePrice/BrandPriceManagement/BrandManagementScreen/ManagePriceScreens';
+import ManageMaterialComponent from '../ManageMaterial/MaterialManage/MaterialManageScreens';
+import OrderRequestScreen from '../BrandOrderManagement/OrderRequestScreen';
+import UploadBrandInforForm from './BrandUploadInforComponent';
 
-const DashboardManageMaterialScreen = () => {
+const DashboardBrandUploadInformationComponent = () => {
     const [menuOpen, setMenuOpen] = useState(false);
-    const [activeMenu, setActiveMenu] = useState('manage_material');
+    const [activeMenu, setActiveMenu] = useState('expert_tailoring');
     const [showScrollButton, setShowScrollButton] = React.useState<boolean>(false);
     const [popperOpen, setPopperOpen] = useState<Record<string, boolean>>({});
 
@@ -90,6 +90,7 @@ const DashboardManageMaterialScreen = () => {
                 );
         }
     };
+
     return (
         <div className="flex">
             <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
@@ -103,4 +104,4 @@ const DashboardManageMaterialScreen = () => {
     );
 };
 
-export default DashboardManageMaterialScreen;
+export default DashboardBrandUploadInformationComponent;

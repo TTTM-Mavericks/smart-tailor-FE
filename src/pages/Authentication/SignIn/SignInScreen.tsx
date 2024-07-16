@@ -121,6 +121,14 @@ function SignInScreen() {
           Cookies.set('refreshToken', refreshToken);
           Cookies.set('userAuth', JSON.stringify(response.data.user));
 
+          const BRANDROLECHECK = Cookies.get('userAuth') as string;
+          const brandAuth = JSON.parse(BRANDROLECHECK);
+          const { userID, email, fullName, language, phoneNumber, roleName, imageUrl, userStatus } = brandAuth;
+
+          if (roleName === 'BRAND' && userStatus === 'ACTIVE') {
+            window.location.href = `/brand/updateProfile/${userID}`;
+          }
+
           setTimeout(() => {
             window.location.href = '/'
           }, 2000)

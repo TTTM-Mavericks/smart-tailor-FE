@@ -38,4 +38,8 @@ export interface FormData {
     accountNumber: number;
     accountName: string;
     address: string;
+    province: string,
+    district: string,
+    ward: string,
+    QR_Payment: string
 }
