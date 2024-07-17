@@ -131,6 +131,7 @@ function CustomDesignScreen() {
     console.log('Received updatePart from child: ', updatePart);
     setUpdatePartData(updatePart);
     setPartOfClothData(updatePart);
+
   }, []);
   const divRef = useRef<HTMLDivElement>(null);
   const { id } = useParams();
@@ -145,6 +146,8 @@ function CustomDesignScreen() {
 
     __handleFetchSystemItemData();
     __handleFetchDesignModelData();
+    __handleGetDesignDatabyId(id);
+
 
     const userCookie = Cookies.get('userAuth');
     if (userCookie) {
@@ -185,13 +188,15 @@ function CustomDesignScreen() {
 
   useEffect(() => {
     setPartOfClothData(partOfClothData);
+    state.modelData = partOfClothData;
+
   }, [partOfClothData])
 
 
   useEffect(() => {
     if (typeOfModel === 'shirtModel') {
       setPartOfClothData(PartOfShirtDesignData);
-      __handleGetDesignDatabyId(id);
+      // __handleGetDesignDatabyId(id);
       setSelectedPartOfCloth(PartOfShirtDesignData[0]);
     }
 
@@ -290,12 +295,10 @@ function CustomDesignScreen() {
         setPartOfClothData(response.data.partOfDesign);
         console.log(response.data);
         const order = ["LOGO_PART", "FRONT_CLOTH_PART", "BACK_CLOTH_PART", "SLEEVE_CLOTH_PART"];
-
         const sortedParts = response.data.partOfDesign.sort((a: PartOfDesignInterface, b: PartOfDesignInterface) => order.indexOf(a.partOfDesignName) - order.indexOf(b.partOfDesignName));
         console.log(sortedParts);
         setSelectedPartOfCloth(response.data.partOfDesign[0]);
-        // setSelectedStamp(response.data.partOfDesign[0].itemMasks);
-        state.modelData = response.data.partOfDesign;
+        setTypeOfModelID(response.data.expertTailoring.expertTailoringID)
       }
       else {
         toast.error(`${response.message}`, { autoClose: 4000 });
@@ -408,6 +411,7 @@ function CustomDesignScreen() {
             typeOfItem: 'IMAGE',
             imageUrl: result,
             zIndex: 1,
+            indexZ: 1,
             position: {
               x: 150,
               y: 170
@@ -435,6 +439,11 @@ function CustomDesignScreen() {
             itemMaskID: __handleGenerateItemId(),
             typeOfItem: 'IMAGE',
             imageUrl: result,
+            position: { x: 150, y: 170 },
+            positionX: 150,
+            positionY: 170,
+            zIndex: 1,
+            indexZ: 1
           };
           return [newItem];
         });
@@ -450,7 +459,8 @@ function CustomDesignScreen() {
         position: { x: 150, y: 170 },
         positionX: 150,
         positionY: 170,
-        zIndex: 0
+        zIndex: 1,
+        indexZ: 1
       };
 
       if (prev && prev.length > 0) {
@@ -517,7 +527,9 @@ function CustomDesignScreen() {
     if (result) {
       const imgBase64 = await __handleChangeImageToBase64(result.imageUrl);
       result.imageUrl = imgBase64; // Update the imageUrl with base64 string
-      result.partOfDesignID === selectedPartOfCloth.partOfDesignID;
+      result.partOfDesignID = selectedPartOfCloth.partOfDesignID;
+      result.indexZ = 1;
+      result.zIndex = 1;
       setSelectedStamp((prevSelectedStamp = []) => {
         const existingItemIndex = prevSelectedStamp.findIndex(
           (existingItem: ItemMaskInterface) => existingItem.itemMaskID === item.itemMaskID

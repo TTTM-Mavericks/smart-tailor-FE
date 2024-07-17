@@ -29,6 +29,7 @@ export interface ItemMaskInterface {
   rotate?: any;
   itemMaterial?: ItemMaterialInterface,
   materialID?: string
+  indexZ?: number
 
 
 }
