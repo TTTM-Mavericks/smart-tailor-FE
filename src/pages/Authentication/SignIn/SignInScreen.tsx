@@ -125,8 +125,11 @@ function SignInScreen() {
           const brandAuth = JSON.parse(BRANDROLECHECK);
           const { userID, email, fullName, language, phoneNumber, roleName, imageUrl, userStatus } = brandAuth;
 
-          if (roleName === 'BRAND' && userStatus === 'ACTIVE') {
+          const fetchApiBrand = await api.get(`${versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.getBrandByID + `/${userID}`}`)
+          if (fetchApiBrand.data.brandName === null) {
             window.location.href = `/brand/updateProfile/${userID}`;
+          } else {
+            window.location.href = `/brand`
           }
 
           setTimeout(() => {

@@ -41,5 +41,5 @@ export interface FormData {
     province: string,
     district: string,
     ward: string,
-    QR_Payment: string
+    qrPayment: string
 }

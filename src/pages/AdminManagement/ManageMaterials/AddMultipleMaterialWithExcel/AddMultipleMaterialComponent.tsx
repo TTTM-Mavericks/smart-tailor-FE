@@ -386,13 +386,8 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
             return hasNullValues || isCategoryNameNull || isMaterialNameNull || isHsCodeNull || isBasePriceNull || isUnitNumber;
         });
 
-        const rowsWithoutError = rows.filter(row => !rowsWithError.includes(row));
-
-        // Concatenate rows with errors first
-        const sortedRows = [...rowsWithError];
-
-        // Add rows to the worksheet
-        worksheet.addRows(sortedRows);
+        // Add rows with errors to the worksheet
+        worksheet.addRows(rowsWithError);
 
         // Set styles for column header row
         worksheet.getRow(2).eachCell(cell => {
@@ -407,10 +402,10 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
         });
 
         // Apply validation and coloring for errors
-        const duplicates = checkForDuplicates(sortedRows, ['Category_Name', 'Material_Name']);
+        const duplicates = checkForDuplicates(rowsWithError, ['Category_Name', 'Material_Name']);
         const columnsWithErrors = new Set<number>();
 
-        sortedRows.forEach((row, rowIndex) => {
+        rowsWithError.forEach((row, rowIndex) => {
             const excelRow = worksheet.getRow(rowIndex + 3);
             worksheet.columns.forEach((column, colIndex) => {
                 const cell = excelRow.getCell(colIndex + 1);
@@ -502,7 +497,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
         });
 
         // Reapply red fill to individual cells with errors to override column color
-        rows.forEach((row, rowIndex) => {
+        rowsWithError.forEach((row, rowIndex) => {
             const excelRow = worksheet.getRow(rowIndex + 3);
             worksheet.columns.forEach((column, colIndex) => {
                 const cell = excelRow.getCell(colIndex + 1);
@@ -542,10 +537,11 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
 
         const a = document.createElement("a");
         a.href = url;
-        a.download = "Material_Category_Fix_Change.xlsx";
+        a.download = "Material_Category_Errors.xlsx";
         a.click();
         window.URL.revokeObjectURL(url);
     };
+
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px', maxHeight: '80vh', overflowY: 'auto', position: "relative" }}>

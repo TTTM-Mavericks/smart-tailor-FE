@@ -99,21 +99,21 @@ const ManageBrand: React.FC = () => {
     const _hanldeConfirmAccept = async (id: number) => {
         try {
             const result = await Swal.fire({
-                title: `${t(codeLanguage + '000061')}`,
-                text: `${t(codeLanguage + '000062')}`,
+                title: `Confirm Accept`,
+                text: `Are you sure you want to accept thís brand`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: `${t(codeLanguage + '000063')}`,
+                confirmButtonText: `Yes I want to accept`,
                 cancelButtonText: `${t(codeLanguage + '000055')}`
             });
 
             if (result.isConfirmed) {
                 await _handleAcceptBrand(id.toString()); // Ensure id is converted to string if necessary
                 Swal.fire(
-                    `${t(codeLanguage + '000064')}`,
-                    `${t(codeLanguage + '000065')}`,
+                    `Accept Brand Success`,
+                    `Brand Have Been Accept Successfull`,
                     'success'
                 );
 
@@ -127,8 +127,8 @@ const ManageBrand: React.FC = () => {
                 );
             } else {
                 Swal.fire(
-                    `${t(codeLanguage + '000066')}`,
-                    `${t(codeLanguage + '000067')}`,
+                    `Cancel Accept Brand`,
+                    `You Cancelled Accept Brand`,
                     'error'
                 );
             }
@@ -146,21 +146,21 @@ const ManageBrand: React.FC = () => {
     const _hanldeConfirmDeny = async (id: number) => {
         try {
             const result = await Swal.fire({
-                title: `${t(codeLanguage + '000061')}`,
-                text: `${t(codeLanguage + '000062')}`,
+                title: `Confirm Reject`,
+                text: `Are you sure you want to reject thís brand`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: `${t(codeLanguage + '000063')}`,
+                confirmButtonText: `Yes I want to reject`,
                 cancelButtonText: `${t(codeLanguage + '000055')}`
             });
 
             if (result.isConfirmed) {
                 await _handleDenyBrand(id.toString()); // Ensure id is converted to string if necessary
                 Swal.fire(
-                    `${t(codeLanguage + '000064')}`,
-                    `${t(codeLanguage + '000065')}`,
+                    `Reject Brand Success`,
+                    `Brand Have Been Reject Successfull`,
                     'success'
                 );
 
@@ -174,8 +174,8 @@ const ManageBrand: React.FC = () => {
                 );
             } else {
                 Swal.fire(
-                    `${t(codeLanguage + '000066')}`,
-                    `${t(codeLanguage + '000067')}`,
+                    `Cancel Reject Brand`,
+                    `You Cancelled Reject Brand`,
                     'error'
                 );
             }
