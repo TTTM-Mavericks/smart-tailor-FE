@@ -102,12 +102,12 @@ const Shirt = ({ isDefault }) => {
             let pos;
             pos = [
                 // x =
-                key === 'LOGO_PART' || key === 'FRONT_CLOTH_PART' ? (firstItemMask.position.x - 130 + (firstItemMask.scaleX / 230) + (firstItemMask.scaleX - 230) / 2) / 1000
-                    : key === 'BACK_CLOTH_PART' ? -(firstItemMask.position.x - 130 + (firstItemMask.scaleX / 230) + (firstItemMask.scaleX - 230) / 2) / 1000 : 0
+                key === 'LOGO_PART' || key === 'FRONT_CLOTH_PART' ? (firstItemMask.positionX - 130 + (firstItemMask.scaleX / 230) + (firstItemMask.scaleX - 230) / 2) / 1000
+                    : key === 'BACK_CLOTH_PART' ? -(firstItemMask.positionX - 130 + (firstItemMask.scaleX / 230) + (firstItemMask.scaleX - 230) / 2) / 1000 : 0
                 ,
                 // y=
-                key === 'LOGO_PART' || key === 'FRONT_CLOTH_PART' ? -(firstItemMask.position.y - 80 + (firstItemMask.scaleY / 230) + (firstItemMask.scaleY - 230) / 2) / 1000
-                    : key === 'BACK_CLOTH_PART' ? -(firstItemMask.position.y - 80 + (firstItemMask.scaleY / 230) + (firstItemMask.scaleY - 230) / 2) / 1000 : 0
+                key === 'LOGO_PART' || key === 'FRONT_CLOTH_PART' ? -(firstItemMask.positionY - 80 + (firstItemMask.scaleY / 230) + (firstItemMask.scaleY - 230) / 2) / 1000
+                    : key === 'BACK_CLOTH_PART' ? -(firstItemMask.positexturetionY - 80 + (firstItemMask.scaleY / 230) + (firstItemMask.scaleY - 230) / 2) / 1000 : 0
                 ,
                 // z=
                 key === 'LOGO_PART' || key === 'FRONT_CLOTH_PART' ? 0.15

@@ -32,7 +32,8 @@ export const featuresEndpoints = {
   expertTailoring: '/expert-tailoring',
   expertTailoringMaterial: '/expert-tailoring-material',
   brand: '/brand',
-  systemImage: '/system-image'
+  systemImage: '/system-image',
+
 }
 export const functionEndpoints = {
   auth: {
@@ -50,7 +51,8 @@ export const functionEndpoints = {
     systemItem: '/systemItem',
     addNewDesign: '/add-new-design',
     getDesignByID: '/get-design-by-id',
-    getAllDesign: '/get-all-design'
+    getAllDesign: '/get-all-design',
+    updateDesign: '/update-design'
   },
   designDetail: {
     addNewDesignDetail: '/add-new-design-detail',

@@ -80,7 +80,7 @@ const ImageDraggableComponent: React.FC<props> = ({
                 if (itemMasks && itemMasks.itemMasks) {
                     const setPositionDefault = itemMasks.itemMasks.map((item) => ({
                         ...item,
-                        position: { x: item.positionX, y: item.positionY }
+                        // position: { x: item.positionX, y: item.positionY }
                     }));
                     setData(setPositionDefault as ItemMaskInterface[]);
                     setOldPartOfClothData(partOfClothData);
@@ -258,7 +258,7 @@ const ImageDraggableComponent: React.FC<props> = ({
         const target = e.target as HTMLElement;
         if (target) {
             e.preventDefault();
-            // setSelectedItemDrag(item);
+            setSelectedItemDrag(item);
         }
     };
 
@@ -302,7 +302,6 @@ const ImageDraggableComponent: React.FC<props> = ({
                                 rotate: rotate
                             };
                         }
-                        console.log('{ x: x, y: y }: ', { x: x, y: y });
                         return dataItem;
                     });
                 });
@@ -458,7 +457,7 @@ const ImageDraggableComponent: React.FC<props> = ({
             data && data?.map((item: ItemMaskInterface) => (
                 <Draggable
                     key={item.itemMaskID}
-                    position={item.position ? { x: item.position.x, y: item.position.y } : { x: 0, y: 0 }}
+                    position={item.positionX && item.positionY ? { x: item.positionX, y: item.positionY } : { x: 0, y: 0 }}
                     onDrag={(e, ui) => __handleOnDrag(e, ui, item)}
                     onStop={(e, ui) => __handleDragStop(e, ui, item)}
                     onStart={(e, ui) => __handleDragStart(e, ui, item)}

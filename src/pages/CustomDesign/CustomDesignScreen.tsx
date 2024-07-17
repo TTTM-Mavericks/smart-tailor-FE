@@ -30,7 +30,7 @@ import LoadingComponent from '../../components/Loading/LoadingComponent';
 import { UserInterface } from '../../models/UserModel';
 import Cookies from 'js-cookie';
 import { toast, ToastContainer } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Cloud, UploadCloud } from 'react-feather';
 import { __handleDownloadElementAsPng, __handleGetElementAsBase64 } from '../../utils/CanvasUtils';
 
@@ -133,6 +133,7 @@ function CustomDesignScreen() {
     setPartOfClothData(updatePart);
   }, []);
   const divRef = useRef<HTMLDivElement>(null);
+  const { id } = useParams();
   // ---------------UseEffect---------------//
 
   useEffect(() => {
@@ -190,7 +191,7 @@ function CustomDesignScreen() {
   useEffect(() => {
     if (typeOfModel === 'shirtModel') {
       setPartOfClothData(PartOfShirtDesignData);
-      // __handleGetDesignDatabyId();
+      __handleGetDesignDatabyId(id);
       setSelectedPartOfCloth(PartOfShirtDesignData[0]);
     }
 
@@ -245,7 +246,7 @@ function CustomDesignScreen() {
       print_type: '',
       createDate: '',
       lastModifiedDate: '',
-      zIndex: 80,
+      zIndex: 1,
       itemMaskID: item.imageID,
       rotate: 0
     }));
@@ -281,10 +282,10 @@ function CustomDesignScreen() {
    * Handle get design by ID
    * @returns 
    */
-  const __handleGetDesignDatabyId = async () => {
+  const __handleGetDesignDatabyId = async (id: any) => {
     setIsLoadingPage(true);
     try {
-      const response = await api.get(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.getDesignByID}/30928d49-e5d7-48af-88a0-5bbfaf443ee9`);
+      const response = await api.get(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.getDesignByID}/${id}`);
       if (response.status === 200) {
         setPartOfClothData(response.data.partOfDesign);
         console.log(response.data);
@@ -294,6 +295,7 @@ function CustomDesignScreen() {
         console.log(sortedParts);
         setSelectedPartOfCloth(response.data.partOfDesign[0]);
         // setSelectedStamp(response.data.partOfDesign[0].itemMasks);
+        state.modelData = response.data.partOfDesign;
       }
       else {
         toast.error(`${response.message}`, { autoClose: 4000 });
@@ -405,6 +407,15 @@ function CustomDesignScreen() {
             itemMaskID: __handleGenerateItemId(),
             typeOfItem: 'IMAGE',
             imageUrl: result,
+            zIndex: 1,
+            position: {
+              x: 150,
+              y: 170
+            },
+            positionX: 150,
+            positionY: 170,
+            scaleX: 230,
+            scaleY: 230,
           };
 
           if (prev && prev.length > 0) {
@@ -611,25 +622,44 @@ function CustomDesignScreen() {
     };
     console.log(bodyRequest);
     setMainDesign(bodyRequest);
+    return bodyRequest
+  }
+
+  /**
+   * 
+   */
+  const __handleSaveDesign = () => {
+    if (partOfClothData) {
+
+      __handleGetMaterialInformation(partOfClothData).then((value) => {
+        __handleUpdateDesign(true, value);
+      })
+    }
   }
 
   /**
   * Handle Create design
   * @param item 
   */
-  const __handleCreateDesign = async () => {
+  const __handleUpdateDesign = async (isLickSaveButton: boolean, mainDesign: DesignInterface | undefined) => {
 
-    if (!mainDesign) return;
+    if (!mainDesign) {
+      __handleGetMaterialInformation
+    };
     setIsLoadingPage(true);
     try {
-      const response = await api.post(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.addNewDesign}`, mainDesign);
+      const response = await api.put(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.updateDesign}/${id}`, mainDesign);
       if (response.status === 200) {
         toast.success(`${response.message}`, { autoClose: 4000 });
-        setTimeout(() => {
+        if (!isLickSaveButton) {
+          setTimeout(() => {
+            setIsLoadingPage(false);
+            navigate(`/design_detail/${response.data.designID}`);
+          }, 3000)
+        } else {
           setIsLoadingPage(false);
-          navigate(`/design_detail/${response.data.designID}`);
-        }, 3000);
 
+        }
       } else {
         toast.error(`${response.message}`, { autoClose: 4000 });
         setIsLoadingPage(false);
@@ -677,7 +707,7 @@ function CustomDesignScreen() {
         model={(
           <CanvasModel typeOfModel={typeOfModel} isDefault={true} is3D={true} />
         )}
-        onCreateDesign={__handleCreateDesign}
+        onCreateDesign={() => __handleUpdateDesign(false, mainDesign)}
       ></ChooseMaterialDialogComponent>
 
       {/* Update design tool Dialog */}
@@ -729,7 +759,7 @@ function CustomDesignScreen() {
             <span>{t(codeLanguage + '000104')}</span>
           </button>
 
-          <button className={` py-1 px-4 rounded inline-flex items-center ${styles.customDesign__container__header__buttonGroup__saveBtn} `}>
+          <button className={` py-1 px-4 rounded inline-flex items-center ${styles.customDesign__container__header__buttonGroup__saveBtn} `} onClick={() => __handleSaveDesign()}>
             <FaSave size={20} style={{ marginRight: 5, backgroundColor: 'transparent', border: 'none' }} className={styles.saveIcon}></FaSave>
             <span>{t(codeLanguage + '000105')}</span>
           </button>

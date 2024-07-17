@@ -76,6 +76,7 @@ import {
   DashboardManagerMangeTask,
   FeedbackComponent
 } from './pages/ManagerManagement';
+import CreateDesignComponent from './pages/CustomDesign/Components/CreateDesign/CreateDesignComponent';
 
 
 const tokenIsValid = (token) => {
@@ -152,7 +153,9 @@ function App() {
 
           {/* Design route */}
           {/* <Route path="/design" element={<PrivateRoute element={<CustomDesignScreen />} requiredRole="CUSTOMER" />} /> */}
-          <Route path='/design' element={<CustomDesignScreen></CustomDesignScreen>} />
+          <Route path='/design/:id' element={<CustomDesignScreen></CustomDesignScreen>} />
+          <Route path='/design_create' element={<CreateDesignComponent></CreateDesignComponent>} />
+
 
 
           {/* Admin dashboard route */}
