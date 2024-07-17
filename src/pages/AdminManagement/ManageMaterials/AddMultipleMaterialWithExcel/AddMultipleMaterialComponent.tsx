@@ -160,6 +160,55 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
     };
 
     /**
+     * When User click on Ok Button It will check
+     * Check the data change (update or delete)
+     * Check if categoryName and materialName are duplicate
+     * Check if categoryName, materialName, hscode, basePrice, and unit are null
+     * If there are validation errors, download the error data
+     * If not, upload data
+     */
+    // const _handleConfirm = async () => {
+    //     // Function to check if a value is a number and greater than 0
+    //     const isValidBasePrice = (basePrice: any): boolean => {
+    //         return typeof basePrice === 'number' && basePrice > 0;
+    //     };
+
+    //     const isValidHSCode = (hsCode: any): boolean => {
+    //         return typeof hsCode === 'number' && hsCode > 0;
+    //     };
+
+    //     // Check for duplicates based on Category_Name and Material_Name
+    //     const duplicates = checkForDuplicates(excelData, ['Category_Name', 'Material_Name']);
+
+    //     // Check for invalid entries
+    //     const invalidEntries = excelData.some(item =>
+    //         !item.Category_Name ||
+    //         !item.Material_Name ||
+    //         item.Unit === undefined ||
+    //         item.Base_Price === undefined ||
+    //         item.HS_Code === undefined ||
+    //         !isValidBasePrice(item.Base_Price) ||
+    //         !isValidHSCode(item.HS_Code)
+    //     );
+
+    //     if (invalidEntries) {
+    //         _handleUploadData()
+    //         // setError('There are duplicate values or missing required fields!');
+    //     }
+    //     if (duplicates.size > 0) {
+    //         _handleUploadData()
+    //         // setError('Duplicate Please Try Again')
+    //     }
+    //     if (!hasDataChanged()) {
+    //         _handleUploadData()
+    //         // setError('Data have changing, Please click download button to download and upload again')
+    //     }
+    //     else {
+    //         await _handleUploadData();
+    //     }
+    // };
+
+    /**
      * Upload The File and Brand Name to Back End
      * If one field Error or dupplicate then it throw error
      */
@@ -221,56 +270,6 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
             }
         }
     };
-
-
-    /**
-     * When User click on Ok Button It will check
-     * Check the data change (update or delete)
-     * Check if categoryName and materialName are duplicate
-     * Check if categoryName, materialName, hscode, basePrice, and unit are null
-     * If there are validation errors, download the error data
-     * If not, upload data
-     */
-    // const _handleConfirm = async () => {
-    //     // Function to check if a value is a number and greater than 0
-    //     const isValidBasePrice = (basePrice: any): boolean => {
-    //         return typeof basePrice === 'number' && basePrice > 0;
-    //     };
-
-    //     const isValidHSCode = (hsCode: any): boolean => {
-    //         return typeof hsCode === 'number' && hsCode > 0;
-    //     };
-
-    //     // Check for duplicates based on Category_Name and Material_Name
-    //     const duplicates = checkForDuplicates(excelData, ['Category_Name', 'Material_Name']);
-
-    //     // Check for invalid entries
-    //     const invalidEntries = excelData.some(item =>
-    //         !item.Category_Name ||
-    //         !item.Material_Name ||
-    //         item.Unit === undefined ||
-    //         item.Base_Price === undefined ||
-    //         item.HS_Code === undefined ||
-    //         !isValidBasePrice(item.Base_Price) ||
-    //         !isValidHSCode(item.HS_Code)
-    //     );
-
-    //     if (invalidEntries) {
-    //         _handleUploadData()
-    //         // setError('There are duplicate values or missing required fields!');
-    //     }
-    //     if (duplicates.size > 0) {
-    //         _handleUploadData()
-    //         // setError('Duplicate Please Try Again')
-    //     }
-    //     if (!hasDataChanged()) {
-    //         _handleUploadData()
-    //         // setError('Data have changing, Please click download button to download and upload again')
-    //     }
-    //     else {
-    //         await _handleUploadData();
-    //     }
-    // };
 
     /**
      * Download the sample data

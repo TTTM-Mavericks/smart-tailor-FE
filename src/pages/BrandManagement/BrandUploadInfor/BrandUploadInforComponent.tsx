@@ -215,6 +215,7 @@ const UploadBrandInforForm: React.FC = () => {
                 text: 'Brand profile uploaded successfully',
             });
             setActiveStep(2)
+            window.location.href = `/brand/waiting_process_information`;
 
         } catch (error) {
             console.error('Error uploading profile', error);
