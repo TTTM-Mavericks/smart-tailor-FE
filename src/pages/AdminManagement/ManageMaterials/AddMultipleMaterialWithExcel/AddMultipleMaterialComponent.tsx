@@ -212,10 +212,14 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
      * Upload The File and Brand Name to Back End
      * If one field Error or dupplicate then it throw error
      */
+    React.useEffect(() => {
+        console.log('Updated errorCheckGet:', errorCheckGet);
+    }, [errorCheckGet]);
+
     const _handleUploadData = async () => {
         if (!selectedFile) {
             console.error('No file selected');
-            toast.error('No file select. Please Select One')
+            toast.error('No file selected. Please select one');
             return;
         }
 
@@ -248,19 +252,14 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                 closeMultipleCard();
             }
         } catch (error: any) {
-            // Add New Category And Material By Excel File Successfully! => Add Correct
-            // Some Data could not be processed correctly => Add File Success Again
-            // Invalid Data Type => Add Worng Excel
             if (error.response) {
                 const errorMessage = error.response.data.message;
                 // Check for specific error messages or status codes
                 if (errorMessage === "Invalid Data Type") {
-                    setErrorCheckGet(error.response.data.errors)
-                    console.log(errorCheckGet);
+                    setErrorCheckGet(error.response.data.errors);
                     toast.error('Invalid Data Type error');
                 } else if (errorMessage === "Some Data could not be processed correctly") {
                     setErrorCheckGet(error.response.data.errors);
-                    console.log(errorCheckGet);
                     toast.error('Some Data could not be processed correctly');
                 } else {
                     toast.error('Unknown Error');
@@ -333,6 +332,101 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
      * Error in Data
      * Color the yellow in excel file
      */
+    // const _handleDownloadErrorData = async () => {
+    //     const workBook = new ExcelJS.Workbook();
+    //     const worksheet = workBook.addWorksheet('Category and Material');
+
+    //     // Define the columns and headers
+    //     worksheet.columns = [
+    //         { header: 'Category_Name', key: 'Category_Name', width: 25 },
+    //         { header: 'Material_Name', key: 'Material_Name', width: 25 },
+    //         { header: 'HS_Code', key: 'HS_Code', width: 20 },
+    //         { header: 'Unit', key: 'Unit', width: 20 },
+    //         { header: 'Base_Price', key: 'Base_Price', width: 20 }
+    //     ];
+
+    //     // Insert a custom header row above the defined columns
+    //     worksheet.insertRow(1, ['CATEGORY AND MATERIAL ERRORS']);
+
+    //     // Merge cells for the custom header row
+    //     worksheet.mergeCells('A1:E1');
+
+    //     // Set styles for the custom header row
+    //     const customHeaderRow = worksheet.getRow(1);
+    //     customHeaderRow.height = 30;
+    //     customHeaderRow.eachCell(cell => {
+    //         cell.font = { bold: true, size: 16 };
+    //         cell.alignment = { vertical: 'middle', horizontal: 'center' };
+    //         cell.fill = {
+    //             type: 'pattern',
+    //             pattern: 'solid',
+    //             fgColor: { argb: 'FFFF0000' } // Red background
+    //         };
+    //         cell.font = { color: { argb: 'FFFFFFFF' } }; // White text
+    //     });
+
+    //     // Identify rows with errors
+    //     const rowsWithError = excelData.filter((item, index) =>
+    //         errorCheckGet.some((error: any) =>
+    //             error.errorMessage.some((message: any) =>
+    //                 message.includes(`row Index ${index + 1}`) ||
+    //                 message.includes(`row Index: ${index + 1}`)
+    //             )
+    //         )
+    //     );
+
+    //     // Add rows with errors to the worksheet
+    //     worksheet.addRows(rowsWithError);
+
+    //     // Set styles for column header row
+    //     worksheet.getRow(2).eachCell(cell => {
+    //         cell.font = { bold: true };
+    //         cell.alignment = { vertical: 'middle', horizontal: 'center' };
+    //         cell.fill = {
+    //             type: 'pattern',
+    //             pattern: 'solid',
+    //             fgColor: { argb: 'FFD3D3D3' } // Light grey background
+    //         };
+    //     });
+
+    //     // Apply validation and coloring for errors
+    //     errorCheckGet.forEach((error: any) => {
+    //         error.errorMessage.forEach((message: any) => {
+    //             const match = message.match(/(HS_Code|Unit|Base_Price|Category_Name|Material_Name) at row Index (\d+) (.*)!/) ||
+    //                 message.match(/(HS_Code|Unit|Base_Price|Category_Name|Material_Name) at row Index: (\d+) (.*)!/);
+    //             if (match) {
+    //                 const [_, column, rowIndex, errorDetail] = match;
+    //                 const columnIndex = worksheet.getColumn(column).number;
+    //                 const excelRow = rowsWithError.findIndex((row: any) => row.rowNumber === parseInt(rowIndex)) + 3; // Adjust for header and filtered rows
+
+    //                 if (excelRow > 2) { // Ensure we're not modifying the header rows
+    //                     const cell = worksheet.getCell(excelRow, columnIndex);
+
+    //                     cell.value = `${cell.value || ''} (Error: ${errorDetail})`; // Append the error message
+    //                     cell.fill = {
+    //                         type: 'pattern',
+    //                         pattern: 'solid',
+    //                         fgColor: { argb: 'FFFFFF00' }, // Yellow fill for errors
+    //                     };
+    //                     cell.font = {
+    //                         color: { argb: 'FFFF0000' }, // Red text color
+    //                     };
+    //                 }
+    //             }
+    //         });
+    //     });
+
+    //     const buf = await workBook.xlsx.writeBuffer();
+    //     const blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    //     const url = window.URL.createObjectURL(blob);
+
+    //     const a = document.createElement("a");
+    //     a.href = url;
+    //     a.download = "Material_Category_Errors.xlsx";
+    //     a.click();
+    //     window.URL.revokeObjectURL(url);
+    // };
+
     const _handleDownloadErrorData = async () => {
         const workBook = new ExcelJS.Workbook();
         const worksheet = workBook.addWorksheet('Category and Material');
@@ -347,191 +441,97 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
         ];
 
         // Insert a custom header row above the defined columns
-        worksheet.insertRow(1, ['CATEGORY AND MATERIAL']);
+        worksheet.insertRow(1, ['CATEGORY AND MATERIAL ERRORS']);
 
         // Merge cells for the custom header row
         worksheet.mergeCells('A1:E1');
-        worksheet.autoFilter = 'A1:E1';
+        worksheet.autoFilter = 'A2:E2';  // Apply filter to the actual header row
 
         // Set styles for the custom header row
         const customHeaderRow = worksheet.getRow(1);
-        customHeaderRow.height = 30; // Optional: adjust row height
+        customHeaderRow.height = 30;
         customHeaderRow.eachCell(cell => {
-            cell.font = { bold: true, size: 16 };
+            cell.font = { bold: true, size: 16, color: { argb: 'FFFFFFFF' } };
             cell.alignment = { vertical: 'middle', horizontal: 'center' };
-            cell.border = {
-                top: { style: 'thin' },
-                left: { style: 'thin' },
-                bottom: { style: 'thin' },
-                right: { style: 'thin' },
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFFF0000' }  // Red background
             };
         });
-
-        const rows = excelData.map(item => ({
-            Category_Name: item.Category_Name,
-            Material_Name: item.Material_Name,
-            HS_Code: item.HS_Code,
-            Unit: item.Unit,
-            Base_Price: item.Base_Price
-        }));
-
-        // Identify and sort rows with errors
-        const rowsWithError = rows.filter(row => {
-            const hasNullValues = Object.values(row).some(value => value === null || value === '' || value === undefined);
-            const isCategoryNameNull = row.Category_Name === null || row.Category_Name === undefined;
-            const isMaterialNameNull = row.Material_Name === null || row.Material_Name === undefined;
-            const isHsCodeNull = row.HS_Code === null || row.HS_Code === undefined || row.HS_Code <= 0 || typeof row.HS_Code === 'string';
-            const isBasePriceNull = row.Base_Price === null || row.Base_Price === undefined || row.Base_Price <= 0 || typeof row.Base_Price === 'string';
-            const isUnitNumber = typeof row.Unit === 'number';
-            return hasNullValues || isCategoryNameNull || isMaterialNameNull || isHsCodeNull || isBasePriceNull || isUnitNumber;
-        });
-
-        // Add rows with errors to the worksheet
-        worksheet.addRows(rowsWithError);
 
         // Set styles for column header row
         worksheet.getRow(2).eachCell(cell => {
             cell.font = { bold: true };
             cell.alignment = { vertical: 'middle', horizontal: 'center' };
-            cell.border = {
-                top: { style: 'thin' },
-                left: { style: 'thin' },
-                bottom: { style: 'thin' },
-                right: { style: 'thin' },
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFD3D3D3' }  // Light grey background
             };
         });
 
-        // Apply validation and coloring for errors
-        const duplicates = checkForDuplicates(rowsWithError, ['Category_Name', 'Material_Name']);
-        const columnsWithErrors = new Set<number>();
+        // Create a map to store error messages for each cell
+        const errorMap = new Map();
+        // Create a set to store the row numbers with errors
+        const errorRows = new Set();
 
-        rowsWithError.forEach((row, rowIndex) => {
-            const excelRow = worksheet.getRow(rowIndex + 3);
-            worksheet.columns.forEach((column, colIndex) => {
-                const cell = excelRow.getCell(colIndex + 1);
-                const columnName = column.key;
-                const value = row[columnName];
-
-                if (columnName === 'Category_Name' || columnName === 'Material_Name') {
-                    if (duplicates.has(`${row.Category_Name}|${row.Material_Name}`) || value == null || typeof value === 'number') {
-                        columnsWithErrors.add(colIndex + 1);
-                        cell.fill = {
-                            type: 'pattern',
-                            pattern: 'solid',
-                            fgColor: { argb: 'FF0000' },
-                        };
-                        cell.font = { color: { argb: 'FFFF00' } };
-
-                        if (value == null) {
-                            cell.value = 'Null Value';
-                        } else if (typeof value === 'number') {
-                            cell.value = `${value} (Invalid Type)`;
-                        } else {
-                            const duplicateRowNumber = rows.findIndex(r => r.Category_Name === row.Category_Name && r.Material_Name === row.Material_Name && r !== row) + 3;
-                            cell.value = `${value} #Duplicate with row ${duplicateRowNumber}`;
-                        }
+        errorCheckGet.forEach((error: any) => {
+            error.errorMessage.forEach((message: any) => {
+                const match = message.match(/(HS_Code|Unit|Base_Price|Category_Name|Material_Name) at row Index (\d+) (.*)!/);
+                if (match) {
+                    const [_, column, rowIndex, errorDetail] = match;
+                    const key = `${parseInt(rowIndex, 10) + 1}-${column}`;  // Adjust row index to match Excel rows
+                    if (!errorMap.has(key)) {
+                        errorMap.set(key, []);
                     }
-                } else if (columnName === 'HS_Code') {
-                    if (value == null || parseFloat(value) <= 0) {
-                        columnsWithErrors.add(colIndex + 1);
-                        cell.fill = {
-                            type: 'pattern',
-                            pattern: 'solid',
-                            fgColor: { argb: 'FF0000' },
-                        };
-                        cell.font = { color: { argb: 'FFFF00' } };
-
-                        if (value == null) {
-                            cell.value = 'Null Value';
-                        } else if (parseFloat(value) <= 0) {
-                            cell.value = `${value} (Invalid HS Code)`;
-                        }
-                    }
-                } else if (columnName === 'Unit') {
-                    if (value == null || typeof value === 'number') {
-                        columnsWithErrors.add(colIndex + 1);
-                        cell.fill = {
-                            type: 'pattern',
-                            pattern: 'solid',
-                            fgColor: { argb: 'FF0000' },
-                        };
-                        cell.font = { color: { argb: 'FFFF00' } };
-
-                        if (value == null) {
-                            cell.value = 'Null Value';
-                        } else if (typeof value === 'number') {
-                            cell.value = `${value} (Invalid Type)`;
-                        }
-                    }
-                } else if (columnName === 'Base_Price') {
-                    if (value == null || parseFloat(value) <= 0) {
-                        columnsWithErrors.add(colIndex + 1);
-                        cell.fill = {
-                            type: 'pattern',
-                            pattern: 'solid',
-                            fgColor: { argb: 'FF0000' },
-                        };
-                        cell.font = { color: { argb: 'FFFF00' } };
-
-                        if (value == null) {
-                            cell.value = 'Null Value';
-                        } else if (parseFloat(value) <= 0) {
-                            cell.value = `${value} (Invalid Base Price)`;
-                        }
-                    }
+                    errorMap.get(key).push(message);  // Store full error message
+                    errorRows.add(parseInt(rowIndex, 10) + 1);  // Add the row number to errorRows
                 }
             });
         });
 
-        // Color entire columns with errors
-        columnsWithErrors.forEach(colNumber => {
-            worksheet.getColumn(colNumber).eachCell({ includeEmpty: true }, (cell, rowNumber) => {
-                if (rowNumber >= 2) { // Skip the custom header row
-                    cell.fill = {
-                        type: 'pattern',
-                        pattern: 'solid',
-                        fgColor: { argb: 'ADD8E6' }, // Light blue fill for columns with errors
-                    };
-                }
-            });
-        });
+        // Add only error rows to the worksheet
+        excelData.forEach((rowData, rowIndex) => {
+            if (errorRows.has(rowIndex + 4)) {  // Check if this row is in the errorRows set
+                const row = worksheet.addRow(rowData);
 
-        // Reapply red fill to individual cells with errors to override column color
-        rowsWithError.forEach((row, rowIndex) => {
-            const excelRow = worksheet.getRow(rowIndex + 3);
-            worksheet.columns.forEach((column, colIndex) => {
-                const cell = excelRow.getCell(colIndex + 1);
-                const columnName = column.key;
-                const value = row[columnName];
+                // Apply error formatting to cells with errors
+                worksheet.columns.forEach((column, colIndex) => {
+                    const cell = row.getCell(colIndex + 1);
+                    const errorKey = `${rowIndex + 4}-${column.key}`;  // Adjust rowIndex to match error messages
 
-                if ((columnName === 'Category_Name' || columnName === 'Material_Name') &&
-                    (duplicates.has(`${row.Category_Name}|${row.Material_Name}`) || value == null || typeof value === 'number')) {
-                    cell.fill = {
-                        type: 'pattern',
-                        pattern: 'solid',
-                        fgColor: { argb: 'FF0000' }, // Red fill for errors
-                    };
-                    cell.font = {
-                        color: { argb: 'FFFF00' }, // Yellow text color
-                    };
-                } else if ((columnName === 'HS_Code' || columnName === 'Base_Price' || columnName === 'Unit') &&
-                    (value == null || (columnName === 'Unit' && typeof value === 'number') ||
-                        (columnName === 'HS_Code' && parseFloat(value) <= 0) ||
-                        (columnName === 'Base_Price' && parseFloat(value) <= 0))) {
-                    cell.fill = {
-                        type: 'pattern',
-                        pattern: 'solid',
-                        fgColor: { argb: 'FF0000' }, // Red fill for errors
-                    };
-                    cell.font = {
-                        color: { argb: 'FFFF00' }, // Yellow text color
-                    };
-                }
-            });
+                    // Handle null values
+                    if (cell.value === null) {
+                        cell.value = 'NULL';
+                        cell.font = { color: { argb: 'FF808080' } };  // Gray color for NULL values
+                        cell.fill = {
+                            type: 'pattern',
+                            pattern: 'solid',
+                            fgColor: { argb: 'FFFFFF00' },  // Yellow fill for errors
+                        };
+                    }
+
+                    if (errorMap.has(errorKey)) {
+                        const errors = errorMap.get(errorKey);
+                        cell.value = {
+                            richText: [
+                                { text: `${cell.value || ''}\n`, font: { color: { argb: '000000' } } },
+                                { text: `Error: ${errors.join('\n')}`, font: { color: { argb: 'FFFF0000' } } }  // Red text for errors
+                            ]
+                        };
+                        cell.fill = {
+                            type: 'pattern',
+                            pattern: 'solid',
+                            fgColor: { argb: 'FFFFFF00' },  // Yellow fill for errors
+                        };
+                    }
+                    cell.alignment = { wrapText: true, vertical: 'top' };  // Enable text wrapping and align to top for all cells
+                });
+            }
         });
 
         const buf = await workBook.xlsx.writeBuffer();
-
         const blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
         const url = window.URL.createObjectURL(blob);
 
