@@ -32,7 +32,6 @@ export const featuresEndpoints = {
   expertTailoring: '/expert-tailoring',
   expertTailoringMaterial: '/expert-tailoring-material',
   brand: '/brand',
-  user: '/user'
 }
 export const functionEndpoints = {
   auth: {
@@ -60,11 +59,7 @@ export const functionEndpoints = {
     addExcel: '/add-new-brand-material-by-excel-file',
     addManual: '/add-new-brand-material',
     updateBrandMaterial: '/update-brand-material',
-    brandSignUp: '/add-new-brand',
-    uploadBrandInfor: '/upload-brand-infor',
-    acceptBrand: '/accept-brand',
-    rejectBrand: '/reject-brand',
-    getBrandByID: '/get-brand'
+    brandSignUp: '/add-new-brand'
   },
   customer: {
     updateProfile: '/update-customer-profile'
@@ -93,8 +88,7 @@ export const functionEndpoints = {
     downloadSampleDataExcelFile: '/generate-sample-category-material-by-excel-file',
     downloadSampleBrandPriceExcelData: '/export-category-material-for-brand-by-excel',
     getListMaterialByCategoryByID: '/get-list-material-by-category-id',
-    getListMaterialByCategoryAndExpert: '/get-list-material-by-expert-tailoring-id-and-category-id',
-    getAllBrandMaterialByBrandID: '/get-all-brand-material-by-brand-id'
+    getListMaterialByCategoryAndExpert: '/get-list-material-by-expert-tailoring-id-and-category-id'
   },
   category: {
     addNewCategory: '/add-new-category',
@@ -142,13 +136,6 @@ export const functionEndpoints = {
     addNewExpertTailoringByExcelFile: '/add-new-expert-tailoring-material-by-excel-file',
     updateStatusExpertTailoringMaterial: '/change-status-expert-tailoring-material'
   },
-  user: {
-    getAllCustomer: '/get-all-customer',
-    getAllBrand: '/get-all-brand',
-    getAllAccountant: '/get-all-accountant',
-    getAllEmployee: '/get-all-employee',
-    getAllManager: '/get-all-manager'
-  }
 }
 
 

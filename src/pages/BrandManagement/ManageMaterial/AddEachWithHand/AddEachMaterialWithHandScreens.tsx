@@ -20,8 +20,6 @@ import axios from 'axios';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import { AddMaterial } from '../../../../models/BrandMaterialExcelModel';
 import Swal from 'sweetalert2';
-import { UserInterface } from '../../../../models/UserModel';
-import Cookies from 'js-cookie';
 
 const brandName = "LA LA LISA BRAND";
 
@@ -35,10 +33,11 @@ const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
     const [formData, setFormData] = useState({
         categoryName: '',
         materialName: '',
+        price: 110000000,
         unit: '',
         hsCode: '',
-        brandPrice: 0,
-        basePrice: 0,
+        brandPrice: 110000000,
+        basePrice: 110000000,
     });
 
     const [categoryData, setCategoryData] = useState<string[]>([]);
@@ -47,49 +46,6 @@ const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
     const [unitData, setUnitData] = useState<string[]>([]);
     const [basePriceData, setBasePriceData] = useState<number[]>([]);
 
-    let brandAuth: any = null;
-
-    const BRANDROLECHECK = Cookies.get('userAuth');
-
-    if (BRANDROLECHECK) {
-        try {
-            brandAuth = JSON.parse(BRANDROLECHECK);
-            const { userID, email, fullName, language, phoneNumber, roleName, imageUrl, userStatus } = brandAuth;
-            // Your code that uses the parsed data
-        } catch (error) {
-            console.error('Error parsing JSON:', error);
-            // Handle the error, perhaps by setting default values or showing an error message
-        }
-    } else {
-        console.error('userAuth cookie is not set');
-        // Handle the case when the cookie does not exist
-    }
-
-
-    let brandFromSignUp: any = null
-    // Get BrandID from session
-    const getBrandFromSingUp = sessionStorage.getItem('userRegister') as string | null;
-
-    if (getBrandFromSingUp) {
-        const BRANDFROMSIGNUPPARSE: UserInterface = JSON.parse(getBrandFromSingUp);
-        const brandID = BRANDFROMSIGNUPPARSE.userID;
-        const brandEmail = BRANDFROMSIGNUPPARSE.email;
-        brandFromSignUp = { brandID, brandEmail }
-        console.log(brandFromSignUp);
-
-        console.log('Brand ID:', brandID);
-        console.log('Brand Email:', brandEmail);
-    } else {
-        console.error('No user data found in session storage');
-    }
-    // Get ID When something null
-    const getID = () => {
-        if (!brandAuth || brandAuth.userID === null || brandAuth.userID === undefined || brandAuth.userID === '') {
-            return brandFromSignUp.brandID;
-        } else {
-            return brandAuth.userID;
-        }
-    };
     const _handleCategoryChange = (event: SelectChangeEvent<string>) => {
         const category = event.target.value;
         setFormData(prev => ({
@@ -174,9 +130,8 @@ const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
         setFormData(prev => ({ ...prev, brandPrice }));
     };
 
-
     useEffect(() => {
-        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_material + functionEndpoints.material.getAllBrandMaterialByBrandID + `/${getID()}`}`;
+        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_material + functionEndpoints.material.getAllMaterialByBrandName + `?brandName=${brandName}`}`;
         axios
             .get(apiUrl)
             .then(response => {
@@ -197,15 +152,11 @@ const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
             .catch(error => console.error('Error fetching data:', error));
     }, []);
 
-    console.log(formData);
-
-    console.log(getID());
-
     const _handleSubmit = async () => {
         try {
             const response = await axios.post(
                 `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_material + functionEndpoints.brand.addManual}`,
-                { ...formData, brandID: getID() },
+                { ...formData, brandName },
                 {
                     headers: {
                         'Content-Type': 'application/json',
@@ -213,23 +164,18 @@ const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
                 }
             );
 
-            if (response.status === 200) {
+            if (response.data) {
                 // addNewMaterial({ ...formData, brandName });
                 Swal.fire('Add Success!', 'Material has been added!', 'success');
-            }
-            if (response.status === 409) {
-                Swal.fire('Add Failed!', 'Brand Material is Existed', 'error');
-            }
-            else {
+            } else {
                 Swal.fire('Add Material failed!', 'Please check the information!', 'error');
             }
         } catch (err: any) {
-            if (err.status === 409) {
-                Swal.fire('Add Failed!', 'Brand Material is Existed', 'error');
-            }
-            else {
-                Swal.fire('Add Material failed!', 'Please check the information!', 'error');
-            }
+            Swal.fire({
+                icon: 'error',
+                title: 'Add Failed',
+                text: 'There was an error adding the material. Please try again later.',
+            });
         }
     };
 

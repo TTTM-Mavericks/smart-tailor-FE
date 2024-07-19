@@ -1,14 +1,17 @@
-import * as React from "react";
-import { Box, IconButton } from "@mui/material";
+import { Box, Button, IconButton, Menu, MenuItem, Modal } from "@mui/material";
 import { DataGrid, GridToolbar, GridColDef } from "@mui/x-data-grid";
 import { tokens } from "../../../../../theme";
 import { useTheme } from "@mui/material";
-import { useTranslation } from 'react-i18next';
+import * as React from "react";
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import Swal from "sweetalert2";
+import EditBrandPopUpScreens from "../ManagerEditBrand/EditBrandPopUpScreens";
+import { useTranslation } from 'react-i18next';
 import axios from "axios";
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
-import { Brand } from "../../../../../models/ManagerBrandModel";
-import { CancelOutlined, CheckCircleOutline } from "@mui/icons-material";
+import { ExpertTailoring } from "../../../../../models/ManagerExpertTailoringModel";
+import { ExpertTailoringEdit } from "../../../../../models/ManagerExpertTailoringModel";
 
 // Make Style of popup
 const style = {
@@ -27,7 +30,47 @@ const style = {
 const ManageBrand: React.FC = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [data, setData] = React.useState<Brand[]>([]);
+    const [data, setData] = React.useState<ExpertTailoring[]>([]);
+
+    // set formid to pass it to component edit Material
+    const [formId, setFormId] = React.useState<ExpertTailoringEdit | null>(null);
+
+    // Open Edit PopUp when clicking on the edit icon
+    const [editopen, setEditOpen] = React.useState<boolean>(false);
+    const _handleEditOpen = () => setEditOpen(true);
+    const _handleEditClose = () => setEditOpen(false);
+
+    // open or close the add modal
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const open = Boolean(anchorEl);
+    const _handleClick = (event: any) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const _handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    // close open pop up
+    const [addOpenOrClose, setAddOpenOrClose] = React.useState<boolean>(false)
+
+    const _handleAddOpen = () => {
+        setAddOpenOrClose(true);
+    }
+
+    const _handleAddClose = () => {
+        setAddOpenOrClose(false)
+    }
+
+    // close open pop up
+    const [addMultiple, setAddMultiple] = React.useState<boolean>(false)
+
+    const _handleAddMultipleOpen = () => {
+        setAddMultiple(true);
+    }
+
+    const _handleAddMultipleClose = () => {
+        setAddMultiple(false)
+    }
 
     // Get language in local storage
     const selectedLanguage = localStorage.getItem('language');
@@ -42,7 +85,7 @@ const ManageBrand: React.FC = () => {
     }, [selectedLanguage, i18n]);
 
     React.useEffect(() => {
-        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.user + functionEndpoints.user.getAllBrand}`;
+        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.getAllExpertTailoring}`;
 
         axios.get(apiUrl)
             .then(response => {
@@ -62,12 +105,38 @@ const ManageBrand: React.FC = () => {
             .catch(error => console.error('Error fetching data:', error));
     }, []);
 
+    // Thêm người dùng mới vào danh sách
+    const _handleAddExpertTailoring = (addNewExpertTailoring: ExpertTailoring) => {
+        setData(prevData => [...prevData, addNewExpertTailoring]);
+    }
+
+    // Cập nhật người dùng trong danh sách
+    const _handleUpdateMaterial = (updatedExpertTailoring: ExpertTailoringEdit) => {
+        setData(prevData => prevData.map((ExpertTailoring: any) => ExpertTailoring.expertTailoringID === updatedExpertTailoring.expertTailoringID ? updatedExpertTailoring : ExpertTailoring));
+    }
+
+    // EDIT 
+    const _handleEditClick = (
+        expertTailoringID: string,
+        expertTailoringName: string,
+        sizeImageUrl: string,
+    ) => {
+        // Handle edit action
+        const ExpertTailoringDataToEdit: ExpertTailoringEdit = {
+            expertTailoringID: expertTailoringID,
+            expertTailoringName: expertTailoringName,
+            sizeImageUrl: sizeImageUrl,
+        }
+        setFormId(ExpertTailoringDataToEdit);
+        _handleEditOpen();
+    };
+
     //DELETE OR UPDATE
-    const _handleAcceptBrand = async (brandID: string) => {
+    const _handleDeleteClick = async (expertTailoringID: string) => {
         try {
-            const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.acceptBrand}`;
+            const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.updateStatusExpertTailoring}`;
 
-            const response = await axios.get(apiUrl + `/${brandID}`)
+            const response = await axios.put(apiUrl + `/${expertTailoringID}`)
 
             if (!response.data) {
                 throw new Error('Error deleting material');
@@ -76,106 +145,43 @@ const ManageBrand: React.FC = () => {
             return response.data;
         } catch (error) {
             throw error;
-        }
-    };
-
-    const _handleDenyBrand = async (brandID: string) => {
-        try {
-            const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.rejectBrand}`;
-            console.log("brandid: " + brandID);
-
-            const response = await axios.get(apiUrl + `/${brandID}`)
-
-            if (!response.data) {
-                throw new Error('Error deleting material');
-            }
-
-            return response.data;
-        } catch (error) {
-            throw error;
-        }
-    };
-
-    const _hanldeConfirmAccept = async (id: number) => {
-        try {
-            const result = await Swal.fire({
-                title: `Confirm Accept`,
-                text: `Are you sure you want to accept thís brand`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: `Yes I want to accept`,
-                cancelButtonText: `${t(codeLanguage + '000055')}`
-            });
-
-            if (result.isConfirmed) {
-                await _handleAcceptBrand(id.toString()); // Ensure id is converted to string if necessary
-                Swal.fire(
-                    `Accept Brand Success`,
-                    `Brand Have Been Accept Successfull`,
-                    'success'
-                );
-
-                // Update the deleted material from the current data list
-                setData((prevData: any) =>
-                    prevData.map((expertTailoring: any) =>
-                        expertTailoring.brandID === id
-                            ? { ...expertTailoring, status: !expertTailoring.status }
-                            : expertTailoring
-                    )
-                );
-            } else {
-                Swal.fire(
-                    `Cancel Accept Brand`,
-                    `You Cancelled Accept Brand`,
-                    'error'
-                );
-            }
-        } catch (error: any) {
-            console.error('Error:', error);
-            Swal.fire(
-                'Error',
-                `${error.message || 'Unknown error'}`,
-                'error'
-            );
         }
     };
 
     // confirm 
-    const _hanldeConfirmDeny = async (id: number) => {
+    const _hanldeConfirmDelete = async (id: number) => {
         try {
             const result = await Swal.fire({
-                title: `Confirm Reject`,
-                text: `Are you sure you want to reject thís brand`,
+                title: `${t(codeLanguage + '000061')}`,
+                text: `${t(codeLanguage + '000062')}`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: `Yes I want to reject`,
+                confirmButtonText: `${t(codeLanguage + '000063')}`,
                 cancelButtonText: `${t(codeLanguage + '000055')}`
             });
 
             if (result.isConfirmed) {
-                await _handleDenyBrand(id.toString()); // Ensure id is converted to string if necessary
+                await _handleDeleteClick(id.toString()); // Ensure id is converted to string if necessary
                 Swal.fire(
-                    `Reject Brand Success`,
-                    `Brand Have Been Reject Successfull`,
+                    `${t(codeLanguage + '000064')}`,
+                    `${t(codeLanguage + '000065')}`,
                     'success'
                 );
 
                 // Update the deleted material from the current data list
                 setData((prevData: any) =>
                     prevData.map((expertTailoring: any) =>
-                        expertTailoring.brandID === id
+                        expertTailoring.expertTailoringID === id
                             ? { ...expertTailoring, status: !expertTailoring.status }
                             : expertTailoring
                     )
                 );
             } else {
                 Swal.fire(
-                    `Cancel Reject Brand`,
-                    `You Cancelled Reject Brand`,
+                    `${t(codeLanguage + '000066')}`,
+                    `${t(codeLanguage + '000067')}`,
                     'error'
                 );
             }
@@ -191,42 +197,18 @@ const ManageBrand: React.FC = () => {
 
     const columns: GridColDef[] = [
         {
-            field: "email",
-            headerName: "Email",
+            field: "expertTailoringName",
+            headerName: "ExpertTailoring Name",
             flex: 1,
         },
         {
-            field: "fullName",
-            headerName: "Full Name",
+            field: "sizeImageUrl",
+            headerName: "Size Image Url",
             flex: 1,
         },
         {
-            field: "language",
-            headerName: "Language",
-            headerAlign: "left",
-            align: "left",
-        },
-        {
-            field: "phoneNumber",
-            headerName: "Phone Number",
-            headerAlign: "left",
-            align: "left",
-        },
-        {
-            field: "provider",
-            headerName: "Provider",
-            headerAlign: "left",
-            align: "left",
-        },
-        {
-            field: "userStatus",
+            field: "status",
             headerName: "Status",
-            headerAlign: "left",
-            align: "left",
-        },
-        {
-            field: "roleName",
-            headerName: "Role",
             headerAlign: "left",
             align: "left",
         },
@@ -237,18 +219,18 @@ const ManageBrand: React.FC = () => {
             sortable: false,
             renderCell: (params) => (
                 <Box>
-                    <IconButton onClick={() => _hanldeConfirmAccept(params.row.userID)}>
-                        <CheckCircleOutline htmlColor="green" />
+                    <IconButton onClick={() => _handleEditClick(params.row.expertTailoringID, params.row.expertTailoringName, params.row.sizeImageUrl)}>
+                        <EditIcon />
                     </IconButton>
-                    <IconButton onClick={() => _hanldeConfirmDeny(params.row.userID)}>
-                        <CancelOutlined htmlColor={colors.primary[300]} />
+                    <IconButton onClick={() => _hanldeConfirmDelete(params.row.expertTailoringID)}>
+                        <DeleteIcon htmlColor={colors.primary[300]} />
                     </IconButton>
                 </Box>
             )
         }
     ];
 
-    const getRowId = (row: any) => `${row.userID}-${row.email}-${row.fullName}`;
+    const getRowId = (row: any) => `${row.expertTailoringID}-${row.expertTailoringName}-${row.sizeImageUrl}`;
 
     return (
         <Box m="20px">
@@ -287,6 +269,7 @@ const ManageBrand: React.FC = () => {
                     }
                 }}
             >
+
                 <DataGrid
                     rows={data}
                     columns={columns}
@@ -294,6 +277,21 @@ const ManageBrand: React.FC = () => {
                     disableRowSelectionOnClick
                     getRowId={getRowId}
                 />
+                <Modal
+                    open={editopen}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                >
+                    <Box sx={style}>
+                        {formId !== null && (
+                            <EditBrandPopUpScreens
+                                editClose={_handleEditClose}
+                                fid={formId}
+                                updateExpertTailoring={_handleUpdateMaterial}
+                            />
+                        )}
+                    </Box>
+                </Modal>
             </Box>
         </Box>
     );

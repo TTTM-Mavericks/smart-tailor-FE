@@ -13,7 +13,3 @@ export interface Category {
     categoryID: string,
     categoryName: string
 }
-
-export interface AddCategory {
-    categoryNames: string
-}
