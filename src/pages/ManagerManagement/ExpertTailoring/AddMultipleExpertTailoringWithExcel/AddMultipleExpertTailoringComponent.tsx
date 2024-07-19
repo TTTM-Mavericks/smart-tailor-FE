@@ -145,7 +145,7 @@ const AddMultipleExpertTailoringComponentWithExcel: React.FC<AddExpertTailoringW
                         setExcelData(updatedData)
                         setOriginalData(updatedData);
                         updatedData.forEach(item => {
-                            console.log(`Expert_Tailoring_Name: ${item.Expert_Tailoring_Name}, Size_Image_Url Name: ${item.Size_Image_Url}`);
+                            console.log(`Category: ${item.Expert_Tailoring_Name}, Material Name: ${item.Size_Image_Url}`);
                         });
                         console.log(updatedData);
                     }
@@ -298,17 +298,19 @@ const AddMultipleExpertTailoringComponentWithExcel: React.FC<AddExpertTailoringW
         const worksheet = workBook.addWorksheet('Expert Tailoring');
 
         worksheet.columns = [
-            { header: 'Expert_Tailoring_Name', key: 'Expert_Tailoring_Name', width: 50 },
-            { header: 'Size_Image_Url', key: 'Size_Image_Url', width: 120 },
+            { header: 'Expert_Tailoring_Name', key: 'Expert_Tailoring_Name', width: 20 },
+            { header: 'Size_Image_Url', key: 'Size_Image_Url', width: 20 },
         ];
 
         // Insert a custom header row above the defined columns
         worksheet.insertRow(1, ['EXPERT TAILORING']);
-        worksheet.mergeCells('A1:B1'); // Adjust the merge range
+
+        // Merge cells for the custom header row
+        worksheet.mergeCells('A1:B1');
 
         // Set styles for the custom header row
         const customHeaderRow = worksheet.getRow(1);
-        customHeaderRow.height = 30;
+        customHeaderRow.height = 30; // Optional: adjust row height
         customHeaderRow.eachCell(cell => {
             cell.font = { bold: true, size: 16 };
             cell.alignment = { vertical: 'middle', horizontal: 'center' };
@@ -343,7 +345,7 @@ const AddMultipleExpertTailoringComponentWithExcel: React.FC<AddExpertTailoringW
         worksheet.addRows(sortedRows);
 
         // Set styles for header row
-        worksheet.getRow(2).eachCell(cell => {
+        worksheet.getRow(1).eachCell(cell => {
             cell.font = { bold: true };
             cell.alignment = { vertical: 'middle', horizontal: 'center' };
             cell.border = {
@@ -353,8 +355,6 @@ const AddMultipleExpertTailoringComponentWithExcel: React.FC<AddExpertTailoringW
                 right: { style: 'thin' },
             };
         });
-
-        const columnsWithErrors = new Set<number>();
 
         // Apply validation and coloring for errors
         const duplicates = checkForDuplicates(sortedRows, ['Expert_Tailoring_Name', 'Size_Image_Url']);
@@ -437,18 +437,10 @@ const AddMultipleExpertTailoringComponentWithExcel: React.FC<AddExpertTailoringW
 
         const a = document.createElement("a");
         a.href = url;
-        a.download = "Expert_Tailoring_Edit.xlsx";
+        a.download = "Exper_Tailoring_Edit.xlsx";
         a.click();
         window.URL.revokeObjectURL(url);
     };
-
-
-
-
-
-
-
-
 
     /**
         * Download the sample data
@@ -561,8 +553,8 @@ const AddMultipleExpertTailoringComponentWithExcel: React.FC<AddExpertTailoringW
                             <tbody>
                                 {excelData.map((data, index) => (
                                     <tr key={index}>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Expert_Tailoring_Name ? colors.primary[200] : 'red' }} >{data.Expert_Tailoring_Name || 'Null Name'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Size_Image_Url ? colors.primary[200] : 'red' }}>{data.Size_Image_Url || 'Null Name'}</td>
+                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Expert_Tailoring_Name ? colors.primary[200] : 'red' }} >{data.Expert_Tailoring_Name || 'Null Category Name'}</td>
+                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Size_Image_Url ? colors.primary[200] : 'red' }}>{data.Size_Image_Url || 'Null Material Name'}</td>
                                         <td style={{ border: '1px solid #ddd', padding: '8px', color: data.error ? 'red' : 'green' }}>
                                             {(() => {
                                                 const hasNullValues = Object.values(data).some(value => value === null || value === undefined);
@@ -593,6 +585,7 @@ const AddMultipleExpertTailoringComponentWithExcel: React.FC<AddExpertTailoringW
                                                     return <CheckCircleRounded style={{ color: 'green' }} />;
                                                 }
                                             })()}
+
                                         </td>
                                         <td style={{ border: '1px solid #ddd', padding: '8px' }}>
                                             <div style={{ display: "flex" }}>

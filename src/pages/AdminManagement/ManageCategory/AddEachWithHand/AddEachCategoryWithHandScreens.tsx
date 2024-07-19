@@ -12,73 +12,80 @@ import Swal from 'sweetalert2';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
-import { AddCategory } from '../../../../models/AdminCategoryExcelModel';
-import { display } from '@mui/system';
-
+import { Category } from '../../../../models/AdminCategoryExcelModel';
 interface AddMaterialWithHandsFormProps {
     closeCard: () => void;
-    addNewCategory: (addedNewCategory: AddCategory[]) => void;
+    addNewCategory: (addedNewCategory: Category) => void
 }
 
 const AddEachCategoryWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ closeCard, addNewCategory }) => {
-    // Initialize formData as an array of AddCategory objects
-    const [formData, setFormData] = useState<AddCategory[]>([
-        { categoryNames: 'Fabric' },
-        { categoryNames: 'Thread' }
-    ]);
 
-    const { t, i18n } = useTranslation();
+    // ---------------UseState Variable---------------//
+    const [formData, setFormData] = useState({
+        categoryName: 'Vải',
+    });
+
+
+    // ---------------Usable Variable---------------//
+
+    // Get language in local storage
     const selectedLanguage = localStorage.getItem('language');
+    const codeLanguage = selectedLanguage?.toUpperCase();
 
+    // Using i18n
+    const { t, i18n } = useTranslation();
+
+    // ---------------UseEffect---------------//
     useEffect(() => {
-        if (selectedLanguage) {
+        if (selectedLanguage !== null) {
             i18n.changeLanguage(selectedLanguage);
         }
     }, [selectedLanguage, i18n]);
 
-    const _handleFormChange = (index: number, event: ChangeEvent<HTMLInputElement>) => {
-        const { value } = event.target;
-        setFormData(prevFormData => {
-            const newFormDatas = [...prevFormData];
-            newFormDatas[index] = { categoryNames: value }; // Update to match AddCategory type
-            return newFormDatas;
-        });
+    // ---------------FunctionHandler---------------//
+
+    /**
+     * 
+     * @param e 
+     * Tracking the changing in each fields
+     */
+    const _handleFormChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData(prevFormData => ({
+            ...prevFormData,
+            [name]: value,
+        }));
     };
 
-    const _handleAddCategory = () => {
-        setFormData([...formData, { categoryNames: '' }]); // Add a new empty category
-    };
 
-    const _handleRemoveCategory = (index: number) => {
-        setFormData(prevFormData => prevFormData.filter((_, i) => i !== index));
-    };
-
+    /**
+     * Submit the add manual with validate fields
+     * When success show success popup
+     * When fail then show fail popup
+     */
     const _handleSubmit = async () => {
-        if (formData.length === 0) {
-            Swal.fire(
-                'Validation Error',
-                'Please add at least one category.',
-                'warning'
-            );
-            return;
-        }
-
         try {
-            const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.addNewCategory}`;
-            const response = await axios.post(apiUrl, { categoryNames: formData.map(cat => cat.categoryNames) }); // Extract categoryNames
+            console.log('Form Data:', JSON.stringify(formData));
+
+            const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.addNewCategory + `?categoryName=${formData.categoryName}`}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
 
             console.log('Response:', response.data);
 
             if (response.data.status === 200) {
-                addNewCategory(formData);
+                addNewCategory(response.data);
                 Swal.fire(
                     'Add Success!',
-                    'Categories have been added!',
+                    'User has been updated!',
                     'success'
                 );
+
             } else {
                 Swal.fire(
-                    'Add Category Fail!',
+                    'Add User fail!',
                     'Please check information!',
                     'error'
                 );
@@ -86,15 +93,24 @@ const AddEachCategoryWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
         } catch (err: any) {
             console.error('Error:', err);
             Swal.fire(
-                'Add Category Fail!',
-                `${err.message || 'Unknown error'}`,
+                'Add fail!',
+                `${err.message || 'Unknown error'} `,
                 'error'
             );
         }
     };
 
     return (
-        <Box style={{ overflowY: 'auto', overflowX: 'hidden', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+        <Box style={{
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            '&::-webkit-scrollbar': {
+                width: 0,
+                backgroundColor: '#f5f5f5',
+            }
+        }}>
             <div>
                 <Typography variant="h5" align="center">
                     ADD NEW CATEGORY
@@ -104,37 +120,29 @@ const AddEachCategoryWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
                 </IconButton>
                 <Box height={50} />
                 <Grid container spacing={3}>
-                    {formData.map((category, index) => (
-                        <Grid item xs={12} key={index} style={{ display: "flex" }}>
-                            <TextField
-                                fullWidth
-                                label={`Category ${index + 1}`}
-                                variant="outlined"
-                                size="small"
-                                value={category.categoryNames}
-                                onChange={(e: any) => _handleFormChange(index, e)}
-                            />
-                            <Button
-                                type="button"
-                                onClick={() => _handleRemoveCategory(index)}
-                                className="ml-4 bg-blue-500 text-yellow-100 py-2 px-4 rounded-md shadow-lg transition-transform duration-200 hover:bg-blue-600 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                            >
-                                Remove
-                            </Button>
-                        </Grid>
-                    ))}
+                    <Grid item xs={6}>
+                        <TextField
+                            fullWidth
+                            label="Category Name"
+                            variant="outlined"
+                            size="small"
+                            name="categoryName"
+                            value={formData.categoryName}
+                            onChange={_handleFormChange}
+                        />
+                    </Grid>
                 </Grid>
-                <div style={{ textAlign: 'center', alignItems: 'center', marginTop: '3rem' }}>
-                    <Button onClick={_handleAddCategory} style={{ backgroundColor: "#EC6208", color: "white" }}>
-                        Add Category
-                    </Button>
-                    <Button onClick={_handleSubmit} style={{ backgroundColor: "#EC6208", color: "white", marginLeft: '1rem' }}>
+                <div
+                    onClick={closeCard}
+                    style={{ textAlign: 'center', alignItems: 'center', marginTop: '3rem' }}
+                >
+                    <Button onClick={_handleSubmit} style={{ backgroundColor: "#EC6208", color: "white" }}>
                         Submit
                     </Button>
                 </div>
             </div>
         </Box>
     );
-};
+}
 
 export default AddEachCategoryWithHand;

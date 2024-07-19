@@ -11,7 +11,7 @@ import { Add } from "@mui/icons-material";
 import AddEachCategoryWithHand from "../../AddEachWithHand/AddEachCategoryWithHandScreens";
 import AddMultipleComponentWithExcel from "../../AddMultipleCategoryWithExcel/AddMultipleMaterialComponent";
 import { useTranslation } from 'react-i18next';
-import { AddCategory, Category } from "../../../../../models/AdminCategoryExcelModel";
+import { Category } from "../../../../../models/AdminCategoryExcelModel";
 import axios from "axios";
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 
@@ -109,8 +109,8 @@ const ManageCategories: React.FC = () => {
     }, []);
 
     // Thêm người dùng mới vào danh sách
-    const _handleAddCategory = (newCategory: AddCategory[]) => {
-        setData((prevData: any) => [...prevData, ...newCategory]);
+    const _handleAddCategory = (newCategory: Category) => {
+        setData(prevData => [...prevData, newCategory]);
     }
 
     // Cập nhật người dùng trong danh sách
@@ -304,6 +304,31 @@ const ManageCategories: React.FC = () => {
                                     </Box>
                                 </Modal>
                             </MenuItem>
+
+                            {/* <MenuItem>
+                        <div onClick={_handleAddMultipleOpen}>{t(codeLanguage + '000050')}</div>
+                        <Modal
+                        open={addMultiple}
+                        aria-labelledby="modal-modal-title"
+                        aria-describedby="modal-modal-description"
+                        >
+                        <Box sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            width: "70%",
+                            bgcolor: colors.primary[100],
+                            border: '2px solid #000',
+                            boxShadow: 24,
+                            p: 4,
+                            borderRadius: "20px"
+                            }}>
+                            <AddMultipleComponentWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddCategory} />
+                            </Box>
+                            </Modal>
+                            
+                            </MenuItem> */}
                         </Menu>
                     </div>
                 </div>
