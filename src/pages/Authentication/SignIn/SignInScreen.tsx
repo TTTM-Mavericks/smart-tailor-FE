@@ -121,19 +121,6 @@ function SignInScreen() {
           Cookies.set('refreshToken', refreshToken);
           Cookies.set('userAuth', JSON.stringify(response.data.user));
 
-          const BRANDROLECHECK = Cookies.get('userAuth') as string;
-          const brandAuth = JSON.parse(BRANDROLECHECK);
-          const { userID, email, fullName, language, phoneNumber, roleName, imageUrl, userStatus } = brandAuth;
-
-          const fetchApiBrand = await api.get(`${versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.getBrandByID + `/${userID}`}`)
-          if (fetchApiBrand.data.brandName === null) {
-            window.location.href = `/brand/updateProfile/${userID}`;
-          } else if (fetchApiBrand.data.brandStatus === "PENDING") {
-            window.location.href = `/brand/waiting_process_information`
-          } else {
-            window.location.href = `/brand`
-          }
-
           setTimeout(() => {
             window.location.href = '/'
           }, 2000)

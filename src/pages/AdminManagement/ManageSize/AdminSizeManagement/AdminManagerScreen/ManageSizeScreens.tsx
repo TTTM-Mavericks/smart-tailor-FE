@@ -282,6 +282,10 @@ const ManageSizes: React.FC = () => {
                         getRowId={getRowId}
                     />
                 </Box>
+
+
+
+
                 <Modal
                     open={editOpen}
                     onClose={_handleEditClose}

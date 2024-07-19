@@ -19,18 +19,8 @@ const DashboardManagerMangeExpertTailoring = () => {
         setMenuOpen(!menuOpen);
     };
 
-    useEffect(() => {
-        // Get the active tab from localStorage on component mount
-        const savedActiveMenu = localStorage.getItem('managerActiveMenu');
-        if (savedActiveMenu) {
-            setActiveMenu(savedActiveMenu);
-        }
-    }, []);
-
     const handleMenuClick = (menu: any) => {
         setActiveMenu(menu);
-        // Save the active tab to localStorage
-        localStorage.setItem('managerActiveMenu', menu);
     };
 
     // Effect to close popper on outside click
@@ -86,7 +76,7 @@ const DashboardManagerMangeExpertTailoring = () => {
                 return <ManageSizeExpertTailoring />;
             case 'material_expert_tailoring':
                 return <ManageExpertTailoringMaterial />;
-            case 'manage_brand':
+            case 'manager_manage_brand':
                 return <ManageBrand />;
             case 'manager_manage_task':
                 return <ManageTask />;
