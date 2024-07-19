@@ -29,6 +29,7 @@ export interface ItemMaskInterface {
   rotate?: any;
   itemMaterial?: ItemMaterialInterface,
   materialID?: string
+  indexZ?: number
 
 
 }
@@ -124,6 +125,7 @@ export interface ExpertTailoringSizeInterface {
   createDate: string;
   lastModifiedDate: string | null;
   quantity?: number;
+  designDetailId?: any;
 }
 
 export interface SizeInterface {

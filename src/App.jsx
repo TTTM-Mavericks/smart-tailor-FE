@@ -62,7 +62,8 @@ import { FilterProductScreen } from './pages/FilterProduct';
 import {
   OrderDetailScreen,
   OrderHistory,
-  OrderProductScreen
+  OrderProductScreen,
+  PickedOrderScreen
 } from './pages/Order';
 
 import Brand from './pages/BrandManagement/DashboardBrand/BrandDashboardScreen';
@@ -75,6 +76,7 @@ import {
   DashboardManagerMangeTask,
   FeedbackComponent
 } from './pages/ManagerManagement';
+import CreateDesignComponent from './pages/CustomDesign/Components/CreateDesign/CreateDesignComponent';
 
 
 const tokenIsValid = (token) => {
@@ -148,11 +150,10 @@ function App() {
           <Route path='/auth/verify/:email' element={<VerifyEmailScreen></VerifyEmailScreen>} />
           <Route path='/auth/profilesetting' element={<ProfileSettings></ProfileSettings>} />
 
-
           {/* Design route */}
           {/* <Route path="/design" element={<PrivateRoute element={<CustomDesignScreen />} requiredRole="CUSTOMER" />} /> */}
-          <Route path='/design' element={<CustomDesignScreen></CustomDesignScreen>} />
-
+          <Route path='/design/:id' element={<CustomDesignScreen></CustomDesignScreen>} />
+          <Route path='/design_create' element={<CreateDesignComponent></CreateDesignComponent>} />
 
           {/* Admin dashboard route */}
           <Route path='/admin' element={<DashboardAdminScreens></DashboardAdminScreens>} />
@@ -163,7 +164,7 @@ function App() {
 
           {/* Brand Dashboard Route */}
           <Route path='/brand' element={<DashboardManageMaterialScreen></DashboardManageMaterialScreen>} />
-          <Route path='/brand/signup' element={<BrandSignUpScreen></BrandSignUpScreen>} />
+          <Route path='/brand/manage_order_request/:id' element={<OrderRequestScreen></OrderRequestScreen>} />
           <Route path='/brand/signup' element={<BrandSignUpScreen></BrandSignUpScreen>} />
           <Route path='/brand/updateProfile/:id' element={<OrderRequestScreen></OrderRequestScreen>} />
 
@@ -176,12 +177,13 @@ function App() {
           <Route path='/order_history' element={<OrderHistory></OrderHistory>} />
           <Route path='/design_detail/:id' element={<OrderProductScreen></OrderProductScreen>} />
 
-
           {/* Manager dashboard route */}
           <Route path='/manager' element={<DashboardManagerMangeExpertTailoring />} />
 
           <Route path='*' element={<Screen404 />} />
           <Route path='error404' element={<Screen404 />} />
+          <Route path='/pickedOrder' element={<PickedOrderScreen />} />
+
         </Routes>
       </BrowserRouter>
     </div>

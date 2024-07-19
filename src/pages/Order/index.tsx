@@ -1,10 +1,12 @@
 import OrderDetailScreen from "./OrderDetail/OrderDetailScreen";
 import OrderHistory from "./OrderHistory/OrderHistoryScreen";
-import OrderProductScreen from './OrderProduct/OrderProductScreen'
-import ChangeAddressDialogComponent from './OrderProduct/ChangeAddressDialogComponent'
+import OrderProductScreen from './OrderProduct/OrderProductScreen';
+import ChangeAddressDialogComponent from './OrderProduct/ChangeAddressDialogComponent';
+import PickedOrderScreen from './PickedOrder/PickedOrderScreen'
 export {
     OrderDetailScreen,
     OrderHistory,
     OrderProductScreen,
-    ChangeAddressDialogComponent
+    ChangeAddressDialogComponent,
+    PickedOrderScreen
 }
