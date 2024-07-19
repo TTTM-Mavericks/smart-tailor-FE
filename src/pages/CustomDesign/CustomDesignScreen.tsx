@@ -269,7 +269,6 @@ function CustomDesignScreen() {
         console.log(transformData(response.data));
         setCurrentItemList(transformData(response.data));
         setIsCurrentItemListLoading(false);
-        setIsLoadingPage(false);
       }
       else {
         toast.error(`${response.message}`, { autoClose: 4000 });
@@ -298,7 +297,9 @@ function CustomDesignScreen() {
         const sortedParts = response.data.partOfDesign.sort((a: PartOfDesignInterface, b: PartOfDesignInterface) => order.indexOf(a.partOfDesignName) - order.indexOf(b.partOfDesignName));
         console.log(sortedParts);
         setSelectedPartOfCloth(response.data.partOfDesign[0]);
-        setTypeOfModelID(response.data.expertTailoring.expertTailoringID)
+        setTypeOfModelID(response.data.expertTailoring.expertTailoringID);
+        setIsLoadingPage(false);
+
       }
       else {
         toast.error(`${response.message}`, { autoClose: 4000 });
@@ -1143,6 +1144,7 @@ function CustomDesignScreen() {
       {/* DIALOG */}
 
       {/* Choose Material Dialog */}
+      {/* <CanvasModel typeOfModel={typeOfModel} isDefault={false} is3D={true} /> */}
 
 
     </div >

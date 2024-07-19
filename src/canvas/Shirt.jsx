@@ -1,6 +1,6 @@
 import { easing } from "maath";
 import { useFrame, useLoader } from "@react-three/fiber";
-import { useGLTF, Decal, useTexture } from "@react-three/drei";
+import { useGLTF, Decal } from "@react-three/drei";
 import { useSnapshot } from "valtio";
 import { useEffect, useState } from "react";
 import { TextureLoader } from "three";
@@ -23,6 +23,7 @@ const Shirt = ({ isDefault }) => {
     const { nodes, materials } = useGLTF('/shirt_baked.glb');
 
     useEffect(() => {
+        console.log('materials: ', nodes);
         if (isDefault) return;
         if (snap.modelData) {
             setModelData(snap.modelData);
@@ -161,6 +162,7 @@ const Shirt = ({ isDefault }) => {
                             // depthTest={true}
                             depthWrite={true}
                             // dispose={true}
+                            renderOrder={item.indexZ}
                         />
                     ))
                 ))}
