@@ -211,6 +211,19 @@ const OrderDetailScreen: React.FC = () => {
                                 </div>
                             </div>
                         </div>
+
+                        <div className="flex flex-col md:flex-row md:ml-6 w-1/3">
+                            <div className="md:w-1/2 mt-4 md:mt-0" style={{ margin: '0 auto' }}>
+                                <p className="font-medium text-gray-600">Buyer</p>
+                                <p className="text-sm text-gray-600">{orderDetail?.buyerName}</p>
+                                <p className="text-sm text-gray-600">{orderDetail?.phone}</p>
+                                <a href="#" className="text-indigo-600 hover:text-indigo-800 transition duration-200">Edit</a>
+                            </div>
+                            <div className="md:w-1/2 md:mt-0 ">
+                                <p className="font-medium text-gray-600">{t(codeLanguage + '000194')}</p>
+                                <p className="text-sm text-gray-600 whitespace-pre-line">{orderDetail?.address}, {orderDetail?.ward}, {orderDetail?.district}, {orderDetail?.province}</p>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Progress Bar */}

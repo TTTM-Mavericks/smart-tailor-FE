@@ -124,6 +124,7 @@ function CustomDesignScreen() {
     setPartOfClothData(updatePart);
   }, []);
   const divRef = useRef<HTMLDivElement>(null);
+  const { id } = useParams();
   // ---------------UseEffect---------------//
 
   useEffect(() => {
@@ -210,7 +211,7 @@ function CustomDesignScreen() {
     setSelectedStamp(selectedStamp);
   }, [selectedStamp])
 
-  useEffect(()=>{
+  useEffect(() => {
 
   })
   // ---------------FunctionHandler---------------//
@@ -228,6 +229,9 @@ function CustomDesignScreen() {
       if (response.status === 200) {
         setPartOfClothData(response.data.partOfDesign);
         setSelectedPartOfCloth(response.data.partOfDesign[0]);
+        setTypeOfModelID(response.data.expertTailoring.expertTailoringID);
+        setIsLoadingPage(false);
+
       }
       else {
         toast.error(`${response.message}`, { autoClose: 4000 });
@@ -531,7 +535,7 @@ function CustomDesignScreen() {
    * Get Design data after choose material
    * @param item 
    */
-  const __handleGetMaterialInformation = async(item: PartOfDesignInterface[]) => {
+  const __handleGetMaterialInformation = async (item: PartOfDesignInterface[]) => {
     const successImaUrl = await __handleGetElementAsBase64('canvas3DElement')
     console.log(successImaUrl);
     const bodyRequest: Design = {
@@ -699,7 +703,7 @@ function CustomDesignScreen() {
         <div className={`${styles.customDesign__container__editorArea__display} editorArea__display `}>
 
           {/* Menu Bar of editor area */}
-          <div  className={styles.customDesign__container__editorArea__display__menuBar} >
+          <div className={styles.customDesign__container__editorArea__display__menuBar} >
             <div className={styles.customDesign__container__editorArea__display__menuBar__buttonGroup}>
               {/* TODO */}
               <button onClick={() => setIsOpenNotiChangeUpdateImageDesignTool(true)}>
@@ -743,9 +747,9 @@ function CustomDesignScreen() {
           {selectedPartOfCloth && !changeUploadPartOfDesignTool && (
             <>
               <div
-            
+
                 className={`${styles.customDesign__container__editorArea__display__displayDesign} editorArea__display__displayDesign`}
-                
+
               >
                 <ImageDraggableComponent
                   partOfCloth={selectedPartOfCloth}
