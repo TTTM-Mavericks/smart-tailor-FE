@@ -7,38 +7,40 @@ import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import style from './VerticalStepperStyle.module.scss'
+import { values } from 'core-js/core/array';
 
 const steps = [
     {
         label: 'Waiting to confirm',
         description: ``,
+        value: 'NOT_VERIFY'
     },
     {
         label: 'Deposit',
         description:
             '',
+        value: 'DEPOSIT',
     },
     {
-        label: 'Working',
+        label: 'Pending',
         description: ``,
+        value: 'PENDING'
     },
     {
         label: 'Successfull',
-        description: `Try out different ad text to see what brings in the most customers,
-              and learn how to enhance your ads using features like ad extensions.
-              If you run into any problems with your ads, find out how to tell if
-              they're running and how to resolve approval issues.`,
+        description: ``,
+        value: 'SUCCESSFULL'
     },
     {
         label: 'Delivery',
-        description: `Try out different ad text to see what brings in the most customers,
-              and learn how to enhance your ads using features like ad extensions.
-              If you run into any problems with your ads, find out how to tell if
-              they're running and how to resolve approval issues.`,
+        description: ``,
+        value: 'DELIVERY'
     },
 ];
-
-export default function VerticalLinearStepperComponent() {
+type props = {
+    status?: string
+}
+const VerticalLinearStepperComponent: React.FC<props> = ({ status }) => {
     const [activeStep, setActiveStep] = React.useState(0);
 
     const handleNext = () => {
@@ -53,9 +55,18 @@ export default function VerticalLinearStepperComponent() {
         setActiveStep(0);
     };
 
+    React.useEffect(() => {
+        if (status === 'NOT_VERIFY') setActiveStep(0);
+        if (status === 'DEPOSIT') setActiveStep(1);
+        if (status === 'PENDING') setActiveStep(2);
+        if (status === 'SUCCESSFULL') setActiveStep(3);
+        if (status === 'DELIVERY') setActiveStep(4);
+
+    }, [status])
+
     return (
         <div className={`${style.verticalStepper__container}`}>
-            <Stepper style={{width: '60%'}} activeStep={activeStep} orientation="vertical">
+            <Stepper style={{ width: '60%' }} activeStep={activeStep} orientation="vertical">
                 {steps.map((step, index) => (
                     <Step key={step.label}>
                         <StepLabel
@@ -84,3 +95,5 @@ export default function VerticalLinearStepperComponent() {
         </div>
     );
 }
+
+export default VerticalLinearStepperComponent

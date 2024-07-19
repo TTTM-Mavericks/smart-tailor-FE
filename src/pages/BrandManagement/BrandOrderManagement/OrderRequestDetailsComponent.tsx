@@ -10,11 +10,13 @@ import style from './OrderRequestStyle.module.scss'
 import { FaMinusCircle, FaPlusCircle } from 'react-icons/fa';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import { toast } from 'react-toastify';
+import { UserInterface } from '../../../models/UserModel';
 
 interface OrderDetailsProps {
     order: OrderInterface;
     design: DesignInterface,
-    designDetail: DesignDetailInterface[]
+    designDetail: DesignDetailInterface[],
+    brand?: UserInterface,
 }
 
 
@@ -101,7 +103,7 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
     },
 }));
 
-const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, design, designDetail }) => {
+const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, design, designDetail, brand }) => {
 
     // TODO MUTIL LANGUAGE
 
@@ -238,7 +240,7 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
     const __handleAcceptOrderRequest = async () => {
         try {
             const bodyRequest = {
-                brandID: '33b75858-fc11-4c19-a95e-bede1106eb9a',
+                brandID: brand?.userID,
                 orderID: order?.orderID,
                 detailList: sizeQuantities.map((item) => (item.designDetailId))
             }
@@ -247,7 +249,7 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
             if (response.status === 200) {
                 console.log(response.data);
                 toast.success(`${response.message}`, { autoClose: 4000 });
-
+                window.location.href = '/brand';
             } else {
                 toast.error(`${response.message}`, { autoClose: 4000 });
                 console.log(response.message);
@@ -301,7 +303,7 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
                                                         renderInput={(params) => <CustomTextField {...params} label="Size" variant="outlined" sx={{ paddingTop: -20 }} />}
                                                     />
                                                 </Grid>
-                                                <Grid className={`${style.orderProduct__container__detail__sizeDetail__quantity}`} style={{ position: 'relative' }} item>
+                                                {/* <Grid className={`${style.orderProduct__container__detail__sizeDetail__quantity}`} style={{ position: 'relative' }} item>
                                                     <CustomTextFieldQuantity
                                                         fullWidth
                                                         type="number"
@@ -313,7 +315,7 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
                                                     />
                                                     <FaMinusCircle size={20} color={primaryColor} onClick={() => __handleRemoveSizeQuantity(index)} style={{ display: sizeQuantities.length === 1 ? 'none' : 'flex', cursor: 'pointer', position: 'absolute', right: -20, top: 5 }}>
                                                     </FaMinusCircle>
-                                                </Grid>
+                                                </Grid> */}
                                             </div>
                                         );
                                     })}
