@@ -17,6 +17,8 @@ import ExcelJS from 'exceljs';
 import { toast, ToastContainer } from 'react-toastify';
 import Swal from 'sweetalert2';
 import Cookies from 'js-cookie';
+import { UserInterface } from '../../../../../models/UserModel';
+import { get } from 'core-js/core/dict';
 
 // const BRANDNAME = localStorage.getItem('brandName')
 
@@ -40,6 +42,7 @@ const style = {
 
 };
 
+const BRANDID = localStorage.getItem('userAuth')
 const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormProps> = ({ closeMultipleCard, addNewMaterial }) => {
     // ---------------UseState Variable---------------//
     const [error, setError] = React.useState<string>('');
@@ -50,11 +53,55 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
     const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
     const [editOpen, setEditOpen] = React.useState<boolean>(false);
     const [addData, setAddData] = React.useState<ExcelData[]>([])
-
+    const [errorCheckGet, setErrorCheckGet] = React.useState([])
     // ---------------Usable Variable---------------//
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
+    let brandAuth: any = null;
+
+    const BRANDROLECHECK = Cookies.get('userAuth');
+
+    if (BRANDROLECHECK) {
+        try {
+            brandAuth = JSON.parse(BRANDROLECHECK);
+            const { userID, email, fullName, language, phoneNumber, roleName, imageUrl, userStatus } = brandAuth;
+            // Your code that uses the parsed data
+        } catch (error) {
+            console.error('Error parsing JSON:', error);
+            // Handle the error, perhaps by setting default values or showing an error message
+        }
+    } else {
+        console.error('userAuth cookie is not set');
+        // Handle the case when the cookie does not exist
+    }
+
+
+    let brandFromSignUp: any = null
+    // Get BrandID from session
+    const getBrandFromSingUp = sessionStorage.getItem('userRegister') as string | null;
+
+    if (getBrandFromSingUp) {
+        const BRANDFROMSIGNUPPARSE: UserInterface = JSON.parse(getBrandFromSingUp);
+        const brandID = BRANDFROMSIGNUPPARSE.userID;
+        const brandEmail = BRANDFROMSIGNUPPARSE.email;
+        brandFromSignUp = { brandID, brandEmail }
+        console.log(brandFromSignUp);
+
+        console.log('Brand ID:', brandID);
+        console.log('Brand Email:', brandEmail);
+    } else {
+        console.error('No user data found in session storage');
+    }
+    // Get ID When something null
+    const getID = () => {
+        if (!brandAuth || brandAuth.userID === null || brandAuth.userID === undefined || brandAuth.userID === '') {
+            return brandFromSignUp.brandID;
+        } else {
+            return brandAuth.userID;
+        }
+    };
+    console.log(getID() + " bebe");
 
     const hasDataChanged = () => {
         if (JSON.stringify(originalData) !== JSON.stringify(excelData)) {
@@ -178,7 +225,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
 
         const formData = new FormData();
         formData.append('file', selectedFile);
-        formData.append('brandName', 'LA LA LISA BRAND');
+        formData.append('brandID', getID());
 
         // Log information about the file
         console.log('File name:', selectedFile.name);
@@ -195,7 +242,6 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
             brandPrice: item.Brand_Price
         }));
 
-        const brandName = 'LA LA LISA BRAND'
         try {
             // const token = Cookies.get('token');
             const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_material + functionEndpoints.brand.addExcel}`, formData,
@@ -219,39 +265,19 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
         } catch (error: any) {
             // Check for specific error status codes
             if (error.response) {
-                if (error.response.status === 400) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Add Brand Price Fail!',
-                        text: 'Add Brand Price Fail!'
-                    });
-                    console.error('Failed to upload data: Bad Request');
-                    closeMultipleCard();
-                } else if (error.response.status === 401) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Add Brand Price Fail!',
-                        text: 'Add Brand Price Fail!'
-                    });
-                    closeMultipleCard();
-                    console.error('Failed to upload data: Unauthorized');
+                const errorMessage = error.response.data.message;
+                // Check for specific error messages or status codes
+                if (errorMessage === "Invalid Data Type") {
+                    setErrorCheckGet(error.response.data.errors);
+                    toast.error('Invalid Data Type error');
+                } else if (errorMessage === "Some Data could not be processed correctly") {
+                    setErrorCheckGet(error.response.data.errors);
+                    toast.error('Some Data could not be processed correctly');
                 } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Add Brand Price Fail!',
-                        text: 'Add Brand Price Fail!'
-                    });
-                    closeMultipleCard();
-                    console.error('Failed to upload data: Unknown Error');
+                    toast.error('Unknown Error');
                 }
             } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Add Brand Price Fail!',
-                    text: 'Add Brand Price Fail!'
-                });
-                closeMultipleCard();
-                console.error('Error uploading data:', error.message);
+                toast.error('Error uploading data');
             }
         }
     };
@@ -286,127 +312,157 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
      * The columns Material, Category, Hs Code, Unit, Base Price is view only and can not edit
      * Download CSV File for the Brand to save in the local computer
      */
-    const _handleDownloadErrorData = async () => {
+    const _handleDownloadBrandErrorData = async () => {
         try {
-            const dataToDownload = excelData.map(({ error, ...item }) => item);
             const workbook = new ExcelJS.Workbook();
             const worksheet = workbook.addWorksheet('Brand Material');
 
-            // Add headers
-            const headers = Object.keys(dataToDownload[0] || {});
-            worksheet.addRow(headers);
+            // Define the columns and headers
+            worksheet.columns = [
+                { header: 'Category_Name', key: 'Category_Name', width: 25 },
+                { header: 'Material_Name', key: 'Material_Name', width: 25 },
+                { header: 'HS_Code', key: 'HS_Code', width: 20 },
+                { header: 'Unit', key: 'Unit', width: 20 },
+                { header: 'Base_Price', key: 'Base_Price', width: 20 },
+                { header: 'Brand_Price', key: 'Brand_Price', width: 20 }
+            ];
 
             // Insert a custom header row above the defined columns
-            worksheet.insertRow(1, ['Brand Price Material']);
+            worksheet.insertRow(1, ['BRAND MATERIAL ERRORS']);
 
             // Merge cells for the custom header row
             worksheet.mergeCells('A1:F1');
+            worksheet.autoFilter = 'A2:F2';  // Apply filter to the actual header row
 
             // Set styles for the custom header row
             const customHeaderRow = worksheet.getRow(1);
-            customHeaderRow.height = 30; // Optional: adjust row height
+            customHeaderRow.height = 30;
             customHeaderRow.eachCell(cell => {
-                cell.font = { bold: true, size: 16 };
+                cell.font = { bold: true, size: 16, color: { argb: 'FFFFFFFF' } };
                 cell.alignment = { vertical: 'middle', horizontal: 'center' };
-                cell.border = {
-                    top: { style: 'thin' },
-                    left: { style: 'thin' },
-                    bottom: { style: 'thin' },
-                    right: { style: 'thin' },
+                cell.fill = {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'FFFF0000' }  // Red background
                 };
             });
 
-            // Add data rows
-            dataToDownload.forEach(data => {
-                worksheet.addRow(Object.values(data));
+            // Set styles for column header row
+            worksheet.getRow(2).eachCell(cell => {
+                cell.font = { bold: true };
+                cell.alignment = { vertical: 'middle', horizontal: 'center' };
+                cell.fill = {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'FFD3D3D3' }  // Light grey background
+                };
             });
 
-            // Unprotect all cells in the worksheet
-            worksheet.eachRow((row: any) => {
-                row.eachCell((cell: any) => {
-                    cell.protection = {
-                        locked: false
-                    };
-                });
-            });
+            // Create a map to store error messages for each cell
+            const errorMap = new Map();
+            // Create a set to store the row numbers with errors
+            const errorRows = new Set();
 
-            // Protect specified columns
-            const lastColumnIndex = worksheet.columns.length;
-            const protectedColumns = [1, 2, 3, 4, 5]; // ExcelJS uses 1-based indexing
+            const allColumns = ['Category_Name', 'Material_Name', 'HS_Code', 'Unit', 'Base_Price', 'Brand_Price'];
 
-            worksheet.columns.forEach((column: any, columnIndex: any) => {
-                if (protectedColumns.includes(columnIndex + 1)) {
-                    column.eachCell((cell: any) => {
-                        cell.protection = {
-                            locked: true,
-                        };
-                    });
-                } else if (columnIndex + 1 === 6) {
-                    column.eachCell((cell: any) => {
-                        if (cell.value === null) { // Only lock non-null cells
-                            cell.protection = {
-                                locked: false,
-                            };
-                            cell.fill = {
-                                type: 'pattern',
-                                pattern: 'solid',
-                                fgColor: { argb: 'FFFF00' } // Yellow fill color
-                            };
-                            cell.value = 'Null Value';
-                            cell.font = { // Set font color
-                                color: { argb: 'FF0000' }, // Red font color
-                                bold: true
-                            };
+            // Assuming errorCheckGet is available in this context
+            errorCheckGet.forEach((error: any) => {
+                error.errorMessage.forEach((message: any) => {
+                    if (message.startsWith('Brand Material')) {
+                        // If the message starts with "Brand Material", extract the row index
+                        const match = message.match(/Brand Material .* at row Index (\d+)/);
+                        if (match) {
+                            const rowIndex = parseInt(match[1], 10);
+                            const actualRowIndex = rowIndex + 1;
+
+                            // Mark all columns for this row as erroneous
+                            allColumns.forEach(column => {
+                                const key = `${actualRowIndex}-${column}`;
+                                if (!errorMap.has(key)) {
+                                    errorMap.set(key, []);
+                                }
+                                errorMap.get(key).push(message);
+                            });
+                            errorRows.add(actualRowIndex);
                         }
-                    });
-                }
-            });
-
-            // Protect header row
-            worksheet.getRow(1).eachCell((cell: any) => {
-                cell.protection = {
-                    locked: true,
-                };
-            });
-
-            const columnWidths = headers.map((take, index) => {
-                const maxLength = Math.max(...dataToDownload.map(data => `${data[take]}`.length));
-                return Math.max(10, Math.min(maxLength + 2, 50)); // Adjust min and max widths as needed
-            });
-
-            // Set column widths
-            worksheet.columns.forEach((column, index) => {
-                column.width = columnWidths[index];
-            });
-
-            // Set the sheet protection property
-            worksheet.protect('DMLOLTU123@', { selectLockedCells: true, selectUnlockedCells: true });
-
-            // Set fill color for cells where Price < 0 or null 
-            worksheet.eachRow((row, rowIndex) => {
-                row.eachCell((cell, colIndex) => {
-                    if (headers[colIndex - 1] === 'Brand_Price') {
-                        const value = cell.value as number | undefined;
-                        if (value === undefined || value < 0) {
-                            cell.fill = {
-                                type: 'pattern',
-                                pattern: 'solid',
-                                fgColor: { argb: 'FFFF00' } // Yellow fill color
-                            };
-                            cell.value = `${value}  #Price must more than 0`,
-                                cell.font = {
-                                    color: { argb: 'FF0000' }, // Red font color
-                                    bold: true
-                                };
+                    } else {
+                        // For other errors, continue with the existing logic
+                        const match = message.match(/(Category_Name|Material_Name|HS_Code|Unit|Base_Price|Brand_Price) at row Index (\d+) (.*)!/);
+                        if (match) {
+                            const [_, column, rowIndex, errorDetail] = match;
+                            const actualRowIndex = parseInt(rowIndex, 10) + 1;
+                            const key = `${actualRowIndex}-${column}`;
+                            if (!errorMap.has(key)) {
+                                errorMap.set(key, []);
+                            }
+                            errorMap.get(key).push(message);
+                            errorRows.add(actualRowIndex);
                         }
                     }
                 });
             });
 
+            // Add only error rows to the worksheet
+            excelData.forEach((rowData, rowIndex) => {
+                if (errorRows.has(rowIndex + 4)) {
+                    const row = worksheet.addRow(rowData);
+
+                    worksheet.columns.forEach((column, colIndex) => {
+                        const cell = row.getCell(colIndex + 1);
+                        const errorKey = `${rowIndex + 4}-${column.key}`;
+
+                        if (cell.value === null) {
+                            cell.value = 'NULL';
+                            cell.font = { color: { argb: 'FF808080' } };
+                            cell.fill = {
+                                type: 'pattern',
+                                pattern: 'solid',
+                                fgColor: { argb: 'FFFFFF00' },
+                            };
+                        }
+
+                        if (errorMap.has(errorKey)) {
+                            const errors = errorMap.get(errorKey);
+                            cell.value = {
+                                richText: [
+                                    { text: `${cell.value || ''}\n`, font: { color: { argb: '000000' } } },
+                                    { text: `Error: ${errors.join('\n')}`, font: { color: { argb: 'FFFF0000' } } }
+                                ]
+                            };
+                            cell.fill = {
+                                type: 'pattern',
+                                pattern: 'solid',
+                                fgColor: { argb: 'FFFFFF00' },
+                            };
+                        }
+
+                        // Additional check for Brand_Price
+                        if (column.key === 'Brand_Price') {
+                            const value = cell.value as number | undefined;
+                            if (value === undefined || value < 0) {
+                                cell.fill = {
+                                    type: 'pattern',
+                                    pattern: 'solid',
+                                    fgColor: { argb: 'FFFFFF00' }
+                                };
+                                cell.value = {
+                                    richText: [
+                                        { text: `${value}\n`, font: { color: { argb: '000000' } } },
+                                        { text: 'Error: Price must be more than 0', font: { color: { argb: 'FFFF0000' } } }
+                                    ]
+                                };
+                            }
+                        }
+
+                        cell.alignment = { wrapText: true, vertical: 'top' };
+                    });
+                }
+            });
+
             // Generate and save the file
             const buffer = await workbook.xlsx.writeBuffer();
-            const blob = new Blob([buffer], { type: "application/octet-stream" });
-            saveAs(blob, "BrandMaterialData.xlsx");
+            const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+            saveAs(blob, "Brand_Material_Errors.xlsx");
         } catch (error) {
             console.error("Error generating Excel file:", error);
             alert("Error generating Excel file. Please try again.");
@@ -532,7 +588,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                                 backgroundColor: '#E96208',
                                 marginLeft: "20px"
                             }}
-                            onClick={_handleDownloadErrorData}
+                            onClick={_handleDownloadBrandErrorData}
                         >
                             Download Data
                         </Button>
@@ -627,7 +683,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                     <Button
                         variant="contained"
                         color="primary"
-                        onClick={_handleConfirm}
+                        onClick={_handleUploadData}
                         endIcon={<CheckCircleRounded />}
                         style={{ backgroundColor: '#E96208', color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
                     >
