@@ -52,8 +52,7 @@ import {
   DashboardBrandProfileScreens,
   DashboardBrandScreens,
   DashboardManageMaterialScreen,
-  OrderRequestScreen,
-  WaitingProcessComponent
+  OrderRequestScreen
 } from './pages/BrandManagement';
 
 import Screen404 from './pages/Error/Screen404';
@@ -168,7 +167,6 @@ function App() {
           <Route path='/brand/manage_order_request/:id' element={<OrderRequestScreen></OrderRequestScreen>} />
           <Route path='/brand/signup' element={<BrandSignUpScreen></BrandSignUpScreen>} />
           <Route path='/brand/updateProfile/:id' element={<OrderRequestScreen></OrderRequestScreen>} />
-          <Route path='/brand/waiting_process_information' element={<WaitingProcessComponent></WaitingProcessComponent>} />
 
           {/* Detail Product Route */}
           <Route path='/detail_product/:id' element={<ProductDetailScreens></ProductDetailScreens>} />

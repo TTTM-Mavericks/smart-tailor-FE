@@ -6,8 +6,6 @@ import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { UpdateMaterial } from "../../../../../models/BrandMaterialExcelModel";
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
-import Cookies from "js-cookie";
-import { UserInterface } from "../../../../../models/UserModel";
 
 interface EditMaterialPopUpScreenFormProps {
     fid: {
@@ -35,49 +33,6 @@ const EditMaterialPopUpScreens: React.FC<EditMaterialPopUpScreenFormProps> = ({ 
     });
     const BRANDNAME = fid.brandName;
 
-    let brandAuth: any = null;
-
-    const BRANDROLECHECK = Cookies.get('userAuth');
-
-    if (BRANDROLECHECK) {
-        try {
-            brandAuth = JSON.parse(BRANDROLECHECK);
-            const { userID, email, fullName, language, phoneNumber, roleName, imageUrl, userStatus } = brandAuth;
-            // Your code that uses the parsed data
-        } catch (error) {
-            console.error('Error parsing JSON:', error);
-            // Handle the error, perhaps by setting default values or showing an error message
-        }
-    } else {
-        console.error('userAuth cookie is not set');
-        // Handle the case when the cookie does not exist
-    }
-
-
-    let brandFromSignUp: any = null
-    // Get BrandID from session
-    const getBrandFromSingUp = sessionStorage.getItem('userRegister') as string | null;
-
-    if (getBrandFromSingUp) {
-        const BRANDFROMSIGNUPPARSE: UserInterface = JSON.parse(getBrandFromSingUp);
-        const brandID = BRANDFROMSIGNUPPARSE.userID;
-        const brandEmail = BRANDFROMSIGNUPPARSE.email;
-        brandFromSignUp = { brandID, brandEmail }
-        console.log(brandFromSignUp);
-
-        console.log('Brand ID:', brandID);
-        console.log('Brand Email:', brandEmail);
-    } else {
-        console.error('No user data found in session storage');
-    }
-    // Get ID When something null
-    const getID = () => {
-        if (!brandAuth || brandAuth.userID === null || brandAuth.userID === undefined || brandAuth.userID === '') {
-            return brandFromSignUp.brandID;
-        } else {
-            return brandAuth.userID;
-        }
-    };
     /**
      * Tracking Change of Each Fields
      * @param e 
@@ -105,12 +60,12 @@ const EditMaterialPopUpScreens: React.FC<EditMaterialPopUpScreenFormProps> = ({ 
     const _handleSubmit = () => {
 
         axios.put(`${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_material + functionEndpoints.brand.updateBrandMaterial}`, {
-            ...formData, brandID: getID()
+            ...formData, brandName: BRANDNAME
         })
 
             .then((response) => {
                 console.log('Response:', response);
-                // updateMaterial({ ...formData, brandID: getID() });
+                updateMaterial({ ...formData, brandName: BRANDNAME });
                 Swal.fire(
                     `Edit Success!`,
                     `The Brand Price Updated Success`,
@@ -150,7 +105,6 @@ const EditMaterialPopUpScreens: React.FC<EditMaterialPopUpScreenFormProps> = ({ 
                         sx={{ minWidth: "100%" }}
                         value={formData.categoryName}
                         onChange={_handleChange}
-                        disabled={true}
                     />
                 </Grid>
                 <Grid item xs={11}>
@@ -162,7 +116,6 @@ const EditMaterialPopUpScreens: React.FC<EditMaterialPopUpScreenFormProps> = ({ 
                         size="small"
                         sx={{ minWidth: "100%" }}
                         value={formData.materialName}
-                        disabled={true}
                         onChange={_handleChange}
                     />
                 </Grid>
@@ -175,7 +128,6 @@ const EditMaterialPopUpScreens: React.FC<EditMaterialPopUpScreenFormProps> = ({ 
                         size="small"
                         sx={{ minWidth: "100%" }}
                         value={formData.basePrice}
-                        disabled={true}
                         onChange={_handleChange}
                     />
                 </Grid>
@@ -187,7 +139,6 @@ const EditMaterialPopUpScreens: React.FC<EditMaterialPopUpScreenFormProps> = ({ 
                         variant="outlined"
                         size="small"
                         sx={{ minWidth: "100%" }}
-                        disabled={true}
                         value={formData.unit}
                         onChange={_handleChange}
                     />
@@ -200,7 +151,6 @@ const EditMaterialPopUpScreens: React.FC<EditMaterialPopUpScreenFormProps> = ({ 
                         variant="outlined"
                         size="small"
                         sx={{ minWidth: "100%" }}
-                        disabled={true}
                         value={formData.hsCode}
                         onChange={_handleChange}
                     />

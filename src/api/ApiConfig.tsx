@@ -91,8 +91,7 @@ export const functionEndpoints = {
     downloadSampleDataExcelFile: '/generate-sample-category-material-by-excel-file',
     downloadSampleBrandPriceExcelData: '/export-category-material-for-brand-by-excel',
     getListMaterialByCategoryByID: '/get-list-material-by-category-id',
-    getListMaterialByCategoryAndExpert: '/get-list-material-by-expert-tailoring-id-and-category-id',
-    getAllBrandMaterialByBrandID: '/get-all-brand-material-by-brand-id'
+    getListMaterialByCategoryAndExpert: '/get-list-material-by-expert-tailoring-id-and-category-id'
   },
   category: {
     addNewCategory: '/add-new-category',
