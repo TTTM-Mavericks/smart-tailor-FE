@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import Sidebar from '../../GlobalComponent/SideBarComponent/SideBarComponent';
-import Navbar from '../../GlobalComponent/NavBarComponent/NavbarComponent';
-import ManageExpertTailoring from '../ManagerExpertTailoringManagement/ManagerManageScreen/ManageExpertTailoringScreens';
-import ManageBrand from '../../ManageBrand/ManagerBrandManagement/ManagerManageBrandScreen/ManageBrandScreens';
-import ManageTask from '../../ManageTask/ManagerTaskManagement/ManagerManageTaskScreen/ManageTaskScreens';
-import ManageEmployee from '../../ManageEmployee/ManagerEmployeeManagement/ManagerManageEmployeeScreen/ManageEmployeeScreens';
-import ManageCustomer from '../../ManageCustomer/ManageCustomerManagement/ManagerManageCustomerScreen/ManageCustomerScreens';
-import ManageSizeExpertTailoring from '../../SizeExpertTailoring/ManagerSizeExpertTailoringManagement/ManagerManageScreen/ManageExpertTailoringScreens';
-import ManageExpertTailoringMaterial from '../../ExpertTailoringMaterial/ManagerExpertTailoringMaterialManagement/ManagerManageExpertTailoringMaterialScreen/ManageExpertTailoringMaterialScreens';
+import Sidebar from '../GlobalComponent/SideBarComponent/SideBarComponent';
+import Navbar from '../GlobalComponent/NavBarComponent/NavbarComponent';
+import BrandProfileSetup from '../BrandProfile/BrandProfileComponent';
+import ManagePrice from '../ManagePrice/BrandPriceManagement/BrandManagementScreen/ManagePriceScreens';
+import ManageMaterialComponent from '../ManageMaterial/MaterialManage/MaterialManageScreens';
+import OrderRequestScreen from '../BrandOrderManagement/OrderRequestScreen';
+import UploadBrandInforForm from './BrandUploadInforComponent';
 
-const DashboardManagerMangeExpertTailoring = () => {
+const DashboardBrandUploadInformationComponent = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [activeMenu, setActiveMenu] = useState('expert_tailoring');
     const [showScrollButton, setShowScrollButton] = React.useState<boolean>(false);
@@ -19,18 +17,8 @@ const DashboardManagerMangeExpertTailoring = () => {
         setMenuOpen(!menuOpen);
     };
 
-    useEffect(() => {
-        // Get the active tab from localStorage on component mount
-        const savedActiveMenu = localStorage.getItem('managerActiveMenu');
-        if (savedActiveMenu) {
-            setActiveMenu(savedActiveMenu);
-        }
-    }, []);
-
     const handleMenuClick = (menu: any) => {
         setActiveMenu(menu);
-        // Save the active tab to localStorage
-        localStorage.setItem('managerActiveMenu', menu);
     };
 
     // Effect to close popper on outside click
@@ -82,21 +70,23 @@ const DashboardManagerMangeExpertTailoring = () => {
 
     const renderComponent = () => {
         switch (activeMenu) {
-            case 'size_expert_tailoring':
-                return <ManageSizeExpertTailoring />;
-            case 'material_expert_tailoring':
-                return <ManageExpertTailoringMaterial />;
-            case 'manage_brand':
-                return <ManageBrand />;
-            case 'manager_manage_task':
-                return <ManageTask />;
-            case 'manager_manage_employee':
-                return <ManageEmployee />;
-            case 'manager_manage_customer':
-                return <ManageCustomer />;
+            case '/brand/manage_order_request/:id':
+                return <UploadBrandInforForm />;
+            case 'manage_notification':
+                return <></>;
+            case 'brand_profile':
+                return <BrandProfileSetup />;
+            case 'manage_order':
+                return <></>;
+            case 'manage_price':
+                return <ManagePrice />;
+            case 'manage_material':
+                return <ManageMaterialComponent />;
+            case 'manage_order_request':
+                return <OrderRequestScreen />;
             default:
                 return (
-                    <ManageExpertTailoring />
+                    <ManageMaterialComponent />
                 );
         }
     };
@@ -114,4 +104,4 @@ const DashboardManagerMangeExpertTailoring = () => {
     );
 };
 
-export default DashboardManagerMangeExpertTailoring;
+export default DashboardBrandUploadInformationComponent;

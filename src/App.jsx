@@ -1,39 +1,13 @@
-import React from 'react'; // Import React
 import Cookies from 'js-cookie'
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 import { jwtDecode } from 'jwt-decode';
 import CustomDesignScreen from './pages/CustomDesign/CustomDesignScreen';
-import AboutUsPage from './pages/AboutUs/AboutUsScreen';
 import HomeScreen from './pages/Home/HomeScreen';
-import ContactUsPage from './pages/ContactUs/ContactUsScreen';
 
-import {
-  DashboardAdminScreens,
-  DashboardAdminManageMaterialScreen,
-  DashboardAdminProfileScreens,
-  DashboardRecentTransactionScreen,
-  DashboardManageInvoiceScreen,
-  DashboardFAQScreens,
-  DashboardPieChartScreens,
-  DashboardGeographyChartScreens,
-  DashboardLineChartScreens,
-  DashboardBarChartScreens,
-  DashboardAdminManageCategoryScreen,
-  DashboardAdminManagePriceQuantityScreen,
-} from './pages/AdminManagement';
+import { DashboardAdminScreens } from './pages/AdminManagement';
 
-import {
-  DashboardEmployeeProfileScreens,
-  DashboardEmployeeScreens,
-  DashboardEmployeeManageBrandScreens,
-  DashboardManageReportScreen,
-  DashboardManageOrderScreen,
-  DashboardManageTransactionScreen,
-  DashboardEmployeeOrderDetailScreen,
-  DashboardEmployeeManageUserScreens,
-  DashboardManageNotification
-} from './pages/EmployeeManagement';
+import { DashboardEmployeeScreens, DashboardEmployeeOrderDetailScreen } from './pages/EmployeeManagement';
 
 import {
   ChangePasswordScreen,
@@ -45,15 +19,7 @@ import {
   VerifyEmailScreen,
 } from './pages/Authentication';
 
-import {
-  BrandSignUpScreen,
-  DashboardBrandManageNotification,
-  DashboardBrandManagePriceQuantityScreen,
-  DashboardBrandProfileScreens,
-  DashboardBrandScreens,
-  DashboardManageMaterialScreen,
-  OrderRequestScreen
-} from './pages/BrandManagement';
+import { BrandSignUpScreen, DashboardManageMaterialScreen, OrderRequestScreen, UploadBrandInforForm, WaitingProcessComponent } from './pages/BrandManagement';
 
 import Screen404 from './pages/Error/Screen404';
 import { ProductDetailScreens } from './pages/DetailProduct';
@@ -65,17 +31,7 @@ import {
   OrderProductScreen
 } from './pages/Order';
 
-import Brand from './pages/BrandManagement/DashboardBrand/BrandDashboardScreen';
-
-import {
-  DashboardManagerMangeBrand,
-  DashboardManagerMangeCustomer,
-  DashboardManagerMangeEmployee,
-  DashboardManagerMangeExpertTailoring,
-  DashboardManagerMangeTask,
-  FeedbackComponent
-} from './pages/ManagerManagement';
-
+import { DashboardManagerMangeExpertTailoring } from './pages/ManagerManagement';
 
 const tokenIsValid = (token) => {
   try {
@@ -164,8 +120,9 @@ function App() {
           {/* Brand Dashboard Route */}
           <Route path='/brand' element={<DashboardManageMaterialScreen></DashboardManageMaterialScreen>} />
           <Route path='/brand/signup' element={<BrandSignUpScreen></BrandSignUpScreen>} />
-          <Route path='/brand/signup' element={<BrandSignUpScreen></BrandSignUpScreen>} />
-          <Route path='/brand/updateProfile/:id' element={<OrderRequestScreen></OrderRequestScreen>} />
+          <Route path='/brand/updateProfile/:id' element={<UploadBrandInforForm></UploadBrandInforForm>} />
+          <Route path='/brand/manage_order_request/:id' element={<OrderRequestScreen></OrderRequestScreen>} />
+          <Route path='/brand/waiting_process_information' element={<WaitingProcessComponent></WaitingProcessComponent>} />
 
           {/* Detail Product Route */}
           <Route path='/detail_product/:id' element={<ProductDetailScreens></ProductDetailScreens>} />
