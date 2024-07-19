@@ -155,7 +155,7 @@ export const functionEndpoints = {
   },
   systemImage: {
     getAllSystemIamge: '/get-all-system-image',
-    
+
   }
 }
 

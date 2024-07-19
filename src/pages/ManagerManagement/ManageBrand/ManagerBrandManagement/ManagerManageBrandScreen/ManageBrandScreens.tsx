@@ -28,7 +28,7 @@ const ManageBrand: React.FC = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [data, setData] = React.useState<Brand[]>([]);
-
+    const [enabledButtons, setEnabledButtons] = React.useState<Record<string, boolean>>({});
     // Get language in local storage
     const selectedLanguage = localStorage.getItem('language');
     const codeLanguage = selectedLanguage?.toUpperCase();
@@ -117,12 +117,11 @@ const ManageBrand: React.FC = () => {
                     'success'
                 );
 
-                // Update the deleted material from the current data list
                 setData((prevData: any) =>
-                    prevData.map((expertTailoring: any) =>
-                        expertTailoring.brandID === id
-                            ? { ...expertTailoring, status: !expertTailoring.status }
-                            : expertTailoring
+                    prevData.map((user: any) =>
+                        user.userID === id
+                            ? { ...user, userStatus: "REJECT" }
+                            : user
                     )
                 );
             } else {
@@ -166,10 +165,10 @@ const ManageBrand: React.FC = () => {
 
                 // Update the deleted material from the current data list
                 setData((prevData: any) =>
-                    prevData.map((expertTailoring: any) =>
-                        expertTailoring.brandID === id
-                            ? { ...expertTailoring, status: !expertTailoring.status }
-                            : expertTailoring
+                    prevData.map((user: any) =>
+                        user.userID === id
+                            ? { ...user, userStatus: "ACCEPT" }
+                            : user
                     )
                 );
             } else {
@@ -188,6 +187,14 @@ const ManageBrand: React.FC = () => {
             );
         }
     };
+
+    React.useEffect(() => {
+        const initialEnabledButtons: Record<string, boolean> = {};
+        data.forEach(row => {
+            initialEnabledButtons[row.userID] = false;
+        });
+        setEnabledButtons(initialEnabledButtons);
+    }, [data]);
 
     const columns: GridColDef[] = [
         {
@@ -235,16 +242,21 @@ const ManageBrand: React.FC = () => {
             headerName: "Actions",
             flex: 1,
             sortable: false,
-            renderCell: (params) => (
-                <Box>
-                    <IconButton onClick={() => _hanldeConfirmAccept(params.row.userID)}>
-                        <CheckCircleOutline htmlColor="green" />
-                    </IconButton>
-                    <IconButton onClick={() => _hanldeConfirmDeny(params.row.userID)}>
-                        <CancelOutlined htmlColor={colors.primary[300]} />
-                    </IconButton>
-                </Box>
-            )
+            renderCell: (params) => {
+                if (params.row.userStatus === "ACTIVE") {
+                    return (
+                        <Box>
+                            <IconButton onClick={() => _hanldeConfirmAccept(params.row.userID)}>
+                                <CheckCircleOutline htmlColor="green" />
+                            </IconButton>
+                            <IconButton onClick={() => _hanldeConfirmDeny(params.row.userID)}>
+                                <CancelOutlined htmlColor={colors.primary[300]} />
+                            </IconButton>
+                        </Box>
+                    );
+                }
+                return null;
+            }
         }
     ];
 
