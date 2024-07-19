@@ -33,6 +33,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Cloud, UploadCloud } from 'react-feather';
 import { __handleDownloadElementAsPng, __handleGetElementAsBase64 } from '../../utils/CanvasUtils';
+import { useSnapshot } from 'valtio';
 
 
 interface ItemMask {
@@ -119,7 +120,7 @@ function CustomDesignScreen() {
   const [titleDesign, setTitleDesign] = useState<string>('Design sample');
   const [isClickOutSide, setIsClickOutSize] = useState<boolean>(false);
   const [successImgPartOfDesign, setSuccessImgPartOfDesign] = useState<string>('');
-
+  const [colorModel, setColorModel] = useState<string>();
 
 
 
@@ -135,6 +136,7 @@ function CustomDesignScreen() {
   }, []);
   const divRef = useRef<HTMLDivElement>(null);
   const { id } = useParams();
+  const snap = useSnapshot(state)
   // ---------------UseEffect---------------//
 
   useEffect(() => {
@@ -299,6 +301,8 @@ function CustomDesignScreen() {
         setSelectedPartOfCloth(response.data.partOfDesign[0]);
         setTypeOfModelID(response.data.expertTailoring.expertTailoringID);
         setIsLoadingPage(false);
+        setColorModel(response.data.color);
+        state.color = response.data.color;
 
       }
       else {
@@ -630,7 +634,7 @@ function CustomDesignScreen() {
       titleDesign: "test TitleDesign",
       publicStatus: true,
       imageUrl: successImaUrl ? successImaUrl : '',
-      color: "BLACK",
+      color: snap.color || '#f0f0f0f0',
       partOfDesign: transformPartOfDesign(item)
     };
     console.log(bodyRequest);
@@ -1063,7 +1067,7 @@ function CustomDesignScreen() {
                 <div
                   className={styles.customDesign__container__editorArea__itemSelector__itemGroup__sampleItemList}
                 >
-                  <ColorPicker></ColorPicker>
+                  <ColorPicker colorDefault={colorModel}></ColorPicker>
                 </div>
               )}
 

@@ -151,7 +151,7 @@ const Shirt = ({ isDefault }) => {
                 dispose={null}
             >
 
-                {deCalData && deCalData.map((decalGroup) => (
+                {!snap.isFullTexture && deCalData && deCalData.map((decalGroup) => (
                     decalGroup.items.map((item) => (
                         <Decal
                             position={__handleFixPosition(item, decalGroup.key)}
@@ -164,6 +164,11 @@ const Shirt = ({ isDefault }) => {
                             // dispose={true}
                             renderOrder={item.indexZ}
                         />
+                    ))
+                ))}
+                {snap.isFullTexture && deCalData && deCalData.map((decalGroup) => (
+                    decalGroup.items.map((item) => (
+                        <meshStandardMaterial map={item.texture} depthWrite={true} renderOrder={item.indexZ}></meshStandardMaterial>
                     ))
                 ))}
 

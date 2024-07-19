@@ -12,6 +12,7 @@ import CancelOrderPolicyDialogComponent from '../../../components/Dialog/PolicyD
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import { useNavigate, useParams } from 'react-router-dom';
 import { OrderDetailInterface, OrderInterface } from '../../../models/OrderModel';
+import { PaymentOrderDialogComponent } from '../../../components';
 
 const OrderDetailScreen: React.FC = () => {
     // TODO MUTIL LANGUAGE
@@ -52,6 +53,8 @@ const OrderDetailScreen: React.FC = () => {
 
     const [showScrollButton, setShowScrollButton] = useState<boolean>(false);
     const [isOpenCancelOrderPolicyDialog, setIsOpenCancelOrderPolicyDialog] = useState<boolean>(false);
+    const [isOpenPaymentOrderDialog, setIsOpenPaymentOrderDialog] = useState<boolean>(false);
+    
     const [isLoadingPage, setIsLoadingPage] = useState<boolean>(false);
     const [orderDetail, setOrderDetail] = useState<OrderDetailInterface>();
 
@@ -122,6 +125,13 @@ const OrderDetailScreen: React.FC = () => {
     };
 
     /**
+     * Close order policy dialog
+     */
+    const __handleClosePaymentOrderDilog = () => {
+        setIsOpenPaymentOrderDialog(false);
+    };
+
+    /**
      * Scrolls the window to the top smoothly.
      */
     const _handleScrollToTop = () => {
@@ -153,6 +163,13 @@ const OrderDetailScreen: React.FC = () => {
             }
         })
     };
+
+        /**
+     * Handle cancel order click
+     */
+        const _handlePaymentOrder = () => {
+            
+        };
 
     // Get language in local storage
     const selectedLanguage = localStorage.getItem('language');
@@ -224,7 +241,7 @@ const OrderDetailScreen: React.FC = () => {
                         </div>
 
                         <div className="flex flex-col md:flex-row md:ml-6 w-1/3">
-                            <div className="md:w-1/2 mt-4 md:mt-0" style={{margin: '0 auto'}}>
+                            <div className="md:w-1/2 mt-4 md:mt-0" style={{ margin: '0 auto' }}>
                                 <p className="font-medium text-gray-600">Buyer</p>
                                 <p className="text-sm text-gray-600">{orderDetail?.buyerName}</p>
                                 <p className="text-sm text-gray-600">{orderDetail?.phone}</p>
@@ -303,13 +320,12 @@ const OrderDetailScreen: React.FC = () => {
                         </button>
 
                         <button
-                            onClick={() => setIsOpenCancelOrderPolicyDialog(true)}
+                            onClick={() => setIsOpenPaymentOrderDialog(true)}
                             className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200"
                             style={{ backgroundColor: greenColor }}
                         >
                             Payment
                         </button>
-                        <CancelOrderPolicyDialogComponent onClick={_handleCancelOrder} onClose={__handleCloseCancelOrderPolicyDilog} isOpen={isOpenCancelOrderPolicyDialog}></CancelOrderPolicyDialogComponent>
 
                     </div>
 
@@ -330,7 +346,13 @@ const OrderDetailScreen: React.FC = () => {
                     )}
                 </div>
             </div>
+
+            {/* DIALOG */}
+            <CancelOrderPolicyDialogComponent onClick={_handleCancelOrder} onClose={__handleCloseCancelOrderPolicyDilog} isOpen={isOpenCancelOrderPolicyDialog}></CancelOrderPolicyDialogComponent>
+            <PaymentOrderDialogComponent onClick={_handlePaymentOrder} onClose={__handleClosePaymentOrderDilog} isOpen={isOpenPaymentOrderDialog}></PaymentOrderDialogComponent>
+
             <FooterComponent />
+
         </div>
     );
 };

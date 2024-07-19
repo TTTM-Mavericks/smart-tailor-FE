@@ -233,10 +233,10 @@ const OrderProductScreen = () => {
      */
     const __handlePostSizeAndQuatity = async () => {
         const checkValidSize = sizeQuantities.map((item) => {
-            if(!item.sizeID || !item.sizeName || !item.size) return false;
+            if (!item.sizeID || !item.sizeName || !item.size) return false;
             return true;
         })
-        if(!checkValidSize) {
+        if (!checkValidSize) {
             toast.error(`Please enter your size`, { autoClose: 4000 });
             return;
         }
@@ -482,7 +482,7 @@ const OrderProductScreen = () => {
                             </div>
                             <div className="flex justify-start items-start bg-gray-50 light:bg-gray-800 px-4 md:py-6 md:p-6 xl:pl-8 xl:pt-0 w-full">
                                 <div className="mr-10 w-full md:w-40" style={{ width: 280, height: 260, marginTop: 0, borderRadius: '5px' }}>
-                                    <img className="w-full h-full object-cover rounded-md shadow-md mb-4 md:mb-0" src={designData?.imageUrl} style={{borderRadius: '5px'}} alt="dress" />
+                                    <img className="w-full h-full object-cover rounded-md shadow-md mb-4 md:mb-0" src={designData?.imageUrl} style={{ borderRadius: '5px' }} alt="dress" />
                                 </div>
                                 <div className="mt-4 md:mt-6 flex flex-col md:flex-row justify-start  items-start md:items-center md:space-x-6 xl:space-x-8 w-full">
                                     <div className="border-b border-gray-200 md:flex-row flex-col flex justify-between items-start w-full pb-8 space-y-4 md:space-y-0" >
@@ -494,8 +494,8 @@ const OrderProductScreen = () => {
                                                     </div>
                                                     <div className={`${style.orderProduct__container__content}`}>
                                                         <div className={`${style.orderProduct__container__information}`}>
-                                                            <p className="text-sm light:text-white leading-none text-gray-800"><span className="light:text-gray-400 text-gray-300">Exper tailoring: </span> {designData?.expertTailoring?.expertTailoringName}</p>
-                                                            <p className="text-sm light:text-white leading-none text-gray-800"><span className="light:text-gray-400 text-gray-300">Color: </span> {designData?.color}</p>
+                                                            <p className="text-sm light:text-white leading-none text-gray-800" style={{display: 'flex', alignItems: 'center', }} ><span className="light:text-gray-400 text-gray-600 mr-1">Exper tailoring: </span> <div>{designData?.expertTailoring?.expertTailoringName}</div></p>
+                                                            <p className="text-sm light:text-white leading-none text-gray-800" style={{display: 'flex', alignItems: 'center', }}><span className="light:text-gray-400 text-gray-600 mr-1">Color: </span> <div style={{ padding: '3px 5px 3px 5px', backgroundColor: designData?.color, width: 'fit-content', borderRadius: 8 }}>{designData?.color}</div></p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -728,9 +728,9 @@ const OrderProductScreen = () => {
                                 <div className="flex justify-between items-center w-full">
                                     <p className="text-base light:text-white font-semibold leading-4 text-gray-800">Total</p>
                                     <div>
-                                        <span style={{color: greenColor, fontWeight: 400}} className="text-gray-600">{__handleAddCommasToNumber(__handleRoundToThreeDecimalPlaces(__handleCalculateTotalMin(materialPrice?.min, materialPrice?.max, 2)))}</span>
+                                        <span style={{ color: greenColor, fontWeight: 400 }} className="text-gray-600">{__handleAddCommasToNumber(__handleRoundToThreeDecimalPlaces(__handleCalculateTotalMin(materialPrice?.min, materialPrice?.max, 2)))}</span>
                                         <span> - </span>
-                                        <span style={{color: redColor, fontWeight: 400}} className="text-gray-600">{__handleAddCommasToNumber(__handleRoundToThreeDecimalPlaces(__handleCalculateTotalMax(materialPrice?.min, materialPrice?.max, 2)))} VND</span>
+                                        <span style={{ color: redColor, fontWeight: 400 }} className="text-gray-600">{__handleAddCommasToNumber(__handleRoundToThreeDecimalPlaces(__handleCalculateTotalMax(materialPrice?.min, materialPrice?.max, 2)))} VND</span>
                                     </div>
 
                                 </div>
