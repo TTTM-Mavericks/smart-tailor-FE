@@ -1,6 +1,6 @@
 import { easing } from "maath";
 import { useFrame, useLoader } from "@react-three/fiber";
-import { useGLTF, Decal } from "@react-three/drei";
+import { useGLTF, Decal, useTexture } from "@react-three/drei";
 import { useSnapshot } from "valtio";
 import { useEffect, useState } from "react";
 import { TextureLoader } from "three";
@@ -22,12 +22,11 @@ const Shirt = ({ isDefault }) => {
 
     const { nodes, materials } = useGLTF('/shirt_baked.glb');
 
+
     useEffect(() => {
-        console.log('materials: ', nodes);
         if (isDefault) return;
         if (snap.modelData) {
             setModelData(snap.modelData);
-            console.log('snap.modelData: ', snap.modelData);
 
             // Accumulate all item masks from different parts
             const newDecals = snap.modelData.reduce((acc, item) => {
@@ -151,7 +150,7 @@ const Shirt = ({ isDefault }) => {
                 dispose={null}
             >
 
-                {!snap.isFullTexture && deCalData && deCalData.map((decalGroup) => (
+                {deCalData && deCalData.map((decalGroup) => (
                     decalGroup.items.map((item) => (
                         <Decal
                             position={__handleFixPosition(item, decalGroup.key)}
@@ -162,13 +161,7 @@ const Shirt = ({ isDefault }) => {
                             // depthTest={true}
                             depthWrite={true}
                             // dispose={true}
-                            renderOrder={item.indexZ}
                         />
-                    ))
-                ))}
-                {snap.isFullTexture && deCalData && deCalData.map((decalGroup) => (
-                    decalGroup.items.map((item) => (
-                        <meshStandardMaterial map={item.texture} depthWrite={true} renderOrder={item.indexZ}></meshStandardMaterial>
                     ))
                 ))}
 

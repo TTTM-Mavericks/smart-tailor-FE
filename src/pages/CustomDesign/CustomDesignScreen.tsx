@@ -30,10 +30,9 @@ import LoadingComponent from '../../components/Loading/LoadingComponent';
 import { UserInterface } from '../../models/UserModel';
 import Cookies from 'js-cookie';
 import { toast, ToastContainer } from 'react-toastify';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Cloud, UploadCloud } from 'react-feather';
 import { __handleDownloadElementAsPng, __handleGetElementAsBase64 } from '../../utils/CanvasUtils';
-import { useSnapshot } from 'valtio';
 
 
 interface ItemMask {
@@ -66,15 +65,6 @@ interface Design {
   imageUrl: string;
   color: string;
   partOfDesign: PartOfDesign[];
-}
-
-interface ImageSystemData {
-  imageID: string;
-  imageName: string;
-  imageURL: string;
-  imageStatus: boolean;
-  imageType: string;
-  isPremium: boolean;
 }
 
 
@@ -120,7 +110,7 @@ function CustomDesignScreen() {
   const [titleDesign, setTitleDesign] = useState<string>('Design sample');
   const [isClickOutSide, setIsClickOutSize] = useState<boolean>(false);
   const [successImgPartOfDesign, setSuccessImgPartOfDesign] = useState<string>('');
-  const [colorModel, setColorModel] = useState<string>();
+
 
 
 
@@ -132,11 +122,8 @@ function CustomDesignScreen() {
     console.log('Received updatePart from child: ', updatePart);
     setUpdatePartData(updatePart);
     setPartOfClothData(updatePart);
-
   }, []);
   const divRef = useRef<HTMLDivElement>(null);
-  const { id } = useParams();
-  const snap = useSnapshot(state)
   // ---------------UseEffect---------------//
 
   useEffect(() => {
@@ -148,8 +135,6 @@ function CustomDesignScreen() {
 
     __handleFetchSystemItemData();
     __handleFetchDesignModelData();
-    __handleGetDesignDatabyId(id);
-
 
     const userCookie = Cookies.get('userAuth');
     if (userCookie) {
@@ -190,15 +175,13 @@ function CustomDesignScreen() {
 
   useEffect(() => {
     setPartOfClothData(partOfClothData);
-    state.modelData = partOfClothData;
-
   }, [partOfClothData])
 
 
   useEffect(() => {
     if (typeOfModel === 'shirtModel') {
       setPartOfClothData(PartOfShirtDesignData);
-      // __handleGetDesignDatabyId(id);
+      // __handleGetDesignDatabyId()
       setSelectedPartOfCloth(PartOfShirtDesignData[0]);
     }
 
@@ -227,83 +210,24 @@ function CustomDesignScreen() {
     setSelectedStamp(selectedStamp);
   }, [selectedStamp])
 
-  useEffect(() => {
-    __handleGetAllSystemImageStamps()
-  }, [])
+  useEffect(()=>{
+
+  })
   // ---------------FunctionHandler---------------//
 
   //+++++ FETCH API +++++//
-
-  const transformData = (data: ImageSystemData[]): ItemMaskInterface[] => {
-    return data.map((item, index) => ({
-      partOfDesignID: '',
-      itemMaskName: item.imageName,
-      typeOfItem: item.imageType,
-      isSystemItem: false,
-      isPremium: item.isPremium,
-      position: {
-        x: 150,
-        y: 170
-      },
-      positionX: 150,
-      positionY: 170,
-      scaleX: 230,
-      scaleY: 230,
-      imageUrl: item.imageURL,
-      print_type: '',
-      createDate: '',
-      lastModifiedDate: '',
-      zIndex: 1,
-      itemMaskID: item.imageID,
-      rotate: 0
-    }));
-  }
-
-
-  /**
-   * Get all system item stamps
-   * @returns 
-   */
-  const __handleGetAllSystemImageStamps = async () => {
-    try {
-      const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.systemImage + functionEndpoints.systemImage.getAllSystemIamge}`);
-      if (response.status === 200) {
-        console.log(transformData(response.data));
-        setCurrentItemList(transformData(response.data));
-        setIsCurrentItemListLoading(false);
-      }
-      else {
-        toast.error(`${response.message}`, { autoClose: 4000 });
-        setIsLoadingPage(false);
-        return;
-      }
-    } catch (error) {
-      toast.error(`${error}`, { autoClose: 4000 });
-      console.log('error: ', error);
-      setIsLoadingPage(false);
-    }
-  }
 
   /**
    * Handle get design by ID
    * @returns 
    */
-  const __handleGetDesignDatabyId = async (id: any) => {
+  const __handleGetDesignDatabyId = async () => {
     setIsLoadingPage(true);
     try {
-      const response = await api.get(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.getDesignByID}/${id}`);
+      const response = await api.get(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.getDesignByID}/15962d3e-8fde-49fc-b061-6c02b14efa80`);
       if (response.status === 200) {
         setPartOfClothData(response.data.partOfDesign);
-        console.log(response.data);
-        const order = ["LOGO_PART", "FRONT_CLOTH_PART", "BACK_CLOTH_PART", "SLEEVE_CLOTH_PART"];
-        const sortedParts = response.data.partOfDesign.sort((a: PartOfDesignInterface, b: PartOfDesignInterface) => order.indexOf(a.partOfDesignName) - order.indexOf(b.partOfDesignName));
-        console.log(sortedParts);
         setSelectedPartOfCloth(response.data.partOfDesign[0]);
-        setTypeOfModelID(response.data.expertTailoring.expertTailoringID);
-        setIsLoadingPage(false);
-        setColorModel(response.data.color);
-        state.color = response.data.color;
-
       }
       else {
         toast.error(`${response.message}`, { autoClose: 4000 });
@@ -382,7 +306,7 @@ function CustomDesignScreen() {
       const response = await api.get(`https://665dc0c3e88051d604081de3.mockapi.io/api/v1/stamps`);
 
       if (response) {
-        // setCurrentItemList(response);
+        setCurrentItemList(response);
         setIsCurrentItemListLoading(false);
         setIsLoadingPage(false);
       }
@@ -415,16 +339,6 @@ function CustomDesignScreen() {
             itemMaskID: __handleGenerateItemId(),
             typeOfItem: 'IMAGE',
             imageUrl: result,
-            zIndex: 1,
-            indexZ: 1,
-            position: {
-              x: 150,
-              y: 170
-            },
-            positionX: 150,
-            positionY: 170,
-            scaleX: 230,
-            scaleY: 230,
           };
 
           if (prev && prev.length > 0) {
@@ -444,11 +358,6 @@ function CustomDesignScreen() {
             itemMaskID: __handleGenerateItemId(),
             typeOfItem: 'IMAGE',
             imageUrl: result,
-            position: { x: 150, y: 170 },
-            positionX: 150,
-            positionY: 170,
-            zIndex: 1,
-            indexZ: 1
           };
           return [newItem];
         });
@@ -464,8 +373,7 @@ function CustomDesignScreen() {
         position: { x: 150, y: 170 },
         positionX: 150,
         positionY: 170,
-        zIndex: 1,
-        indexZ: 1
+        zIndex: 0
       };
 
       if (prev && prev.length > 0) {
@@ -532,9 +440,7 @@ function CustomDesignScreen() {
     if (result) {
       const imgBase64 = await __handleChangeImageToBase64(result.imageUrl);
       result.imageUrl = imgBase64; // Update the imageUrl with base64 string
-      result.partOfDesignID = selectedPartOfCloth.partOfDesignID;
-      result.indexZ = 1;
-      result.zIndex = 1;
+      result.partOfDesignID === selectedPartOfCloth.partOfDesignID;
       setSelectedStamp((prevSelectedStamp = []) => {
         const existingItemIndex = prevSelectedStamp.findIndex(
           (existingItem: ItemMaskInterface) => existingItem.itemMaskID === item.itemMaskID
@@ -625,7 +531,7 @@ function CustomDesignScreen() {
    * Get Design data after choose material
    * @param item 
    */
-  const __handleGetMaterialInformation = async (item: PartOfDesignInterface[]) => {
+  const __handleGetMaterialInformation = async(item: PartOfDesignInterface[]) => {
     const successImaUrl = await __handleGetElementAsBase64('canvas3DElement')
     console.log(successImaUrl);
     const bodyRequest: Design = {
@@ -634,49 +540,30 @@ function CustomDesignScreen() {
       titleDesign: "test TitleDesign",
       publicStatus: true,
       imageUrl: successImaUrl ? successImaUrl : '',
-      color: snap.color || '#f0f0f0f0',
+      color: "BLACK",
       partOfDesign: transformPartOfDesign(item)
     };
     console.log(bodyRequest);
     setMainDesign(bodyRequest);
-    return bodyRequest
-  }
-
-  /**
-   * 
-   */
-  const __handleSaveDesign = () => {
-    if (partOfClothData) {
-
-      __handleGetMaterialInformation(partOfClothData).then((value) => {
-        __handleUpdateDesign(true, value);
-      })
-    }
   }
 
   /**
   * Handle Create design
   * @param item 
   */
-  const __handleUpdateDesign = async (isLickSaveButton: boolean, mainDesign: DesignInterface | undefined) => {
+  const __handleCreateDesign = async () => {
 
-    if (!mainDesign) {
-      __handleGetMaterialInformation
-    };
+    if (!mainDesign) return;
     setIsLoadingPage(true);
     try {
-      const response = await api.put(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.updateDesign}/${id}`, mainDesign);
+      const response = await api.post(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.addNewDesign}`, mainDesign);
       if (response.status === 200) {
         toast.success(`${response.message}`, { autoClose: 4000 });
-        if (!isLickSaveButton) {
-          setTimeout(() => {
-            setIsLoadingPage(false);
-            navigate(`/design_detail/${response.data.designID}`);
-          }, 3000)
-        } else {
+        setTimeout(() => {
           setIsLoadingPage(false);
+          navigate(`/design_detail/${response.data.designID}`);
+        }, 3000);
 
-        }
       } else {
         toast.error(`${response.message}`, { autoClose: 4000 });
         setIsLoadingPage(false);
@@ -724,7 +611,7 @@ function CustomDesignScreen() {
         model={(
           <CanvasModel typeOfModel={typeOfModel} isDefault={true} is3D={true} />
         )}
-        onCreateDesign={() => __handleUpdateDesign(false, mainDesign)}
+        onCreateDesign={__handleCreateDesign}
       ></ChooseMaterialDialogComponent>
 
       {/* Update design tool Dialog */}
@@ -776,7 +663,7 @@ function CustomDesignScreen() {
             <span>{t(codeLanguage + '000104')}</span>
           </button>
 
-          <button className={` py-1 px-4 rounded inline-flex items-center ${styles.customDesign__container__header__buttonGroup__saveBtn} `} onClick={() => __handleSaveDesign()}>
+          <button className={` py-1 px-4 rounded inline-flex items-center ${styles.customDesign__container__header__buttonGroup__saveBtn} `}>
             <FaSave size={20} style={{ marginRight: 5, backgroundColor: 'transparent', border: 'none' }} className={styles.saveIcon}></FaSave>
             <span>{t(codeLanguage + '000105')}</span>
           </button>
@@ -812,7 +699,7 @@ function CustomDesignScreen() {
         <div className={`${styles.customDesign__container__editorArea__display} editorArea__display `}>
 
           {/* Menu Bar of editor area */}
-          <div className={styles.customDesign__container__editorArea__display__menuBar} >
+          <div  className={styles.customDesign__container__editorArea__display__menuBar} >
             <div className={styles.customDesign__container__editorArea__display__menuBar__buttonGroup}>
               {/* TODO */}
               <button onClick={() => setIsOpenNotiChangeUpdateImageDesignTool(true)}>
@@ -856,9 +743,9 @@ function CustomDesignScreen() {
           {selectedPartOfCloth && !changeUploadPartOfDesignTool && (
             <>
               <div
-
+            
                 className={`${styles.customDesign__container__editorArea__display__displayDesign} editorArea__display__displayDesign`}
-
+                
               >
                 <ImageDraggableComponent
                   partOfCloth={selectedPartOfCloth}
@@ -1067,7 +954,7 @@ function CustomDesignScreen() {
                 <div
                   className={styles.customDesign__container__editorArea__itemSelector__itemGroup__sampleItemList}
                 >
-                  <ColorPicker colorDefault={colorModel}></ColorPicker>
+                  <ColorPicker></ColorPicker>
                 </div>
               )}
 
@@ -1148,7 +1035,6 @@ function CustomDesignScreen() {
       {/* DIALOG */}
 
       {/* Choose Material Dialog */}
-      {/* <CanvasModel typeOfModel={typeOfModel} isDefault={false} is3D={true} /> */}
 
 
     </div >

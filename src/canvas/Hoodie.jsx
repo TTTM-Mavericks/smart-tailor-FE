@@ -26,7 +26,7 @@ const Hoodie = () => {
 
 
     useEffect(() => {
-        console.log('nodesnodesnodesnodesnodesnodes: ', materials);
+        console.log('nodesnodesnodesnodesnodesnodes: ', nodes);
         if (snap.modelData) {
             setModelData(snap.modelData);
 
@@ -90,10 +90,8 @@ const Hoodie = () => {
         }
     }, [modelData]);
 
-    useEffect(() => {
-        console.log('snap.color: ', snap.color);
-    }, [snap.color])
-    useFrame((state, delta) => easing.dampC(materials.lambert1.color, '#FFFFFF', 0.25, delta))
+
+    useFrame((state, delta) => easing.dampC(materials.lambert1.color, snap.color, 0.25, delta))
 
     const stateString = JSON.stringify(snap)
 

@@ -6,7 +6,6 @@ import Navbar from '../GlobalComponent/NavBarComponent/NavbarComponent';
 import { useNavigate, useParams } from 'react-router-dom';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import { DesignDetailInterface, DesignInterface } from '../../../models/DesignModel';
-import { ToastContainer } from 'react-toastify';
 
 
 interface OrderDetailInterface {
@@ -42,26 +41,15 @@ const OrderRequestScreen: React.FC = () => {
       const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.designDetail + functionEndpoints.designDetail.getAllInforOrderDetail}/${id}`);
       if (response.status === 200) {
         console.log('detail order: ', response.data);
-        if (response.data === null) {
-          navigate('/pickedOrder')
-        } else
-          if (response.data.design === null) {
-            navigate('/pickedOrder')
-          } else
-            if (response.data.designDetail.length === 0) {
-              navigate('/pickedOrder')
-            }
-            else {
-              setOrderDetail(response.data);
-            }
+        setOrderDetail(response.data);
       }
       else {
         console.log('detail order: ', response.message);
-        // navigate('/error404');
+        navigate('/error404');
       }
     } catch (error) {
       console.log('error: ', error);
-      // navigate('/error404');
+      navigate('/error404');
     }
   }
 
@@ -82,7 +70,7 @@ const OrderRequestScreen: React.FC = () => {
 
   return (
     <div>
-      <ToastContainer></ToastContainer>
+
       <div className="flex">
         <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
         <div className="flex flex-col w-full">
