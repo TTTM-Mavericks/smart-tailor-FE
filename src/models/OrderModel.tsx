@@ -44,8 +44,7 @@ export interface OrderInterface {
     createDate: string; // LocalDateTime
     lastModifiedDate: string; // LocalDateTime
     payment?: PaymentInterface[];
-    designResponse?: DesignInterface;
-
+    designResponse?: DesignInterface
 }
 
 export interface OrderDetailInterface {
@@ -68,8 +67,7 @@ export interface OrderDetailInterface {
     address: string;
     brandResponse: any | null;
     buyerName: string | null;
-    designResponse: DesignInterface;
-    detailList?: DesignDetailInterface[];
+    designResponse: DesignInterface
 }
 
 export interface OrderRequestDetailInterface {

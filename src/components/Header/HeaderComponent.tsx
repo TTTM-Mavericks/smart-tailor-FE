@@ -29,7 +29,7 @@ const navigation = {
     {
       id: 'design',
       name: 'Design',
-      href: '/design_create',
+      href: '/design',
       number: '000132',
       type: 'page'
     },

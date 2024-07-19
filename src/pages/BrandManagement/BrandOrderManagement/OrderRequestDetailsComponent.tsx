@@ -9,7 +9,6 @@ import { IoMdCloseCircleOutline } from 'react-icons/io';
 import style from './OrderRequestStyle.module.scss'
 import { FaMinusCircle, FaPlusCircle } from 'react-icons/fa';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
-import { toast } from 'react-toastify';
 
 interface OrderDetailsProps {
     order: OrderInterface;
@@ -35,7 +34,6 @@ interface SizeQuantity {
     unit?: string;
     createDate?: string;
     lastModifiedDate?: null;
-    designDetailId?: any;
 }
 
 const sizes = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
@@ -124,49 +122,47 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
                 ...item.size,
                 sizeID: item.size.sizeID,
                 sizeName: item.size.sizeName,
-                quantity: item.quantity,
-                designDetailId: item.designDetailId
-
+                quantity: item.quantity
             }
         ));
         console.log('extractedSizes: ', extractedSizes);
         setSizes(extractedSizes);
 
-    }, [designDetail]);
+    }, [designDetail])
 
     useEffect(() => {
-        console.log('sizeQuantities: ', sizeQuantities);
-    }, [sizeQuantities])
+        console.log('aaaaaa: ', sizes);
+
+    }, [sizes])
 
 
-    // /**
-    //  * Handle fetch expert tailoring size
-    //  */
-    // const __handleGetExpertTailoringSize = async (designID: any) => {
-    //     setIsLoadingPage(true);
-    //     try {
-    //         const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.designDetail + functionEndpoints.designDetail.getAllInforOrderDetail}/${designID}`);
-    //         if (response.status === 200) {
-    //             console.log('size: ', response.data);
-    //             const extractedSizes = response.data.map((item: any) => (
-    //                 {
-    //                     ...item.size,
-    //                     sizeID: item.size.sizeID,
-    //                     sizeName: item.size.sizeName,
-    //                     quantity: item.quantity,
-    //                     designDetailId: item.designDetailId
-    //                 }
-    //             ));
-    //             console.log(extractedSizes);
-    //             setSize(extractedSizes);
-    //         }
-    //         else {
-    //             return;
-    //         }
-    //     } catch (error) {
-    //         console.log('error: ', error);
-    //     }
-    // }
+    /**
+     * Handle fetch expert tailoring size
+     */
+    const __handleGetExpertTailoringSize = async (designID: any) => {
+        setIsLoadingPage(true);
+        try {
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.designDetail + functionEndpoints.designDetail.getAllInforOrderDetail}/${designID}`);
+            if (response.status === 200) {
+                console.log('size: ', response.data);
+                const extractedSizes = response.data.map((item: any) => (
+                    {
+                        ...item.size,
+                        sizeID: item.size.sizeID,
+                        sizeName: item.size.sizeName,
+                        quantity: item.quantity
+                    }
+                ));
+                console.log(extractedSizes);
+                setSize(extractedSizes);
+            }
+            else {
+                return;
+            }
+        } catch (error) {
+            console.log('error: ', error);
+        }
+    }
 
 
     const handleToggleExpand = (partId: string) => {
@@ -190,10 +186,10 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
      * @param index 
      * @param newSize 
      */
-    const __handleSizeChange = (index: number, newSizeID: string, nameSize: string, designDetailId: any) => {
+    const __handleSizeChange = (index: number, newSizeID: string, nameSize: string) => {
         if (!newSizeID || !nameSize) return;
         const updatedSizeQuantities = [...sizeQuantities];
-        updatedSizeQuantities[index] = { ...updatedSizeQuantities[index], sizeID: newSizeID, size: nameSize, designDetailId: designDetailId };
+        updatedSizeQuantities[index] = { ...updatedSizeQuantities[index], sizeID: newSizeID, size: nameSize };
         setSizeQuantities(updatedSizeQuantities);
     };
 
@@ -232,34 +228,6 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
         setIsChecked(event.target.checked);
     };
 
-    /**
-     * Handle brand accept order request from customer
-     */
-    const __handleAcceptOrderRequest = async () => {
-        try {
-            const bodyRequest = {
-                brandID: '33b75858-fc11-4c19-a95e-bede1106eb9a',
-                orderID: order?.orderID,
-                detailList: sizeQuantities.map((item) => (item.designDetailId))
-            }
-            console.log('bodyRequest: ', bodyRequest);
-            const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.brandPickOrder}`, bodyRequest);
-            if (response.status === 200) {
-                console.log(response.data);
-                toast.success(`${response.message}`, { autoClose: 4000 });
-
-            } else {
-                toast.error(`${response.message}`, { autoClose: 4000 });
-                console.log(response.message);
-            }
-            console.log(response);
-        } catch (error) {
-            toast.error(`${error}`, { autoClose: 4000 });
-            console.log(error);
-
-        }
-    }
-
 
     return (
         <div className="container mx-auto p-6 bg-white rounded-lg shadow-lg">
@@ -295,7 +263,7 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
                                                         value={selectedSize}
                                                         onChange={(event, newValue) => {
                                                             if (newValue) {
-                                                                __handleSizeChange(index, newValue.sizeID, newValue.sizeName, newValue.designDetailId);
+                                                                __handleSizeChange(index, newValue.sizeID, newValue.sizeName);
                                                             }
                                                         }}
                                                         renderInput={(params) => <CustomTextField {...params} label="Size" variant="outlined" sx={{ paddingTop: -20 }} />}
@@ -338,7 +306,6 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
                                     <button
                                         type="submit"
                                         className={`${style.orderRequest__button__accept} px-5 py-2.5 text-sm font-medium text-white mt-3`}
-                                        onClick={() => __handleAcceptOrderRequest()}
                                     >
                                         Accept
                                     </button>

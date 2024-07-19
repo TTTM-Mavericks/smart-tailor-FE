@@ -32,8 +32,6 @@ export const featuresEndpoints = {
   expertTailoring: '/expert-tailoring',
   expertTailoringMaterial: '/expert-tailoring-material',
   brand: '/brand',
-  systemImage: '/system-image',
-
 }
 export const functionEndpoints = {
   auth: {
@@ -51,8 +49,7 @@ export const functionEndpoints = {
     systemItem: '/systemItem',
     addNewDesign: '/add-new-design',
     getDesignByID: '/get-design-by-id',
-    getAllDesign: '/get-all-design',
-    updateDesign: '/update-design'
+    getAllDesign: '/get-all-design'
   },
   designDetail: {
     addNewDesignDetail: '/add-new-design-detail',
@@ -117,8 +114,7 @@ export const functionEndpoints = {
   },
   order: {
     createOrder: '/create-order',
-    getOrderById: '/get-order-by-id',
-    brandPickOrder: '/brand-pick_order',
+    getOrderById: '/get-order-by-id'
   },
   sizeExpertTailoring: {
     getAllSizeExpertTailoringByExperId: '/get-all-size-by-expert-tailoring-id',
@@ -140,9 +136,6 @@ export const functionEndpoints = {
     addNewExpertTailoringByExcelFile: '/add-new-expert-tailoring-material-by-excel-file',
     updateStatusExpertTailoringMaterial: '/change-status-expert-tailoring-material'
   },
-  systemImage: {
-    getAllSystemIamge: '/get-all-system-image',
-  }
 }
 
 
