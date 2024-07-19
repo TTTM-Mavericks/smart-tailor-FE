@@ -44,7 +44,7 @@ interface Design {
 
 
 const CreateDesignComponent = () => {
-    // ---------------UseState Variable---------------//
+    // ---------------UseState Variable---------------// 
     const [isLoadingPage, setIsLoadingPage] = useState<boolean>(false);
     const [userAuth, setUserAuth] = useState<UserInterface>();
     const [typeOfModelID, setTypeOfModelID] = useState<string>('');
