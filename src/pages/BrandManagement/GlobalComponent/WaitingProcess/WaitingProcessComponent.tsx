@@ -58,6 +58,8 @@ const WaitingProcessComponent: React.FC = () => {
         }
     };
 
+    console.log("huhuuhu:" + getID());
+
     // Get Email When Email Null
     const getEmail = () => {
         if (!brandAuth || brandAuth.email === null || brandAuth.email === undefined || brandAuth.email === '') {
