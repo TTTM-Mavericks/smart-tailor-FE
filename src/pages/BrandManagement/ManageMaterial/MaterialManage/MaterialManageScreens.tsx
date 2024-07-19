@@ -15,6 +15,8 @@ import { Material } from "../../../../models/BrandMaterialExcelModel";
 import AddMultipleMaterialWithExcel from "../CRUDMaterialWithExcelTable/AddMultipleInExcelTable/AddMultipleMaterialComponent";
 import { UpdateMaterial } from "../../../../models/BrandMaterialExcelModel";
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
+import { UserInterface } from "../../../../models/UserModel";
+import Cookies from "js-cookie";
 const brand_name = "LA LA LISA BRAND"
 
 // Make Style of popup
@@ -78,6 +80,52 @@ const ManageMaterialComponent: React.FC = () => {
         setAddMultiple(false)
     }
 
+
+    let brandAuth: any = null;
+
+    const BRANDROLECHECK = Cookies.get('userAuth');
+
+    if (BRANDROLECHECK) {
+        try {
+            brandAuth = JSON.parse(BRANDROLECHECK);
+            const { userID, email, fullName, language, phoneNumber, roleName, imageUrl, userStatus } = brandAuth;
+            // Your code that uses the parsed data
+        } catch (error) {
+            console.error('Error parsing JSON:', error);
+            // Handle the error, perhaps by setting default values or showing an error message
+        }
+    } else {
+        console.error('userAuth cookie is not set');
+        // Handle the case when the cookie does not exist
+    }
+
+
+    let brandFromSignUp: any = null
+    // Get BrandID from session
+    const getBrandFromSingUp = sessionStorage.getItem('userRegister') as string | null;
+
+    if (getBrandFromSingUp) {
+        const BRANDFROMSIGNUPPARSE: UserInterface = JSON.parse(getBrandFromSingUp);
+        const brandID = BRANDFROMSIGNUPPARSE.userID;
+        const brandEmail = BRANDFROMSIGNUPPARSE.email;
+        brandFromSignUp = { brandID, brandEmail }
+        console.log(brandFromSignUp);
+
+        console.log('Brand ID:', brandID);
+        console.log('Brand Email:', brandEmail);
+    } else {
+        console.error('No user data found in session storage');
+    }
+    // Get ID When something null
+    const getID = () => {
+        if (!brandAuth || brandAuth.userID === null || brandAuth.userID === undefined || brandAuth.userID === '') {
+            return brandFromSignUp.brandID;
+        } else {
+            return brandAuth.userID;
+        }
+    };
+
+
     // Get language in local storage
     const selectedLanguage = localStorage.getItem('language');
     const codeLanguage = selectedLanguage?.toUpperCase();
@@ -91,7 +139,7 @@ const ManageMaterialComponent: React.FC = () => {
     }, [selectedLanguage, i18n]);
 
     React.useEffect(() => {
-        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_material + functionEndpoints.material.getAllMaterialByBrandName + `?brandName=${brand_name}`}`;
+        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_material + functionEndpoints.material.getAllBrandMaterialByBrandID + `/${getID()}`}`;
         fetch(apiUrl)
             .then(response => {
                 if (!response.ok) {

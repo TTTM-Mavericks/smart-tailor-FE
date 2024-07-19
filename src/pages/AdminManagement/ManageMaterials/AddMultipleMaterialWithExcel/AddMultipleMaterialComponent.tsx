@@ -9,9 +9,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import EditMultipleUsersInExcelTable from './CRUDWithExcelTable/EditMultipleMaterialInExcelTable';
 import { useTranslation } from 'react-i18next';
-import { AddExcelMaterial, ExcelData, Material } from '../../../../models/AdminMaterialExcelModel';
+import { AddExcelMaterial, ExcelData } from '../../../../models/AdminMaterialExcelModel';
 import axios from 'axios';
-import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
+import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import ExcelJS from 'exceljs';
 import { toast, ToastContainer } from 'react-toastify';
 import Swal from 'sweetalert2';
@@ -49,6 +49,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
+    const [errorCheckGet, setErrorCheckGet] = React.useState([])
     // ---------------Usable Variable---------------//
     // Get language in local storage
     const selectedLanguage = localStorage.getItem('language');
@@ -159,85 +160,6 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
     };
 
     /**
-     * Upload The File and Brand Name to Back End
-     * If one field Error or dupplicate then it throw error
-     */
-    const _handleUploadData = async () => {
-        if (!selectedFile) {
-            console.error('No file selected');
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('file', selectedFile);
-        // formData.append('brandName', 'LA LA LISA BRAND');
-
-        // Log information about the file
-        console.log('File name:', selectedFile.name);
-        console.log('File size:', selectedFile.size);
-        console.log('File type:', selectedFile.type);
-
-        const transformedData = addData.map(item => ({
-            basePrice: item.Base_Price,
-            categoryName: item.Category_Name,
-            materialName: item.Material_Name,
-            unit: item.Unit,
-            hsCode: item.HS_Code
-        }));
-
-        try {
-            // const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0YW1tdHNlMTYxMDg3QGZwdC5lZHUudm4iLCJpYXQiOjE3MTgyODUyMTMsImV4cCI6MTcxODM3MTYxM30.UUpy2s9SwYGF_TyIru6VASQ-ZzGTOqx7mkWkcSR2__0'; // Replace with the actual bearer token
-            const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.addNewMaterialByExcelFile}`, formData,
-
-                // {
-                //     headers: {
-                //         'Authorization': `Bearer ${token}`
-                //     }
-                // }
-            );
-
-            if (response.data.status === 200) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Add Excel Material Success',
-                    text: 'Excel Material has been added successfully!',
-                });
-
-                addNewMaterial(transformedData)
-                closeMultipleCard();
-            }
-            if (response.data.status === 400) {
-                Swal.fire(
-                    'Add Excel Material fail!',
-                    'Please check information!',
-                    'error'
-                );
-                closeMultipleCard();
-            }
-        } catch (error: any) {
-            // Check for specific error status codes
-            if (error.response) {
-                if (error.response.status === 400) {
-                    console.error('Failed to upload data: Bad Request');
-                } else if (error.response.status === 401) {
-                    console.error('Failed to upload data: Unauthorized');
-                } else {
-                    console.error('Failed to upload data: Unknown Error');
-                }
-            } else {
-                console.error('Error uploading data:', error.message);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Added Failed',
-                    text: 'There was an error Added Material. Please try again later.',
-                });
-            }
-            setError('The category is not existed or something error!');
-        }
-    };
-
-
-    /**
      * When User click on Ok Button It will check
      * Check the data change (update or delete)
      * Check if categoryName and materialName are duplicate
@@ -245,36 +167,106 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
      * If there are validation errors, download the error data
      * If not, upload data
      */
-    const _handleConfirm = async () => {
-        // Function to check if a value is a number and greater than 0
-        const isValidBasePrice = (basePrice: any): boolean => {
-            return typeof basePrice === 'number' && basePrice > 0;
-        };
+    // const _handleConfirm = async () => {
+    //     // Function to check if a value is a number and greater than 0
+    //     const isValidBasePrice = (basePrice: any): boolean => {
+    //         return typeof basePrice === 'number' && basePrice > 0;
+    //     };
 
-        const isValidHSCode = (hsCode: any): boolean => {
-            return typeof hsCode === 'number' && hsCode > 0;
-        };
+    //     const isValidHSCode = (hsCode: any): boolean => {
+    //         return typeof hsCode === 'number' && hsCode > 0;
+    //     };
 
-        // Check for duplicates based on Category_Name and Material_Name
-        const duplicates = checkForDuplicates(excelData, ['Category_Name', 'Material_Name']);
+    //     // Check for duplicates based on Category_Name and Material_Name
+    //     const duplicates = checkForDuplicates(excelData, ['Category_Name', 'Material_Name']);
 
-        // Check for invalid entries
-        const invalidEntries = excelData.some(item =>
-            !item.Category_Name ||
-            !item.Material_Name ||
-            item.Unit === null ||
-            !isValidBasePrice(item.Base_Price) ||
-            !isValidHSCode(item.HS_Code)
-        );
+    //     // Check for invalid entries
+    //     const invalidEntries = excelData.some(item =>
+    //         !item.Category_Name ||
+    //         !item.Material_Name ||
+    //         item.Unit === undefined ||
+    //         item.Base_Price === undefined ||
+    //         item.HS_Code === undefined ||
+    //         !isValidBasePrice(item.Base_Price) ||
+    //         !isValidHSCode(item.HS_Code)
+    //     );
 
-        if (invalidEntries || duplicates.size > 0) {
-            setError('There are duplicate values or missing required fields!');
+    //     if (invalidEntries) {
+    //         _handleUploadData()
+    //         // setError('There are duplicate values or missing required fields!');
+    //     }
+    //     if (duplicates.size > 0) {
+    //         _handleUploadData()
+    //         // setError('Duplicate Please Try Again')
+    //     }
+    //     if (!hasDataChanged()) {
+    //         _handleUploadData()
+    //         // setError('Data have changing, Please click download button to download and upload again')
+    //     }
+    //     else {
+    //         await _handleUploadData();
+    //     }
+    // };
+
+    /**
+     * Upload The File and Brand Name to Back End
+     * If one field Error or dupplicate then it throw error
+     */
+    React.useEffect(() => {
+        console.log('Updated errorCheckGet:', errorCheckGet);
+    }, [errorCheckGet]);
+
+    const _handleUploadData = async () => {
+        if (!selectedFile) {
+            console.error('No file selected');
+            toast.error('No file selected. Please select one');
+            return;
         }
-        if (!hasDataChanged()) {
-            setError('Data have changing, Please click download button to download and upload again')
-        }
-        else {
-            await _handleUploadData();
+
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+
+        // Log information about the file
+        console.log('File name:', selectedFile.name);
+        console.log('File size:', selectedFile.size);
+        console.log('File type:', selectedFile.type);
+
+        const transformedData = addData.map(item => ({
+            categoryName: item.Category_Name,
+            materialName: item.Material_Name,
+            hsCode: item.HS_Code,
+            unit: item.Unit,
+            basePrice: item.Base_Price,
+        }));
+
+        try {
+            const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.addNewMaterialByExcelFile}`, formData);
+            if (response.status === 200) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Add Excel Material Success',
+                    text: `${response.data.message}`,
+                });
+
+                addNewMaterial(transformedData);
+                closeMultipleCard();
+            }
+        } catch (error: any) {
+            if (error.response) {
+                const errorMessage = error.response.data.message;
+                // Check for specific error messages or status codes
+                if (errorMessage === "Invalid Data Type") {
+                    setErrorCheckGet(error.response.data.errors);
+                    toast.error('Invalid Data Type error');
+                } else if (errorMessage === "Some Data could not be processed correctly") {
+                    setErrorCheckGet(error.response.data.errors);
+                    toast.error('Some Data could not be processed correctly');
+                } else {
+                    toast.error('Unknown Error');
+                }
+            } else {
+                toast.error('Error uploading data');
+            }
         }
     };
 
@@ -350,151 +342,107 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
             { header: 'Material_Name', key: 'Material_Name', width: 25 },
             { header: 'HS_Code', key: 'HS_Code', width: 20 },
             { header: 'Unit', key: 'Unit', width: 20 },
-            { header: 'Base_Price', key: 'Base_Price', width: 20 },
+            { header: 'Base_Price', key: 'Base_Price', width: 20 }
         ];
 
         // Insert a custom header row above the defined columns
-        worksheet.insertRow(1, ['CATEGORY AND MATERIAL']);
+        worksheet.insertRow(1, ['CATEGORY AND MATERIAL ERRORS']);
 
         // Merge cells for the custom header row
         worksheet.mergeCells('A1:E1');
+        worksheet.autoFilter = 'A2:E2';  // Apply filter to the actual header row
 
         // Set styles for the custom header row
         const customHeaderRow = worksheet.getRow(1);
-        customHeaderRow.height = 30; // Optional: adjust row height
+        customHeaderRow.height = 30;
         customHeaderRow.eachCell(cell => {
-            cell.font = { bold: true, size: 16 };
+            cell.font = { bold: true, size: 16, color: { argb: 'FFFFFFFF' } };
             cell.alignment = { vertical: 'middle', horizontal: 'center' };
-            cell.border = {
-                top: { style: 'thin' },
-                left: { style: 'thin' },
-                bottom: { style: 'thin' },
-                right: { style: 'thin' },
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFFF0000' }  // Red background
             };
         });
-
-        const rows = excelData.map(item => ({
-            Category_Name: item.Category_Name,
-            Material_Name: item.Material_Name,
-            HS_Code: item.HS_Code,
-            Unit: item.Unit,
-            Base_Price: item.Base_Price,
-            error: item.error
-        }));
-
-        // Identify and sort rows with errors
-        const rowsWithError = rows.filter(row => {
-            const hasNullValues = Object.values(row).some(value => value === null || value === '' || value === undefined);
-            const isCategoryNameNull = row.Category_Name === null || row.Category_Name === undefined;
-            const isMaterialNameNull = row.Material_Name === null || row.Material_Name === undefined;
-            const isHsCodeNull = row.HS_Code === null || row.HS_Code === undefined || row.HS_Code <= 0 || typeof row.HS_Code === 'string';
-            const isBasePriceNull = row.Base_Price === null || row.Base_Price === undefined || row.Base_Price <= 0 || typeof row.Base_Price === 'string';
-            const isUnitNumber = typeof row.Unit === 'number';
-            return hasNullValues || isCategoryNameNull || isMaterialNameNull || isHsCodeNull || isBasePriceNull || isUnitNumber;
-        });
-
-        const rowsWithoutError = rows.filter(row => !rowsWithError.includes(row));
-
-        // Concatenate rows with errors first
-        const sortedRows = [...rowsWithError, ...rowsWithoutError];
-
-        // Add rows to the worksheet
-        worksheet.addRows(sortedRows);
 
         // Set styles for column header row
         worksheet.getRow(2).eachCell(cell => {
             cell.font = { bold: true };
             cell.alignment = { vertical: 'middle', horizontal: 'center' };
-            cell.border = {
-                top: { style: 'thin' },
-                left: { style: 'thin' },
-                bottom: { style: 'thin' },
-                right: { style: 'thin' },
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFD3D3D3' }  // Light grey background
             };
         });
 
-        // Apply validation and coloring for errors
-        const duplicates = checkForDuplicates(sortedRows, ['Category_Name', 'Material_Name']);
+        // Create a map to store error messages for each cell
+        const errorMap = new Map();
+        // Create a set to store the row numbers with errors
+        const errorRows = new Set();
 
-        sortedRows.forEach((row, rowIndex) => {
-            const excelRow = worksheet.getRow(rowIndex + 3); // +3 to account for the custom header row and column header row
-            excelRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-                const columnName = worksheet.getColumn(colNumber).key as string;
-                const value = row[columnName];
-
-                if (columnName === 'Category_Name' || columnName === 'Material_Name') {
-                    if (duplicates.has(`${row.Category_Name}|${row.Material_Name}`)) {
-                        const duplicateRowNumber = sortedRows.findIndex(r => r.Category_Name === row.Category_Name && r.Material_Name === row.Material_Name && r !== row) + 3;
-                        cell.fill = {
-                            type: 'pattern',
-                            pattern: 'solid',
-                            fgColor: { argb: 'FFFF00' }, // Yellow fill for errors
-                        };
-                        cell.value = `${value} #Duplicate with row ${duplicateRowNumber}`;
-                    } else if (!value) {
-                        cell.fill = {
-                            type: 'pattern',
-                            pattern: 'solid',
-                            fgColor: { argb: 'FFFF00' }, // Yellow fill for errors
-                        };
-                        cell.value = 'Null Value';
+        errorCheckGet.forEach((error: any) => {
+            error.errorMessage.forEach((message: any) => {
+                const match = message.match(/(HS_Code|Unit|Base_Price|Category_Name|Material_Name) at row Index (\d+) (.*)!/);
+                if (match) {
+                    const [_, column, rowIndex, errorDetail] = match;
+                    const key = `${parseInt(rowIndex, 10) + 1}-${column}`;  // Adjust row index to match Excel rows
+                    if (!errorMap.has(key)) {
+                        errorMap.set(key, []);
                     }
-                } else if (columnName === 'HS_Code' || columnName === 'Base_Price' || columnName === 'Unit') {
-                    if (!value) {
-                        cell.fill = {
-                            type: 'pattern',
-                            pattern: 'solid',
-                            fgColor: { argb: 'FFFF00' }, // Yellow fill for errors
-                        };
-                        cell.value = 'null value';
-                    } else if (columnName === 'Unit' && typeof value === 'number') {
-                        cell.fill = {
-                            type: 'pattern',
-                            pattern: 'solid',
-                            fgColor: { argb: 'FFFF00' }, // Red fill for numeric Unit
-                        };
-                        cell.value = `${value} (Invalid Type)`;
-                    } else if (columnName === 'HS_Code' && typeof value === 'string') {
-                        cell.fill = {
-                            type: 'pattern',
-                            pattern: 'solid',
-                            fgColor: { argb: 'FFFF00' }, // Red fill for invalid HS_Code
-                        };
-                        cell.value = `${value} (Invalid HS Code)`;
-                    } else if (columnName === 'HS_Code' && parseFloat(value) <= 0) {
-                        cell.fill = {
-                            type: 'pattern',
-                            pattern: 'solid',
-                            fgColor: { argb: 'FFFF00' }, // Red fill for invalid HS_Code
-                        };
-                        cell.value = `${value} (Invalid HS Code)`;
-                    } else if (columnName === 'Base_Price' && typeof value === 'string') {
-                        cell.fill = {
-                            type: 'pattern',
-                            pattern: 'solid',
-                            fgColor: { argb: 'FFFF00' }, // Red fill for invalid Base_Price
-                        };
-                        cell.value = `${value} (Invalid Base Price)`;
-                    } else if (columnName === 'Base_Price' && parseFloat(value) <= 0) {
-                        cell.fill = {
-                            type: 'pattern',
-                            pattern: 'solid',
-                            fgColor: { argb: 'FFFF00' }, // Red fill for invalid HS_Code
-                        };
-                        cell.value = `${value} (Invalid Base Price)`;
-                    }
+                    errorMap.get(key).push(message);  // Store full error message
+                    errorRows.add(parseInt(rowIndex, 10) + 1);  // Add the row number to errorRows
                 }
             });
         });
 
-        const buf = await workBook.xlsx.writeBuffer();
+        // Add only error rows to the worksheet
+        excelData.forEach((rowData, rowIndex) => {
+            if (errorRows.has(rowIndex + 4)) {  // Check if this row is in the errorRows set
+                const row = worksheet.addRow(rowData);
 
+                // Apply error formatting to cells with errors
+                worksheet.columns.forEach((column, colIndex) => {
+                    const cell = row.getCell(colIndex + 1);
+                    const errorKey = `${rowIndex + 4}-${column.key}`;  // Adjust rowIndex to match error messages
+
+                    // Handle null values
+                    if (cell.value === null) {
+                        cell.value = 'NULL';
+                        cell.font = { color: { argb: 'FF808080' } };  // Gray color for NULL values
+                        cell.fill = {
+                            type: 'pattern',
+                            pattern: 'solid',
+                            fgColor: { argb: 'FFFFFF00' },  // Yellow fill for errors
+                        };
+                    }
+
+                    if (errorMap.has(errorKey)) {
+                        const errors = errorMap.get(errorKey);
+                        cell.value = {
+                            richText: [
+                                { text: `${cell.value || ''}\n`, font: { color: { argb: '000000' } } },
+                                { text: `Error: ${errors.join('\n')}`, font: { color: { argb: 'FFFF0000' } } }  // Red text for errors
+                            ]
+                        };
+                        cell.fill = {
+                            type: 'pattern',
+                            pattern: 'solid',
+                            fgColor: { argb: 'FFFFFF00' },  // Yellow fill for errors
+                        };
+                    }
+                    cell.alignment = { wrapText: true, vertical: 'top' };  // Enable text wrapping and align to top for all cells
+                });
+            }
+        });
+
+        const buf = await workBook.xlsx.writeBuffer();
         const blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
         const url = window.URL.createObjectURL(blob);
 
         const a = document.createElement("a");
         a.href = url;
-        a.download = "ErrorData.xlsx";
+        a.download = "Material_Category_Errors.xlsx";
         a.click();
         window.URL.revokeObjectURL(url);
     };
@@ -596,15 +544,14 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                                         <td style={{ border: '1px solid #ddd', padding: '8px', color: data.error ? 'red' : 'green' }}>
                                             {(() => {
                                                 const hasNullValues = Object.values(data).some(value => value === null || value === undefined);
-                                                const isCategoryNameNull = data.Category_Name === null || data.Category_Name === undefined;
-                                                const isMaterialNameNull = data.Material_Name === null || data.Material_Name === undefined;
+                                                const isCategoryNameNull = data.Category_Name === null || data.Category_Name === undefined || typeof data.Category_Name !== 'string';
+                                                const isMaterialNameNull = data.Material_Name === null || data.Material_Name === undefined || typeof data.Material_Name !== 'string';
                                                 const isHsCodeNullOrNotString = data.HS_Code === null || data.HS_Code === undefined || typeof data.HS_Code !== 'number' || data.HS_Code <= 0;
                                                 const isBasePriceNullOrNotNumberOrZero = data.Base_Price === null || data.Base_Price === undefined || typeof data.Base_Price !== 'number' || data.Base_Price <= 0;
                                                 const isUnitNullOrNotString = data.Unit === null || data.Unit === undefined || typeof data.Unit !== 'string';
 
                                                 const isUnitNumber = () => {
                                                     if (typeof data.Unit === 'number') {
-                                                        console.log("Unit should not be a number.");
                                                         return true;
                                                     }
                                                     return false;
@@ -684,7 +631,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                     <Button
                         variant="contained"
                         color="primary"
-                        onClick={_handleConfirm}
+                        onClick={_handleUploadData}
                         endIcon={<CheckCircleRounded />}
                         style={{ backgroundColor: '#E96208', color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
                     >
