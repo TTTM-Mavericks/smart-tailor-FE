@@ -150,13 +150,10 @@ function App() {
           <Route path='/auth/verify/:email' element={<VerifyEmailScreen></VerifyEmailScreen>} />
           <Route path='/auth/profilesetting' element={<ProfileSettings></ProfileSettings>} />
 
-
           {/* Design route */}
           {/* <Route path="/design" element={<PrivateRoute element={<CustomDesignScreen />} requiredRole="CUSTOMER" />} /> */}
           <Route path='/design/:id' element={<CustomDesignScreen></CustomDesignScreen>} />
           <Route path='/design_create' element={<CreateDesignComponent></CreateDesignComponent>} />
-
-
 
           {/* Admin dashboard route */}
           <Route path='/admin' element={<DashboardAdminScreens></DashboardAdminScreens>} />
@@ -179,7 +176,6 @@ function App() {
           <Route path='/order_detail/:id' element={<OrderDetailScreen></OrderDetailScreen>} />
           <Route path='/order_history' element={<OrderHistory></OrderHistory>} />
           <Route path='/design_detail/:id' element={<OrderProductScreen></OrderProductScreen>} />
-
 
           {/* Manager dashboard route */}
           <Route path='/manager' element={<DashboardManagerMangeExpertTailoring />} />
