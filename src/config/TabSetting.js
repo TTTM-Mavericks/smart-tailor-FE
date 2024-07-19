@@ -18,10 +18,6 @@ const EditorTabs = [
 
 const FilterTabs = [
     {
-        name: "logoShirt",
-        icon: logoShirt,
-    },
-    {
         name: "stylishShirt",
         icon: stylishShirt,
     },

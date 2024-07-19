@@ -28,10 +28,16 @@ import { FilterProductScreen } from './pages/FilterProduct';
 import {
   OrderDetailScreen,
   OrderHistory,
-  OrderProductScreen
+  OrderProductScreen,
+  PickedOrderScreen
 } from './pages/Order';
 
 import { DashboardManagerMangeExpertTailoring } from './pages/ManagerManagement';
+import Brand from './pages/BrandManagement/DashboardBrand/BrandDashboardScreen';
+
+
+import CreateDesignComponent from './pages/CustomDesign/Components/CreateDesign/CreateDesignComponent';
+
 
 const tokenIsValid = (token) => {
   try {
@@ -104,11 +110,10 @@ function App() {
           <Route path='/auth/verify/:email' element={<VerifyEmailScreen></VerifyEmailScreen>} />
           <Route path='/auth/profilesetting' element={<ProfileSettings></ProfileSettings>} />
 
-
           {/* Design route */}
           {/* <Route path="/design" element={<PrivateRoute element={<CustomDesignScreen />} requiredRole="CUSTOMER" />} /> */}
-          <Route path='/design' element={<CustomDesignScreen></CustomDesignScreen>} />
-
+          <Route path='/design/:id' element={<CustomDesignScreen></CustomDesignScreen>} />
+          <Route path='/design_create' element={<CreateDesignComponent></CreateDesignComponent>} />
 
           {/* Admin dashboard route */}
           <Route path='/admin' element={<DashboardAdminScreens></DashboardAdminScreens>} />
@@ -133,12 +138,13 @@ function App() {
           <Route path='/order_history' element={<OrderHistory></OrderHistory>} />
           <Route path='/design_detail/:id' element={<OrderProductScreen></OrderProductScreen>} />
 
-
           {/* Manager dashboard route */}
           <Route path='/manager' element={<DashboardManagerMangeExpertTailoring />} />
 
           <Route path='*' element={<Screen404 />} />
           <Route path='error404' element={<Screen404 />} />
+          <Route path='/pickedOrder' element={<PickedOrderScreen />} />
+
         </Routes>
       </BrowserRouter>
     </div>
