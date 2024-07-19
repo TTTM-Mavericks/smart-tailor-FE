@@ -11,6 +11,8 @@ import EditMaterialPopUpScreens from "./ManageMaterial/MaterialManage/EditMateri
 import DashboardBrandManagePriceQuantityScreen from "./ManagePrice/BrandPriceManagement/DashboardBrandPrice/DashboardBrandPriceComponent";
 import OrderRequestScreen from './BrandOrderManagement/OrderRequestScreen';
 import BrandSignUpScreen from './BrandAuth/SignUpBrand/BrandSignUpScreen'
+import UploadBrandInforForm from "./BrandUploadInfor/BrandUploadInforComponent";
+import WaitingProcessComponent from "./GlobalComponent/WaitingProcess/WaitingProcessComponent";
 export {
     DashboardBrandScreens,
     DashboardBrandManageNotification,
@@ -24,6 +26,8 @@ export {
     EditMaterialPopUpScreens,
     DashboardBrandManagePriceQuantityScreen,
     OrderRequestScreen,
-    BrandSignUpScreen
+    BrandSignUpScreen,
+    UploadBrandInforForm,
+    WaitingProcessComponent
 
 }
