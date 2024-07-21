@@ -192,7 +192,6 @@ export default function BrandSignUpScreen() {
       setIsloading(false);
     }
   }
-
   return (
     <ThemeProvider theme={defaultTheme}>
       <LoadingComponent isLoading={isLoading} time={5000}></LoadingComponent>
@@ -245,7 +244,7 @@ export default function BrandSignUpScreen() {
         </Menu>
 
         <div className={styles.signup__backGround}>
-          <img src={signUpBackground}></img>
+          <img src="https://www.sender.net/wp-content/uploads/2021/03/email_newsletter_signup_forms_on_website.png"></img>
         </div>
         <div className={styles.signup__box}>
           <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
