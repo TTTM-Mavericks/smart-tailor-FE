@@ -68,6 +68,7 @@ const ManageBrand: React.FC = () => {
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.acceptBrand}`;
 
             const response = await axios.get(apiUrl + `/${brandID}`)
+            console.log("brandID" + brandID);
 
             if (!response.data) {
                 throw new Error('Error deleting material');
@@ -120,7 +121,7 @@ const ManageBrand: React.FC = () => {
                 setData((prevData: any) =>
                     prevData.map((user: any) =>
                         user.userID === id
-                            ? { ...user, userStatus: "REJECT" }
+                            ? { user }
                             : user
                     )
                 );
@@ -167,7 +168,7 @@ const ManageBrand: React.FC = () => {
                 setData((prevData: any) =>
                     prevData.map((user: any) =>
                         user.userID === id
-                            ? { ...user, userStatus: "ACCEPT" }
+                            ? { user }
                             : user
                     )
                 );
