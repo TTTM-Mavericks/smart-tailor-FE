@@ -381,17 +381,38 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
         // Create a set to store the row numbers with errors
         const errorRows = new Set();
 
+        const allColumns = ['Category_Name', 'Material_Name', 'HS_Code', 'Unit', 'Base_Price'];
+
         errorCheckGet.forEach((error: any) => {
             error.errorMessage.forEach((message: any) => {
-                const match = message.match(/(HS_Code|Unit|Base_Price|Category_Name|Material_Name) at row Index (\d+) (.*)!/);
-                if (match) {
-                    const [_, column, rowIndex, errorDetail] = match;
-                    const key = `${parseInt(rowIndex, 10) + 1}-${column}`;  // Adjust row index to match Excel rows
-                    if (!errorMap.has(key)) {
-                        errorMap.set(key, []);
+                if (message.startsWith('Material_Name')) {
+                    // If the message starts with "Brand Material", extract the row index
+                    const match = message.match(/Material_Name at row Index (\d+) (.*)/);
+                    if (match) {
+                        const rowIndex = parseInt(match[1], 10);
+                        const actualRowIndex = rowIndex + 1;
+
+                        // Mark all columns for this row as erroneous
+                        allColumns.forEach(column => {
+                            const key = `${actualRowIndex}-${column}`;
+                            if (!errorMap.has(key)) {
+                                errorMap.set(key, []);
+                            }
+                            errorMap.get(key).push(message);
+                        });
+                        errorRows.add(actualRowIndex);
                     }
-                    errorMap.get(key).push(message);  // Store full error message
-                    errorRows.add(parseInt(rowIndex, 10) + 1);  // Add the row number to errorRows
+                } else {
+                    const match = message.match(/(HS_Code|Unit|Base_Price|Category_Name|Material_Name) at row Index (\d+) (.*)!/);
+                    if (match) {
+                        const [_, column, rowIndex, errorDetail] = match;
+                        const key = `${parseInt(rowIndex, 10) + 1}-${column}`;  // Adjust row index to match Excel rows
+                        if (!errorMap.has(key)) {
+                            errorMap.set(key, []);
+                        }
+                        errorMap.get(key).push(message);  // Store full error message
+                        errorRows.add(parseInt(rowIndex, 10) + 1);  // Add the row number to errorRows
+                    }
                 }
             });
         });

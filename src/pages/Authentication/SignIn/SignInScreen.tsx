@@ -128,7 +128,7 @@ function SignInScreen() {
           const fetchApiBrand = await api.get(`${versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.getBrandByID + `/${userID}`}`)
           if (fetchApiBrand.data.brandName === null) {
             window.location.href = `/brand/updateProfile/${userID}`;
-          } else if (fetchApiBrand.data.brandStatus === "PENDING") {
+          } if (fetchApiBrand.data.brandStatus === "PENDING") {
             window.location.href = `/brand/waiting_process_information`
           } else {
             window.location.href = `/brand`

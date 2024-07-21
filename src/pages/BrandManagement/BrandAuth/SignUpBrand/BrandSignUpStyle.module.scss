@@ -8,13 +8,29 @@
     display: flex;
 }
 
+@keyframes moveUpDown {
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
 .signup__backGround {
     width: 60%;
     height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    img{
+    animation: moveUpDown 2s ease-in-out infinite;
+
+    img {
         width: 100%;
         height: 100%;
     }
@@ -25,7 +41,7 @@
     margin: 0 auto;
     height: 100%;
     // width: 30vw;
-    background: linear-gradient(155deg, rgba(233, 116, 35, 0.7) 0%, rgba(233, 116, 35, 0.7) 38.500080333246004%, rgba(235, 235, 235, 0.7) 74.85924410434251%, rgba(248, 248, 248, 0.7) 100%);
+    // background: linear-gradient(155deg, rgba(233, 116, 35, 0.7) 0%, rgba(233, 116, 35, 0.7) 38.500080333246004%, rgba(235, 235, 235, 0.7) 74.85924410434251%, rgba(248, 248, 248, 0.7) 100%);
     // border-radius: 20px;
 }
 
