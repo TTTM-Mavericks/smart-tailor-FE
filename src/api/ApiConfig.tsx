@@ -53,7 +53,8 @@ export const functionEndpoints = {
     addNewDesign: '/add-new-design',
     getDesignByID: '/get-design-by-id',
     getAllDesign: '/get-all-design',
-    updateDesign: '/update-design'
+    updateDesign: '/update-design',
+    getAllDesignByUserID: '/get-all-design-by-user-id'
   },
   designDetail: {
     addNewDesignDetail: '/add-new-design-detail',

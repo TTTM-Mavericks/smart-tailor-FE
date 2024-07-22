@@ -1,0 +1,58 @@
+@import '../../../index.module.scss';
+
+.designCollection__container {
+  width: 80%;
+  display: flex;
+  margin: 0 auto;
+  margin-top: 20px;
+  margin-bottom: 200px;
+
+  &__menuBar {
+    width: 40%;
+  }
+
+  &__groupItem{
+    width: 90%;
+    margin: 0 40px 20px 40px;
+
+  }
+
+  &__gradientBackground {
+    height: 150px;
+    display: flex;
+    background: linear-gradient(90deg, rgba(128, 203, 196, 1) 0%, rgba(148, 187, 233, 1) 100%);
+    border-radius: 10px;
+    .textStyle {
+      padding-left: 50px;
+      padding-top: 80px;
+      font-size: 30px;
+      font-weight: bold;
+
+      /* Tailwind utilities for text styling */
+    }
+  }
+}
+
+
+/* styleComponent.module.scss */
+.button {
+  @apply inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500;
+}
+
+/* styleComponent.module.scss */
+.tab {
+  @apply inline-flex items-center justify-center px-4 py-2 border-b-2 text-sm font-medium text-gray-700 hover:text-gray-900 cursor-pointer;
+}
+.activeTab {
+  @apply text-black border-purple-500;
+}
+.scroll__container {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scroll__container::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari, Opera */
+}
+
+/* styleComponent.module.scss */
