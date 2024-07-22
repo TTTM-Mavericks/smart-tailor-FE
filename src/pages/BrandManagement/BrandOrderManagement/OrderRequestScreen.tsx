@@ -95,7 +95,7 @@ const OrderRequestScreen: React.FC = () => {
         <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
         <div className="flex flex-col w-full">
           <Navbar toggleMenu={toggleMenu} menu="Mangage Brand Price" popperOpen={popperOpen} togglePopper={togglePopper} />
-          <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
+          <main className="p-6 flex-grow ml-0 xl:ml-[20%] w-3/4">
             {orderDetail && (
               <OrderRequestDetailsComponent brand={brandAuth} order={orderDetail.order} design={orderDetail.design} designDetail={orderDetail.designDetail} />
             )}

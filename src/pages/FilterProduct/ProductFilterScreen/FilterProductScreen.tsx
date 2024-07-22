@@ -8,6 +8,7 @@ import Rating from '@mui/material/Rating';
 import { useNavigate } from 'react-router-dom';
 import { ArrowUpward } from '@mui/icons-material';
 import { IconButton } from "@mui/material";
+import { DesignInterface } from '../../../models/DesignModel';
 
 // Fake Data to test
 const sortOptions = [
@@ -330,6 +331,7 @@ export default function FilterProductScreen() {
     const [showScrollButton, setShowScrollButton] = useState<boolean>(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [productsPerPage] = useState(8);
+    const [designList, setDesignList] = useState<DesignInterface[]>();
 
 
 

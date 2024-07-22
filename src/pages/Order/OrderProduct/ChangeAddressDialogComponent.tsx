@@ -11,60 +11,6 @@ import VNLocationData from '../../../locationData.json'
 import { ToastContainer, toast } from 'react-toastify';
 import Cookies from 'js-cookie';
 import { UserInterface } from '../../../models/UserModel';
-const sampleAddressData = [
-    {
-        id: 1,
-        email: "john.doe@example.com",
-        fullName: "John Doe",
-        phoneNumber: "0987654321",
-        imageUrl: "https://example.com/images/johndoe.jpg",
-        gender: true,
-        dateOfBirth: "15-05-1995",
-        address: "123 Main St",
-        province: "Province A",
-        district: "District B",
-        ward: "Ward C"
-    },
-    {
-        id: 2,
-        email: "jane.smith@example.com",
-        fullName: "Jane Smith",
-        phoneNumber: "0123456789",
-        imageUrl: "https://example.com/images/janesmith.jpg",
-        gender: false,
-        dateOfBirth: "20-08-1990",
-        address: "456 Elm St",
-        province: "Province X",
-        district: "District Y",
-        ward: "Ward Z"
-    },
-    {
-        id: 3,
-        email: "alice.wonderland@example.com",
-        fullName: "Alice Wonderland",
-        phoneNumber: "0223344556",
-        imageUrl: "https://example.com/images/alice.jpg",
-        gender: false,
-        dateOfBirth: "05-12-1988",
-        address: "789 Oak St",
-        province: "Province M",
-        district: "District N",
-        ward: "Ward O"
-    },
-    {
-        id: 4,
-        email: "bob.builder@example.com",
-        fullName: "Bob Builder",
-        phoneNumber: "0556677889",
-        imageUrl: "https://example.com/images/bob.jpg",
-        gender: true,
-        dateOfBirth: "10-02-1985",
-        address: "101 Pine St",
-        province: "Province J",
-        district: "District K",
-        ward: "Ward L"
-    }
-];
 
 const isProfileDataComplete = (profileData: CustomerProfile): boolean => {
     // return Object.values(profileData).every(value => value !== '');
@@ -113,14 +59,18 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
      * Set default address when dialog init
      */
     React.useEffect(() => {
-        console.log(isOpen);
-        setAddressList(sampleAddressData);
-        const address = sampleAddressData.find((item: any) => item.id === selectedAddress);
-        if (address) {
-            setProfileData(address);
-            onSelectedAddressData(address);
-            console.log(address);
+        const addressLocalHost = localStorage.getItem('addressList');
+        if (addressLocalHost) {
+            const addressLocalHostParse = JSON.parse(addressLocalHost)
+            console.log(isOpen);
+            setAddressList(addressLocalHostParse);
 
+            const address = addressLocalHostParse.find((item: any) => item.id === selectedAddress);
+            if (address) {
+                setProfileData(address);
+                onSelectedAddressData(address);
+                console.log(address);
+            }
         }
     }, [isOpen])
 
@@ -138,9 +88,9 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
     /**
      * Set address list
      */
-    React.useEffect(() => {
-        setAddressList(sampleAddressData);
-    }, [sampleAddressData]);
+    // React.useEffect(() => {
+    //     setAddressList(sampleAddressData);
+    // }, [sampleAddressData]);
 
     /**
      * Set change open dialog state
@@ -295,6 +245,8 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
     const __handleRemoveOutAddressList = (id: any) => {
         const updatedList = addressList.filter((address: any) => address.id !== id);
         setAddressList(updatedList);
+        localStorage.setItem('addressList', JSON.stringify(updatedList));
+
     }
 
     /**
@@ -304,6 +256,7 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
         if (isProfileDataComplete(profileData)) {
             const updatedList = [...addressList, { ...profileData, id: addressList.length + 1 }];
             setAddressList(updatedList);
+            localStorage.setItem('addressList', JSON.stringify(updatedList));
             setSelectedAddress(addressList.length + 1);
             toast.success(`Add new successful`, { autoClose: 4000 });
             setSelectAddicon(false);
@@ -323,12 +276,12 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
             id === address.id ? { ...profileData, id: id } : address
         );
         setAddressList(updatedList);
+        localStorage.setItem('addressList', JSON.stringify(updatedList));
         toast.success(`Update successfull`, { autoClose: 4000 });
     }
 
     return (
         <>
-            <ToastContainer />
             <Dialog
                 open={open}
                 className={`${style.changeAddressDialogContainer}`}
@@ -417,7 +370,7 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
                                                 placeholder="your.email@mail.com"
                                                 name="email"
                                                 value={profileData.email}
-                                                
+
                                             />
                                         </div>
 

@@ -12,7 +12,7 @@ import CancelOrderPolicyDialogComponent from '../../../components/Dialog/PolicyD
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import { useNavigate, useParams } from 'react-router-dom';
 import { OrderDetailInterface, OrderInterface } from '../../../models/OrderModel';
-import { PaymentOrderDialogComponent } from '../../../components';
+import { CustomerReportOrderDialogComponent, PaymentOrderDialogComponent } from '../../../components';
 import { PaymentOrderInterface } from '../../../models/PaymentModel';
 import { __handleAddCommasToNumber } from '../../../utils/NumbericUtils';
 import LoadingComponent from '../../../components/Loading/LoadingComponent';
@@ -34,7 +34,9 @@ const OrderDetailScreen: React.FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [selectedAddress, setSelectedAddress] = useState<any>();
     const [isChangeAddressDialogOpen, setIsChangeAddressDialogOpen] = useState<boolean>(false);
-
+    const [rating, setRating] = useState<number | null>(null);
+    const [comment, setComment] = useState<string>('');
+    const [isOpenReportOrderDialog, setIsOpenReportOrderDialog] = useState<boolean>(false);
 
 
     const { id } = useParams();
@@ -211,6 +213,29 @@ const OrderDetailScreen: React.FC = () => {
         console.log(isOpen);
     }
 
+    const __handleSubmitRating = () => {
+        if (rating !== null) {
+            setRating(null);
+            setComment('');
+        }
+    }
+
+    const __handleReorder = () => {
+        setIsLoading(true);
+        setTimeout(() => {
+            navigate(`/design_detail/${orderDetail?.designResponse.designID}`)
+            setIsLoading(false);
+        }, 1000)
+    }
+
+    const __handleOpenReportDialog = () => {
+        setIsOpenReportOrderDialog(true);
+    }
+
+    const __handleCloseReportDialog = () => {
+        setIsOpenReportOrderDialog(false);
+    }
+
     return (
         <div className={`${style.orderDetail__container}`} >
             <HeaderComponent />
@@ -275,12 +300,31 @@ const OrderDetailScreen: React.FC = () => {
                                 <p className="text-sm text-gray-600">{selectedAddress ? selectedAddress.fullName : orderDetail?.buyerName}</p>
                                 <p className="text-sm text-gray-600">{selectedAddress ? selectedAddress.phoneNumber : orderDetail?.phone}</p>
                                 <button onClick={() => __handleOpenChangeAddressDialog(true)} className="text-indigo-600 hover:text-indigo-800 transition duration-200">Edit</button>
+                                <form onSubmit={__handleSubmitRating} className='mt-12'>
+                                    <h2 className="text-md font-semibold mb-4">Rate Us</h2>
+                                    <div className="flex items-center mb-4">
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <button
+                                                key={star}
+                                                type="button"
+                                                className={`text-2xl mr-1 ${rating && rating >= star ? 'text-yellow-500' : 'text-gray-400'}`}
+                                                onClick={() => setRating(star)}
+                                            >
+                                                ★
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                </form>
                             </div>
                             <div className="md:w-1/2 md:mt-0 ">
                                 <p className="font-medium text-gray-600">{t(codeLanguage + '000194')}</p>
                                 <p className="text-sm text-gray-600 whitespace-pre-line">{selectedAddress ? selectedAddress.address : orderDetail?.address}, {selectedAddress ? selectedAddress.ward : orderDetail?.ward}, {selectedAddress ? selectedAddress.district : orderDetail?.district}, {selectedAddress ? selectedAddress.province : orderDetail?.province}</p>
+
                             </div>
+
                         </div>
+
                     </div>
 
                     {/* Progress Bar */}
@@ -294,10 +338,11 @@ const OrderDetailScreen: React.FC = () => {
                                 <p key={index} className={`text-center ${index <= orderDetails.currentStep ? 'text-indigo-600' : 'text-gray-400'}`}>{step}</p>
                             ))}
                         </div>
+
                     </div>
 
 
-                    {(orderDetail?.orderStatus !== 'NOT_VERIFY' && orderDetail?.orderStatus !== 'CANCEL') && (
+                    {(orderDetail?.orderStatus !== 'NOT_VERIFY' && orderDetail?.orderStatus !== 'PROCESSING' && orderDetail?.orderStatus !== 'CANCEL') && (
                         <>
 
                             <div className="mt-10 border-t pt-4">
@@ -365,6 +410,31 @@ const OrderDetailScreen: React.FC = () => {
                         </>
                     )}
                     {/* Billing and Payment Information Section */}
+                    {orderDetail?.orderStatus === 'PROCESSING' && (
+                        <div >
+
+                            <div className="flex justify-end mt-4">
+                                <button
+                                    onClick={() => __handleOpenReportDialog()}
+                                    className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200 mr-4"
+                                    style={{ backgroundColor: redColor }}
+                                >
+                                    Report
+                                </button>
+                                <button
+                                    onClick={() => __handleReorder()}
+                                    className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200"
+                                    style={{ backgroundColor: greenColor }}
+                                >
+                                    Reorder
+                                </button>
+
+                            </div>
+
+
+                        </div>
+                    )}
+
 
                     {showScrollButton && (
                         <IconButton
@@ -388,6 +458,9 @@ const OrderDetailScreen: React.FC = () => {
             <CancelOrderPolicyDialogComponent onClick={_handleCancelOrder} onClose={__handleCloseCancelOrderPolicyDilog} isOpen={isOpenCancelOrderPolicyDialog}></CancelOrderPolicyDialogComponent>
             <PaymentOrderDialogComponent paymentData={payment} onClick={_handlePaymentOrder} onClose={__handleClosePaymentOrderDilog} isOpen={isOpenPaymentOrderDialog}></PaymentOrderDialogComponent>
             <ChangeAddressDialogComponent onSelectedAddressData={(address) => __handleGetSelectedAdress(address)} isOpen={isChangeAddressDialogOpen} onClose={() => __handleOpenChangeAddressDialog(false)}></ChangeAddressDialogComponent>
+            <CustomerReportOrderDialogComponent orderID={orderDetail?.orderID} onClose={__handleCloseReportDialog} isOpen={isOpenReportOrderDialog}></CustomerReportOrderDialogComponent>
+
+
             <FooterComponent />
 
         </div>

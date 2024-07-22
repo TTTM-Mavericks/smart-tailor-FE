@@ -117,8 +117,38 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
     const [isChecked, setIsChecked] = useState(false);
     const [sizes, setSizes] = useState<ExpertTailoringSizeInterface[]>();
     const [isLoadingPage, setIsLoadingPage] = useState<boolean>(false);
+    const [coutingNumber, setCountingNumber] = useState<number>();
+    const [endTime] = useState(new Date(new Date().getTime() + 5000 * 1000));
+    const [remainingTime, setRemainingTime] = useState(50000 * 1000);
 
-    const navigate = useNavigate()
+
+
+    // Convert remaining time from milliseconds to seconds
+    const seconds = Math.floor(remainingTime / 1000);
+
+
+    const navigate = useNavigate();
+
+
+
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const now = new Date();
+            const timeDiff = endTime.getTime() - now.getTime();
+
+            if (timeDiff <= 0) {
+                clearInterval(interval);
+                setRemainingTime(0);
+            } else {
+                setRemainingTime(timeDiff);
+            }
+        }, 1000); // Update every second
+
+        return () => clearInterval(interval); // Cleanup on unmount
+    }, [endTime]);
+
+    // Convert elapsed time from milliseconds to seconds
 
 
     useEffect(() => {
@@ -293,6 +323,17 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
         }
     }
 
+    /**
+     * Couting expried time
+     * @param startTime 
+     * @returns 
+     */
+    const __handleTimeCounter = (startTime: any) => {
+        const now = new Date();
+        const timeDiff = now.getTime() - startTime.getTime();
+        const seconds = Math.floor(timeDiff / 1000); // Convert milliseconds to seconds
+        return seconds;
+    };
 
     return (
         <div className="container mx-auto p-6 bg-white rounded-lg shadow-lg">
@@ -375,7 +416,22 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
                                 <div style={{ marginTop: 0 }}>
                                     <button
                                         type="submit"
-                                        className={`${style.orderRequest__button__accept} px-5 py-2.5 text-sm font-medium text-white mt-3`}
+                                        className={`${style.orderRequest__button__accept} px-5 py-2.5 text-sm font-medium mt-3`}
+                                        style={{
+                                            color: redColor,
+                                            justifyContent:'center',
+                                            alignContent: 'center',
+                                            backgroundColor: whiteColor,
+                                            fontSize: 30
+                                        }}
+                                    >
+                                        {seconds}
+                                    </button>
+                                </div>
+                                <div style={{ marginTop: 0 }}>
+                                    <button
+                                        type="submit"
+                                        className={`${style.orderRequest__button__accept} px-5 py-2.5 text-sm font-medium text-white mt-0`}
                                         onClick={() => __handleAcceptOrderRequest()}
                                     >
                                         Accept
