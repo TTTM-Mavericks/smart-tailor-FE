@@ -42,86 +42,6 @@ type Props = {
     onCreateDesign?: () => void;
 }
 
-const ITEM_HEIGHT = 40;
-const ITEM_PADDING_TOP = 8;
-const CustomPaper = styled('div')(({ theme }) => ({
-    '& .MuiAutocomplete-listbox': {
-        backgroundColor: whiteColor,
-        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-        width: '100%',
-        border: `1px solid ${grayColor1}`,
-        fontSize: '12px',
-        '&::-webkit-scrollbar': {
-            width: '0.3em',
-            borderRadius: '4px',
-            backgroundColor: grayColor1
-        },
-        '&::-webkit-scrollbar-track': {
-            webkitBoxShadow: 'inset 0 0 6px rgba(0,0,0,0.1)',
-            borderRadius: '4px',
-            backGroundColor: grayColor1
-        },
-        '&::-webkit-scrollbar-thumb': {
-            backgroundColor: '#7b7b7b',
-            borderRadius: '4px'
-        },
-    },
-}));
-
-const CustomPopper = (props: any) => {
-    return <Popper {...props} placement="bottom-start" />;
-};
-
-const CustomTextField = styled(TextField)(({ theme }) => ({
-    '& .MuiInputBase-root': {
-        height: '35px',
-        width: '150px',
-        borderRadius: '4px',
-    },
-    '& .MuiOutlinedInput-input': {
-        fontSize: '12px',
-    },
-    '& .MuiInputLabel-root': {
-        fontSize: '12px', // Adjust font size of the label
-    },
-    '& .MuiInputLabel-root.Mui-focused': {
-        color: primaryColor, // Label color when focused
-    },
-    '& .MuiOutlinedInput-root': {
-        '& fieldset': {
-        },
-        '&:hover fieldset': {
-            border: `1.5px solid ${primaryColor}`, // Border color on hover,
-            color: primaryColor
-        },
-        '&.Mui-focused fieldset': {
-            border: `1.5px solid ${primaryColor}`, // Border color when focused
-        },
-    },
-}));
-
-const stylesInputField = {
-    input1: {
-        height: 50
-    },
-    input2: {
-        height: 200,
-        fontSize: "3em"
-    }
-};
-
-const names = [
-    'chỉ đỏ',
-    'Van Henry',
-    'April Tucker',
-    'Ralph Hubbard',
-    'Omar Alexander',
-    'Carlos Abbott',
-    'Miriam Wagner',
-    'Bradley Wilkerson',
-    'Virginia Andrews',
-    'Kelly Snyder',
-];
 
 const productData = [
     {
@@ -362,9 +282,7 @@ const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child
                     </div> */}
 
                     <div className={styles.dialog__content__lableGroup} style={{ width: '50%' }} >
-                        <div>
-                            <span className={styles.dialog__content__span__text}>For item mask</span>
-                        </div>
+
                         {/* <div className={styles.dialog__content__span}>
                             <span style={{ color: redColor }}>1.999.999</span>
                             <span> - </span>
@@ -381,7 +299,7 @@ const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child
 
 
             </DialogContent>
-            <DialogContent className={`${styles.dialog__content__totalPrice}`}>
+            {/* <DialogContent className={`${styles.dialog__content__totalPrice}`}>
                 <div className={`${styles.dialog__content__totalPrice__note} inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10`}>
                     <IoIosWarning size={50} color={yellowColor} mode={'contain'} />
                     <span>
@@ -423,7 +341,7 @@ const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child
                         </tr>
                     </tbody>
                 </table>
-            </DialogContent>
+            </DialogContent> */}
             <DialogActions>
                 <Button onClick={() => __handleOpenMaterialSavingDialog()} style={{ color: primaryColor, padding: '5px 20px 5px 20px' }}  >
                     Cancel

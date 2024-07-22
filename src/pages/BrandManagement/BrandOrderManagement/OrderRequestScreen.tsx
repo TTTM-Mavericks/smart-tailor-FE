@@ -7,6 +7,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import { DesignDetailInterface, DesignInterface } from '../../../models/DesignModel';
 import { ToastContainer } from 'react-toastify';
+import { UserInterface } from '../../../models/UserModel';
+import Cookies from 'js-cookie';
 
 
 interface OrderDetailInterface {
@@ -23,12 +25,18 @@ const OrderRequestScreen: React.FC = () => {
   const [showScrollButton, setShowScrollButton] = React.useState<boolean>(false);
   const [popperOpen, setPopperOpen] = useState<Record<string, boolean>>({});
   const [orderDetail, setOrderDetail] = useState<OrderDetailInterface>();
-
+  const [brandAuth, setBrandAuth] = useState<UserInterface>();
   const { id } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
-    __handleGetOrderDetail();
+    const brand = Cookies.get('userAuth');
+    if (brand) {
+      const brandParse: UserInterface = JSON.parse(brand);
+      setBrandAuth(brandParse);
+      if (brandParse.roleName !== 'BRAND') navigate('/error404');
+      __handleGetOrderDetail();
+    }
   }, [])
 
   // ---------------FunctionHandler---------------//
@@ -87,9 +95,9 @@ const OrderRequestScreen: React.FC = () => {
         <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
         <div className="flex flex-col w-full">
           <Navbar toggleMenu={toggleMenu} menu="Mangage Brand Price" popperOpen={popperOpen} togglePopper={togglePopper} />
-          <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
+          <main className="p-6 flex-grow ml-0 xl:ml-[20%] w-3/4">
             {orderDetail && (
-              <OrderRequestDetailsComponent order={orderDetail.order} design={orderDetail.design} designDetail={orderDetail.designDetail} />
+              <OrderRequestDetailsComponent brand={brandAuth} order={orderDetail.order} design={orderDetail.design} designDetail={orderDetail.designDetail} />
             )}
           </main>
         </div>

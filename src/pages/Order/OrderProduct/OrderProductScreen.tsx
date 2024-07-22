@@ -196,16 +196,17 @@ const OrderProductScreen = () => {
             if (response.status === 200) {
                 setDesignData(response.data);
                 __handleGetExpertTailoringSize(response.data.expertTailoring.expertTailoringID)
+                setIsLoadingPage(false);
             }
             else {
                 toast.error(`${response.message}`, { autoClose: 4000 });
-                setIsLoadingPage(false);
+
                 return;
             }
         } catch (error) {
             toast.error(`${error}`, { autoClose: 4000 });
             console.log('error: ', error);
-            setIsLoadingPage(false);
+
         }
     }
 
@@ -470,6 +471,7 @@ const OrderProductScreen = () => {
     return (
         <div className={`${style.orderProduct__container}`}>
             <HeaderComponent></HeaderComponent>
+            <LoadingComponent isLoading={isLoadingPage}></LoadingComponent>
 
             <div>
                 <div className="py-0 md:px-6 2xl:px-20 2xl:container 2xl:mx-auto">
@@ -494,8 +496,8 @@ const OrderProductScreen = () => {
                                                     </div>
                                                     <div className={`${style.orderProduct__container__content}`}>
                                                         <div className={`${style.orderProduct__container__information}`}>
-                                                            <p className="text-sm light:text-white leading-none text-gray-800" style={{display: 'flex', alignItems: 'center', }} ><span className="light:text-gray-400 text-gray-600 mr-1">Exper tailoring: </span> <div>{designData?.expertTailoring?.expertTailoringName}</div></p>
-                                                            <p className="text-sm light:text-white leading-none text-gray-800" style={{display: 'flex', alignItems: 'center', }}><span className="light:text-gray-400 text-gray-600 mr-1">Color: </span> <div style={{ padding: '3px 5px 3px 5px', backgroundColor: designData?.color, width: 'fit-content', borderRadius: 8 }}>{designData?.color}</div></p>
+                                                            <p className="text-sm light:text-white leading-none text-gray-800" style={{ display: 'flex', alignItems: 'center', }} ><span className="light:text-gray-400 text-gray-600 mr-1">Exper tailoring: </span> <div>{designData?.expertTailoring?.expertTailoringName}</div></p>
+                                                            <p className="text-sm light:text-white leading-none text-gray-800" style={{ display: 'flex', alignItems: 'center', }}><span className="light:text-gray-400 text-gray-600 mr-1">Color: </span> <div style={{ padding: '3px 5px 3px 5px', backgroundColor: designData?.color, width: 'fit-content', borderRadius: 8 }}>{designData?.color}</div></p>
                                                         </div>
                                                     </div>
                                                 </div>

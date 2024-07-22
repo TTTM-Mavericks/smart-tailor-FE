@@ -10,18 +10,21 @@ import style from './OrderRequestStyle.module.scss'
 import { FaMinusCircle, FaPlusCircle } from 'react-icons/fa';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import { toast } from 'react-toastify';
+import { UserInterface } from '../../../models/UserModel';
+import { useNavigate } from 'react-router-dom';
 
 interface OrderDetailsProps {
     order: OrderInterface;
     design: DesignInterface,
-    designDetail: DesignDetailInterface[]
+    designDetail: DesignDetailInterface[],
+    brand?: UserInterface,
 }
 
 
 interface SizeQuantity {
     sizeID?: any;
     size?: string;
-    quantity: number;
+    quantity?: number;
     width?: number;
     height?: number;
     ring1?: number;
@@ -80,12 +83,12 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
         fontSize: '12px',
     },
     '& .MuiInputLabel-root': {
-        fontSize: '12px', // Adjust font size of the label
-        marginTop: '-10px'
+        fontSize: '12px',
+        marginTop: '0px'
     },
     '& .MuiInputLabel-root.Mui-focused': {
-        color: primaryColor, // Label color when focused
-        marginTop: '0px'
+        color: primaryColor,
+        paddingTop: '0px'
     },
     '& .MuiOutlinedInput-root': {
         '& fieldset': {
@@ -101,7 +104,7 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
     },
 }));
 
-const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, design, designDetail }) => {
+const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, design, designDetail, brand }) => {
 
     // TODO MUTIL LANGUAGE
 
@@ -110,10 +113,42 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
     const [dialogOpen, setDialogOpen] = useState(false);
     const [size, setSize] = useState<string | null>('L');
     const [quantity, setQuantity] = useState<number | null>(100);
-    const [sizeQuantities, setSizeQuantities] = useState<SizeQuantity[]>([{ size: 'L', quantity: 1, sizeID: 'dsfsdfds' }]);
+    const [sizeQuantities, setSizeQuantities] = useState<SizeQuantity[]>([]);
     const [isChecked, setIsChecked] = useState(false);
     const [sizes, setSizes] = useState<ExpertTailoringSizeInterface[]>();
     const [isLoadingPage, setIsLoadingPage] = useState<boolean>(false);
+    const [coutingNumber, setCountingNumber] = useState<number>();
+    const [endTime] = useState(new Date(new Date().getTime() + 5000 * 1000));
+    const [remainingTime, setRemainingTime] = useState(50000 * 1000);
+
+
+
+    // Convert remaining time from milliseconds to seconds
+    const seconds = Math.floor(remainingTime / 1000);
+
+
+    const navigate = useNavigate();
+
+
+
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const now = new Date();
+            const timeDiff = endTime.getTime() - now.getTime();
+
+            if (timeDiff <= 0) {
+                clearInterval(interval);
+                setRemainingTime(0);
+            } else {
+                setRemainingTime(timeDiff);
+            }
+        }, 1000); // Update every second
+
+        return () => clearInterval(interval); // Cleanup on unmount
+    }, [endTime]);
+
+    // Convert elapsed time from milliseconds to seconds
 
 
     useEffect(() => {
@@ -131,6 +166,18 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
         ));
         console.log('extractedSizes: ', extractedSizes);
         setSizes(extractedSizes);
+
+        setSizeQuantities(prevQuantities => {
+            // Create the new size items to be added
+            const newSizeQuantities = extractedSizes?.map(item => ({
+                sizeID: item.sizeID,
+                sizeName: item.sizeName,
+                designDetailId: item.designDetailId
+            })) || [];
+
+            // Return the updated array
+            return [...prevQuantities, ...newSizeQuantities];
+        });
 
     }, [designDetail]);
 
@@ -230,7 +277,21 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
      */
     const __handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setIsChecked(event.target.checked);
+        if (event.target.checked) {
+            setSizeQuantities(prevQuantities => {
+                // Create the new size items to be added
+                const newSizeQuantities = sizes?.map(item => ({
+                    sizeID: item.sizeID,
+                    sizeName: item.sizeName,
+                    designDetailId: item.designDetailId
+                })) || [];
+
+                // Return the updated array
+                return [...prevQuantities, ...newSizeQuantities];
+            });
+        }
     };
+
 
     /**
      * Handle brand accept order request from customer
@@ -238,7 +299,7 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
     const __handleAcceptOrderRequest = async () => {
         try {
             const bodyRequest = {
-                brandID: '33b75858-fc11-4c19-a95e-bede1106eb9a',
+                brandID: brand?.userID,
                 orderID: order?.orderID,
                 detailList: sizeQuantities.map((item) => (item.designDetailId))
             }
@@ -247,7 +308,9 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
             if (response.status === 200) {
                 console.log(response.data);
                 toast.success(`${response.message}`, { autoClose: 4000 });
-
+                setTimeout(() => {
+                    navigate('/brand');
+                }, 3000);
             } else {
                 toast.error(`${response.message}`, { autoClose: 4000 });
                 console.log(response.message);
@@ -260,6 +323,17 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
         }
     }
 
+    /**
+     * Couting expried time
+     * @param startTime 
+     * @returns 
+     */
+    const __handleTimeCounter = (startTime: any) => {
+        const now = new Date();
+        const timeDiff = now.getTime() - startTime.getTime();
+        const seconds = Math.floor(timeDiff / 1000); // Convert milliseconds to seconds
+        return seconds;
+    };
 
     return (
         <div className="container mx-auto p-6 bg-white rounded-lg shadow-lg">
@@ -287,7 +361,7 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
                                         const filteredSizes = sizes ? sizes.filter(size => !sizeQuantities.some(sq => sq.sizeID === size.sizeID)) : [];
 
                                         return (
-                                            <div key={index} style={{ display: 'flex', margin: 10 }}>
+                                            <div key={index} style={{ display: 'flex', margin: 10, alignItems: 'center' }}>
                                                 <Grid item>
                                                     <Autocomplete
                                                         options={filteredSizes}
@@ -301,7 +375,7 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
                                                         renderInput={(params) => <CustomTextField {...params} label="Size" variant="outlined" sx={{ paddingTop: -20 }} />}
                                                     />
                                                 </Grid>
-                                                <Grid className={`${style.orderProduct__container__detail__sizeDetail__quantity}`} style={{ position: 'relative' }} item>
+                                                {/* <Grid className={`${style.orderProduct__container__detail__sizeDetail__quantity}`} style={{ position: 'relative' }} item>
                                                     <CustomTextFieldQuantity
                                                         fullWidth
                                                         type="number"
@@ -311,33 +385,53 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
                                                         inputProps={{ min: 1 }}
                                                         style={{ marginLeft: 20, marginRight: 10 }}
                                                     />
-                                                    <FaMinusCircle size={20} color={primaryColor} onClick={() => __handleRemoveSizeQuantity(index)} style={{ display: sizeQuantities.length === 1 ? 'none' : 'flex', cursor: 'pointer', position: 'absolute', right: -20, top: 5 }}>
-                                                    </FaMinusCircle>
-                                                </Grid>
+                                                    
+                                                </Grid> */}
+
+
+                                                <FaMinusCircle size={20} color={primaryColor} onClick={() => __handleRemoveSizeQuantity(index)} style={{ display: sizeQuantities.length === 1 ? 'none' : 'flex', cursor: 'pointer', marginLeft: 20 }}>
+                                                </FaMinusCircle>
+
                                             </div>
                                         );
                                     })}
-
-                                    <div>
-                                        <FaPlusCircle size={20} style={{ cursor: 'pointer', marginLeft: 10 }} color={primaryColor} onClick={__handleAddSizeQuantity}>
-                                        </FaPlusCircle>
-                                    </div>
+                                    {sizeQuantities.length !== sizes?.length && (
+                                        <div>
+                                            <FaPlusCircle size={20} style={{ cursor: 'pointer', marginLeft: 10 }} color={primaryColor} onClick={__handleAddSizeQuantity}>
+                                            </FaPlusCircle>
+                                        </div>
+                                    )}
                                 </div>
 
                             </Grid>
                             <Grid item xs={12} sm={3}>
-                                <FormControlLabel
+                                {/* <FormControlLabel
                                     control={<Checkbox color={'error'} checked={isChecked} onChange={__handleCheckboxChange} />}
                                     label={(<span style={{ fontSize: 14 }}>Accept full order</span>)}
                                     style={{ fontSize: '1px', fontWeight: 500 }}
                                     sx={{ fontSize: 12 }}
 
 
-                                />
+                                /> */}
                                 <div style={{ marginTop: 0 }}>
                                     <button
                                         type="submit"
-                                        className={`${style.orderRequest__button__accept} px-5 py-2.5 text-sm font-medium text-white mt-3`}
+                                        className={`${style.orderRequest__button__accept} px-5 py-2.5 text-sm font-medium mt-3`}
+                                        style={{
+                                            color: redColor,
+                                            justifyContent:'center',
+                                            alignContent: 'center',
+                                            backgroundColor: whiteColor,
+                                            fontSize: 30
+                                        }}
+                                    >
+                                        {seconds}
+                                    </button>
+                                </div>
+                                <div style={{ marginTop: 0 }}>
+                                    <button
+                                        type="submit"
+                                        className={`${style.orderRequest__button__accept} px-5 py-2.5 text-sm font-medium text-white mt-0`}
                                         onClick={() => __handleAcceptOrderRequest()}
                                     >
                                         Accept

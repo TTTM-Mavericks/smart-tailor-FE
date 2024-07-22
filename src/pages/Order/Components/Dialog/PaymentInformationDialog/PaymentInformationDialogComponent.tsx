@@ -4,17 +4,18 @@ import { IoMdCloseCircleOutline } from 'react-icons/io';
 import styles from './PaymentInformationDialogStyle.module.scss';
 import { primaryColor, redColor, whiteColor, greenColor, yellowColor } from '../../../../../root/ColorSystem';
 import { PaymentInterface } from '../../../../../models/OrderModel';
+import { PaymentOrderInterface } from '../../../../../models/PaymentModel';
 
 type OrderPolicyDialogProps = {
     isOpen: boolean;
     onClose: () => void;
     onOrderProduct?: () => void;
-    data?: PaymentInterface;
+    data?: PaymentInterface | PaymentOrderInterface;
 }
 
 const PaymentInformationDialogComponent: React.FC<OrderPolicyDialogProps> = ({ isOpen, onClose, onOrderProduct, data }) => {
     const [isChecked, setIsChecked] = useState(false);
-    const [paymentData, setPaymentData] = useState<PaymentInterface>();
+    const [paymentData, setPaymentData] = useState<PaymentInterface | PaymentOrderInterface>();
 
     useEffect(() => {
         setPaymentData(data);
@@ -109,10 +110,10 @@ const PaymentInformationDialogComponent: React.FC<OrderPolicyDialogProps> = ({ i
                                 <Typography variant="body2" style={{ fontSize: 14 }}><strong>Type:</strong> {paymentData.paymentType}</Typography>
                             </Grid>
                             <Grid item xs={6}>
-                                <Typography variant="body2" style={{ fontSize: 14 }}><strong>Created:</strong> {paymentData.createDate}</Typography>
+                                {/* <Typography variant="body2" style={{ fontSize: 14 }}><strong>Created:</strong> {paymentData.createDate}</Typography> */}
                             </Grid>
                             <Grid item xs={6}>
-                                <Typography variant="body2" style={{ fontSize: 14 }}><strong>Last Modified:</strong> {paymentData.lastModifiedDate}</Typography>
+                                {/* <Typography variant="body2" style={{ fontSize: 14 }}><strong>Last Modified:</strong> {paymentData.lastModifiedDate}</Typography> */}
                             </Grid>
                         </Grid>
                     </div>

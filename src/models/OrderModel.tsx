@@ -1,4 +1,6 @@
 import { DesignDetailInterface, DesignInterface } from "./DesignModel";
+import { PaymentOrderInterface } from "./PaymentModel";
+
 
 export interface PaymentInterface {
     paymentID: string; // UUID
@@ -70,6 +72,7 @@ export interface OrderDetailInterface {
     buyerName: string | null;
     designResponse: DesignInterface;
     detailList?: DesignDetailInterface[];
+    paymentList?: PaymentOrderInterface[]
 }
 
 export interface OrderRequestDetailInterface {

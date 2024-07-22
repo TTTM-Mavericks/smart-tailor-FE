@@ -12,12 +12,36 @@ import CancelOrderPolicyDialogComponent from '../../../components/Dialog/PolicyD
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import { useNavigate, useParams } from 'react-router-dom';
 import { OrderDetailInterface, OrderInterface } from '../../../models/OrderModel';
-import { PaymentOrderDialogComponent } from '../../../components';
+import { CustomerReportOrderDialogComponent, PaymentOrderDialogComponent } from '../../../components';
+import { PaymentOrderInterface } from '../../../models/PaymentModel';
+import { __handleAddCommasToNumber } from '../../../utils/NumbericUtils';
+import LoadingComponent from '../../../components/Loading/LoadingComponent';
+import ChangeAddressDialogComponent from '../OrderProduct/ChangeAddressDialogComponent';
 
 const OrderDetailScreen: React.FC = () => {
     // TODO MUTIL LANGUAGE
 
     // ---------------UseState---------------//
+
+
+    const [showScrollButton, setShowScrollButton] = useState<boolean>(false);
+    const [isOpenCancelOrderPolicyDialog, setIsOpenCancelOrderPolicyDialog] = useState<boolean>(false);
+    const [isOpenPaymentOrderDialog, setIsOpenPaymentOrderDialog] = useState<boolean>(false);
+
+    const [isLoadingPage, setIsLoadingPage] = useState<boolean>(false);
+    const [orderDetail, setOrderDetail] = useState<OrderDetailInterface>();
+    const [payment, setPayment] = useState<PaymentOrderInterface[]>();
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [selectedAddress, setSelectedAddress] = useState<any>();
+    const [isChangeAddressDialogOpen, setIsChangeAddressDialogOpen] = useState<boolean>(false);
+    const [rating, setRating] = useState<number | null>(null);
+    const [comment, setComment] = useState<string>('');
+    const [isOpenReportOrderDialog, setIsOpenReportOrderDialog] = useState<boolean>(false);
+
+
+    const { id } = useParams();
+    const navigate = useNavigate();
+
     const orderDetails = {
         orderNumber: 'W086438695',
         date: '2021-03-22',
@@ -41,29 +65,15 @@ const OrderDetailScreen: React.FC = () => {
             phone: '9999999999'
         },
         progressSteps: [
-            '100 products',
+            '0 products',
             '200 products',
-            '300 products',
+            '500 products',
             'Successfull'
         ],
-        currentStep: 1,
+        currentStep: orderDetail?.orderStatus === 'NOT_VERIFY' ? 0 : 1,
         currentStep1: 2,
         progressDate: 'March 24, 2021'
     };
-
-    const [showScrollButton, setShowScrollButton] = useState<boolean>(false);
-    const [isOpenCancelOrderPolicyDialog, setIsOpenCancelOrderPolicyDialog] = useState<boolean>(false);
-    const [isOpenPaymentOrderDialog, setIsOpenPaymentOrderDialog] = useState<boolean>(false);
-    
-    const [isLoadingPage, setIsLoadingPage] = useState<boolean>(false);
-    const [orderDetail, setOrderDetail] = useState<OrderDetailInterface>();
-
-
-
-    const { id } = useParams();
-    const navigate = useNavigate();
-
-
     // ---------------UseEffect---------------//
 
     /**
@@ -98,12 +108,14 @@ const OrderDetailScreen: React.FC = () => {
      * Handle get order detail data
      */
     const __handleGetOrderDetail = async () => {
-        setIsLoadingPage(true);
+        setIsLoading(true);
         try {
             const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderById}/${id}`);
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
                 setOrderDetail(response.data);
+                setPayment(response.data.paymentList);
+                setIsLoading(false)
             }
             else {
                 console.log('detail order: ', response.message);
@@ -164,12 +176,12 @@ const OrderDetailScreen: React.FC = () => {
         })
     };
 
-        /**
-     * Handle cancel order click
-     */
-        const _handlePaymentOrder = () => {
-            
-        };
+    /**
+ * Handle cancel order click
+ */
+    const _handlePaymentOrder = () => {
+
+    };
 
     // Get language in local storage
     const selectedLanguage = localStorage.getItem('language');
@@ -183,12 +195,54 @@ const OrderDetailScreen: React.FC = () => {
         }
     }, [selectedLanguage, i18n]);
 
+
+    /**
+     * Add selected address
+     * @param address 
+     */
+    const __handleGetSelectedAdress = (address: any) => {
+        setSelectedAddress(address);
+    }
+
+    /**
+     * Open dialog address
+     * @param isOpen 
+     */
+    const __handleOpenChangeAddressDialog = (isOpen: boolean) => {
+        setIsChangeAddressDialogOpen(isOpen);
+        console.log(isOpen);
+    }
+
+    const __handleSubmitRating = () => {
+        if (rating !== null) {
+            setRating(null);
+            setComment('');
+        }
+    }
+
+    const __handleReorder = () => {
+        setIsLoading(true);
+        setTimeout(() => {
+            navigate(`/design_detail/${orderDetail?.designResponse.designID}`)
+            setIsLoading(false);
+        }, 1000)
+    }
+
+    const __handleOpenReportDialog = () => {
+        setIsOpenReportOrderDialog(true);
+    }
+
+    const __handleCloseReportDialog = () => {
+        setIsOpenReportOrderDialog(false);
+    }
+
     return (
         <div className={`${style.orderDetail__container}`} >
             <HeaderComponent />
+            <LoadingComponent isLoading={isLoading}></LoadingComponent>
             <div className={`${style.orderDetail__container__group}`} style={{ marginTop: '2%', marginBottom: '10%' }}>
                 <div className={`${style.orderDetail__container__group__stepper}`}>
-                    <VerticalLinearStepperComponent></VerticalLinearStepperComponent>
+                    <VerticalLinearStepperComponent status={orderDetail?.orderStatus}></VerticalLinearStepperComponent>
                 </div>
                 <div className={`${style.orderDetail__container__detail} px-12 bg-white md:flex-row`}>
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
@@ -235,7 +289,7 @@ const OrderDetailScreen: React.FC = () => {
 
                             <div className="flex flex-col md:flex-row md:space-x-10 mt-4">
                                 <div className="md:w-1/2">
-                                    <div className={style.orderDetail__orderStatus__tag}>{orderDetail?.orderStatus}</div>
+                                    <div className={style.orderDetail__orderStatus__tag} style={orderDetail?.orderStatus === 'CANCEL' ? { backgroundColor: redColor } : {}}>{orderDetail?.orderStatus}</div>
                                 </div>
                             </div>
                         </div>
@@ -243,15 +297,34 @@ const OrderDetailScreen: React.FC = () => {
                         <div className="flex flex-col md:flex-row md:ml-6 w-1/3">
                             <div className="md:w-1/2 mt-4 md:mt-0" style={{ margin: '0 auto' }}>
                                 <p className="font-medium text-gray-600">Buyer</p>
-                                <p className="text-sm text-gray-600">{orderDetail?.buyerName}</p>
-                                <p className="text-sm text-gray-600">{orderDetail?.phone}</p>
-                                <a href="#" className="text-indigo-600 hover:text-indigo-800 transition duration-200">Edit</a>
+                                <p className="text-sm text-gray-600">{selectedAddress ? selectedAddress.fullName : orderDetail?.buyerName}</p>
+                                <p className="text-sm text-gray-600">{selectedAddress ? selectedAddress.phoneNumber : orderDetail?.phone}</p>
+                                <button onClick={() => __handleOpenChangeAddressDialog(true)} className="text-indigo-600 hover:text-indigo-800 transition duration-200">Edit</button>
+                                <form onSubmit={__handleSubmitRating} className='mt-12'>
+                                    <h2 className="text-md font-semibold mb-4">Rate Us</h2>
+                                    <div className="flex items-center mb-4">
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <button
+                                                key={star}
+                                                type="button"
+                                                className={`text-2xl mr-1 ${rating && rating >= star ? 'text-yellow-500' : 'text-gray-400'}`}
+                                                onClick={() => setRating(star)}
+                                            >
+                                                ★
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                </form>
                             </div>
                             <div className="md:w-1/2 md:mt-0 ">
                                 <p className="font-medium text-gray-600">{t(codeLanguage + '000194')}</p>
-                                <p className="text-sm text-gray-600 whitespace-pre-line">{orderDetail?.address}, {orderDetail?.ward}, {orderDetail?.district}, {orderDetail?.province}</p>
+                                <p className="text-sm text-gray-600 whitespace-pre-line">{selectedAddress ? selectedAddress.address : orderDetail?.address}, {selectedAddress ? selectedAddress.ward : orderDetail?.ward}, {selectedAddress ? selectedAddress.district : orderDetail?.district}, {selectedAddress ? selectedAddress.province : orderDetail?.province}</p>
+
                             </div>
+
                         </div>
+
                     </div>
 
                     {/* Progress Bar */}
@@ -265,69 +338,103 @@ const OrderDetailScreen: React.FC = () => {
                                 <p key={index} className={`text-center ${index <= orderDetails.currentStep ? 'text-indigo-600' : 'text-gray-400'}`}>{step}</p>
                             ))}
                         </div>
+
                     </div>
 
 
+                    {(orderDetail?.orderStatus !== 'NOT_VERIFY' && orderDetail?.orderStatus !== 'PROCESSING' && orderDetail?.orderStatus !== 'CANCEL') && (
+                        <>
 
+                            <div className="mt-10 border-t pt-4">
+                                <div className="flex flex-col md:flex-row justify-between">
+                                    <div className="w-full md:w-2/5 pr-0 md:pr-4 mb-4 md:mb-0">
+                                        <p className="font-medium text-gray-600">{t(codeLanguage + '000210')}</p>
+                                        <p className="text-gray-600 whitespace-pre-line">{orderDetails.billingAddress}</p>
+                                    </div>
+                                    <div className="w-full md:w-2/5 pl-0 md:pl-4 mb-4 md:mb-0">
+                                        <p className="font-medium text-gray-600">{t(codeLanguage + '000211')}</p>
+                                        <div className="flex items-center">
+                                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAAfCAMAAACF8f6iAAAAdVBMVEX///8UNMsAJMkAKspca9YALMoAJskAD8cIL8oAIMgAHcioreYAFMextumiqOUAAMaMlN9GV9G+wuxLXNLv8Pp7hdxlctf6+/7Cxu3f4fbm6PiVnOLO0fHV1/PZ3PSco+RWZtU5TdCBit0tRM5vetkfOswnP839FUl8AAAB00lEQVQ4je1TW4KDIAwkIIKIj/q2rda27t7/iJsE63KE/dj5aIlJJiQThPjHn8KjbbcEkQfzjkY7ihZ/ZzS7R+uMf/YLO+chSbbikzlOQ6W1ria2EqnlIGajtSFWk1oAsL5kp1RayySqelUAqqZT5wH8IgoJ9iLEDS0rM6n8Ss4iQxJQ8X1rBbbli6dgn0L0ioi6CkBfiql4GY56UnXw1yjx7vADHdCRYRNvC1nDFexv0Oopjxy/GH1gmpAgPc2HxLD7GbQrJJVHTx+0XEJsGtI6XEAjDZXwfRdCsH27jebo6RQlhfTGTfmOLT3g10tKwzCPTwhyf2GFOHFxSCduR8KgQbIAiad5uI3OOHk30n39HGc6mrNlLQT9u9Db9E0SONyOxoHqBQklizgxwSI5qvcmWbG3ajwcJVJSWxcLab6uNJ0+TsQkOLQQTRYIAlBTlHamQaXOYVjkQ8xBJElnXAdibXhdSHa1U/qJ8zYMzevEGuGtqI/WfO2vXWHDZiFlrSHIs/8DO1F61swATw5DtCI+/xJlWF4RplPGiYWR0vHmL5WUuJzXKsPHoJWj6lkmTXh4c3WEfdCVeV6yQiueaEZdU+/JXtNzu5Lz2CA85uIffws/lusXjWNFJpAAAAAASUVORK5CYII=" alt="Visa" className="inline-block mr-2" />
+                                            <div>
+                                                <p className="text-gray-600">Ending with {orderDetails.paymentInfo.ending}</p>
+                                                <p className="text-gray-600">Expires {orderDetails.paymentInfo.expires}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="w-full md:w-3/5 mt-6 md:mt-0">
+                                        <div className="flex flex-col space-y-4">
+                                            <div className="flex justify-between border-b pb-2">
+                                                <p className="text-gray-600">Total price</p>
+                                                <p className="text-gray-600">{__handleAddCommasToNumber(orderDetail?.totalPrice)} VND</p>
+                                            </div>
+                                            <div className="flex justify-between border-b pb-2">
+                                                <p className="text-gray-600">Deposit price</p>
+                                                <p className="text-gray-600">{payment?.map((item) => {
+                                                    if (item.paymentType === 'DEPOSIT') return __handleAddCommasToNumber(item.payOSResponse.data.amount)
+                                                })} VND</p>
+                                            </div>
+                                            <div className="flex justify-between border-b pb-2">
+                                                <p className="text-gray-600">Discount</p>
+                                                <p className="text-gray-600">0</p>
+                                            </div>
+                                            <div className="flex justify-between font-semibold text-gray-900">
+                                                <p>{t(codeLanguage + '000206')}</p>
+                                                <p>{payment?.map((item) => {
+                                                    if (item.paymentType === 'DEPOSIT') return __handleAddCommasToNumber(item.payOSResponse.data.amount)
+                                                })} VND</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Cancel Order Button */}
+                            <div className="flex justify-end mt-4">
+                                <button
+                                    onClick={() => setIsOpenCancelOrderPolicyDialog(true)}
+                                    className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200 mr-4"
+                                    style={{ backgroundColor: redColor }}
+                                >
+                                    {t(codeLanguage + '000205')}
+                                </button>
+
+                                <button
+                                    onClick={() => setIsOpenPaymentOrderDialog(true)}
+                                    className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200"
+                                    style={{ backgroundColor: greenColor }}
+                                >
+                                    Payment
+                                </button>
+
+                            </div>
+                        </>
+                    )}
                     {/* Billing and Payment Information Section */}
-                    <div className="mt-10 border-t pt-4">
-                        <div className="flex flex-col md:flex-row justify-between">
-                            <div className="w-full md:w-2/5 pr-0 md:pr-4 mb-4 md:mb-0">
-                                <p className="font-medium text-gray-600">{t(codeLanguage + '000210')}</p>
-                                <p className="text-gray-600 whitespace-pre-line">{orderDetails.billingAddress}</p>
+                    {orderDetail?.orderStatus === 'PROCESSING' && (
+                        <div >
+
+                            <div className="flex justify-end mt-4">
+                                <button
+                                    onClick={() => __handleOpenReportDialog()}
+                                    className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200 mr-4"
+                                    style={{ backgroundColor: redColor }}
+                                >
+                                    Report
+                                </button>
+                                <button
+                                    onClick={() => __handleReorder()}
+                                    className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200"
+                                    style={{ backgroundColor: greenColor }}
+                                >
+                                    Reorder
+                                </button>
+
                             </div>
-                            <div className="w-full md:w-2/5 pl-0 md:pl-4 mb-4 md:mb-0">
-                                <p className="font-medium text-gray-600">{t(codeLanguage + '000211')}</p>
-                                <div className="flex items-center">
-                                    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAAfCAMAAACF8f6iAAAAdVBMVEX///8UNMsAJMkAKspca9YALMoAJskAD8cIL8oAIMgAHcioreYAFMextumiqOUAAMaMlN9GV9G+wuxLXNLv8Pp7hdxlctf6+/7Cxu3f4fbm6PiVnOLO0fHV1/PZ3PSco+RWZtU5TdCBit0tRM5vetkfOswnP839FUl8AAAB00lEQVQ4je1TW4KDIAwkIIKIj/q2rda27t7/iJsE63KE/dj5aIlJJiQThPjHn8KjbbcEkQfzjkY7ihZ/ZzS7R+uMf/YLO+chSbbikzlOQ6W1ria2EqnlIGajtSFWk1oAsL5kp1RayySqelUAqqZT5wH8IgoJ9iLEDS0rM6n8Ss4iQxJQ8X1rBbbli6dgn0L0ioi6CkBfiql4GY56UnXw1yjx7vADHdCRYRNvC1nDFexv0Oopjxy/GH1gmpAgPc2HxLD7GbQrJJVHTx+0XEJsGtI6XEAjDZXwfRdCsH27jebo6RQlhfTGTfmOLT3g10tKwzCPTwhyf2GFOHFxSCduR8KgQbIAiad5uI3OOHk30n39HGc6mrNlLQT9u9Db9E0SONyOxoHqBQklizgxwSI5qvcmWbG3ajwcJVJSWxcLab6uNJ0+TsQkOLQQTRYIAlBTlHamQaXOYVjkQ8xBJElnXAdibXhdSHa1U/qJ8zYMzevEGuGtqI/WfO2vXWHDZiFlrSHIs/8DO1F61swATw5DtCI+/xJlWF4RplPGiYWR0vHmL5WUuJzXKsPHoJWj6lkmTXh4c3WEfdCVeV6yQiueaEZdU+/JXtNzu5Lz2CA85uIffws/lusXjWNFJpAAAAAASUVORK5CYII=" alt="Visa" className="inline-block mr-2" />
-                                    <div>
-                                        <p className="text-gray-600">Ending with {orderDetails.paymentInfo.ending}</p>
-                                        <p className="text-gray-600">Expires {orderDetails.paymentInfo.expires}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="w-full md:w-3/5 mt-6 md:mt-0">
-                                <div className="flex flex-col space-y-4">
-                                    <div className="flex justify-between border-b pb-2">
-                                        <p className="text-gray-600">{t(codeLanguage + '000209')}</p>
-                                        <p className="text-gray-600">$72</p>
-                                    </div>
-                                    <div className="flex justify-between border-b pb-2">
-                                        <p className="text-gray-600">{t(codeLanguage + '000208')}</p>
-                                        <p className="text-gray-600">$5</p>
-                                    </div>
-                                    <div className="flex justify-between border-b pb-2">
-                                        <p className="text-gray-600">{t(codeLanguage + '000207')}</p>
-                                        <p className="text-gray-600">$6.16</p>
-                                    </div>
-                                    <div className="flex justify-between font-semibold text-gray-900">
-                                        <p>{t(codeLanguage + '000206')}</p>
-                                        <p>$83.16</p>
-                                    </div>
-                                </div>
-                            </div>
+
+
                         </div>
-                    </div>
+                    )}
 
-                    {/* Cancel Order Button */}
-                    <div className="flex justify-end mt-4">
-                        <button
-                            onClick={() => setIsOpenCancelOrderPolicyDialog(true)}
-                            className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200 mr-4"
-                            style={{ backgroundColor: redColor }}
-                        >
-                            {t(codeLanguage + '000205')}
-                        </button>
-
-                        <button
-                            onClick={() => setIsOpenPaymentOrderDialog(true)}
-                            className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200"
-                            style={{ backgroundColor: greenColor }}
-                        >
-                            Payment
-                        </button>
-
-                    </div>
 
                     {showScrollButton && (
                         <IconButton
@@ -349,7 +456,10 @@ const OrderDetailScreen: React.FC = () => {
 
             {/* DIALOG */}
             <CancelOrderPolicyDialogComponent onClick={_handleCancelOrder} onClose={__handleCloseCancelOrderPolicyDilog} isOpen={isOpenCancelOrderPolicyDialog}></CancelOrderPolicyDialogComponent>
-            <PaymentOrderDialogComponent onClick={_handlePaymentOrder} onClose={__handleClosePaymentOrderDilog} isOpen={isOpenPaymentOrderDialog}></PaymentOrderDialogComponent>
+            <PaymentOrderDialogComponent paymentData={payment} onClick={_handlePaymentOrder} onClose={__handleClosePaymentOrderDilog} isOpen={isOpenPaymentOrderDialog}></PaymentOrderDialogComponent>
+            <ChangeAddressDialogComponent onSelectedAddressData={(address) => __handleGetSelectedAdress(address)} isOpen={isChangeAddressDialogOpen} onClose={() => __handleOpenChangeAddressDialog(false)}></ChangeAddressDialogComponent>
+            <CustomerReportOrderDialogComponent orderID={orderDetail?.orderID} onClose={__handleCloseReportDialog} isOpen={isOpenReportOrderDialog}></CustomerReportOrderDialogComponent>
+
 
             <FooterComponent />
 

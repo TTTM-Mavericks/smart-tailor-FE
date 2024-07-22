@@ -8,9 +8,10 @@ import state from "../store";
 
 
 const Shirt = ({ isDefault }) => {
+    const snap = useSnapshot(state)
 
     /** @type {[PartOfDesignInterface[], React.Dispatch<React.SetStateAction<PartOfDesignInterface[]>>]} */
-    const [modelData, setModelData] = useState();
+    const [modelData, setModelData] = useState(snap.modelData && snap.modelData || []);
 
     /** @type {[ItemMaskInterface[], React.Dispatch<React.SetStateAction<ItemMaskInterface[]>>]} */
     const [deCal, setDecal] = useState();
@@ -18,7 +19,6 @@ const Shirt = ({ isDefault }) => {
     // /** @type {{key:string , items:[ItemMaskInterface[]}, React.Dispatch<React.SetStateAction<ItemMaskInterface[]>>]} */
     const [deCalData, setDecalData] = useState([]);
 
-    const snap = useSnapshot(state)
 
     const { nodes, materials } = useGLTF('/shirt_baked.glb');
 
@@ -27,15 +27,18 @@ const Shirt = ({ isDefault }) => {
         if (isDefault) return;
         if (snap.modelData) {
             setModelData(snap.modelData);
-            console.log('snap.modelData: ', snap.modelData);
 
             // Accumulate all item masks from different parts
             const newDecals = snap.modelData.reduce((acc, item) => {
                 if (item.itemMasks) {
                     acc.push({ key: item.partOfDesignName, items: item.itemMasks });
                 }
+                console.log('snap.modelData hehehehe: ', snap.modelData);
+
+
                 return acc;
             }, []);
+            console.log('newDecals: ', newDecals);
 
             setDecalData(newDecals);
         }
@@ -137,6 +140,7 @@ const Shirt = ({ isDefault }) => {
 
     const loadTexture = (imageUrl) => {
         const loader = new TextureLoader();
+        console.log('-------------------------------load', loader);
         return loader.loadAsync(imageUrl);
     };
 
