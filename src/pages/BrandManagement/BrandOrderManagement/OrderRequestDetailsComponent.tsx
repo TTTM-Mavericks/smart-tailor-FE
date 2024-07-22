@@ -11,6 +11,7 @@ import { FaMinusCircle, FaPlusCircle } from 'react-icons/fa';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import { toast } from 'react-toastify';
 import { UserInterface } from '../../../models/UserModel';
+import { useNavigate } from 'react-router-dom';
 
 interface OrderDetailsProps {
     order: OrderInterface;
@@ -23,7 +24,7 @@ interface OrderDetailsProps {
 interface SizeQuantity {
     sizeID?: any;
     size?: string;
-    quantity: number;
+    quantity?: number;
     width?: number;
     height?: number;
     ring1?: number;
@@ -82,12 +83,12 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
         fontSize: '12px',
     },
     '& .MuiInputLabel-root': {
-        fontSize: '12px', // Adjust font size of the label
-        marginTop: '-10px'
+        fontSize: '12px',
+        marginTop: '0px'
     },
     '& .MuiInputLabel-root.Mui-focused': {
-        color: primaryColor, // Label color when focused
-        marginTop: '0px'
+        color: primaryColor,
+        paddingTop: '0px'
     },
     '& .MuiOutlinedInput-root': {
         '& fieldset': {
@@ -112,10 +113,12 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
     const [dialogOpen, setDialogOpen] = useState(false);
     const [size, setSize] = useState<string | null>('L');
     const [quantity, setQuantity] = useState<number | null>(100);
-    const [sizeQuantities, setSizeQuantities] = useState<SizeQuantity[]>([{ size: 'L', quantity: 1, sizeID: 'dsfsdfds' }]);
+    const [sizeQuantities, setSizeQuantities] = useState<SizeQuantity[]>([]);
     const [isChecked, setIsChecked] = useState(false);
     const [sizes, setSizes] = useState<ExpertTailoringSizeInterface[]>();
     const [isLoadingPage, setIsLoadingPage] = useState<boolean>(false);
+
+    const navigate = useNavigate()
 
 
     useEffect(() => {
@@ -133,6 +136,18 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
         ));
         console.log('extractedSizes: ', extractedSizes);
         setSizes(extractedSizes);
+
+        setSizeQuantities(prevQuantities => {
+            // Create the new size items to be added
+            const newSizeQuantities = extractedSizes?.map(item => ({
+                sizeID: item.sizeID,
+                sizeName: item.sizeName,
+                designDetailId: item.designDetailId
+            })) || [];
+
+            // Return the updated array
+            return [...prevQuantities, ...newSizeQuantities];
+        });
 
     }, [designDetail]);
 
@@ -232,7 +247,21 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
      */
     const __handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setIsChecked(event.target.checked);
+        if (event.target.checked) {
+            setSizeQuantities(prevQuantities => {
+                // Create the new size items to be added
+                const newSizeQuantities = sizes?.map(item => ({
+                    sizeID: item.sizeID,
+                    sizeName: item.sizeName,
+                    designDetailId: item.designDetailId
+                })) || [];
+
+                // Return the updated array
+                return [...prevQuantities, ...newSizeQuantities];
+            });
+        }
     };
+
 
     /**
      * Handle brand accept order request from customer
@@ -249,7 +278,9 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
             if (response.status === 200) {
                 console.log(response.data);
                 toast.success(`${response.message}`, { autoClose: 4000 });
-                window.location.href = '/brand';
+                setTimeout(() => {
+                    navigate('/brand');
+                }, 3000);
             } else {
                 toast.error(`${response.message}`, { autoClose: 4000 });
                 console.log(response.message);
@@ -289,7 +320,7 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
                                         const filteredSizes = sizes ? sizes.filter(size => !sizeQuantities.some(sq => sq.sizeID === size.sizeID)) : [];
 
                                         return (
-                                            <div key={index} style={{ display: 'flex', margin: 10 }}>
+                                            <div key={index} style={{ display: 'flex', margin: 10, alignItems: 'center' }}>
                                                 <Grid item>
                                                     <Autocomplete
                                                         options={filteredSizes}
@@ -313,29 +344,34 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
                                                         inputProps={{ min: 1 }}
                                                         style={{ marginLeft: 20, marginRight: 10 }}
                                                     />
-                                                    <FaMinusCircle size={20} color={primaryColor} onClick={() => __handleRemoveSizeQuantity(index)} style={{ display: sizeQuantities.length === 1 ? 'none' : 'flex', cursor: 'pointer', position: 'absolute', right: -20, top: 5 }}>
-                                                    </FaMinusCircle>
+                                                    
                                                 </Grid> */}
+
+
+                                                <FaMinusCircle size={20} color={primaryColor} onClick={() => __handleRemoveSizeQuantity(index)} style={{ display: sizeQuantities.length === 1 ? 'none' : 'flex', cursor: 'pointer', marginLeft: 20 }}>
+                                                </FaMinusCircle>
+
                                             </div>
                                         );
                                     })}
-
-                                    <div>
-                                        <FaPlusCircle size={20} style={{ cursor: 'pointer', marginLeft: 10 }} color={primaryColor} onClick={__handleAddSizeQuantity}>
-                                        </FaPlusCircle>
-                                    </div>
+                                    {sizeQuantities.length !== sizes?.length && (
+                                        <div>
+                                            <FaPlusCircle size={20} style={{ cursor: 'pointer', marginLeft: 10 }} color={primaryColor} onClick={__handleAddSizeQuantity}>
+                                            </FaPlusCircle>
+                                        </div>
+                                    )}
                                 </div>
 
                             </Grid>
                             <Grid item xs={12} sm={3}>
-                                <FormControlLabel
+                                {/* <FormControlLabel
                                     control={<Checkbox color={'error'} checked={isChecked} onChange={__handleCheckboxChange} />}
                                     label={(<span style={{ fontSize: 14 }}>Accept full order</span>)}
                                     style={{ fontSize: '1px', fontWeight: 500 }}
                                     sx={{ fontSize: 12 }}
 
 
-                                />
+                                /> */}
                                 <div style={{ marginTop: 0 }}>
                                     <button
                                         type="submit"

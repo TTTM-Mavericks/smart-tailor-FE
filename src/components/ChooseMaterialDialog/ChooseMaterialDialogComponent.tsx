@@ -362,9 +362,7 @@ const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child
                     </div> */}
 
                     <div className={styles.dialog__content__lableGroup} style={{ width: '50%' }} >
-                        <div>
-                            <span className={styles.dialog__content__span__text}>For item mask</span>
-                        </div>
+
                         {/* <div className={styles.dialog__content__span}>
                             <span style={{ color: redColor }}>1.999.999</span>
                             <span> - </span>
@@ -381,7 +379,7 @@ const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child
 
 
             </DialogContent>
-            <DialogContent className={`${styles.dialog__content__totalPrice}`}>
+            {/* <DialogContent className={`${styles.dialog__content__totalPrice}`}>
                 <div className={`${styles.dialog__content__totalPrice__note} inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10`}>
                     <IoIosWarning size={50} color={yellowColor} mode={'contain'} />
                     <span>
@@ -423,7 +421,7 @@ const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child
                         </tr>
                     </tbody>
                 </table>
-            </DialogContent>
+            </DialogContent> */}
             <DialogActions>
                 <Button onClick={() => __handleOpenMaterialSavingDialog()} style={{ color: primaryColor, padding: '5px 20px 5px 20px' }}  >
                     Cancel

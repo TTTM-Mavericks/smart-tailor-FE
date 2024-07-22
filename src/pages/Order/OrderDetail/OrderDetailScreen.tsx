@@ -16,6 +16,7 @@ import { PaymentOrderDialogComponent } from '../../../components';
 import { PaymentOrderInterface } from '../../../models/PaymentModel';
 import { __handleAddCommasToNumber } from '../../../utils/NumbericUtils';
 import LoadingComponent from '../../../components/Loading/LoadingComponent';
+import ChangeAddressDialogComponent from '../OrderProduct/ChangeAddressDialogComponent';
 
 const OrderDetailScreen: React.FC = () => {
     // TODO MUTIL LANGUAGE
@@ -31,7 +32,8 @@ const OrderDetailScreen: React.FC = () => {
     const [orderDetail, setOrderDetail] = useState<OrderDetailInterface>();
     const [payment, setPayment] = useState<PaymentOrderInterface[]>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
-
+    const [selectedAddress, setSelectedAddress] = useState<any>();
+    const [isChangeAddressDialogOpen, setIsChangeAddressDialogOpen] = useState<boolean>(false);
 
 
 
@@ -191,6 +193,24 @@ const OrderDetailScreen: React.FC = () => {
         }
     }, [selectedLanguage, i18n]);
 
+
+    /**
+     * Add selected address
+     * @param address 
+     */
+    const __handleGetSelectedAdress = (address: any) => {
+        setSelectedAddress(address);
+    }
+
+    /**
+     * Open dialog address
+     * @param isOpen 
+     */
+    const __handleOpenChangeAddressDialog = (isOpen: boolean) => {
+        setIsChangeAddressDialogOpen(isOpen);
+        console.log(isOpen);
+    }
+
     return (
         <div className={`${style.orderDetail__container}`} >
             <HeaderComponent />
@@ -252,13 +272,13 @@ const OrderDetailScreen: React.FC = () => {
                         <div className="flex flex-col md:flex-row md:ml-6 w-1/3">
                             <div className="md:w-1/2 mt-4 md:mt-0" style={{ margin: '0 auto' }}>
                                 <p className="font-medium text-gray-600">Buyer</p>
-                                <p className="text-sm text-gray-600">{orderDetail?.buyerName}</p>
-                                <p className="text-sm text-gray-600">{orderDetail?.phone}</p>
-                                <a href="#" className="text-indigo-600 hover:text-indigo-800 transition duration-200">Edit</a>
+                                <p className="text-sm text-gray-600">{selectedAddress ? selectedAddress.fullName : orderDetail?.buyerName}</p>
+                                <p className="text-sm text-gray-600">{selectedAddress ? selectedAddress.phoneNumber : orderDetail?.phone}</p>
+                                <button onClick={() => __handleOpenChangeAddressDialog(true)} className="text-indigo-600 hover:text-indigo-800 transition duration-200">Edit</button>
                             </div>
                             <div className="md:w-1/2 md:mt-0 ">
                                 <p className="font-medium text-gray-600">{t(codeLanguage + '000194')}</p>
-                                <p className="text-sm text-gray-600 whitespace-pre-line">{orderDetail?.address}, {orderDetail?.ward}, {orderDetail?.district}, {orderDetail?.province}</p>
+                                <p className="text-sm text-gray-600 whitespace-pre-line">{selectedAddress ? selectedAddress.address : orderDetail?.address}, {selectedAddress ? selectedAddress.ward : orderDetail?.ward}, {selectedAddress ? selectedAddress.district : orderDetail?.district}, {selectedAddress ? selectedAddress.province : orderDetail?.province}</p>
                             </div>
                         </div>
                     </div>
@@ -367,7 +387,7 @@ const OrderDetailScreen: React.FC = () => {
             {/* DIALOG */}
             <CancelOrderPolicyDialogComponent onClick={_handleCancelOrder} onClose={__handleCloseCancelOrderPolicyDilog} isOpen={isOpenCancelOrderPolicyDialog}></CancelOrderPolicyDialogComponent>
             <PaymentOrderDialogComponent paymentData={payment} onClick={_handlePaymentOrder} onClose={__handleClosePaymentOrderDilog} isOpen={isOpenPaymentOrderDialog}></PaymentOrderDialogComponent>
-
+            <ChangeAddressDialogComponent onSelectedAddressData={(address) => __handleGetSelectedAdress(address)} isOpen={isChangeAddressDialogOpen} onClose={() => __handleOpenChangeAddressDialog(false)}></ChangeAddressDialogComponent>
             <FooterComponent />
 
         </div>

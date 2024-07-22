@@ -117,7 +117,7 @@ function CustomDesignScreen() {
   const [userAuth, setUserAuth] = useState<UserInterface>();
   const [mainDesign, setMainDesign] = useState<DesignInterface>();
   const [usedMaterial, setUsedMaterial] = useState<MaterialInterface[]>();
-  const [titleDesign, setTitleDesign] = useState<string>('Design sample');
+  const [titleDesign, setTitleDesign] = useState<string>();
   const [isClickOutSide, setIsClickOutSize] = useState<boolean>(false);
   const [successImgPartOfDesign, setSuccessImgPartOfDesign] = useState<string>('');
   const [colorModel, setColorModel] = useState<string>();
@@ -274,13 +274,11 @@ function CustomDesignScreen() {
       }
       else {
         toast.error(`${response.message}`, { autoClose: 4000 });
-        setIsLoadingPage(false);
         return;
       }
     } catch (error) {
       toast.error(`${error}`, { autoClose: 4000 });
       console.log('error: ', error);
-      setIsLoadingPage(false);
     }
   }
 
@@ -300,20 +298,19 @@ function CustomDesignScreen() {
         console.log(sortedParts);
         setSelectedPartOfCloth(response.data.partOfDesign[0]);
         setTypeOfModelID(response.data.expertTailoring.expertTailoringID);
-        setIsLoadingPage(false);
         setColorModel(response.data.color);
-        state.color = response.data.color;
+        // state.color = response.data.color;
+        state.modelData = response.data.partOfDesign
+        setIsLoadingPage(false);
 
       }
       else {
         toast.error(`${response.message}`, { autoClose: 4000 });
-        setIsLoadingPage(false);
         return;
       }
     } catch (error) {
       toast.error(`${error}`, { autoClose: 4000 });
       console.log('error: ', error);
-      setIsLoadingPage(false);
     }
   }
 
@@ -631,10 +628,10 @@ function CustomDesignScreen() {
     const bodyRequest: Design = {
       userID: userAuth?.userID || '',
       expertTailoringID: typeOfModelID,
-      titleDesign: "test TitleDesign",
+      titleDesign: titleDesign || "test TitleDesign",
       publicStatus: true,
       imageUrl: successImaUrl ? successImaUrl : '',
-      color: snap.color || '#f0f0f0f0',
+      color: snap.color || '#FFFFFF',
       partOfDesign: transformPartOfDesign(item)
     };
     console.log(bodyRequest);
@@ -763,7 +760,7 @@ function CustomDesignScreen() {
                 className="block h-7 rounded-md border-0 py-1.5 pl-2 text-gray-900 ring-1 ring-inset ring-gray-300"
                 value={titleDesign}
                 onChange={(e) => setTitleDesign(e.target.value)}
-                placeholder='Design title'
+                placeholder={designModelData?.titleDesign ? designModelData?.titleDesign : 'Design title'}
                 style={{ outline: 'none', fontSize: 13 }}
               />
             </div>
