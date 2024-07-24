@@ -29,6 +29,8 @@ interface PartOfDesign {
     imageUrl: string;
     successImageUrl: string;
     materialID: string;
+    width?: number,
+    height?: number,
     itemMask: ItemMask[];
 }
 
@@ -146,6 +148,8 @@ const CreateDesignComponent = () => {
                         imageUrl: "/src/assets/clothes/shirt-front-design.png",
                         successImageUrl: "",
                         materialID: "",
+                        width: 60,
+                        height: 80,
                         itemMask: []
                     },
                     {
@@ -153,6 +157,8 @@ const CreateDesignComponent = () => {
                         imageUrl: "/src/assets/clothes/shirt-front-design.png",
                         successImageUrl: "",
                         materialID: "",
+                        width: 60,
+                        height: 80,
                         itemMask: []
                     },
                     {
@@ -160,6 +166,8 @@ const CreateDesignComponent = () => {
                         imageUrl: "/src/assets/clothes/shirt-back-design.png",
                         successImageUrl: "",
                         materialID: "",
+                        width: 60,
+                        height: 80,
                         itemMask: []
                     },
                     {
@@ -167,6 +175,8 @@ const CreateDesignComponent = () => {
                         imageUrl: "/src/assets/clothes/shirt-front-design.png",
                         successImageUrl: "",
                         materialID: "",
+                        width: 15,
+                        height: 20,
                         itemMask: []
                     }
                 ]
@@ -208,7 +218,7 @@ const CreateDesignComponent = () => {
 
     return (
         <div>
-            <LoadingComponent isLoading={true} title='Setting' containerStyle={{backgroundColor: whiteColor}}></LoadingComponent>
+            <LoadingComponent isLoading={true} title='Setting' containerStyle={{ backgroundColor: whiteColor }}></LoadingComponent>
         </div>
     );
 };

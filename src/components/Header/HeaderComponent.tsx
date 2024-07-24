@@ -27,6 +27,13 @@ const navigation = {
   categories: [
 
     {
+      id: 'product',
+      name: 'Products',
+      href: '/product',
+      number: '000130',
+      type: 'page'
+    },
+    {
       id: 'design',
       name: 'Design',
       href: '/design_create',
@@ -428,7 +435,7 @@ export default function HeaderComponent() {
               </div>
 
               {/* Section 2 */}
-              <Popover.Group className="hidden lg:ml-8 lg:block lg:self-stretch">
+              {/* <Popover.Group className="hidden lg:ml-8 lg:block lg:self-stretch">
                 <div className="flex h-full space-x-8">
                   {navigation.categories_2.map((category) => (
                     <Popover key={category.name} className="flex">
@@ -514,7 +521,7 @@ export default function HeaderComponent() {
                     </Popover>
                   ))}
                 </div>
-              </Popover.Group>
+              </Popover.Group> */}
 
               {/* Flyout menus */}
               <Popover.Group className="hidden lg:ml-8 lg:block lg:self-stretch">

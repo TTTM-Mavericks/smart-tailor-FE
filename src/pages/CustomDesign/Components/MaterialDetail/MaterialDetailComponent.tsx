@@ -465,7 +465,7 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                         <Step key={index} onClick={() => __handleStepClick(index, part)}>
                             <StepLabel
                             >
-                                <span style={{fontSize: 10, fontWeight:'500', cursor: 'pointer'}}>
+                                <span style={{ fontSize: 10, fontWeight: '500', cursor: 'pointer' }}>
                                     {part.partOfDesignName}
                                 </span>
                             </StepLabel>
@@ -474,7 +474,7 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                 </Stepper>
             </div>
             <form className={`${style.materialDetail__container}`} style={primaryKey === 'DIALOG' ? { display: 'flex' } : {}} >
-                <div className={`${style.materialDetail__container__itemMaskArea}`} style={primaryKey === 'DIALOG' ? { paddingRight: '10px', height: 350, overflow: 'auto' } : {}}>
+                <div className={`${style.materialDetail__container__itemMaskArea} items-center justify-center `} style={primaryKey === 'DIALOG' ? { paddingRight: '10px', height: 350, overflow: 'auto' } : {}}>
                     {data?.map((part: PartOfDesignInterface, key) => (
                         <div >
                             {selectedPartOfDesign?.partOfDesignID === part.partOfDesignID ? part?.itemMasks?.map((item, optionIdx) => (
@@ -573,8 +573,15 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                             )) : (
                                 <></>
                             )}
+
                         </div>
                     ))}
+
+                    {selectedPartOfDesign?.itemMasks?.length === 0 && (
+                        <div style={{ margin: '0 auto', width: 'fit-content' }} className='items-center'>
+                            <span style={{fontSize: 13, color: redColor}} className="pl-0 text-indigo-600 hover:text-indigo-800 transition duration-200 items-center">Do not have any item masks</span>
+                        </div>
+                    )}
                 </div>
 
                 <div style={{ marginTop: -20 }}>

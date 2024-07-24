@@ -71,9 +71,8 @@ const CustomerReportOrderDialogComponent: React.FC<Props> = ({ isOpen, onClose, 
                     style={{ position: 'absolute', right: 20, top: 20 }}
                 />
             </DialogTitle>
-            <DialogContent className={styles.orderPolicyDialog__content}>
-                <div className="p-6 bg-gray-100 flex flex-col items-center justify-center">
-                    <div className="w-full max-w-3xl bg-white p-6 shadow-md rounded-md">
+            <DialogContent className={`${styles.orderPolicyDialog__content}  bg-gray-100 flex flex-col items-center `}>
+                    <div className="w-full max-w-3xl bg-white p-6 shadow-md rounded-md mt-6">
                         <h2 className="text-md font-semibold mb-4 ">Order #{orderID}</h2>
                         <form onSubmit={__handleSubmit}>
                             <div className="mb-4">
@@ -120,7 +119,6 @@ const CustomerReportOrderDialogComponent: React.FC<Props> = ({ isOpen, onClose, 
                                 />
                             </div>
                         </form>
-                    </div>
                 </div>
             </DialogContent>
             <DialogActions>

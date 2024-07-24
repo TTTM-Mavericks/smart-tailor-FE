@@ -37,6 +37,7 @@ import Brand from './pages/BrandManagement/DashboardBrand/BrandDashboardScreen';
 
 
 import CreateDesignComponent from './pages/CustomDesign/Components/CreateDesign/CreateDesignComponent';
+import DesignCollectionScreen from './pages/DesignCollection/DesignCollectionContainer/DesignCollectionScreen';
 
 
 const tokenIsValid = (token) => {
@@ -144,6 +145,9 @@ function App() {
           <Route path='*' element={<Screen404 />} />
           <Route path='error404' element={<Screen404 />} />
           <Route path='/pickedOrder' element={<PickedOrderScreen />} />
+
+          {/* Manage design */}
+          <Route path='/collection' element={<DesignCollectionScreen />} />
 
         </Routes>
       </BrowserRouter>
