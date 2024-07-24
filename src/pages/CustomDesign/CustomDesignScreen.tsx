@@ -12,7 +12,7 @@ import { shirtModel, systemLogo } from '../../assets';
 import { HiOutlineDownload, HiShoppingCart, HiOutlineLogin } from 'react-icons/hi';
 import { FaSave, FaTshirt, FaPen, FaIcons, FaRegHeart, FaFileCode, FaHeart, FaCrown } from "react-icons/fa";
 import { useTranslation } from 'react-i18next';
-import { blackColor, greenColor, primaryColor, redColor, whiteColor, yellowColor } from '../../root/ColorSystem';
+import { blackColor, grayColor, greenColor, primaryColor, redColor, whiteColor, yellowColor } from '../../root/ColorSystem';
 import { IoMdColorPalette } from "react-icons/io";
 import { IoText } from "react-icons/io5";
 import { GiClothes } from "react-icons/gi";
@@ -55,6 +55,8 @@ interface PartOfDesign {
   imageUrl: string;
   successImageUrl: string;
   materialID: string;
+  width: number;
+  height: number;
   itemMask: ItemMask[];
 }
 
@@ -121,6 +123,9 @@ function CustomDesignScreen() {
   const [isClickOutSide, setIsClickOutSize] = useState<boolean>(false);
   const [successImgPartOfDesign, setSuccessImgPartOfDesign] = useState<string>('');
   const [colorModel, setColorModel] = useState<string>();
+  const [isSaved, setIsSaved] = useState<boolean>(false);
+  const [imghehe, setImgHehe] = useState<string>();
+
 
 
 
@@ -136,8 +141,30 @@ function CustomDesignScreen() {
   }, []);
   const divRef = useRef<HTMLDivElement>(null);
   const { id } = useParams();
-  const snap = useSnapshot(state)
+  const snap = useSnapshot(state);
   // ---------------UseEffect---------------//
+
+
+  // useEffect(() => {
+  //   if (!partOfClothData) return;
+
+  //   const executeFunction = () => {
+  //     __handleGetMaterialInformation(partOfClothData).then((value) => {
+  //       __handleUpdateDesign(true, value);
+  //     });
+  //   };
+
+  //   // Execute immediately
+  //   executeFunction();
+
+  //   // Set interval to execute every 2 minutes (120000 ms)
+  //   const intervalId = setInterval(executeFunction, 150000);
+
+  //   // Cleanup function to clear interval on component unmount
+  //   return () => clearInterval(intervalId);
+  // }, []);
+
+
 
   useEffect(() => {
     const getItemFromStorage = localStorage.getItem('collection')
@@ -299,6 +326,7 @@ function CustomDesignScreen() {
         setSelectedPartOfCloth(response.data.partOfDesign[0]);
         setTypeOfModelID(response.data.expertTailoring.expertTailoringID);
         setColorModel(response.data.color);
+        setTitleDesign(response.data.titleDesign);
         // state.color = response.data.color;
         state.modelData = response.data.partOfDesign
         setIsLoadingPage(false);
@@ -434,23 +462,25 @@ function CustomDesignScreen() {
   }
 
   const __handleReadFileUploadImageTool = (type: any) => {
+
     reader(file)
       .then((result) => {
-        setSelectedStamp((prev) => {
-          const newItem: ItemMaskInterface = {
-            itemMaskID: __handleGenerateItemId(),
-            typeOfItem: 'IMAGE',
-            imageUrl: result,
-            position: { x: 150, y: 170 },
-            positionX: 150,
-            positionY: 170,
-            zIndex: 1,
-            indexZ: 1
-          };
-          return [newItem];
+        const newUploadPart = partOfClothData?.map((part) => {
+          if (selectedPartOfCloth.partOfDesignID === part.partOfDesignID) {
+            return {
+              ...part,
+              imageUrl: result
+            };
+          }
+          setSelectedPartOfCloth(part)
+          return part;
         });
-      })
-  }
+
+        setPartOfClothData(newUploadPart);
+      }
+      )
+  };
+
 
   const __handleAddTextToDesign = (txtBase64: any) => {
     setSelectedStamp((prev) => {
@@ -614,6 +644,8 @@ function CustomDesignScreen() {
       imageUrl: part.imageUrl || "",
       successImageUrl: part.successImageUrl || "",
       materialID: part.materialID,
+      width: 15,
+      height: 20,
       itemMask: transformItemMasks(part.itemMasks || [])
     }));
   };
@@ -660,11 +692,14 @@ function CustomDesignScreen() {
     if (!mainDesign) {
       __handleGetMaterialInformation
     };
-    setIsLoadingPage(true);
+    if (!isLickSaveButton) {
+      setIsLoadingPage(true);
+    }
     try {
       const response = await api.put(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.updateDesign}/${id}`, mainDesign);
       if (response.status === 200) {
-        toast.success(`${response.message}`, { autoClose: 4000 });
+        // toast.success(`${response.message}`, { autoClose: 4000 });
+
         if (!isLickSaveButton) {
           setTimeout(() => {
             setIsLoadingPage(false);
@@ -672,6 +707,10 @@ function CustomDesignScreen() {
           }, 3000)
         } else {
           setIsLoadingPage(false);
+          setIsSaved(true);
+          setTimeout(() => {
+            setIsSaved(false);
+          }, 5000);
 
         }
       } else {
@@ -750,7 +789,7 @@ function CustomDesignScreen() {
           <div >
             <h3>{t(codeLanguage + '000001')}</h3>
           </div>
-          <UploadCloud size={20} style={{ marginTop: 5, marginLeft: 15 }} color={greenColor}> </UploadCloud>
+          <UploadCloud size={20} style={{ marginTop: 5, marginLeft: 15 }} color={isSaved ? greenColor : blackColor}> </UploadCloud>
           <div>
             <div className="relative rounded-md shadow-sm ml-20">
               <input
@@ -760,7 +799,7 @@ function CustomDesignScreen() {
                 className="block h-7 rounded-md border-0 py-1.5 pl-2 text-gray-900 ring-1 ring-inset ring-gray-300"
                 value={titleDesign}
                 onChange={(e) => setTitleDesign(e.target.value)}
-                placeholder={designModelData?.titleDesign ? designModelData?.titleDesign : 'Design title'}
+                placeholder={titleDesign ? titleDesign : 'Design title'}
                 style={{ outline: 'none', fontSize: 13 }}
               />
             </div>
@@ -781,11 +820,6 @@ function CustomDesignScreen() {
           <button className={` py-1 px-4 rounded inline-flex items-center ${styles.customDesign__container__header__buttonGroup__orderBtn} `} onClick={() => __handleOpenMaterialDialog()}>
             <HiShoppingCart size={20} style={{ marginRight: 5, backgroundColor: 'transparent', border: 'none' }} className={styles.orderIcon}></HiShoppingCart>
             <span>{t(codeLanguage + '000106')}</span>
-          </button>
-
-          <button onClick={() => window.location.href = '/auth/signin'} className={` py-1 px-4 rounded inline-flex items-center ${styles.customDesign__container__header__buttonGroup__signInBtn} `}>
-            <HiOutlineLogin size={20} style={{ marginRight: 5, backgroundColor: 'transparent', border: 'none' }} className={styles.signInIcon} ></HiOutlineLogin>
-            <span>{t(codeLanguage + '000107')}</span>
           </button>
 
         </div>
@@ -1134,7 +1168,13 @@ function CustomDesignScreen() {
 
       <Designer />
       <main id='canvas3DElement' className={styles.customDesign__container__canvas}>
-        <CanvasModel typeOfModel={typeOfModel} isDefault={false} is3D={true} />
+        {!changeUploadPartOfDesignTool ? (
+          <CanvasModel typeOfModel={typeOfModel} isDefault={false} is3D={true} />
+        ) : (
+          <div style={{ backgroundColor: grayColor, opacity: 0.7, width: '100%', height: '100%' }}>
+            <img src={selectedPartOfCloth.imageUrl} style={{ width: '100%', height: '100%' }}></img>
+          </div>
+        )}
       </main>
 
       <div className={styles.customDesign__container__itemEditor}>

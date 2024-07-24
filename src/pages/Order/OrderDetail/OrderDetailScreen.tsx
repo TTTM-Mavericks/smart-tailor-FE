@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import HeaderComponent from '../../../components/Header/HeaderComponent';
 import FooterComponent from '../../../components/Footer/FooterComponent';
-import { IconButton } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, IconButton, Typography } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { greenColor, primaryColor, redColor } from '../../../root/ColorSystem';
+import { greenColor, primaryColor, redColor, whiteColor } from '../../../root/ColorSystem';
 import VerticalLinearStepperComponent from '../Components/ProgressBar/VerticalStepperComponent';
 import style from './OrderDetailStyles.module.scss'
 import CancelOrderPolicyDialogComponent from '../../../components/Dialog/PolicyDialog/CancelOrderPolicyDialogComponent';
@@ -17,6 +17,7 @@ import { PaymentOrderInterface } from '../../../models/PaymentModel';
 import { __handleAddCommasToNumber } from '../../../utils/NumbericUtils';
 import LoadingComponent from '../../../components/Loading/LoadingComponent';
 import ChangeAddressDialogComponent from '../OrderProduct/ChangeAddressDialogComponent';
+import { IoMdCloseCircleOutline } from 'react-icons/io';
 
 const OrderDetailScreen: React.FC = () => {
     // TODO MUTIL LANGUAGE
@@ -37,6 +38,8 @@ const OrderDetailScreen: React.FC = () => {
     const [rating, setRating] = useState<number | null>(null);
     const [comment, setComment] = useState<string>('');
     const [isOpenReportOrderDialog, setIsOpenReportOrderDialog] = useState<boolean>(false);
+    const [isOpenRatingDialog, setIsOpenRatingDialog] = useState<boolean>(false);
+    const [isOpenReasonCancelDialog, setIsOpenReasonCancelDialog] = useState<boolean>(false);
 
 
     const { id } = useParams();
@@ -75,6 +78,12 @@ const OrderDetailScreen: React.FC = () => {
         progressDate: 'March 24, 2021'
     };
     // ---------------UseEffect---------------//
+
+    useEffect(() => {
+        if (orderDetail?.orderStatus === 'PENDING') {
+            setIsOpenRatingDialog(true);
+        }
+    }, [orderDetail])
 
     /**
      * Move to Top When scroll down
@@ -236,6 +245,10 @@ const OrderDetailScreen: React.FC = () => {
         setIsOpenReportOrderDialog(false);
     }
 
+    const __handleRatingOrder = () => {
+        setIsOpenRatingDialog(false);
+    }
+
     return (
         <div className={`${style.orderDetail__container}`} >
             <HeaderComponent />
@@ -245,15 +258,21 @@ const OrderDetailScreen: React.FC = () => {
                     <VerticalLinearStepperComponent status={orderDetail?.orderStatus}></VerticalLinearStepperComponent>
                 </div>
                 <div className={`${style.orderDetail__container__detail} px-12 bg-white md:flex-row`}>
+
+
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
                         <h6 className="text-2xl font-bold text-gray-800 mb-4 md:mb-0">{t(codeLanguage + '000191')}</h6>
                         <a href="/order_history" className="text-sm text-indigo-600 hover:text-indigo-800 transition duration-200">{t(codeLanguage + '000192')} &rarr;</a>
                     </div>
 
+
+
                     <div className="border-b pb-4 mb-6">
-                        <p className="text-sm text-gray-700">
+                        <p className="text-sm text-gray-700 flex">
                             <span style={{ fontWeight: "bolder" }}>#{orderDetail?.orderID}</span>
+                            <span className="ml-auto text-sm text-gray-700 cursor-pointer" onClick={()=>__handleOpenReportDialog()}>Report</span>
                         </p>
+
                         <p className="text-sm text-gray-700">
                             <span style={{ fontWeight: "normal" }}>{orderDetail?.expectedStartDate}</span>
                         </p>
@@ -288,42 +307,31 @@ const OrderDetailScreen: React.FC = () => {
                             </div>
 
                             <div className="flex flex-col md:flex-row md:space-x-10 mt-4">
-                                <div className="md:w-1/2">
+                                <div className="md:w-1/2 flex items-center">
                                     <div className={style.orderDetail__orderStatus__tag} style={orderDetail?.orderStatus === 'CANCEL' ? { backgroundColor: redColor } : {}}>{orderDetail?.orderStatus}</div>
+                                    {orderDetail?.orderStatus === 'CANCEL' && (
+                                        <div className="ml-10">
+                                            <a onClick={() => setIsOpenReasonCancelDialog(!isOpenReasonCancelDialog)} className="text-sm text-indigo-600 hover:text-indigo-800 transition duration-200 cursor-pointer">View reasons</a>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
 
-                        <div className="flex flex-col md:flex-row md:ml-6 w-1/3">
-                            <div className="md:w-1/2 mt-4 md:mt-0" style={{ margin: '0 auto' }}>
-                                <p className="font-medium text-gray-600">Buyer</p>
-                                <p className="text-sm text-gray-600">{selectedAddress ? selectedAddress.fullName : orderDetail?.buyerName}</p>
-                                <p className="text-sm text-gray-600">{selectedAddress ? selectedAddress.phoneNumber : orderDetail?.phone}</p>
-                                <button onClick={() => __handleOpenChangeAddressDialog(true)} className="text-indigo-600 hover:text-indigo-800 transition duration-200">Edit</button>
-                                <form onSubmit={__handleSubmitRating} className='mt-12'>
-                                    <h2 className="text-md font-semibold mb-4">Rate Us</h2>
-                                    <div className="flex items-center mb-4">
-                                        {[1, 2, 3, 4, 5].map((star) => (
-                                            <button
-                                                key={star}
-                                                type="button"
-                                                className={`text-2xl mr-1 ${rating && rating >= star ? 'text-yellow-500' : 'text-gray-400'}`}
-                                                onClick={() => setRating(star)}
-                                            >
-                                                ★
-                                            </button>
-                                        ))}
-                                    </div>
-
-                                </form>
+                        {orderDetail?.orderStatus !== 'DELIVERY' && (
+                            <div className="flex flex-col md:flex-row md:ml-6 w-1/3">
+                                <div className="md:w-1/2 mt-4 md:mt-0" style={{ margin: '0 auto' }}>
+                                    <p className="font-medium text-gray-600">Buyer</p>
+                                    <p className="text-sm text-gray-600">{selectedAddress ? selectedAddress.fullName : orderDetail?.buyerName}</p>
+                                    <p className="text-sm text-gray-600">{selectedAddress ? selectedAddress.phoneNumber : orderDetail?.phone}</p>
+                                    <button onClick={() => __handleOpenChangeAddressDialog(true)} className="text-indigo-600 hover:text-indigo-800 transition duration-200">Edit</button>
+                                </div>
+                                <div className="md:w-1/2 md:mt-0 ">
+                                    <p className="font-medium text-gray-600">{t(codeLanguage + '000194')}</p>
+                                    <p className="text-sm text-gray-600 whitespace-pre-line">{selectedAddress ? selectedAddress.address : orderDetail?.address}, {selectedAddress ? selectedAddress.ward : orderDetail?.ward}, {selectedAddress ? selectedAddress.district : orderDetail?.district}, {selectedAddress ? selectedAddress.province : orderDetail?.province}</p>
+                                </div>
                             </div>
-                            <div className="md:w-1/2 md:mt-0 ">
-                                <p className="font-medium text-gray-600">{t(codeLanguage + '000194')}</p>
-                                <p className="text-sm text-gray-600 whitespace-pre-line">{selectedAddress ? selectedAddress.address : orderDetail?.address}, {selectedAddress ? selectedAddress.ward : orderDetail?.ward}, {selectedAddress ? selectedAddress.district : orderDetail?.district}, {selectedAddress ? selectedAddress.province : orderDetail?.province}</p>
-
-                            </div>
-
-                        </div>
+                        )}
 
                     </div>
 
@@ -342,7 +350,7 @@ const OrderDetailScreen: React.FC = () => {
                     </div>
 
 
-                    {(orderDetail?.orderStatus !== 'NOT_VERIFY' && orderDetail?.orderStatus !== 'PROCESSING' && orderDetail?.orderStatus !== 'CANCEL') && (
+                    {(orderDetail?.orderStatus !== 'NOT_VERIFY' && orderDetail?.orderStatus !== 'PENDING' && orderDetail?.orderStatus !== 'CANCEL') && (
                         <>
 
                             <div className="mt-10 border-t pt-4">
@@ -410,7 +418,7 @@ const OrderDetailScreen: React.FC = () => {
                         </>
                     )}
                     {/* Billing and Payment Information Section */}
-                    {orderDetail?.orderStatus === 'PROCESSING' && (
+                    {orderDetail?.orderStatus === 'CANCEL' && (
                         <div >
 
                             <div className="flex justify-end mt-4">
@@ -460,6 +468,79 @@ const OrderDetailScreen: React.FC = () => {
             <ChangeAddressDialogComponent onSelectedAddressData={(address) => __handleGetSelectedAdress(address)} isOpen={isChangeAddressDialogOpen} onClose={() => __handleOpenChangeAddressDialog(false)}></ChangeAddressDialogComponent>
             <CustomerReportOrderDialogComponent orderID={orderDetail?.orderID} onClose={__handleCloseReportDialog} isOpen={isOpenReportOrderDialog}></CustomerReportOrderDialogComponent>
 
+            <Dialog open={isOpenRatingDialog}>
+                <DialogTitle>
+                    <h2 className="text-md font-semibold mb-4 ">Rating</h2>
+                </DialogTitle>
+
+                <DialogContent style={{ textAlign: 'center' }} >
+                    <form onSubmit={__handleSubmitRating} className='flex items-center mt-0 px-12'>
+                        <div className="flex items-center mb-4">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                                <button
+                                    key={star}
+                                    type="button"
+                                    className={`text-2xl mr-1 ${rating && rating >= star ? 'text-yellow-500' : 'text-gray-400'}`}
+                                    onClick={() => setRating(star)}
+                                >
+                                    ★
+                                </button>
+                            ))}
+                        </div>
+
+                    </form>
+
+                    <button
+                        type="submit"
+                        className="px-5 py-2.5 text-sm font-medium text-white"
+                        onClick={__handleRatingOrder}
+                        style={{
+                            border: `1px solid ${primaryColor}`,
+                            borderRadius: 4,
+                            color: whiteColor,
+                            marginBottom: 10,
+                            marginRight: 10,
+                            backgroundColor: primaryColor,
+                            margin: '0 auto'
+                        }}
+                    >
+                        Submit
+                    </button>
+                </DialogContent>
+            </Dialog>
+
+            {/* Cancel reason dialog */}
+
+            <Dialog open={isOpenReasonCancelDialog} onClose={() => setIsOpenReasonCancelDialog(false)}>
+                <DialogTitle>
+                    <h2 className="text-md font-semibold mb-4 ">Reason</h2>
+                    <IoMdCloseCircleOutline
+                        cursor="pointer"
+                        size={20}
+                        color={redColor}
+                        onClick={() => setIsOpenReasonCancelDialog(false)}
+                        style={{ position: 'absolute', right: 20, top: 20 }}
+                    />
+                </DialogTitle>
+
+                <DialogContent >
+                    <Typography variant="body1" className={style.content__section}>
+                        <strong>General Provisions</strong><br />
+                        <li>This order cancellation policy applies to all custom orders placed through our platform.</li>
+                        <li>Customers must agree to the terms and conditions of this cancellation policy when placing an order.</li>
+                    </Typography>
+                    <Typography variant="body1" className={style.content__section}>
+                        <strong>Order Cancellation Period</strong><br />
+                        <li>Customers can cancel their order within X hours from the time the order is created.</li>
+                        <li>After X hours, the order will be considered non-cancellable without incurring compensation costs.</li>
+                    </Typography>
+                    <Typography variant="body1" className={style.content__section}>
+                        <strong>Order Cancellation Procedure</strong><br />
+                        <li>To cancel an order, customers must submit a cancellation request through our website or contact our customer service directly.</li>
+                        <li>The cancellation notice must include the order number and the reason for cancellation.</li>
+                    </Typography>
+                </DialogContent>
+            </Dialog>
 
             <FooterComponent />
 

@@ -29,7 +29,11 @@ export interface ItemMaskInterface {
   rotate?: any;
   itemMaterial?: ItemMaterialInterface,
   materialID?: string
-  indexZ?: number
+  indexZ?: number;
+  topLeftRadius?: number;
+  topRightRadius?: number;
+  bottomLeftRadius?: number;
+  bottomRightRadius?: number;
 
 
 }
@@ -44,7 +48,10 @@ export interface PartOfDesignInterface {
   successImageUrl?: string;
   itemMasks?: ItemMaskInterface[];
   materialID?: any;
+  width?: number,
+  height?: number,
   material?: MaterialInterface;
+  realpartImageUrl?: string;
 }
 
 export interface DesignInterface {
