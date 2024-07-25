@@ -10,6 +10,14 @@ import { IoTrashOutline } from "react-icons/io5";
 import zIndex from '@mui/material/styles/zIndex';
 import { __handleGetElementAsBase64 } from '../../../../utils/CanvasUtils';
 
+
+interface BorderRadiusItemMaskInterface {
+    topLeftRadius?: number;
+    topRightRadius?: number;
+    bottomLeftRadius?: number;
+    bottomRightRadius?: number;
+}
+
 type props = {
     partOfCloth?: PartOfDesignInterface,
     partOfClothData?: PartOfDesignInterface[],
@@ -18,13 +26,15 @@ type props = {
     onDeleteItem: (item: any) => void;
     onUpdatePart: (updatePart: PartOfDesignInterface[]) => void;
     stamps?: ItemMaskInterface[] | undefined;
-    rotate?: any;
+    rotate?: {itemMaskID: any, value: number};
     onSetIsOtherItemSelected?: (itemId: any) => void;
     onUndo?: () => void;
     onRedo?: () => void;
     isOutSideClick?: boolean;
     onGetStateOuside?: (state: boolean) => void;
     onTriggerConvertSuccessImg?: () => void;
+    borderRadiusItemMask?: BorderRadiusItemMaskInterface,
+    onGetSelectedItemDrag: (value: ItemMaskInterface) => void;
 }
 
 const ImageDraggableComponent: React.FC<props> = ({
@@ -41,7 +51,9 @@ const ImageDraggableComponent: React.FC<props> = ({
     onRedo,
     isOutSideClick,
     onGetStateOuside,
-    onTriggerConvertSuccessImg
+    onTriggerConvertSuccessImg,
+    borderRadiusItemMask,
+    onGetSelectedItemDrag
 }, ref: Ref<any>) => {
 
     // TODO MUTIL LANGUAGE
@@ -68,12 +80,18 @@ const ImageDraggableComponent: React.FC<props> = ({
 
     // ---------------UseEffect---------------//
 
+    useEffect(() => {
+        console.log('Item drag - rotate: ', rotate);
+        console.log('Item drag - borderRadiusItemMask: ', borderRadiusItemMask);
+
+    }, [rotate, borderRadiusItemMask])
+
     /**
      * Set value of data when  partOfCloth and partOfClothData change
      */
     useEffect(() => {
         if (JSON.stringify(partOfClothData) !== JSON.stringify(oldPartOfClothData)) {
-            console.log('partOfClothData: ', partOfClothData);
+            console.log('Item drag - partOfClothData: ', partOfClothData);
             const result: PartOfDesignInterface[] | undefined = partOfClothData?.filter((item: PartOfDesignInterface) => item.partOfDesignName === partOfCloth?.partOfDesignName);
             if (result && result.length > 0) {
                 const itemMasks = result.find((item: PartOfDesignInterface) => item.partOfDesignID === partOfCloth?.partOfDesignID);
@@ -81,7 +99,12 @@ const ImageDraggableComponent: React.FC<props> = ({
                     const setPositionDefault = itemMasks.itemMasks.map((item) => ({
                         ...item,
                         position: { x: item.positionX, y: item.positionY },
-                        zIndex: item.indexZ
+                        zIndex: item.indexZ,
+                        // rotate: item.rotate,
+                        // bottomLeftRadius: item?.bottomLeftRadius || 0,
+                        // bottomRightRadius: item?.bottomRightRadius || 0,
+                        // topLeftRadius: item?.topLeftRadius || 0,
+                        // topRightRadius: item?.topRightRadius || 0,
                     }));
                     setData(setPositionDefault as ItemMaskInterface[]);
                     setOldPartOfClothData(partOfClothData);
@@ -147,13 +170,12 @@ const ImageDraggableComponent: React.FC<props> = ({
                 if (dataItem.itemMaskID === selectedItemDrag.itemMaskID) {
                     return {
                         ...dataItem,
-                        rotate: rotate
+                        rotate: selectedItemDrag.itemMaskID === rotate?.itemMaskID ? rotate?.value : dataItem.rotate
                     };
                 }
                 return dataItem;
             });
         });
-        console.log(`${rotate}deg`);
     }, [rotate, selectedItemDrag]);
 
     // useEffect(()=>{
@@ -161,6 +183,29 @@ const ImageDraggableComponent: React.FC<props> = ({
     //     state.modelData = data;
     // },[data])
 
+
+    /**
+     * Set rotate degree for item
+     */
+    useEffect(() => {
+        console.log('borderRadiusItemMask: ', borderRadiusItemMask);
+        if (!selectedItemDrag) return;
+        setData((prevData) => {
+            if (!prevData) return prevData;
+            return prevData.map((dataItem: ItemMaskInterface) => {
+                if (dataItem.itemMaskID === selectedItemDrag.itemMaskID) {
+                    return {
+                        ...dataItem,
+                        // topLeftRadius: borderRadiusItemMask?.topLeftRadius,
+                        // topRightRadius: borderRadiusItemMask?.topRightRadius,
+                        // bottomLeftRadius: borderRadiusItemMask?.bottomLeftRadius,
+                        // bottomRightRadius: borderRadiusItemMask?.bottomRightRadius
+                    };
+                }
+                return dataItem;
+            });
+        });
+    }, [borderRadiusItemMask, selectedItemDrag]);
 
 
     // ---------------FunctionHandler---------------//
@@ -251,6 +296,7 @@ const ImageDraggableComponent: React.FC<props> = ({
         setSelectedItemDrag(item);
         if (onSetIsOtherItemSelected) {
             onSetIsOtherItemSelected(item.itemMaskID);
+            onGetSelectedItemDrag(item)
         }
     };
 
@@ -306,7 +352,12 @@ const ImageDraggableComponent: React.FC<props> = ({
                                 position: { x: x, y: y },
                                 positionX: x,
                                 positionY: y,
-                                rotate: rotate
+                                // rotate: rotate,
+                                // topLeftRadius: borderRadiusItemMask?.topLeftRadius,
+                                // topRightRadius: borderRadiusItemMask?.topRightRadius,
+                                // bottomLeftRadius: borderRadiusItemMask?.bottomLeftRadius,
+                                // bottomRightRadius: borderRadiusItemMask?.bottomRightRadius
+
                             };
                         }
                         return dataItem;
@@ -356,7 +407,7 @@ const ImageDraggableComponent: React.FC<props> = ({
                             scaleY: newHeight,
                         };
                     }
-                    setSize({width: newWidth, height: newHeight})
+                    setSize({ width: newWidth, height: newHeight })
                     console.log('neww: ', newWidth, '- newH: ', newHeight);
                     return dataItem;
                 });
@@ -479,7 +530,7 @@ const ImageDraggableComponent: React.FC<props> = ({
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                border: 'none',
+                                border: selectedItemDrag?.itemMaskID === item.itemMaskID ? '1px solid black' : 'none',
                                 zIndex: itemZIndices[item.itemMaskID] ?? 1,
                                 rotate: `${item.rotate}deg`,
                             }}
@@ -489,7 +540,7 @@ const ImageDraggableComponent: React.FC<props> = ({
                             defaultSize={item.typeOfItem !== 'TEXT' ? { width: item.scaleX, height: item.scaleY } : { width: 230 }}
                             handleWrapperStyle={{ pointerEvents: 'auto' }}
                             className={`${styles.resizeable__element}`}
-                            
+
                         >
                             {selectedItemDrag?.itemMaskID === item.itemMaskID && (
                                 <>
@@ -507,14 +558,23 @@ const ImageDraggableComponent: React.FC<props> = ({
                                     />
                                 </>
                             )}
-                            <img src={item.imageUrl} className={`${styles.item__img__resizeable}`} style={{ border: selectedItemDrag?.itemMaskID === item.itemMaskID ? '1px solid black' : 'none', pointerEvents: 'auto' }} onClick={() => __handleSelectedIteamDrag(item)} alt="Draggable Image" />
+                            <img
+                                src={item.imageUrl}
+                                className={`${styles.item__img__resizeable}`}
+                                style={
+                                    {
+                                        pointerEvents: 'auto',
+                                        borderTopLeftRadius: item.topLeftRadius,
+                                        borderTopRightRadius: item.topRightRadius,
+                                        borderBottomLeftRadius: item.bottomLeftRadius,
+                                        borderBottomRightRadius: item.bottomRightRadius
+                                    }
+                                }
+                                onClick={() => __handleSelectedIteamDrag(item)} alt="Draggable Image" />
                         </Resizable>
                     </div>
                 </Draggable>
-            )), [data, selectedItemDrag, itemPositions, itemZIndices, resizing])
-
-
-
+            )), [data, selectedItemDrag, itemPositions, itemZIndices, resizing]);
 
     return (
         <>
