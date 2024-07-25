@@ -140,7 +140,6 @@ const Shirt = ({ isDefault }) => {
 
     const loadTexture = (imageUrl) => {
         const loader = new TextureLoader();
-        console.log('-------------------------------load', loader);
         return loader.loadAsync(imageUrl);
     };
 
