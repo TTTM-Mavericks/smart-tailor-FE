@@ -100,6 +100,26 @@ function SignInScreen() {
 
 
   /**
+   * 
+   * @param roleName 
+   * @returns 
+   */
+  const roleBasedRedirect = (roleName: string) => {
+    switch (roleName) {
+      case 'ADMIN':
+        return '/admin';
+      case 'EMPLOYEE':
+        return '/employee';
+      case 'MANAGER':
+        return '/manager';
+      case 'ACCOUNTANT':
+        return '/accountant';
+      default:
+        return '/';
+    }
+  };
+
+  /**
    * Handle signin
    * @param event 
    */
@@ -114,40 +134,41 @@ function SignInScreen() {
 
         const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.signin}`, requestData);
         if (response.status === 200) {
-          localStorage.setItem('userAuth', JSON.stringify(response.data.user));
-          const authToken = response.data.access_token;
-          const refreshToken = response.data.refresh_token;
-          Cookies.set('token', authToken);
-          Cookies.set('refreshToken', refreshToken);
-          Cookies.set('userAuth', JSON.stringify(response.data.user));
+          const { user, access_token, refresh_token } = response.data;
 
-          const BRANDROLECHECK = Cookies.get('userAuth') as string;
-          const brandAuth = JSON.parse(BRANDROLECHECK);
-          const { userID, email, fullName, language, phoneNumber, roleName, imageUrl, userStatus } = brandAuth;
+          localStorage.setItem('userAuth', JSON.stringify(user));
+          Cookies.set('token', access_token);
+          Cookies.set('refreshToken', refresh_token);
+          Cookies.set('userAuth', JSON.stringify(user));
 
-          const fetchApiBrand = await api.get(`${versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.getBrandByID + `/${userID}`}`)
-          if (fetchApiBrand.data.brandName === null) {
-            window.location.href = `/brand/updateProfile/${userID}`;
-          } if (fetchApiBrand.data.brandStatus === "PENDING") {
-            window.location.href = `/brand/waiting_process_information`
+          const redirectUrl = roleBasedRedirect(user.roleName);
+          console.log(redirectUrl + "bebeurl");
+          await new Promise(resolve => setTimeout(resolve, 20000));
+
+          if (user.roleName === 'BRAND') {
+            const fetchApiBrand = await api.get(`${versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.getBrandByID + `/${user.userID}`}`);
+            const { brandName, brandStatus } = fetchApiBrand.data;
+
+            if (brandName === null) {
+              window.location.href = `/brand/updateProfile/${user.userID}`;
+            } else if (brandStatus === "PENDING") {
+              window.location.href = `/brand/waiting_process_information`;
+            } else {
+              window.location.href = `/brand`;
+            }
           } else {
-            window.location.href = `/brand`
+            window.location.href = redirectUrl;
           }
-
-          setTimeout(() => {
-            window.location.href = '/'
-          }, 2000)
-
-        } else {
-          setIsloading(false);
-          toast.error(`${response.message}`, { autoClose: 3000 });
-
         }
-
       } catch (error: any) {
         console.error('Error posting data:', error);
+        if (error.response) {
+          toast.error(`${error.response.data.message || 'An error occurred'}`, { autoClose: 3000 });
+        } else {
+          toast.error('Network error. Please try again.', { autoClose: 3000 });
+        }
+      } finally {
         setIsloading(false);
-        toast.error(`${error}`, { autoClose: 3000 });
       }
     } else {
       setEmailErrorValidate(errorEmailValidate);
@@ -155,7 +176,6 @@ function SignInScreen() {
       toast.error(`Invalid Email or Password`, { autoClose: 3000 });
     }
   };
-
 
   const __handleLoginSuccess = (response: any) => {
     try {

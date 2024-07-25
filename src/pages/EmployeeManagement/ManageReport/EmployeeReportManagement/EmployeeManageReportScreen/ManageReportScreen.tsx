@@ -1,35 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import './ManageReportStyles.module.scss'
 import { motion } from 'framer-motion';
-import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaTimes } from 'react-icons/fa';
+import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { Report, ReportImageList } from '../../../../../models/EmployeeManageReportModel';
+import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
+import axios from 'axios';
 
-interface Report {
-    id: number;
-    orderId: string;
-    customerName: string;
-    date: string;
-    status: 'Pending' | 'Resolved';
-    description: string;
-}
-
-const OrderReport: React.FC<{ report: Report; onViewDetails: (report: Report) => void; onMarkResolved: (id: number) => void }> = ({ report, onViewDetails, onMarkResolved }) => (
-    <div className="bg-white shadow-lg rounded-lg p-6 transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl">
-        <h3 className="text-xl font-semibold mb-3 text-indigo-700">Order #{report.orderId}</h3>
-        <p className="text-gray-600 mb-2">Customer: {report.customerName}</p>
-        <p className="text-gray-600 mb-2">Date: {report.date}</p>
-        <p className="text-gray-600 mb-2">Status:
-            <span className={`ml-2 font-semibold px-2 py-1 rounded-full ${report.status === 'Resolved'
+const OrderReport: React.FC<{ report: Report; onViewDetails: (report: Report) => void; onMarkResolved: (reportID: string) => void }> = ({ report, onViewDetails, onMarkResolved }) => (
+    <div className="bg-white shadow-lg rounded-lg p-6 transition duration-300 ease-in-out transform hover:shadow-xl">
+        <h3 className="text-xl font-semibold mb-3 text-indigo-700">Type Report: {report.typeOfReport}</h3>
+        <p className="text-gray-600 mb-2">Customer: {report.orderResponse.buyerName}</p>
+        <p className="text-gray-600 mb-2">Date: {report.createDate}</p>
+        <p className="text-gray-600 mb-2">Status Report:
+            <span className={`ml-2 font-semibold px-2 py-1 rounded-full ${report.reportStatus === true
                 ? 'bg-green-200 text-green-800'
                 : 'bg-yellow-200 text-yellow-800'
                 }`}>
-                {report.status}
+                {report.reportStatus ? 'Read' : 'Unread'}
             </span>
         </p>
-        <p className="text-gray-700 mt-4">{report.description}</p>
+        <p className="text-gray-700 mt-4">{report.content}</p>
         <div className="mt-6 flex justify-between">
             <button onClick={() => onViewDetails(report)} className="bg-indigo-500 text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300">View Details</button>
             <button
-                onClick={() => onMarkResolved(report.id)}
+                onClick={() => onMarkResolved(report.reportID)}
                 className="bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300"
             >
                 Mark as Resolved
@@ -37,138 +31,162 @@ const OrderReport: React.FC<{ report: Report; onViewDetails: (report: Report) =>
         </div>
     </div>
 );
+function isReportImageListArray(reportImageList: ReportImageList | ReportImageList[]): reportImageList is ReportImageList[] {
+    return Array.isArray(reportImageList);
+}
 
-const ReportModal: React.FC<{ report: Report; onClose: () => void; onMarkResolved: (id: number) => void }> = ({ report, onClose, onMarkResolved }) => (
-    <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center p-4"
-        onClick={onClose}
-    >
+const ReportModal: React.FC<{ report: Report; onClose: () => void; onMarkResolved: (reportID: string) => void }> = ({ report, onClose, onMarkResolved }) => {
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'NOT_VERIFY': return 'text-gray-600';
+            case 'PENDING': return 'text-yellow-600';
+            case 'DEPOSIT': return 'text-blue-600';
+            case 'PROCESSING': return 'text-orange-600';
+            case 'CANCEL': return 'text-red-600';
+            case 'COMPLETED': return 'text-green-600';
+            case 'DELIVERED': return 'text-indigo-600';
+            default: return 'text-gray-600';
+        }
+    };
+
+    const nextImage = () => {
+        if (isReportImageListArray(report.reportImageList)) {
+            setCurrentImageIndex((prevIndex) =>
+                prevIndex === report.reportImageList.length - 1 ? 0 : prevIndex + 1
+            );
+        }
+    };
+
+    const prevImage = () => {
+        if (isReportImageListArray(report.reportImageList)) {
+            setCurrentImageIndex((prevIndex) =>
+                prevIndex === 0 ? report.reportImageList.length - 1 : prevIndex - 1
+            );
+        }
+    };
+
+    return (
         <motion.div
-            initial={{ scale: 0.9, y: 50 }}
-            animate={{ scale: 1, y: 0 }}
-            exit={{ scale: 0.9, y: 50 }}
-            className="relative bg-white w-full max-w-2xl rounded-lg shadow-2xl p-8"
-            onClick={e => e.stopPropagation()}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm overflow-y-auto h-full w-full flex items-center justify-center p-4 z-50"
+            onClick={onClose}
         >
-            <button
-                onClick={onClose}
-                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition duration-150"
+            <motion.div
+                initial={{ scale: 0.9, y: 50 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.9, y: 50 }}
+                className="relative bg-white w-full max-w-2xl rounded-xl shadow-2xl p-8 max-h-[90vh] overflow-y-auto"
+                onClick={e => e.stopPropagation()}
             >
-                <FaTimes size={24} />
-            </button>
-
-            <h2 className="text-3xl font-bold text-indigo-700 mb-6">Order Report Details</h2>
-
-            <div className="grid grid-cols-2 gap-6 mb-8">
-                <div>
-                    <p className="text-gray-600 flex items-center mb-2">
-                        <FaClipboardCheck className="mr-2 text-indigo-500" />
-                        <span className="font-semibold">Order ID:</span>
-                    </p>
-                    <p className="text-xl font-bold text-gray-800">{report.orderId}</p>
-                </div>
-                <div>
-                    <p className="text-gray-600 flex items-center mb-2">
-                        <FaUser className="mr-2 text-indigo-500" />
-                        <span className="font-semibold">Customer:</span>
-                    </p>
-                    <p className="text-xl font-bold text-gray-800">{report.customerName}</p>
-                </div>
-                <div>
-                    <p className="text-gray-600 flex items-center mb-2">
-                        <FaCalendar className="mr-2 text-indigo-500" />
-                        <span className="font-semibold">Date:</span>
-                    </p>
-                    <p className="text-xl font-bold text-gray-800">{report.date}</p>
-                </div>
-                <div>
-                    <p className="text-gray-600 flex items-center mb-2">
-                        <FaExclamationCircle className="mr-2 text-indigo-500" />
-                        <span className="font-semibold">Status:</span>
-                    </p>
-                    <p className={`text-xl font-bold ${report.status === 'Resolved' ? 'text-green-600' : 'text-yellow-600'}`}>
-                        {report.status}
-                    </p>
-                </div>
-            </div>
-
-            <div className="mb-8">
-                <h3 className="text-xl font-semibold text-gray-700 mb-3">Description</h3>
-                <p className="text-gray-600 bg-gray-100 p-4 rounded-lg">{report.description}</p>
-            </div>
-
-            <div className="flex justify-end space-x-4">
                 <button
                     onClick={onClose}
-                    className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-150"
+                    className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition duration-150"
+                    aria-label="Close modal"
                 >
-                    Close
+                    <FaTimes size={24} />
                 </button>
-                <button
-                    onClick={() => onMarkResolved(report.id)}
-                    className={`px-6 py-3 rounded-lg text-white transition duration-150 ${report.status === 'Resolved'
-                        ? 'bg-green-500 hover:bg-green-600 cursor-not-allowed'
-                        : 'bg-indigo-500 hover:bg-indigo-600'
-                        }`}
-                    disabled={report.status === 'Resolved'}
-                >
-                    {report.status === 'Resolved' ? 'Already Resolved' : 'Mark as Resolved'}
-                </button>
-            </div>
+
+                <h2 className="text-3xl font-bold text-indigo-700 mb-6 shadow-text">Order Report Details</h2>
+
+                <div className="flex justify-between items-center mb-6 bg-indigo-50 p-4 rounded-lg">
+                    <div className="flex items-center">
+                        <FaClipboardCheck className="text-indigo-500 mr-2" size={20} />
+                        <span className="font-semibold text-gray-700">Order ID:</span>
+                    </div>
+                    <p className="text-xl font-bold text-indigo-700">{report.reportID}</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    {[
+                        { icon: FaUser, label: 'Customer', value: report.orderResponse.buyerName },
+                        { icon: FaCalendar, label: 'Date', value: report.lastModifiedDate },
+                        {
+                            icon: FaExclamationCircle,
+                            label: 'Report Status',
+                            value: report.reportStatus ? 'Read' : 'Unread',
+                            customClass: report.reportStatus ? 'text-green-600' : 'text-yellow-600'
+                        },
+                        {
+                            icon: FaExclamationCircle,
+                            label: 'Order Status',
+                            value: report.orderResponse.orderStatus,
+                            customClass: getStatusColor(report.orderResponse.orderStatus)
+                        }
+                    ].map((item, index) => (
+                        <div key={index} className="bg-gray-50 p-4 rounded-lg">
+                            <p className="text-gray-600 flex items-center mb-2">
+                                <item.icon className="mr-2 text-indigo-500" />
+                                <span className="font-semibold">{item.label}:</span>
+                            </p>
+                            <p className={`text-lg font-bold ${item.customClass || 'text-gray-800'}`}>
+                                {item.value}
+                            </p>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="mb-8">
+                    <h3 className="text-xl font-semibold text-gray-700 mb-3">Description</h3>
+                    <p className="text-gray-600 bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-inner">
+                        {report.content}
+                    </p>
+                </div>
+
+                {isReportImageListArray(report.reportImageList) && report.reportImageList.length > 0 && (
+                    <div className="mb-8">
+                        <h3 className="text-xl font-semibold text-gray-700 mb-3">Report Images</h3>
+                        <div className="relative">
+                            <img
+                                src={report.reportImageList[currentImageIndex].reportImageUrl}
+                                alt={report.reportImageList[currentImageIndex].reportImageName}
+                                className="w-full h-64 object-cover rounded-lg"
+                            />
+                            {report.reportImageList.length > 1 && (
+                                <>
+                                    <button onClick={prevImage} className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full">
+                                        <FaChevronLeft />
+                                    </button>
+                                    <button onClick={nextImage} className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full">
+                                        <FaChevronRight />
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                        <p className="text-center mt-2 text-gray-600">
+                            {report.reportImageList[currentImageIndex].reportImageName}
+                        </p>
+                    </div>
+                )}
+
+                <div className="flex justify-end space-x-4">
+                    <button
+                        onClick={onClose}
+                        className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-150 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                    >
+                        Close
+                    </button>
+                    <button
+                        onClick={() => onMarkResolved(report.reportID)}
+                        className={`px-6 py-3 rounded-lg text-white transition duration-150 focus:outline-none focus:ring-2 ${report.reportStatus
+                            ? 'bg-green-500 hover:bg-green-600 focus:ring-green-400 cursor-not-allowed'
+                            : 'bg-indigo-500 hover:bg-indigo-600 focus:ring-indigo-400'
+                            }`}
+                        disabled={report.reportStatus}
+                    >
+                        {report.reportStatus ? 'Already Resolved' : 'Mark as Resolved'}
+                    </button>
+                </div>
+            </motion.div>
         </motion.div>
-    </motion.div>
-);
+    );
+};
 
 const EmployeeManageReport: React.FC = () => {
-    const [reports, setReports] = useState<Report[]>([
-        { id: 1, orderId: '12345', customerName: 'John Doe', date: '2024-07-25', status: 'Pending', description: 'The product arrived damaged.' },
-        { id: 2, orderId: '67890', customerName: 'Jane Smith', date: '2024-07-24', status: 'Resolved', description: 'Wrong item received, but customer support helped resolve the issue.' },
-        { id: 3, orderId: '11111', customerName: 'Alice Johnson', date: '2024-07-23', status: 'Pending', description: 'Item not as described.' },
-        { id: 4, orderId: '22222', customerName: 'Bob Brown', date: '2024-07-22', status: 'Resolved', description: 'Late delivery, but resolved with a refund.' },
-        { id: 5, orderId: '33333', customerName: 'Carol White', date: '2024-07-21', status: 'Pending', description: 'Package lost in transit.' },
-        { id: 6, orderId: '44444', customerName: 'David Black', date: '2024-07-20', status: 'Resolved', description: 'Received a refund for a damaged product.' },
-        { id: 7, orderId: '55555', customerName: 'Eve Green', date: '2024-07-19', status: 'Pending', description: 'Missing parts in the package.' },
-        { id: 8, orderId: '66666', customerName: 'Frank Red', date: '2024-07-18', status: 'Resolved', description: 'Replacement sent for a defective item.' },
-        { id: 9, orderId: '77777', customerName: 'Grace Blue', date: '2024-07-17', status: 'Pending', description: 'Incorrect size received.' },
-        { id: 10, orderId: '88888', customerName: 'Hank Yellow', date: '2024-07-16', status: 'Resolved', description: 'Refund issued for a missing package.' },
-        { id: 11, orderId: '99999', customerName: 'Ivy Purple', date: '2024-07-15', status: 'Pending', description: 'Delayed shipment.' },
-        { id: 12, orderId: '10101', customerName: 'Jack Orange', date: '2024-07-14', status: 'Resolved', description: 'Product returned and refund processed.' },
-        { id: 13, orderId: '20202', customerName: 'Kate Pink', date: '2024-07-13', status: 'Pending', description: 'Received wrong color.' },
-        { id: 14, orderId: '30303', customerName: 'Leo Brown', date: '2024-07-12', status: 'Resolved', description: 'Exchanged for the correct item.' },
-        { id: 15, orderId: '40404', customerName: 'Mia Grey', date: '2024-07-11', status: 'Pending', description: 'Package damaged in transit.' },
-        { id: 16, orderId: '50505', customerName: 'Nick White', date: '2024-07-10', status: 'Resolved', description: 'Refund for delayed shipment.' },
-        { id: 17, orderId: '60606', customerName: 'Olive Black', date: '2024-07-09', status: 'Pending', description: 'Product arrived defective.' },
-        { id: 18, orderId: '70707', customerName: 'Paul Green', date: '2024-07-08', status: 'Resolved', description: 'Replacement sent for missing parts.' },
-        { id: 19, orderId: '80808', customerName: 'Quinn Red', date: '2024-07-07', status: 'Pending', description: 'Incorrect item shipped.' },
-        { id: 20, orderId: '90909', customerName: 'Rita Blue', date: '2024-07-06', status: 'Resolved', description: 'Refund processed for incorrect item.' },
-        { id: 21, orderId: '11112', customerName: 'Sam Yellow', date: '2024-07-05', status: 'Pending', description: 'Product not received.' },
-        { id: 22, orderId: '22223', customerName: 'Tina Purple', date: '2024-07-04', status: 'Resolved', description: 'Refund for lost package.' },
-        { id: 23, orderId: '33334', customerName: 'Uma Orange', date: '2024-07-03', status: 'Pending', description: 'Delayed delivery.' },
-        { id: 24, orderId: '44445', customerName: 'Vince Pink', date: '2024-07-02', status: 'Resolved', description: 'Replacement sent for delayed shipment.' },
-        { id: 25, orderId: '55556', customerName: 'Walt Brown', date: '2024-07-01', status: 'Pending', description: 'Received the wrong item.' },
-        { id: 26, orderId: '66667', customerName: 'Xena Grey', date: '2024-06-30', status: 'Resolved', description: 'Refund processed for wrong item.' },
-        { id: 27, orderId: '77778', customerName: 'Yuri White', date: '2024-06-29', status: 'Pending', description: 'Product arrived damaged.' },
-        { id: 28, orderId: '88889', customerName: 'Zane Black', date: '2024-06-28', status: 'Resolved', description: 'Replacement sent for damaged product.' },
-        { id: 29, orderId: '99990', customerName: 'Amy Green', date: '2024-06-27', status: 'Pending', description: 'Missing parts.' },
-        { id: 30, orderId: '10102', customerName: 'Brian Red', date: '2024-06-26', status: 'Resolved', description: 'Refund for missing parts.' },
-        { id: 31, orderId: '20203', customerName: 'Cathy Blue', date: '2024-06-25', status: 'Pending', description: 'Wrong size.' },
-        { id: 32, orderId: '30304', customerName: 'Derek Yellow', date: '2024-06-24', status: 'Resolved', description: 'Exchanged for correct size.' },
-        { id: 33, orderId: '40405', customerName: 'Eve Purple', date: '2024-06-23', status: 'Pending', description: 'Delayed shipment.' },
-        { id: 34, orderId: '50506', customerName: 'Frank Orange', date: '2024-06-22', status: 'Resolved', description: 'Refund for delayed shipment.' },
-        { id: 35, orderId: '60607', customerName: 'Grace Pink', date: '2024-06-21', status: 'Pending', description: 'Product not as described.' },
-        { id: 36, orderId: '70708', customerName: 'Henry Brown', date: '2024-06-20', status: 'Resolved', description: 'Replacement sent for incorrect item.' },
-        { id: 37, orderId: '80809', customerName: 'Ivy Grey', date: '2024-06-19', status: 'Pending', description: 'Package lost in transit.' },
-        { id: 38, orderId: '90910', customerName: 'Jack White', date: '2024-06-18', status: 'Resolved', description: 'Refund for lost package.' },
-        { id: 39, orderId: '11113', customerName: 'Kate Black', date: '2024-06-17', status: 'Pending', description: 'Incorrect color received.' },
-        { id: 40, orderId: '22224', customerName: 'Leo Green', date: '2024-06-16', status: 'Resolved', description: 'Exchanged for correct color.' },
-        { id: 41, orderId: '33335', customerName: 'Mia Red', date: '2024-06-15', status: 'Pending', description: 'Received a damaged product.' },
-        { id: 42, orderId: '44446', customerName: 'Nick Blue', date: '2024-06-14', status: 'Resolved', description: 'Replacement sent for damaged product.' },
-        { id: 43, orderId: '55557', customerName: 'Olive Yellow', date: '2024-06-13', status: 'Pending', description: 'Product arrived defective.' },
-    ]);
-
+    const [reports, setReports] = useState<Report[]>([]);
     const [filteredReports, setFilteredReports] = useState<Report[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [reportsPerPage] = useState(6);
@@ -176,11 +194,32 @@ const EmployeeManageReport: React.FC = () => {
         date: '',
         status: '',
         name: '',
+        orderStatus: '',
     });
     const [selectedReport, setSelectedReport] = useState<Report | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [itemsPerPage, setItemsPerPage] = useState(20);
     const [goToPage, setGoToPage] = useState('1');
+
+    useEffect(() => {
+        const apiUrl = `${baseURL}${versionEndpoints.v1}${featuresEndpoints.report}${functionEndpoints.report.getAllReport}`;
+        axios.get(apiUrl)
+            .then(response => {
+                if (response.status !== 200) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.data;
+            })
+            .then((responseData) => {
+                if (responseData && Array.isArray(responseData.data)) {
+                    setReports(responseData.data);
+                    console.log("Data received:", responseData);
+                } else {
+                    console.error('Invalid data format:', responseData);
+                }
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    }, []);
 
     useEffect(() => {
         applyFilters();
@@ -189,25 +228,35 @@ const EmployeeManageReport: React.FC = () => {
     const applyFilters = () => {
         let filtered = reports;
         if (filters.date) {
-            filtered = filtered.filter(report => report.date === filters.date);
+            const filterDate = new Date(filters.date);
+            filtered = filtered.filter(report => {
+                const reportDate = new Date(report.createDate.split(' ')[0]);
+                return reportDate.toDateString() === filterDate.toDateString();
+            });
         }
-        if (filters.status) {
-            filtered = filtered.filter(report => report.status === filters.status);
+        if (filters.status !== '') {
+            filtered = filtered.filter(report => report.reportStatus === (filters.status === 'true'));
         }
         if (filters.name) {
             filtered = filtered.filter(report =>
-                report.customerName.toLowerCase().includes(filters.name.toLowerCase())
+                report.typeOfReport.toLowerCase().includes(filters.name.toLowerCase())
             );
+        }
+        if (filters.orderStatus !== '') {
+            filtered = filtered.filter(report => report.orderResponse.orderStatus === filters.orderStatus);
         }
         setFilteredReports(filtered);
         setCurrentPage(1);
     };
 
     const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setFilters({
-            ...filters,
-            [e.target.name]: e.target.value,
-        });
+        const value = e.target.name === 'status'
+            ? e.target.value === 'true' ? true : e.target.value === 'false' ? false : ''
+            : e.target.value;
+        setFilters(prevFilters => ({
+            ...prevFilters,
+            [e.target.name]: value,
+        }));
     };
 
     const indexOfLastReport = currentPage * reportsPerPage;
@@ -271,9 +320,9 @@ const EmployeeManageReport: React.FC = () => {
         setSelectedReport(null);
     };
 
-    const handleMarkResolved = (id: number) => {
+    const handleMarkResolved = (id: string) => {
         setReports(reports.map(report =>
-            report.id === id ? { ...report, status: 'Resolved' } : report
+            report.reportID === id ? { ...report, status: true } : report
         ));
         handleCloseModal();
     };
@@ -287,27 +336,43 @@ const EmployeeManageReport: React.FC = () => {
                     onChange={handleFilterChange}
                     className="px-4 py-2 rounded-full border-2 border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-300 ease-in-out transform hover:scale-105"
                 />
-                <select
+                {/* <select
                     name="status"
                     onChange={handleFilterChange}
                     className="px-4 py-2 rounded-full border-2 border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-300 ease-in-out transform hover:scale-105"
                 >
-                    <option value="">All Statuses</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Resolved">Resolved</option>
-                </select>
+                    <option value="">All Report Statuses</option>
+                    <option value="false">Unread</option>
+                    <option value="true">Read</option>
+                </select> */}
+                <div className='custom-select'>
+                    <select
+                        name="orderStatus"
+                        onChange={handleFilterChange}
+                        className="px-4 py-2 rounded-full border-2 border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-300 ease-in-out transform hover:scale-105"
+                    >
+                        <option value="">All Order Statuses</option>
+                        <option value="NOT_VERIFY">Not Verify</option>
+                        <option value="PENDING">Pending</option>
+                        <option value="DEPOSIT">Deposit</option>
+                        <option value="PROCESSING">Processing</option>
+                        <option value="CANCEL">Cancel</option>
+                        <option value="COMPLETED">Completed</option>
+                        <option value="DELIVERED">Delivered</option>
+                    </select>
+                </div>
                 <input
                     type="text"
                     name="name"
-                    placeholder="Filter by customer name..."
+                    placeholder="Filter by brand name..."
                     onChange={handleFilterChange}
                     className="px-4 py-2 rounded-full border-2 border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-300 ease-in-out transform hover:scale-105"
                 />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div >
                 {currentReports.map(report => (
-                    <OrderReport key={report.id} report={report} onViewDetails={handleViewDetails} onMarkResolved={handleMarkResolved} />
+                    <OrderReport key={report.reportID} report={report} onViewDetails={handleViewDetails} onMarkResolved={handleMarkResolved} />
                 ))}
             </div>
 
@@ -317,6 +382,7 @@ const EmployeeManageReport: React.FC = () => {
                     onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
                     className="border rounded-md px-3 py-2 text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:border-orange-500"
                 >
+                    <option value={5}>5/page</option>
                     <option value={10}>10/page</option>
                     <option value={20}>20/page</option>
                     <option value={50}>50/page</option>

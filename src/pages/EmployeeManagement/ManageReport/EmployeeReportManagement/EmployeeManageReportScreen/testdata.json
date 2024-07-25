@@ -1,0 +1,70 @@
+{
+    "reportID": "228badaa-ea73-4546-97df-70330187b4a5",
+    "typeOfReport": "Brand Nguu",
+    "orderResponse": {
+        "orderID": "e32268ba-0c5e-4d98-a2c3-74d4e4edb8ca",
+        "parentOrderID": null,
+        "quantity": 4,
+        "orderStatus": "CANCEL",
+        "orderType": "PARENT_ORDER",
+        "address": "asd",
+        "province": "Tỉnh Phú Thọ",
+        "district": "Huyện Tân Sơn",
+        "ward": "Xã Long Cốc",
+        "phone": null,
+        "buyerName": "as",
+        "totalPrice": 0,
+        "expectedStartDate": null,
+        "expectedProductCompletionDate": null,
+        "estimatedDeliveryDate": null,
+        "productionStartDate": null,
+        "productionCompletionDate": null,
+        "detailList": [
+            {
+                "designDetailId": "2db83990-2ecf-4d7c-ba97-8f3e0a06886f",
+                "quantity": 1,
+                "size": {
+                    "sizeID": "d0c05708-4a5c-11ef-817d-0a002700000b",
+                    "sizeName": "L",
+                    "status": true,
+                    "createDate": "2024-07-25T15:06:37",
+                    "lastModifiedDate": null
+                },
+                "detailStatus": false
+            },
+            {
+                "designDetailId": "340b7bca-3d45-4c75-bd25-bb9da1d8e91c",
+                "quantity": 3,
+                "size": {
+                    "sizeID": "d0c05177-4a5c-11ef-817d-0a002700000b",
+                    "sizeName": "S",
+                    "status": true,
+                    "createDate": "2024-07-25T15:06:37",
+                    "lastModifiedDate": null
+                },
+                "detailStatus": false
+            }
+        ],
+        "paymentList": null
+    },
+    "content": "This is the content of the report.",
+    "reportStatus": true,
+    "reportImageList": [
+        {
+            "reportImageID": "40d39c5b-f924-41a3-830e-debe730a02e5",
+            "reportImageName": "Profit Graph",
+            "reportImageUrl": "http://example.com/profit-graph.png",
+            "createDate": "2024-07-25 15:10:42",
+            "lastModifiedDate": null
+        },
+        {
+            "reportImageID": "85ed6737-24cb-4359-aeb9-8b060fa70bef",
+            "reportImageName": "Sales Chart",
+            "reportImageUrl": "http://example.com/sales-chart.png",
+            "createDate": "2024-07-25 15:10:42",
+            "lastModifiedDate": null
+        }
+    ],
+    "createDate": "2024-07-25 15:10:42",
+    "lastModifiedDate": "2024-07-25 15:10:42"
+}

@@ -34,6 +34,7 @@ export const featuresEndpoints = {
   brand: '/brand',
   user: '/user',
   systemImage: '/system-image',
+  report: '/report'
 
 }
 export const functionEndpoints = {
@@ -157,6 +158,11 @@ export const functionEndpoints = {
   systemImage: {
     getAllSystemIamge: '/get-all-system-image',
 
+  },
+  report: {
+    getAllReport: '/get-all-report',
+    createReport: '/create-report',
+    getReportByOrderID: '/get-all-report-by-order-id'
   }
 }
 

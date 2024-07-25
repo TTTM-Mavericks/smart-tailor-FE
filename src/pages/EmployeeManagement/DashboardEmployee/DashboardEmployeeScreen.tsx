@@ -19,8 +19,18 @@ const DashboardEmployeeScreens = () => {
         setMenuOpen(!menuOpen);
     };
 
+    useEffect(() => {
+        // Get the active tab from localStorage on component mount
+        const savedActiveMenu = localStorage.getItem('employeeActiveMenu');
+        if (savedActiveMenu) {
+            setActiveMenu(savedActiveMenu);
+        }
+    }, []);
+
     const handleMenuClick = (menu: any) => {
         setActiveMenu(menu);
+        // Save the active tab to localStorage
+        localStorage.setItem('employeeActiveMenu', menu);
     };
 
     // Effect to close popper on outside click

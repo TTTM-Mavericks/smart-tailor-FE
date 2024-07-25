@@ -202,7 +202,7 @@ export default function FilterProductScreen() {
     return (
         <div className="bg-white" style={{ marginTop: "0" }}>
             <HeaderComponent />
-            <div>
+            <div style={{ marginTop: "-3%" }}>
                 <Transition.Root show={mobileFiltersOpen} as={Fragment}>
                     <Dialog as="div" className="relative z-40 lg:hidden" onClose={setMobileFiltersOpen}>
                         <Transition.Child
