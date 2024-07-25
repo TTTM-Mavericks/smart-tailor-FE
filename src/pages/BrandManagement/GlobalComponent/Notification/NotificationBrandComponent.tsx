@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Stomp } from '@stomp/stompjs';
-import io from "socket.io-client";
-import { Button, Divider, IconButton, Menu, Badge, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import React, { useEffect, useRef, useState } from 'react';
+import { IconButton } from "@mui/material";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
+import { EyeIcon } from '@heroicons/react/24/outline';
 
 interface NotificationInterface {
     notiID?: any;
@@ -35,203 +34,112 @@ interface UserInterFace {
     followed?: boolean;
 }
 
-const NotificationBrandComponent = () => {
-    const [anchorOpenNotification, setAnchorOpenNotification] = React.useState<null | HTMLElement>(null);
-    const [data, setData] = useState<NotificationInterface[]>([]);
+interface NotificationItemProps {
+    avatar: string;
+    name: string;
+    message: string;
+    time: string;
+}
 
-    // Pop Up Notification
-    const [openPopup, setOpenPopup] = React.useState<boolean>(false);
+interface NotificationBrandComponentProps {
+    setActiveMenu: (menu: string) => void;
+}
 
-    const _handleOpenPopup = () => {
-        setOpenPopup(true);
+const NotificationBrandComponent: React.FC<NotificationBrandComponentProps> = ({ setActiveMenu }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const notificationRef = useRef<HTMLDivElement>(null);
+
+    const toggleNotifications = () => {
+        setIsOpen(!isOpen);
     };
 
-    const _handleClosePopup = () => {
-        setOpenPopup(false);
+    const _handleViewAllClick = () => {
+        setActiveMenu('manage_notification');
     };
 
-    const _handleCloseNotification = () => {
-        setAnchorOpenNotification(null);
-    };
-
-    const _handleClickNotification = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorOpenNotification(event.currentTarget);
-    };
-
-    // Create a WebSocket connection instance
-    // const socket = io('ws://localhost:6969');
-    // const stompClient = Stomp.over(socket);
-
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         try {
-    //             const response = await fetch(`http://localhost:6969/api/v1/notification/get-all-notification?userid=1&target_userid=2`);
-    //             const getData = await response.json();
-    //             if (getData) {
-    //                 setData(getData.data);
-    //             } else {
-    //                 console.log(getData.data);
-    //             }
-    //         } catch (error) {
-    //             console.error("An error occurred during data fetching:", error);
-    //         }
-    //     };
-    //     fetchData();
-
-    //     // Connect to WebSocket only once
-    //     stompClient.connect({}, () => {
-    //         console.log('Connected to WebSocket');
-    //         // Subscribe to notifications topic
-    //         stompClient.subscribe('/topic/public', (message: any) => {
-    //             const newNotification: NotificationInterface = JSON.parse(message.body);
-    //             // Update state with new notification
-    //             setData((prevData) => [newNotification, ...prevData]);
-    //         });
-    //     });
-
-    //     // Cleanup function to disconnect from WebSocket
-    //     return () => {
-    //         stompClient.disconnect();
-    //     };
-
-    // }, [stompClient]);
-
-    const _handleMarkAllRead = () => {
-        const fetchData = async () => {
-            try {
-                const promises = data.map(async (noti) => {
-                    const isActive = noti.baseUserID && noti.baseUserID.status === "ACTIVE";
-
-                    if (isActive) {
-                        const response = await fetch(`http://localhost:6969/api/v1/notification/un-read-notification?noti_id=${noti.notiID}`, {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                // 'Authorization': `Bearer ${tokenString}`,
-                            },
-                            // Uncomment the following line if you need to send data in the request body
-                            // body: JSON.stringify(params),
-                        });
-                        console.log("notiid" + noti.notiID);
-
-                        if (response.status === 200) {
-                            const updatedData = await response.json();
-                            // Update the state with the updated data
-                            setData((prevData) =>
-                                prevData.map((item) =>
-                                    item.notiID === noti.notiID ? updatedData : item
-                                )
-                            );
-                        } else {
-                            console.log("An error occurred:", await response.json());
-                        }
-                    }
-                });
-
-                await Promise.all(promises);
-            } catch (error) {
-                console.error("An error occurred during data fetching:", error);
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
             }
         };
 
-        fetchData();
-    };
-
-    const _handleMarkIsRead = async (clickedItem: NotificationInterface) => {
-        try {
-            const response = await fetch(`http://localhost:6969/api/v1/notification/un-read-notification?noti_id=${clickedItem.notiID}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            if (response.status === 200) {
-                // Update the status of the clicked item locally
-                setData(prevData => prevData.map(item => {
-                    if (item.notiID === clickedItem.notiID) {
-                        return { ...item, status: true }; // Mark the clicked item as read
-                    }
-                    return item;
-                }));
-            } else {
-                console.log("An error occurred:", await response.json());
-            }
-        } catch (error) {
-            console.error("An error occurred during data fetching:", error);
-        }
-    };
-
-
-    const newNotificationsCount = data.filter(item => !item.status).length;
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     return (
-        <div>
-            <IconButton>
-                <Badge
-                    badgeContent={newNotificationsCount}
-                    color="error"
-                    onClick={_handleClickNotification}
-                >
-                    <NotificationsOutlinedIcon />
-                </Badge>
-                <Menu
-                    anchorEl={anchorOpenNotification}
-                    open={Boolean(anchorOpenNotification)}
-                    onClose={_handleCloseNotification}
-                    style={{ height: "70%", minWidth: "200px", borderRadius: "10px" }}
-                >
-                    {data.map((item) => (
-                        <div key={item.notiID} style={{ borderRadius: '4px', marginBottom: '8px', position: 'relative', backgroundColor: item.status ? 'rgba(162,222,82,0.1)' : 'rgba(234,49,62,0.1)' }} onClick={_handleMarkIsRead} >
-                            <div onClick={() => _handleMarkIsRead(item)} style={{ padding: '12px', cursor: 'pointer' }}>
-                                <div style={{ position: 'absolute', top: '12px', right: '12px', borderRadius: '4px', padding: '4px 8px', backgroundColor: item.status ? 'rgba(162,222,82,0.6)' : 'rgba(234,49,62,0.6)', color: '#fff' }}>
-                                    <span>{item.status ? 'Readed' : 'News'}</span>
-                                </div>
-                                <div>
-                                    <p style={{ fontSize: '14px', fontWeight: '500', marginBottom: '4px', color: '#333' }}>{item.baseUserID?.username}</p>
-                                    <p style={{ fontSize: '12px', fontWeight: '400', marginBottom: '2px', color: '#555' }}>{item.action === 'FOLLOW' ? `${item.action} You` : `${item.action} your post`}</p>
-                                    <p style={{ fontSize: '11px', fontWeight: '400', color: '#888' }}>{item.dateTime}</p>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                    <Divider component="li" />
-                    <div style={{ padding: "8px", display: "flex", justifyContent: "flex-end", backgroundColor: "#fafbfd", borderTop: '1px solid #eee' }}>
-                        <Button onClick={_handleMarkAllRead} style={{ color: "#666", marginRight: '8px' }}>Mark all as read</Button>
-                        <Button onClick={_handleOpenPopup} style={{ color: "#666" }}>View All</Button>
-                    </div>
-                </Menu>
-
-                <Dialog open={openPopup} onClose={_handleClosePopup} PaperProps={{
-                    style: {
-                        backgroundColor: "white",
-                        boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
-                        borderRadius: "10px",
-                        width: "100%"
-                    },
-                }}>
-                    <DialogTitle>All Notifications</DialogTitle>
-                    <DialogContent>
-                        {data.map((item) => (
-                            <div key={item.notiID} style={{ borderRadius: '4px', marginBottom: '8px', position: 'relative', backgroundColor: item.status ? 'rgba(162,222,82,0.1)' : 'rgba(234,49,62,0.1)' }}>
-                                <div onClick={() => _handleMarkIsRead(item)} style={{ padding: '12px', cursor: 'pointer' }}>
-                                    <div style={{ position: 'absolute', top: '12px', right: '12px', borderRadius: '4px', padding: '4px 8px', backgroundColor: item.status ? 'rgba(162,222,82,0.6)' : 'rgba(234,49,62,0.6)', color: '#fff' }}>
-                                        <span>{item.status ? 'Readed' : 'News'}</span>
-                                    </div>
-                                    <div>
-                                        <p style={{ fontSize: '14px', fontWeight: '500', marginBottom: '4px', color: '#333' }}>{item.baseUserID?.username}</p>
-                                        <p style={{ fontSize: '12px', fontWeight: '400', marginBottom: '2px', color: '#555' }}>{item.action === 'FOLLOW' ? `${item.action} You` : `${item.action} your post`}</p>
-                                        <p style={{ fontSize: '11px', fontWeight: '400', color: '#888' }}>{item.dateTime}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={_handleClosePopup}>Close</Button>
-                    </DialogActions>
-                </Dialog>
+        <div className='relative' ref={notificationRef}>
+            <IconButton onClick={toggleNotifications}>
+                <NotificationsOutlinedIcon />
             </IconButton>
+
+            {isOpen && (
+                <div className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-md overflow-hidden z-50">
+                    <div className="p-4">
+                        <div className="flex items-center justify-center w-12 h-12 bg-blue-500 rounded-full mx-auto mb-4">
+                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                            </svg>
+                        </div>
+                        <h2 className="text-xl font-semibold text-center mb-4">Notifications</h2>
+                        <div className="space-y-4">
+                            <NotificationItem
+                                avatar="https://scontent.fsgn19-1.fna.fbcdn.net/v/t39.30808-1/411436928_355670253755110_5935660771330271398_n.jpg?stp=dst-jpg_p200x200&_nc_cat=102&ccb=1-7&_nc_sid=0ecb9b&_nc_ohc=hur-Cub5-DwQ7kNvgHwYrFJ&_nc_ht=scontent.fsgn19-1.fna&oh=00_AYA-T9fDj7Eo2WN4mUwqcxcWqVJr-q5gU43Nfj4PcEoHZA&oe=66A4288C"
+                                name="Jese Leos"
+                                message="Hey, what's up? All set for the presentation?"
+                                time="a few moments ago"
+                            />
+                            <NotificationItem
+                                avatar="https://scontent.fsgn19-1.fna.fbcdn.net/v/t39.30808-1/411436928_355670253755110_5935660771330271398_n.jpg?stp=dst-jpg_p200x200&_nc_cat=102&ccb=1-7&_nc_sid=0ecb9b&_nc_ohc=hur-Cub5-DwQ7kNvgHwYrFJ&_nc_ht=scontent.fsgn19-1.fna&oh=00_AYA-T9fDj7Eo2WN4mUwqcxcWqVJr-q5gU43Nfj4PcEoHZA&oe=66A4288C"
+                                name="Joseph Mcfall"
+                                message="and 5 others started following you."
+                                time="10 minutes ago"
+                            />
+                            <NotificationItem
+                                avatar="https://scontent.fsgn19-1.fna.fbcdn.net/v/t39.30808-1/411436928_355670253755110_5935660771330271398_n.jpg?stp=dst-jpg_p200x200&_nc_cat=102&ccb=1-7&_nc_sid=0ecb9b&_nc_ohc=hur-Cub5-DwQ7kNvgHwYrFJ&_nc_ht=scontent.fsgn19-1.fna&oh=00_AYA-T9fDj7Eo2WN4mUwqcxcWqVJr-q5gU43Nfj4PcEoHZA&oe=66A4288C"
+                                name="Bonnie Green"
+                                message="and 141 others love your story. See it and view more stories."
+                                time="44 minutes ago"
+                            />
+                            <NotificationItem
+                                avatar="https://scontent.fsgn19-1.fna.fbcdn.net/v/t39.30808-1/411436928_355670253755110_5935660771330271398_n.jpg?stp=dst-jpg_p200x200&_nc_cat=102&ccb=1-7&_nc_sid=0ecb9b&_nc_ohc=hur-Cub5-DwQ7kNvgHwYrFJ&_nc_ht=scontent.fsgn19-1.fna&oh=00_AYA-T9fDj7Eo2WN4mUwqcxcWqVJr-q5gU43Nfj4PcEoHZA&oe=66A4288C"
+                                name="Leslie Livingston"
+                                message='mentioned you in a comment: @bonnie.green what do you say?'
+                                time="44 minutes ago"
+                            />
+                            <NotificationItem
+                                avatar="https://scontent.fsgn19-1.fna.fbcdn.net/v/t39.30808-1/411436928_355670253755110_5935660771330271398_n.jpg?stp=dst-jpg_p200x200&_nc_cat=102&ccb=1-7&_nc_sid=0ecb9b&_nc_ohc=hur-Cub5-DwQ7kNvgHwYrFJ&_nc_ht=scontent.fsgn19-1.fna&oh=00_AYA-T9fDj7Eo2WN4mUwqcxcWqVJr-q5gU43Nfj4PcEoHZA&oe=66A4288C"
+                                name="Robert Brown"
+                                message="posted a new video: Glassmorphism - learn how to implement the new design trend."
+                                time="3 hours ago"
+                            />
+                        </div>
+                        <button
+                            className="w-full mt-4 py-2 text-sm text-blue-600 hover:underline focus:outline-none"
+                            onClick={() => setActiveMenu('manage_notification')}
+                        >
+                            View all
+                        </button>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+const NotificationItem: React.FC<NotificationItemProps> = ({ avatar, name, message, time }) => {
+    return (
+        <div className="flex items-start space-x-3">
+            <img className="w-10 h-10 rounded-full" src={avatar} alt={name} />
+            <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900">
+                    <span className="font-semibold">{name}</span> {message}
+                </p>
+                <p className="text-sm text-blue-500">{time}</p>
+            </div>
         </div>
     );
 };

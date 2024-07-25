@@ -6,6 +6,7 @@ import BrandProfileSetup from '../../BrandProfile/BrandProfileComponent';
 import ManagePrice from '../../ManagePrice/BrandPriceManagement/BrandManagementScreen/ManagePriceScreens';
 import OrderRequestScreen from '../../BrandOrderManagement/OrderRequestScreen';
 import UploadBrandInforForm from '../../BrandUploadInfor/BrandUploadInforComponent';
+import NotificationPage from '../../ManageNotification/NotificationPageComponent';
 
 const DashboardManageMaterialScreen = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -73,7 +74,7 @@ const DashboardManageMaterialScreen = () => {
             case '/brand/manage_order_request/:id':
                 return <UploadBrandInforForm />;
             case 'manage_notification':
-                return <></>;
+                return <NotificationPage></NotificationPage>;
             case 'brand_profile':
                 return <BrandProfileSetup />;
             case 'manage_order':

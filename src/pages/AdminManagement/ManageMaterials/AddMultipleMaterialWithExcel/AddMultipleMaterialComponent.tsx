@@ -15,6 +15,7 @@ import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } 
 import ExcelJS from 'exceljs';
 import { toast, ToastContainer } from 'react-toastify';
 import Swal from 'sweetalert2';
+import { margin } from '@mui/system';
 
 interface AddMaterialWithMultipleExcelFormProps {
     closeMultipleCard: () => void;
@@ -470,7 +471,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
 
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px', maxHeight: '80vh', overflowY: 'auto', position: "relative" }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px', maxHeight: '75vh', overflowY: 'auto', position: "relative" }}>
             <Typography variant="h5" align="center" marginBottom={"20px"}>
                 {t(codeLanguage + '000052')}
             </Typography>
@@ -511,7 +512,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                     accept=".xlsx, .xls"
                     style={{ marginBottom: '20px', padding: '10px', borderRadius: '4px', border: '1px solid #ccc', marginRight: "20px" }}
                 />
-                <ToastContainer />
+                <ToastContainer style={{ marginTop: "-5%", marginRight: "-20%" }} />
             </div>
 
             {
@@ -526,14 +527,14 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                             endIcon={<DownloadIcon />}
                             style={{
                                 color: 'white',
-                                marginBottom: '20px',
+                                marginBottom: '2%',
                                 boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
                                 backgroundColor: '#E96208',
-                                marginLeft: "20px"
+                                marginRight: "-250%",
                             }}
                             onClick={_handleDownloadErrorData}
                         >
-                            Download Data
+                            Download Error Data
                         </Button>
                     </div>
                 )
@@ -643,7 +644,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                         color="primary"
                         onClick={closeMultipleCard}
                         endIcon={<Cancel />}
-                        style={{ backgroundColor: '#088FE9', color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
+                        style={{ backgroundColor: '#FF3232', color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
                     >
                         {t(codeLanguage + '000055')}
                     </Button>
@@ -654,7 +655,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                         color="primary"
                         onClick={_handleUploadData}
                         endIcon={<CheckCircleRounded />}
-                        style={{ backgroundColor: '#E96208', color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
+                        style={{ backgroundColor: 'green', color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
                     >
                         {t(codeLanguage + '000056')}
                     </Button>

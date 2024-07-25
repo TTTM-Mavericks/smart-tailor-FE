@@ -198,15 +198,29 @@ const ManageBrand: React.FC = () => {
     }, [data]);
 
     const columns: GridColDef[] = [
-        {
-            field: "email",
-            headerName: "Email",
-            flex: 1,
-        },
+        { field: "email", headerName: "Email", flex: 1, headerAlign: "left" },
         {
             field: "fullName",
-            headerName: "Full Name",
+            headerAlign: "left",
+            headerName: "Brand Name",
             flex: 1,
+            renderCell: (params) => (
+                <Box display="flex" alignItems="center">
+                    <Box
+                        component="img"
+                        src={params.row.imageUrl}
+                        alt={params.row.fullName}
+                        sx={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: '50%',
+                            objectFit: 'cover',
+                            mr: 2
+                        }}
+                    />
+                    {params.row.fullName}
+                </Box>
+            )
         },
         {
             field: "language",
@@ -217,26 +231,43 @@ const ManageBrand: React.FC = () => {
         {
             field: "phoneNumber",
             headerName: "Phone Number",
-            headerAlign: "left",
-            align: "left",
+            flex: 1,
+            headerAlign: "center",
+            align: "center",
         },
         {
             field: "provider",
             headerName: "Provider",
-            headerAlign: "left",
-            align: "left",
         },
         {
             field: "userStatus",
-            headerName: "Status",
-            headerAlign: "left",
-            align: "left",
-        },
-        {
-            field: "roleName",
-            headerName: "Role",
-            headerAlign: "left",
-            align: "left",
+            headerName: "User Status",
+            renderCell: (params) => (
+                <Box
+                    sx={{
+                        backgroundColor: params.value === 'Active' ? '#ffebee' : '#e8f5e9',
+                        color: params.value === 'Active' ? '#f44336' : '#4caf50',
+                        borderRadius: '16px',
+                        padding: '1px 5px',
+                        fontSize: '0.75rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        height: "50%",
+                        marginTop: "20%"
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                            backgroundColor: params.value === 'Active' ? '#f44336' : '#4caf50',
+                        }}
+                    />
+                    {params.value}
+                </Box>
+            )
         },
         {
             field: "actions",

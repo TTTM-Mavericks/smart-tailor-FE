@@ -1,76 +1,19 @@
-import { Box, Button, IconButton, Menu, MenuItem, Modal } from "@mui/material";
+import { Box, IconButton } from "@mui/material";
 import { DataGrid, GridToolbar, GridColDef } from "@mui/x-data-grid";
 import { tokens } from "../../../../../theme";
 import { useTheme } from "@mui/material";
 import * as React from "react";
 import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
 import Swal from "sweetalert2";
-import EditCustomerPopUpScreens from "../EmployeeEditBrand/EditBrandPopUpScreen";
-import { Add } from "@mui/icons-material";
-import AddEachBrandsWithHand from "../../AddEachWithHand/AddEachBrandWithHandScreens";
 import { useTranslation } from 'react-i18next';
-
-interface User {
-    id: number;
-    registrarId: string;
-    name: string;
-    age: number;
-    phone: string;
-    email: string;
-    address: string;
-    city: string;
-    zipCode: string;
-}
-
-// Make Style of popup
-const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: "50%",
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-    borderRadius: "20px"
-};
+import { Brand } from "../../../../../models/ManagerBrandModel";
+import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from "../../../../../api/ApiConfig";
+import { height } from "@mui/system";
 
 const EmployeeManageBrand: React.FC = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [data, setData] = React.useState<User[]>([]);
-
-    // set formid to pass it to component edit user
-    const [formId, setFormId] = React.useState<User | null>(null);
-
-    // Open Edit PopUp when clicking on the edit icon
-    const [editopen, setEditOpen] = React.useState<boolean>(false);
-    const _handleEditOpen = () => setEditOpen(true);
-    const _handleEditClose = () => setEditOpen(false);
-
-    // open or close the add modal
-    const [anchorEl, setAnchorEl] = React.useState(null);
-    const open = Boolean(anchorEl);
-    const _handleClick = (event: any) => {
-        setAnchorEl(event.currentTarget);
-    };
-    const _handleClose = () => {
-        setAnchorEl(null);
-    };
-    console.log("anchorEl" + anchorEl);
-
-    // close open pop up
-    const [addOpenOrClose, setAddOpenOrClose] = React.useState<boolean>(false)
-
-    const _handleAddOpen = () => {
-        setAddOpenOrClose(true);
-    }
-
-    const _handleAddClose = () => {
-        setAddOpenOrClose(false)
-    }
+    const [data, setData] = React.useState<Brand[]>([]);
 
     // Get language in local storage
     const selectedLanguage = localStorage.getItem('language');
@@ -85,7 +28,7 @@ const EmployeeManageBrand: React.FC = () => {
     }, [selectedLanguage, i18n]);
 
     React.useEffect(() => {
-        const apiUrl = 'https://66080c21a2a5dd477b13eae5.mockapi.io/CPSE_DATA_TEST';
+        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.user + functionEndpoints.user.getAllBrand}`;
         fetch(apiUrl)
             .then(response => {
                 if (!response.ok) {
@@ -94,8 +37,8 @@ const EmployeeManageBrand: React.FC = () => {
                 return response.json();
             })
             .then((responseData) => {
-                if (responseData && Array.isArray(responseData)) {
-                    setData(responseData);
+                if (responseData && Array.isArray(responseData.data)) {
+                    setData(responseData.data);
                     console.log("Data received:", responseData);
 
                 } else {
@@ -105,37 +48,8 @@ const EmployeeManageBrand: React.FC = () => {
             .catch(error => console.error('Error fetching data:', error));
     }, []);
 
-    // Thêm người dùng mới vào danh sách
-    const _handleAddUser = (newUser: User) => {
-        setData(prevData => [...prevData, newUser]);
-    }
-
-    // Cập nhật người dùng trong danh sách
-    const _handleUpdateUser = (updatedUser: User) => {
-        setData(prevData => prevData.map(user => user.id === updatedUser.id ? updatedUser : user));
-    }
-
-    // EDIT 
-    const _handleEditClick = (id: number, registrarId: string, name: string, age: number, phone: string, email: string, address: string, city: string, zipCode: string) => {
-        // Handle edit action
-        const userDataToEdit: User = {
-            id: id,
-            registrarId: registrarId,
-            name: name,
-            age: age,
-            phone: phone,
-            email: email,
-            address: address,
-            city: city,
-            zipCode: zipCode
-        }
-        setFormId(userDataToEdit);
-        _handleEditOpen();
-    };
-
-    //DELETE OR UPDATE
-    const _handleDeleteClick = async (id: number) => {
-        // Handle delete action
+    //DELETE 
+    const _handleDeleteClick = async (id: string) => {
         try {
             const response = await fetch(`https://66080c21a2a5dd477b13eae5.mockapi.io/CPSE_DATA_TEST/${id}`, {
                 method: 'DELETE',
@@ -151,8 +65,8 @@ const EmployeeManageBrand: React.FC = () => {
 
     }
 
-    // confirm 
-    const _handleConfirmDelete = async (id: number) => {
+    // Confirm Delete
+    const _handleConfirmDelete = async (id: string) => {
         try {
             const result = await Swal.fire({
                 title: `${t(codeLanguage + '000061')}`,
@@ -171,8 +85,7 @@ const EmployeeManageBrand: React.FC = () => {
                     `${t(codeLanguage + '000065')}`,
                     'success'
                 )
-                // Loại bỏ người dùng khỏi danh sách hiện tại
-                setData(prevData => prevData.filter(user => user.id !== id));
+                setData(prevData => prevData.filter(user => user.userID !== id));
             } else {
                 Swal.fire(
                     `${t(codeLanguage + '000066')}`,
@@ -185,46 +98,77 @@ const EmployeeManageBrand: React.FC = () => {
         }
     };
 
-
     const columns: GridColDef[] = [
-        { field: "id", headerName: "ID", flex: 0.5 },
-        { field: "registrarId", headerName: "Registrar ID" },
+        { field: "email", headerName: "Email", flex: 1, headerAlign: "left" },
         {
-            field: "name",
-            headerName: "Name",
+            field: "fullName",
+            headerAlign: "left",
+            headerName: "Brand Name",
             flex: 1,
+            renderCell: (params) => (
+                <Box display="flex" alignItems="center">
+                    <Box
+                        component="img"
+                        src={params.row.imageUrl}
+                        alt={params.row.fullName}
+                        sx={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: '50%',
+                            objectFit: 'cover',
+                            mr: 2
+                        }}
+                    />
+                    {params.row.fullName}
+                </Box>
+            )
         },
         {
-            field: "age",
-            headerName: "Age",
-            type: "number",
+            field: "language",
+            headerName: "Language",
             headerAlign: "left",
             align: "left",
         },
         {
-            field: "phone",
+            field: "phoneNumber",
             headerName: "Phone Number",
             flex: 1,
+            headerAlign: "center",
+            align: "center",
         },
         {
-            field: "email",
-            headerName: "Email",
-            flex: 1,
+            field: "provider",
+            headerName: "Provider",
         },
         {
-            field: "address",
-            headerName: "Address",
-            flex: 1,
-        },
-        {
-            field: "city",
-            headerName: "City",
-            flex: 1,
-        },
-        {
-            field: "zipCode",
-            headerName: "Zip Code",
-            flex: 1,
+            field: "userStatus",
+            headerName: "User Status",
+            renderCell: (params) => (
+                <Box
+                    sx={{
+                        backgroundColor: params.value === 'Active' ? '#ffebee' : '#e8f5e9',
+                        color: params.value === 'Active' ? '#f44336' : '#4caf50',
+                        borderRadius: '16px',
+                        padding: '1px 5px',
+                        fontSize: '0.75rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        height: "50%",
+                        marginTop: "20%"
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                            backgroundColor: params.value === 'Active' ? '#f44336' : '#4caf50',
+                        }}
+                    />
+                    {params.value}
+                </Box>
+            )
         },
         {
             field: "actions",
@@ -233,9 +177,6 @@ const EmployeeManageBrand: React.FC = () => {
             sortable: false,
             renderCell: (params) => (
                 <Box>
-                    <IconButton onClick={() => _handleEditClick(params.row.id, params.row.registrarId, params.row.name, params.row.age, params.row.email, params.row.phone, params.row.address, params.row.city, params.row.zipCode)}>
-                        <EditIcon />
-                    </IconButton>
                     <IconButton onClick={() => _handleConfirmDelete(params.row.id)}>
                         <DeleteIcon htmlColor={colors.primary[300]} />
                     </IconButton>
@@ -244,8 +185,9 @@ const EmployeeManageBrand: React.FC = () => {
         }
     ];
 
+
     const getRowId = (row: any) => {
-        return row.registrarId; // Sử dụng một thuộc tính duy nhất làm id cho mỗi hàng
+        return row.userID;
     };
 
     return (
@@ -285,101 +227,14 @@ const EmployeeManageBrand: React.FC = () => {
                     }
                 }}
             >
-                <Button
-                    id="basic-button"
-                    aria-controls={open ? 'basic-menu' : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={open ? 'true' : undefined}
-                    onClick={_handleClick}
-                    endIcon={<Add />}
-                    variant="contained"
-                    color="primary"
-                    style={{ backgroundColor: `${colors.primary[300]} !important`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
-                >
-                    {t(codeLanguage + '000048')}
-                </Button>
-                <Menu
-                    id="basic-menu"
-                    anchorEl={anchorEl}
-                    open={open}
-                    onClose={_handleClose}
-                    MenuListProps={{
-                        'aria-labelledby': 'basic-button',
-                    }}
-                >
-                    <MenuItem >
-                        <div onClick={_handleAddOpen}>{t(codeLanguage + '000049')}</div>
-                        <Modal
-                            open={addOpenOrClose}
-                            aria-labelledby="modal-modal-title"
-                            aria-describedby="modal-modal-description"
-                        >
-                            <Box sx={{
-                                backgroundColor: colors.primary[100], position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: "50%",
-                                bgcolor: 'background.paper',
-                                border: '2px solid #000',
-                                boxShadow: 24,
-                                p: 4,
-                                borderRadius: "20px"
-                            }}>
-                                <AddEachBrandsWithHand closeCard={_handleAddClose} addNewUser={_handleAddUser} />
-                            </Box>
-                        </Modal>
-                    </MenuItem>
-
-                    {/* <MenuItem>
-                        <div onClick={handleAddMultipleOpen}>{t(codeLanguage + '000050')}</div>
-                        <Modal
-                            open={addMultiple}
-                            aria-labelledby="modal-modal-title"
-                            aria-describedby="modal-modal-description"
-                        >
-                            <Box sx={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: "70%",
-                                bgcolor: colors.primary[100],
-                                border: '2px solid #000',
-                                boxShadow: 24,
-                                p: 4,
-                                borderRadius: "20px"
-                            }}>
-                                <AddMultipleComponentWithExcel closeMultipleCard={handleAddMultipleClose} addNewUser={_handleAddUser} />
-                            </Box>
-                        </Modal>
-
-                    </MenuItem> */}
-                </Menu>
 
                 <DataGrid
                     rows={data}
                     columns={columns}
                     slots={{ toolbar: GridToolbar }}
-                    // checkboxSelection
                     disableRowSelectionOnClick
                     getRowId={getRowId}
                 />
-                <Modal
-                    open={editopen}
-                    aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description"
-                >
-                    <Box sx={style}>
-                        {formId !== null && (
-                            <EditCustomerPopUpScreens
-                                editClose={_handleEditClose}
-                                fid={formId}
-                                updateUser={_handleUpdateUser}
-                            />
-                        )}
-                    </Box>
-                </Modal>
             </Box>
         </Box>
     );

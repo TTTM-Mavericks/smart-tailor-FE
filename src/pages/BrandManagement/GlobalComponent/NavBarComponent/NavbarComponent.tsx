@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BellAlertIcon } from '@heroicons/react/20/solid';
+import NotificationBrandComponent from '../Notification/NotificationBrandComponent';
 
 interface NavbarProps {
     toggleMenu: () => void;
@@ -9,6 +10,12 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ toggleMenu, menu, popperOpen, togglePopper }) => {
+    const [activeMenu, setActiveMenu] = useState<string>('');
+
+    const handleSetActiveMenu = (menu: string) => {
+        setActiveMenu(menu);
+    };
+
     return (
         <div className="p-4 xl:ml-80">
             <nav className="block w-full max-w-full bg-transparent text-white shadow-none rounded-xl transition-all px-0 py-1">
@@ -47,6 +54,10 @@ const Navbar: React.FC<NavbarProps> = ({ toggleMenu, menu, popperOpen, togglePop
                             </div>
                         </div>
 
+                        <div className="relative">
+                            <NotificationBrandComponent setActiveMenu={handleSetActiveMenu} />
+                        </div>
+
                         {/* Menu Icon */}
                         <button
                             onClick={toggleMenu}
@@ -66,15 +77,6 @@ const Navbar: React.FC<NavbarProps> = ({ toggleMenu, menu, popperOpen, togglePop
 
                         <button
                             type="button"
-                            className="relative middle none font-sans font-medium text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none w-10 max-w-[40px] h-10 max-h-[40px] rounded-lg text-xs text-gray-500 hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30"
-                            onClick={() => togglePopper('notification')}
-                        >
-                            <BellAlertIcon className="h-6 w-6 text-red-500" />
-                        </button>
-
-
-                        <button
-                            type="button"
                             // className="relative middle none font-sans font-medium text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none w-10 max-w-[40px] h-10 max-h-[40px] rounded-lg text-xs text-gray-500 hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30"
                             onClick={() => togglePopper('user')}
                         >
@@ -89,10 +91,10 @@ const Navbar: React.FC<NavbarProps> = ({ toggleMenu, menu, popperOpen, togglePop
                         </button>
                     </div>
                 </div>
-            </nav>
+            </nav >
 
             <div className="relative">
-                {popperOpen.notification && (
+                {/* {popperOpen.notification && (
                     <div
                         className="popover absolute right-0 mt-2 w-72 p-6 rounded-md shadow-md shadow-black/5 bg-white z-50"
                     >
@@ -102,7 +104,8 @@ const Navbar: React.FC<NavbarProps> = ({ toggleMenu, menu, popperOpen, togglePop
                             <li className="py-1">Notification 2</li>
                         </ul>
                     </div>
-                )}
+                )} */}
+                {/* <NotificationBrandComponent /> */}
                 {popperOpen.user && (
                     <div
                         className="popover absolute right-0 mt-2 w-48 p-6 rounded-md shadow-md shadow-black/5 bg-white z-50"
@@ -117,7 +120,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleMenu, menu, popperOpen, togglePop
                 )}
             </div>
 
-        </div>
+        </div >
     );
 };
 
