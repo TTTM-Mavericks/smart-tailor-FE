@@ -48,6 +48,11 @@ interface ItemMask {
   indexZ: number;
   imageUrl: string;
   printType: string;
+  topLeftRadius?: number;
+  topRightRadius?: number;
+  bottomLeftRadius?: number;
+  bottomRightRadius?: number;
+  rotate?: number
 }
 
 interface PartOfDesign {
@@ -58,6 +63,8 @@ interface PartOfDesign {
   width: number;
   height: number;
   itemMask: ItemMask[];
+  realpartImageUrl?: string;
+
 }
 
 interface Design {
@@ -77,6 +84,13 @@ interface ImageSystemData {
   imageStatus: boolean;
   imageType: string;
   isPremium: boolean;
+}
+
+interface BorderRadiusItemMaskInterface {
+  topLeftRadius?: number;
+  topRightRadius?: number;
+  bottomLeftRadius?: number;
+  bottomRightRadius?: number;
 }
 
 
@@ -110,7 +124,7 @@ function CustomDesignScreen() {
   const [redoStack, setRedoStack] = useState<any[]>([]);
   const [newPartOfDesignData, setNewPartOfDeignData] = useState<PartOfDesignInterface[]>();
   const [updatePartData, setUpdatePartData] = useState<any>(null);
-  const [angle, setAngle] = useState<number>(0);
+  const [angle, setAngle] = useState<{itemMaskID: any, value: number}>();
   const [itemIdToChangeRotate, setItemIdToChangeRotate] = useState<any>();
   const [isOpenMaterialDialog, setIsOpenMaterialDiaglog] = useState<boolean>(false);
   const [changeUploadPartOfDesignTool, setChangeUploadPartOfDesignTool] = useState<boolean>(false);
@@ -125,6 +139,16 @@ function CustomDesignScreen() {
   const [colorModel, setColorModel] = useState<string>();
   const [isSaved, setIsSaved] = useState<boolean>(false);
   const [imghehe, setImgHehe] = useState<string>();
+  const [borderRadiusItemMask, setBorderRadiusItemMask] = useState<BorderRadiusItemMaskInterface>(
+    {
+      topLeftRadius: 0,
+      topRightRadius: 0,
+      bottomLeftRadius: 0,
+      bottomRightRadius: 0,
+    }
+  );
+  const [selectedItemMask, setSelectedItemMask] = useState<ItemMaskInterface>();
+
 
 
 
@@ -216,6 +240,7 @@ function CustomDesignScreen() {
   }, [selectedItem]);
 
   useEffect(() => {
+
     setPartOfClothData(partOfClothData);
     state.modelData = partOfClothData;
 
@@ -257,6 +282,42 @@ function CustomDesignScreen() {
   useEffect(() => {
     __handleGetAllSystemImageStamps()
   }, [])
+
+  // useEffect(() => {
+  //   // console.log('vào đâyyyyyyyyyyyyyyyyyyyyyyyyyyy');
+  //   if (!partOfClothData) return;
+
+  //   const newPartOfClothData = partOfClothData?.map((part) => {
+  //     if (part.partOfDesignID === selectedPartOfCloth.partOfDesignID) {
+  //       return {
+  //         ...part,
+  //         itemMasks: part.itemMasks?.map((item) => {
+  //           if (item.itemMaskID === selectedItemMask?.itemMaskID) {
+  //             return {
+  //               ...item,
+  //               bottomLeftRadius: borderRadiusItemMask.bottomLeftRadius || 0,
+  //               bottomRightRadius: borderRadiusItemMask.bottomRightRadius || 0,
+  //               topLeftRadius: borderRadiusItemMask.topLeftRadius || 0,
+  //               topRightRadius: borderRadiusItemMask.topRightRadius || 0,
+  //               rotate: angle || 0
+  //             };
+  //           }
+  //           return item;
+  //         })
+  //       };
+  //     }
+  //     return part;
+  //   });
+
+  //   // setPartOfClothData(newPartOfClothData)
+
+  //   console.log('+++++++++++++++++++++++++++++++++++++++++++++++++: ', newPartOfClothData);
+
+
+
+
+  // }, [angle, borderRadiusItemMask, partOfClothData]);
+
   // ---------------FunctionHandler---------------//
 
   //+++++ FETCH API +++++//
@@ -282,7 +343,11 @@ function CustomDesignScreen() {
       lastModifiedDate: '',
       zIndex: 1,
       itemMaskID: item.imageID,
-      rotate: 0
+      rotate: 0,
+      topLeftRadius: 0,
+      topRightRadius: 0,
+      bottomLeftRadius: 0,
+      bottomRightRadius: 0,
     }));
   }
 
@@ -450,6 +515,10 @@ function CustomDesignScreen() {
             positionY: 170,
             scaleX: 230,
             scaleY: 230,
+            topLeftRadius: 0,
+            topRightRadius: 0,
+            bottomLeftRadius: 0,
+            bottomRightRadius: 0,
           };
 
           if (prev && prev.length > 0) {
@@ -492,7 +561,11 @@ function CustomDesignScreen() {
         positionX: 150,
         positionY: 170,
         zIndex: 1,
-        indexZ: 1
+        indexZ: 1,
+        topLeftRadius: 0,
+        topRightRadius: 0,
+        bottomLeftRadius: 0,
+        bottomRightRadius: 0,
       };
 
       if (prev && prev.length > 0) {
@@ -629,7 +702,13 @@ function CustomDesignScreen() {
       scaleY: mask.scaleY || 1,
       indexZ: mask.zIndex || 0,
       imageUrl: mask.imageUrl || "",
-      printType: mask.printType || "EMBROIDER"
+      printType: mask.printType || "EMBROIDER",
+      topLeftRadius: mask.topLeftRadius || 0,
+      topRightRadius: mask.topRightRadius || 0,
+      bottomLeftRadius: mask.bottomLeftRadius || 0,
+      bottomRightRadius: mask.bottomRightRadius || 0,
+      rotate: mask.rotate || 0,
+
     }));
   };
 
@@ -646,7 +725,8 @@ function CustomDesignScreen() {
       materialID: part.materialID,
       width: 15,
       height: 20,
-      itemMask: transformItemMasks(part.itemMasks || [])
+      itemMask: transformItemMasks(part.itemMasks || []),
+      realPartImageUrl: part.realpartImageUrl || "",
     }));
   };
 
@@ -904,6 +984,8 @@ function CustomDesignScreen() {
                   onUndo={__handleUndoFlow}
                   onRedo={__handleRedoFlow}
                   isOutSideClick={isClickOutSide}
+                  borderRadiusItemMask={borderRadiusItemMask}
+                  onGetSelectedItemDrag={setSelectedItemMask}
                 ></ImageDraggableComponent>
               </div>
             </>
@@ -1178,7 +1260,16 @@ function CustomDesignScreen() {
       </main>
 
       <div className={styles.customDesign__container__itemEditor}>
-        <ItemEditorToolsComponent targetRef={divRef} itemIdSelected={itemIdToChangeRotate} onValueChange={setAngle}></ItemEditorToolsComponent>
+        <ItemEditorToolsComponent
+          partOfDesignData={partOfClothData}
+          selectedPartOfDesign={selectedPartOfCloth}
+          selectedItemMask={selectedItemMask}
+          targetRef={divRef}
+          itemIdSelected={itemIdToChangeRotate}
+          onValueChange={setAngle}
+          onGetBorderRadiusValueChange={setBorderRadiusItemMask}
+        />
+
       </div>
 
 
