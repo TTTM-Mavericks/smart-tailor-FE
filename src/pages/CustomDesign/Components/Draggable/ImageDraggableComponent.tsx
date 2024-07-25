@@ -1,4 +1,4 @@
-import React, { Ref, forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+import React, { Ref, forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import styles from './ImageDraggableStyle.module.scss';
 import { useSnapshot } from 'valtio';
@@ -9,6 +9,7 @@ import { Menu, MenuItem } from '@mui/material';
 import { IoTrashOutline } from "react-icons/io5";
 import zIndex from '@mui/material/styles/zIndex';
 import { __handleGetElementAsBase64 } from '../../../../utils/CanvasUtils';
+import html2canvas from 'html2canvas';
 
 
 interface BorderRadiusItemMaskInterface {
@@ -16,6 +17,11 @@ interface BorderRadiusItemMaskInterface {
     topRightRadius?: number;
     bottomLeftRadius?: number;
     bottomRightRadius?: number;
+}
+
+interface ItemSizeInterface {
+    width?: number,
+    height?: number
 }
 
 type props = {
@@ -26,7 +32,7 @@ type props = {
     onDeleteItem: (item: any) => void;
     onUpdatePart: (updatePart: PartOfDesignInterface[]) => void;
     stamps?: ItemMaskInterface[] | undefined;
-    rotate?: {itemMaskID: any, value: number};
+    rotate?: { itemMaskID: any, value: number };
     onSetIsOtherItemSelected?: (itemId: any) => void;
     onUndo?: () => void;
     onRedo?: () => void;
@@ -35,6 +41,7 @@ type props = {
     onTriggerConvertSuccessImg?: () => void;
     borderRadiusItemMask?: BorderRadiusItemMaskInterface,
     onGetSelectedItemDrag: (value: ItemMaskInterface) => void;
+    itemSize?: ItemSizeInterface;
 }
 
 const ImageDraggableComponent: React.FC<props> = ({
@@ -53,7 +60,8 @@ const ImageDraggableComponent: React.FC<props> = ({
     onGetStateOuside,
     onTriggerConvertSuccessImg,
     borderRadiusItemMask,
-    onGetSelectedItemDrag
+    onGetSelectedItemDrag,
+    itemSize
 }, ref: Ref<any>) => {
 
     // TODO MUTIL LANGUAGE
@@ -81,10 +89,9 @@ const ImageDraggableComponent: React.FC<props> = ({
     // ---------------UseEffect---------------//
 
     useEffect(() => {
-        console.log('Item drag - rotate: ', rotate);
-        console.log('Item drag - borderRadiusItemMask: ', borderRadiusItemMask);
+        setData(data);
+    }, [data])
 
-    }, [rotate, borderRadiusItemMask])
 
     /**
      * Set value of data when  partOfCloth and partOfClothData change
@@ -100,11 +107,6 @@ const ImageDraggableComponent: React.FC<props> = ({
                         ...item,
                         position: { x: item.positionX, y: item.positionY },
                         zIndex: item.indexZ,
-                        // rotate: item.rotate,
-                        // bottomLeftRadius: item?.bottomLeftRadius || 0,
-                        // bottomRightRadius: item?.bottomRightRadius || 0,
-                        // topLeftRadius: item?.topLeftRadius || 0,
-                        // topRightRadius: item?.topRightRadius || 0,
                     }));
                     setData(setPositionDefault as ItemMaskInterface[]);
                     setOldPartOfClothData(partOfClothData);
@@ -145,21 +147,6 @@ const ImageDraggableComponent: React.FC<props> = ({
     }, [resizing])
 
     /**
-     * Set size of resizable
-     */
-    // useEffect(() => {
-    //     const element = document.querySelector('.imageDraggable__resizeable');
-    //     if (element instanceof HTMLElement) {
-    //         const rect = element.getBoundingClientRect();
-    //         setSize({
-    //             width: rect.width,
-    //             height: rect.height,
-    //         });
-    //         console.log('w: ', rect.width, '- h: ', rect.height);
-    //     }
-    // }, [resizing]);
-
-    /**
      * Set rotate degree for item
      */
     useEffect(() => {
@@ -176,7 +163,7 @@ const ImageDraggableComponent: React.FC<props> = ({
                 return dataItem;
             });
         });
-    }, [rotate, selectedItemDrag]);
+    }, [rotate]);
 
     // useEffect(()=>{
     //     console.log('history: ', history);
@@ -188,7 +175,6 @@ const ImageDraggableComponent: React.FC<props> = ({
      * Set rotate degree for item
      */
     useEffect(() => {
-        console.log('borderRadiusItemMask: ', borderRadiusItemMask);
         if (!selectedItemDrag) return;
         setData((prevData) => {
             if (!prevData) return prevData;
@@ -196,19 +182,50 @@ const ImageDraggableComponent: React.FC<props> = ({
                 if (dataItem.itemMaskID === selectedItemDrag.itemMaskID) {
                     return {
                         ...dataItem,
-                        // topLeftRadius: borderRadiusItemMask?.topLeftRadius,
-                        // topRightRadius: borderRadiusItemMask?.topRightRadius,
-                        // bottomLeftRadius: borderRadiusItemMask?.bottomLeftRadius,
-                        // bottomRightRadius: borderRadiusItemMask?.bottomRightRadius
+                        topLeftRadius: borderRadiusItemMask?.topLeftRadius,
+                        topRightRadius: borderRadiusItemMask?.topRightRadius,
+                        bottomLeftRadius: borderRadiusItemMask?.bottomLeftRadius,
+                        bottomRightRadius: borderRadiusItemMask?.bottomRightRadius
                     };
                 }
                 return dataItem;
             });
         });
-    }, [borderRadiusItemMask, selectedItemDrag]);
+
+
+    }, [borderRadiusItemMask]);
+
+    /**
+     * Set item size
+     */
+    useEffect(() => {
+        if (!selectedItemDrag) return;
+        setData((prevData) => {
+            if (!prevData) return prevData;
+            return prevData.map((dataItem: ItemMaskInterface) => {
+                if (dataItem.itemMaskID === selectedItemDrag.itemMaskID) {
+                    return {
+                        ...dataItem,
+                        scaleX: itemSize?.width,
+                        scaleY: itemSize?.height
+                    };
+                }
+                return dataItem;
+            });
+        });
+
+
+    }, [itemSize]);
 
 
     // ---------------FunctionHandler---------------//
+
+    const __handleGetDefaultSize = (item: ItemMaskInterface, itemSize?: { width?: number; height?: number }) => {
+        // If itemSize is provided, use it; otherwise, fall back to scaleX/scaleY
+        return itemSize
+            ? { width: itemSize.width ?? item.scaleX, height: itemSize.height ?? item.scaleY }
+            : { width: item.scaleX, height: item.scaleY };
+    };
 
     const __handleUndo = () => {
         if (historyIndex > 0) {
@@ -227,49 +244,69 @@ const ImageDraggableComponent: React.FC<props> = ({
         }
     };
 
+    const [base64Image, setBase64Image] = useState<string>('');
+    const elementRef = useRef(null);
+
+    const captureElementAsBase64 = async (element: HTMLElement): Promise<string | null> => {
+        try {
+            const canvas = await html2canvas(element, {
+                backgroundColor: null, // This option removes the background
+                scale: window.devicePixelRatio, // Improve image quality
+                logging: false // Disable logging if not needed
+            });
+            const imgBase64 = canvas.toDataURL('image/png');
+            return imgBase64;
+        } catch (error) {
+            console.error('Error capturing element:', error);
+            return null;
+        }
+    };
 
     /**
      * Save PartOfClothData while edit and response to customDesign
      */
     const __handleSetNewPartOfDesignData = async () => {
-        const result: ItemMaskInterface[] | undefined = data?.filter((item: ItemMaskInterface) => item.itemMaskID === selectedItemDrag?.itemMaskID);
-        if (result) {
-            const url = await __handleGetElementAsBase64('designArea');
-            const updateItemData: ItemMaskInterface[] | undefined = data?.map(part =>
-                part.itemMaskID === selectedItemDrag?.itemMaskID
-                    ? {
-                        ...part,
-                        // position: positonItemDrag,
-                        // zIndex: itemZIndices,
-                        // scaleX: size.width,
-                        // scaleY: size.height
-                    }
-                    : part
-            );
-            const updatePart = partOfClothData?.map(part =>
-                part.partOfDesignID === partOfCloth?.partOfDesignID
-                    ? { ...part, itemMasks: !updateItemData ? [] : updateItemData, successImageUrl: url } : part
-            );
+        if (!selectedItemDrag || !data) return;
 
-            if (updatePart) {
-                onUpdatePart(updatePart)
-                state.modelData = updatePart;
-            }
-            state.modelData = updatePart;
+        const element = document.querySelector(`[data-item-mask-id="${selectedItemDrag.itemMaskID}"]`) as HTMLElement;
 
-            if (JSON.stringify(updateItemData) !== JSON.stringify(data)) {
-                console.log('updateItemData: ', updateItemData);
-                setData(updateItemData);
-            }
+        const result = data.filter((item: ItemMaskInterface) => item.itemMaskID === selectedItemDrag.itemMaskID);
+        if (!result.length) return;
 
-            // Save the current state to history
-            setHistory((prevHistory: any) => {
-                const newHistory = [...prevHistory.slice(0, historyIndex + 1), data];
-                setHistoryIndex(newHistory.length - 1);
-                return newHistory;
-            });
+        const url = await __handleGetElementAsBase64('designArea');
+        const base64Image = await captureElementAsBase64(element);
+
+        const updatedItemData = data.map(part =>
+            part.itemMaskID === selectedItemDrag.itemMaskID
+                ? {
+                    ...part,
+                    imageUrl: base64Image || part.imageUrl, // Fallback to the existing imageUrl if base64Image is null
+                }
+                : part
+        );
+
+        const updatedPart = partOfClothData?.map(part =>
+            part.partOfDesignID === partOfCloth?.partOfDesignID
+                ? { ...part, itemMasks: updatedItemData, successImageUrl: url }
+                : part
+        );
+
+        if (updatedPart) {
+            onUpdatePart(updatedPart);
         }
-    }
+
+        if (JSON.stringify(updatedItemData) !== JSON.stringify(data)) {
+            console.log('Updated Item Data:', updatedItemData);
+            setData(updatedItemData);
+        }
+
+        // Save the current state to history
+        setHistory(prevHistory => {
+            const newHistory = [...prevHistory.slice(0, historyIndex + 1), updatedItemData];
+            setHistoryIndex(newHistory.length - 1);
+            return newHistory;
+        });
+    };
 
 
     /**
@@ -292,7 +329,16 @@ const ImageDraggableComponent: React.FC<props> = ({
     //         }
     //     });
     // };
-    const __handleSelectedIteamDrag = (item: ItemMaskInterface) => {
+    const __handleSelectedIteamDrag = async (item: ItemMaskInterface) => {
+        const element = document.querySelector(`[data-item-mask-id="${item.itemMaskID}"]`) as HTMLElement;
+
+        if (element) {
+            const base64Image = await captureElementAsBase64(element);
+            if (base64Image) {
+                console.log('Base64 Image:', base64Image);
+            }
+        }
+        console.log('base64Image: ', base64Image);
         setSelectedItemDrag(item);
         if (onSetIsOtherItemSelected) {
             onSetIsOtherItemSelected(item.itemMaskID);
@@ -523,7 +569,11 @@ const ImageDraggableComponent: React.FC<props> = ({
                     defaultClassNameDragged={`${styles.imageDraggable__resizeable} imageDraggable__resizeable`}
 
                 >
-                    <div key={item.itemMaskID} style={{ position: 'absolute', zIndex: item.indexZ }} onContextMenu={(e: any) => __handleContextMenu(e, item)}>
+                    <div
+                        key={item.itemMaskID}
+                        style={{ position: 'absolute', zIndex: item.indexZ }}
+                        onContextMenu={(e: any) => __handleContextMenu(e, item)}
+                    >
                         <Resizable
                             key={item.itemMaskID}
                             style={{
@@ -538,6 +588,7 @@ const ImageDraggableComponent: React.FC<props> = ({
                             onResize={__handleOnResize}
                             onResizeStop={(e, direction, refToElement, delta) => __handleResizeEnd(e, direction, refToElement, delta)}
                             defaultSize={item.typeOfItem !== 'TEXT' ? { width: item.scaleX, height: item.scaleY } : { width: 230 }}
+                            // defaultSize={__handleGetDefaultSize(item, itemSize)}
                             handleWrapperStyle={{ pointerEvents: 'auto' }}
                             className={`${styles.resizeable__element}`}
 
@@ -570,11 +621,14 @@ const ImageDraggableComponent: React.FC<props> = ({
                                         borderBottomRightRadius: item.bottomRightRadius
                                     }
                                 }
-                                onClick={() => __handleSelectedIteamDrag(item)} alt="Draggable Image" />
+                                onClick={() => __handleSelectedIteamDrag(item)} alt="Draggable Image"
+                                data-item-mask-id={item.itemMaskID}
+
+                            />
                         </Resizable>
                     </div>
                 </Draggable>
-            )), [data, selectedItemDrag, itemPositions, itemZIndices, resizing]);
+            )), [data, selectedItemDrag, itemPositions, itemZIndices, resizing, rotate, borderRadiusItemMask, itemSize]);
 
     return (
         <>

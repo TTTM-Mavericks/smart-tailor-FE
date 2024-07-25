@@ -99,7 +99,7 @@ function CustomDesignScreen() {
   // TODO MUTIL LANGUAGE
 
   // ---------------UseState Variable---------------//
-  const [selectedPartOfCloth, setSelectedPartOfCloth] = useState<PartOfDesignInterface>(PartOfShirtDesignData[0]);
+  const [selectedPartOfCloth, setSelectedPartOfCloth] = useState<PartOfDesignInterface>();
   const [partOfClothData, setPartOfClothData] = useState<PartOfDesignInterface[]>();
   const [selectedStamp, setSelectedStamp] = useState<ItemMaskInterface[]>();
   const [selectedItem, setSelectedItem] = useState<string>('LOGO_PART');
@@ -124,7 +124,7 @@ function CustomDesignScreen() {
   const [redoStack, setRedoStack] = useState<any[]>([]);
   const [newPartOfDesignData, setNewPartOfDeignData] = useState<PartOfDesignInterface[]>();
   const [updatePartData, setUpdatePartData] = useState<any>(null);
-  const [angle, setAngle] = useState<{itemMaskID: any, value: number}>();
+  const [angle, setAngle] = useState<{ itemMaskID: any, value: number }>();
   const [itemIdToChangeRotate, setItemIdToChangeRotate] = useState<any>();
   const [isOpenMaterialDialog, setIsOpenMaterialDiaglog] = useState<boolean>(false);
   const [changeUploadPartOfDesignTool, setChangeUploadPartOfDesignTool] = useState<boolean>(false);
@@ -148,7 +148,7 @@ function CustomDesignScreen() {
     }
   );
   const [selectedItemMask, setSelectedItemMask] = useState<ItemMaskInterface>();
-
+  const [itemSize, setItemSize] = useState<{ width?: number, height?: number }>()
 
 
 
@@ -161,6 +161,12 @@ function CustomDesignScreen() {
     console.log('Received updatePart from child: ', updatePart);
     setUpdatePartData(updatePart);
     setPartOfClothData(updatePart);
+    // const result = updatePart?.find((item: PartOfDesignInterface) => item.partOfDesignID === selectedPartOfCloth?.partOfDesignID);
+    // if (result) {
+    //   console.log('selectedPartOfCloth change: ', result.itemMasks);
+    //   setSelectedStamp(result.itemMasks)
+    // }
+    state.modelData = updatePart
 
   }, []);
   const divRef = useRef<HTMLDivElement>(null);
@@ -227,13 +233,15 @@ function CustomDesignScreen() {
   }, [selectedLanguage]);
 
   useEffect(() => {
-    setSelectedPartOfCloth(selectedPartOfCloth);
-    const result = partOfClothData?.find((item: PartOfDesignInterface) => item.partOfDesignName === selectedPartOfCloth.partOfDesignName);
+    // setSelectedPartOfCloth(selectedPartOfCloth);
+    const result = partOfClothData?.find((item: PartOfDesignInterface) => item.partOfDesignName === selectedPartOfCloth?.partOfDesignName);
     if (result) {
+      console.log('selectedPartOfCloth change: ', result.itemMasks);
       setSelectedStamp(result.itemMasks)
     }
 
   }, [selectedPartOfCloth]);
+
 
   useEffect(() => {
     setSelectedItem(selectedItem)
@@ -242,7 +250,7 @@ function CustomDesignScreen() {
   useEffect(() => {
 
     setPartOfClothData(partOfClothData);
-    state.modelData = partOfClothData;
+    // state.modelData = partOfClothData;
 
   }, [partOfClothData])
 
@@ -262,22 +270,23 @@ function CustomDesignScreen() {
 
   useEffect(() => {
     if (selectedStamp) {
-      const result = partOfClothData?.filter((item: PartOfDesignInterface) => item.partOfDesignName === selectedPartOfCloth.partOfDesignName);
+      const result = partOfClothData?.filter((item: PartOfDesignInterface) => item.partOfDesignName === selectedPartOfCloth?.partOfDesignName);
       if (result) {
         const updatedPartOfClothData = partOfClothData?.map(part =>
-          part.partOfDesignID === selectedPartOfCloth.partOfDesignID
+          part.partOfDesignID === selectedPartOfCloth?.partOfDesignID
             ? { ...part, itemMasks: selectedStamp }
             : part
         );
+
         setPartOfClothData(updatedPartOfClothData);
       }
     }
   }, [selectedStamp, selectedPartOfCloth]);
 
 
-  useEffect(() => {
-    setSelectedStamp(selectedStamp);
-  }, [selectedStamp])
+  // useEffect(() => {
+  //   setSelectedStamp(selectedStamp);
+  // }, [selectedStamp])
 
   useEffect(() => {
     __handleGetAllSystemImageStamps()
@@ -393,7 +402,7 @@ function CustomDesignScreen() {
         setColorModel(response.data.color);
         setTitleDesign(response.data.titleDesign);
         // state.color = response.data.color;
-        state.modelData = response.data.partOfDesign
+        // state.modelData = response.data.partOfDesign
         setIsLoadingPage(false);
 
       }
@@ -535,10 +544,10 @@ function CustomDesignScreen() {
     reader(file)
       .then((result) => {
         const newUploadPart = partOfClothData?.map((part) => {
-          if (selectedPartOfCloth.partOfDesignID === part.partOfDesignID) {
+          if (selectedPartOfCloth?.partOfDesignID === part.partOfDesignID) {
             return {
               ...part,
-              imageUrl: result
+              realpartImageUrl: result
             };
           }
           setSelectedPartOfCloth(part)
@@ -632,9 +641,13 @@ function CustomDesignScreen() {
     if (result) {
       const imgBase64 = await __handleChangeImageToBase64(result.imageUrl);
       result.imageUrl = imgBase64; // Update the imageUrl with base64 string
-      result.partOfDesignID = selectedPartOfCloth.partOfDesignID;
+      result.partOfDesignID = selectedPartOfCloth?.partOfDesignID;
       result.indexZ = 1;
       result.zIndex = 1;
+      console.log('adddddddd   before: ', selectedStamp);
+
+      // setSelectedPartOfCloth(selectedPartOfCloth);
+
       setSelectedStamp((prevSelectedStamp = []) => {
         const existingItemIndex = prevSelectedStamp.findIndex(
           (existingItem: ItemMaskInterface) => existingItem.itemMaskID === item.itemMaskID
@@ -648,8 +661,9 @@ function CustomDesignScreen() {
           return updatedStamps;
         } else {
           // Add new item
-          console.log('adddddddd: ', result);
-          const addItemArr = [...prevSelectedStamp, { ...result, partOfDesignID: selectedPartOfCloth.partOfDesignID }];
+
+          const addItemArr = [...prevSelectedStamp, { ...result, partOfDesignID: selectedPartOfCloth?.partOfDesignID }];
+          console.log('adddddddd   after: ', addItemArr);
           return addItemArr;
         }
       });
@@ -986,6 +1000,7 @@ function CustomDesignScreen() {
                   isOutSideClick={isClickOutSide}
                   borderRadiusItemMask={borderRadiusItemMask}
                   onGetSelectedItemDrag={setSelectedItemMask}
+                  itemSize={itemSize}
                 ></ImageDraggableComponent>
               </div>
             </>
@@ -1201,7 +1216,6 @@ function CustomDesignScreen() {
                 </div>
               )}
 
-
             </div>
           ) : (
             <div className={styles.customDesign__container__editorArea__itemSelector__itemGroup}>
@@ -1247,18 +1261,20 @@ function CustomDesignScreen() {
           )}
         </div>
       </div>
-
       <Designer />
+
+      {/* Canvas 3d display area */}
       <main id='canvas3DElement' className={styles.customDesign__container__canvas}>
         {!changeUploadPartOfDesignTool ? (
           <CanvasModel typeOfModel={typeOfModel} isDefault={false} is3D={true} />
         ) : (
           <div style={{ backgroundColor: grayColor, opacity: 0.7, width: '100%', height: '100%' }}>
-            <img src={selectedPartOfCloth.imageUrl} style={{ width: '100%', height: '100%' }}></img>
+            <img src={selectedPartOfCloth?.realpartImageUrl} style={{ width: '100%', height: '100%' }}></img>
           </div>
         )}
       </main>
 
+      {/* Editor tools */}
       <div className={styles.customDesign__container__itemEditor}>
         <ItemEditorToolsComponent
           partOfDesignData={partOfClothData}
@@ -1268,6 +1284,7 @@ function CustomDesignScreen() {
           itemIdSelected={itemIdToChangeRotate}
           onValueChange={setAngle}
           onGetBorderRadiusValueChange={setBorderRadiusItemMask}
+          onGetSizeValueChange={setItemSize}
         />
 
       </div>

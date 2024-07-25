@@ -80,7 +80,7 @@ const OrderDetailScreen: React.FC = () => {
     // ---------------UseEffect---------------//
 
     useEffect(() => {
-        if (orderDetail?.orderStatus === 'PENDING') {
+        if (orderDetail?.orderStatus === 'SUCESSFULL') {
             setIsOpenRatingDialog(true);
         }
     }, [orderDetail])
@@ -270,7 +270,7 @@ const OrderDetailScreen: React.FC = () => {
                     <div className="border-b pb-4 mb-6">
                         <p className="text-sm text-gray-700 flex">
                             <span style={{ fontWeight: "bolder" }}>#{orderDetail?.orderID}</span>
-                            <span className="ml-auto text-sm text-gray-700 cursor-pointer" onClick={()=>__handleOpenReportDialog()}>Report</span>
+                            <span className="ml-auto text-sm text-gray-700 cursor-pointer" onClick={() => __handleOpenReportDialog()}>Report</span>
                         </p>
 
                         <p className="text-sm text-gray-700">
@@ -541,6 +541,18 @@ const OrderDetailScreen: React.FC = () => {
                     </Typography>
                 </DialogContent>
             </Dialog>
+
+            {/* <Dialog open={isOpenPaymentOrderDialog} aria-labelledby="popup-dialog-title" maxWidth="lg" fullWidth>
+                <DialogTitle id="popup-dialog-title">Facebook</DialogTitle>
+                <DialogContent dividers>
+                    <iframe
+                        src="https://pay.payos.vn/web/cdd33a1073ca4240aa13a4af031163ac"
+                        style={{ width: '100%', height: '80vh', border: 'none' }}
+                        title="Facebook"
+                    />
+                </DialogContent>
+                
+            </Dialog> */}
 
             <FooterComponent />
 
