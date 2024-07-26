@@ -27,7 +27,7 @@ export interface OrderResponse {
     estimatedDeliveryDate: string,
     productionStartDate: string,
     productionCompletionDate: string,
-    detailList: DetailList,
+    detailList: DetailList[],
     paymentList: string
 }
 

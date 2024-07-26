@@ -6,22 +6,75 @@ import { Report, ReportImageList } from '../../../../../models/EmployeeManageRep
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import axios from 'axios';
 
-const OrderReport: React.FC<{ report: Report; onViewDetails: (report: Report) => void; onMarkResolved: (reportID: string) => void }> = ({ report, onViewDetails, onMarkResolved }) => (
-    <div className="bg-white shadow-lg rounded-lg p-6 transition duration-300 ease-in-out transform hover:shadow-xl">
+const getStatusColor = (status: string) => {
+    switch (status) {
+        case 'NOT_VERIFY':
+            return 'text-gray-600';
+        case 'PENDING':
+            return 'text-yellow-600';
+        case 'DEPOSIT':
+            return 'text-blue-600';
+        case 'PROCESSING':
+            return 'text-orange-600';
+        case 'CANCEL':
+            return 'text-red-600';
+        case 'COMPLETED':
+            return 'text-green-600';
+        case 'DELIVERED':
+            return 'text-indigo-600';
+        default:
+            return 'text-gray-600';
+    }
+};
+
+const OrderReport: React.FC<{
+    report: Report;
+    onViewDetails: (report: Report) => void;
+    onMarkResolved: (reportID: string) => void;
+}> = ({ report, onViewDetails, onMarkResolved }) => (
+    <div className="bg-white mb-8 shadow-lg rounded-lg p-6 transition duration-300 ease-in-out transform hover:shadow-xl">
         <h3 className="text-xl font-semibold mb-3 text-indigo-700">Type Report: {report.typeOfReport}</h3>
-        <p className="text-gray-600 mb-2">Customer: {report.orderResponse.buyerName}</p>
-        <p className="text-gray-600 mb-2">Date: {report.createDate}</p>
-        <p className="text-gray-600 mb-2">Status Report:
-            <span className={`ml-2 font-semibold px-2 py-1 rounded-full ${report.reportStatus === true
-                ? 'bg-green-200 text-green-800'
-                : 'bg-yellow-200 text-yellow-800'
-                }`}>
-                {report.reportStatus ? 'Read' : 'Unread'}
-            </span>
-        </p>
-        <p className="text-gray-700 mt-4">{report.content}</p>
-        <div className="mt-6 flex justify-between">
-            <button onClick={() => onViewDetails(report)} className="bg-indigo-500 text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300">View Details</button>
+        <div className="flex justify-between">
+            <div className="w-1/2">
+                <p className="text-gray-600 mb-2">Customer: {report.orderResponse.buyerName}</p>
+                <p className="text-gray-600 mb-2">Date: {report.createDate}</p>
+                <p className="text-gray-600 mb-2">
+                    Status Report:{' '}
+                    <span
+                        className={`ml-2 font-semibold px-2 py-1 rounded-full ${report.reportStatus ? 'bg-green-200 text-green-800' : 'bg-yellow-200 text-yellow-800'
+                            }`}
+                    >
+                        {report.reportStatus ? 'Read' : 'Unread'}
+                    </span>
+                </p>
+                <div className="mt-4">
+                    {report.orderResponse.detailList.map((detail, index) => (
+                        <p key={index} className="text-gray-600">
+                            Size {detail.size.sizeName}: Quantity {detail.quantity}
+                        </p>
+                    ))}
+                </div>
+            </div>
+            <div className="w-1/2">
+                <p className="text-gray-600 mb-2">Order ID: {report.orderResponse.orderID}</p>
+                <p className="text-gray-600 mb-2">
+                    Order Status: <span className={`mb-2 ${getStatusColor(report.orderResponse.orderStatus)} font-bold`}>{report.orderResponse.orderStatus}</span>
+                </p>
+                <p className="text-gray-600 mb-2">Total Quantity: {report.orderResponse.quantity}</p>
+                <p className="text-gray-600 mb-2">
+                    Address: {report.orderResponse.address}, {report.orderResponse.ward}, {report.orderResponse.district},{' '}
+                    {report.orderResponse.province}
+                </p>
+                <p className="text-gray-700 mt-4">Content: {report.content}</p>
+            </div>
+        </div>
+        <div className="mt-6 flex justify-end">
+            <button
+                onClick={() => onViewDetails(report)}
+                className="bg-indigo-500 text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"
+            >
+                View Details
+            </button>
             <button
                 onClick={() => onMarkResolved(report.reportID)}
                 className="bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300"
@@ -31,6 +84,7 @@ const OrderReport: React.FC<{ report: Report; onViewDetails: (report: Report) =>
         </div>
     </div>
 );
+
 function isReportImageListArray(reportImageList: ReportImageList | ReportImageList[]): reportImageList is ReportImageList[] {
     return Array.isArray(reportImageList);
 }
@@ -328,28 +382,26 @@ const EmployeeManageReport: React.FC = () => {
     };
 
     return (
-        <div>
-            <div className="mb-8 flex flex-wrap gap-4 justify-center bg-white p-6 rounded-lg shadow-lg">
-                <input
-                    type="date"
-                    name="date"
-                    onChange={handleFilterChange}
-                    className="px-4 py-2 rounded-full border-2 border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-300 ease-in-out transform hover:scale-105"
-                />
-                {/* <select
-                    name="status"
-                    onChange={handleFilterChange}
-                    className="px-4 py-2 rounded-full border-2 border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-300 ease-in-out transform hover:scale-105"
-                >
-                    <option value="">All Report Statuses</option>
-                    <option value="false">Unread</option>
-                    <option value="true">Read</option>
-                </select> */}
-                <div className='custom-select'>
+        <div className='-mt-8'>
+            <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 bg-white p-6 rounded-lg shadow-lg">
+                <div className="flex flex-col">
+                    <label htmlFor="dateFilter" className="mb-2 text-sm font-medium text-gray-700">Date</label>
+                    <input
+                        id="dateFilter"
+                        type="date"
+                        name="date"
+                        onChange={handleFilterChange}
+                        className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
+                    />
+                </div>
+
+                <div className="flex flex-col">
+                    <label htmlFor="orderStatusFilter" className="mb-2 text-sm font-medium text-gray-700">Order Status</label>
                     <select
+                        id="orderStatusFilter"
                         name="orderStatus"
                         onChange={handleFilterChange}
-                        className="px-4 py-2 rounded-full border-2 border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-300 ease-in-out transform hover:scale-105"
+                        className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
                     >
                         <option value="">All Order Statuses</option>
                         <option value="NOT_VERIFY">Not Verify</option>
@@ -361,13 +413,18 @@ const EmployeeManageReport: React.FC = () => {
                         <option value="DELIVERED">Delivered</option>
                     </select>
                 </div>
-                <input
-                    type="text"
-                    name="name"
-                    placeholder="Filter by brand name..."
-                    onChange={handleFilterChange}
-                    className="px-4 py-2 rounded-full border-2 border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-300 ease-in-out transform hover:scale-105"
-                />
+
+                <div className="flex flex-col">
+                    <label htmlFor="brandNameFilter" className="mb-2 text-sm font-medium text-gray-700">Brand Name</label>
+                    <input
+                        id="brandNameFilter"
+                        type="text"
+                        name="name"
+                        placeholder="Filter by brand name..."
+                        onChange={handleFilterChange}
+                        className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
+                    />
+                </div>
             </div>
 
             <div >
