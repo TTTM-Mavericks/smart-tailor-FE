@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import NotificationBrandComponent from '../GlobalComponent/Notification/NotificationBrandComponent';
 
 const NotificationPage = () => {
     const [activeTab, setActiveTab] = useState('all');
@@ -120,7 +121,7 @@ const NotificationPage = () => {
     return (
         <div style={{ width: "50%", marginLeft: "20%" }}>
             {/* <h1 className="text-2xl font-bold mb-4">Thông báo</h1> */}
-            <div className="flex mb-4">
+            {/* <div className="flex mb-4">
                 <button
                     className={`mr-4 ${activeTab === 'all' ? 'text-blue-500' : ''}`}
                     onClick={() => setActiveTab('all')}
@@ -148,12 +149,6 @@ const NotificationPage = () => {
                                 <p className="text-gray-400 text-sm">{notification.reactions} cảm xúc · {notification.comments} bình luận</p>
                             )}
                         </div>
-                        {notification.type === 'like' && (
-                            <span className="ml-auto text-blue-500">👍</span>
-                        )}
-                        {notification.type === 'mention' && (
-                            <span className="ml-auto text-green-500">💬</span>
-                        )}
                     </div>
                 ))}
             </div>
@@ -164,7 +159,8 @@ const NotificationPage = () => {
                 >
                     View Previous Notification
                 </button>
-            )}
+            )} */}
+            <NotificationBrandComponent />
         </div>
     );
 };

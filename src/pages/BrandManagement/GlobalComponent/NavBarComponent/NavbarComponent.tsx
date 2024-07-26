@@ -16,6 +16,8 @@ const Navbar: React.FC<NavbarProps> = ({ toggleMenu, menu, popperOpen, togglePop
         setActiveMenu(menu);
     };
 
+    const userId = 'a'
+
     return (
         <div className="p-4 xl:ml-80">
             <nav className="block w-full max-w-full bg-transparent text-white shadow-none rounded-xl transition-all px-0 py-1">
@@ -55,7 +57,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleMenu, menu, popperOpen, togglePop
                         </div>
 
                         <div className="relative">
-                            <NotificationBrandComponent setActiveMenu={handleSetActiveMenu} />
+                            {/* <NotificationBrandComponent /> */}
                         </div>
 
                         {/* Menu Icon */}
