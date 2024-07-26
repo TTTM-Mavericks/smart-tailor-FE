@@ -618,7 +618,8 @@ const ImageDraggableComponent: React.FC<props> = ({
                                         borderTopLeftRadius: item.topLeftRadius,
                                         borderTopRightRadius: item.topRightRadius,
                                         borderBottomLeftRadius: item.bottomLeftRadius,
-                                        borderBottomRightRadius: item.bottomRightRadius
+                                        borderBottomRightRadius: item.bottomRightRadius,
+                                        // transform: 'scaleX(-1)'
                                     }
                                 }
                                 onClick={() => __handleSelectedIteamDrag(item)} alt="Draggable Image"

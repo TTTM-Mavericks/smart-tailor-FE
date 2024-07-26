@@ -119,7 +119,7 @@ const OrderDetailScreen: React.FC = () => {
     const __handleGetOrderDetail = async () => {
         setIsLoading(true);
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderById}/${id}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderDetailById}/${id}`);
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
                 setOrderDetail(response.data);

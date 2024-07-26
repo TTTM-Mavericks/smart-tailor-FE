@@ -10,6 +10,7 @@ import { grayColor1, primaryColor, redColor, secondaryColor, whiteColor } from '
 import { ToastContainer, toast } from 'react-toastify';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import { __handleAddCommasToNumber } from '../../../../utils/NumbericUtils';
+import { GrFormNext } from "react-icons/gr";
 
 
 type materialDetailProps = {
@@ -17,6 +18,7 @@ type materialDetailProps = {
     primaryKey?: any,
     onGetMaterial: (item: PartOfDesignInterface[]) => void;
     expertID?: any,
+    onGetIsFullStepActive: (value: boolean) => void;
 }
 
 interface PrinTypeInterface {
@@ -94,7 +96,7 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
 }));
 
 
-const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesigndata, primaryKey, onGetMaterial, expertID }) => {
+const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesigndata, primaryKey, onGetMaterial, expertID, onGetIsFullStepActive }) => {
     // TODO MUTIL LANGUAGE
     // ---------------UseState Variable---------------//
     const [selectedColors, setSelectedColors] = useState<any>([]);
@@ -116,7 +118,9 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
     const [fabricMaterialList, setFabricMaterialList] = useState<MaterialInterface[]>();
     const [heatInkMaterial, setHeatInkMaterial] = useState<MaterialInterface[]>();
     const [embroiderMaterial, setEmbroiderMaterial] = useState<MaterialInterface[]>();
-    const [activeStep, setActiveStep] = useState(0);
+    const [activeStep, setActiveStep] = useState<number>(0);
+    const [isFullStepActive, setIsFullStepActive] = useState<boolean>(false);
+    const [currentStep, setCurrentStep] = useState<{ index: any, part: PartOfDesignInterface }>();
 
     // ---------------Usable Variable---------------//
     const { t, i18n } = useTranslation();
@@ -453,12 +457,32 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
 
     const __handleStepClick = (index: any, part: PartOfDesignInterface) => {
         setActiveStep(index);
-        setSelectedPartOfDesign(part)
+        setSelectedPartOfDesign(part);
+        setCurrentStep({ index, part })
+        if (index + 1 === partOfDesigndata?.length) {
+            setIsFullStepActive(true);
+            onGetIsFullStepActive(true);
+        } else {
+            setIsFullStepActive(false);
+            onGetIsFullStepActive(false);
+        }
+    };
+
+    const __handleStepButtonClick = () => {
+        setActiveStep(currentStep?.index + 1);
+        setSelectedPartOfDesign(currentStep?.part);
+        if (currentStep?.index + 1 === partOfDesigndata?.length) {
+            setIsFullStepActive(true);
+            onGetIsFullStepActive(true);
+        } else {
+            setIsFullStepActive(false);
+            onGetIsFullStepActive(false);
+        }
     };
 
 
     return (
-        <div style={{ width: '100%' }}>
+        <div style={{ width: '100%', position: 'relative' }}>
             <div className={style.materialDetail__partOfClothStep}>
                 <Stepper alternativeLabel activeStep={activeStep} orientation="horizontal">
                     {data?.map((part, index) => (
@@ -472,9 +496,17 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                         </Step>
                     ))}
                 </Stepper>
+                {/* {!isFullStepActive && (
+                    <button onClick={__handleStepButtonClick} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'absolute', right: 0 }} >
+                        <GrFormNext size={20}></GrFormNext>
+                    </button>
+                )} */}
+            </div>
+            <div style={{ paddingLeft: 20 }}>
+                <span style={{ fontSize: 12, fontWeight: '500' }}>ITEM MASKS</span>
             </div>
             <form className={`${style.materialDetail__container}`} style={primaryKey === 'DIALOG' ? { display: 'flex' } : {}} >
-                <div className={`${style.materialDetail__container__itemMaskArea} items-center justify-center `} style={primaryKey === 'DIALOG' ? { paddingRight: '10px', height: 350, overflow: 'auto' } : {}}>
+                <div className={`${style.materialDetail__container__itemMaskArea} items-center justify-center `} style={primaryKey === 'DIALOG' ? { paddingRight: '10px', height: 350, overflow: 'auto', marginTop: 20 } : {}}>
                     {data?.map((part: PartOfDesignInterface, key) => (
                         <div >
                             {selectedPartOfDesign?.partOfDesignID === part.partOfDesignID ? part?.itemMasks?.map((item, optionIdx) => (
@@ -577,9 +609,10 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                         </div>
                     ))}
 
+
                     {selectedPartOfDesign?.itemMasks?.length === 0 && (
                         <div style={{ margin: '0 auto', width: 'fit-content' }} className='items-center'>
-                            <span style={{fontSize: 13, color: redColor}} className="pl-0 text-indigo-600 hover:text-indigo-800 transition duration-200 items-center">Do not have any item masks</span>
+                            <span style={{ fontSize: 13, color: redColor }} className="pl-0 text-indigo-600 hover:text-indigo-800 transition duration-200 items-center">Do not have any item masks</span>
                         </div>
                     )}
                 </div>
@@ -589,8 +622,8 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                         <div style={{ paddingLeft: 20 }}>
                             <span style={{ fontSize: 12, fontWeight: '500' }}>{selectedPartOfDesign.partOfDesignName}</span>
                             <a onClick={() => __handleApplyAllMaterialForItemMask()} style={{ fontSize: 11, fontWeight: '500', color: secondaryColor, cursor: 'pointer', float: 'right' }}>Apply all items</a>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 0 }}>
-                                <div style={{ width: 100, fontSize: 14 }} >
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 0, marginTop: 10 }}>
+                                <div style={{ width: 100, fontSize: 14, }} >
                                     <label
                                         className="ml-2 min-w-0 flex-1 text-gray-500"
                                         style={{ fontSize: 11 }}
@@ -708,6 +741,7 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                     }
                 </div>
             </form>
+
         </div >
     );
 };

@@ -148,7 +148,9 @@ function CustomDesignScreen() {
     }
   );
   const [selectedItemMask, setSelectedItemMask] = useState<ItemMaskInterface>();
-  const [itemSize, setItemSize] = useState<{ width?: number, height?: number }>()
+  const [itemSize, setItemSize] = useState<{ width?: number, height?: number }>();
+  const [isFullStepActive, setIsFullStepActive] = useState<boolean>(false);
+
 
 
 
@@ -848,8 +850,9 @@ function CustomDesignScreen() {
         typeOfModel={typeOfModel}
         isOpen={isOpenMaterialDialog}
         onClose={() => __handleCloseMaterialDialog()}
+        isFullStepActive={isFullStepActive}
         child={(
-          <MaterialDetailComponent expertID={typeOfModelID} primaryKey={'DIALOG'} partOfDesigndata={partOfClothData} onGetMaterial={(item) => __handleGetMaterialInformation(item)}></MaterialDetailComponent>
+          <MaterialDetailComponent onGetIsFullStepActive={setIsFullStepActive} expertID={typeOfModelID} primaryKey={'DIALOG'} partOfDesigndata={partOfClothData} onGetMaterial={(item) => __handleGetMaterialInformation(item)}></MaterialDetailComponent>
         )}
         model={(
           <CanvasModel typeOfModel={typeOfModel} isDefault={true} is3D={true} />
