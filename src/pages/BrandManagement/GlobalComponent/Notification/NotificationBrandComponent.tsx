@@ -6,7 +6,7 @@ interface Notification {
     message: string;
 }
 
-const NotificationComponent: React.FC = () => {
+const NotificationBrandComponent: React.FC = () => {
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const userId = "a";  // Assign the current user's username
 
@@ -14,8 +14,12 @@ const NotificationComponent: React.FC = () => {
         const socket = new SockJS('http://localhost:6969/websocket?userid=' + userId);
         const stompClient = Stomp.over(socket);
 
+        stompClient.debug = (str) => {
+            console.log(str);
+        };
+
         stompClient.connect({}, (frame: any) => {
-            // console.log('Connected: ' + frame);
+            console.log('Connected: ' + frame);
 
             stompClient.subscribe('/topic/messages', (message: any) => {
                 showMessage(JSON.parse(message.body));
@@ -32,6 +36,8 @@ const NotificationComponent: React.FC = () => {
             stompClient.subscribe('/user/topic/private-notifications', (message: any) => {
                 showMessage(JSON.parse(message.body));
             });
+        }, (error: string) => {
+            console.log('Error: ' + error);
         });
 
         return () => {
@@ -59,4 +65,4 @@ const NotificationComponent: React.FC = () => {
     );
 };
 
-export default NotificationComponent;
+export default NotificationBrandComponent;

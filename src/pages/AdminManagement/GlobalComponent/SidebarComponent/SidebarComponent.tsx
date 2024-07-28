@@ -83,6 +83,14 @@ const Sidebar: React.FC<SidebarProps> = ({ menuOpen, toggleMenu, activeMenu, han
                             <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">Bar Chart</p>
                         </div>
                     </li>
+                    <li>
+                        <div onClick={() => handleMenuClick('system_configuration')} className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'system_configuration' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                                <path fillRule="evenodd" d="M1.5 5.625c0-1.036.84-1.875 1.875-1.875h17.25c1.035 0 1.875.84 1.875 1.875v12.75c0 1.035-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 011.5 18.375V5.625zM21 9.375A.375.375 0 0020.625 9h-7.5a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375h7.5a.375.375 0 00.375-.375v-1.5zm-9 0A.375.375 0 0011.625 9h-7.5a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375h7.5a.375.375 0 00.375-.375v-1.5zM4.5 14.25a.75.75 0 000 1.5h15a.75.75 0 000-1.5h-15z" clipRule="evenodd"></path>
+                            </svg>
+                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">System Configuration</p>
+                        </div>
+                    </li>
                 </ul>
             </div>
         </aside>

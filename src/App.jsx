@@ -38,6 +38,7 @@ import Brand from './pages/BrandManagement/DashboardBrand/BrandDashboardScreen';
 
 import CreateDesignComponent from './pages/CustomDesign/Components/CreateDesign/CreateDesignComponent';
 import DesignCollectionScreen from './pages/DesignCollection/DesignCollectionContainer/DesignCollectionScreen';
+import { DashboardAccountantScreens } from './pages/AccountantManagement';
 
 
 const tokenIsValid = (token) => {
@@ -149,6 +150,8 @@ function App() {
           {/* Manage design */}
           <Route path='/collection' element={<DesignCollectionScreen />} />
 
+          {/* Accountant dashboard route */}
+          <Route path='/accountant' element={<DashboardAccountantScreens></DashboardAccountantScreens>} />
         </Routes>
       </BrowserRouter>
     </div>

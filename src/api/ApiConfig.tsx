@@ -127,6 +127,9 @@ export const functionEndpoints = {
     createOrder: '/create-order',
     getOrderById: '/get-order-by-id',
     brandPickOrder: '/brand-pick_order',
+    getOrderDetailById: '/get-order-detail-by-id',
+    getOrderByBrandId: '/get-order-by-brand-id',
+    getAllOrder: '/get-all-order'
   },
   sizeExpertTailoring: {
     getAllSizeExpertTailoringByExperId: '/get-all-size-by-expert-tailoring-id',

@@ -3,7 +3,7 @@ export interface Report {
     typeOfReport: string;
     orderResponse: OrderResponse;
     content: string,
-    reportStatus: boolean,
+    reportStatus: string,
     reportImageList: ReportImageList,
     createDate: string,
     lastModifiedDate: string
