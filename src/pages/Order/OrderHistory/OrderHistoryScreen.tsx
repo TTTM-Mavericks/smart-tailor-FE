@@ -186,7 +186,7 @@ const OrderHistory: React.FC = () => {
     const __handleFetchOrderData = async () => {
         setIsLoading(true)
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderById}/${'c11d9f7d-4a77-490f-9a39-a3b89790319'}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderById}/${'aa130e98-a1ff-404d-a819-939152a00a74'}`);
             if (response.status === 200) {
                 console.log(response.data);
                 setOrderDetail(response.data);

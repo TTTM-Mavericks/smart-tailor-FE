@@ -75,6 +75,8 @@ interface Design {
   imageUrl: string;
   color: string;
   partOfDesign: PartOfDesign[];
+  minWeight: number
+  maxWeight: number
 }
 
 interface ImageSystemData {
@@ -760,7 +762,9 @@ function CustomDesignScreen() {
       publicStatus: true,
       imageUrl: successImaUrl ? successImaUrl : '',
       color: snap.color || '#FFFFFF',
-      partOfDesign: transformPartOfDesign(item)
+      partOfDesign: transformPartOfDesign(item),
+      minWeight: 0.2,
+      maxWeight: 0.4
     };
     console.log(bodyRequest);
     setMainDesign(bodyRequest);
@@ -1276,6 +1280,21 @@ function CustomDesignScreen() {
           </div>
         )}
       </main>
+
+      <Dialog open={false} maxWidth={'lg'} fullWidth>
+        <DialogContent>
+          <main id='canvas3DElement' style={{ height: 550 }}>
+            {!changeUploadPartOfDesignTool ? (
+              <CanvasModel typeOfModel={typeOfModel} isDefault={false} is3D={true} />
+            ) : (
+              <div style={{ backgroundColor: grayColor, opacity: 0.7, width: '100%', height: '100%' }}>
+                <img src={selectedPartOfCloth?.realpartImageUrl} style={{ width: '100%', height: '100%' }}></img>
+              </div>
+            )}
+          </main>
+        </DialogContent>
+
+      </Dialog>
 
       {/* Editor tools */}
       <div className={styles.customDesign__container__itemEditor}>
