@@ -29,6 +29,7 @@ import {
 import { IoIosWarning } from "react-icons/io";
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import LoadingComponent from '../Loading/LoadingComponent';
+import { toast } from 'react-toastify';
 
 
 type Props = {
@@ -40,6 +41,7 @@ type Props = {
     typeOfModel?: any;
     key?: any;
     onCreateDesign?: () => void;
+    isFullStepActive?: boolean;
 }
 
 
@@ -110,7 +112,7 @@ const productData = [
     },
 ]
 
-const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child, model, typeOfModel, key, onCreateDesign }) => {
+const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child, model, typeOfModel, key, onCreateDesign, isFullStepActive }) => {
     // TODO MUTIL LANGUAGE
     // ---------------UseState Variable---------------//
     const [selectedLanguage, setSelectedLanguage] = useState<string>(localStorage.getItem('language') || 'en');
@@ -175,9 +177,13 @@ const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child
     }
 
     const __handleSaveMaterialInformation = () => {
-        setIsOpenSaveMaterialDialog(false);
-        if (onCreateDesign) {
-            onCreateDesign();
+        if (isFullStepActive) {
+            setIsOpenSaveMaterialDialog(false);
+            if (onCreateDesign) {
+                onCreateDesign();
+            }
+        } else {
+            toast.error('Please enter full part', { autoClose: 4000 });
         }
         // __handleClose();
     }
@@ -346,6 +352,7 @@ const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child
                 <Button onClick={() => __handleOpenMaterialSavingDialog()} style={{ color: primaryColor, padding: '5px 20px 5px 20px' }}  >
                     Cancel
                 </Button>
+
                 <Button onClick={() => __handleSaveMaterialInformation()} style={{ backgroundColor: redColor, color: whiteColor, padding: '5px 20px 5px 20px' }}>
                     Order
                 </Button>

@@ -11,9 +11,14 @@ import { values } from 'core-js/core/array';
 
 const steps = [
     {
-        label: 'Waiting to confirm',
+        label: 'Not verify',
         description: ``,
         value: 'NOT_VERIFY'
+    },
+    {
+        label: 'Pending',
+        description: ``,
+        value: 'PENDING'
     },
     {
         label: 'Deposit',
@@ -22,19 +27,20 @@ const steps = [
         value: 'DEPOSIT',
     },
     {
-        label: 'Pending',
+        label: 'Processing',
         description: ``,
-        value: 'PENDING'
+        value: 'PROCESSING'
+    },
+
+    {
+        label: 'Completed',
+        description: ``,
+        value: 'COMPLETED'
     },
     {
-        label: 'Successfull',
+        label: 'Delivered',
         description: ``,
-        value: 'SUCCESSFULL'
-    },
-    {
-        label: 'Delivery',
-        description: ``,
-        value: 'DELIVERY'
+        value: 'DELIVERED'
     },
 ];
 type props = {

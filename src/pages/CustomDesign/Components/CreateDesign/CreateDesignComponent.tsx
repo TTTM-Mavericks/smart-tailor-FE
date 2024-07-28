@@ -42,6 +42,8 @@ interface Design {
     imageUrl: string;
     color: string;
     partOfDesign: PartOfDesign[];
+    minWeight: number,
+    maxWeight: number
 }
 
 
@@ -142,6 +144,8 @@ const CreateDesignComponent = () => {
                 publicStatus: true,
                 imageUrl: '',
                 color: "",
+                minWeight: 0.2,
+                maxWeight: 0.4,
                 partOfDesign: [
                     {
                         partOfDesignName: "LOGO_PART",

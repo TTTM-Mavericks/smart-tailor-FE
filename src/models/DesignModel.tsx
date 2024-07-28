@@ -70,6 +70,8 @@ export interface DesignInterface {
   expertTailoringID?: string;
   expertTailoring?: ExpertTailoringInterface;
   materialDetail?: MaterialDetailInterface[];
+  minWeight?: number,
+  maxWeight?: number,
 
 }
 

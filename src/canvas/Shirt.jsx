@@ -164,7 +164,7 @@ const Shirt = ({ isDefault }) => {
                             map={item.texture}
                             // depthTest={true}
                             depthWrite={true}
-                            // dispose={true}
+                            dispose={true}
                             renderOrder={item.indexZ}
                         />
                     ))

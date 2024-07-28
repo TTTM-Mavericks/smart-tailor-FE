@@ -9,15 +9,19 @@ import { AiOutlineRadiusUpleft, AiOutlineRadiusUpright } from "react-icons/ai";
 import { AiOutlineRadiusBottomleft, AiOutlineRadiusBottomright } from "react-icons/ai";
 import { styled } from '@mui/system';
 import { ItemMaskInterface, PartOfDesignInterface } from '../../../../models/DesignModel';
+import { MdHeight, MdWidthFull } from "react-icons/md";
+import { RxWidth, RxHeight } from "react-icons/rx";
+import { Value } from 'react-quill';
 
 interface ItemEditorToolsComponentProps {
-    onValueChange: (value: {itemMaskID: any, value: number}) => void;
+    onValueChange: (value: { itemMaskID: any, value: number }) => void;
     itemIdSelected?: any;
     targetRef?: React.RefObject<HTMLDivElement>;
     onGetBorderRadiusValueChange?: (value: BorderRadiusItemMaskInterface) => void;
     selectedItemMask?: ItemMaskInterface;
     partOfDesignData?: PartOfDesignInterface[];
     selectedPartOfDesign?: PartOfDesignInterface;
+    onGetSizeValueChange?: (Value: ItemSizeInterface) => void
 }
 
 interface IconButtonProps {
@@ -30,6 +34,11 @@ interface BorderRadiusItemMaskInterface {
     topRightRadius?: number;
     bottomLeftRadius?: number;
     bottomRightRadius?: number;
+}
+
+interface ItemSizeInterface {
+    width?: number,
+    height?: number
 }
 
 const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -50,11 +59,12 @@ const ItemEditorToolsComponent: React.FC<ItemEditorToolsComponentProps> = ({
     onGetBorderRadiusValueChange,
     selectedItemMask,
     partOfDesignData,
-    selectedPartOfDesign
+    selectedPartOfDesign,
+    onGetSizeValueChange
 
 }) => {
 
-    const [value, setValue] = useState<{itemMaskID: any, value: number}>();
+    const [value, setValue] = useState<{ itemMaskID: any, value: number }>();
     const [oldItemId, setOldItemId] = useState<any>();
     const [borderRadiusItemMask, setBorderRadiusItemMask] = useState<BorderRadiusItemMaskInterface>({
         topLeftRadius: 0,
@@ -62,6 +72,8 @@ const ItemEditorToolsComponent: React.FC<ItemEditorToolsComponentProps> = ({
         bottomLeftRadius: 0,
         bottomRightRadius: 0,
     });
+
+    const [itemSize, setItemSize] = useState<ItemSizeInterface>({ width: 0, height: 0 })
 
     const [oldSelectedItemMask, setOldSelectedItemMask] = useState<ItemMaskInterface>();
 
@@ -118,18 +130,30 @@ const ItemEditorToolsComponent: React.FC<ItemEditorToolsComponentProps> = ({
 
     const __handleChange = (event: Event, newValue: number | number[]) => {
         const updatedValue = newValue as number;
-        setValue({itemMaskID: selectedItemMask?.itemMaskID, value: updatedValue});
-        onValueChange({itemMaskID: selectedItemMask?.itemMaskID, value: updatedValue});
+        setValue({ itemMaskID: selectedItemMask?.itemMaskID, value: updatedValue });
+        onValueChange({ itemMaskID: selectedItemMask?.itemMaskID, value: updatedValue });
+    };
+
+    const __handleSizeWidthChange = (event: Event, newValue: number | number[]) => {
+        const updatedValue = newValue as number;
+        setItemSize({ width: updatedValue, height: itemSize?.height });
+        onGetSizeValueChange && onGetSizeValueChange({ width: updatedValue, height: itemSize?.height });
+    };
+
+    const __handleSizeHeightChange = (event: Event, newValue: number | number[]) => {
+        const updatedValue = newValue as number;
+        setItemSize({ width: itemSize?.width, height: updatedValue });
+        onGetSizeValueChange && onGetSizeValueChange({ width: itemSize?.width, height: updatedValue });
     };
 
     const __handleReset = (newValue: number | number[]) => {
         if (itemIdSelected === oldItemId) {
             const updatedValue = newValue as number;
-            setValue({itemMaskID: selectedItemMask?.itemMaskID, value: updatedValue});
-            onValueChange({itemMaskID: selectedItemMask?.itemMaskID, value: updatedValue});
+            setValue({ itemMaskID: selectedItemMask?.itemMaskID, value: updatedValue });
+            onValueChange({ itemMaskID: selectedItemMask?.itemMaskID, value: updatedValue });
         } else {
-            setValue({itemMaskID: selectedItemMask?.itemMaskID, value: 0});
-            onValueChange({itemMaskID: selectedItemMask?.itemMaskID, value: 0});
+            setValue({ itemMaskID: selectedItemMask?.itemMaskID, value: 0 });
+            onValueChange({ itemMaskID: selectedItemMask?.itemMaskID, value: 0 });
             setOldItemId(itemIdSelected);
         }
     };
@@ -157,6 +181,7 @@ const ItemEditorToolsComponent: React.FC<ItemEditorToolsComponentProps> = ({
         }));
     };
 
+
     const icons: IconButtonProps[] = [
         { icon: <Move size={17} />, alt: 'Move' },
         { icon: <Minimize size={17} onClick={__handleFullscreen} />, alt: 'Minimize' },
@@ -183,24 +208,7 @@ const ItemEditorToolsComponent: React.FC<ItemEditorToolsComponentProps> = ({
     return (
         <div>
             <div className="grid grid-cols-4 gap-4 mx-4 my-2">
-                <LightTooltip
-                    title={<SliderTooltip value={value?.value || 0} onChange={__handleChange} max={360} />}
-                    placement="top"
-                    arrow
-                    sx={{
-                        '& .MuiTooltip-tooltip': {
-                            backgroundColor: 'white',
-                            color: 'black',
-                        },
-                        '& .MuiTooltip-arrow': {
-                            color: 'white',
-                        },
-                    }}
-                >
-                    <button className="bg-white p-2 rounded shadow flex justify-center items-center">
-                        <MdOutlineCropRotate size={17} />
-                    </button>
-                </LightTooltip>
+
 
                 <LightTooltip
                     title={<SliderTooltip value={borderRadiusItemMask?.topLeftRadius || 0} onChange={__handleBorderRadiusChange('topLeftRadius')} max={360} />}
@@ -277,14 +285,85 @@ const ItemEditorToolsComponent: React.FC<ItemEditorToolsComponentProps> = ({
                         <AiOutlineRadiusBottomright size={17} />
                     </button>
                 </LightTooltip>
+
+                <LightTooltip
+                    title={<SliderTooltip value={value?.value || 0} onChange={__handleChange} max={360} />}
+                    placement="top"
+                    arrow
+                    sx={{
+                        '& .MuiTooltip-tooltip': {
+                            backgroundColor: 'white',
+                            color: 'black',
+                        },
+                        '& .MuiTooltip-arrow': {
+                            color: 'white',
+                        },
+                    }}
+                >
+                    <button className="bg-white p-2 rounded shadow flex justify-center items-center">
+                        <MdOutlineCropRotate size={17} />
+                    </button>
+                </LightTooltip>
+
+                <LightTooltip
+                    title={<SliderTooltip value={itemSize?.width || 0} onChange={__handleSizeWidthChange} max={360} />}
+                    placement="top"
+                    arrow
+                    sx={{
+                        '& .MuiTooltip-tooltip': {
+                            backgroundColor: 'white',
+                            color: 'black',
+                        },
+                        '& .MuiTooltip-arrow': {
+                            color: 'white',
+                        },
+                    }}
+                >
+                    <button className="bg-white p-2 rounded shadow flex justify-center items-center">
+                        <RxWidth size={17} />
+                    </button>
+                </LightTooltip>
+
+                <LightTooltip
+                    title={<SliderTooltip value={itemSize?.height || 0} onChange={__handleSizeHeightChange} max={360} />}
+                    placement="top"
+                    arrow
+                    sx={{
+                        '& .MuiTooltip-tooltip': {
+                            backgroundColor: 'white',
+                            color: 'black',
+                        },
+                        '& .MuiTooltip-arrow': {
+                            color: 'white',
+                        },
+                    }}
+                >
+                    <button className="bg-white p-2 rounded shadow flex justify-center items-center">
+                        <RxHeight size={17} />
+                    </button>
+                </LightTooltip>
+
+                <button className="bg-white p-2 rounded shadow flex justify-center items-center">
+                    <Minimize size={17} onClick={__handleFullscreen} />
+                </button>
+
+                <button className="bg-white p-2 rounded shadow flex justify-center items-center">
+                    <ZoomIn size={17} />
+                </button>
+
+                <button className="bg-white p-2 rounded shadow flex justify-center items-center">
+                    <ZoomOut size={17} />
+                </button>
+
+
             </div>
-            <div className="grid grid-cols-4 gap-4 mx-4 my-2">
+            {/* <div className="grid grid-cols-4 gap-4 mx-4 my-2">
                 {icons.map((icon, index) => (
                     <button key={index} className="bg-white p-2 rounded shadow flex justify-center items-center">
                         {icon.icon}
                     </button>
                 ))}
-            </div>
+            </div> */}
         </div>
     );
 };
