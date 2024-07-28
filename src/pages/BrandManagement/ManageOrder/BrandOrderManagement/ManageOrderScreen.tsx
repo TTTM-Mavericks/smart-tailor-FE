@@ -5,9 +5,14 @@ import axios from 'axios';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import { BrandOrder, ImageList } from '../../../../models/BrandManageOrderModel';
 import { motion } from 'framer-motion'
-import { values } from 'core-js/core/array';
-import { use } from 'i18next';
 
+/**
+ * 
+ * @param status 
+ * @returns 
+ * Take The Status of all state
+ * With Each status have each color
+ */
 const getStatusColor = (status: string) => {
     switch (status) {
         case 'NOT_VERIFY': return 'text-gray-600';
@@ -21,6 +26,13 @@ const getStatusColor = (status: string) => {
     }
 };
 
+/**
+ * 
+ * @param param0 
+ * @returns 
+ * Show The modal when click on the each item part
+ * Show the information of each item part
+ */
 const DesignModal: React.FC<{ part: any; onClose: () => void }> = ({ part, onClose }) => {
     return (
         <motion.div
@@ -55,10 +67,10 @@ const DesignModal: React.FC<{ part: any; onClose: () => void }> = ({ part, onClo
                             <h3 className="text-lg font-semibold mb-2">Item Masks</h3>
                             <div className="bg-gray-100 p-4 rounded">
                                 <img src={part.imageUrl || '/placeholder-image.png'} alt="Item Mask" className="w-24 h-24 object-contain mb-2" />
-                                <p><strong>Item Mask Name:</strong> {part.material?.materialName}</p>
+                                <p><strong>Item Mask:</strong> {part.material?.materialName}</p>
                                 <p><strong>Type:</strong> ICON</p>
-                                <p><strong>Position:</strong> X: 92, Y: 50</p>
-                                <p><strong>Scale:</strong> X: 230, Y: 230</p>
+                                <p><strong>Position:</strong> X: {part.itemMasks?.positionX}, Y: {part.itemMasks?.positionY}</p>
+                                <p><strong>Scale:</strong>X: {part.itemMasks?.scaleX}, Y: {part.itemMasks?.scaleY}</p>
                             </div>
                         </div>
                     </div>
@@ -68,6 +80,13 @@ const DesignModal: React.FC<{ part: any; onClose: () => void }> = ({ part, onClo
     );
 };
 
+/**
+ * 
+ * @param param0 
+ * @returns 
+ * Show The part of design when click on the Show Design Details
+ * Show All 4 part
+ */
 const DesignDetails: React.FC<{ design: any }> = ({ design }) => {
     const [isDesignModalOpen, setIsDesignModalOpen] = useState(false);
     const [selectedDesignPart, setSelectedDesignPart] = useState<any>(null);
@@ -117,6 +136,14 @@ const DesignDetails: React.FC<{ design: any }> = ({ design }) => {
     );
 };
 
+/**
+ * 
+ * @param param0 
+ * @returns 
+ * The Card when first load the page order management
+ * call api /get-all-design-detail-by-order-id
+ * Click on DesignDetails to show the detail of the Order Brand Details
+ */
 const BrandOrderFields: React.FC<{
     order: BrandOrder;
     onViewDetails: (order: BrandOrder, design: any) => void;
@@ -143,7 +170,7 @@ const BrandOrderFields: React.FC<{
         if (showDesignDetails && !designDetails) {
             fetchDesignDetails();
         }
-    }, [showDesignDetails]);
+    }, [showDesignDetails, onViewDetails]);
 
     useEffect(() => {
         console.log("Updated designDetails:", designDetails);
@@ -182,9 +209,8 @@ const BrandOrderFields: React.FC<{
                     <p className="text-gray-700 mt-4">Price: {order.totalPrice}</p>
                 </div>
             </div>
-            <div className="mt-4 flex items-center">
+            <div className="mt-4 flex items-center" onClick={() => setShowDesignDetails(!showDesignDetails)}>
                 <ArrowDropDown
-                    onClick={() => setShowDesignDetails(!showDesignDetails)}
                     className="cursor-pointer mr-2"
                 />
                 <span style={{ fontWeight: "bold" }}>Show Design Details</span>
@@ -212,10 +238,22 @@ const BrandOrderFields: React.FC<{
     );
 };
 
+/**
+ * 
+ * @param orderImageList 
+ * @returns 
+ * Function to get All Image (if need)
+ */
 function isOrderImageListArray(orderImageList: ImageList | ImageList[]): orderImageList is ImageList[] {
     return Array.isArray(orderImageList);
 }
 
+/**
+ * 
+ * @param param0 
+ * @returns 
+ * The modal of the Brand when click on the View Detail Button
+ */
 const BrandOrderModal: React.FC<{ order: BrandOrder; onClose: () => void; onMarkResolved: (orderID: string) => void, designDetails: any }> = ({ order, onClose, onMarkResolved, designDetails }) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -376,6 +414,13 @@ const BrandOrderModal: React.FC<{ order: BrandOrder; onClose: () => void; onMark
     );
 };
 
+/**
+ * 
+ * @returns 
+ * Call Api /get-all-order
+ * Get all the order of the brand 
+ * show all card of the BrandOrderFields
+ */
 const BrandManageOrder: React.FC = () => {
     const [order, setOrder] = useState<BrandOrder[]>([]);
     const [filteredOrders, setFilteredOrders] = useState<BrandOrder[]>([]);
@@ -503,10 +548,17 @@ const BrandManageOrder: React.FC = () => {
         return pageNumbers;
     };
 
-    const handleViewDetails = (order: BrandOrder, designDetail: any) => {
+    const handleViewDetails = async (order: BrandOrder) => {
         setSelectedOrder(order);
         setIsModalOpen(true);
-        setDesignDetails(designDetail)
+        setDesignDetails(designDetails)
+        try {
+            const response = await axios.get(`${baseURL + versionEndpoints.v1 + featuresEndpoints.designDetail + functionEndpoints.designDetail.getAllInforOrderDetail + `/${order.orderID}`}`);
+            setDesignDetails(response.data.data.design);
+        } catch (error) {
+            console.error('Error fetching design details:', error);
+        } finally {
+        }
     };
 
     const handleCloseModal = () => {
