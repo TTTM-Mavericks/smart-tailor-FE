@@ -63,10 +63,11 @@ const VerticalLinearStepperComponent: React.FC<props> = ({ status }) => {
 
     React.useEffect(() => {
         if (status === 'NOT_VERIFY') setActiveStep(0);
-        if (status === 'DEPOSIT') setActiveStep(1);
-        if (status === 'PENDING') setActiveStep(2);
-        if (status === 'SUCCESSFULL') setActiveStep(3);
-        if (status === 'DELIVERY') setActiveStep(4);
+        if (status === 'PENDING') setActiveStep(1);
+        if (status === 'DEPOSIT') setActiveStep(2);
+        if (status === 'PROCESSING') setActiveStep(3);
+        if (status === 'COMPLETED') setActiveStep(3);
+        if (status === 'DELIVERED') setActiveStep(4);
 
     }, [status])
 

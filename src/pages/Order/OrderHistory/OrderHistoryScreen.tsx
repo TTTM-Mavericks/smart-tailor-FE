@@ -15,137 +15,11 @@ import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../
 import { toast, ToastContainer } from 'react-toastify';
 import { PaymentOrderInterface } from '../../../models/PaymentModel';
 import LoadingComponent from '../../../components/Loading/LoadingComponent';
-
-
-const examplePayments: PaymentInterface[] = [
-    {
-        paymentID: '5f8d0d55-99a1-4c1a-9443-7f82f8a5e1e3',
-        paymentSenderID: '9b6d8b8b-8c6e-4c4d-9b1c-1a6b3c6a6c1c',
-        paymentSenderName: 'John Doe',
-        paymentSenderBankCode: 'ABC123',
-        paymentSenderBankNumber: '123456789',
-        paymentRecipientID: '1a2b3c4d-5e6f-7g8h-9i0j-1k2l3m4n5o6p',
-        paymentRecipientName: 'Jane Smith',
-        paymentRecipientBankCode: 'XYZ789',
-        paymentRecipientBankNumber: '987654321',
-        paymentAmount: 250.75,
-        paymentMethod: 'Credit Card',
-        paymentStatus: true,
-        paymentType: 'Order payment',
-        createDate: '2023-07-04T10:30:00',
-        lastModifiedDate: '2023-07-04T12:00:00'
-    },
-    {
-        paymentID: '6e5d0d55-88a1-4c1b-8443-7d82f8b5e2f4',
-        paymentSenderID: '7c6d8b8b-8c6f-4c4d-8b1c-1b6b3c6b6d2d',
-        paymentSenderName: 'Alice Johnson',
-        paymentSenderBankCode: 'DEF456',
-        paymentSenderBankNumber: '234567890',
-        paymentRecipientID: '2a3b4c5d-6e7f-8g9h-0i1j-2k3l4m5n6o7p',
-        paymentRecipientName: 'Bob Brown',
-        paymentRecipientBankCode: 'UVW123',
-        paymentRecipientBankNumber: '876543210',
-        paymentAmount: 150.50,
-        paymentMethod: 'Bank Transfer',
-        paymentStatus: false,
-        paymentType: 'Deposit',
-        createDate: '2023-06-20T09:00:00',
-        lastModifiedDate: '2023-06-20T10:30:00'
-    }
-];
-
-const exampleOrders: OrderInterface[] = [
-    {
-        orderID: '8f9d0d55-77a1-4c1a-9443-7f82f8a5e1e3234234',
-        parentOrderID: '9g0h1i2j-8k3l-4m5n-6o7p-8q9r1s2t3u4v',
-        designID: '1a2b3c4d-5e6f-7g8h-9i0j-1k2l3m4n5o6p',
-        design: {
-            designID: '1a2b3c4d-5e6f-7g8h-9i0j-1k2l3m4n5o6p',
-            imageUrl: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxAQEA8NDQ8ODQ0NDw0NDQ0NDQ8NDQ0PFhEWFxUWExMYKCgsGBolHBgTITMhKSksLjouGCA0RDMsNygtLisBCgoKDA0NGwoQFysZGh0rKysrKysrKysrLSsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrK//AABEIAQMAwgMBIgACEQEDEQH/xAAcAAEBAAIDAQEAAAAAAAAAAAAAAQIHAwYIBQT/xABMEAACAQICBQYICAgPAAAAAAAAAQIDBAURBgcSITETUWFxgZEUIjJBUlWTwSVCZHKCoaKjCBYXI0SUpLE0NUNFVGJzdHWDkrKz0fD/xAAVAQEBAAAAAAAAAAAAAAAAAAAAAf/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AN0gAAAAAAAoAAAAAAAAAAAAAUhQCKRFAAAAAAAAAwAAAAAAABQAAAAAAAAAAAAApCgEUiKAAAAAAAABgAAAAAAACgAAAAAAAAAAAABSFAIpEUAAAAAAAADAAAAAAAAFBCgAfI0g0ms7CG3eXEKTabhTz2q1TL0Ka3y7jUWPa6LqVbPD6NGjbR4K7g6tWr0y2JJRXQm+vmDegNMWOvGfC4w+EueVC5cc/oSi/wDcfSWvC0+NY3i6p0H70BtUGqZa8LT4tjdv506Ef3Nn4LzXlLfyGHLz5OtdPd2Rj7wNyg0Ng2u+88Ifhdtb1bV+VC2jKnWp8zjKUmpPoeXWjcOj2k9lfx2rO4p1ZJZzot7Fen86nLeuvh0gfYKQoBFIigAAAAAAAAYAAAAAAAbA/DjWLUbOhUurqap0aSzlLi3m8korzybySXSaT0o1t3tdyp2KVjQe5T3VLqS6ZPdDqSb/AKxy67tIuWuYYfTl+as8qldLhK4nHcn82D+8fMayzA5KtWU5SqVJSqVJvOdSpKU6k3zyk97OOSzAA40uc7DofpFSsHXdfD7fElXVJRVy4rkHDazcM4y47Sz4eSj4DROAHbtKNMLe9t/B6OEWmHz5SFR3FCVN1co55x3QjuefP5jqFTJLMu0Iw88uxcwC3p7K6XvZz0qsoyjOEpQnB5wnCThOD54yW9M4wwNjaMa2b632YXmWIUFkm55U7qKz81RbpbvNJb+dG7sCxmhe0IXVrPbpVM1vWU4SXlRmvNJf+3HktSNlak9JOQvHY1JfmL9ZQze6FzFZxy5tqOcetQA30ikKAAAAAAAAEYAAKAAAfI0qxqFjaV7ueTVGDcYt5cpUe6EO2TS7T65pbXtjuc6GGwe6CV3XS87acaaf23l80DVV/czqznVqy26lWc6tSfpTk25PvbOJGFR7n1MsXuXUgMgQoAuZABcwQoAgIA/6M7SvODjOnJwqU5RqU5rjCcWnGS6U0mcbZjSYHq/Q3Ho4hZW97HJSqwyrQX8nWi9mpHq2k8ujI+2aO1CY7ydxcYbN+JcxdzQ6K0ElNLpcMn/lm8QAAAAAAAAMAQAUEAHHdVVCMpSajGKcpSfBJLe2eUtIsWd5d3F5L9IqynFPc401uprsioo3vrkxnwbDKlOLyq3ko2kOOezLfU+wprtR52YHHX8l9TMocF1Iwr+S+oyXBAZIqMSgUEKBQQAGyAgAwpMy85hTA+ng2JztLi3vKee3bVadZJcZRT8aPbHaj2nrS0uYVacK1OSlTqwhUpyXCUJJNPuaPH0T0LqSxrwjDVbyedXD6krd55Z8i/HpPqybj9ADYRCFAAgAyBABgAAABGBoXXhizrYhTtE/EsqKclnu5arlJ5rogqfezW7Nkadav8R8Jur2CjeQuKtStlBqFaKlJ5R2JbmoxyW557uBrmvTlCTp1YzpVF5VOpCVOceuL3oDhr+SzIxrcO1fvKwBSADIEKAAAAjKQCGEOL6zIxjxfWBzI2BqRxjwfE/B5PKnf0pUcnw5aGc6f1covpI19tJcXkd30G0DxO4r291Ck7KjRrUa6uLpSpt7E1LxKfGXDmS6QPR4AAAACgADAGJUwKBmYgSVNPjvPi41ovaXkdi6oU6q+LtxTlB88ZcYvqZ9sqA0Np9qwhaUql3a1pxpUk6sqFVcp4q35QnxXbn1ms2eltav8VXr+T1F35I80AEUhkAAAApABSAAYtm1dFdTPhFKhd3d7s0rilTrxo2tPx9mpBSjnVnweT9F9ZquZ6r0FeeF4Z/h9j/wQA4NHdB8OsMpW1rT5VfpFb8/X7Jyz2ezI7HkEUAAAAAAAADiAAAAAUEKgOm6238E3v8AZJd84o81no7XHLLCbvpjRj316aPOIFRSIoApCgAAAAAEkeqNX7zwnDH8htF3Uoo8ryPUeraWeEYb/dKK7lkB2RFIigAAAAAAAAcQAAAAAAAOh66n8E3HTO1X7RTPOp6F13yywqp01bZffRfuPPQGSAAFBCoCggAoBAEj07qslng2HPmt9nunJe48xPgemNUM88EsOiFaPdXqIDt4AAAAAAAAAA4gAAAAAAAa516yywzL0ri3X2m/caAN8a+5ZYfSXpXdJP8A0TZoZMDIAACohQKAAAAAM9IalpZ4JZ9ErtftNQ83SPRmpGeeDW69Grdr7+T94HfAAAAAAAAAABwlIAKCACggA1b+EDPKxtV6V5H6qVQ0WjeX4QX8Es18rf1UZmj0gADYzAoIUDIgKBAMgwDPQuoyXwRBc1zdL7SfvPPRv7ULPPDKq9G+rpdtKk/eBskAAAAAAAAAAcQAAAAAEAB+XEsMoXMOTuaNK4p57ShWpxqxT50pefifGloJhT/m6y7LeCOxlA6y9AsK9XWfsIk/EDCvV9p7GJ2cAdXer/CvV9p7GJPye4V/QLX2SO0lQHVVq9wr1fa+yRn+T/CvV9p7FHZwB1laAYV6vs/YRMvxDwr1dZfq8DsgA64tBcK9XWX6tTPt4dh9G3gqNtSpUKUW2qdGnGnBN8Xsx85+goGQIigAAAAAAAAcQIAKCACghQAAAAACghUBUAgAAAAAAZIpEUAAAAAAAADhAAAAAAgAKAAAAAFRCoCggAoIAKAAKXMxAGWYzMQBlmMzEAZZgxAGAAAAAAAABQAAAABAAVAAAAABSACgAAAAAAAAAD//2Q=='
-        },
-        brandID: '2b3c4d5e-6f7g-8h9i-0j1k-2l3m4n5o6p7q',
-        quantity: 5,
-        discountID: '3c4d5e6f-7g8h-9i0j-1k2l-3m4n5o6p7q8r',
-        orderStatus: 'Delivered',
-        orderType: 'Standard',
-        address: '123 Main St',
-        district: 'Central',
-        province: 'State',
-        ward: 'Ward 1',
-        phone: 1234567890,
-        buyerName: 'John Doe',
-        totalPrice: 500.00,
-        employeeID: '4d5e6f7g-8h9i-0j1k-2l3m-4n5o6p7q8r9s',
-        expectedStartDate: '2023-05-01T08:00:00',
-        expectedProductCompletionDate: '2023-05-10T17:00:00',
-        estimatedDeliveryDate: '2023-05-12T10:00:00',
-        productionStartDate: '2023-05-01T09:00:00',
-        productCompletionDate: '2023-05-10T16:00:00',
-        createDate: '2023-04-25T10:30:00',
-        lastModifiedDate: '2023-04-25T12:00:00',
-        payment: examplePayments
-    },
-    {
-        orderID: '7g8h1i2j-77a1-4c1a-9443-7f82f8a5e1e4',
-        parentOrderID: '8i9j0k1l-8m3n-4o5p-6q7r-8s9t1u2v3w4x',
-        designID: '2b3c4d5e-6f7g-8h9i-0j1k-2l3m4n5o6p7r',
-        design: {
-            designID: '1a2b3c4d-5e6f-7g8h-9i0j-1k2l3m4n5o6p',
-            imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4PHI5muWT_qjOt9JhBhYZsxfHd_5dJ0xz7zW58UfOCkg-SN1opuEk1HWEpbCxp2_--LM&usqp=CAU'
-        },
-        brandID: '3c4d5e6f-7g8h-9i0j-1k2l-3m4n5o6p7q8s',
-        quantity: 2,
-        discountID: '4d5e6f7g-8h9i-0j1k-2l3m-4n5o6p7q8r9t',
-        orderStatus: 'Pending',
-        orderType: 'Custom',
-        address: '456 Elm St',
-        district: 'West',
-        province: 'Province',
-        ward: 'Ward 2',
-        phone: 9876543210,
-        buyerName: 'Alice Johnson',
-        totalPrice: 300.00,
-        employeeID: '5e6f7g8h-9i0j-1k2l-3m4n-5o6p7q8r9s0t',
-        expectedStartDate: '2023-06-01T08:00:00',
-        expectedProductCompletionDate: '2023-06-10T17:00:00',
-        estimatedDeliveryDate: '2023-06-12T10:00:00',
-        productionStartDate: '2023-06-01T09:00:00',
-        productCompletionDate: '2023-06-10T16:00:00',
-        createDate: '2023-05-25T10:30:00',
-        lastModifiedDate: '2023-05-25T12:00:00',
-        payment: examplePayments
-    },
-    {
-        orderID: '7g8h1i2j-77a1-4c1a-9443-7f82f8a5e1e456966767',
-        parentOrderID: '8i9j0k1l-8m3n-4o5p-6q7r-8s9t1u2v3w4x',
-        designID: '2b3c4d5e-6f7g-8h9i-0j1k-2l3m4n5o6p7r',
-        design: {
-            designID: '1a2b3c4d-5e6f-7g8h-9i0j-1k2l3m4n5o6p',
-            imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4PHI5muWT_qjOt9JhBhYZsxfHd_5dJ0xz7zW58UfOCkg-SN1opuEk1HWEpbCxp2_--LM&usqp=CAU'
-        },
-        brandID: '3c4d5e6f-7g8h-9i0j-1k2l-3m4n5o6p7q8s',
-        quantity: 2,
-        discountID: '4d5e6f7g-8h9i-0j1k-2l3m-4n5o6p7q8r9t',
-        orderStatus: 'Cancel',
-        orderType: 'Custom',
-        address: '456 Elm St',
-        district: 'West',
-        province: 'Province',
-        ward: 'Ward 2',
-        phone: 9876543210,
-        buyerName: 'Alice Johnson',
-        totalPrice: 300.00,
-        employeeID: '5e6f7g8h-9i0j-1k2l-3m4n-5o6p7q8r9s0t',
-        expectedStartDate: '2023-06-01T08:00:00',
-        expectedProductCompletionDate: '2023-06-10T17:00:00',
-        estimatedDeliveryDate: '2023-06-12T10:00:00',
-        productionStartDate: '2023-06-01T09:00:00',
-        productCompletionDate: '2023-06-10T16:00:00',
-        createDate: '2023-05-25T10:30:00',
-        lastModifiedDate: '2023-05-25T12:00:00',
-        payment: examplePayments
-    }
-];
+import Cookies from 'js-cookie';
+import { UserInterface } from '../../../models/UserModel';
+import { __handleAddCommasToNumber } from '../../../utils/NumbericUtils';
+import { PaymentOrderDialogComponent } from '../../../components';
+import { Listbox, Transition } from '@headlessui/react';
 
 
 const OrderHistory: React.FC = () => {
@@ -157,15 +31,34 @@ const OrderHistory: React.FC = () => {
     const [currentPaymentData, setCurrentPaymentData] = useState<PaymentInterface | PaymentOrderInterface>();
     // const [isExtendTransaction, setIsExtendTransaction] = useState<{ orderID: string, isExtend: boolean } | null>(null);
     const [isExtendTransaction, setIsExtendTransaction] = useState<{ [key: string]: boolean }>({});
-    const [orderDetail, setOrderDetail] = useState<OrderDetailInterface>();
+    const [orderDetailList, setOrderDetailList] = useState<OrderDetailInterface[]>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [userAuth, setUserAuth] = useState<UserInterface>();
+    const [isOpenPaymentDialog, setIsOpenPaymentDialog] = useState<{ [key: string]: boolean }>({});
+
+    const [selectedOwner, setSelectedOwner] = React.useState('Owner');
+    const [selectedCategory, setSelectedCategory] = React.useState('Category');
+    const [selectedDate, setSelectedDate] = React.useState('Modify date');
+    const [selectedRelevance, setSelectedRelevance] = React.useState('Liên quan nhất');
+    const [activeTab, setActiveTab] = useState('All');
+
+
+    const options = ['Option 1', 'Option 2', 'Option 3'];
+
+
+
     // ---------------UseEffect---------------//
 
     /**
      * Move to Top When scroll down
      */
     useEffect(() => {
-        __handleFetchOrderData();
+        const userStorage = Cookies.get('userAuth');
+        if (userStorage) {
+            const userParse: UserInterface = JSON.parse(userStorage);
+            setUserAuth(userParse)
+            __handleFetchOrderData(userParse.userID);
+        }
         const handleScroll = () => {
             if (window.scrollY > 200) {
                 setShowScrollButton(true);
@@ -183,13 +76,13 @@ const OrderHistory: React.FC = () => {
 
     // ---------------FunctionHandler---------------//
 
-    const __handleFetchOrderData = async () => {
+    const __handleFetchOrderData = async (userID: any) => {
         setIsLoading(true)
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderById}/${'aa130e98-a1ff-404d-a819-939152a00a74'}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderByUserId}/${userID}`);
             if (response.status === 200) {
                 console.log(response.data);
-                setOrderDetail(response.data);
+                setOrderDetailList(response.data);
                 setIsLoading(false)
             } else {
                 toast.error(`${response.message}`, { autoClose: 4000 });
@@ -242,7 +135,7 @@ const OrderHistory: React.FC = () => {
                     <svg className="w-6 h-6 mr-2" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
-                    <span className="font-medium">{item.paymentStatus}</span>
+                    <span className="font-medium">{'Successfully'}</span>
                 </div>
             );
         }
@@ -287,6 +180,61 @@ const OrderHistory: React.FC = () => {
         }
     }, [selectedLanguage, i18n]);
 
+
+    const __handleOpenPaymentDialog = (paymentId: any) => {
+        setIsOpenPaymentDialog({ [paymentId]: true })
+    }
+
+    const __handleClosePaymentDialog = (paymentId: any) => {
+        setIsOpenPaymentDialog({ [paymentId]: false })
+    }
+
+
+    const renderDropdown = (selected: string, setSelected: React.Dispatch<React.SetStateAction<string>>) => (
+        <Listbox value={selected} onChange={setSelected} >
+            <div className="relative" style={{ zIndex: 30 }}>
+                <Listbox.Button className={`${style.button} flex items-center`}>
+                    {selected}
+                    <FaAngleDown className="ml-2 w-4 h-4" aria-hidden="true" />
+                </Listbox.Button>
+                <Transition
+                    as={React.Fragment}
+                    leave="transition ease-in duration-100"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                >
+                    <Listbox.Options className="absolute mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                        {options.map((option, idx) => (
+                            <Listbox.Option
+                                key={idx}
+                                className={({ active }) =>
+                                    `cursor-pointer select-none relative py-2 pl-10 pr-4 ${active ? 'text-amber-900 bg-amber-100' : 'text-gray-900'}`
+                                }
+                                style={{ zIndex: 30 }}
+                                value={option}
+                            >
+                                {({ selected, active }) => (
+                                    <>
+                                        <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
+                                            {option}
+                                        </span>
+                                        {selected ? (
+                                            <span className={`absolute inset-y-0 left-0 flex items-center pl-3 ${active ? 'text-amber-600' : 'text-amber-600'}`}>
+                                                {/* <CheckIcon className="w-5 h-5" aria-hidden="true" /> */}
+                                            </span>
+                                        ) : null}
+                                    </>
+                                )}
+                            </Listbox.Option>
+                        ))}
+                    </Listbox.Options>
+                </Transition>
+            </div>
+        </Listbox>
+    );
+
+
+
     return (
         <div>
             <HeaderComponent />
@@ -309,16 +257,42 @@ const OrderHistory: React.FC = () => {
                     </div>
                 </aside>
                 <div style={{ width: '100%' }} className="max-w-6xl mx-auto p-4 md:p-6 min-h-screen">
+                    <div className={`${style.gradientBackground}`}>
+                        <p className={style.textStyle}>{t(codeLanguage + '000198')}</p>
+                    </div>
+                    <div className={` inline-flex items-center rounded-md bg-yellow-50 px-2 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10 mt-10`}>
+                        <span>
+                            {t(codeLanguage + '000199')}
+                        </span>
+                    </div>
 
-                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 md:mb-8">{t(codeLanguage + '000198')}</h1>
-                    <p className="text-base sm:text-lg text-gray-700 mb-4 md:mb-8">{t(codeLanguage + '000199')}</p>
-                    {exampleOrders.map((order, index) => (
-                        <div key={index} className="bg-white rounded-xl shadow-md p-4 md:p-6 mb-4 md:mb-8 transform transition-all hover:shadow-lg">
-                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6" >
+                    <div className='my-10'>
+                        <div className="flex space-x-4">
+                            {renderDropdown(selectedOwner, setSelectedOwner)}
+                            {renderDropdown(selectedCategory, setSelectedCategory)}
+                            {renderDropdown(selectedDate, setSelectedDate)}
+                            <div className="flex space-x-2">
+                                <div className={`${style.button} flex items-center`}>
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                                    </svg>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    {orderDetailList?.map((orderDetail) => (
+                        <div className="bg-white rounded-xl shadow-md p-4 md:p-6 mb-4 md:mb-8 transform transition-all hover:shadow-lg">
+                            <div className="flex flex-col md:flex-row items-start md:items-center mb-4 md:mb-6" >
                                 <div className="mb-4 md:mb-0 w-max">
+                                    <img className="w-32 h-28 md:w-35 md:h-40 rounded-lg shadow-md" src={orderDetail?.designResponse.imageUrl} alt={`Image `} />
+
+                                </div>
+                                <div className="mb-4 md:mb-0 w-max ml-12">
                                     <h2 className="text-1xl md:text-1xl font-bold text-gray-800 pb-2">{t(codeLanguage + '000193')} </h2>
-                                    <p className="text-sm text-gray-500 pb-2"> #{order.orderID}</p>
-                                    <p className="text-sm text-gray-500 pb-2">{t(codeLanguage + '000200')}: {order.lastModifiedDate}</p>
+                                    <p className="text-sm text-gray-500 pb-2"> #{orderDetail?.orderID}</p>
+                                    <p className="text-sm text-gray-500 pb-2">{t(codeLanguage + '000200')}: {orderDetail?.expectedStartDate}</p>
                                     <div style={{
                                         display: 'flex',
                                         alignContent: 'center',
@@ -327,16 +301,18 @@ const OrderHistory: React.FC = () => {
                                         <p className="text-sm text-gray-500">Status: </p>
                                         <Stack direction="row" spacing={5} padding={1}>
                                             <Chip
-                                                label={`${order.orderStatus} 
-                                            ${order.orderStatus === 'Cancel' || order.orderStatus === 'Delivered' ? 'at ' + order.expectedProductCompletionDate : ''}
+                                                label={`${orderDetail?.orderStatus} 
+                                            ${orderDetail?.orderStatus === 'Cancel' || orderDetail?.orderStatus === 'Delivered' ? 'at ' + orderDetail?.expectedProductCompletionDate : ''}
                                             `}
                                                 variant="filled"
                                                 style={
                                                     {
                                                         backgroundColor:
-                                                            order.orderStatus === 'Pending' ? secondaryColor
-                                                                : order.orderStatus === 'Delivered' ? greenColor
-                                                                    : redColor,
+                                                            orderDetail?.orderStatus === 'PENDING' ? secondaryColor
+                                                                : orderDetail?.orderStatus === 'DELIVERED' ? greenColor
+                                                                    : orderDetail?.orderStatus === 'DEPOSIT' ? secondaryColor
+                                                                        : orderDetail?.orderStatus === 'PROCESSING' ? secondaryColor
+                                                                            : redColor,
                                                         opacity: 1,
                                                         color: whiteColor
                                                     }
@@ -344,59 +320,65 @@ const OrderHistory: React.FC = () => {
                                         </Stack>
                                         {/* <p className="text-sm text-gray-500"></p> */}
                                     </div>
-                                    <button
-                                        onClick={() => __handleExtendTranscation(order.orderID)}
-                                        className={`${style.orderHistory__transactionLable}`}
-                                    >
-                                        <p className="text-1xl md:text-1xl font-bold text-gray-800 pr-5">Giao dịch</p>
-                                        {isExtendTransaction[order.orderID] ? (
-                                            <FaAngleUp />
-                                        ) : (
-                                            <FaAngleDown />
-                                        )}
-                                    </button>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-lg font-bold text-gray-900">{order.totalPrice}</p>
                                     <div className="mt-2">
-                                        <button className={`${style.orderHistory__viewOrder__button} ml-2 md:ml-4 px-3 py-2 md:px-4 md:py-2`}>{t(codeLanguage + '000201')}</button>
-                                        {order.orderStatus === 'Delivered' && (
-                                            <button className={`${style.orderHistory__reOrder__button} ml-2 md:ml-4 px-3 py-2 md:px-4 md:py-2`} >Mua lại</button>
+                                        <button onClick={() => window.location.href = `/order_detail/${orderDetail?.orderID}`} className={`${style.orderHistory__viewOrder__button} ml-2 md:ml-4 px-3 py-2 md:px-4 md:py-2`}>{t(codeLanguage + '000201')}</button>
+                                        {orderDetail?.orderStatus === 'Delivered' && (
+                                            <button className={`${style.orderHistory__reOrder__button} ml-2 md:ml-4 px-3 py-2 md:px-4 md:py-2`} >ReOrder</button>
                                         )}
                                     </div>
+                                    <p className='ml-2 md:ml-4 px-3 py-2 md:px-4 md:py-2' style={{ position: 'absolute', top: 50, right: 0, fontWeight: 'bold' }}>{__handleAddCommasToNumber(orderDetail?.totalPrice)} VND</p>
 
                                 </div>
                             </div>
+                            <button
+                                onClick={() => __handleExtendTranscation(orderDetail?.orderID)}
+                                className={`${style.orderHistory__transactionLable}`}
+                            >
+                                <p className="text-1xl md:text-1xl font-bold text-gray-800 pr-5">Transactions</p>
+                                {isExtendTransaction[orderDetail?.orderID || '1'] ? (
+                                    <FaAngleUp />
+                                ) : (
+                                    <FaAngleDown />
+                                )}
 
-                            {isExtendTransaction[order.orderID] && order?.payment?.map((payment, itemIndex) => (
+                            </button>
+
+                            {isExtendTransaction[orderDetail?.orderID || '1'] && (
+                                <div className='mt-10'></div>
+                            )}
+
+                            {isExtendTransaction[orderDetail?.orderID || '1'] && orderDetail?.paymentList?.map((payment, itemIndex) => (
                                 <div key={itemIndex} className="flex flex-col md:flex-row items-start md:items-center mb-4 md:mb-6 border-b pb-4 md:pb-6">
                                     <div className="flex-shrink-0">
-                                        <img className="w-32 h-28 md:w-35 md:h-40 rounded-lg shadow-md" src={order?.design?.imageUrl} alt={`Image `} />
+                                        {/* <img className="w-32 h-28 md:w-35 md:h-40 rounded-lg shadow-md" src={orderDetail?.designResponse.imageUrl} alt={`Image `} /> */}
                                     </div>
                                     <div className="ml-0 md:ml-6 mt-4 md:mt-0 flex-grow" style={{ position: 'relative' }}>
-                                        <h3 className="text-lg md:text-xl font-semibold text-gray-800">{payment.paymentSenderName}</h3>
-                                        <p className="text-sm text-gray-500 pb-2">{payment.paymentAmount}</p>
-                                        <p className="text-sm text-gray-500 pb-2">{payment.lastModifiedDate}</p>
+                                        <p className="text-sm text-gray-500 pb-2">ID: #<span> {payment.paymentID}</span></p>
+                                        <p className="text-sm text-gray-500 pb-2">Amount: <span> {__handleAddCommasToNumber(payment.paymentAmount)} VND</span></p>
+                                        <p className="text-sm text-gray-500 pb-2">Create at: <span> {payment.payOSResponse.data.createdAt}</span></p>
+
                                         <p
-                                            key={`view-product-${index}-${itemIndex}`}
+
                                             className={`${style.orderHistory__viewInvoice__button} ml-2 md:ml-4 px-3 py-2 md:px-4 md:py-2`}
                                             onClick={() => __handleViewInvoiceClick(payment)}
                                         >
-                                            Xem hóa đơn
+                                            View transaction
                                         </p>
                                         <div className="flex flex-col md:flex-row items-start md:items-center">
                                             {renderStatusIcon(payment)}
-                                            <div className="ml-0 md:ml-auto mt-4 md:mt-0">
+                                            <div className="ml-0 md:ml-auto mt-4 md:mt-0  px-3 py-2 md:px-4 md:py-2">
 
                                                 {!payment.paymentStatus && (
                                                     <button
-                                                        key={`buy-again-${index}-${itemIndex}`}
-                                                        className={`${style.orderHistory__payment__button} ml-2 md:ml-4 px-3 py-2 md:px-4 md:py-2`}
+                                                        className={`${style.orderHistory__payment__button} ml-2 md:ml-4 px-3 py-2 md:px-4 md:py-2 `}
+                                                        onClick={() => __handleOpenPaymentDialog(payment.paymentID)}
                                                     >
-                                                        Thanh toán
+                                                        Payment
                                                     </button>
                                                 )}
-
+                                                <PaymentOrderDialogComponent isOpen={isOpenPaymentDialog[payment.paymentID] === true} onClose={() => __handleClosePaymentDialog(payment.paymentID)} paymentData={orderDetail.paymentList} ></PaymentOrderDialogComponent>
 
                                             </div>
                                         </div>
@@ -405,96 +387,6 @@ const OrderHistory: React.FC = () => {
                             ))}
                         </div>
                     ))}
-
-                    <div className="bg-white rounded-xl shadow-md p-4 md:p-6 mb-4 md:mb-8 transform transition-all hover:shadow-lg">
-                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6" >
-                            <div className="mb-4 md:mb-0 w-max">
-                                <h2 className="text-1xl md:text-1xl font-bold text-gray-800 pb-2">{t(codeLanguage + '000193')} </h2>
-                                <p className="text-sm text-gray-500 pb-2"> #{orderDetail?.orderID}</p>
-                                <p className="text-sm text-gray-500 pb-2">{t(codeLanguage + '000200')}: {orderDetail?.expectedStartDate}</p>
-                                <div style={{
-                                    display: 'flex',
-                                    alignContent: 'center',
-                                    alignItems: 'center',
-                                }} >
-                                    <p className="text-sm text-gray-500">Status: </p>
-                                    <Stack direction="row" spacing={5} padding={1}>
-                                        <Chip
-                                            label={`${orderDetail?.orderStatus} 
-                                            ${orderDetail?.orderStatus === 'Cancel' || orderDetail?.orderStatus === 'Delivered' ? 'at ' + orderDetail?.expectedProductCompletionDate : ''}
-                                            `}
-                                            variant="filled"
-                                            style={
-                                                {
-                                                    backgroundColor:
-                                                        orderDetail?.orderStatus === 'Pending' ? secondaryColor
-                                                            : orderDetail?.orderStatus === 'Delivered' ? greenColor
-                                                                : redColor,
-                                                    opacity: 1,
-                                                    color: whiteColor
-                                                }
-                                            } />
-                                    </Stack>
-                                    {/* <p className="text-sm text-gray-500"></p> */}
-                                </div>
-                                <button
-                                    onClick={() => __handleExtendTranscation(orderDetail?.orderID)}
-                                    className={`${style.orderHistory__transactionLable}`}
-                                >
-                                    <p className="text-1xl md:text-1xl font-bold text-gray-800 pr-5">Giao dịch</p>
-                                    {isExtendTransaction[orderDetail?.orderID || '1'] ? (
-                                        <FaAngleUp />
-                                    ) : (
-                                        <FaAngleDown />
-                                    )}
-                                </button>
-                            </div>
-                            <div className="text-right">
-                                <p className="text-lg font-bold text-gray-900">{orderDetail?.totalPrice}</p>
-                                <div className="mt-2">
-                                    <button onClick={() => window.location.href = `/order_detail/${orderDetail?.orderID}`} className={`${style.orderHistory__viewOrder__button} ml-2 md:ml-4 px-3 py-2 md:px-4 md:py-2`}>{t(codeLanguage + '000201')}</button>
-                                    {orderDetail?.orderStatus === 'Delivered' && (
-                                        <button className={`${style.orderHistory__reOrder__button} ml-2 md:ml-4 px-3 py-2 md:px-4 md:py-2`} >Mua lại</button>
-                                    )}
-                                </div>
-
-                            </div>
-                        </div>
-
-                        {isExtendTransaction[orderDetail?.orderID || '1'] && orderDetail?.paymentList?.map((payment, itemIndex) => (
-                            <div key={itemIndex} className="flex flex-col md:flex-row items-start md:items-center mb-4 md:mb-6 border-b pb-4 md:pb-6">
-                                <div className="flex-shrink-0">
-                                    <img className="w-32 h-28 md:w-35 md:h-40 rounded-lg shadow-md" src={orderDetail?.designResponse.imageUrl} alt={`Image `} />
-                                </div>
-                                <div className="ml-0 md:ml-6 mt-4 md:mt-0 flex-grow" style={{ position: 'relative' }}>
-                                    <h3 className="text-lg md:text-xl font-semibold text-gray-800">{payment.paymentSenderName}</h3>
-                                    <p className="text-sm text-gray-500 pb-2">{payment.paymentAmount}</p>
-                                    <p
-
-                                        className={`${style.orderHistory__viewInvoice__button} ml-2 md:ml-4 px-3 py-2 md:px-4 md:py-2`}
-                                        onClick={() => __handleViewInvoiceClick(payment)}
-                                    >
-                                        Xem hóa đơn
-                                    </p>
-                                    <div className="flex flex-col md:flex-row items-start md:items-center">
-                                        {renderStatusIcon(payment)}
-                                        <div className="ml-0 md:ml-auto mt-4 md:mt-0">
-
-                                            {!payment.paymentStatus && (
-                                                <button
-                                                    className={`${style.orderHistory__payment__button} ml-2 md:ml-4 px-3 py-2 md:px-4 md:py-2`}
-                                                >
-                                                    Thanh toán
-                                                </button>
-                                            )}
-
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
 
                     {showScrollButton && (
                         <IconButton

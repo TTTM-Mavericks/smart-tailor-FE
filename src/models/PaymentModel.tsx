@@ -10,6 +10,8 @@ export interface PayOSResponseDataInterface {
     status: string;
     checkoutUrl: string;
     qrCode: string;
+    id?: any,
+    createdAt?: string
 }
 
 export interface PayOSResponseInterface {

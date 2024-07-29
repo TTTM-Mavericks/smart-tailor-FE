@@ -3,17 +3,18 @@ import Swal from 'sweetalert2';
 import { Dialog, DialogContent, DialogTitle, IconButton, Typography } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { greenColor, redColor, secondaryColor } from '../../../root/ColorSystem';
+import { greenColor, redColor, secondaryColor, yellowColor } from '../../../root/ColorSystem';
 import style from './BrandManageOrderProcessingComponentStyle.module.scss'
 import CancelOrderPolicyDialogComponent from '../../../components/Dialog/PolicyDialog/CancelOrderPolicyDialogComponent';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import { useNavigate, useParams } from 'react-router-dom';
 import { OrderDetailInterface } from '../../../models/OrderModel';
 import { PaymentOrderInterface } from '../../../models/PaymentModel';
-import { IoMdCloseCircleOutline } from 'react-icons/io';
+import { IoIosWarning, IoMdCloseCircleOutline } from 'react-icons/io';
 import { UserInterface } from '../../../models/UserModel';
 import Cookies from 'js-cookie';
 import { FaCheck } from "react-icons/fa";
+import { toast } from 'react-toastify';
 
 const BrandManageOrderProcessingComponent: React.FC = () => {
     // TODO MUTIL LANGUAGE
@@ -264,6 +265,30 @@ const BrandManageOrderProcessingComponent: React.FC = () => {
         return ((index + 1) / progressSteps.length) * 100;
     };
 
+    const __handelUpdateOrderState = async (orderID: any, step: string) => {
+        try {
+            const bodyRequest = {
+                orderID: orderID,
+                status: step
+            }
+            const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            if (response.status === 200) {
+                console.log('detail order: ', response.data);
+                setIsLoading(false);
+                toast.success(`${response.message}`, {autoClose: 4000});
+            }
+            else {
+                console.log('detail order: ', response.message);
+                toast.error(`${response.message}`, {autoClose: 4000});
+                navigate('/error404');
+            }
+        } catch (error) {
+            console.log('error: ', error);
+            toast.error(`${error}`, {autoClose: 4000});
+            navigate('/error404');
+        }
+    }
+
     return (
         <div className={`${style.orderProcessing__container}`} >
             <div className={`${style.orderProcessing__container__group}`} style={{ marginTop: '2%', marginBottom: '10%' }}>
@@ -331,7 +356,16 @@ const BrandManageOrderProcessingComponent: React.FC = () => {
                                 {/* Progress Bar */}
                                 {openOrderDetail && openOrderDetail.orderID === orderDetail.orderID && (
                                     <Dialog open={true} onClose={__handleCloseDialog} aria-labelledby="popup-dialog-title" maxWidth="lg" fullWidth>
-                                        <DialogTitle id="popup-dialog-title">Order Progress</DialogTitle>
+                                        <DialogTitle id="popup-dialog-title">
+                                            <div style={{ float: 'left', alignItems: 'center', justifyContent: 'center' }}>
+                                                <span> Order Progress</span>
+                                                <div className={` inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10 ml-2`}>
+                                                    <span>
+                                                        Click to complete state
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </DialogTitle>
                                         <IoMdCloseCircleOutline
                                             cursor={'pointer'}
                                             size={20}
@@ -349,6 +383,7 @@ const BrandManageOrderProcessingComponent: React.FC = () => {
                                                     {progressSteps.map((step, index) => {
                                                         const isCompleted = index < progressSteps.indexOf(orderDetail.orderStatus);
                                                         const isCurrent = index === progressSteps.indexOf(orderDetail.orderStatus);
+                                                        const isClickable = index >= 2 && index <= 4;
                                                         return (
                                                             <p key={index} className={`text-center ${isCompleted ? 'text-green-600' : isCurrent ? 'text-indigo-600' : 'text-gray-400'}`}>
                                                                 <button
@@ -356,6 +391,7 @@ const BrandManageOrderProcessingComponent: React.FC = () => {
                                                                     style={{
                                                                         backgroundColor: isCompleted ? '#CBCBCB' : isCurrent ? secondaryColor : '#CBCBCB',
                                                                     }}
+                                                                    onClick={isCurrent && isClickable ? () => __handelUpdateOrderState(orderDetail.orderID, step) : () => console.log('none')} // Add your click handler here
                                                                 >
                                                                     {isCompleted && (<FaCheck color={greenColor} style={{ marginRight: 10 }} size={12}></FaCheck>)}
                                                                     {step}
@@ -405,7 +441,7 @@ const BrandManageOrderProcessingComponent: React.FC = () => {
                                     </IconButton>
                                 )}
 
-                            </div>
+                            </div >
                         </>
                     ))}
                 </div>
@@ -453,7 +489,7 @@ const BrandManageOrderProcessingComponent: React.FC = () => {
 
 
 
-        </div>
+        </div >
     );
 };
 

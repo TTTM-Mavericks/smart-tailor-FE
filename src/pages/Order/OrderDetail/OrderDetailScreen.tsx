@@ -258,32 +258,34 @@ const OrderDetailScreen: React.FC = () => {
                     <VerticalLinearStepperComponent status={orderDetail?.orderStatus}></VerticalLinearStepperComponent>
                 </div>
                 <div className={`${style.orderDetail__container__detail} px-12 bg-white md:flex-row`}>
-
-
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
                         <h6 className="text-2xl font-bold text-gray-800 mb-4 md:mb-0">{t(codeLanguage + '000191')}</h6>
                         <a href="/order_history" className="text-sm text-indigo-600 hover:text-indigo-800 transition duration-200">{t(codeLanguage + '000192')} &rarr;</a>
                     </div>
-
-
 
                     <div className="border-b pb-4 mb-6">
                         <p className="text-sm text-gray-700 flex">
                             <span style={{ fontWeight: "bolder" }}>#{orderDetail?.orderID}</span>
                             <span className="ml-auto text-sm text-gray-700 cursor-pointer" onClick={() => __handleOpenReportDialog()}>Report</span>
                         </p>
-
-                        <p className="text-sm text-gray-700">
-                            <span style={{ fontWeight: "normal" }}>{orderDetail?.expectedStartDate}</span>
-                        </p>
                     </div>
 
                     <div className="flex flex-col md:flex-row items-start mb-6">
-                        <img src={orderDetail?.designResponse.imageUrl} alt={orderDetail?.designResponse.imageUrl} className="w-40 h-52 object-cover rounded-md shadow-md mb-4 md:mb-0" />
+                        <div className="flex flex-col items-center  mr-3">
+                            <img
+                                src={orderDetail?.designResponse.imageUrl}
+                                alt={orderDetail?.designResponse.imageUrl}
+                                className="w-40 h-52 object-cover rounded-md shadow-md mb-4 md:mb-0"
+                            />
+                            <button onClick={() => navigate(`/design/${orderDetail?.designResponse.designID}`)} className="text-indigo-600 hover:text-indigo-800 transition duration-200 mt-2">Edit design</button>
+                        </div>
+
 
                         <div className="md:ml-6 w-1/2">
-                            <h2 className="text-1xl font-semibold text-gray-900">{orderDetail?.designResponse.titleDesign}</h2>
-                            <p className="text-sm text-gray-700">{orderDetail?.totalPrice}</p>
+                            <p className="text-sm text-gray-600 mb-1 mt-3 w-full">
+                                <span className='font-semibold text-gray-600'>Design: </span>
+                                <span style={{ fontWeight: "normal" }}>{orderDetail?.designResponse.titleDesign}</span>
+                            </p>
                             <p className="text-sm text-gray-600 mb-1 mt-3 w-full">
                                 <span className='font-semibold text-gray-600'>Expert tailoring: </span>
                                 <span style={{ fontWeight: "normal" }}>{orderDetail?.designResponse.expertTailoring?.expertTailoringName}</span>
@@ -293,6 +295,7 @@ const OrderDetailScreen: React.FC = () => {
                                 <span className='font-semibold text-gray-600'>Quantity: </span>
                                 <span style={{ fontWeight: "normal" }}>{orderDetail?.quantity}</span>
                             </p>
+
                             <div className="text-sm text-gray-600 mb-1 mt-3 w-1/2">
                                 {orderDetail?.detailList?.map((item, index) => (
                                     <div key={index} className="grid grid-cols-2 gap-0 mb-2">
@@ -305,6 +308,17 @@ const OrderDetailScreen: React.FC = () => {
                                     </div>
                                 ))}
                             </div>
+                            <p className="text-sm text-gray-600 mb-1 mt-3 w-full">
+                                <span className='font-semibold text-gray-600'>Total price: </span>
+                                <span style={{ fontWeight: "bold", fontSize: 17 }}>{__handleAddCommasToNumber(orderDetail?.totalPrice)} VND</span>
+                            </p>
+
+                            {orderDetail?.expectedStartDate && (
+                                <p className="text-sm text-gray-600 mb-1 mt-3 w-full">
+                                    <span className='font-semibold text-gray-600'>Expected start at: </span>
+                                    <span style={{ fontWeight: "normal" }}>{orderDetail?.expectedStartDate}</span>
+                                </p>
+                            )}
 
                             <div className="flex flex-col md:flex-row md:space-x-10 mt-4">
                                 <div className="md:w-1/2 flex items-center">
@@ -337,7 +351,10 @@ const OrderDetailScreen: React.FC = () => {
 
                     {/* Progress Bar */}
                     <div className="border-t pt-4 mb-20">
-                        <p className="text-sm text-gray-600 mb-2">{t(codeLanguage + '000195')} {orderDetails.progressDate}</p>
+                        <p className="text-sm text-gray-600 mb-1 mt-3 w-full">
+                            <span className='font-semibold text-gray-600'>Expected complete at: </span>
+                            <span style={{ fontWeight: "normal" }}>{orderDetail?.expectedProductCompletionDate}</span>
+                        </p>
                         <div className="relative w-full h-2 bg-gray-200 rounded-full mb-4">
                             <div className="absolute top-0 left-0 h-2 bg-indigo-600 rounded-full" style={{ width: `${(orderDetails.currentStep / (orderDetails.progressSteps.length - 1)) * 100}%` }}></div>
                         </div>
@@ -350,7 +367,7 @@ const OrderDetailScreen: React.FC = () => {
                     </div>
 
 
-                    {(orderDetail?.orderStatus !== 'NOT_VERIFY' && orderDetail?.orderStatus !== 'PENDING' && orderDetail?.orderStatus !== 'CANCEL') && (
+                    {orderDetail?.paymentList && orderDetail?.paymentList?.length > 0 && (
                         <>
 
                             <div className="mt-10 border-t pt-4">
@@ -371,14 +388,13 @@ const OrderDetailScreen: React.FC = () => {
                                     </div>
                                     <div className="w-full md:w-3/5 mt-6 md:mt-0">
                                         <div className="flex flex-col space-y-4">
+
                                             <div className="flex justify-between border-b pb-2">
-                                                <p className="text-gray-600">Total price</p>
-                                                <p className="text-gray-600">{__handleAddCommasToNumber(orderDetail?.totalPrice)} VND</p>
-                                            </div>
-                                            <div className="flex justify-between border-b pb-2">
-                                                <p className="text-gray-600">Deposit price</p>
+                                                {payment && payment[0].paymentType === 'DEPOSIT' && (
+                                                    <p className="text-gray-600">Deposit price</p>
+                                                )}
                                                 <p className="text-gray-600">{payment?.map((item) => {
-                                                    if (item.paymentType === 'DEPOSIT') return __handleAddCommasToNumber(item.payOSResponse.data.amount)
+                                                    if (true) return __handleAddCommasToNumber(item.payOSResponse.data.amount)
                                                 })} VND</p>
                                             </div>
                                             <div className="flex justify-between border-b pb-2">
@@ -388,7 +404,7 @@ const OrderDetailScreen: React.FC = () => {
                                             <div className="flex justify-between font-semibold text-gray-900">
                                                 <p>{t(codeLanguage + '000206')}</p>
                                                 <p>{payment?.map((item) => {
-                                                    if (item.paymentType === 'DEPOSIT') return __handleAddCommasToNumber(item.payOSResponse.data.amount)
+                                                    if (true) return __handleAddCommasToNumber(item.payOSResponse.data.amount)
                                                 })} VND</p>
                                             </div>
                                         </div>
