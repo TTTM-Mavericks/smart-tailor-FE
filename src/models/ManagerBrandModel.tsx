@@ -8,6 +8,7 @@ export interface Brand {
     userStatus: string,
     roleName: string,
     imageUrl: string,
+    actionTaken: boolean;
 }
 
 export interface EditBrand {

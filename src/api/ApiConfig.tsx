@@ -129,7 +129,9 @@ export const functionEndpoints = {
     brandPickOrder: '/brand-pick_order',
     getOrderDetailById: '/get-order-detail-by-id',
     getOrderByBrandId: '/get-order-by-brand-id',
-    getAllOrder: '/get-all-order'
+    getAllOrder: '/get-all-order',
+    getOrderByUserId: '/get-order-by-user-id',
+    changeOrderStatus: '/change-order-status'
   },
   sizeExpertTailoring: {
     getAllSizeExpertTailoringByExperId: '/get-all-size-by-expert-tailoring-id',
@@ -165,7 +167,8 @@ export const functionEndpoints = {
   report: {
     getAllReport: '/get-all-report',
     createReport: '/create-report',
-    getReportByOrderID: '/get-all-report-by-order-id'
+    getReportByOrderID: '/get-all-report-by-order-id',
+    createOrderReport: '/create-report'
   }
 }
 

@@ -5,6 +5,8 @@ import styles from './CustomerReportOrderDialogComponentStyle.module.scss'
 import { IoMdCloseCircleOutline, IoMdTrash } from 'react-icons/io';
 import LoadingComponent from '../../Loading/LoadingComponent';
 import { OrderDetailInterface } from '../../../models/OrderModel';
+import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
+import { toast } from 'react-toastify';
 
 type Props = {
     isOpen: boolean;
@@ -17,9 +19,9 @@ const CustomerReportOrderDialogComponent: React.FC<Props> = ({ isOpen, onClose, 
     //TODO MUTIL LANGUAGE
 
     // ---------------UseState Variable---------------//
-    const [isChecked, setIsChecked] = useState(false);
     const [images, setImages] = useState<File[]>([]);
     const [comment, setComment] = useState<string>('');
+    const [isLoadingPage, setIsLoadingPage] = useState<boolean>(false);
 
 
 
@@ -29,17 +31,6 @@ const CustomerReportOrderDialogComponent: React.FC<Props> = ({ isOpen, onClose, 
 
     // ---------------FunctionHandler---------------//
 
-
-    const __handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setIsChecked(event.target.checked);
-    };
-
-    const __handleButtonClick = () => {
-        if (isChecked) {
-            // Handle the button click event
-            console.log('Button clicked');
-        }
-    };
 
     const __handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
@@ -59,19 +50,55 @@ const CustomerReportOrderDialogComponent: React.FC<Props> = ({ isOpen, onClose, 
         console.log('Comment:', comment);
     };
 
+    const __handleReportOrder = async () => {
+        setIsLoadingPage(true);
+
+        const reportImageList = images.map(image => ({
+            reportImageName: image.name,
+            reportImageUrl: URL.createObjectURL(image)
+        }));
+
+        const bodyData = {
+            typeOfReport: "Order report",
+            orderID,
+            content: comment,
+            reportImageList
+        };
+
+        try {
+            const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.report + functionEndpoints.report.createOrderReport}`, bodyData);
+            if (response.status === 200) {
+                setIsLoadingPage(false);
+                toast.success(`${response.message}`, { autoClose: 4000 })
+                setTimeout(() => {
+                    window.location.reload();
+                }, 3000);
+
+            } else {
+                setIsLoadingPage(false);
+            }
+        } catch (error) {
+            console.log('error: ', error);
+            setIsLoadingPage(false);
+
+        }
+    };
+
     return (
-        <Dialog open={isOpen} style={{ zIndex: 99 }} maxWidth='md' fullWidth>
-            <DialogTitle>
-                Order report
-                <IoMdCloseCircleOutline
-                    cursor="pointer"
-                    size={20}
-                    color={redColor}
-                    onClick={onClose}
-                    style={{ position: 'absolute', right: 20, top: 20 }}
-                />
-            </DialogTitle>
-            <DialogContent className={`${styles.orderPolicyDialog__content}  bg-gray-100 flex flex-col items-center `}>
+        <>
+            <LoadingComponent isLoading={isLoadingPage}></LoadingComponent>
+            <Dialog open={isOpen} style={{ zIndex: 99 }} maxWidth='md' fullWidth>
+                <DialogTitle>
+                    Order report
+                    <IoMdCloseCircleOutline
+                        cursor="pointer"
+                        size={20}
+                        color={redColor}
+                        onClick={onClose}
+                        style={{ position: 'absolute', right: 20, top: 20 }}
+                    />
+                </DialogTitle>
+                <DialogContent className={`${styles.orderPolicyDialog__content}  bg-gray-100 flex flex-col items-center `}>
                     <div className="w-full max-w-3xl bg-white p-6 shadow-md rounded-md mt-6">
                         <h2 className="text-md font-semibold mb-4 ">Order #{orderID}</h2>
                         <form onSubmit={__handleSubmit}>
@@ -119,26 +146,28 @@ const CustomerReportOrderDialogComponent: React.FC<Props> = ({ isOpen, onClose, 
                                 />
                             </div>
                         </form>
-                </div>
-            </DialogContent>
-            <DialogActions>
-                <button
-                    type="submit"
-                    className="px-5 py-2.5 text-sm font-medium text-white"
-                    style={{
-                        border: `1px solid ${primaryColor}`,
-                        borderRadius: 4,
-                        color: whiteColor,
-                        marginBottom: 10,
-                        marginRight: 10,
-                        backgroundColor: primaryColor,
-                    }}
-                    onClick={onClick}
-                >
-                    Submit
-                </button>
-            </DialogActions>
-        </Dialog>
+                    </div>
+                </DialogContent>
+                <DialogActions>
+                    <button
+                        type="submit"
+                        className="px-5 py-2.5 text-sm font-medium text-white"
+                        style={{
+                            border: `1px solid ${primaryColor}`,
+                            borderRadius: 4,
+                            color: whiteColor,
+                            marginBottom: 10,
+                            marginRight: 10,
+                            backgroundColor: primaryColor,
+                        }}
+                        onClick={__handleReportOrder}
+                    >
+                        Submit
+                    </button>
+                </DialogActions>
+            </Dialog>
+        </>
+
 
     );
 };

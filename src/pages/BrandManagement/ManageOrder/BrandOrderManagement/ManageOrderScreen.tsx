@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa';
+import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaChevronLeft, FaChevronRight, FaTimes, FaCheck } from 'react-icons/fa';
 import { ArrowDropDown } from '@mui/icons-material';
 import axios from 'axios';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import { BrandOrder, ImageList } from '../../../../models/BrandManageOrderModel';
 import { motion } from 'framer-motion'
+import { Dialog, DialogContent, DialogTitle } from '@mui/material';
+import { IoMdCloseCircleOutline } from 'react-icons/io';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { secondaryColor } from '../../../../root/ColorSystem';
 
 /**
  * 
@@ -25,6 +30,18 @@ const getStatusColor = (status: string) => {
         default: return 'text-gray-600';
     }
 };
+
+/**
+ * Progress Step
+ */
+const progressSteps = [
+    'PENDING',
+    'START_PRODUCING',
+    'FINISH_FIRST_STAGE',
+    'FINISG_SECOND_STAGE',
+    'COMPLETED'
+]
+
 
 /**
  * 
@@ -61,16 +78,34 @@ const DesignModal: React.FC<{ part: any; onClose: () => void }> = ({ part, onClo
                     </div>
                     <div className="flex">
                         <div className="w-1/2 pr-4">
-                            <img src={part.imageUrl || '/placeholder-image.png'} alt={part.partOfDesignName} className="w-full h-auto object-contain" />
+                            <img
+                                src={part.successImageUrl || '/placeholder-image.png'}
+                                alt={part.partOfDesignName}
+                                className="w-full h-auto object-contain rounded-lg shadow-md"
+                            />
                         </div>
                         <div className="w-1/2 pl-4">
-                            <h3 className="text-lg font-semibold mb-2">Item Masks</h3>
-                            <div className="bg-gray-100 p-4 rounded">
-                                <img src={part.imageUrl || '/placeholder-image.png'} alt="Item Mask" className="w-24 h-24 object-contain mb-2" />
-                                <p><strong>Item Mask:</strong> {part.material?.materialName}</p>
-                                <p><strong>Type:</strong> ICON</p>
-                                <p><strong>Position:</strong> X: {part.itemMasks?.positionX}, Y: {part.itemMasks?.positionY}</p>
-                                <p><strong>Scale:</strong>X: {part.itemMasks?.scaleX}, Y: {part.itemMasks?.scaleY}</p>
+                            <h3 className="text-2xl font-bold mb-4 text-indigo-700">Item Masks</h3>
+                            <div className="bg-gray-100 p-6 rounded-lg shadow-inner">
+                                {part?.itemMasks && part.itemMasks.map((mask: any, index: any) => (
+                                    <div key={index} className="mb-6 last:mb-0 bg-white p-4 rounded-md shadow-sm">
+                                        <div className="flex items-center mb-4">
+                                            {mask.imageUrl && (
+                                                <img
+                                                    src={mask.imageUrl}
+                                                    alt="Mask Image"
+                                                    className="w-20 h-24 object-cover rounded-md mr-4"
+                                                />
+                                            )}
+                                            <h4 className="text-lg font-semibold text-gray-800">{mask.itemMaskName}</h4>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-2 text-sm">
+                                            <p><span className="font-medium text-gray-600">Type:</span> {mask.typeOfItem}</p>
+                                            <p><span className="font-medium text-gray-600">Position:</span> X: {mask.positionX}, Y: {mask.positionY}</p>
+                                            <p><span className="font-medium text-gray-600">Scale:</span> X: {mask.scaleX}, Y: {mask.scaleY}</p>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
@@ -90,6 +125,7 @@ const DesignModal: React.FC<{ part: any; onClose: () => void }> = ({ part, onClo
 const DesignDetails: React.FC<{ design: any }> = ({ design }) => {
     const [isDesignModalOpen, setIsDesignModalOpen] = useState(false);
     const [selectedDesignPart, setSelectedDesignPart] = useState<any>(null);
+    console.log("bebe" + JSON.stringify(selectedDesignPart));
 
     return (
         <div className="mt-4 p-4 rounded-lg">
@@ -149,9 +185,48 @@ const BrandOrderFields: React.FC<{
     onViewDetails: (order: BrandOrder, design: any) => void;
     onMarkResolved: (orderID: string) => void;
 }> = ({ order, onViewDetails, onMarkResolved }) => {
+    const navigate = useNavigate();
     const [showDesignDetails, setShowDesignDetails] = useState(false);
     const [designDetails, setDesignDetails] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [openOrderDetail, setOpenOrderDetail] = useState<BrandOrder | null>(null);
+
+    const __handleOpenDialog = (orderDetail: BrandOrder) => {
+        setOpenOrderDetail(orderDetail);
+    };
+
+    const __handleCloseDialog = () => {
+        setOpenOrderDetail(null);
+    };
+
+    const calculateProgressWidth = (status: string) => {
+        const index = progressSteps.indexOf(status);
+        return ((index + 1) / progressSteps.length) * 100;
+    };
+
+    const __handelUpdateOrderState = async (orderID: any, step: string) => {
+        try {
+            const bodyRequest = {
+                orderID: orderID,
+                status: step
+            }
+            const response = await axios.post(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            if (response.status === 200) {
+                console.log('detail order: ', response.data);
+                setIsLoading(false);
+                toast.success(`${response}`, { autoClose: 4000 });
+            }
+            else {
+                console.log('detail order: ', response);
+                toast.error(`${response}`, { autoClose: 4000 });
+                navigate('/error404');
+            }
+        } catch (error) {
+            console.log('error: ', error);
+            toast.error(`${error}`, { autoClose: 4000 });
+            navigate('/error404');
+        }
+    }
 
     const fetchDesignDetails = async () => {
         setIsLoading(true);
@@ -167,46 +242,58 @@ const BrandOrderFields: React.FC<{
     };
 
     useEffect(() => {
-        if (showDesignDetails && !designDetails) {
-            fetchDesignDetails();
-        }
-    }, [showDesignDetails, onViewDetails]);
-
-    useEffect(() => {
-        console.log("Updated designDetails:", designDetails);
-    }, [designDetails]);
+        fetchDesignDetails();
+    }, [order.orderID]);
 
     return (
         <div className="bg-white mb-8 shadow-lg rounded-lg p-6 transition duration-300 ease-in-out transform hover:shadow-xl">
             <h3 className="text-xl font-semibold mb-3 text-indigo-700">Type order: {order.orderType}</h3>
             <div className="flex justify-between">
                 <div className="w-1/2">
+                    <div className="flex">
+                        <div className="flex-shrink-0">
+                            {isLoading ? (
+                                <p>Loading image...</p>
+                            ) : designDetails && designDetails.imageUrl ? (
+                                <div className="mb-4">
+                                    <img
+                                        src={designDetails.imageUrl}
+                                        alt="Model"
+                                        className="mt-2 w-40 h-52 rounded-lg"
+                                    />
+                                </div>
+                            ) : (
+                                <p>No image available</p>
+                            )}
+                        </div>
+                        <div className="ml-4">
+                            <p className="text-gray-600 mb-2">Order ID: {order.orderID}</p>
+                            <p className="text-gray-600 mb-2">
+                                Order Status: <span className={`mb-2 ${getStatusColor(order.orderStatus)} font-bold`}>{order.orderStatus}</span>
+                            </p>
+                            <div className="mt-4">
+                                {order.detailList.map((detail, index) => (
+                                    <p key={index} className="text-gray-600">
+                                        Size {detail.size.sizeName}: Quantity {detail.quantity}
+                                    </p>
+                                ))}
+                            </div>
+                            <p className="text-gray-700 mt-4">Price: {order.totalPrice}</p>
+                        </div>
+                    </div>
+                </div>
+                <div className="w-1/2">
                     <p className="text-gray-600 mb-2">Customer: {order.buyerName}</p>
                     <p className="text-gray-600 mb-2">Date: {order.createDate}</p>
                     <p className="text-gray-600 mb-2">
-                        Status order:{' '}
+                        Status:{' '}
                         <span className={`ml-2 font-semibold px-2 py-1 rounded-full ${order.orderStatus ? 'bg-green-200 text-green-800' : 'bg-yellow-200 text-yellow-800'}`}>
                             {order.orderStatus ? 'Read' : 'Unread'}
                         </span>
                     </p>
-                    <div className="mt-4">
-                        {order.detailList.map((detail, index) => (
-                            <p key={index} className="text-gray-600">
-                                Size {detail.size.sizeName}: Quantity {detail.quantity}
-                            </p>
-                        ))}
-                    </div>
-                </div>
-                <div className="w-1/2">
-                    <p className="text-gray-600 mb-2">Order ID: {order.orderID}</p>
-                    <p className="text-gray-600 mb-2">
-                        Order Status: <span className={`mb-2 ${getStatusColor(order.orderStatus)} font-bold`}>{order.orderStatus}</span>
-                    </p>
-                    <p className="text-gray-600 mb-2">Total Quantity: {order.quantity}</p>
                     <p className="text-gray-600 mb-2">
                         Address: {order.address}, {order.ward}, {order.district}, {order.province}
                     </p>
-                    <p className="text-gray-700 mt-4">Price: {order.totalPrice}</p>
                 </div>
             </div>
             <div className="mt-4 flex items-center" onClick={() => setShowDesignDetails(!showDesignDetails)}>
@@ -216,9 +303,7 @@ const BrandOrderFields: React.FC<{
                 <span style={{ fontWeight: "bold" }}>Show Design Details</span>
             </div>
             {showDesignDetails && (
-                isLoading ? <p>Loading...</p> :
-                    designDetails ? <DesignDetails design={designDetails} /> :
-                        <p>No design details available</p>
+                <DesignDetails design={designDetails} />
             )}
             <div className="mt-6 flex justify-end">
                 <button
@@ -228,12 +313,65 @@ const BrandOrderFields: React.FC<{
                     View Details
                 </button>
                 <button
-                    onClick={() => onMarkResolved(order.orderID)}
-                    className="bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300"
+                    onClick={() => __handleOpenDialog(order)}
+                    className="px-4 py-2 text-white rounded-md  transition duration-200 ml-auto"
+                    style={{ backgroundColor: "green" }}
                 >
-                    Mark as Resolved
+                    Update order
                 </button>
             </div>
+
+            {/* Progress Bar */}
+            {openOrderDetail && openOrderDetail.orderID === order.orderID && (
+                <Dialog open={true} onClose={__handleCloseDialog} aria-labelledby="popup-dialog-title" maxWidth="lg" fullWidth>
+                    <DialogTitle id="popup-dialog-title">
+                        <div style={{ float: 'left', alignItems: 'center', justifyContent: 'center' }}>
+                            <span> Order Progress</span>
+                            <div className={` inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10 ml-2`}>
+                                <span>
+                                    Click to complete state
+                                </span>
+                            </div>
+                        </div>
+                    </DialogTitle>
+                    <IoMdCloseCircleOutline
+                        cursor={'pointer'}
+                        size={20}
+                        color="red"
+                        onClick={__handleCloseDialog}
+                        style={{ position: 'absolute', right: 20, top: 20 }}
+                    />
+                    <DialogContent dividers>
+                        <div className="pt-4 mb-20">
+                            <p className="text-sm text-gray-600 mb-2">Progress Date: {order.productionCompletionDate}</p>
+                            <div className="relative w-full h-2 bg-gray-200 rounded-full mb-4">
+                                <div className="absolute top-0 left-0 h-2 bg-indigo-600 rounded-full" style={{ width: `${calculateProgressWidth(order.orderStatus)}%` }}></div>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                                {progressSteps.map((step, index) => {
+                                    const isCompleted = index < progressSteps.indexOf(order.orderStatus);
+                                    const isCurrent = index === progressSteps.indexOf(order.orderStatus);
+                                    const isClickable = index >= 2 && index <= 4;
+                                    return (
+                                        <p key={index} className={`text-center ${isCompleted ? 'text-green-600' : isCurrent ? 'text-indigo-600' : 'text-gray-400'}`}>
+                                            <button
+                                                className=" flex justify-center items-center px-4 py-2 text-white rounded-md transition duration-200 ml-auto"
+                                                style={{
+                                                    backgroundColor: isCompleted ? '#CBCBCB' : isCurrent ? secondaryColor : '#CBCBCB',
+                                                }}
+                                                onClick={isCurrent && isClickable ? () => __handelUpdateOrderState(order.orderID, step) : () => console.log('none')} // Add your click handler here
+                                            >
+                                                {isCompleted && (<FaCheck color="green" style={{ marginRight: 10 }} size={12}></FaCheck>)}
+                                                {step}
+                                            </button>
+                                        </p>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+            )}
         </div>
     );
 };
@@ -355,11 +493,11 @@ const BrandOrderModal: React.FC<{ order: BrandOrder; onClose: () => void; onMark
                     </p>
                 </div>
 
-                {designDetails && designDetails.expertTailoring && (
+                {designDetails && (
                     <div className="mb-8">
                         <h3 className="text-xl font-semibold text-gray-700 mb-3">Model Image</h3>
                         <img
-                            src={designDetails.expertTailoring.modelImageUrl}
+                            src={designDetails.imageUrl}
                             alt="Model"
                             className="mt-2 max-w-full h-auto rounded-lg"
                         />
@@ -431,13 +569,13 @@ const BrandManageOrder: React.FC = () => {
         status: '',
         name: '',
         orderStatus: '',
+        orderID: '',
     });
     const [selectedOrder, setSelectedOrder] = useState<BrandOrder | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [itemsPerPage, setItemsPerPage] = useState(20);
     const [goToPage, setGoToPage] = useState('1');
     const [designDetails, setDesignDetails] = useState<any>(null)
-
     useEffect(() => {
         const apiUrl = `${baseURL}${versionEndpoints.v1}${featuresEndpoints.order}${functionEndpoints.order.getAllOrder}`;
         axios.get(apiUrl)
@@ -482,6 +620,11 @@ const BrandManageOrder: React.FC = () => {
         }
         if (filters.orderStatus !== '') {
             filtered = filtered.filter(order => order.orderStatus === filters.orderStatus);
+        }
+        if (filters.orderID) { // Add this block
+            filtered = filtered.filter(order =>
+                order.orderID.toLowerCase().includes(filters.orderID.toLowerCase())
+            );
         }
         setFilteredOrders(filtered);
         setCurrentPage(1);
@@ -613,6 +756,18 @@ const BrandManageOrder: React.FC = () => {
                         type="text"
                         name="name"
                         placeholder="Filter by brand name..."
+                        onChange={handleFilterChange}
+                        className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
+                    />
+                </div>
+
+                <div className="flex flex-col">
+                    <label htmlFor="orderIDFilter" className="mb-2 text-sm font-medium text-gray-700">Order ID</label>
+                    <input
+                        id="orderIDFilter"
+                        type="text"
+                        name="orderID"
+                        placeholder="Filter by Order ID..."
                         onChange={handleFilterChange}
                         className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
                     />

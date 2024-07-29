@@ -267,12 +267,9 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
             if (error.response) {
                 const errorMessage = error.response.data.message;
                 // Check for specific error messages or status codes
-                if (errorMessage === "Invalid Data Type") {
+                if (error.response.status === 400) {
                     setErrorCheckGet(error.response.data.errors);
-                    toast.error('Invalid Data Type error');
-                } else if (errorMessage === "Some Data could not be processed correctly") {
-                    setErrorCheckGet(error.response.data.errors);
-                    toast.error('Some Data could not be processed correctly');
+                    toast.error(errorMessage);
                 } else {
                     toast.error('Unknown Error');
                 }
@@ -674,7 +671,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                         color="primary"
                         onClick={closeMultipleCard}
                         endIcon={<Cancel />}
-                        style={{ backgroundColor: '#088FE9', color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
+                        style={{ backgroundColor: '#FF3232', color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
                     >
                         {t(codeLanguage + '000055')}
                     </Button>
@@ -685,7 +682,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                         color="primary"
                         onClick={_handleUploadData}
                         endIcon={<CheckCircleRounded />}
-                        style={{ backgroundColor: '#E96208', color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
+                        style={{ backgroundColor: 'green', color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
                     >
                         {t(codeLanguage + '000056')}
                     </Button>

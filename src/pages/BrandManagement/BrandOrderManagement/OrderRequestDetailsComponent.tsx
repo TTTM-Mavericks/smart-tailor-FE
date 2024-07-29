@@ -419,7 +419,7 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
                                         className={`${style.orderRequest__button__accept} px-5 py-2.5 text-sm font-medium mt-3`}
                                         style={{
                                             color: redColor,
-                                            justifyContent:'center',
+                                            justifyContent: 'center',
                                             alignContent: 'center',
                                             backgroundColor: whiteColor,
                                             fontSize: 30

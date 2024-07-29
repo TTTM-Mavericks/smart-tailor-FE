@@ -243,10 +243,12 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
         try {
             const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.addNewMaterialByExcelFile}`, formData);
             if (response.status === 200) {
+                const { successCount, failureCount, message } = response.data;
+
                 Swal.fire({
                     icon: 'success',
                     title: 'Add Excel Material Success',
-                    text: `${response.data.message}`,
+                    text: `${message}\nSuccess: ${successCount}\nFailure: ${failureCount}`,
                 });
 
                 addNewMaterial(transformedData);
@@ -256,12 +258,9 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
             if (error.response) {
                 const errorMessage = error.response.data.message;
                 // Check for specific error messages or status codes
-                if (errorMessage === "Invalid Data Type") {
+                if (error.response.status === 400) {
                     setErrorCheckGet(error.response.data.errors);
-                    toast.error('Invalid Data Type error');
-                } else if (errorMessage === "Some Data could not be processed correctly") {
-                    setErrorCheckGet(error.response.data.errors);
-                    toast.error('Some Data could not be processed correctly');
+                    toast.error(errorMessage);
                 } else {
                     toast.error('Unknown Error');
                 }
@@ -270,6 +269,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
             }
         }
     };
+
 
     /**
      * Download the sample data
