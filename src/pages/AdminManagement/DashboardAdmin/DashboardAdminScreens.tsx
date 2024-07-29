@@ -14,6 +14,7 @@ import ManageMaterials from '../ManageMaterials/AdminMaterialManagerment/AdminMa
 import AdminManagePrice from '../ManagePrice/AdminPriceManagement/AdminManagementScreen/ManagePriceScreens';
 import ManageSizes from '../ManageSize/AdminSizeManagement/AdminManagerScreen/ManageSizeScreens';
 import ManageCategories from '../ManageCategory/AdminCategoryManagement/AdminManagerScreen/ManageCategoryScreens';
+import AdminConfiguration from '../SystemConfigurationAdministration/SystemConfigurationAdministrationScreen';
 
 const DashboardAdminScreens = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -111,6 +112,8 @@ const DashboardAdminScreens = () => {
                 return <BarChartComponent />;
             case 'pie_chart':
                 return <PieChartComponent />;
+            case 'system_configuration':
+                return <AdminConfiguration />;
             default:
                 return (
                     <>
@@ -130,7 +133,7 @@ const DashboardAdminScreens = () => {
         <div className="flex">
             <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
             <div className="flex flex-col w-full">
-                <Navbar toggleMenu={toggleMenu} menu="Dashboard" popperOpen={popperOpen} togglePopper={togglePopper} />
+                <Navbar toggleMenu={toggleMenu} menu={activeMenu} popperOpen={popperOpen} togglePopper={togglePopper} />
                 <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
                     {renderComponent()}
                 </main>

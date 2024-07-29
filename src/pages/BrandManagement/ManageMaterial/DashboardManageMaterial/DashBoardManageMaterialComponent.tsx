@@ -6,11 +6,13 @@ import BrandProfileSetup from '../../BrandProfile/BrandProfileComponent';
 import ManagePrice from '../../ManagePrice/BrandPriceManagement/BrandManagementScreen/ManagePriceScreens';
 import OrderRequestScreen from '../../BrandOrderManagement/OrderRequestScreen';
 import UploadBrandInforForm from '../../BrandUploadInfor/BrandUploadInforComponent';
+import NotificationPage from '../../ManageNotification/NotificationPageComponent';
 import BrandManageOrderProcessingComponent from '../../BrandOrderProcessing/BrandManageOrderProcessingComponent';
+import BrandManageOrder from '../../ManageOrder/BrandOrderManagement/ManageOrderScreen';
 
 const DashboardManageMaterialScreen = () => {
     const [menuOpen, setMenuOpen] = useState(false);
-    const [activeMenu, setActiveMenu] = useState('manage_material');
+    const [activeMenu, setActiveMenu] = useState('manage_notification');
     const [showScrollButton, setShowScrollButton] = React.useState<boolean>(false);
     const [popperOpen, setPopperOpen] = useState<Record<string, boolean>>({});
 
@@ -18,9 +20,19 @@ const DashboardManageMaterialScreen = () => {
         setMenuOpen(!menuOpen);
     };
 
+    useEffect(() => {
+        // Get the active tab from localStorage on component mount
+        const savedActiveMenu = localStorage.getItem('brandActiveMenu');
+        if (savedActiveMenu) {
+            setActiveMenu(savedActiveMenu);
+        }
+    }, []);
+
     const handleMenuClick = (menu: any) => {
         setActiveMenu(menu);
-    };
+        // Save the active tab to localStorage
+        localStorage.setItem('brandActiveMenu', menu);
+    }
 
     // Effect to close popper on outside click
     useEffect(() => {
@@ -74,11 +86,11 @@ const DashboardManageMaterialScreen = () => {
             case '/brand/manage_order_request/:id':
                 return <UploadBrandInforForm />;
             case 'manage_notification':
-                return <></>;
+                return <NotificationPage></NotificationPage>;
             case 'brand_profile':
                 return <BrandProfileSetup />;
             case 'manage_order':
-                return <></>;
+                return <BrandManageOrder></BrandManageOrder>;
             case 'manage_order_processing':
                 return <BrandManageOrderProcessingComponent></BrandManageOrderProcessingComponent>;
             case 'manage_price':

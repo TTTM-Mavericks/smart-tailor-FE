@@ -28,7 +28,6 @@ const ManageBrand: React.FC = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [data, setData] = React.useState<Brand[]>([]);
-    const [enabledButtons, setEnabledButtons] = React.useState<Record<string, boolean>>({});
     // Get language in local storage
     const selectedLanguage = localStorage.getItem('language');
     const codeLanguage = selectedLanguage?.toUpperCase();
@@ -53,8 +52,12 @@ const ManageBrand: React.FC = () => {
             })
             .then((responseData) => {
                 if (responseData && Array.isArray(responseData.data)) {
-                    setData(responseData.data);
-                    console.log("Data received:", responseData);
+                    const updatedData = responseData.data.map((brand: Brand) => ({
+                        ...brand,
+                        actionTaken: brand.userStatus !== "ACTIVE" || localStorage.getItem(`brandAction_${brand.userID}`) === 'true'
+                    }));
+                    setData(updatedData);
+                    console.log("Data received:", updatedData);
                 } else {
                     console.error('Invalid data format:', responseData);
                 }
@@ -62,7 +65,6 @@ const ManageBrand: React.FC = () => {
             .catch(error => console.error('Error fetching data:', error));
     }, []);
 
-    //DELETE OR UPDATE
     const _handleAcceptBrand = async (brandID: string) => {
         try {
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.acceptBrand}`;
@@ -71,10 +73,10 @@ const ManageBrand: React.FC = () => {
             console.log("brandID" + brandID);
 
             if (!response.data) {
-                throw new Error('Error deleting material');
+                throw new Error('Error accepting brand');
             }
 
-            return response.data;
+            return response;
         } catch (error) {
             throw error;
         }
@@ -88,10 +90,10 @@ const ManageBrand: React.FC = () => {
             const response = await axios.get(apiUrl + `/${brandID}`)
 
             if (!response.data) {
-                throw new Error('Error deleting material');
+                throw new Error('Error rejecting brand');
             }
 
-            return response.data;
+            return response;
         } catch (error) {
             throw error;
         }
@@ -101,7 +103,7 @@ const ManageBrand: React.FC = () => {
         try {
             const result = await Swal.fire({
                 title: `Confirm Accept`,
-                text: `Are you sure you want to accept thís brand`,
+                text: `Are you sure you want to accept this brand`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -111,20 +113,24 @@ const ManageBrand: React.FC = () => {
             });
 
             if (result.isConfirmed) {
-                await _handleAcceptBrand(id.toString()); // Ensure id is converted to string if necessary
-                Swal.fire(
-                    `Accept Brand Success`,
-                    `Brand Have Been Accept Successfull`,
-                    'success'
-                );
+                const response = await _handleAcceptBrand(id.toString());
+                if (response.status === 200) {
+                    Swal.fire(
+                        `Accept Brand Success`,
+                        `Brand Has Been Accepted Successfully`,
+                        'success'
+                    );
 
-                setData((prevData: any) =>
-                    prevData.map((user: any) =>
-                        user.userID === id
-                            ? { user }
-                            : user
-                    )
-                );
+                    localStorage.setItem(`brandAction_${id}`, 'true');
+
+                    setData((prevData: Brand[]) =>
+                        prevData.map((brand) =>
+                            brand.userID === id
+                                ? { ...brand, userStatus: 'ACCEPTED', actionTaken: true }
+                                : brand
+                        )
+                    );
+                }
             } else {
                 Swal.fire(
                     `Cancel Accept Brand`,
@@ -142,12 +148,11 @@ const ManageBrand: React.FC = () => {
         }
     };
 
-    // confirm 
     const _hanldeConfirmDeny = async (id: number) => {
         try {
             const result = await Swal.fire({
                 title: `Confirm Reject`,
-                text: `Are you sure you want to reject thís brand`,
+                text: `Are you sure you want to reject this brand`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -157,21 +162,24 @@ const ManageBrand: React.FC = () => {
             });
 
             if (result.isConfirmed) {
-                await _handleDenyBrand(id.toString()); // Ensure id is converted to string if necessary
-                Swal.fire(
-                    `Reject Brand Success`,
-                    `Brand Have Been Reject Successfull`,
-                    'success'
-                );
+                const response = await _handleDenyBrand(id.toString());
+                if (response.status === 200) {
+                    Swal.fire(
+                        `Reject Brand Success`,
+                        `Brand Has Been Rejected Successfully`,
+                        'success'
+                    );
 
-                // Update the deleted material from the current data list
-                setData((prevData: any) =>
-                    prevData.map((user: any) =>
-                        user.userID === id
-                            ? { user }
-                            : user
-                    )
-                );
+                    localStorage.setItem(`brandAction_${id}`, 'true');
+
+                    setData((prevData: Brand[]) =>
+                        prevData.map((brand) =>
+                            brand.userID === id
+                                ? { ...brand, userStatus: 'REJECTED', actionTaken: true }
+                                : brand
+                        )
+                    );
+                }
             } else {
                 Swal.fire(
                     `Cancel Reject Brand`,
@@ -189,54 +197,75 @@ const ManageBrand: React.FC = () => {
         }
     };
 
-    React.useEffect(() => {
-        const initialEnabledButtons: Record<string, boolean> = {};
-        data.forEach(row => {
-            initialEnabledButtons[row.userID] = false;
-        });
-        setEnabledButtons(initialEnabledButtons);
-    }, [data]);
-
     const columns: GridColDef[] = [
-        {
-            field: "email",
-            headerName: "Email",
-            flex: 1,
-        },
+        { field: "email", headerName: "Email", flex: 1, headerAlign: "left" },
         {
             field: "fullName",
-            headerName: "Full Name",
-            flex: 1,
-        },
-        {
-            field: "language",
-            headerName: "Language",
             headerAlign: "left",
-            align: "left",
+            headerName: "Brand Name",
+            flex: 1,
+            renderCell: (params) => (
+                <Box display="flex" alignItems="center">
+                    <Box
+                        component="img"
+                        src={params.row.imageUrl}
+                        alt={params.row.fullName}
+                        sx={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: '50%',
+                            objectFit: 'cover',
+                            mr: 2
+                        }}
+                    />
+                    {params.row.fullName}
+                </Box>
+            )
         },
         {
             field: "phoneNumber",
             headerName: "Phone Number",
-            headerAlign: "left",
-            align: "left",
+            flex: 1,
+            headerAlign: "center",
+            align: "center",
         },
         {
             field: "provider",
             headerName: "Provider",
-            headerAlign: "left",
-            align: "left",
+        },
+        {
+            field: "createDate",
+            headerName: "Date Create"
         },
         {
             field: "userStatus",
-            headerName: "Status",
-            headerAlign: "left",
-            align: "left",
-        },
-        {
-            field: "roleName",
-            headerName: "Role",
-            headerAlign: "left",
-            align: "left",
+            headerName: "User Status",
+            renderCell: (params) => (
+                <Box
+                    sx={{
+                        backgroundColor: params.value === 'ACTIVE' ? '#e8f5e9' : '#ffebee',
+                        color: params.value === 'ACTIVE' ? '#4caf50' : '#e8f5e9',
+                        borderRadius: '16px',
+                        padding: '1px 5px',
+                        fontSize: '0.75rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        height: "50%",
+                        marginTop: "20%"
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                            backgroundColor: params.value === 'ACTIVE' ? '#4caf50' : '#f44336',
+                        }}
+                    />
+                    {params.value}
+                </Box>
+            )
         },
         {
             field: "actions",
@@ -244,7 +273,7 @@ const ManageBrand: React.FC = () => {
             flex: 1,
             sortable: false,
             renderCell: (params) => {
-                if (params.row.userStatus === "ACTIVE") {
+                if (params.row.userStatus === "ACTIVE" && !params.row.actionTaken) {
                     return (
                         <Box>
                             <IconButton onClick={() => _hanldeConfirmAccept(params.row.userID)}>

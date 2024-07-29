@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import VNLocationData from '../../../locationData.json';
-import { Location, District, Ward } from '../../../models/BrandUploadInforModel';
-import { Bank, FormData } from '../../../models/BrandUploadInforModel';
+import { Location, District, Ward, FormDataBrandInformation } from '../../../models/BrandUploadInforModel';
+import { Bank } from '../../../models/BrandUploadInforModel';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import Cookies from 'js-cookie';
 import Swal from 'sweetalert2';
-import VerticalStepProgressComponent from '../GlobalComponent/VerticalStepProgress/VerticalStepProgressComponent';
 import { UserInterface } from '../../../models/UserModel';
 
 const UploadBrandInforForm = () => {
@@ -21,6 +20,43 @@ const UploadBrandInforForm = () => {
     const [selectedWard, setSelectedWard] = useState<Ward | null>(null);
     const [country, setCountrySelect] = useState([])
     const [activeOption, setActiveOption] = useState('monthly');
+
+    const [formErrors, setFormErrors] = useState({
+        brandName: '',
+        accountNumber: '',
+        address: ''
+    });
+
+    const validateForm = () => {
+        let isValid = true;
+        const errors = {
+            brandName: '',
+            accountNumber: '',
+            address: ''
+        };
+
+        if (!formData.brandName || formData.brandName.length > 100) {
+            errors.brandName = 'Brand name is required and must be 100 characters or less';
+            isValid = false;
+        }
+
+        if (!formData.accountNumber || formData.accountNumber.length > 50) {
+            errors.accountNumber = 'Account number is required and must be 50 characters or less';
+            isValid = false;
+        }
+
+        if (!formData.address || formData.address.length > 255) {
+            errors.address = 'Address is required and must be 255 characters or less';
+            isValid = false;
+        }
+
+        setFormErrors(errors);
+        return isValid;
+    };
+
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [files, setFiles] = useState<File[]>([]);
+    const [previewUrls, setPreviewUrls] = useState<string[]>([]);
     // const userAuthData = localStorage.getItem('userAuth') as string;
     let brandAuth: any = null;
 
@@ -75,7 +111,16 @@ const UploadBrandInforForm = () => {
         }
     };
 
-    const [formData, setFormData] = useState<FormData>({
+    /**
+    * Get the image to user for review
+    */
+    useEffect(() => {
+        return () => {
+            previewUrls.forEach(URL.revokeObjectURL);
+        };
+    }, [previewUrls]);
+
+    const [formData, setFormData] = useState<FormDataBrandInformation>({
         brandName: '',
         bankName: '',
         accountNumber: 34561662002,
@@ -84,7 +129,8 @@ const UploadBrandInforForm = () => {
         province: '',
         district: '',
         ward: '',
-        qrPayment: 'https://img.vietqr.io/image/970423-34561662002-compact.jpg'
+        qrPayment: 'https://img.vietqr.io/image/970423-34561662002-compact.jpg',
+        // imageURL: []
     });
 
     const [banks, setBanks] = useState<Bank[]>([]);
@@ -113,6 +159,62 @@ const UploadBrandInforForm = () => {
             console.error("Không tìm thấy dữ liệu địa chỉ");
         }
     }, [formData]);
+
+    /**
+   * 
+   * @param e 
+   * Make a change in the code
+   */
+    const _handleChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFiles = Array.from(e.target.files || []);
+        setFiles(prevFiles => [...prevFiles, ...selectedFiles]);
+
+        const newPreviewUrls = selectedFiles.map(file => URL.createObjectURL(file));
+        setPreviewUrls(prevUrls => [...prevUrls, ...newPreviewUrls]);
+
+    };
+
+    /**
+     * 
+     * @param files 
+     * @returns 
+     * Upload the image into the cloudinary
+     */
+    const _handleUploadToCloudinary = async (files: File[]): Promise<string[]> => {
+        const cloudName = 'dby2saqmn';
+        const presetKey = 'whear-app';
+        const folderName = 'test';
+
+        const formData = new FormData();
+        formData.append('upload_preset', presetKey);
+        formData.append('folder', folderName);
+
+        const uploadedUrls: string[] = [];
+
+        for (const file of Array.from(files)) {
+            formData.append('file', file);
+
+            try {
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const responseData = await response.json();
+
+                if (responseData.secure_url) {
+                    const imageUrl = responseData.secure_url;
+                    uploadedUrls.push(imageUrl);
+                } else {
+                    console.error('Error uploading image to Cloudinary. Response:', responseData);
+                }
+            } catch (error) {
+                console.error('Error uploading images to Cloudinary:', error);
+            }
+        }
+
+        return uploadedUrls;
+    };
 
     // ---------------Fetch Banks Data---------------//
     useEffect(() => {
@@ -195,6 +297,11 @@ const UploadBrandInforForm = () => {
             ...formData,
             [name]: value,
         });
+
+        setFormErrors({
+            ...formErrors,
+            [name]: ''
+        });
     };
 
     const handleBankChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -263,9 +370,38 @@ const UploadBrandInforForm = () => {
 
     const _handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!validateForm()) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Please correct the errors in the form',
+            });
+            return;
+        }
+        let uploadedImageURLs: string[] = [];
+
+        if (files && files.length > 0) {
+            try {
+                uploadedImageURLs = await _handleUploadToCloudinary(files);
+                console.log("Uploaded image URLs:", uploadedImageURLs);
+            } catch (error) {
+                console.error('Error uploading images:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Image Upload Failed',
+                    text: 'There was an error uploading your images. Please try again.',
+                });
+                return; // Stop the submission if image upload fails
+            }
+        }
+
+        const updatedFormData = {
+            ...formData,
+            imageURL: uploadedImageURLs
+        };
+
         try {
-            // Log the formData object directly
-            console.log("formData:", formData);
+            console.log("Submitting form data:", updatedFormData);
 
             const response = await axios.post(
                 `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.uploadBrandInfor + '/' + getID()}`,
@@ -274,23 +410,22 @@ const UploadBrandInforForm = () => {
 
             console.log('Profile uploaded successfully:', response.data);
 
-            // Show success alert using swalAlert
             Swal.fire({
                 icon: 'success',
                 title: 'Upload Brand Information Success!',
                 text: 'Brand profile uploaded successfully',
             });
-            setActiveStep(2)
+            setActiveStep(2);
             window.location.href = `/brand/waiting_process_information`;
 
         } catch (error) {
             console.error('Error uploading profile', error);
             Swal.fire({
                 icon: 'error',
-                title: 'Upload Brand Information Fail!',
-                text: 'Brand profile uploaded Fail',
+                title: 'Upload Brand Information Failed!',
+                text: 'There was an error uploading your brand profile. Please try again.',
             });
-            setActiveStep(1)
+            setActiveStep(1);
         }
     }
 
@@ -427,6 +562,39 @@ const UploadBrandInforForm = () => {
                     </div>
                 </div>
                 <h2 className="text-2xl font-bold mb-6">Payment information</h2>
+
+                {/* Image Array */}
+                <div className="flex flex-wrap gap-4 mb-4">
+                    {previewUrls.map((url, index) => (
+                        <div key={url} className="relative w-40 h-40 rounded-lg overflow-hidden">
+                            <img src={url} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
+                            <button
+                                onClick={() => {
+                                    const newFiles = files.filter((_, i) => i !== index);
+                                    const newPreviewUrls = previewUrls.filter((_, i) => i !== index);
+                                    setFiles(newFiles);
+                                    setPreviewUrls(newPreviewUrls);
+                                }}
+                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
+                            >
+                                X
+                            </button>
+                        </div>
+                    ))}
+                    <div
+                        onClick={() => fileInputRef.current?.click()}
+                        className="w-40 h-40 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer"
+                    >
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            className="hidden"
+                            onChange={_handleChanges}
+                            accept="image/*"
+                        />
+                        <span className="text-4xl text-gray-400">+</span>
+                    </div>
+                </div>
                 {/* Form Input POST */}
                 <form className="space-y-4" onSubmit={_handleSubmit}>
                     <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4">
@@ -436,13 +604,16 @@ const UploadBrandInforForm = () => {
                             value={getEmail()}
                             readOnly
                             className="flex-1 p-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                        <input type="text"
-                            name="brandName"
-                            id="brandName"
-                            value={formData.brandName}
-                            onChange={_handleChange}
-                            className="flex-1 p-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Enter brand name" />
+                        <div className="flex-1 flex flex-col">
+                            <input type="text"
+                                name="brandName"
+                                id="brandName"
+                                value={formData.brandName}
+                                onChange={_handleChange}
+                                className={`p-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${formErrors.brandName ? 'border-red-500' : ''}`}
+                                placeholder="Enter brand name" />
+                            {formErrors.brandName && <p className="text-red-500 text-sm mt-1">{formErrors.brandName}</p>}
+                        </div>
                     </div>
                     <div className='flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4'>
                         <select
@@ -457,12 +628,16 @@ const UploadBrandInforForm = () => {
                                 <option key={bank.bin} value={bank.bin}>{bank.shortName}</option>
                             ))}
                         </select>
-                        <input type="text"
-                            name="accountNumber"
-                            id="accountNumber"
-                            value={formData.accountNumber}
-                            onChange={_handleChange}
-                            className="flex-1 p-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter account number" />
+                        <div className="flex-1 flex flex-col">
+                            <input type="text"
+                                name="accountNumber"
+                                id="accountNumber"
+                                value={formData.accountNumber}
+                                onChange={_handleChange}
+                                className={`p-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${formErrors.accountNumber ? 'border-red-500' : ''}`}
+                                placeholder="Enter account number" />
+                            {formErrors.accountNumber && <p className="text-red-500 text-sm mt-1">{formErrors.accountNumber}</p>}
+                        </div>
                     </div>
                     {/* <input type="text" className="w-full p-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Card number" /> */}
                     <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4">
@@ -473,13 +648,16 @@ const UploadBrandInforForm = () => {
                             placeholder='Account Name Not Found'
                             readOnly
                             className="flex-1 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800" />
-                        <input
-                            type='text'
-                            placeholder="Enter your address"
-                            name="address"
-                            value={formData.address}
-                            onChange={_handleChange}
-                            className="flex-1 p-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        <div className="flex-1 flex flex-col">
+                            <input
+                                type='text'
+                                placeholder="Enter your address"
+                                name="address"
+                                value={formData.address}
+                                onChange={_handleChange}
+                                className={`p-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${formErrors.address ? 'border-red-500' : ''}`} />
+                            {formErrors.address && <p className="text-red-500 text-sm mt-1">{formErrors.address}</p>}
+                        </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-10">
                         <div className="col-span-1">

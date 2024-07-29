@@ -1,103 +1,273 @@
-import { Box, Button, IconButton, Menu, MenuItem, Modal } from "@mui/material";
-import { DataGrid, GridToolbar, GridColDef } from "@mui/x-data-grid";
-import { tokens } from "../../../../../theme";
-import { useTheme } from "@mui/material";
-import * as React from "react";
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import Swal from "sweetalert2";
-import EditCustomerPopUpScreens from "../EmployeeEditReport/EditReportPopUpScreen";
-import { Add } from "@mui/icons-material";
-import AddEachUsersWithHand from "../../AddEachWithHand/AddEachReportWithHandScreens";
-import { useTranslation } from 'react-i18next';
+import React, { useState, useEffect } from 'react';
+import './ManageReportStyles.module.scss'
+import { motion } from 'framer-motion';
+import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { Report, ReportImageList } from '../../../../../models/EmployeeManageReportModel';
+import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
+import axios from 'axios';
 
-interface User {
-    id: number;
-    registrarId: string;
-    name: string;
-    age: number;
-    phone: string;
-    email: string;
-    address: string;
-    city: string;
-    zipCode: string;
+const getStatusColor = (status: string) => {
+    switch (status) {
+        case 'NOT_VERIFY':
+            return 'text-gray-600';
+        case 'PENDING':
+            return 'text-yellow-600';
+        case 'DEPOSIT':
+            return 'text-blue-600';
+        case 'PROCESSING':
+            return 'text-orange-600';
+        case 'CANCEL':
+            return 'text-red-600';
+        case 'COMPLETED':
+            return 'text-green-600';
+        case 'DELIVERED':
+            return 'text-indigo-600';
+        default:
+            return 'text-gray-600';
+    }
+};
+
+const OrderReport: React.FC<{
+    report: Report;
+    onViewDetails: (report: Report) => void;
+    onMarkResolved: (reportID: string) => void;
+}> = ({ report, onViewDetails, onMarkResolved }) => (
+    <div className="bg-white mb-8 shadow-lg rounded-lg p-6 transition duration-300 ease-in-out transform hover:shadow-xl">
+        <h3 className="text-xl font-semibold mb-3 text-indigo-700">Type Report: {report.typeOfReport}</h3>
+        <div className="flex justify-between">
+            <div className="w-1/2">
+                <p className="text-gray-600 mb-2">Customer: {report.orderResponse.buyerName}</p>
+                <p className="text-gray-600 mb-2">Date: {report.createDate}</p>
+                <p className="text-gray-600 mb-2">
+                    Status Report:{' '}
+                    <span
+                        className={`ml-2 font-semibold px-2 py-1 rounded-full ${report.reportStatus ? 'bg-green-200 text-green-800' : 'bg-yellow-200 text-yellow-800'
+                            }`}
+                    >
+                        {report.reportStatus ? 'Read' : 'Unread'}
+                    </span>
+                </p>
+                <div className="mt-4">
+                    {report.orderResponse.detailList.map((detail, index) => (
+                        <p key={index} className="text-gray-600">
+                            Size {detail.size.sizeName}: Quantity {detail.quantity}
+                        </p>
+                    ))}
+                </div>
+            </div>
+            <div className="w-1/2">
+                <p className="text-gray-600 mb-2">Order ID: {report.orderResponse.orderID}</p>
+                <p className="text-gray-600 mb-2">
+                    Order Status: <span className={`mb-2 ${getStatusColor(report.orderResponse.orderStatus)} font-bold`}>{report.orderResponse.orderStatus}</span>
+                </p>
+                <p className="text-gray-600 mb-2">Total Quantity: {report.orderResponse.quantity}</p>
+                <p className="text-gray-600 mb-2">
+                    Address: {report.orderResponse.address}, {report.orderResponse.ward}, {report.orderResponse.district},{' '}
+                    {report.orderResponse.province}
+                </p>
+                <p className="text-gray-700 mt-4">Content: {report.content}</p>
+            </div>
+        </div>
+        <div className="mt-6 flex justify-end">
+            <button
+                onClick={() => onViewDetails(report)}
+                className="bg-indigo-500 text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"
+            >
+                View Details
+            </button>
+            <button
+                onClick={() => onMarkResolved(report.reportID)}
+                className="bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300"
+            >
+                Mark as Resolved
+            </button>
+        </div>
+    </div>
+);
+
+function isReportImageListArray(reportImageList: ReportImageList | ReportImageList[]): reportImageList is ReportImageList[] {
+    return Array.isArray(reportImageList);
 }
 
-// Make Style of popup
-const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: "50%",
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-    borderRadius: "20px"
+const ReportModal: React.FC<{ report: Report; onClose: () => void; onMarkResolved: (reportID: string) => void }> = ({ report, onClose, onMarkResolved }) => {
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'NOT_VERIFY': return 'text-gray-600';
+            case 'PENDING': return 'text-yellow-600';
+            case 'DEPOSIT': return 'text-blue-600';
+            case 'PROCESSING': return 'text-orange-600';
+            case 'CANCEL': return 'text-red-600';
+            case 'COMPLETED': return 'text-green-600';
+            case 'DELIVERED': return 'text-indigo-600';
+            default: return 'text-gray-600';
+        }
+    };
+
+    const nextImage = () => {
+        if (isReportImageListArray(report.reportImageList)) {
+            setCurrentImageIndex((prevIndex) =>
+                prevIndex === report.reportImageList.length - 1 ? 0 : prevIndex + 1
+            );
+        }
+    };
+
+    const prevImage = () => {
+        if (isReportImageListArray(report.reportImageList)) {
+            setCurrentImageIndex((prevIndex) =>
+                prevIndex === 0 ? report.reportImageList.length - 1 : prevIndex - 1
+            );
+        }
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm overflow-y-auto h-full w-full flex items-center justify-center p-4 z-50"
+            onClick={onClose}
+        >
+            <motion.div
+                initial={{ scale: 0.9, y: 50 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.9, y: 50 }}
+                className="relative bg-white w-full max-w-2xl rounded-xl shadow-2xl p-8 max-h-[90vh] overflow-y-auto"
+                onClick={e => e.stopPropagation()}
+            >
+                <button
+                    onClick={onClose}
+                    className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition duration-150"
+                    aria-label="Close modal"
+                >
+                    <FaTimes size={24} />
+                </button>
+
+                <h2 className="text-3xl font-bold text-indigo-700 mb-6 shadow-text">Order Report Details</h2>
+
+                <div className="flex justify-between items-center mb-6 bg-indigo-50 p-4 rounded-lg">
+                    <div className="flex items-center">
+                        <FaClipboardCheck className="text-indigo-500 mr-2" size={20} />
+                        <span className="font-semibold text-gray-700">Order ID:</span>
+                    </div>
+                    <p className="text-xl font-bold text-indigo-700">{report.reportID}</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    {[
+                        { icon: FaUser, label: 'Customer', value: report.orderResponse.buyerName },
+                        { icon: FaCalendar, label: 'Date', value: report.lastModifiedDate },
+                        {
+                            icon: FaExclamationCircle,
+                            label: 'Report Status',
+                            value: report.reportStatus ? 'Read' : 'Unread',
+                            customClass: report.reportStatus ? 'text-green-600' : 'text-yellow-600'
+                        },
+                        {
+                            icon: FaExclamationCircle,
+                            label: 'Order Status',
+                            value: report.orderResponse.orderStatus,
+                            customClass: getStatusColor(report.orderResponse.orderStatus)
+                        }
+                    ].map((item, index) => (
+                        <div key={index} className="bg-gray-50 p-4 rounded-lg">
+                            <p className="text-gray-600 flex items-center mb-2">
+                                <item.icon className="mr-2 text-indigo-500" />
+                                <span className="font-semibold">{item.label}:</span>
+                            </p>
+                            <p className={`text-lg font-bold ${item.customClass || 'text-gray-800'}`}>
+                                {item.value}
+                            </p>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="mb-8">
+                    <h3 className="text-xl font-semibold text-gray-700 mb-3">Description</h3>
+                    <p className="text-gray-600 bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-inner">
+                        {report.content}
+                    </p>
+                </div>
+
+                {isReportImageListArray(report.reportImageList) && report.reportImageList.length > 0 && (
+                    <div className="mb-8">
+                        <h3 className="text-xl font-semibold text-gray-700 mb-3">Report Images</h3>
+                        <div className="relative">
+                            <img
+                                src={report.reportImageList[currentImageIndex].reportImageUrl}
+                                alt={report.reportImageList[currentImageIndex].reportImageName}
+                                className="w-full h-64 object-cover rounded-lg"
+                            />
+                            {report.reportImageList.length > 1 && (
+                                <>
+                                    <button onClick={prevImage} className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full">
+                                        <FaChevronLeft />
+                                    </button>
+                                    <button onClick={nextImage} className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full">
+                                        <FaChevronRight />
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                        <p className="text-center mt-2 text-gray-600">
+                            {report.reportImageList[currentImageIndex].reportImageName}
+                        </p>
+                    </div>
+                )}
+
+                <div className="flex justify-end space-x-4">
+                    <button
+                        onClick={onClose}
+                        className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-150 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                    >
+                        Close
+                    </button>
+                    <button
+                        onClick={() => onMarkResolved(report.reportID)}
+                        className={`px-6 py-3 rounded-lg text-white transition duration-150 focus:outline-none focus:ring-2 ${report.reportStatus
+                            ? 'bg-green-500 hover:bg-green-600 focus:ring-green-400 cursor-not-allowed'
+                            : 'bg-indigo-500 hover:bg-indigo-600 focus:ring-indigo-400'
+                            }`}
+                        disabled={report.reportStatus}
+                    >
+                        {report.reportStatus ? 'Already Resolved' : 'Mark as Resolved'}
+                    </button>
+                </div>
+            </motion.div>
+        </motion.div>
+    );
 };
 
 const EmployeeManageReport: React.FC = () => {
-    const theme = useTheme();
-    const colors = tokens(theme.palette.mode);
-    const [data, setData] = React.useState<User[]>([]);
+    const [reports, setReports] = useState<Report[]>([]);
+    const [filteredReports, setFilteredReports] = useState<Report[]>([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [reportsPerPage] = useState(6);
+    const [filters, setFilters] = useState({
+        date: '',
+        status: '',
+        name: '',
+        orderStatus: '',
+    });
+    const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [itemsPerPage, setItemsPerPage] = useState(20);
+    const [goToPage, setGoToPage] = useState('1');
 
-    // set formid to pass it to component edit user
-    const [formId, setFormId] = React.useState<User | null>(null);
-
-    // Open Edit PopUp when clicking on the edit icon
-    const [editopen, setEditOpen] = React.useState<boolean>(false);
-    const _handleEditOpen = () => setEditOpen(true);
-    const _handleEditClose = () => setEditOpen(false);
-
-    // open or close the add modal
-    const [anchorEl, setAnchorEl] = React.useState(null);
-    const open = Boolean(anchorEl);
-    const _handleClick = (event: any) => {
-        setAnchorEl(event.currentTarget);
-    };
-    const _handleClose = () => {
-        setAnchorEl(null);
-    };
-    console.log("anchorEl" + anchorEl);
-
-    // close open pop up
-    const [addOpenOrClose, setAddOpenOrClose] = React.useState<boolean>(false)
-
-    const _handleAddOpen = () => {
-        setAddOpenOrClose(true);
-    }
-
-    const _handleAddClose = () => {
-        setAddOpenOrClose(false)
-    }
-
-    // Get language in local storage
-    const selectedLanguage = localStorage.getItem('language');
-    const codeLanguage = selectedLanguage?.toUpperCase();
-
-    // Using i18n
-    const { t, i18n } = useTranslation();
-    React.useEffect(() => {
-        if (selectedLanguage !== null) {
-            i18n.changeLanguage(selectedLanguage);
-        }
-    }, [selectedLanguage, i18n]);
-
-    React.useEffect(() => {
-        const apiUrl = 'https://66080c21a2a5dd477b13eae5.mockapi.io/CPSE_DATA_TEST';
-        fetch(apiUrl)
+    useEffect(() => {
+        const apiUrl = `${baseURL}${versionEndpoints.v1}${featuresEndpoints.report}${functionEndpoints.report.getAllReport}`;
+        axios.get(apiUrl)
             .then(response => {
-                if (!response.ok) {
+                if (response.status !== 200) {
                     throw new Error('Network response was not ok');
                 }
-                return response.json();
+                return response.data;
             })
             .then((responseData) => {
-                if (responseData && Array.isArray(responseData)) {
-                    setData(responseData);
+                if (responseData && Array.isArray(responseData.data)) {
+                    setReports(responseData.data);
                     console.log("Data received:", responseData);
-
                 } else {
                     console.error('Invalid data format:', responseData);
                 }
@@ -105,283 +275,232 @@ const EmployeeManageReport: React.FC = () => {
             .catch(error => console.error('Error fetching data:', error));
     }, []);
 
-    // Thêm người dùng mới vào danh sách
-    const _handleAddUser = (newUser: User) => {
-        setData(prevData => [...prevData, newUser]);
-    }
+    useEffect(() => {
+        applyFilters();
+    }, [filters, reports]);
 
-    // Cập nhật người dùng trong danh sách
-    const _handleUpdateUser = (updatedUser: User) => {
-        setData(prevData => prevData.map(user => user.id === updatedUser.id ? updatedUser : user));
-    }
-
-    // EDIT 
-    const _handleEditClick = (id: number, registrarId: string, name: string, age: number, phone: string, email: string, address: string, city: string, zipCode: string) => {
-        // Handle edit action
-        const userDataToEdit: User = {
-            id: id,
-            registrarId: registrarId,
-            name: name,
-            age: age,
-            phone: phone,
-            email: email,
-            address: address,
-            city: city,
-            zipCode: zipCode
+    const applyFilters = () => {
+        let filtered = reports;
+        if (filters.date) {
+            const filterDate = new Date(filters.date);
+            filtered = filtered.filter(report => {
+                const reportDate = new Date(report.createDate.split(' ')[0]);
+                return reportDate.toDateString() === filterDate.toDateString();
+            });
         }
-        setFormId(userDataToEdit);
-        _handleEditOpen();
+        if (filters.status !== '') {
+            filtered = filtered.filter(report => report.reportStatus === (filters.status === 'true'));
+        }
+        if (filters.name) {
+            filtered = filtered.filter(report =>
+                report.typeOfReport.toLowerCase().includes(filters.name.toLowerCase())
+            );
+        }
+        if (filters.orderStatus !== '') {
+            filtered = filtered.filter(report => report.orderResponse.orderStatus === filters.orderStatus);
+        }
+        setFilteredReports(filtered);
+        setCurrentPage(1);
     };
 
-    //DELETE OR UPDATE
-    const _handleDeleteClick = async (id: number) => {
-        // Handle delete action
-        try {
-            const response = await fetch(`https://66080c21a2a5dd477b13eae5.mockapi.io/CPSE_DATA_TEST/${id}`, {
-                method: 'DELETE',
-            });
-            if (!response.ok) {
-                throw new Error('Error deleting user');
-            }
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            throw error;
-        }
+    const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const value = e.target.name === 'status'
+            ? e.target.value === 'true' ? true : e.target.value === 'false' ? false : ''
+            : e.target.value;
+        setFilters(prevFilters => ({
+            ...prevFilters,
+            [e.target.name]: value,
+        }));
+    };
 
-    }
+    const indexOfLastReport = currentPage * reportsPerPage;
+    const indexOfFirstReport = indexOfLastReport - reportsPerPage;
+    const currentReports = filteredReports.slice(indexOfFirstReport, indexOfLastReport);
 
-    // confirm 
-    const confirmDelete = async (id: number) => {
-        try {
-            const result = await Swal.fire({
-                title: `${t(codeLanguage + '000061')}`,
-                text: `${t(codeLanguage + '000062')}`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: `${t(codeLanguage + '000063')}`,
-                cancelButtonText: `${t(codeLanguage + '000055')}`
-            });
-            if (result.isConfirmed) {
-                await _handleDeleteClick(id);
-                Swal.fire(
-                    `${t(codeLanguage + '000064')}`,
-                    `${t(codeLanguage + '000065')}`,
-                    'success'
-                )
-                // Loại bỏ người dùng khỏi danh sách hiện tại
-                setData(prevData => prevData.filter(user => user.id !== id));
+    const paginate = (pageNumber: number) => {
+        setCurrentPage(pageNumber);
+        setGoToPage(pageNumber.toString());
+    };
+
+    const handleItemsPerPageChange = (newItemsPerPage: number) => {
+        setItemsPerPage(newItemsPerPage);
+        setCurrentPage(1);
+    };
+
+    const totalPages = Math.ceil(filteredReports.length / itemsPerPage);
+
+    const renderPageNumbers = () => {
+        const pageNumbers = [];
+        const showEllipsis = totalPages > 7;
+
+        if (showEllipsis) {
+            if (currentPage <= 4) {
+                for (let i = 1; i <= 5; i++) {
+                    pageNumbers.push(i);
+                }
+                pageNumbers.push('...');
+                pageNumbers.push(totalPages);
+            } else if (currentPage >= totalPages - 3) {
+                pageNumbers.push(1);
+                pageNumbers.push('...');
+                for (let i = totalPages - 4; i <= totalPages; i++) {
+                    pageNumbers.push(i);
+                }
             } else {
-                Swal.fire(
-                    `${t(codeLanguage + '000066')}`,
-                    `${t(codeLanguage + '000067')}`,
-                    'error'
-                );
+                pageNumbers.push(1);
+                pageNumbers.push('...');
+                for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+                    pageNumbers.push(i);
+                }
+                pageNumbers.push('...');
+                pageNumbers.push(totalPages);
             }
-        } catch (error) {
-            console.error('Error:', error);
+        } else {
+            for (let i = 1; i <= totalPages; i++) {
+                pageNumbers.push(i);
+            }
         }
+
+        return pageNumbers;
     };
 
+    const handleViewDetails = (report: Report) => {
+        setSelectedReport(report);
+        setIsModalOpen(true);
+    };
 
-    const columns: GridColDef[] = [
-        { field: "id", headerName: "ID", flex: 0.5 },
-        { field: "registrarId", headerName: "Registrar ID" },
-        {
-            field: "name",
-            headerName: "Name",
-            flex: 1,
-        },
-        {
-            field: "age",
-            headerName: "Age",
-            type: "number",
-            headerAlign: "left",
-            align: "left",
-        },
-        {
-            field: "phone",
-            headerName: "Phone Number",
-            flex: 1,
-        },
-        {
-            field: "email",
-            headerName: "Email",
-            flex: 1,
-        },
-        {
-            field: "address",
-            headerName: "Address",
-            flex: 1,
-        },
-        {
-            field: "city",
-            headerName: "City",
-            flex: 1,
-        },
-        {
-            field: "zipCode",
-            headerName: "Zip Code",
-            flex: 1,
-        },
-        {
-            field: "actions",
-            headerName: "Actions",
-            flex: 1,
-            sortable: false,
-            renderCell: (params) => (
-                <Box>
-                    <IconButton onClick={() => _handleEditClick(params.row.id, params.row.registrarId, params.row.name, params.row.age, params.row.email, params.row.phone, params.row.address, params.row.city, params.row.zipCode)}>
-                        <EditIcon />
-                    </IconButton>
-                    <IconButton onClick={() => confirmDelete(params.row.id)}>
-                        <DeleteIcon htmlColor={colors.primary[300]} />
-                    </IconButton>
-                </Box>
-            )
-        }
-    ];
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedReport(null);
+    };
 
-    const getRowId = (row: any) => {
-        return row.registrarId; // Sử dụng một thuộc tính duy nhất làm id cho mỗi hàng
+    const handleMarkResolved = (id: string) => {
+        setReports(reports.map(report =>
+            report.reportID === id ? { ...report, status: true } : report
+        ));
+        handleCloseModal();
     };
 
     return (
-        <Box m="20px">
-            <Box
-                m="40px 0 0 0"
-                height="75vh"
-                sx={{
-                    "& .MuiDataGrid-root": {
-                        border: "none",
-                    },
-                    "& .MuiDataGrid-cell": {
-                        borderBottom: "none",
-                    },
-                    "& .name-column--cell": {
-                        color: colors.primary[300],
-                    },
-                    "& .MuiDataGrid-columnHeaders": {
-                        backgroundColor: colors.primary[300],
-                        borderBottom: "none",
-                    },
-                    "& .MuiDataGrid-virtualScroller": {
-                        backgroundColor: colors.primary[100],
-                    },
-                    "& .MuiDataGrid-footerContainer": {
-                        borderTop: "none",
-                        backgroundColor: colors.primary[100],
-                    },
-                    "& .MuiCheckbox-root": {
-                        color: `${colors.primary[100]} !important`,
-                    },
-                    "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-                        color: `${colors.primary[200]} !important`,
-                    },
-                    "& .MuiBadge-badge": {
-                        display: "none !important"
-                    }
-                }}
-            >
-                <Button
-                    id="basic-button"
-                    aria-controls={open ? 'basic-menu' : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={open ? 'true' : undefined}
-                    onClick={_handleClick}
-                    endIcon={<Add />}
-                    variant="contained"
-                    color="primary"
-                    style={{ backgroundColor: `${colors.primary[300]} !important`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
+        <div className='-mt-8'>
+            <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 bg-white p-6 rounded-lg shadow-lg">
+                <div className="flex flex-col">
+                    <label htmlFor="dateFilter" className="mb-2 text-sm font-medium text-gray-700">Date</label>
+                    <input
+                        id="dateFilter"
+                        type="date"
+                        name="date"
+                        onChange={handleFilterChange}
+                        className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
+                    />
+                </div>
+
+                <div className="flex flex-col">
+                    <label htmlFor="orderStatusFilter" className="mb-2 text-sm font-medium text-gray-700">Order Status</label>
+                    <select
+                        id="orderStatusFilter"
+                        name="orderStatus"
+                        onChange={handleFilterChange}
+                        className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
+                    >
+                        <option value="">All Order Statuses</option>
+                        <option value="NOT_VERIFY">Not Verify</option>
+                        <option value="PENDING">Pending</option>
+                        <option value="DEPOSIT">Deposit</option>
+                        <option value="PROCESSING">Processing</option>
+                        <option value="CANCEL">Cancel</option>
+                        <option value="COMPLETED">Completed</option>
+                        <option value="DELIVERED">Delivered</option>
+                    </select>
+                </div>
+
+                <div className="flex flex-col">
+                    <label htmlFor="brandNameFilter" className="mb-2 text-sm font-medium text-gray-700">Brand Name</label>
+                    <input
+                        id="brandNameFilter"
+                        type="text"
+                        name="name"
+                        placeholder="Filter by brand name..."
+                        onChange={handleFilterChange}
+                        className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
+                    />
+                </div>
+            </div>
+
+            <div >
+                {currentReports.map(report => (
+                    <OrderReport key={report.reportID} report={report} onViewDetails={handleViewDetails} onMarkResolved={handleMarkResolved} />
+                ))}
+            </div>
+
+            <div className="mt-8 flex flex-wrap items-center justify-center space-x-4">
+                <select
+                    value={itemsPerPage}
+                    onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                    className="border rounded-md px-3 py-2 text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:border-orange-500"
                 >
-                    {t(codeLanguage + '000048')}
-                </Button>
-                <Menu
-                    id="basic-menu"
-                    anchorEl={anchorEl}
-                    open={open}
-                    onClose={_handleClose}
-                    MenuListProps={{
-                        'aria-labelledby': 'basic-button',
-                    }}
+                    <option value={5}>5/page</option>
+                    <option value={10}>10/page</option>
+                    <option value={20}>20/page</option>
+                    <option value={50}>50/page</option>
+                </select>
+
+                <button
+                    onClick={() => paginate(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
                 >
-                    <MenuItem >
-                        <div onClick={_handleAddOpen}>{t(codeLanguage + '000049')}</div>
-                        <Modal
-                            open={addOpenOrClose}
-                            aria-labelledby="modal-modal-title"
-                            aria-describedby="modal-modal-description"
-                        >
-                            <Box sx={{
-                                backgroundColor: colors.primary[100], position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: "50%",
-                                bgcolor: 'background.paper',
-                                border: '2px solid #000',
-                                boxShadow: 24,
-                                p: 4,
-                                borderRadius: "20px"
-                            }}>
-                                <AddEachUsersWithHand closeCard={_handleAddClose} addNewUser={_handleAddUser} />
-                            </Box>
-                        </Modal>
-                    </MenuItem>
+                    &lt;
+                </button>
 
-                    {/* <MenuItem>
-                        <div onClick={handleAddMultipleOpen}>{t(codeLanguage + '000050')}</div>
-                        <Modal
-                            open={addMultiple}
-                            aria-labelledby="modal-modal-title"
-                            aria-describedby="modal-modal-description"
-                        >
-                            <Box sx={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: "70%",
-                                bgcolor: colors.primary[100],
-                                border: '2px solid #000',
-                                boxShadow: 24,
-                                p: 4,
-                                borderRadius: "20px"
-                            }}>
-                                <AddMultipleComponentWithExcel closeMultipleCard={handleAddMultipleClose} addNewUser={_handleAddUser} />
-                            </Box>
-                        </Modal>
+                {renderPageNumbers().map((number, index) => (
+                    <button
+                        key={index}
+                        onClick={() => typeof number === 'number' && paginate(number)}
+                        className={`px-3 py-2 rounded-md ${number === currentPage
+                            ? 'bg-orange-500 text-white'
+                            : 'text-gray-700 hover:bg-gray-100'
+                            } ${number === '...' ? 'cursor-default' : ''}`}
+                    >
+                        {number}
+                    </button>
+                ))}
 
-                    </MenuItem> */}
-                </Menu>
+                <button
+                    onClick={() => paginate(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                >
+                    &gt;
+                </button>
 
-                <DataGrid
-                    rows={data}
-                    columns={columns}
-                    slots={{ toolbar: GridToolbar }}
-                    // checkboxSelection
-                    disableRowSelectionOnClick
-                    getRowId={getRowId}
+                <div className="flex items-center space-x-2 mt-4 sm:mt-0">
+                    <span className="text-gray-600">Go to</span>
+                    <input
+                        type="text"
+                        className="border border-gray-300 rounded-md w-16 px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        value={goToPage}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoToPage(e.target.value)}
+                        onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                            if (e.key === 'Enter') {
+                                const page = Math.max(1, Math.min(parseInt(goToPage), totalPages));
+                                if (!isNaN(page)) {
+                                    paginate(page);
+                                }
+                            }
+                        }}
+                    />
+                </div>
+            </div>
+
+            {isModalOpen && selectedReport && (
+                <ReportModal
+                    report={selectedReport}
+                    onClose={handleCloseModal}
+                    onMarkResolved={handleMarkResolved}
                 />
-                <Modal
-                    open={editopen}
-                    aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description"
-                >
-                    <Box sx={style}>
-                        {formId !== null && (
-                            <EditCustomerPopUpScreens
-                                editClose={_handleEditClose}
-                                fid={formId}
-                                updateUser={_handleUpdateUser}
-                            />
-                        )}
-                    </Box>
-                </Modal>
-            </Box>
-        </Box>
+            )}
+        </div>
     );
 };
 

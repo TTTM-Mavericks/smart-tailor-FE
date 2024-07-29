@@ -31,7 +31,7 @@ export interface Bank {
     swift_code: string;
 }
 
-export interface FormData {
+export interface FormDataBrandInformation {
     // email: string;
     brandName: string;
     bankName: string;
@@ -41,5 +41,6 @@ export interface FormData {
     province: string,
     district: string,
     ward: string,
-    qrPayment: string
+    qrPayment: string,
+    // imageURL: string[]
 }

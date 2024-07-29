@@ -1,4 +1,4 @@
-import { Box, Button, IconButton, Menu, MenuItem, Modal } from "@mui/material";
+import { Box, Button, IconButton, Menu, MenuItem, Modal, Typography } from "@mui/material";
 import { DataGrid, GridToolbar, GridColDef } from "@mui/x-data-grid";
 import { tokens } from "../../../../../theme";
 import { useTheme } from "@mui/material";
@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { AddExcelMaterial, AddMaterial, ExcelData, Material } from "../../../../../models/AdminMaterialExcelModel";
 import axios from "axios";
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
-import { margin } from "@mui/system";
+import { height, margin } from "@mui/system";
 const style = {
     position: 'absolute',
     top: '50%',
@@ -289,6 +289,33 @@ const ManageMaterials: React.FC = () => {
             field: "status",
             headerName: "status",
             flex: 1,
+            renderCell: (params) => (
+                <Box
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: '8px',
+                            height: '8px',
+                            borderRadius: '50%',
+                            backgroundColor: params.row.status ? '#4caf50' : '#f44336',
+                            marginRight: '8px',
+                        }}
+                    />
+                    <Typography
+                        variant="caption"
+                        sx={{
+                            color: params.row.status ? '#4caf50' : '#f44336',
+                            fontWeight: 'medium',
+                        }}
+                    >
+                        {params.row.status ? 'Active' : 'Inactive'}
+                    </Typography>
+                </Box>
+            ),
         },
 
         {
@@ -431,7 +458,8 @@ const ManageMaterials: React.FC = () => {
                                         border: '2px solid #000',
                                         boxShadow: 24,
                                         p: 4,
-                                        borderRadius: "20px"
+                                        borderRadius: "20px",
+                                        height: "fit-content"
                                     }}>
                                         <AddMultipleComponentWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddExcelMaterial} />
                                     </Box>
