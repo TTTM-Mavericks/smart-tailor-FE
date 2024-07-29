@@ -719,8 +719,8 @@ const OrderProductScreen = () => {
                                         <p className="text-sm light:text-gray-300 leading-4 text-gray-600">{__handleAddCommasToNumber(materialPrice?.max)} VND</p>
                                     </div>
                                     <div className="flex justify-between items-center w-full">
-                                        <p className="text-sm light:text-white leading-4 text-gray-800">Discount <span className="bg-gray-200 p-1 text-xs font-medium light:bg-white light:text-gray-800 leading-3 text-gray-800">Quantity (2%) </span></p>
-                                        <p className="text-sm light:text-gray-300 leading-4 text-gray-600">-{__handleAddCommasToNumber((materialPrice?.min + materialPrice?.max) / 2 * 2 / 100)} VND</p>
+                                        <p className="text-sm light:text-white leading-4 text-gray-800">Discount <span className="bg-gray-200 p-1 text-xs font-medium light:bg-white light:text-gray-800 leading-3 text-gray-800">Quantity (0%) </span></p>
+                                        <p className="text-sm light:text-gray-300 leading-4 text-gray-600">-{((materialPrice?.min + materialPrice?.max) / 2 * 0 / 100) ==0 ? __handleAddCommasToNumber((materialPrice?.min + materialPrice?.max) / 2 * 0 / 100) : '0'} VND</p>
                                     </div>
                                     <div className="flex justify-between items-center w-full">
                                         <p className="text-sm light:text-white leading-4 text-gray-800">Shipping</p>

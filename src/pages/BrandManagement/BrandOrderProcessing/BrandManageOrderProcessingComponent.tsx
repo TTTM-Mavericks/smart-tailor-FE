@@ -15,6 +15,8 @@ import { UserInterface } from '../../../models/UserModel';
 import Cookies from 'js-cookie';
 import { FaCheck } from "react-icons/fa";
 import { toast } from 'react-toastify';
+import BrandUpdateSampleProductDialog from '../GlobalComponent/Dialog/UpdateSampleProduct/BrandUpdateSampleProductDialog';
+import BrandProductivityInputDialog from '../GlobalComponent/Dialog/BrandProductivity/BrandProductivityInputDialog';
 
 const BrandManageOrderProcessingComponent: React.FC = () => {
     // TODO MUTIL LANGUAGE
@@ -275,16 +277,16 @@ const BrandManageOrderProcessingComponent: React.FC = () => {
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
                 setIsLoading(false);
-                toast.success(`${response.message}`, {autoClose: 4000});
+                toast.success(`${response.message}`, { autoClose: 4000 });
             }
             else {
                 console.log('detail order: ', response.message);
-                toast.error(`${response.message}`, {autoClose: 4000});
+                toast.error(`${response.message}`, { autoClose: 4000 });
                 navigate('/error404');
             }
         } catch (error) {
             console.log('error: ', error);
-            toast.error(`${error}`, {autoClose: 4000});
+            toast.error(`${error}`, { autoClose: 4000 });
             navigate('/error404');
         }
     }
@@ -486,7 +488,8 @@ const BrandManageOrderProcessingComponent: React.FC = () => {
                 </DialogContent>
             </Dialog>
 
-
+            <BrandUpdateSampleProductDialog isOpen={false} orderID={'ádasdasd'}></BrandUpdateSampleProductDialog>
+            <BrandProductivityInputDialog isOpen={true}></BrandProductivityInputDialog>
 
 
         </div >

@@ -17,6 +17,7 @@ import longSkirtModel from './clothes/long-skirt-model.png';
 import shirtFrontDesign from './clothes/shirt-front-design.png';
 import shirtBackDesign from './clothes/shirt-back-design.png';
 import signUpBackground from './system/signup-background.jpg';
+import shirtSleeve from './clothes/shirt-sleeve.png'
 
 
 
@@ -43,5 +44,6 @@ export {
     womenSkirtBottomModel,
     longSkirtModel,
     shirtBackDesign,
-    signUpBackground
+    signUpBackground,
+    shirtSleeve
 };

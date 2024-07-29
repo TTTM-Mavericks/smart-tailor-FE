@@ -138,7 +138,7 @@ const CustomerReportOrderDialogComponent: React.FC<Props> = ({ isOpen, onClose, 
                                 </label>
                                 <textarea
                                     id="comment"
-                                    className="w-full p-3 border border-gray-300 rounded-md"
+                                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-orange-500 "
                                     value={comment}
                                     onChange={(e) => setComment(e.target.value)}
                                     rows={4}

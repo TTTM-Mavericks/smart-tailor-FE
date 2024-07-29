@@ -4,6 +4,7 @@ import Navbar from '../GlobalComponent/NavbarComponent/NavbarComponent';
 import { IconButton } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
 import AccountantDashboards from '../AccountantDashboard/AccountantDashboardScreen';
+import AccountantManagePaymentForBrandComponent from '../AccountantManagePaymentForBrand/AccountantManagePaymentForBrandComponent';
 
 const DashboardAccountantScreens = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -77,13 +78,15 @@ const DashboardAccountantScreens = () => {
 
     const renderComponent = () => {
         switch (activeMenu) {
-            case 'accountant_manage_income':
+            case 'accountant_manage_brand_payment':
                 return (
-                    <></>
+                    <AccountantManagePaymentForBrandComponent></AccountantManagePaymentForBrandComponent>
                 );
             default:
                 return (
-                    <AccountantDashboards />
+                    // <AccountantDashboards />
+                    <AccountantManagePaymentForBrandComponent></AccountantManagePaymentForBrandComponent>
+
                 );
         }
     };

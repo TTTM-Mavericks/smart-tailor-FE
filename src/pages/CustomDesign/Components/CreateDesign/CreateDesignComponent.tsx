@@ -176,7 +176,7 @@ const CreateDesignComponent = () => {
                     },
                     {
                         partOfDesignName: "SLEEVE_CLOTH_PART",
-                        imageUrl: "/src/assets/clothes/shirt-front-design.png",
+                        imageUrl: "/src/assets/clothes/shirt-sleeve.png",
                         successImageUrl: "",
                         materialID: "",
                         width: 15,

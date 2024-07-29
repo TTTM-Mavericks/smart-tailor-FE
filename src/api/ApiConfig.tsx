@@ -34,7 +34,9 @@ export const featuresEndpoints = {
   brand: '/brand',
   user: '/user',
   systemImage: '/system-image',
-  report: '/report'
+  report: '/report',
+  systemPropertise: '/system-property',
+  brandPropertise: '/brand-property'
 
 }
 export const functionEndpoints = {
@@ -131,7 +133,8 @@ export const functionEndpoints = {
     getOrderByBrandId: '/get-order-by-brand-id',
     getAllOrder: '/get-all-order',
     getOrderByUserId: '/get-order-by-user-id',
-    changeOrderStatus: '/change-order-status'
+    changeOrderStatus: '/change-order-status',
+    getAllSubOrder: '/get-all-order'
   },
   sizeExpertTailoring: {
     getAllSizeExpertTailoringByExperId: '/get-all-size-by-expert-tailoring-id',
@@ -169,6 +172,12 @@ export const functionEndpoints = {
     createReport: '/create-report',
     getReportByOrderID: '/get-all-report-by-order-id',
     createOrderReport: '/create-report'
+  },
+  systemPropertise: {
+    getAllSystemPropertise: '/get-all-system-properties'
+  },
+  brandPropertise: {
+    addNewBrandPropertise: '/add-new-brand-property'
   }
 }
 
