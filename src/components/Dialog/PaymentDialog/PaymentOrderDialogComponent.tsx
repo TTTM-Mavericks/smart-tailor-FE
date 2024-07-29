@@ -47,9 +47,9 @@ const PaymentOrderDialogComponent: React.FC<CancelOrderPolicyDialogProps> = ({ i
     // ---------------UseEffect---------------//
 
     useEffect(() => {
-        const result = paymentData?.find((item) => item.paymentType === 'DEPOSIT');
-        if (result) {
-            setPaymentInfor(result);
+        // const result = paymentData?.find((item) => item.paymentType === 'DEPOSIT');
+        if (paymentData) {
+            setPaymentInfor(paymentData[0]);
         }
     },
         [paymentData])
@@ -109,8 +109,7 @@ const PaymentOrderDialogComponent: React.FC<CancelOrderPolicyDialogProps> = ({ i
                         <div className="flex w-3/4 items-center space-x-2">
                             <img src="path_to_bank_logo" alt="Bank Logo" className="w-8 h-8" />
                             <div>
-                                <div className="text-sm font-medium">Bank</div>
-                                <div className="text-lg font-semibold">MB</div>
+                                <div className="text-sm font-medium">{paymentInfor?.paymentRecipientBankCode}</div>
                             </div>
                         </div>
 
@@ -118,28 +117,28 @@ const PaymentOrderDialogComponent: React.FC<CancelOrderPolicyDialogProps> = ({ i
                             <div className="flex justify-between items-center border-b py-2">
                                 <span style={{ fontSize: 13 }} className="font-semibold">Account Holder:</span>
                                 <div className="flex items-center justify-end">
-                                    <span style={{ fontSize: 14 }} className="text-right">{paymentInfor?.payOSResponse.data.accountName || 'N/A'}</span>
+                                    <span style={{ fontSize: 14 }} className="text-right">{paymentInfor?.paymentRecipientName || 'N/A'}</span>
                                     <button className="ml-2 bg-gray-100 text-sm font-medium py-1 px-2 rounded">Copy</button>
                                 </div>
                             </div>
                             <div className="flex justify-between items-center border-b py-2">
                                 <span style={{ fontSize: 13 }} className="font-semibold">Account Number:</span>
                                 <div className="flex items-center justify-end">
-                                    <span style={{ fontSize: 14 }} className="text-right">{paymentInfor?.payOSResponse.data.accountNumber || 'N/A'}</span>
+                                    <span style={{ fontSize: 14 }} className="text-right">{paymentInfor?.paymentRecipientBankNumber || 'N/A'}</span>
                                     <button className="ml-2 bg-gray-100 text-sm font-medium py-1 px-2 rounded">Copy</button>
                                 </div>
                             </div>
                             <div className="flex justify-between items-center border-b py-2">
                                 <span style={{ fontSize: 13 }} className="font-semibold">Amount:</span>
                                 <div className="flex items-center justify-end">
-                                    <span style={{ fontSize: 14 }} className="text-right">{__handleAddCommasToNumber(paymentInfor?.payOSResponse.data.amount)} VND</span>
+                                    <span style={{ fontSize: 14 }} className="text-right">{__handleAddCommasToNumber(paymentInfor?.paymentAmount)} VND</span>
                                     <button className="ml-2 bg-gray-100 text-sm font-medium py-1 px-2 rounded">Copy</button>
                                 </div>
                             </div>
                             <div className="flex justify-between items-center py-2">
                                 <span style={{ fontSize: 13 }} className="font-semibold">Description:</span>
                                 <div className="flex items-center justify-end">
-                                    <span style={{ fontSize: 14 }} className="text-right">{paymentInfor?.payOSResponse.data.description || 'N/A'}</span>
+                                    <span style={{ fontSize: 14 }} className="text-right">{paymentInfor?.paymentType || 'N/A'}</span>
                                     <button className="ml-2 bg-gray-100 text-sm font-medium py-1 px-2 rounded">Copy</button>
                                 </div>
                             </div>
