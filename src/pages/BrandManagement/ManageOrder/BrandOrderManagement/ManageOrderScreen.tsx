@@ -9,8 +9,11 @@ import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { secondaryColor } from '../../../../root/ColorSystem';
+import { greenColor, secondaryColor } from '../../../../root/ColorSystem';
 import PartOfDesignInformationDialogComponent from '../../BrandOrderManagement/PartOfDesignInformationDialogComponent';
+import LoadingComponent from '../../../../components/Loading/LoadingComponent';
+import Cookies from 'js-cookie';
+import { UserInterface } from '../../../../models/UserModel';
 
 /**
  * 
@@ -205,21 +208,25 @@ const BrandOrderFields: React.FC<{
     };
 
     const __handelUpdateOrderState = async (orderID: any, step: string) => {
+        setIsLoading(true);
         try {
             const bodyRequest = {
                 orderID: orderID,
                 status: step
             }
-            const response = await axios.post(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            console.log('bodyRequest: ', bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
                 setIsLoading(false);
-                toast.success(`${response}`, { autoClose: 4000 });
+                toast.success(`${response.message}`, { autoClose: 4000 });
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000)
             }
             else {
-                console.log('detail order: ', response);
-                toast.error(`${response}`, { autoClose: 4000 });
-                navigate('/error404');
+                console.log('detail error: ', response.message);
+                toast.error(`${response.message}`, { autoClose: 4000 });
             }
         } catch (error) {
             console.log('error: ', error);
@@ -349,8 +356,8 @@ const BrandOrderFields: React.FC<{
                             </div>
                             <div className="flex justify-between text-sm">
                                 {progressSteps.map((step, index) => {
-                                    const isCompleted = index < progressSteps.indexOf(order.orderStatus);
-                                    const isCurrent = index === progressSteps.indexOf(order.orderStatus);
+                                    const isCompleted = index < progressSteps.indexOf(order.orderStatus) + 1;
+                                    const isCurrent = index === progressSteps.indexOf(order.orderStatus) + 1;
                                     const isClickable = index >= 2 && index <= 4;
                                     return (
                                         <p key={index} className={`text-center ${isCompleted ? 'text-green-600' : isCurrent ? 'text-indigo-600' : 'text-gray-400'}`}>
@@ -361,7 +368,7 @@ const BrandOrderFields: React.FC<{
                                                 }}
                                                 onClick={isCurrent && isClickable ? () => __handelUpdateOrderState(order.orderID, step) : () => console.log('none')} // Add your click handler here
                                             >
-                                                {isCompleted && (<FaCheck color="green" style={{ marginRight: 10 }} size={12}></FaCheck>)}
+                                                {isCompleted && (<FaCheck color={greenColor} style={{ marginRight: 10 }} size={12}></FaCheck>)}
                                                 {step}
                                             </button>
                                         </p>
@@ -579,14 +586,22 @@ const BrandManageOrder: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [itemsPerPage, setItemsPerPage] = useState(20);
     const [goToPage, setGoToPage] = useState('1');
-    const [designDetails, setDesignDetails] = useState<any>(null)
+    const [designDetails, setDesignDetails] = useState<any>(null);
+    const [isLoading, setIsLoading] = useState(false);
+
 
     useEffect(() => {
-        const apiUrl = `${baseURL}${versionEndpoints.v1}${featuresEndpoints.order}${functionEndpoints.order.getAllOrder}`;
+        setIsLoading(true);
+        const userStorage = Cookies.get('userAuth');
+        if (!userStorage) return;
+        const userParse: UserInterface = JSON.parse(userStorage)
+        const apiUrl = `${baseURL}${versionEndpoints.v1}${featuresEndpoints.order}${functionEndpoints.order.getOrderByBrandId}/${userParse.userID}`;
+        console.log(apiUrl);
         axios.get(apiUrl)
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');
+                    setIsLoading(false);
                 }
                 return response.data;
             })
@@ -732,6 +747,7 @@ const BrandManageOrder: React.FC = () => {
 
     return (
         <div className='-mt-8'>
+
             <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 bg-white p-6 rounded-lg shadow-lg">
                 <div className="flex flex-col">
                     <label htmlFor="filterSelect" className="mb-2 text-sm font-medium text-gray-700">Select Filter</label>

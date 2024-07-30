@@ -55,11 +55,14 @@ const BrandProductivityInputDialog: React.FC<Props> = ({ isOpen, onClose, brandI
                 brandPropertyStatus: true,
             }
 
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.brandPropertise + functionEndpoints.brandPropertise.addNewBrandPropertise}`, bodyRequest);
+            const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.brandPropertise + functionEndpoints.brandPropertise.addNewBrandPropertise}`, bodyRequest);
             if (response.status === 200) {
                 toast.success(`${response.message}`, { autoClose: 4000 });
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
             } else {
-                toast.error(`${response.message}`, {autoClose: 4000});
+                toast.error(`${response.message}`, { autoClose: 4000 });
 
             }
             console.log(bodyRequest);
@@ -67,7 +70,7 @@ const BrandProductivityInputDialog: React.FC<Props> = ({ isOpen, onClose, brandI
             if (onClose) onClose();
         } catch (error) {
             setError('Failed to add new brand property.');
-            toast.error(`${error}`, {autoClose: 4000});
+            toast.error(`${error}`, { autoClose: 4000 });
 
         }
     };

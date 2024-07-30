@@ -134,7 +134,8 @@ export const functionEndpoints = {
     getAllOrder: '/get-all-order',
     getOrderByUserId: '/get-order-by-user-id',
     changeOrderStatus: '/change-order-status',
-    getAllSubOrder: '/get-all-order'
+    getAllSubOrder: '/get-all-order',
+    getDeliveredOrder: '/get-all-delivery-order'
   },
   sizeExpertTailoring: {
     getAllSizeExpertTailoringByExperId: '/get-all-size-by-expert-tailoring-id',
