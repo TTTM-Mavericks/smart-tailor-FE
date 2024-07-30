@@ -248,7 +248,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                 Swal.fire({
                     icon: 'success',
                     title: 'Add Excel Material Success',
-                    text: `${message}\nSuccess: ${successCount}\nFailure: ${failureCount}`,
+                    text: `Add Excel Material Success`,
                 });
 
                 addNewMaterial(transformedData);

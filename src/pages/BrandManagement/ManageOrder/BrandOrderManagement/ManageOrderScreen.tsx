@@ -10,6 +10,7 @@ import { IoMdCloseCircleOutline } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { secondaryColor } from '../../../../root/ColorSystem';
+import PartOfDesignInformationDialogComponent from '../../BrandOrderManagement/PartOfDesignInformationDialogComponent';
 
 /**
  * 
@@ -126,7 +127,7 @@ const DesignDetails: React.FC<{ design: any }> = ({ design }) => {
     const [isDesignModalOpen, setIsDesignModalOpen] = useState(false);
     const [selectedDesignPart, setSelectedDesignPart] = useState<any>(null);
     console.log("bebe" + JSON.stringify(selectedDesignPart));
-
+    const [dialogOpen, setDialogOpen] = useState(false);
     return (
         <div className="mt-4 p-4 rounded-lg">
             <h4 className="text-lg font-semibold mb-4">Part of Designs</h4>
@@ -145,12 +146,13 @@ const DesignDetails: React.FC<{ design: any }> = ({ design }) => {
                         <p>Material name: {part.material?.materialName || 'N/A'}</p>
                         <p>HS code: {part.material?.hsCode || 'N/A'}</p>
                     </div>
-                    {(part.partOfDesignName === 'SLEEVE_CLOTH_PART' || part.partOfDesignName === 'LOGO_PART' || part.partOfDesignName === 'FRONT_CLOTH_PART' || part.partOfDesignName === 'BACK_CLOTH_PART') && (
+                    {(part?.itemMasks && part?.itemMasks?.length > 0) && (
                         <div className="ml-auto">
                             <button
                                 onClick={() => {
                                     setSelectedDesignPart(part);
                                     setIsDesignModalOpen(true);
+                                    setDialogOpen(true)
                                 }}
                                 className="inline-block p-1 bg-orange-500 text-white rounded"
                             >
@@ -162,11 +164,9 @@ const DesignDetails: React.FC<{ design: any }> = ({ design }) => {
                     )}
                 </div>
             ))}
+
             {isDesignModalOpen && selectedDesignPart && (
-                <DesignModal
-                    part={selectedDesignPart}
-                    onClose={() => setIsDesignModalOpen(false)}
-                />
+                <PartOfDesignInformationDialogComponent open={dialogOpen} onClose={() => setIsDesignModalOpen(false)} part={selectedDesignPart} />
             )}
         </div>
     );
@@ -314,7 +314,7 @@ const BrandOrderFields: React.FC<{
                 </button>
                 <button
                     onClick={() => __handleOpenDialog(order)}
-                    className="px-4 py-2 text-white rounded-md  transition duration-200 ml-auto"
+                    className="bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300"
                     style={{ backgroundColor: "green" }}
                 >
                     Update order
@@ -494,15 +494,18 @@ const BrandOrderModal: React.FC<{ order: BrandOrder; onClose: () => void; onMark
                 </div>
 
                 {designDetails && (
-                    <div className="mb-8">
-                        <h3 className="text-xl font-semibold text-gray-700 mb-3">Model Image</h3>
-                        <img
-                            src={designDetails.imageUrl}
-                            alt="Model"
-                            className="mt-2 max-w-full h-auto rounded-lg"
-                        />
+                    <div className="mb-8 flex justify-center">
+                        <div className="text-center">
+                            <h3 className="text-xl font-semibold text-gray-700 mb-3">Model Image</h3>
+                            <img
+                                src={designDetails.imageUrl}
+                                alt="Model"
+                                className="mt-2 max-w-full h-auto rounded-lg"
+                            />
+                        </div>
                     </div>
                 )}
+
                 {isOrderImageListArray(order.orderImageList) && order.orderImageList.length > 0 && (
                     <div className="mb-8">
                         <h3 className="text-xl font-semibold text-gray-700 mb-3">Report Images</h3>
@@ -565,6 +568,7 @@ const BrandManageOrder: React.FC = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [ordersPerPage] = useState(6);
     const [filters, setFilters] = useState({
+        selectedFilter: 'date',
         date: '',
         status: '',
         name: '',
@@ -576,6 +580,7 @@ const BrandManageOrder: React.FC = () => {
     const [itemsPerPage, setItemsPerPage] = useState(20);
     const [goToPage, setGoToPage] = useState('1');
     const [designDetails, setDesignDetails] = useState<any>(null)
+
     useEffect(() => {
         const apiUrl = `${baseURL}${versionEndpoints.v1}${featuresEndpoints.order}${functionEndpoints.order.getAllOrder}`;
         axios.get(apiUrl)
@@ -587,8 +592,9 @@ const BrandManageOrder: React.FC = () => {
             })
             .then((responseData) => {
                 if (responseData && Array.isArray(responseData.data)) {
-                    setOrder(responseData.data);
-                    console.log("Data received:", responseData);
+                    const subOrders = responseData.data.filter((order: any) => order.orderType === FILTERED_ORDER_TYPE);
+                    setOrder(subOrders);
+                    console.log("Data received:", subOrders);
                 } else {
                     console.error('Invalid data format:', responseData);
                 }
@@ -600,48 +606,56 @@ const BrandManageOrder: React.FC = () => {
         applyFilters();
     }, [filters, order]);
 
+    const FILTERED_ORDER_TYPE = "SUB_ORDER";
 
     const applyFilters = () => {
-        let filtered = order;
-        if (filters.date) {
-            const filterDate = new Date(filters.date);
-            filtered = filtered.filter(order => {
-                const orderDate = new Date(order.createDate.split(' ')[0]);
-                return orderDate.toDateString() === filterDate.toDateString();
-            });
+        let filtered = order.filter(order => order.orderType === FILTERED_ORDER_TYPE);
+
+        switch (filters.selectedFilter) {
+            case 'date':
+                if (filters.date) {
+                    const filterDate = new Date(filters.date);
+                    filtered = filtered.filter(order => {
+                        const orderDate = new Date(order.createDate.split(' ')[0]);
+                        return orderDate.toDateString() === filterDate.toDateString();
+                    });
+                }
+                break;
+            case 'orderID':
+                if (filters.orderID) {
+                    filtered = filtered.filter(order =>
+                        order.orderID.toLowerCase().includes(filters.orderID.toLowerCase())
+                    );
+                }
+                break;
+            case 'name':
+                if (filters.name) {
+                    filtered = filtered.filter(order =>
+                        order.orderType.toLowerCase().includes(filters.name.toLowerCase())
+                    );
+                }
+                break;
+            case 'orderStatus':
+                if (filters.orderStatus !== '') {
+                    filtered = filtered.filter(order => order.orderStatus === filters.orderStatus);
+                }
+                break;
         }
-        if (filters.status !== '') {
-            filtered = filtered.filter(order => order.orderStatus === (filters.status === 'true'));
-        }
-        if (filters.name) {
-            filtered = filtered.filter(order =>
-                order.orderType.toLowerCase().includes(filters.name.toLowerCase())
-            );
-        }
-        if (filters.orderStatus !== '') {
-            filtered = filtered.filter(order => order.orderStatus === filters.orderStatus);
-        }
-        if (filters.orderID) { // Add this block
-            filtered = filtered.filter(order =>
-                order.orderID.toLowerCase().includes(filters.orderID.toLowerCase())
-            );
-        }
+
         setFilteredOrders(filtered);
         setCurrentPage(1);
     };
 
     const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const value = e.target.name === 'status'
-            ? e.target.value === 'true' ? true : e.target.value === 'false' ? false : ''
-            : e.target.value;
+        const { name, value } = e.target;
         setFilters(prevFilters => ({
             ...prevFilters,
-            [e.target.name]: value,
+            [name]: value,
         }));
     };
 
-    const indexOfLastReport = currentPage * ordersPerPage;
-    const indexOfFirstReport = indexOfLastReport - ordersPerPage;
+    const indexOfLastReport = currentPage * itemsPerPage;
+    const indexOfFirstReport = indexOfLastReport - itemsPerPage;
     const currentOrders = filteredOrders.slice(indexOfFirstReport, indexOfLastReport);
 
     const paginate = (pageNumber: number) => {
@@ -720,58 +734,86 @@ const BrandManageOrder: React.FC = () => {
         <div className='-mt-8'>
             <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 bg-white p-6 rounded-lg shadow-lg">
                 <div className="flex flex-col">
-                    <label htmlFor="dateFilter" className="mb-2 text-sm font-medium text-gray-700">Date</label>
-                    <input
-                        id="dateFilter"
-                        type="date"
-                        name="date"
-                        onChange={handleFilterChange}
-                        className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
-                    />
-                </div>
-
-                <div className="flex flex-col">
-                    <label htmlFor="orderStatusFilter" className="mb-2 text-sm font-medium text-gray-700">Order Status</label>
+                    <label htmlFor="filterSelect" className="mb-2 text-sm font-medium text-gray-700">Select Filter</label>
                     <select
-                        id="orderStatusFilter"
-                        name="orderStatus"
+                        id="filterSelect"
+                        name="selectedFilter"
+                        value={filters.selectedFilter}
                         onChange={handleFilterChange}
                         className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
                     >
-                        <option value="">All Order Statuses</option>
-                        <option value="NOT_VERIFY">Not Verify</option>
-                        <option value="PENDING">Pending</option>
-                        <option value="DEPOSIT">Deposit</option>
-                        <option value="PROCESSING">Processing</option>
-                        <option value="CANCEL">Cancel</option>
-                        <option value="COMPLETED">Completed</option>
-                        <option value="DELIVERED">Delivered</option>
+                        <option value="date">Date</option>
+                        <option value="orderID">Order ID</option>
+                        <option value="name">Brand Name</option>
+                        <option value="orderStatus">Order Status</option>
                     </select>
                 </div>
 
-                <div className="flex flex-col">
-                    <label htmlFor="brandNameFilter" className="mb-2 text-sm font-medium text-gray-700">Brand Name</label>
-                    <input
-                        id="brandNameFilter"
-                        type="text"
-                        name="name"
-                        placeholder="Filter by brand name..."
-                        onChange={handleFilterChange}
-                        className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
-                    />
-                </div>
+                {filters.selectedFilter === 'date' && (
+                    <div className="flex flex-col">
+                        <label htmlFor="dateFilter" className="mb-2 text-sm font-medium text-gray-700">Date</label>
+                        <input
+                            id="dateFilter"
+                            type="date"
+                            name="date"
+                            value={filters.date}
+                            onChange={handleFilterChange}
+                            className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
+                        />
+                    </div>
+                )}
 
-                <div className="flex flex-col">
-                    <label htmlFor="orderIDFilter" className="mb-2 text-sm font-medium text-gray-700">Order ID</label>
-                    <input
-                        id="orderIDFilter"
-                        type="text"
-                        name="orderID"
-                        placeholder="Filter by Order ID..."
-                        onChange={handleFilterChange}
-                        className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
-                    />
-                </div>
+                {filters.selectedFilter === 'orderID' && (
+                    <div className="flex flex-col">
+                        <label htmlFor="orderIDFilter" className="mb-2 text-sm font-medium text-gray-700">Order ID</label>
+                        <input
+                            id="orderIDFilter"
+                            type="text"
+                            name="orderID"
+                            value={filters.orderID}
+                            placeholder="Filter by Order ID..."
+                            onChange={handleFilterChange}
+                            className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
+                        />
+                    </div>
+                )}
+
+                {filters.selectedFilter === 'name' && (
+                    <div className="flex flex-col">
+                        <label htmlFor="brandNameFilter" className="mb-2 text-sm font-medium text-gray-700">Brand Name</label>
+                        <input
+                            id="brandNameFilter"
+                            type="text"
+                            name="name"
+                            value={filters.name}
+                            placeholder="Filter by brand name..."
+                            onChange={handleFilterChange}
+                            className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
+                        />
+                    </div>
+                )}
+
+                {filters.selectedFilter === 'orderStatus' && (
+                    <div className="flex flex-col">
+                        <label htmlFor="orderStatusFilter" className="mb-2 text-sm font-medium text-gray-700">Order Status</label>
+                        <select
+                            id="orderStatusFilter"
+                            name="orderStatus"
+                            value={filters.orderStatus}
+                            onChange={handleFilterChange}
+                            className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
+                        >
+                            <option value="">All Order Statuses</option>
+                            <option value="NOT_VERIFY">Not Verify</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="DEPOSIT">Deposit</option>
+                            <option value="PROCESSING">Processing</option>
+                            <option value="CANCEL">Cancel</option>
+                            <option value="COMPLETED">Completed</option>
+                            <option value="DELIVERED">Delivered</option>
+                        </select>
+                    </div>
+                )}
             </div>
 
             <div >
