@@ -39,6 +39,7 @@ import Brand from './pages/BrandManagement/DashboardBrand/BrandDashboardScreen';
 import CreateDesignComponent from './pages/CustomDesign/Components/CreateDesign/CreateDesignComponent';
 import DesignCollectionScreen from './pages/DesignCollection/DesignCollectionContainer/DesignCollectionScreen';
 import { DashboardAccountantScreens } from './pages/AccountantManagement';
+import ToogleComponent from './pages/AccountantManagement/GlobalComponent/Toogle/ToogleComponent';
 
 
 const tokenIsValid = (token) => {
@@ -152,6 +153,9 @@ function App() {
 
           {/* Accountant dashboard route */}
           <Route path='/accountant' element={<DashboardAccountantScreens></DashboardAccountantScreens>} />
+
+          {/* Test */}
+          <Route path='/test' element={<ToogleComponent></ToogleComponent>} />
         </Routes>
       </BrowserRouter>
     </div>
