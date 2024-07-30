@@ -14,7 +14,10 @@ import { IoIosWarning, IoMdCloseCircleOutline } from 'react-icons/io';
 import { UserInterface } from '../../../models/UserModel';
 import Cookies from 'js-cookie';
 import { FaCheck } from "react-icons/fa";
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
+import BrandUpdateSampleProductDialog from '../GlobalComponent/Dialog/UpdateSampleProduct/BrandUpdateSampleProductDialog';
+import BrandProductivityInputDialog from '../GlobalComponent/Dialog/BrandProductivity/BrandProductivityInputDialog';
+import LoadingComponent from '../../../components/Loading/LoadingComponent';
 
 const BrandManageOrderProcessingComponent: React.FC = () => {
     // TODO MUTIL LANGUAGE
@@ -75,7 +78,7 @@ const BrandManageOrderProcessingComponent: React.FC = () => {
         'PENDING',
         'START_PRODUCING',
         'FINISH_FIRST_STAGE',
-        'FINISG_SECOND_STAGE',
+        'FINISH_SECOND_STAGE',
         'COMPLETED'
     ]
     // ---------------UseEffect---------------//
@@ -90,6 +93,9 @@ const BrandManageOrderProcessingComponent: React.FC = () => {
      * Move to Top When scroll down
      */
     useEffect(() => {
+
+
+
         const handleScroll = () => {
             if (window.scrollY > 200) {
                 setShowScrollButton(true);
@@ -266,25 +272,29 @@ const BrandManageOrderProcessingComponent: React.FC = () => {
     };
 
     const __handelUpdateOrderState = async (orderID: any, step: string) => {
+        setIsLoading(true);
         try {
             const bodyRequest = {
                 orderID: orderID,
                 status: step
             }
-            const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            console.log('bodyRequest: ', bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
                 setIsLoading(false);
-                toast.success(`${response.message}`, {autoClose: 4000});
+                toast.success(`${response.message}`, { autoClose: 4000 });
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000)
             }
             else {
-                console.log('detail order: ', response.message);
-                toast.error(`${response.message}`, {autoClose: 4000});
-                navigate('/error404');
+                console.log('detail error: ', response.message);
+                toast.error(`${response.message}`, { autoClose: 4000 });
             }
         } catch (error) {
             console.log('error: ', error);
-            toast.error(`${error}`, {autoClose: 4000});
+            toast.error(`${error}`, { autoClose: 4000 });
             navigate('/error404');
         }
     }
@@ -381,8 +391,8 @@ const BrandManageOrderProcessingComponent: React.FC = () => {
                                                 </div>
                                                 <div className="flex justify-between text-sm">
                                                     {progressSteps.map((step, index) => {
-                                                        const isCompleted = index < progressSteps.indexOf(orderDetail.orderStatus);
-                                                        const isCurrent = index === progressSteps.indexOf(orderDetail.orderStatus);
+                                                        const isCompleted = index < progressSteps.indexOf(orderDetail.orderStatus) + 1;
+                                                        const isCurrent = index === progressSteps.indexOf(orderDetail.orderStatus) + 1;
                                                         const isClickable = index >= 2 && index <= 4;
                                                         return (
                                                             <p key={index} className={`text-center ${isCompleted ? 'text-green-600' : isCurrent ? 'text-indigo-600' : 'text-gray-400'}`}>
@@ -486,8 +496,10 @@ const BrandManageOrderProcessingComponent: React.FC = () => {
                 </DialogContent>
             </Dialog>
 
-
-
+            <BrandUpdateSampleProductDialog isOpen={false} orderID={'ádasdasd'}></BrandUpdateSampleProductDialog>
+            <BrandProductivityInputDialog isOpen={false} brandID={userAuth?.userID}></BrandProductivityInputDialog>
+            <ToastContainer></ToastContainer>
+            <LoadingComponent isLoading={isLoading}></LoadingComponent>
 
         </div >
     );

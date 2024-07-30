@@ -11,7 +11,7 @@ import { values } from 'core-js/core/array';
 
 const steps = [
     {
-        label: 'Not verify',
+        label: 'Verify',
         description: ``,
         value: 'NOT_VERIFY'
     },
@@ -66,8 +66,8 @@ const VerticalLinearStepperComponent: React.FC<props> = ({ status }) => {
         if (status === 'PENDING') setActiveStep(1);
         if (status === 'DEPOSIT') setActiveStep(2);
         if (status === 'PROCESSING') setActiveStep(3);
-        if (status === 'COMPLETED') setActiveStep(3);
-        if (status === 'DELIVERED') setActiveStep(4);
+        if (status === 'COMPLETED') setActiveStep(4);
+        if (status === 'DELIVERED') setActiveStep(5);
 
     }, [status])
 

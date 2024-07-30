@@ -393,6 +393,12 @@ const OrderDetailScreen: React.FC = () => {
                                                 {payment && payment[0].paymentType === 'DEPOSIT' && (
                                                     <p className="text-gray-600">Deposit price</p>
                                                 )}
+                                                {payment && payment[0].paymentType === 'STAGE_1' && (
+                                                    <p className="text-gray-600">Stage 1 price</p>
+                                                )}
+                                                {payment && payment[0].paymentType === 'STAGE_2' && (
+                                                    <p className="text-gray-600">Stage 2 price</p>
+                                                )}
                                                 <p className="text-gray-600">{payment?.map((item) => {
                                                     if (true) return __handleAddCommasToNumber(item.payOSResponse.data.amount)
                                                 })} VND</p>

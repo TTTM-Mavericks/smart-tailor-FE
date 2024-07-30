@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
-import { primaryColor, redColor, whiteColor } from '../../../root/ColorSystem';
+import { errorColor, primaryColor, redColor, whiteColor } from '../../../root/ColorSystem';
 import styles from './CustomerReportOrderDialogComponentStyle.module.scss'
 import { IoMdCloseCircleOutline, IoMdTrash } from 'react-icons/io';
 import LoadingComponent from '../../Loading/LoadingComponent';
 import { OrderDetailInterface } from '../../../models/OrderModel';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import { toast } from 'react-toastify';
+import { use } from 'i18next';
 
 type Props = {
     isOpen: boolean;
@@ -22,6 +23,7 @@ const CustomerReportOrderDialogComponent: React.FC<Props> = ({ isOpen, onClose, 
     const [images, setImages] = useState<File[]>([]);
     const [comment, setComment] = useState<string>('');
     const [isLoadingPage, setIsLoadingPage] = useState<boolean>(false);
+    const [errorImg, setErrorImg] = useState<string>('');
 
 
 
@@ -35,7 +37,12 @@ const CustomerReportOrderDialogComponent: React.FC<Props> = ({ isOpen, onClose, 
     const __handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const fileArray = Array.from(e.target.files);
-            setImages((prevImages) => [...prevImages, ...fileArray]);
+            if (images.length + fileArray.length <= 5) {
+                setImages((prevImages) => [...prevImages, ...fileArray]);
+                setErrorImg('');
+            } else {
+                setErrorImg('You can only upload up to 5 images.');
+            }
         }
     };
 
@@ -113,6 +120,7 @@ const CustomerReportOrderDialogComponent: React.FC<Props> = ({ isOpen, onClose, 
                                     onChange={__handleImageChange}
                                     className="w-full p-2 border border-gray-300 rounded-md"
                                 />
+                                <span style={{ fontSize: 13, color: errorColor }}>{errorImg}</span>
                                 <div className="mt-2 flex flex-wrap gap-4">
                                     {images.map((image, index) => (
                                         <div key={index} className="relative">
@@ -138,7 +146,7 @@ const CustomerReportOrderDialogComponent: React.FC<Props> = ({ isOpen, onClose, 
                                 </label>
                                 <textarea
                                     id="comment"
-                                    className="w-full p-3 border border-gray-300 rounded-md"
+                                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-orange-500 "
                                     value={comment}
                                     onChange={(e) => setComment(e.target.value)}
                                     rows={4}

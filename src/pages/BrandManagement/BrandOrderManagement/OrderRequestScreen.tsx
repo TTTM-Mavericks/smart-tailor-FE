@@ -50,18 +50,20 @@ const OrderRequestScreen: React.FC = () => {
       const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.designDetail + functionEndpoints.designDetail.getAllInforOrderDetail}/${id}`);
       if (response.status === 200) {
         console.log('detail order: ', response.data);
+        const allDetailStatusTrue = response.data.designDetail.every((detail: DesignDetailInterface) => detail.detailStatus === true);
         if (response.data === null) {
           navigate('/pickedOrder')
         } else
           if (response.data.design === null) {
             navigate('/pickedOrder')
           } else
-            if (response.data.designDetail.length === 0) {
+            if (allDetailStatusTrue) {
               navigate('/pickedOrder')
             }
             else {
               setOrderDetail(response.data);
             }
+        
       }
       else {
         console.log('detail order: ', response.message);
