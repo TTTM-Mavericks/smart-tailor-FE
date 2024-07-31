@@ -60,36 +60,50 @@ const CustomerReportOrderDialogComponent: React.FC<Props> = ({ isOpen, onClose, 
     const __handleReportOrder = async () => {
         setIsLoadingPage(true);
 
-        const reportImageList = images.map(image => ({
-            reportImageName: image.name,
-            reportImageUrl: URL.createObjectURL(image)
-        }));
-
-        const bodyData = {
-            typeOfReport: "Order report",
-            orderID,
-            content: comment,
-            reportImageList
+        const fileToBase64 = (file: File) => {
+            return new Promise<string>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result as string);
+                reader.onerror = error => reject(error);
+            });
         };
 
         try {
+            const imagePromises = images.map(file => fileToBase64(file));
+            const imageBase64s = await Promise.all(imagePromises);
+
+            const reportImageList = images.map((image, index) => ({
+                reportImageName: image.name,
+                reportImageUrl: imageBase64s[index]
+            }));
+
+            const bodyData = {
+                typeOfReport: "Order report",
+                orderID,
+                content: comment,
+                reportImageList
+            };
+
+            console.log('bodyData: ', bodyData);
+
             const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.report + functionEndpoints.report.createOrderReport}`, bodyData);
+
             if (response.status === 200) {
                 setIsLoadingPage(false);
-                toast.success(`${response.message}`, { autoClose: 4000 })
+                toast.success(`${response.message}`, { autoClose: 4000 });
                 setTimeout(() => {
                     window.location.reload();
                 }, 3000);
-
             } else {
                 setIsLoadingPage(false);
             }
         } catch (error) {
             console.log('error: ', error);
             setIsLoadingPage(false);
-
         }
     };
+
 
     return (
         <>

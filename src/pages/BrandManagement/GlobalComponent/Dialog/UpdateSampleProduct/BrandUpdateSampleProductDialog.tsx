@@ -3,14 +3,17 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/
 import { IoMdCloseCircleOutline, IoMdTrash } from 'react-icons/io';
 import style from './BrandUpdateSampleProductDialogStyle.module.scss';
 import { primaryColor } from '../../../../../root/ColorSystem';
+import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
+import { toast } from 'react-toastify';
 
 type Props = {
     isOpen: boolean;
     onClose?: () => void;
     orderID?: string;
+    brandID?: any
 };
 
-const BrandUpdateSampleProductDialog: React.FC<Props> = ({ isOpen, onClose, orderID }) => {
+const BrandUpdateSampleProductDialog: React.FC<Props> = ({ isOpen, onClose, orderID, brandID }) => {
     const [description, setDescription] = useState<string>('');
     const [images, setImages] = useState<File[]>([]);
     const [videos, setVideos] = useState<File[]>([]);
@@ -49,13 +52,68 @@ const BrandUpdateSampleProductDialog: React.FC<Props> = ({ isOpen, onClose, orde
         setVideos((prevVideos) => prevVideos.filter((_, i) => i !== index));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const fileToBase64 = (file: File) => {
+        return new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = error => reject(error);
+        });
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Handle form submission
-        console.log('Order ID:', orderID);
-        console.log('Description:', description);
-        console.log('Images:', images);
-        console.log('Videos:', videos);
+
+        const imagePromises = images.map(file => fileToBase64(file));
+        const videoPromises = videos.map(file => fileToBase64(file));
+
+        try {
+            const imageBase64s = await Promise.all(imagePromises);
+            const videoBase64s = await Promise.all(videoPromises);
+
+            console.log('Order ID:', orderID);
+            console.log('brand ID:', brandID);
+
+            console.log('Description:', description);
+            console.log('Images (base64):', imageBase64s[0]);
+            console.log('Videos (base64):', videoBase64s[0]);
+
+            try {
+                const bodyRequest = {
+                    subOrderID: orderID,
+                    brandID: brandID,
+                    description: description || '',
+                    imageUrl: imageBase64s[0] || '',
+                    video: videoBase64s[0] || ''
+                }
+
+                console.log(bodyRequest);
+
+                const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.SampleProduct + functionEndpoints.SampleProduct.addSampleProduct}`, bodyRequest);
+                if (response.status === 200) {
+                    console.log('detail order: ', response.data);
+                    toast.success(`${response.message}`, { autoClose: 4000 });
+                    console.log(response.message);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000)
+                }
+                else {
+                    console.log('detail error: ', response.message);
+                    toast.error(`${response.message}`, { autoClose: 4000 });
+                }
+            } catch (error) {
+                console.log(error);
+                toast.error(`${error}`, { autoClose: 4000 });
+            }
+
+
+
+
+            // Perform your API call with the base64 data if needed
+        } catch (error) {
+            console.error('Error converting files to base64:', error);
+        }
     };
 
     return (

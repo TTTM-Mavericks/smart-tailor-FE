@@ -36,7 +36,8 @@ export const featuresEndpoints = {
   systemImage: '/system-image',
   report: '/report',
   systemPropertise: '/system-property',
-  brandPropertise: '/brand-property'
+  brandPropertise: '/brand-property',
+  SampleProduct: '/sample-product-data',
 
 }
 export const functionEndpoints = {
@@ -179,6 +180,10 @@ export const functionEndpoints = {
   },
   brandPropertise: {
     addNewBrandPropertise: '/add-new-brand-property'
+  },
+  SampleProduct: {
+    addSampleProduct: '/add-sample-product-data',
+    getSamplePriductByParentOrderID: '/get-sample-product-data-by-parent-order-id'
   }
 }
 

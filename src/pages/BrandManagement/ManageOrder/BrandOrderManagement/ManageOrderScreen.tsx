@@ -2,18 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaChevronLeft, FaChevronRight, FaTimes, FaCheck } from 'react-icons/fa';
 import { ArrowDropDown } from '@mui/icons-material';
 import axios from 'axios';
-import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
+import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import { BrandOrder, ImageList } from '../../../../models/BrandManageOrderModel';
 import { motion } from 'framer-motion'
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { greenColor, secondaryColor } from '../../../../root/ColorSystem';
+import { greenColor, primaryColor, secondaryColor, yellowColor } from '../../../../root/ColorSystem';
 import PartOfDesignInformationDialogComponent from '../../BrandOrderManagement/PartOfDesignInformationDialogComponent';
 import LoadingComponent from '../../../../components/Loading/LoadingComponent';
 import Cookies from 'js-cookie';
 import { UserInterface } from '../../../../models/UserModel';
+import BrandUpdateSampleProductDialog from '../../GlobalComponent/Dialog/UpdateSampleProduct/BrandUpdateSampleProductDialog';
+import { __handleAddCommasToNumber } from '../../../../utils/NumbericUtils';
 
 /**
  * 
@@ -42,7 +44,7 @@ const progressSteps = [
     'PENDING',
     'START_PRODUCING',
     'FINISH_FIRST_STAGE',
-    'FINISG_SECOND_STAGE',
+    'FINISH_SECOND_STAGE',
     'COMPLETED'
 ]
 
@@ -193,6 +195,17 @@ const BrandOrderFields: React.FC<{
     const [designDetails, setDesignDetails] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [openOrderDetail, setOpenOrderDetail] = useState<BrandOrder | null>(null);
+    const [userAuth, setUseAuth] = useState<UserInterface>();
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [selectedOrderID, setSelectedOrderID] = useState<string | null>(null);
+
+
+    useEffect(() => {
+        const userStorage = Cookies.get('userAuth');
+        if (!userStorage) return;
+        const userParse: UserInterface = JSON.parse(userStorage)
+        setUseAuth(userParse);
+    }, [])
 
     const __handleOpenDialog = (orderDetail: BrandOrder) => {
         setOpenOrderDetail(orderDetail);
@@ -252,8 +265,19 @@ const BrandOrderFields: React.FC<{
         fetchDesignDetails();
     }, [order.orderID]);
 
+    const __handleOpenInputSampleProductDialog = (orderID: any) => {
+        setSelectedOrderID(orderID);
+        setIsDialogOpen(true);
+    };
+
+    const __handleCloseInputSampleProductDialog = () => {
+        setIsDialogOpen(false);
+        setSelectedOrderID(null);
+    };
+
     return (
         <div className="bg-white mb-8 shadow-lg rounded-lg p-6 transition duration-300 ease-in-out transform hover:shadow-xl">
+
             <h3 className="text-xl font-semibold mb-3 text-indigo-700">Type order: {order.orderType}</h3>
             <div className="flex justify-between">
                 <div className="w-1/2">
@@ -285,7 +309,7 @@ const BrandOrderFields: React.FC<{
                                     </p>
                                 ))}
                             </div>
-                            <p className="text-gray-700 mt-4">Price: {order.totalPrice}</p>
+                            <p className="text-gray-700 mt-4">Price: {__handleAddCommasToNumber(order.totalPrice)} VND</p>
                         </div>
                     </div>
                 </div>
@@ -313,18 +337,42 @@ const BrandOrderFields: React.FC<{
                 <DesignDetails design={designDetails} />
             )}
             <div className="mt-6 flex justify-end">
+                {order.orderStatus === 'CHECKING_SAMPLE_DATA' && (
+
+                    <button
+                        onClick={() => __handleOpenInputSampleProductDialog(order.orderID)}
+                        className="bg-indigo-500 text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4"
+                        style={{
+                            borderRadius: 4,
+                            backgroundColor: yellowColor
+                        }}
+                    >
+                        Update sampleData
+                    </button>
+                )}
+                <BrandUpdateSampleProductDialog isOpen={isDialogOpen} orderID={order.orderID} brandID={userAuth?.userID} onClose={__handleCloseInputSampleProductDialog}></BrandUpdateSampleProductDialog>
+
+
                 <button
                     onClick={() => onViewDetails(order, designDetails)}
-                    className="bg-indigo-500 text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"
+                    className="bg-indigo-500 text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4"
+                    style={{
+                        borderRadius: 4,
+                        backgroundColor: secondaryColor
+                    }}
                 >
                     View Details
                 </button>
+
                 <button
                     onClick={() => __handleOpenDialog(order)}
-                    className="bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300"
-                    style={{ backgroundColor: "green" }}
+                    className="bg-green-500 text-white px-4 py-2  hover:bg-green-600 transition duration-300"
+                    style={{
+                        borderRadius: 4,
+                        backgroundColor: greenColor
+                    }}
                 >
-                    Update order
+                    Update process
                 </button>
             </div>
 
@@ -760,7 +808,7 @@ const BrandManageOrder: React.FC = () => {
                     >
                         <option value="date">Date</option>
                         <option value="orderID">Order ID</option>
-                        <option value="name">Brand Name</option>
+                        <option value="name">Order Type</option>
                         <option value="orderStatus">Order Status</option>
                     </select>
                 </div>

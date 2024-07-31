@@ -310,7 +310,7 @@ const OrderDetailScreen: React.FC = () => {
                             </div>
                             <p className="text-sm text-gray-600 mb-1 mt-3 w-full">
                                 <span className='font-semibold text-gray-600'>Total price: </span>
-                                <span style={{ fontWeight: "bold", fontSize: 17 }}>{__handleAddCommasToNumber(orderDetail?.totalPrice)} VND</span>
+                                <span style={{ fontWeight: "bold", fontSize: 17 }}>{orderDetail?.totalPrice && orderDetail?.totalPrice > 0 ? __handleAddCommasToNumber(orderDetail?.totalPrice) + 'VND' : 'Waiting'} </span>
                             </p>
 
                             {orderDetail?.expectedStartDate && (

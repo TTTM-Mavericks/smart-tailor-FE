@@ -92,6 +92,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
     // ---------------FunctionHandler---------------//
 
     const __handleFetchOrderDetails = async (orderId: string) => {
+        console.log('vô');
         try {
             const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getAllSubOrder}/${orderId}`);
             if (response.status === 200) {

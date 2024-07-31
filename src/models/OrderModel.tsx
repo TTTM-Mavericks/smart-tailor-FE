@@ -79,7 +79,19 @@ export interface OrderRequestDetailInterface {
     design: DesignInterface,
     order: OrderDetailInterface,
     designDetail: DesignDetailInterface
-  }
+}
+
+export interface SampleModelInterface {
+    sampleModelID: string;
+    orderID: string;
+    brandID: string;
+    description: string;
+    imageUrl: string;
+    video: string;
+    createDate: string;
+    lastModifiedDate: string | null;
+}
+
 
 
 
