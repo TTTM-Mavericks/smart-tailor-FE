@@ -16,6 +16,7 @@ import Cookies from 'js-cookie';
 import { UserInterface } from '../../../../models/UserModel';
 import BrandUpdateSampleProductDialog from '../../GlobalComponent/Dialog/UpdateSampleProduct/BrandUpdateSampleProductDialog';
 import { __handleAddCommasToNumber } from '../../../../utils/NumbericUtils';
+import BrandUploadProgcessSampleProduct from '../../GlobalComponent/Dialog/UploadProgcessSampleProduct/BrandUploadProgcessSampleProduct';
 
 /**
  * 
@@ -198,6 +199,9 @@ const BrandOrderFields: React.FC<{
     const [userAuth, setUseAuth] = useState<UserInterface>();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedOrderID, setSelectedOrderID] = useState<string | null>(null);
+    const [isUploadSampleDialogOpen, setIsUploadSampleDialogOpen] = useState(false);
+    const [selectedStep, setSelectedStep] = useState<{ orderID: string, step: string } | null>(null);
+
 
 
     useEffect(() => {
@@ -207,12 +211,22 @@ const BrandOrderFields: React.FC<{
         setUseAuth(userParse);
     }, [])
 
-    const __handleOpenDialog = (orderDetail: BrandOrder) => {
+    const __handleOpenUpdateProcessDialog = (orderDetail: BrandOrder) => {
         setOpenOrderDetail(orderDetail);
     };
 
-    const __handleCloseDialog = () => {
+    const __handleCloseUpdateProcessDialog = () => {
         setOpenOrderDetail(null);
+    };
+
+    const __handleOpenUpLoadProcessSampleProductDialog = (orderId: string, step: string) => {
+        setIsUploadSampleDialogOpen(true);
+        setSelectedStep({ orderID: orderId, step: step });
+    };
+
+    const __handleCloseUpLoadProcessSampleProductDialog = () => {
+        setIsUploadSampleDialogOpen(false);
+        setSelectedStep(null);
     };
 
     const calculateProgressWidth = (status: string) => {
@@ -338,19 +352,23 @@ const BrandOrderFields: React.FC<{
             )}
             <div className="mt-6 flex justify-end">
                 {order.orderStatus === 'CHECKING_SAMPLE_DATA' && (
-
-                    <button
-                        onClick={() => __handleOpenInputSampleProductDialog(order.orderID)}
-                        className="bg-indigo-500 text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4"
-                        style={{
-                            borderRadius: 4,
-                            backgroundColor: yellowColor
-                        }}
-                    >
-                        Update sampleData
-                    </button>
+                    <>
+                        <button
+                            onClick={() => __handleOpenInputSampleProductDialog(order.orderID)}
+                            className="bg-indigo-500 text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4"
+                            style={{
+                                borderRadius: 4,
+                                backgroundColor: yellowColor
+                            }}
+                        >
+                            Update sampleData
+                        </button>
+                        {selectedOrderID === order.orderID && (
+                            <BrandUpdateSampleProductDialog isOpen={isDialogOpen} orderID={order.orderID} brandID={userAuth?.userID} onClose={__handleCloseInputSampleProductDialog}></BrandUpdateSampleProductDialog>
+                        )}
+                    </>
                 )}
-                <BrandUpdateSampleProductDialog isOpen={isDialogOpen} orderID={order.orderID} brandID={userAuth?.userID} onClose={__handleCloseInputSampleProductDialog}></BrandUpdateSampleProductDialog>
+
 
 
                 <button
@@ -365,7 +383,7 @@ const BrandOrderFields: React.FC<{
                 </button>
 
                 <button
-                    onClick={() => __handleOpenDialog(order)}
+                    onClick={() => __handleOpenUpdateProcessDialog(order)}
                     className="bg-green-500 text-white px-4 py-2  hover:bg-green-600 transition duration-300"
                     style={{
                         borderRadius: 4,
@@ -378,54 +396,67 @@ const BrandOrderFields: React.FC<{
 
             {/* Progress Bar */}
             {openOrderDetail && openOrderDetail.orderID === order.orderID && (
-                <Dialog open={true} onClose={__handleCloseDialog} aria-labelledby="popup-dialog-title" maxWidth="lg" fullWidth>
-                    <DialogTitle id="popup-dialog-title">
-                        <div style={{ float: 'left', alignItems: 'center', justifyContent: 'center' }}>
-                            <span> Order Progress</span>
-                            <div className={` inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10 ml-2`}>
-                                <span>
-                                    Click to complete state
-                                </span>
+                <>
+                    <Dialog open={true} onClose={__handleCloseUpdateProcessDialog} aria-labelledby="popup-dialog-title" maxWidth="lg" fullWidth>
+                        <DialogTitle id="popup-dialog-title">
+                            <div style={{ float: 'left', alignItems: 'center', justifyContent: 'center' }}>
+                                <span> Order Progress</span>
+                                <div className={` inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10 ml-2`}>
+                                    <span>
+                                        Click to complete state
+                                    </span>
+                                </div>
                             </div>
-                        </div>
-                    </DialogTitle>
-                    <IoMdCloseCircleOutline
-                        cursor={'pointer'}
-                        size={20}
-                        color="red"
-                        onClick={__handleCloseDialog}
-                        style={{ position: 'absolute', right: 20, top: 20 }}
-                    />
-                    <DialogContent dividers>
-                        <div className="pt-4 mb-20">
-                            <p className="text-sm text-gray-600 mb-2">Progress Date: {order.productionCompletionDate}</p>
-                            <div className="relative w-full h-2 bg-gray-200 rounded-full mb-4">
-                                <div className="absolute top-0 left-0 h-2 bg-indigo-600 rounded-full" style={{ width: `${calculateProgressWidth(order.orderStatus)}%` }}></div>
+                        </DialogTitle>
+                        <IoMdCloseCircleOutline
+                            cursor={'pointer'}
+                            size={20}
+                            color="red"
+                            onClick={__handleCloseUpdateProcessDialog}
+                            style={{ position: 'absolute', right: 20, top: 20 }}
+                        />
+                        <DialogContent dividers>
+                            <div className="pt-4 mb-20">
+                                <p className="text-sm text-gray-600 mb-2">Progress Date: {order.productionCompletionDate}</p>
+                                <div className="relative w-full h-2 bg-gray-200 rounded-full mb-4">
+                                    <div className="absolute top-0 left-0 h-2 bg-indigo-600 rounded-full" style={{ width: `${calculateProgressWidth(order.orderStatus)}%` }}></div>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    {progressSteps.map((step, index) => {
+                                        const isCompleted = index < progressSteps.indexOf(order.orderStatus) + 1;
+                                        const isCurrent = index === progressSteps.indexOf(order.orderStatus) + 1;
+                                        const isClickable = index >= 2 && index <= 4;
+                                        return (
+                                            <p key={index} className={`text-center ${isCompleted ? 'text-green-600' : isCurrent ? 'text-indigo-600' : 'text-gray-400'}`}>
+                                                <button
+                                                    className=" flex justify-center items-center px-4 py-2 text-white rounded-md transition duration-200 ml-auto"
+                                                    style={{
+                                                        backgroundColor: isCompleted ? '#CBCBCB' : isCurrent ? secondaryColor : '#CBCBCB',
+                                                    }}
+                                                    onClick={isCurrent && isClickable ? () => __handleOpenUpLoadProcessSampleProductDialog(order.orderID, step) : () => console.log('none')} // Add your click handler here
+                                                >
+                                                    {isCompleted && (<FaCheck color={greenColor} style={{ marginRight: 10 }} size={12}></FaCheck>)}
+                                                    {step}
+                                                </button>
+                                                {selectedStep?.orderID === order.orderID && selectedStep.step === step && (
+                                                    <BrandUploadProgcessSampleProduct
+                                                        step={step}
+                                                        orderID={selectedStep?.orderID}
+                                                        isOpen={true}
+                                                        onClose={__handleCloseUpLoadProcessSampleProductDialog}
+                                                    >
+                                                    </BrandUploadProgcessSampleProduct>
+                                                )}
+                                            </p>
+                                        );
+                                    })}
+                                </div>
                             </div>
-                            <div className="flex justify-between text-sm">
-                                {progressSteps.map((step, index) => {
-                                    const isCompleted = index < progressSteps.indexOf(order.orderStatus) + 1;
-                                    const isCurrent = index === progressSteps.indexOf(order.orderStatus) + 1;
-                                    const isClickable = index >= 2 && index <= 4;
-                                    return (
-                                        <p key={index} className={`text-center ${isCompleted ? 'text-green-600' : isCurrent ? 'text-indigo-600' : 'text-gray-400'}`}>
-                                            <button
-                                                className=" flex justify-center items-center px-4 py-2 text-white rounded-md transition duration-200 ml-auto"
-                                                style={{
-                                                    backgroundColor: isCompleted ? '#CBCBCB' : isCurrent ? secondaryColor : '#CBCBCB',
-                                                }}
-                                                onClick={isCurrent && isClickable ? () => __handelUpdateOrderState(order.orderID, step) : () => console.log('none')} // Add your click handler here
-                                            >
-                                                {isCompleted && (<FaCheck color={greenColor} style={{ marginRight: 10 }} size={12}></FaCheck>)}
-                                                {step}
-                                            </button>
-                                        </p>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    </DialogContent>
-                </Dialog>
+                        </DialogContent>
+                    </Dialog>
+
+
+                </>
             )}
         </div>
     );

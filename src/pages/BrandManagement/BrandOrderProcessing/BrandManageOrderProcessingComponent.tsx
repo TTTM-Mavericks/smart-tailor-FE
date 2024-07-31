@@ -307,7 +307,7 @@ const BrandManageOrderProcessingComponent: React.FC = () => {
                         <>
                             <div key={orderDetail.orderID} className="border-b pb-4 mb-6">
                                 <p className="text-sm text-gray-700 flex mb-10">
-                                    <span style={{ fontWeight: "bolder" }}>#{orderDetail?.orderID}</span>
+                                    <span style={{ fontWeight: "bolder" }}>{orderDetail?.orderID}</span>
                                     <span className="ml-auto text-sm text-gray-700 cursor-pointer" onClick={__handleOpenReportDialog}>Report</span>
                                 </p>
                                 <p className="text-sm text-gray-700">

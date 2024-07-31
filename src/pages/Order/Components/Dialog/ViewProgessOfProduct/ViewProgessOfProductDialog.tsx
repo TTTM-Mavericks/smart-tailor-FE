@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import { IoMdCloseCircleOutline, IoMdTrash } from 'react-icons/io';
-import style from './EmployeeManageOrderStyle.module.scss';
+import style from './ViewProgessOfProductDialogStyle.module.scss';
 import { greenColor, primaryColor, redColor, whiteColor } from '../../../../../root/ColorSystem';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { toast } from 'react-toastify';
@@ -14,7 +14,7 @@ type Props = {
     brandID?: any
 };
 
-const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID, brandID }) => {
+const ViewProgessOfProductDialog: React.FC<Props> = ({ isOpen, onClose, orderID, brandID }) => {
     const [description, setDescription] = useState<string>('');
     const [images, setImages] = useState<File[]>([]);
     const [videos, setVideos] = useState<File[]>([]);
@@ -23,12 +23,11 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID, bra
     const [sampleProductData, setSampleProductData] = useState<SampleModelInterface[]>();
 
 
+
     useEffect(() => {
         if (!isOpen) return
-            __handleFetchOrderData()
+        __handleFetchOrderData()
     }, [isOpen])
-
-
 
     const __handleFetchOrderData = async () => {
         // setIsLoading(true)
@@ -95,10 +94,6 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID, bra
                     {sampleProductData && sampleProductData?.length > 0 ? (
                         sampleProductData?.map((item) => (
                             <div key={item.sampleModelID} className="mb-4">
-                                <h3 className="text-md font-semibold">Sample Model ID: {item.sampleModelID}</h3>
-                                <p><strong>Sub Order ID:</strong> {item.orderID}</p>
-                                <p><strong>Brand ID:</strong> {item.brandID}</p>
-                                <p><strong>Description:</strong> {item.description}</p>
                                 <p><strong>Create Date:</strong> {item.createDate}</p>
                                 <p><strong>Last Modified Date:</strong> {item.lastModifiedDate || 'N/A'}</p>
                                 {item.imageUrl && (
@@ -121,32 +116,6 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID, bra
                                         />
                                     </div>
                                 )}
-                                <div className="flex justify-end space-x-2">
-                                    <button
-                                        type="button"
-                                        className="px-5 py-2.5 text-sm font-medium text-white"
-                                        style={{
-                                            borderRadius: 4,
-                                            color: whiteColor,
-                                            backgroundColor: redColor,
-                                        }}
-                                        onClick={onClose}
-                                    >
-                                        Reject
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="px-5 py-2.5 text-sm font-medium text-white"
-                                        style={{
-                                            borderRadius: 4,
-                                            color: whiteColor,
-                                            backgroundColor: greenColor,
-                                        }}
-                                        onClick={() => __handelUpdateOrderState(item.orderID)}
-                                    >
-                                        Accept
-                                    </button>
-                                </div>
 
                             </div>
                         ))
@@ -162,4 +131,4 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID, bra
     );
 };
 
-export default ViewSampleUpdateDialog;
+export default ViewProgessOfProductDialog;

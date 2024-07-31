@@ -121,7 +121,7 @@ const CustomerReportOrderDialogComponent: React.FC<Props> = ({ isOpen, onClose, 
                 </DialogTitle>
                 <DialogContent className={`${styles.orderPolicyDialog__content}  bg-gray-100 flex flex-col items-center `}>
                     <div className="w-full max-w-3xl bg-white p-6 shadow-md rounded-md mt-6">
-                        <h2 className="text-md font-semibold mb-4 ">Order #{orderID}</h2>
+                        <h2 className="text-md font-semibold mb-4 ">Order {orderID}</h2>
                         <form onSubmit={__handleSubmit}>
                             <div className="mb-4">
                                 <label className="block text-gray-700 font-semibold mb-2">

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import { IoMdCloseCircleOutline, IoMdTrash } from 'react-icons/io';
-import style from './BrandUpdateSampleProductDialogStyle.module.scss';
-import { primaryColor } from '../../../../../root/ColorSystem';
+import style from './BrandUploadProgcessSampleProductStyle.module.scss';
+import { primaryColor, secondaryColor } from '../../../../../root/ColorSystem';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { toast } from 'react-toastify';
 
@@ -10,10 +10,12 @@ type Props = {
     isOpen: boolean;
     onClose?: () => void;
     orderID?: string;
-    brandID?: any
+    brandID?: any;
+    onSubmit?: () => void;
+    step?: string
 };
 
-const BrandUpdateSampleProductDialog: React.FC<Props> = ({ isOpen, onClose, orderID, brandID }) => {
+const BrandUploadProgcessSampleProduct: React.FC<Props> = ({ isOpen, onClose, orderID, brandID, onSubmit, step }) => {
     const [description, setDescription] = useState<string>('');
     const [images, setImages] = useState<File[]>([]);
     const [videos, setVideos] = useState<File[]>([]);
@@ -107,14 +109,36 @@ const BrandUpdateSampleProductDialog: React.FC<Props> = ({ isOpen, onClose, orde
                 toast.error(`${error}`, { autoClose: 4000 });
             }
 
-
-
-
             // Perform your API call with the base64 data if needed
         } catch (error) {
             console.error('Error converting files to base64:', error);
         }
     };
+
+    const __handelUpdateOrderState = async (orderID: any, step: string) => {
+        try {
+            const bodyRequest = {
+                orderID: orderID,
+                status: step
+            }
+            console.log('bodyRequest: ', bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            if (response.status === 200) {
+                console.log('detail order: ', response.data);
+                toast.success(`${response.message}`, { autoClose: 4000 });
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000)
+            }
+            else {
+                console.log('detail error: ', response.message);
+                toast.error(`${response.message}`, { autoClose: 4000 });
+            }
+        } catch (error) {
+            console.log('error: ', error);
+            toast.error(`${error}`, { autoClose: 4000 });
+        }
+    }
 
     return (
         <Dialog open={isOpen} onClose={onClose} aria-labelledby="dialog-title" maxWidth="md" fullWidth>
@@ -130,7 +154,19 @@ const BrandUpdateSampleProductDialog: React.FC<Props> = ({ isOpen, onClose, orde
             </DialogTitle>
             <DialogContent dividers className={`${style.sampleModel__dialogContent} bg-gray-100`}>
                 <div className="p-4 bg-white shadow-md rounded-md">
-                    <h2 className="text-lg font-semibold mb-4">Order {orderID}</h2>
+                    <p className="font-semibold mb-4">Order: {orderID}</p>
+                    <p className={` flex items-center mb-4`}>
+                        <button
+                            className="px-4 py-2 text-white rounded-md transition duration-200"
+                            style={{
+                                backgroundColor: secondaryColor,
+                                fontSize: 10
+                            }}
+                        >
+                            {step}
+                        </button>
+                    </p>
+
                     <form onSubmit={handleSubmit}>
                         <div className="mb-4">
                             <label className="block text-gray-700 font-semibold mb-2">Description</label>
@@ -223,4 +259,4 @@ const BrandUpdateSampleProductDialog: React.FC<Props> = ({ isOpen, onClose, orde
     );
 };
 
-export default BrandUpdateSampleProductDialog;
+export default BrandUploadProgcessSampleProduct;

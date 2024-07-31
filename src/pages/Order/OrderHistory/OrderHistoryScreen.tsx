@@ -291,7 +291,7 @@ const OrderHistory: React.FC = () => {
                                 </div>
                                 <div className="mb-4 md:mb-0 w-max ml-12">
                                     <h2 className="text-1xl md:text-1xl font-bold text-gray-800 pb-2">{t(codeLanguage + '000193')} </h2>
-                                    <p className="text-sm text-gray-500 pb-2"> #{orderDetail?.orderID}</p>
+                                    <p className="text-sm text-gray-500 pb-2"> {orderDetail?.orderID}</p>
                                     <p className="text-sm text-gray-500 pb-2">{t(codeLanguage + '000200')}: {orderDetail?.expectedStartDate}</p>
                                     <div style={{
                                         display: 'flex',
