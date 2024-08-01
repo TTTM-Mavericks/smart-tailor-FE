@@ -10,6 +10,8 @@ import NotificationPage from '../../ManageNotification/NotificationPageComponent
 import BrandManageOrderProcessingComponent from '../../BrandOrderProcessing/BrandManageOrderProcessingComponent';
 import BrandManageOrder from '../../ManageOrder/BrandOrderManagement/ManageOrderScreen';
 import BrandProductivityInputDialog from '../../GlobalComponent/Dialog/BrandProductivity/BrandProductivityInputDialog';
+import { IconButton } from '@mui/material';
+import { ArrowUpward } from '@mui/icons-material';
 
 const DashboardManageMaterialScreen = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -21,6 +23,10 @@ const DashboardManageMaterialScreen = () => {
     const [showProductivityDialog, setShowProductivityDialog] = useState(false);
     const [userAuth, setUserAuth] = useState<any>(null);
     const checkPerformed = useRef(false);
+
+    const _handleScrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
 
     useEffect(() => {
         if (!checkPerformed.current) {
@@ -89,10 +95,6 @@ const DashboardManageMaterialScreen = () => {
         };
     }, []);
 
-    const handleScrollToTop = () => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    };
-
     const togglePopper = (key: string) => {
         setPopperOpen((prev) => ({
             notification: key === 'notification' ? !prev.notification : false,
@@ -150,12 +152,19 @@ const DashboardManageMaterialScreen = () => {
                 </main>
             </div>
             {showScrollButton && (
-                <button
-                    onClick={handleScrollToTop}
-                    className="fixed bottom-5 right-5 bg-blue-500 text-white p-2 rounded-full"
+                <IconButton
+                    style={{
+                        position: 'fixed',
+                        bottom: '20px',
+                        right: '20px',
+                        zIndex: 100,
+                        backgroundColor: "#E96208",
+                        color: "white"
+                    }}
+                    onClick={_handleScrollToTop}
                 >
-                    Scroll to Top
-                </button>
+                    <ArrowUpward />
+                </IconButton>
             )}
         </div>
     );

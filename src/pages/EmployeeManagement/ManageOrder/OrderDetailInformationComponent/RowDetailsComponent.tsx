@@ -70,7 +70,7 @@ const RowDetails: React.FC = () => {
         <Container maxWidth="md">
             <Box mt={4}>
                 <Typography variant="h4" color="textPrimary" gutterBottom>
-                    Order Details #{rowData.id}
+                    Order Details {rowData.id}
                 </Typography>
                 <Grid container spacing={4}>
                     <Grid item xs={12} md={8}>
