@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import NotificationBrandComponent from '../GlobalComponent/Notification/NotificationBrandComponent';
-import NotificationComponent from '../GlobalComponent/Notification/NotificationComponent';
 
 const NotificationPage = () => {
     const [activeTab, setActiveTab] = useState('all');
@@ -161,7 +160,7 @@ const NotificationPage = () => {
                     View Previous Notification
                 </button>
             )} */}
-            <NotificationComponent />
+            <NotificationBrandComponent userId='a' />
         </div>
     );
 };

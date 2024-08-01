@@ -15,7 +15,7 @@ type Props = {
 
 const BrandProductivityInputDialog: React.FC<Props> = ({ isOpen, onClose, brandID }) => {
     const [productivity, setProductivity] = useState<number | string>('');
-    const [propertyID, setPropertyID] = useState<string>('');
+    const [propertyID, setPropertyID] = useState<string>('acf34dcd-4a6e-11ef-817d-0a002700000b');
     const [error, setError] = useState<string>('');
 
     useEffect(() => {
@@ -40,7 +40,7 @@ const BrandProductivityInputDialog: React.FC<Props> = ({ isOpen, onClose, brandI
     }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+        e.preventDefault(); // Prevent default form submission
 
         if (!propertyID) {
             setError('No BRAND_PRODUCTIVITY property ID set.');
@@ -57,21 +57,16 @@ const BrandProductivityInputDialog: React.FC<Props> = ({ isOpen, onClose, brandI
 
             const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.brandPropertise + functionEndpoints.brandPropertise.addNewBrandPropertise}`, bodyRequest);
             if (response.status === 200) {
+                localStorage.setItem('brandFirstLogin', 'false');
                 toast.success(`${response.message}`, { autoClose: 4000 });
-                setTimeout(() => {
-                    window.location.reload();
-                }, 2000);
             } else {
                 toast.error(`${response.message}`, { autoClose: 4000 });
-
             }
-            console.log(bodyRequest);
             setError('');
             if (onClose) onClose();
         } catch (error) {
             setError('Failed to add new brand property.');
             toast.error(`${error}`, { autoClose: 4000 });
-
         }
     };
 

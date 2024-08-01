@@ -17,6 +17,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import ImageMasonry from '../../../components/ImageMasonry/ImageMasonryCoponent';
 import { __validateEmail } from '../Utils';
 import { useNavigate } from 'react-router-dom';
+import BrandProductivityInputDialog from '../../BrandManagement/GlobalComponent/Dialog/BrandProductivity/BrandProductivityInputDialog';
 
 const defaultTheme = createTheme();
 
@@ -35,6 +36,7 @@ function SignInScreen() {
   const [isPasswordValidate, setIsPasswordValidate] = React.useState<boolean>(true);
   const [codeLanguage, setCodeLanguage] = React.useState<string>('EN');
   const [isLoading, setIsloading] = React.useState<boolean>(false);
+  const [showDialog, setShowDialog] = React.useState(false);
 
   // ---------------Usable Variable---------------//
   const { t, i18n } = useTranslation();
@@ -143,21 +145,43 @@ function SignInScreen() {
 
           const redirectUrl = roleBasedRedirect(user.roleName);
           console.log(redirectUrl + "bebeurl");
-          await new Promise(resolve => setTimeout(resolve, 20000));
+          await new Promise(resolve => setTimeout(resolve, 10000));
 
+          if (!localStorage.getItem('brandFirstLogin')) {
+            localStorage.setItem('brandFirstLogin', 'true');
+          }
+
+          if (localStorage.getItem('brandFirstLogin') === 'false') {
+            window.location.href = '/brand';
+          }
+
+          // Check if user role is 'BRAND'
           if (user.roleName === 'BRAND') {
-            const fetchApiBrand = await api.get(`${versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.getBrandByID + `/${user.userID}`}`);
-            const { brandName, brandStatus } = fetchApiBrand.data;
+            try {
+              // Fetch brand data by ID
+              const fetchApiBrand = await api.get(
+                `${versionEndpoints.v1}${featuresEndpoints.brand}${functionEndpoints.brand.getBrandByID}/${user.userID}`
+              );
+              const { brandName, brandStatus } = fetchApiBrand.data;
 
-            if (brandName === null) {
-              window.location.href = `/brand/updateProfile/${user.userID}`;
-            } else if (brandStatus === "PENDING") {
-              window.location.href = `/brand/waiting_process_information`;
-            } else {
-              window.location.href = `/brand`;
+              // Navigate based on brand data
+              if (!brandName) {
+                window.location.href = `/brand/updateProfile/${user.userID}`;
+              } else if (brandStatus === 'PENDING') {
+                window.location.href = '/brand/waiting_process_information';
+              }
+              else if (localStorage.getItem('brandFirstLogin') === 'false') {
+                window.location.href = '/brand';
+              }
+              else {
+                localStorage.setItem('brandFirstLogin', 'true');
+                setTimeout(() => {
+                  window.location.href = '/brand';
+                }, 100);
+              }
+            } catch (error) {
+              console.error('Error fetching brand data:', error);
             }
-          } else {
-            window.location.href = redirectUrl;
           }
         }
       } catch (error: any) {
@@ -379,6 +403,13 @@ function SignInScreen() {
           </Menu>
           {signInBox()}
         </div>
+        {showDialog && <BrandProductivityInputDialog
+          isOpen={showDialog}
+          onClose={() => {
+            setShowDialog(false);
+            window.location.href = '/brand';
+          }}
+        />}
       </ThemeProvider>
     </GoogleOAuthProvider>
   );

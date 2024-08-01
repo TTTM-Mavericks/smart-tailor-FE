@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Sidebar from '../../GlobalComponent/SideBarComponent/SideBarComponent';
 import Navbar from '../../GlobalComponent/NavBarComponent/NavbarComponent';
 import ManageMaterialComponent from '../MaterialManage/MaterialManageScreens';
@@ -9,32 +9,55 @@ import UploadBrandInforForm from '../../BrandUploadInfor/BrandUploadInforCompone
 import NotificationPage from '../../ManageNotification/NotificationPageComponent';
 import BrandManageOrderProcessingComponent from '../../BrandOrderProcessing/BrandManageOrderProcessingComponent';
 import BrandManageOrder from '../../ManageOrder/BrandOrderManagement/ManageOrderScreen';
+import BrandProductivityInputDialog from '../../GlobalComponent/Dialog/BrandProductivity/BrandProductivityInputDialog';
 
 const DashboardManageMaterialScreen = () => {
     const [menuOpen, setMenuOpen] = useState(false);
+
     const [activeMenu, setActiveMenu] = useState('manage_notification');
-    const [showScrollButton, setShowScrollButton] = React.useState<boolean>(false);
+    const [showScrollButton, setShowScrollButton] = useState<boolean>(false);
     const [popperOpen, setPopperOpen] = useState<Record<string, boolean>>({});
+
+    const [showProductivityDialog, setShowProductivityDialog] = useState(false);
+    const [userAuth, setUserAuth] = useState<any>(null);
+    const checkPerformed = useRef(false);
+
+    useEffect(() => {
+        if (!checkPerformed.current) {
+            const isFirstLogin = localStorage.getItem('brandFirstLogin');
+            const dialogShown = sessionStorage.getItem('productivityDialogShown');
+            const userAuthData = JSON.parse(localStorage.getItem('userAuth') || '{}');
+            setUserAuth(userAuthData);
+
+            if (isFirstLogin === 'true' && dialogShown !== 'true') {
+                setShowProductivityDialog(true);
+                sessionStorage.setItem('productivityDialogShown', 'true');
+            }
+            checkPerformed.current = true;
+        }
+    }, []);
+
+    const handleCloseProductivityDialog = () => {
+        setShowProductivityDialog(false);
+        sessionStorage.setItem('productivityDialogShown', 'false');
+    };
 
     const toggleMenu = () => {
         setMenuOpen(!menuOpen);
     };
 
     useEffect(() => {
-        // Get the active tab from localStorage on component mount
         const savedActiveMenu = localStorage.getItem('brandActiveMenu');
         if (savedActiveMenu) {
             setActiveMenu(savedActiveMenu);
         }
     }, []);
 
-    const handleMenuClick = (menu: any) => {
+    const handleMenuClick = (menu: string) => {
         setActiveMenu(menu);
-        // Save the active tab to localStorage
         localStorage.setItem('brandActiveMenu', menu);
     }
 
-    // Effect to close popper on outside click
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (event.target instanceof Element) {
@@ -54,13 +77,9 @@ const DashboardManageMaterialScreen = () => {
         };
     }, []);
 
-    React.useEffect(() => {
+    useEffect(() => {
         const handleScroll = () => {
-            if (window.scrollY > 200) {
-                setShowScrollButton(true);
-            } else {
-                setShowScrollButton(false);
-            }
+            setShowScrollButton(window.scrollY > 200);
         };
 
         window.addEventListener('scroll', handleScroll);
@@ -70,11 +89,11 @@ const DashboardManageMaterialScreen = () => {
         };
     }, []);
 
-    const _handleScrollToTop = () => {
+    const handleScrollToTop = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    const togglePopper = (key: any) => {
+    const togglePopper = (key: string) => {
         setPopperOpen((prev) => ({
             notification: key === 'notification' ? !prev.notification : false,
             user: key === 'user' ? !prev.user : false,
@@ -86,13 +105,13 @@ const DashboardManageMaterialScreen = () => {
             case '/brand/manage_order_request/:id':
                 return <UploadBrandInforForm />;
             case 'manage_notification':
-                return <NotificationPage></NotificationPage>;
+                return <NotificationPage />;
             case 'brand_profile':
                 return <BrandProfileSetup />;
             case 'manage_order':
-                return <BrandManageOrder></BrandManageOrder>;
+                return <BrandManageOrder />;
             case 'manage_order_processing':
-                return <BrandManageOrderProcessingComponent></BrandManageOrderProcessingComponent>;
+                return <BrandManageOrderProcessingComponent />;
             case 'manage_price':
                 return <ManagePrice />;
             case 'manage_material':
@@ -100,20 +119,44 @@ const DashboardManageMaterialScreen = () => {
             case 'manage_order_request':
                 return <OrderRequestScreen />;
             default:
-                return (
-                    <ManageMaterialComponent />
-                );
+                return <ManageMaterialComponent />;
         }
     };
+
     return (
         <div className="flex">
-            <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
+            <Sidebar
+                menuOpen={menuOpen}
+                toggleMenu={toggleMenu}
+                activeMenu={activeMenu}
+                handleMenuClick={handleMenuClick}
+            />
             <div className="flex flex-col w-full">
-                <Navbar toggleMenu={toggleMenu} menu={activeMenu} popperOpen={popperOpen} togglePopper={togglePopper} />
+                <Navbar
+                    toggleMenu={toggleMenu}
+                    menu={activeMenu}
+                    popperOpen={popperOpen}
+                    togglePopper={togglePopper}
+                />
+                {showProductivityDialog && (
+                    <BrandProductivityInputDialog
+                        isOpen={showProductivityDialog}
+                        onClose={handleCloseProductivityDialog}
+                        brandID={userAuth?.userID}
+                    />
+                )}
                 <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
                     {renderComponent()}
                 </main>
             </div>
+            {showScrollButton && (
+                <button
+                    onClick={handleScrollToTop}
+                    className="fixed bottom-5 right-5 bg-blue-500 text-white p-2 rounded-full"
+                >
+                    Scroll to Top
+                </button>
+            )}
         </div>
     );
 };

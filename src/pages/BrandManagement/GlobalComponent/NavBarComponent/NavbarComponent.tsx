@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { BellAlertIcon } from '@heroicons/react/20/solid';
 import NotificationBrandComponent from '../Notification/NotificationBrandComponent';
+import Cookies from 'js-cookie';
+import axios from 'axios';
+import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
+import { toast } from 'react-toastify';
 
 interface NavbarProps {
     toggleMenu: () => void;
@@ -17,6 +21,32 @@ const Navbar: React.FC<NavbarProps> = ({ toggleMenu, menu, popperOpen, togglePop
     };
 
     const userId = 'a'
+
+    const __handleLogout = async () => {
+        try {
+            const authToken = Cookies.get('token');
+            const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.signout}`, { token: authToken });
+
+            if (response.status === 200) {
+                Cookies.remove('token');
+                Cookies.remove('refreshToken');
+                window.location.href = '/auth/signin';
+            } else {
+                const message = response.data?.message || 'Failed to logout';
+                toast.error(message, { autoClose: 4000 });
+            }
+            console.log(response);
+
+        } catch (error: any) {
+            console.error('Error posting data:', error);
+            const errorMessage = error.response?.data?.message || error.message || 'An error occurred';
+            toast.error(errorMessage, { autoClose: 4000 });
+        }
+    }
+
+    const _handleProfile = () => {
+        window.location.href = '/auth/profilesetting';
+    }
 
     return (
         <div className="p-4 xl:ml-80">
@@ -114,9 +144,9 @@ const Navbar: React.FC<NavbarProps> = ({ toggleMenu, menu, popperOpen, togglePop
                     >
                         <h3 className="text-lg font-semibold mb-4">Admin Account</h3>
                         <ul>
-                            <li className="py-1">Profile</li>
+                            <li className="py-1" onClick={_handleProfile} style={{ cursor: "pointer" }}>Profile</li>
                             <li className="py-1">Settings</li>
-                            <li className="py-1">Logout</li>
+                            <li className="py-1" onClick={__handleLogout} style={{ cursor: "pointer" }}>Logout</li>
                         </ul>
                     </div>
                 )}
