@@ -89,7 +89,7 @@ const BrandProductivityInputDialog: React.FC<Props> = ({ isOpen, onClose, brandI
             </DialogTitle>
             <DialogContent dividers className={`${style.dialogContent} bg-gray-100`}>
                 <div className="p-4 bg-white shadow-md rounded-md">
-                    <h2 className="text-lg font-semibold mb-4">Brand #{brandID}</h2>
+                    <h2 className="text-lg font-semibold mb-4">Brand {brandID}</h2>
                     <form onSubmit={handleSubmit}>
                         <div className="mb-4">
                             <div className={` mb-5 inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10 ml-2`}>

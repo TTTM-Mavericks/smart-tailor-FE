@@ -18,6 +18,7 @@ import { __handleAddCommasToNumber } from '../../../utils/NumbericUtils';
 import LoadingComponent from '../../../components/Loading/LoadingComponent';
 import ChangeAddressDialogComponent from '../OrderProduct/ChangeAddressDialogComponent';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
+import ViewProgessOfProductDialog from '../Components/Dialog/ViewProgessOfProduct/ViewProgessOfProductDialog';
 
 const OrderDetailScreen: React.FC = () => {
     // TODO MUTIL LANGUAGE
@@ -28,7 +29,6 @@ const OrderDetailScreen: React.FC = () => {
     const [showScrollButton, setShowScrollButton] = useState<boolean>(false);
     const [isOpenCancelOrderPolicyDialog, setIsOpenCancelOrderPolicyDialog] = useState<boolean>(false);
     const [isOpenPaymentOrderDialog, setIsOpenPaymentOrderDialog] = useState<boolean>(false);
-
     const [isLoadingPage, setIsLoadingPage] = useState<boolean>(false);
     const [orderDetail, setOrderDetail] = useState<OrderDetailInterface>();
     const [payment, setPayment] = useState<PaymentOrderInterface[]>();
@@ -40,6 +40,8 @@ const OrderDetailScreen: React.FC = () => {
     const [isOpenReportOrderDialog, setIsOpenReportOrderDialog] = useState<boolean>(false);
     const [isOpenRatingDialog, setIsOpenRatingDialog] = useState<boolean>(false);
     const [isOpenReasonCancelDialog, setIsOpenReasonCancelDialog] = useState<boolean>(false);
+    const [selectedStep, setSelectedStep] = useState<{ orderID: any, step: string } | null>(null);
+    const [isUploadSampleDialogOpen, setIsUploadSampleDialogOpen] = useState(false);
 
 
     const { id } = useParams();
@@ -249,6 +251,17 @@ const OrderDetailScreen: React.FC = () => {
         setIsOpenRatingDialog(false);
     }
 
+
+    const __handleOpenProcessSampleProductDialog = (orderId: any, step: string) => {
+        setIsUploadSampleDialogOpen(true);
+        setSelectedStep({ orderID: orderId, step: step });
+    };
+
+    const __handleCloseProcessSampleProductDialog = () => {
+        setIsUploadSampleDialogOpen(false);
+        setSelectedStep(null);
+    };
+
     return (
         <div className={`${style.orderDetail__container}`} >
             <HeaderComponent />
@@ -265,7 +278,7 @@ const OrderDetailScreen: React.FC = () => {
 
                     <div className="border-b pb-4 mb-6">
                         <p className="text-sm text-gray-700 flex">
-                            <span style={{ fontWeight: "bolder" }}>#{orderDetail?.orderID}</span>
+                            <span style={{ fontWeight: "bolder" }}>{orderDetail?.orderID}</span>
                             <span className="ml-auto text-sm text-gray-700 cursor-pointer" onClick={() => __handleOpenReportDialog()}>Report</span>
                         </p>
                     </div>
@@ -310,7 +323,7 @@ const OrderDetailScreen: React.FC = () => {
                             </div>
                             <p className="text-sm text-gray-600 mb-1 mt-3 w-full">
                                 <span className='font-semibold text-gray-600'>Total price: </span>
-                                <span style={{ fontWeight: "bold", fontSize: 17 }}>{__handleAddCommasToNumber(orderDetail?.totalPrice)} VND</span>
+                                <span style={{ fontWeight: "bold", fontSize: 17 }}>{orderDetail?.totalPrice && orderDetail?.totalPrice > 0 ? __handleAddCommasToNumber(orderDetail?.totalPrice) + 'VND' : 'Waiting'} </span>
                             </p>
 
                             {orderDetail?.expectedStartDate && (
@@ -360,7 +373,12 @@ const OrderDetailScreen: React.FC = () => {
                         </div>
                         <div className="flex justify-between text-sm">
                             {orderDetails.progressSteps.map((step, index) => (
-                                <p key={index} className={`text-center ${index <= orderDetails.currentStep ? 'text-indigo-600' : 'text-gray-400'}`}>{step}</p>
+                                <>
+                                    <p key={index} onClick={() => index <= orderDetails.currentStep ? __handleOpenProcessSampleProductDialog(orderDetail?.orderID, step) : {}} className={`text-center ${index <= orderDetails.currentStep ? 'text-indigo-600' : 'text-gray-400'} cursor-pointer`}>{step}</p>
+                                    {selectedStep?.step === step && (
+                                        <ViewProgessOfProductDialog orderID={orderDetail?.orderID} isOpen={true} onClose={__handleCloseProcessSampleProductDialog} ></ViewProgessOfProductDialog>
+                                    )}
+                                </>
                             ))}
                         </div>
 

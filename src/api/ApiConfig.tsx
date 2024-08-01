@@ -6,9 +6,9 @@ import { jwtDecode } from 'jwt-decode';
 // const baseURL = 'https://whear-app.azurewebsites.net';
 // const baseURL = 'https://tam.mavericks-tttm.studio';
 // export const baseURL = 'https://be.mavericks-tttm.studio';
-// export const baseURL = 'https://dev01.smart-tailor.live';
+export const baseURL = 'https://dev01.smart-tailor.live';
 
-export const baseURL = 'http://localhost:6969';
+// export const baseURL = 'http://localhost:6969';
 export const googleOAuth2 = '/oauth2/authorization/google'
 export const versionEndpoints = {
   v1: '/api/v1',
@@ -36,7 +36,8 @@ export const featuresEndpoints = {
   systemImage: '/system-image',
   report: '/report',
   systemPropertise: '/system-property',
-  brandPropertise: '/brand-property'
+  brandPropertise: '/brand-property',
+  SampleProduct: '/sample-product-data',
 
 }
 export const functionEndpoints = {
@@ -179,6 +180,10 @@ export const functionEndpoints = {
   },
   brandPropertise: {
     addNewBrandPropertise: '/add-new-brand-property'
+  },
+  SampleProduct: {
+    addSampleProduct: '/add-sample-product-data',
+    getSamplePriductByParentOrderID: '/get-sample-product-data-by-parent-order-id'
   }
 }
 

@@ -5,6 +5,8 @@ import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaTimes, FaC
 import { Report, ReportImageList } from '../../../../../models/EmployeeManageReportModel';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import axios from 'axios';
+import { IoMdCloseCircleOutline } from 'react-icons/io';
+import { greenColor, redColor, secondaryColor } from '../../../../../root/ColorSystem';
 
 const getStatusColor = (status: string) => {
     switch (status) {
@@ -72,12 +74,20 @@ const OrderReport: React.FC<{
             <button
                 onClick={() => onViewDetails(report)}
                 className="bg-indigo-500 text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"
+                style={{
+                    borderRadius: 4,
+                    backgroundColor: secondaryColor
+                }}
             >
                 View Details
             </button>
             <button
                 onClick={() => onMarkResolved(report.reportID)}
                 className="bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300"
+                style={{
+                    borderRadius: 4,
+                    backgroundColor: greenColor
+                }}
             >
                 Mark as Resolved
             </button>
@@ -136,13 +146,13 @@ const ReportModal: React.FC<{ report: Report; onClose: () => void; onMarkResolve
                 className="relative bg-white w-full max-w-2xl rounded-xl shadow-2xl p-8 max-h-[90vh] overflow-y-auto"
                 onClick={e => e.stopPropagation()}
             >
-                <button
+                <IoMdCloseCircleOutline
+                    cursor="pointer"
+                    size={20}
+                    color={redColor}
                     onClick={onClose}
-                    className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition duration-150"
-                    aria-label="Close modal"
-                >
-                    <FaTimes size={24} />
-                </button>
+                    style={{ position: 'absolute', right: 20, top: 20 }}
+                />
 
                 <h2 className="text-3xl font-bold text-indigo-700 mb-6 shadow-text">Order Report Details</h2>
 
@@ -193,11 +203,12 @@ const ReportModal: React.FC<{ report: Report; onClose: () => void; onMarkResolve
                 {isReportImageListArray(report.reportImageList) && report.reportImageList.length > 0 && (
                     <div className="mb-8">
                         <h3 className="text-xl font-semibold text-gray-700 mb-3">Report Images</h3>
-                        <div className="relative">
+                        <div className="relative flex items-center justify-center">
                             <img
                                 src={report.reportImageList[currentImageIndex].reportImageUrl}
                                 alt={report.reportImageList[currentImageIndex].reportImageName}
-                                className="w-full h-64 object-cover rounded-lg"
+                                className="object-cover rounded-lg"
+                                style={{ width: 500, height: 550 }}
                             />
                             {report.reportImageList.length > 1 && (
                                 <>
@@ -210,19 +221,12 @@ const ReportModal: React.FC<{ report: Report; onClose: () => void; onMarkResolve
                                 </>
                             )}
                         </div>
-                        <p className="text-center mt-2 text-gray-600">
-                            {report.reportImageList[currentImageIndex].reportImageName}
-                        </p>
+
                     </div>
                 )}
 
                 <div className="flex justify-end space-x-4">
-                    <button
-                        onClick={onClose}
-                        className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-150 focus:outline-none focus:ring-2 focus:ring-gray-400"
-                    >
-                        Close
-                    </button>
+
                     <button
                         onClick={() => onMarkResolved(report.reportID)}
                         className={`px-6 py-3 rounded-lg text-white transition duration-150 focus:outline-none focus:ring-2 ${report.reportStatus

@@ -8,6 +8,12 @@ import { motion } from 'framer-motion'
 import { toast } from 'react-toastify';
 import LoadingComponent from '../../../../../components/Loading/LoadingComponent';
 import PartOfDesignInformationDialogComponent from '../../../../BrandManagement/BrandOrderManagement/PartOfDesignInformationDialogComponent';
+import { primaryColor, secondaryColor, yellowColor } from '../../../../../root/ColorSystem';
+import { __handleAddCommasToNumber } from '../../../../../utils/NumbericUtils';
+import { UserInterface } from '../../../../../models/UserModel';
+import Cookies from 'js-cookie';
+import BrandUpdateSampleProductDialog from '../../../../BrandManagement/GlobalComponent/Dialog/UpdateSampleProduct/BrandUpdateSampleProductDialog';
+import ViewSampleUpdateDialog from './ViewSampleUpdateDialog';
 
 /**
  * 
@@ -163,6 +169,17 @@ const EmployeeOrderFields: React.FC<{
     const [showDesignDetails, setShowDesignDetails] = useState(false);
     const [designDetails, setDesignDetails] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [userAuth, setUseAuth] = useState<UserInterface>();
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [selectedOrderID, setSelectedOrderID] = useState<string | null>(null);
+
+
+    useEffect(() => {
+        const userStorage = Cookies.get('userAuth');
+        if (!userStorage) return;
+        const userParse: UserInterface = JSON.parse(userStorage)
+        setUseAuth(userParse);
+    }, [])
 
     const fetchDesignDetails = async () => {
         setIsLoading(true);
@@ -180,6 +197,16 @@ const EmployeeOrderFields: React.FC<{
     useEffect(() => {
         fetchDesignDetails();
     }, [order.orderID]);
+
+    const __handleOpenInputSampleProductDialog = (orderID: any) => {
+        setSelectedOrderID(orderID);
+        setIsDialogOpen(true);
+    };
+
+    const __handleCloseInputSampleProductDialog = () => {
+        setIsDialogOpen(false);
+        setSelectedOrderID(null);
+    };
 
     return (
         <div className="bg-white mb-8 shadow-lg rounded-lg p-6 transition duration-300 ease-in-out transform hover:shadow-xl">
@@ -214,7 +241,7 @@ const EmployeeOrderFields: React.FC<{
                                     </p>
                                 ))}
                             </div>
-                            <p className="text-gray-700 mt-4">Price: {order.totalPrice}</p>
+                            <p className="text-gray-700 mt-4">Price: {__handleAddCommasToNumber(order.totalPrice)} VND</p>
                         </div>
                     </div>
                 </div>
@@ -243,16 +270,36 @@ const EmployeeOrderFields: React.FC<{
             )}
             <div className="mt-6 flex justify-end">
                 <button
+                    onClick={() => __handleOpenInputSampleProductDialog(order.orderID)}
+                    className="bg-indigo-500 text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"
+                    style={{
+                        borderRadius: 4,
+                        backgroundColor: yellowColor
+                    }}
+                >
+                    View sample data
+                </button>
+                <ViewSampleUpdateDialog isOpen={isDialogOpen} orderID={order.orderID} brandID={userAuth?.userID} onClose={__handleCloseInputSampleProductDialog}></ViewSampleUpdateDialog>
+
+                <button
                     onClick={() => onViewDetails(order, designDetails)}
                     className="bg-indigo-500 text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"
+                    style={{
+                        borderRadius: 4,
+                        backgroundColor: secondaryColor
+                    }}
                 >
-                    View Details
+                    View details
                 </button>
                 <button
                     onClick={() => onUpdatedOrderPending(order.orderID)}
                     className="bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300"
+                    style={{
+                        borderRadius: 4,
+                        backgroundColor: primaryColor
+                    }}
                 >
-                    Update Order
+                    Verify order
                 </button>
             </div>
         </div>

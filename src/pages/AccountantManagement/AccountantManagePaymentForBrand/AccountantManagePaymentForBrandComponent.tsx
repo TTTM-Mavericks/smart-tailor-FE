@@ -92,6 +92,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
     // ---------------FunctionHandler---------------//
 
     const __handleFetchOrderDetails = async (orderId: string) => {
+        console.log('vô');
         try {
             const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getAllSubOrder}/${orderId}`);
             if (response.status === 200) {
@@ -279,7 +280,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                 
                                 <div className="mb-4 md:mb-0 w-max ">
                                     <h2 className="text-1xl md:text-1xl font-bold text-gray-800 pb-2">{t(codeLanguage + '000193')} </h2>
-                                    <p className="text-sm text-gray-500 pb-2"> #{orderDetail?.orderID}</p>
+                                    <p className="text-sm text-gray-500 pb-2"> {orderDetail?.orderID}</p>
                                     <p className="text-sm text-gray-500 pb-2">{t(codeLanguage + '000200')}: {orderDetail?.expectedStartDate}</p>
                                     <div style={{
                                         display: 'flex',
