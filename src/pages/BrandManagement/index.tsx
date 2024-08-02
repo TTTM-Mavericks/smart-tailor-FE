@@ -14,6 +14,7 @@ import BrandSignUpScreen from './BrandAuth/SignUpBrand/BrandSignUpScreen'
 import UploadBrandInforForm from "./BrandUploadInfor/BrandUploadInforComponent";
 import WaitingProcessComponent from "./GlobalComponent/WaitingProcess/WaitingProcessComponent";
 import BrandManageOrderProcessingComponent from './BrandOrderProcessing/BrandManageOrderProcessingComponent'
+
 export {
     DashboardBrandScreens,
     DashboardBrandManageNotification,

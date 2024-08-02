@@ -114,7 +114,7 @@ const BrandManageOrderProcessingComponent: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        const userStorage = Cookies.get('userAuth');
+        const userStorage = Cookies.get('                                                                                                                                                                                                                                                                                                                                                   ');
         if (userStorage) {
             console.log(userStorage);
             const userParse: UserInterface = JSON.parse(userStorage);
@@ -497,7 +497,7 @@ const BrandManageOrderProcessingComponent: React.FC = () => {
             </Dialog>
 
             <BrandUpdateSampleProductDialog isOpen={false} orderID={'ádasdasd'}></BrandUpdateSampleProductDialog>
-            <BrandProductivityInputDialog isOpen={false} brandID={userAuth?.userID}></BrandProductivityInputDialog>
+            <BrandProductivityInputDialog isOpen={true} brandID={userAuth?.userID}></BrandProductivityInputDialog>
             <ToastContainer></ToastContainer>
             <LoadingComponent isLoading={isLoading}></LoadingComponent>
 
