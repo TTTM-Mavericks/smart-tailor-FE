@@ -9,7 +9,6 @@ import Swal from "sweetalert2";
 import EditMaterialPopUpScreens from "../AdminEditMaterial/EditMaterialPopUpScreens";
 import { Add } from "@mui/icons-material";
 import AddEachCategoryWithHand from "../../AddEachWithHand/AddEachCategoryWithHandScreens";
-import AddMultipleComponentWithExcel from "../../AddMultipleCategoryWithExcel/AddMultipleMaterialComponent";
 import { useTranslation } from 'react-i18next';
 import { AddCategory, Category } from "../../../../../models/AdminCategoryExcelModel";
 import axios from "axios";
