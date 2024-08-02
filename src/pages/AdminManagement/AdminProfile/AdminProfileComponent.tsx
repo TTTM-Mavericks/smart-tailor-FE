@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Sidebar from '../GlobalComponent/SidebarComponent/SidebarComponent';
-import Navbar from '../GlobalComponent/NavbarComponent/NavbarComponent';
 import { IconButton } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
 import ProfileSetup from './AdminProfileSettingComponent';
@@ -41,7 +40,7 @@ const DashboardAdminProfileScreens = () => {
         <div className="flex">
             <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
             <div className="flex flex-col w-full">
-                <Navbar toggleMenu={toggleMenu} />
+                {/* <Navbar toggleMenu={toggleMenu} /> */}
                 <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
                     <ProfileSetup />
                 </main>

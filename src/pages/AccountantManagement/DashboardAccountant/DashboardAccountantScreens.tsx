@@ -6,11 +6,17 @@ import { ArrowUpward } from '@mui/icons-material';
 import AccountantDashboards from '../AccountantDashboard/AccountantDashboardScreen';
 import AccountantManagePaymentForBrandComponent from '../AccountantManagePaymentForBrand/AccountantManagePaymentForBrandComponent';
 
-const DashboardAccountantScreens = () => {
+// Define the type for popperOpen
+type PopperOpenState = Record<string, boolean>;
+
+const DashboardAccountantScreens: React.FC = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [activeMenu, setActiveMenu] = useState('accountant_dashboard');
     const [showScrollButton, setShowScrollButton] = useState(false);
-    const [popperOpen, setPopperOpen] = useState({});
+    const [popperOpen, setPopperOpen] = useState<PopperOpenState>({ // Initialize with type
+        notification: false,
+        user: false,
+    });
 
     useEffect(() => {
         // Get the active tab from localStorage on component mount
@@ -24,14 +30,14 @@ const DashboardAccountantScreens = () => {
         setMenuOpen(!menuOpen);
     };
 
-    const handleMenuClick = (menu: any) => {
+    const handleMenuClick = (menu: string) => { // Updated to string type
         setActiveMenu(menu);
         // Save the active tab to localStorage
         localStorage.setItem('accountantActiveMenu', menu);
     };
 
     useEffect(() => {
-        const handleClickOutside = (event: any) => {
+        const handleClickOutside = (event: MouseEvent) => {
             if (event.target instanceof Element) {
                 if (!event.target.closest('.popover')) {
                     setPopperOpen({
@@ -69,10 +75,10 @@ const DashboardAccountantScreens = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    const togglePopper = (key: any) => {
+    const togglePopper = (key: string) => { // Accept any string key
         setPopperOpen((prev) => ({
-            notification: key === 'notification' ? !prev.notification : false,
-            user: key === 'user' ? !prev.user : false,
+            ...prev,
+            [key]: !prev[key], // Toggle the specific key
         }));
     };
 
@@ -80,13 +86,11 @@ const DashboardAccountantScreens = () => {
         switch (activeMenu) {
             case 'accountant_manage_brand_payment':
                 return (
-                    <AccountantManagePaymentForBrandComponent></AccountantManagePaymentForBrandComponent>
+                    <AccountantManagePaymentForBrandComponent />
                 );
             default:
                 return (
-                    // <AccountantDashboards />
-                    <AccountantManagePaymentForBrandComponent></AccountantManagePaymentForBrandComponent>
-
+                    <AccountantManagePaymentForBrandComponent />
                 );
         }
     };
@@ -99,7 +103,7 @@ const DashboardAccountantScreens = () => {
                 <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
                     {renderComponent()}
                 </main>
-                {/* {showScrollButton && (
+                {showScrollButton && (
                     <IconButton
                         style={{
                             position: 'fixed',
@@ -113,7 +117,7 @@ const DashboardAccountantScreens = () => {
                     >
                         <ArrowUpward />
                     </IconButton>
-                )} */}
+                )}
             </div>
         </div>
     );

@@ -21,6 +21,7 @@ const GeographyChart = () => {
             i18n.changeLanguage(selectedLanguage);
         }
     }, [selectedLanguage, i18n]);
+
     return (
         <>
             <Typography m="40px" variant="h5">
@@ -61,22 +62,11 @@ const GeographyChart = () => {
                         },
                     },
                 }}
-
-                // value={() => { "Value" }}
-                // match={{ text: 'Some tooltip text' }}
-                // layers={['graticule', 'features']}
                 projectionType="mercator"
-                fillColor={""}
                 enableGraticule={true}
-                role=""
-                onClick={() => { "Click" }}
-                onMouseLeave={() => { "Leave" }}
-                onMouseMove={() => { "Move" }}
-                onMouseEnter={() => { "Enter" }}
                 isInteractive={true}
-                graticuleLineColor=""
+                graticuleLineColor={colors.primary[200]}
                 graticuleLineWidth={1}
-
                 features={geoFeatures.features}
                 margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
                 colors="nivo"
@@ -89,88 +79,31 @@ const GeographyChart = () => {
                 projectionRotation={[255, 0, 0]}
                 borderWidth={1.5}
                 borderColor={colors.primary[200]}
-
-                defs={[
+                legends={[
                     {
-                        id: 'dots',
-                        type: 'patternDots',
-                        background: 'inherit',
-                        color: '#38bcb2',
-                        size: 4,
-                        padding: 1,
-                        stagger: true
-                    },
-                    {
-                        id: 'lines',
-                        type: 'patternLines',
-                        background: 'inherit',
-                        color: '#eed312',
-                        rotation: -45,
-                        lineWidth: 6,
-                        spacing: 10
-                    },
-                    {
-                        id: 'gradient',
-                        type: 'linearGradient',
-                        colors: [
+                        anchor: "left",
+                        direction: "column",
+                        justify: true,
+                        translateX: 120,
+                        translateY: -100,
+                        itemsSpacing: 0,
+                        itemWidth: 94,
+                        itemHeight: 18,
+                        itemDirection: "left-to-right",
+                        itemTextColor: colors.primary[200],
+                        itemOpacity: 0.85,
+                        symbolSize: 18,
+                        effects: [
                             {
-                                offset: 0,
-                                color: '#000'
-                            },
-                            {
-                                offset: 100,
-                                color: 'inherit'
-                            }
-                        ]
-                    }
-                ]}
-                fill={[
-                    {
-                        match: {
-                            id: 'CAN'
-                        },
-                        id: 'dots'
-                    },
-                    {
-                        match: {
-                            id: 'CHN'
-                        },
-                        id: 'lines'
-                    },
-                    {
-                        match: {
-                            id: 'ATA'
-                        },
-                        id: 'gradient'
-                    }
-                ]}
-                legends={
-                    [
-                        {
-                            anchor: "left",
-                            direction: "column",
-                            justify: true,
-                            translateX: 120,
-                            translateY: -100,
-                            itemsSpacing: 0,
-                            itemWidth: 94,
-                            itemHeight: 18,
-                            itemDirection: "left-to-right",
-                            itemTextColor: colors.primary[200],
-                            itemOpacity: 0.85,
-                            symbolSize: 18,
-                            effects: [
-                                {
-                                    on: "hover",
-                                    style: {
-                                        itemTextColor: colors.primary[200],
-                                        itemOpacity: 1,
-                                    },
+                                on: "hover",
+                                style: {
+                                    itemTextColor: colors.primary[200],
+                                    itemOpacity: 1,
                                 },
-                            ],
-                        },
-                    ]
-                }
+                            },
+                        ],
+                    },
+                ]}
             />
         </>
     );

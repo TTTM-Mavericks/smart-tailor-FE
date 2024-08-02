@@ -1,8 +1,29 @@
-import React from 'react';
-import { LineChart, Line, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import {
+    XAxis,
+    YAxis,
+    Tooltip,
+    PieChart,
+    Pie,
+    Cell,
+    ResponsiveContainer,
+    AreaChart,
+    Area,
+} from 'recharts';
 
-const AccountantDashboard = () => {
-    const lineChartData = [
+// Data types for charts
+interface LineChartData {
+    name: string;
+    value: number;
+}
+
+interface PieChartData {
+    name: string;
+    value: number;
+    color: string;
+}
+
+const AccountantDashboard: React.FC = () => {
+    const lineChartData: LineChartData[] = [
         { name: 'Apr', value: 1000 },
         { name: 'May', value: 2000 },
         { name: 'Jun', value: 3000 },
@@ -11,7 +32,7 @@ const AccountantDashboard = () => {
         { name: 'Sep', value: 5000 },
     ];
 
-    const pieChartData = [
+    const pieChartData: PieChartData[] = [
         { name: 'Income', value: 55, color: '#00C49F' },
         { name: 'Tax', value: 35, color: '#000000' },
         { name: 'Expenses', value: 10, color: '#E0F2F1' },
@@ -27,7 +48,7 @@ const AccountantDashboard = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-4 mb-6">
-                <ChartCard title="Total Income" subtitle="">
+                <ChartCard title="Total Income">
                     <ResponsiveContainer width="100%" height={300}>
                         <AreaChart data={lineChartData}>
                             <defs>
@@ -127,7 +148,14 @@ const AccountantDashboard = () => {
     );
 };
 
-const StatCard = ({ title, value, change }) => (
+// StatCard Component
+interface StatCardProps {
+    title: string;
+    value: string;
+    change: number;
+}
+
+const StatCard: React.FC<StatCardProps> = ({ title, value, change }) => (
     <div className="bg-white p-4 rounded-lg shadow flex items-center justify-between">
         <div>
             <h3 className="text-sm text-gray-500 mb-1">{title}</h3>
@@ -151,48 +179,61 @@ const StatCard = ({ title, value, change }) => (
     </div>
 );
 
-const ChartCard = ({ title, subtitle, children }) => (
+// ChartCard Component
+interface ChartCardProps {
+    title: string;
+    subtitle?: string;
+    children?: React.ReactNode;
+}
+
+const ChartCard: React.FC<ChartCardProps> = ({ title, subtitle, children }) => (
     <div className="bg-white p-4 rounded-lg shadow">
         <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold">{title}</h3>
             {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
-            <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
         </div>
         {children}
     </div>
 );
 
-const LegendItem = ({ color, label, value }) => (
+// LegendItem Component
+interface LegendItemProps {
+    color: string;
+    label: string;
+    value: string;
+}
+
+const LegendItem: React.FC<LegendItemProps> = ({ color, label, value }) => (
     <div className="flex items-center">
-        <div className={`w-3 h-3 rounded-full mr-2`} style={{ backgroundColor: color }}></div>
-        <span className="text-sm font-medium">{label}</span>
-        <span className="text-sm ml-2 text-gray-500">{value}</span>
+        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }}></div>
+        <p className="ml-2 text-sm">{label}: {value}</p>
     </div>
 );
 
-const TransactionRow = ({ category, name, date, amountDue, amountPaid, status }) => (
-    <tr className="border-b last:border-b-0 text-sm">
-        <td className="py-3 text-blue-600">{category}</td>
-        <td className="py-3">{name}</td>
-        <td className="py-3 text-gray-500">{date}</td>
-        <td className="py-3">{amountDue}</td>
-        <td className="py-3">{amountPaid}</td>
-        <td className="py-3">
-            <span className={`px-2 py-1 rounded-full text-xs ${status.toLowerCase() === 'paid'
-                ? 'bg-green-100 text-green-800'
-                : 'bg-red-100 text-red-800'
-                }`}>
+// TransactionRow Component
+interface TransactionRowProps {
+    category: string;
+    name: string;
+    date: string;
+    amountDue: string;
+    amountPaid: string;
+    status: string;
+}
+
+const TransactionRow: React.FC<TransactionRowProps> = ({ category, name, date, amountDue, amountPaid, status }) => (
+    <tr className="text-sm text-gray-700 border-b">
+        <td className="py-2">{category}</td>
+        <td className="py-2">{name}</td>
+        <td className="py-2">{date}</td>
+        <td className="py-2">{amountDue}</td>
+        <td className="py-2">{amountPaid}</td>
+        <td className="py-2">
+            <span className={`inline-block px-2 py-1 rounded-full text-xs ${status === 'Overdue' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
                 {status}
             </span>
         </td>
-        <td className="py-3">
-            <button className="text-gray-400 hover:text-gray-600">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
-                </svg>
-            </button>
+        <td className="py-2">
+            <button className="text-blue-500 hover:text-blue-700">Edit</button>
         </td>
     </tr>
 );

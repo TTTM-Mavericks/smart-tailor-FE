@@ -1,4 +1,4 @@
-import { Box, Card, useTheme } from "@mui/material";
+import { useTheme } from "@mui/material";
 import { tokens } from "../../../theme";
 import CardInformationDetailComponent from "./CardInformationDetailComponent";
 

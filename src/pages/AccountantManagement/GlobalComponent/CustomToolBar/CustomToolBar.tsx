@@ -13,8 +13,11 @@ const CustomToolbar = () => {
 
     useEffect(() => {
         const updateFilteredRowCount = () => {
-            const visibleRows = apiRef.current.getVisibleRowModels();
-            setFilteredRowCount(visibleRows.size);
+            // Get visible rows
+            const visibleRows = apiRef.current.getVisibleColumns();
+
+            // Count visible rows
+            setFilteredRowCount(visibleRows.length);
         };
 
         // Update initially

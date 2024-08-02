@@ -1,17 +1,7 @@
 import { useState, useEffect } from "react";
-import {
-    Box,
-    useTheme,
-    Card,
-    CardContent,
-    Typography,
-    CardMedia,
-} from "@mui/material";
-import Grid from "@mui/material/Unstable_Grid2";
+import { useTheme } from "@mui/material";
 import { tokens } from "../../../theme";
 import { useTranslation } from 'react-i18next';
-import CountUp from 'react-countup';
-import { color } from "@mui/system";
 
 const CardInformationDetailComponent = () => {
     const theme = useTheme();
