@@ -4,6 +4,7 @@ import {
     GridToolbarExport,
     GridToolbarFilterButton,
     useGridApiContext,
+    gridFilteredSortedRowIdsSelector,
 } from '@mui/x-data-grid';
 import { Badge } from '@mui/material';
 
@@ -13,8 +14,8 @@ const CustomToolbar = () => {
 
     useEffect(() => {
         const updateFilteredRowCount = () => {
-            const visibleRows = apiRef.current.getVisibleRowModels();
-            setFilteredRowCount(visibleRows.size);
+            const visibleRowIds = gridFilteredSortedRowIdsSelector(apiRef);
+            setFilteredRowCount(visibleRowIds.length);
         };
 
         // Update initially
