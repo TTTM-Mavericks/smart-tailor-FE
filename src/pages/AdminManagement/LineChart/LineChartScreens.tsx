@@ -123,8 +123,8 @@ const LineChart = () => {
                             color: colors.primary[300],
                         }}
                     >
-                        <div>x: {point.data.x}</div>
-                        <div>y: {point.data.y}</div>
+                        <div>x: {point.data.x?.toString()}</div>
+                        <div>y: {point.data.y?.toString()}</div>
                     </div>
                 )}
                 fill={[]}
@@ -213,7 +213,6 @@ const LineChart = () => {
                             ],
                         },
                     ]}
-
             />
         </>
     );

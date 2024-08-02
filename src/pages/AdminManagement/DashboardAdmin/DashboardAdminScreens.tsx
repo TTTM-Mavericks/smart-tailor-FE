@@ -16,11 +16,17 @@ import ManageSizes from '../ManageSize/AdminSizeManagement/AdminManagerScreen/Ma
 import ManageCategories from '../ManageCategory/AdminCategoryManagement/AdminManagerScreen/ManageCategoryScreens';
 import AdminConfiguration from '../SystemConfigurationAdministration/SystemConfigurationAdministrationScreen';
 
+// Define the type for popperOpen
+type PopperOpenState = Record<string, boolean>;
+
 const DashboardAdminScreens = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [activeMenu, setActiveMenu] = useState('admin_dashboard');
     const [showScrollButton, setShowScrollButton] = useState(false);
-    const [popperOpen, setPopperOpen] = useState({});
+    const [popperOpen, setPopperOpen] = useState<PopperOpenState>({ // Initialize with type
+        notification: false,
+        user: false,
+    });
 
     useEffect(() => {
         // Get the active tab from localStorage on component mount
@@ -34,7 +40,7 @@ const DashboardAdminScreens = () => {
         setMenuOpen(!menuOpen);
     };
 
-    const handleMenuClick = (menu: any) => {
+    const handleMenuClick = (menu: string) => {
         setActiveMenu(menu);
         // Save the active tab to localStorage
         localStorage.setItem('activeMenu', menu);
@@ -79,10 +85,10 @@ const DashboardAdminScreens = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    const togglePopper = (key: any) => {
+    const togglePopper = (key: string) => { // Accept any string key
         setPopperOpen((prev) => ({
-            notification: key === 'notification' ? !prev.notification : false,
-            user: key === 'user' ? !prev.user : false,
+            ...prev,
+            [key]: !prev[key], // Toggle the specific key
         }));
     };
 

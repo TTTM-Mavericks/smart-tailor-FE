@@ -12,63 +12,8 @@ import axios from 'axios';
 import Rating from '@mui/material/Rating';
 import { motion, useInView } from 'framer-motion';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../api/ApiConfig';
-
-const products = [
-    {
-        id: 1,
-        name: 'Basic Tee',
-        href: '#',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
-        imageAlt: "Front of men's Basic Tee in black.",
-        price: '$35',
-        color: 'Black',
-    },
-    {
-        id: 2,
-        name: 'Basic Tee',
-        href: '#',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
-        imageAlt: "Front of men's Basic Tee in black.",
-        price: '$35',
-        color: 'Black',
-    },
-    {
-        id: 3,
-        name: 'Basic Tee',
-        href: '#',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
-        imageAlt: "Front of men's Basic Tee in black.",
-        price: '$35',
-        color: 'Black',
-    },
-    {
-        id: 4,
-        name: 'Basic Tee',
-        href: '#',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
-        imageAlt: "Front of men's Basic Tee in black.",
-        price: '$35',
-        color: 'Black',
-    },
-    {
-        id: 5,
-        name: 'Basic Tee',
-        href: '#',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
-        imageAlt: "Front of men's Basic Tee in black.",
-        price: '$35',
-        color: 'Black',
-    },
-    {
-        id: 6,
-        name: 'Basic Tee',
-        href: '#',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
-        imageAlt: "Front of men's Basic Tee in black.",
-        price: '$35',
-        color: 'Black',
-    },
-]
+import { IconButton } from '@mui/material';
+import { ArrowUpward } from '@mui/icons-material';
 
 const HomeScreen = () => {
 
@@ -137,24 +82,38 @@ const HomeScreen = () => {
         }
     }, [selectedLanguage, i18n]);
 
-
     useEffect(() => {
         const slider = document.getElementById('slider');
-        const slides = slider.children;
+
+        if (!slider) {
+            console.error("Slider element not found");
+            return;
+        }
+
+        const slides = Array.from(slider.children);
         let currentIndex = 0;
 
         function slideNext() {
-            slides[currentIndex].classList.add('fade-out');
+            if (slides[currentIndex] instanceof HTMLElement) {
+                slides[currentIndex].classList.add('fade-out');
+            }
 
             setTimeout(() => {
                 currentIndex = (currentIndex + 1) % slides.length;
-                slider.style.transform = `translateX(-${currentIndex * 100}%)`;
-                slides[currentIndex].classList.remove('fade-out');
-                slides[currentIndex].classList.add('fade-in');
+                if (slider instanceof HTMLElement) {
+                    slider.style.transform = `translateX(-${currentIndex * 100}%)`;
+                }
 
-                setTimeout(() => {
-                    slides[currentIndex].classList.remove('fade-in');
-                }, 500);
+                if (slides[currentIndex] instanceof HTMLElement) {
+                    slides[currentIndex].classList.remove('fade-out');
+                    slides[currentIndex].classList.add('fade-in');
+
+                    setTimeout(() => {
+                        if (slides[currentIndex] instanceof HTMLElement) {
+                            slides[currentIndex].classList.remove('fade-in');
+                        }
+                    }, 500);
+                }
             }, 500);
         }
 
@@ -171,38 +130,6 @@ const HomeScreen = () => {
         window.location.href = '/product'
     }
 
-    interface FashionItem {
-        id: number;
-        name: string;
-        price: number;
-        image: string;
-        size: string;
-        tags: string[];
-        colors: string[]
-    }
-
-    const fashionItems: FashionItem[] = [
-        {
-            id: 1,
-            name: "Simple Print Men's Thin T-Shirt Short Sleeve Support 4 Sides",
-            price: 10.09,
-            image: "https://res.cloudinary.com/dby2saqmn/image/upload/v1720536717/clothes/mplmusqeleocefrsqrzf.png",
-            size: "2T-XL",
-            tags: ["Recommend"],
-            colors: ["#bb4944", "#90af50", "#4eb0b1"]
-        },
-        {
-            id: 2,
-            name: "Simple Print Men's Thin T-Shirt Short Sleeve Support 4 Sides",
-            price: 10.09,
-            image: "https://res.cloudinary.com/dby2saqmn/image/upload/v1720536717/clothes/mplmusqeleocefrsqrzf.png",
-            size: "2T-XL",
-            tags: ["Recommend"],
-            colors: ["#1ecbe1", "#d32cc2", "#47da25"]
-        },
-    ];
-
-    const [hoveredItem, setHoveredItem] = useState<number | null>(null);
     const [designData, setDesignData] = useState<any>([])
     useEffect(() => {
         const apiUrl = `${baseURL}${versionEndpoints.v1}/${featuresEndpoints.design}${functionEndpoints.design.getAllDesign}`;
@@ -236,12 +163,34 @@ const HomeScreen = () => {
 
     const [currentFilter, setCurrentFilter] = useState('All');
 
-    const materialCategories = ['All', "Cotton Fabric", "Silk Fabric", "Linen Fabric", "Polyester Thread", "Nylon Thread"];
+    const materialCategories = ['All', "Cotton Fabric", "Silk Fabric", "Linen Fabric"];
 
     const filteredDesigns = designData.filter((design: any) => {
         if (currentFilter === 'All') return true;
         return design.partOfDesign.some((part: any) => part.material.materialName === currentFilter);
     });
+
+    const [showScrollButton, setShowScrollButton] = useState(false);
+
+    const _handleScrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 200) {
+                setShowScrollButton(true);
+            } else {
+                setShowScrollButton(false);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
 
     return (
         <div>
@@ -348,153 +297,8 @@ const HomeScreen = () => {
                 </div>
             </div>
 
-            {/* Test Product */}
-            <div className="container mx-auto px-4">
-                <h1 className="text-3xl font-bold text-center my-8">Fashion Items</h1>
-                <p className="text-center mb-8">Each product has undergone strict quality control</p>
-
-
-                <div className="flex justify-center space-x-4 mb-8">
-                    {materialCategories.map((category) => (
-                        <button
-                            key={category}
-                            className={`px-4 py-2 ${currentFilter === category ? 'text-orange-600' : 'text-black-600'} hover:text-orange-600`}
-                            onClick={() => setCurrentFilter(category)}
-                        >
-                            {category}
-                        </button>
-                    ))}
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                    {filteredDesigns.slice(0, 10).map((item: any) => {
-                        const basePrices = getBasePricesForDesign(designData, item.designID);
-                        const totalBasePrice = sumBasePrices(basePrices);
-                        return (
-                            <div
-                                key={item.id}
-                                className="product-card relative overflow-hidden border border-gray-200 rounded-lg"
-                                onMouseEnter={() => setHoveredItem(item.designID)}
-                                onMouseLeave={() => setHoveredItem(null)}
-                            >
-                                <div className="image-container relative w-full h-48 overflow-hidden">
-                                    <img src={item.imageUrl} alt={item.imageAlt} className="w-full h-full object-contain" />
-                                    <button
-                                        onClick={_handleCreateDesign}
-                                        className="start-design-btn absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-orange-600 bg-white py-1 px-2 border-2 border-orange-600 rounded opacity-0 transition-opacity duration-300 hover:bg-gray-100"
-                                    >
-                                        Start Design
-                                    </button>
-                                </div>
-                                <div className="product-info p-4">
-                                    <p className="price text-xl font-bold text-orange-500">{totalBasePrice} VND</p>
-                                    <h2 className="text-sm mb-2">{item.titleDesign}</h2>
-                                    <p className="text-sm text-gray-600">Size: {item.size}</p>
-                                    <div className='flex'>
-                                        <p className="text-sm text-gray-600">Color</p>
-                                        <div className="flex space-x-1 mt-2">
-                                            <div key={item.color} className="w-4 h-4 -mt-1 ml-2" style={{ backgroundColor: item.color, border: "1px solid black" }}></div>
-                                        </div>
-                                        {/* <div className="flex space-x-1 mt-2">
-                                            {item.color.map((color: any) => (
-                                                <div key={color} className="w-4 h-4 -mt-1 ml-2" style={{ backgroundColor: color }}></div>
-                                            ))}
-                                        </div> */}
-                                    </div>
-                                </div>
-
-                                <div className={`hover-details absolute bottom-0 left-0 right-0 bg-white p-4 transform transition-transform duration-300 ${hoveredItem === item.id ? 'translate-y-0' : 'translate-y-full'}`}>
-                                    <p className="price text-xl font-bold text-orange-500 mb-2">{totalBasePrice} VND</p>
-                                    <p className="text-sm">Size: {item.size}</p>
-                                    <h2 className="text-sm mb-2">{item.titleDesign}</h2>
-                                    <div className='flex'>
-                                        <p className="text-sm text-gray-600">Color</p>
-                                        <div className="flex space-x-1 mt-2">
-                                            <div key={item.color} className="w-4 h-4 -mt-1 ml-2" style={{ backgroundColor: item.color, border: "1px solid black" }}></div>
-                                        </div>
-                                        {/* <div className="flex space-x-1 mt-2">
-                                            {item.color.map((color: any) => (
-                                                <div key={color} className="w-4 h-4 -mt-1 ml-2" style={{ backgroundColor: color }}></div>
-                                            ))}
-                                        </div> */}
-                                    </div>
-                                    <p className="text-sm">97% polyester & 3% Spandex</p>
-                                    {/* <div className="flex space-x-2 mt-2">
-                                        {item.tags.map((tag: any) => (
-                                            <span key={tag} className="px-2 py-1 bg-purple-600 text-white text-xs rounded-full">
-                                                {tag}
-                                            </span>
-                                        ))}
-                                    </div> */}
-                                </div>
-                            </div>
-                        )
-                    })}
-                </div>
-
-                <div className="mt-8 text-center justify-content-center">
-                    <button className="inline-block px-6 py-2 border border-orange-500 text-orange-500 rounded-md hover:bg-orange-100 transition-colors duration-300">
-                        MORE &gt;
-                    </button>
-                </div>
-                {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                    {fashionItems.map((item) => (
-                        <div
-                            key={item.id}
-                            className="product-card relative overflow-hidden border border-gray-200 rounded-lg"
-                            onMouseEnter={() => setHoveredItem(item.id)}
-                            onMouseLeave={() => setHoveredItem(null)}
-                        >
-                            <div className="image-container relative w-full h-48 overflow-hidden">
-                                <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
-                                <button
-                                    onClick={_handleCreateDesign}
-                                    className="start-design-btn absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-gray-700 bg-white py-1 px-2 border-2 border-gray-700 rounded opacity-0 transition-opacity duration-300 hover:bg-gray-100"
-                                >
-                                    Start Design
-                                </button>
-                            </div>
-                            <div className="product-info p-4">
-                                <p className="price text-xl font-bold text-orange-500">${item.price.toFixed(2)}</p>
-                                <h2 className="text-sm mb-2">{item.name}</h2>
-                                <p className="text-sm text-gray-600">Size: {item.size}</p>
-                                <div className='flex'>
-                                    <p className="text-sm text-gray-600">Color</p>
-                                    <div className="flex space-x-1 mt-2">
-                                        {item.colors.map((color) => (
-                                            <div key={color} className="w-4 h-4 -mt-1 ml-2" style={{ backgroundColor: color }}></div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                            <div className={`hover-details absolute bottom-0 left-0 right-0 bg-white p-4 transform transition-transform duration-300 ${hoveredItem === item.id ? 'translate-y-0' : 'translate-y-full'}`}>
-                                <p className="price text-xl font-bold text-orange-500 mb-2">${item.price.toFixed(2)}</p>
-                                <p className="text-sm">Size: {item.size}</p>
-                                <div className='flex'>
-                                    <p className="text-sm text-gray-600">Color</p>
-                                    <div className="flex space-x-1 mt-2">
-                                        {item.colors.map((color) => (
-                                            <div key={color} className="w-4 h-4 -mt-1 ml-2" style={{ backgroundColor: color }}></div>
-                                        ))}
-                                    </div>
-                                </div>
-                                <p className="text-sm">97% polyester & 3% Spandex</p>
-                                <div className="flex space-x-2 mt-2">
-                                    {item.tags.map((tag) => (
-                                        <span key={tag} className="px-2 py-1 bg-purple-600 text-white text-xs rounded-full">
-                                            {tag}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div> */}
-            </div>
-
-
             {/* Product */}
-            <div className="bg-white py-24 sm:py-32" style={{ marginTop: "-4%" }}>
+            <div>
                 <motion.div
                     ref={productRef}
                     initial={{ opacity: 0, y: 50 }}
@@ -509,29 +313,41 @@ const HomeScreen = () => {
                                 {t(codeLanguage + '000136')}
                             </p>
                         </div>
+
+                        <div className="flex justify-center space-x-4 mb-8 mt-10">
+                            {materialCategories.map((category) => (
+                                <button
+                                    key={category}
+                                    className={`px-4 py-2 ${currentFilter === category ? 'text-orange-600 border-b-2 border-orange-600' : 'text-gray-600'} hover:text-orange-600 transition duration-300`}
+                                    onClick={() => setCurrentFilter(category)}
+                                >
+                                    {category}
+                                </button>
+                            ))}
+                        </div>
+
                         <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-6xl">
                             <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
-                                {Array.from({ length: 8 }).map((_, index) => (
-                                    <div key={index} className="relative group">
+                                {filteredDesigns.slice(0, 12).map((item: any) => (
+                                    <div key={item.designID} className="relative group">
                                         <img
-                                            src="https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg"
-                                            alt={`Product ${index + 1}`}
+                                            src={item.imageUrl}
+                                            alt={item.imageAlt}
                                             className="w-full h-full object-cover rounded-lg shadow-lg transform transition-transform group-hover:scale-105"
                                         />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-70 rounded-lg"></div>
+                                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-gray-400 via-transparent to-transparent opacity-70 rounded-lg"></div>
                                         <div className="absolute bottom-4 left-4">
                                             <h3 className="text-2xl font-bold text-white" style={{ marginBottom: "10%" }}>
-                                                {t(codeLanguage + '000130')} {index + 1}
+                                                {item.titleDesign}
                                             </h3>
                                             <a
-                                                href="/design"
+                                                href="/design_create"
                                                 className="text-indigo-400 underline"
                                                 style={{
                                                     textDecoration: "none",
                                                     backgroundColor: primaryColor,
                                                     color: "white",
-                                                    padding: "5px",
-                                                    borderRadius: "6%",
+                                                    padding: "5px"
                                                 }}
                                             >
                                                 Design Now
@@ -541,12 +357,19 @@ const HomeScreen = () => {
                                 ))}
                             </div>
                         </div>
+                        <div className="mt-8 text-center justify-content-center">
+                            <button
+                                onClick={_handlePreviewProduct}
+                                className="inline-block px-6 py-2 border border-orange-500 text-orange-500 rounded-md hover:bg-orange-100 transition-colors duration-300">
+                                MORE &gt;
+                            </button>
+                        </div>
                     </div>
                 </motion.div>
             </div>
 
             {/* Content */}
-            <div className="bg-white animate-fadeIn py-24 sm:py-32" style={{ marginTop: "-10%" }}>
+            <div className="bg-white animate-fadeIn py-24 sm:py-32" >
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
                     <div className="mx-auto max-w-2xl lg:text-center">
                         <motion.div
@@ -612,7 +435,6 @@ const HomeScreen = () => {
             </div>
 
             {/* Products */}
-
             <div className="bg-white" style={{ marginTop: "-8%" }}>
                 <motion.div
                     ref={testimonialsRef}
@@ -620,47 +442,65 @@ const HomeScreen = () => {
                     animate={isTestimonialsVisible ? { opacity: 1, y: 0, transition: { duration: 0.5 } } : {}}
                 >
                     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-
-                        <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl animate-slideIn" style={{ textAlign: "center" }}>
+                        <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl text-center animate-slideIn">
                             {t(codeLanguage + '000179')}
                         </p>
-                        <p className="mt-6 text-lg leading-8 text-gray-600" style={{ textAlign: "center" }}>
+                        <p className="mt-6 text-lg leading-8 text-gray-600 text-center">
                             {t(codeLanguage + '000180')}
                         </p>
                         <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-8">
+                            {designData.slice(0, 8).map((product: any) => {
+                                const basePrices = getBasePricesForDesign(designData, product.designID);
+                                const totalBasePrice = sumBasePrices(basePrices);
+                                return (
+                                    <div key={product.id} className="group relative overflow-hidden bg-gray-200 rounded-md hover:shadow-lg transition duration-300 ease-in-out">
+                                        <div className="aspect-w-1 aspect-h-1 w-full">
+                                            <img
+                                                src={product.imageUrl}
+                                                alt={product.imageAlt}
+                                                className="object-cover object-center w-full h-full"
+                                            />
+                                        </div>
+                                        <div className="p-4">
+                                            <h3 className="text-base font-semibold text-gray-900 truncate">{product.titleDesign}</h3>
+                                            <div className="flex mb-3">
+                                                <p className="text-sm text-gray-600">Color</p>
+                                                <div className="flex space-x-1 mt-2">
+                                                    <div key={product.color} className="w-4 h-4 -mt-1 ml-2" style={{ backgroundColor: product.color, border: "1px solid black" }}></div>
+                                                </div>
+                                            </div>
+                                            <Rating
+                                                name="half-rating"
+                                                defaultValue={2.5}
+                                                precision={0.5}
+                                                readOnly
+                                            />
+                                            <p className="mt-2 text-lg font-bold text-gray-900">{totalBasePrice} VND</p>
+                                        </div>
+                                        <div className='flex'>
+                                            <div className="flex space-x-2 mb-2 ml-3">
+                                                <span className="px-2 py-1 bg-purple-600 text-white text-xs rounded-full">
+                                                    {product.expertTailoring.expertTailoringName}
+                                                </span>
+                                            </div>
 
-                            {products.map((product) => (
-
-                                <div key={product.id} className="group relative overflow-hidden bg-gray-200 rounded-md hover:shadow-lg transition duration-300 ease-in-out">
-                                    <div className="aspect-w-1 aspect-h-1 w-full">
-                                        <img
-                                            src={product.imageSrc}
-                                            alt={product.imageAlt}
-                                            className="object-cover object-center w-full h-full"
-                                        />
+                                            <div className="flex space-x-2 mb-2 ml-3">
+                                                <span className="px-2 py-1 bg-green-600 text-white text-xs rounded-full">
+                                                    {product.publicStatus === true ? 'REMAINS' : 'SOLD OUT'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <a href={product.href} className="absolute inset-0 z-10"></a>
                                     </div>
-                                    <div className="p-4">
-                                        <h3 className="text-base font-semibold text-gray-900 truncate">{product.name}</h3>
-                                        <p className="mt-1 text-sm text-gray-600">{product.color}</p>
-                                        <Rating
-                                            name="half-rating"
-                                            defaultValue={2.5}
-                                            precision={0.5}
-                                            readOnly
-                                        />
-                                        <p className="mt-2 text-lg font-bold text-gray-900">{product.price}</p>
-                                    </div>
-
-                                    <a href={product.href} className="absolute inset-0 z-10"></a>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
                 </motion.div>
             </div>
 
             {/* Companies */}
-            <div className="bg-white py-24 sm:py-32" style={{ marginTop: "-8%" }}>
+            < div className="bg-white py-24 sm:py-32" style={{ marginTop: "-8%" }}>
                 <motion.div
                     ref={containerRef}
                     initial={{ opacity: 0, y: 50 }}
@@ -712,10 +552,10 @@ const HomeScreen = () => {
                         </div>
                     </div>
                 </motion.div>
-            </div>
+            </div >
 
             {/* Upgrade detail */}
-            <div className="bg-white py-24 sm:py-32" style={{ marginTop: "-9%" }}>
+            < div className="bg-white py-24 sm:py-32" style={{ marginTop: "-9%" }}>
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
                     <div className="mx-auto max-w-2xl sm:text-center">
                         <motion.div
@@ -791,10 +631,10 @@ const HomeScreen = () => {
                         </div>
                     </motion.div>
                 </div>
-            </div>
+            </div >
 
             {/* Numberic */}
-            <div className="bg-white py-24 sm:py-32" style={{ marginTop: "-12%" }} >
+            < div className="bg-white py-24 sm:py-32" style={{ marginTop: "-12%" }} >
                 <motion.div
                     ref={numbericRef}
                     initial={{ opacity: 0, y: 50 }}
@@ -827,10 +667,10 @@ const HomeScreen = () => {
                         </dl>
                     </div>
                 </motion.div>
-            </div>
+            </div >
 
             {/* Contact form */}
-            <div className="isolate bg-white px-6 py-24 sm:py-32 lg:px-8" style={{ marginTop: "-10%" }}>
+            < div className="isolate bg-white px-6 py-24 sm:py-32 lg:px-8" style={{ marginTop: "-10%" }}>
                 <motion.div
                     ref={contactRef}
                     initial={{ opacity: 0, y: 50 }}
@@ -998,14 +838,29 @@ const HomeScreen = () => {
                         </div>
                     </form>
                 </motion.div>
-            </div>
+
+                {showScrollButton && (
+                    <IconButton
+                        style={{
+                            position: 'fixed',
+                            bottom: '20px',
+                            right: '20px',
+                            zIndex: 100,
+                            backgroundColor: "#E96208",
+                            color: "white"
+                        }}
+                        onClick={_handleScrollToTop}
+                    >
+                        <ArrowUpward />
+                    </IconButton>
+                )}
+            </div >
 
             {/* Footer */}
-            <FooterComponent></FooterComponent>
+            <FooterComponent></FooterComponent >
+
         </div >
     );
 };
-
-
 
 export default HomeScreen;

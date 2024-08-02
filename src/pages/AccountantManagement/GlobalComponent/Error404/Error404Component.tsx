@@ -1,7 +1,6 @@
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import { styled } from '@mui/system';
-import spaceBackground from '../../../../assets/system/smart-tailor_logo.png'; // Import your space background image
 
 // Styled component for the container
 const Container = styled(Box)({
@@ -21,7 +20,7 @@ const OopsText = styled(Typography)({
     fontWeight: 'bold',
     fontSize: '6rem',
     textShadow: '0 0 10px rgba(255, 255, 255, 0.5)',
-    backgroundImage: `url(${spaceBackground})`,
+    backgroundImage: `url(../../../../assets/system/smart-tailor_logo.png)`,
     backgroundClip: 'text',
     color: 'transparent',
     animation: '$textShine 5s infinite alternate',
