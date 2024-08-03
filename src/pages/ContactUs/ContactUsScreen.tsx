@@ -2,7 +2,6 @@ import React, { useRef } from 'react';
 import { Container, Typography, Box, Button, Grid, TextField } from '@mui/material';
 import { motion, useInView } from 'framer-motion';
 import styles from './ContactUsStyles.module.scss';
-import brandImage from '../../../src/assets/img/avatar.jpg';
 import { FaFacebook, FaTwitter, FaInstagram } from 'react-icons/fa';
 import HeaderComponent from '../../components/Header/HeaderComponent';
 import FooterComponent from '../../components/Footer/FooterComponent';
@@ -72,7 +71,7 @@ const ContactUsPage = () => {
                         <Grid item xs={12} md={6}>
                             <motion.div variants={itemVariants}>
                                 <Box bgcolor="background.paper" p={4} borderRadius={4}>
-                                    <img src={brandImage} alt="Brand" className={styles['brand-image']} />
+                                    <img src="../../../src/assets/img/avatar.jpg" alt="Brand" className={styles['brand-image']} />
                                     <Typography variant="h6" gutterBottom color="black">
                                         {t(codeLanguage + '000095')}
                                     </Typography>

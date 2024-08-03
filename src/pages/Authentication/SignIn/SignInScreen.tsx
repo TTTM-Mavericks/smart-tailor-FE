@@ -144,8 +144,8 @@ function SignInScreen() {
           Cookies.set('userAuth', JSON.stringify(user));
 
           const redirectUrl = roleBasedRedirect(user.roleName);
-          console.log(redirectUrl + "bebeurl");
-          await new Promise(resolve => setTimeout(resolve, 10000));
+          console.log('User role:', user.roleName); // Debugging line
+          console.log('Redirect URL:', redirectUrl); // Debugging line
 
           if (!localStorage.getItem('brandFirstLogin')) {
             localStorage.setItem('brandFirstLogin', 'true');
@@ -153,6 +153,7 @@ function SignInScreen() {
 
           if (localStorage.getItem('brandFirstLogin') === 'false') {
             window.location.href = '/brand';
+            return;
           }
 
           // Check if user role is 'BRAND'
@@ -169,11 +170,9 @@ function SignInScreen() {
                 window.location.href = `/brand/updateProfile/${user.userID}`;
               } else if (brandStatus === 'PENDING') {
                 window.location.href = '/brand/waiting_process_information';
-              }
-              else if (localStorage.getItem('brandFirstLogin') === 'false') {
+              } else if (localStorage.getItem('brandFirstLogin') === 'false') {
                 window.location.href = '/brand';
-              }
-              else {
+              } else {
                 localStorage.setItem('brandFirstLogin', 'true');
                 setTimeout(() => {
                   window.location.href = '/brand';
@@ -182,6 +181,9 @@ function SignInScreen() {
             } catch (error) {
               console.error('Error fetching brand data:', error);
             }
+          } else {
+            // Navigate to the appropriate page based on role
+            navigate(redirectUrl);
           }
         }
       } catch (error: any) {

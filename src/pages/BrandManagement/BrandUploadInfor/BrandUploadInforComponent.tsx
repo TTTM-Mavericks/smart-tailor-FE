@@ -40,7 +40,7 @@ const UploadBrandInforForm = () => {
             isValid = false;
         }
 
-        if (!formData.accountNumber || formData.accountNumber.length > 50) {
+        if (!formData.accountNumber || formData.accountNumber.toString().length > 50) {
             errors.accountNumber = 'Account number is required and must be 50 characters or less';
             isValid = false;
         }
@@ -397,8 +397,11 @@ const UploadBrandInforForm = () => {
 
         const updatedFormData = {
             ...formData,
-            imageURL: uploadedImageURLs
+            imageURL: uploadedImageURLs,
+            selectedOption: selectedOption
         };
+
+        console.log(updatedFormData, "formdata");
 
         try {
             console.log("Submitting form data:", updatedFormData);
@@ -416,7 +419,7 @@ const UploadBrandInforForm = () => {
                 text: 'Brand profile uploaded successfully',
             });
             setActiveStep(2);
-            window.location.href = `/brand/waiting_process_information`;
+            // window.location.href = `/brand/waiting_process_information`;
 
         } catch (error) {
             console.error('Error uploading profile', error);

@@ -104,10 +104,14 @@ const DashboardManageMaterialScreen = () => {
 
     const renderComponent = () => {
         switch (activeMenu) {
-            case '/brand/manage_order_request/:id':
-                return <UploadBrandInforForm />;
             case 'manage_notification':
-                return <NotificationPage />;
+                return (
+                    <>
+                        {/* <NotificationPage /> */}
+                        <UploadBrandInforForm />
+                    </>
+
+                );
             case 'brand_profile':
                 return <BrandProfileSetup />;
             case 'manage_order':
