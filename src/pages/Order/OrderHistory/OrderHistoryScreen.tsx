@@ -310,9 +310,10 @@ const OrderHistory: React.FC = () => {
                                                         backgroundColor:
                                                             orderDetail?.orderStatus === 'PENDING' ? secondaryColor
                                                                 : orderDetail?.orderStatus === 'DELIVERED' ? greenColor
-                                                                    : orderDetail?.orderStatus === 'DEPOSIT' ? secondaryColor
-                                                                        : orderDetail?.orderStatus === 'PROCESSING' ? secondaryColor
-                                                                            : redColor,
+                                                                    : orderDetail?.orderStatus === 'COMPLETED' ? greenColor
+                                                                        : orderDetail?.orderStatus === 'DEPOSIT' ? secondaryColor
+                                                                            : orderDetail?.orderStatus === 'PROCESSING' ? secondaryColor
+                                                                                : redColor,
                                                         opacity: 1,
                                                         color: whiteColor
                                                     }

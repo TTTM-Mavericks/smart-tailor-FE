@@ -196,10 +196,10 @@ const SampleCard: React.FC<{ item: SampleModelInterface; onAccept: (item: Sample
                 </p>
             </div>
 
-            <h4 className="text-lg font-semibold text-gray-700 mb-2">Sample Image</h4>
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0 md:space-x-4">
                 {item.imageUrl && (
-                    <div className="flex items-center justify-center content-center">
+                    <div className="flex-1">
+                        <h4 className="text-md font-semibold text-gray-700 mb-2">Sample Image</h4>
                         <img
                             src={item.imageUrl}
                             alt="Sample"
@@ -211,7 +211,7 @@ const SampleCard: React.FC<{ item: SampleModelInterface; onAccept: (item: Sample
 
                 {item.video && (
                     <div className="flex-1">
-                        <h4 className="text-lg font-semibold text-gray-700 mb-2">Sample Video</h4>
+                        <h4 className="text-md font-semibold text-gray-700 mb-2">Sample Video</h4>
                         <video
                             src={item.video}
                             controls

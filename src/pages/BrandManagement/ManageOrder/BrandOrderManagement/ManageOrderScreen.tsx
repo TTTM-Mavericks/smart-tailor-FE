@@ -137,7 +137,7 @@ const DesignDetails: React.FC<{ design: any }> = ({ design }) => {
     const [dialogOpen, setDialogOpen] = useState(false);
     return (
         <div className="mt-4 p-4 rounded-lg">
-            <h4 className="text-lg font-semibold mb-4">Part of Designs</h4>
+            <h4 className="text-sm font-semibold mb-4">Part of Designs</h4>
             {design.partOfDesign.map((part: any) => (
                 <div key={part.partOfDesignID} className="flex items-start mb-4 pb-4 border-b border-gray-300 last:border-b-0">
 
@@ -149,9 +149,9 @@ const DesignDetails: React.FC<{ design: any }> = ({ design }) => {
                         />
                     </div>
                     <div>
-                        <p className="font-medium">Part name: {part.partOfDesignName}</p>
-                        <p>Material name: {part.material?.materialName || 'N/A'}</p>
-                        <p>HS code: {part.material?.hsCode || 'N/A'}</p>
+                        <p className=" text-sm font-medium">Part name: {part.partOfDesignName}</p>
+                        <p className='text-sm'>Material name: {part.material?.materialName || 'N/A'}</p>
+                        <p className='text-sm'>HS code: {part.material?.hsCode || 'N/A'}</p>
                     </div>
                     {(part?.itemMasks && part?.itemMasks?.length > 0) && (
                         <div className="ml-auto">
@@ -373,7 +373,7 @@ const BrandOrderFields: React.FC<{
                                 <p>No image available</p>
                             )}
                         </div>
-                        <div className="ml-4">
+                        <div className="ml-4 mt-10">
                             <p className="text-sm text-gray-600 mb-2">Order ID: {order.orderID}</p>
                             <p className="text-sm text-gray-600 mb-2">
                                 Order Status: <span className={` mb-2 ${getStatusColor(order.orderStatus)} font-bold`}>{order.orderStatus}</span>
@@ -389,7 +389,7 @@ const BrandOrderFields: React.FC<{
                         </div>
                     </div>
                 </div>
-                <div className="w-1/2">
+                <div className="w-1/2 mt-10 pl-28">
                     <p className="text-gray-600 mb-2 text-sm">Customer: {order.buyerName}</p>
                     <p className="text-gray-600 mb-2 text-sm">Date: {order.createDate}</p>
                     <p className="text-gray-600 mb-2 text-sm">
@@ -401,7 +401,7 @@ const BrandOrderFields: React.FC<{
                 <ArrowDropDown
                     className="cursor-pointer mr-2"
                 />
-                <span style={{ fontWeight: "bold" }}>Show Design Details</span>
+                <span style={{ fontWeight: "bold", fontSize: 14 }}>Show Design Details</span>
             </div>
             {showDesignDetails && (
                 <DesignDetails design={designDetails} />
@@ -411,7 +411,7 @@ const BrandOrderFields: React.FC<{
                     <>
                         <button
                             onClick={() => __handleOpenInputSampleProductDialog(order.orderID)}
-                            className="bg-indigo-500 text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4"
+                            className="text-sm bg-indigo-500 text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4"
                             style={{
                                 borderRadius: 4,
                                 backgroundColor: yellowColor
@@ -429,7 +429,7 @@ const BrandOrderFields: React.FC<{
 
                 <button
                     onClick={() => onViewDetails(order, designDetails)}
-                    className="bg-indigo-500 text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4"
+                    className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4"
                     style={{
                         borderRadius: 4,
                         backgroundColor: secondaryColor
@@ -440,7 +440,7 @@ const BrandOrderFields: React.FC<{
 
                 <button
                     onClick={() => __handleOpenUpdateProcessDialog(order)}
-                    className="bg-green-500 text-white px-4 py-2  hover:bg-green-600 transition duration-300"
+                    className="bg-green-500 text-sm text-white px-4 py-2  hover:bg-green-600 transition duration-300"
                     style={{
                         borderRadius: 4,
                         backgroundColor: greenColor

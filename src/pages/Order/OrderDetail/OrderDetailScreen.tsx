@@ -450,7 +450,7 @@ const OrderDetailScreen: React.FC = () => {
 
                             <div className="flex flex-col md:flex-row md:space-x-10 mt-4">
                                 <div className="md:w-1/2 flex items-center">
-                                    <div className={style.orderDetail__orderStatus__tag} style={orderDetail?.orderStatus === 'CANCEL' ? { backgroundColor: redColor } : {}}>{orderDetail?.orderStatus}</div>
+                                    <div className={style.orderDetail__orderStatus__tag} style={orderDetail?.orderStatus === 'CANCEL' ? { backgroundColor: redColor } : (orderDetail?.orderStatus === 'COMPLETED' || orderDetail?.orderStatus === 'DELIVERED') ? { backgroundColor: greenColor } : {}}>{orderDetail?.orderStatus}</div>
                                     {orderDetail?.orderStatus === 'CANCEL' && (
                                         <div className="ml-10">
                                             <a onClick={() => setIsOpenReasonCancelDialog(!isOpenReasonCancelDialog)} className="text-sm text-indigo-600 hover:text-indigo-800 transition duration-200 cursor-pointer">View reasons</a>
