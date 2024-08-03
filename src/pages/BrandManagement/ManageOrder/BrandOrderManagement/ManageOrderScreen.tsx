@@ -76,7 +76,7 @@ const DesignModal: React.FC<{ part: any; onClose: () => void }> = ({ part, onClo
 
                 <div className="bg-white p-6 rounded-lg max-w-2xl w-full">
                     <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-bold">{part.partOfDesignName}</h2>
+                        <h2 className="text-xl font-bold" style={{ fontSize: "13px" }}>{part.partOfDesignName}</h2>
                         <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -136,7 +136,7 @@ const DesignDetails: React.FC<{ design: any }> = ({ design }) => {
     const [dialogOpen, setDialogOpen] = useState(false);
     return (
         <div className="mt-4 p-4 rounded-lg">
-            <h4 className="text-lg font-semibold mb-4">Part of Designs</h4>
+            <h4 className="text-lg font-semibold mb-4" style={{ fontSize: "13px" }}>Part of Designs</h4>
             {design.partOfDesign.map((part: any) => (
                 <div key={part.partOfDesignID} className="flex items-start mb-4 pb-4 border-b border-gray-300 last:border-b-0">
 
@@ -148,9 +148,9 @@ const DesignDetails: React.FC<{ design: any }> = ({ design }) => {
                         />
                     </div>
                     <div>
-                        <p className="font-medium">Part name: {part.partOfDesignName}</p>
-                        <p>Material name: {part.material?.materialName || 'N/A'}</p>
-                        <p>HS code: {part.material?.hsCode || 'N/A'}</p>
+                        <p className="font-medium" style={{ fontSize: "13px" }}>Part name: {part.partOfDesignName}</p>
+                        <p style={{ fontSize: "13px" }}>Material name: {part.material?.materialName || 'N/A'}</p>
+                        <p style={{ fontSize: "13px" }}>HS code: {part.material?.hsCode || 'N/A'}</p>
                     </div>
                     {(part?.itemMasks && part?.itemMasks?.length > 0) && (
                         <div className="ml-auto">
@@ -292,7 +292,7 @@ const BrandOrderFields: React.FC<{
     return (
         <div className="bg-white mb-8 shadow-lg rounded-lg p-6 transition duration-300 ease-in-out transform hover:shadow-xl">
 
-            <h3 className="text-xl font-semibold mb-3 text-indigo-700">Type order: {order.orderType}</h3>
+            <h3 className="text-xl font-semibold mb-3 text-indigo-700" style={{ fontSize: "13px" }}>Type order: {order.orderType}</h3>
             <div className="flex justify-between">
                 <div className="w-1/2">
                     <div className="flex">
@@ -312,25 +312,25 @@ const BrandOrderFields: React.FC<{
                             )}
                         </div>
                         <div className="ml-4">
-                            <p className="text-gray-600 mb-2">Order ID: {order.orderID}</p>
-                            <p className="text-gray-600 mb-2">
+                            <p className="text-gray-600 mb-2" style={{ fontSize: "13px" }}>Order ID: {order.orderID}</p>
+                            <p className="text-gray-600 mb-2" style={{ fontSize: "13px" }}>
                                 Order Status: <span className={`mb-2 ${getStatusColor(order.orderStatus)} font-bold`}>{order.orderStatus}</span>
                             </p>
                             <div className="mt-4">
                                 {order.detailList.map((detail, index) => (
-                                    <p key={index} className="text-gray-600">
+                                    <p key={index} className="text-gray-600" style={{ fontSize: "13px" }}>
                                         Size {detail.size.sizeName}: Quantity {detail.quantity}
                                     </p>
                                 ))}
                             </div>
-                            <p className="text-gray-700 mt-4">Price: {__handleAddCommasToNumber(order.totalPrice)} VND</p>
+                            <p className="text-gray-700 mt-4" style={{ fontSize: "13px" }}>Price: {__handleAddCommasToNumber(order.totalPrice)} VND</p>
                         </div>
                     </div>
                 </div>
                 <div className="w-1/2">
-                    <p className="text-gray-600 mb-2">Customer: {order.buyerName}</p>
-                    <p className="text-gray-600 mb-2">Date: {order.createDate}</p>
-                    <p className="text-gray-600 mb-2">
+                    <p className="text-gray-600 mb-2" style={{ fontSize: "13px" }}>Customer: {order.buyerName}</p>
+                    <p className="text-gray-600 mb-2" style={{ fontSize: "13px" }}>Date: {order.createDate}</p>
+                    <p className="text-gray-600 mb-2" style={{ fontSize: "13px" }}>
                         Address: {order.address}, {order.ward}, {order.district}, {order.province}
                     </p>
                 </div>
@@ -339,7 +339,7 @@ const BrandOrderFields: React.FC<{
                 <ArrowDropDown
                     className="cursor-pointer mr-2"
                 />
-                <span style={{ fontWeight: "bold" }}>Show Design Details</span>
+                <span style={{ fontWeight: "bold" }} style={{ fontSize: "13px" }}>Show Design Details</span>
             </div>
             {showDesignDetails && (
                 <DesignDetails design={designDetails} />
@@ -532,8 +532,8 @@ const BrandOrderModal: React.FC<{ order: BrandOrder; onClose: () => void; onMark
                 <div className="flex justify-between items-center mb-4 bg-indigo-50 p-3 rounded-lg">
                     <div className="flex items-center">
                         <FaClipboardCheck className="text-indigo-500" size={16} />
-                        <span className="font-semibold text-gray-700 text-sm">Order ID:</span>
-                        <p className="text-sm font-bold text-indigo-700">{order.orderID}</p>
+                        <span className="font-semibold text-gray-700 text-sm" style={{ fontSize: "13px" }}>Order ID:</span>
+                        <p className="text-sm font-bold text-indigo-700" style={{ fontSize: "13px" }}>{order.orderID}</p>
                     </div>
                 </div>
 
@@ -559,7 +559,7 @@ const BrandOrderModal: React.FC<{ order: BrandOrder; onClose: () => void; onMark
                                 <item.icon className="mr-2 text-indigo-500" size={14} />
                                 <span className="font-semibold">{item.label}:</span>
                             </p>
-                            <p className={`text-sm font-bold ${item.customClass || 'text-gray-800'}`}>
+                            <p className={`text-sm font-bold ${item.customClass || 'text-gray-800'}`} style={{ fontSize: "13px" }}>
                                 {item.value}
                             </p>
                         </div>
@@ -567,8 +567,8 @@ const BrandOrderModal: React.FC<{ order: BrandOrder; onClose: () => void; onMark
                 </div>
 
                 <div className="mb-6">
-                    <h3 className="text-xs font-semibold text-gray-700 mb-2">Buyer Name</h3>
-                    <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-200 shadow-inner">
+                    <h3 className="text-xs font-semibold text-gray-700 mb-2" style={{ fontSize: "13px" }}>Buyer Name</h3>
+                    <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-200 shadow-inner" style={{ fontSize: "13px" }}>
                         {order.buyerName}
                     </p>
                 </div>
@@ -586,7 +586,7 @@ const BrandOrderModal: React.FC<{ order: BrandOrder; onClose: () => void; onMark
 
                 {isOrderImageListArray(order.orderImageList) && order.orderImageList.length > 0 && (
                     <div className="mb-6">
-                        <h3 className="text-lg font-semibold text-gray-700 mb-2">Report Images</h3>
+                        <h3 className="text-lg font-semibold text-gray-700 mb-2" style={{ fontSize: "13px" }}>Report Images</h3>
                         <div className="relative">
                             <img
                                 src={order.orderImageList[currentImageIndex].orderImageUrl}

@@ -107,8 +107,8 @@ const DashboardManageMaterialScreen = () => {
             case 'manage_notification':
                 return (
                     <>
-                        {/* <NotificationPage /> */}
-                        <UploadBrandInforForm />
+                        <NotificationPage />
+                        {/* <UploadBrandInforForm /> */}
                     </>
 
                 );
