@@ -136,7 +136,9 @@ export const functionEndpoints = {
     getOrderByUserId: '/get-order-by-user-id',
     changeOrderStatus: '/change-order-status',
     getAllSubOrder: '/get-all-order',
-    getDeliveredOrder: '/get-all-delivery-order'
+    getDeliveredOrder: '/get-all-delivery-order',
+    getOrderStageById: '/get-order-stage-by-id',
+    getOrderTimeLineByParentId: '/order-time-line-by-parent-order-id'
   },
   sizeExpertTailoring: {
     getAllSizeExpertTailoringByExperId: '/get-all-size-by-expert-tailoring-id',
@@ -183,7 +185,9 @@ export const functionEndpoints = {
   },
   SampleProduct: {
     addSampleProduct: '/add-sample-product-data',
-    getSamplePriductByParentOrderID: '/get-sample-product-data-by-parent-order-id'
+    getSamplePriductByParentOrderID: '/get-sample-product-data-by-parent-order-id',
+    updateSampleProductStatus: '/update-sample-product-data',
+    getsampleProductDataByParentOrderId: '/get-sample-product-data-by-parent-order-id'
   }
 }
 

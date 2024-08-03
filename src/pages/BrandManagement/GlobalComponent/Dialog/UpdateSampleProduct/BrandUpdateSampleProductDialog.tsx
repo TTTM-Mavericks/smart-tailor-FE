@@ -10,10 +10,11 @@ type Props = {
     isOpen: boolean;
     onClose?: () => void;
     orderID?: string;
-    brandID?: any
+    brandID?: any;
+    stageID?: any
 };
 
-const BrandUpdateSampleProductDialog: React.FC<Props> = ({ isOpen, onClose, orderID, brandID }) => {
+const BrandUpdateSampleProductDialog: React.FC<Props> = ({ isOpen, onClose, orderID, brandID, stageID }) => {
     const [description, setDescription] = useState<string>('');
     const [images, setImages] = useState<File[]>([]);
     const [videos, setVideos] = useState<File[]>([]);
@@ -80,7 +81,8 @@ const BrandUpdateSampleProductDialog: React.FC<Props> = ({ isOpen, onClose, orde
 
             try {
                 const bodyRequest = {
-                    subOrderID: orderID,
+                    orderStageID: stageID,
+                    orderID: orderID,
                     brandID: brandID,
                     description: description || '',
                     imageUrl: imageBase64s[0] || '',
@@ -94,9 +96,7 @@ const BrandUpdateSampleProductDialog: React.FC<Props> = ({ isOpen, onClose, orde
                     console.log('detail order: ', response.data);
                     toast.success(`${response.message}`, { autoClose: 4000 });
                     console.log(response.message);
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 2000)
+
                 }
                 else {
                     console.log('detail error: ', response.message);
@@ -131,6 +131,7 @@ const BrandUpdateSampleProductDialog: React.FC<Props> = ({ isOpen, onClose, orde
             <DialogContent dividers className={`${style.sampleModel__dialogContent} bg-gray-100`}>
                 <div className="p-4 bg-white shadow-md rounded-md">
                     <h2 className="text-lg font-semibold mb-4">Order {orderID}</h2>
+
                     <form onSubmit={handleSubmit}>
                         <div className="mb-4">
                             <label className="block text-gray-700 font-semibold mb-2">Description</label>

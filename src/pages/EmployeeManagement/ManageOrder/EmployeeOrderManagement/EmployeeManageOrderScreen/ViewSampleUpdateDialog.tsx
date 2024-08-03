@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Dialog, Tabs, Tab } from '@mui/material';
-import { FaTimes, FaClipboardCheck, FaUser, FaBuilding, FaCalendar, FaCalendarCheck } from 'react-icons/fa';
+import { FaTimes, FaClipboardCheck, FaUser, FaBuilding, FaCalendar, FaCalendarCheck, FaGlasses } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import api, { versionEndpoints, featuresEndpoints, functionEndpoints } from '../../../../../api/ApiConfig';
 import { toast } from 'react-toastify';
-import { SampleModelInterface } from '../../../../../models/OrderModel';
+import { SampleModelInterface, StageInterface } from '../../../../../models/OrderModel';
+import { IoMdCloseCircleOutline } from 'react-icons/io';
 
 type Props = {
     isOpen: boolean;
@@ -29,7 +30,6 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID, bra
                 console.log(response.data);
                 setSampleProductData(response.data);
             } else {
-                toast.error(`${response.message}`, { autoClose: 4000 });
                 console.log(response.message);
             }
         } catch (error) {
@@ -38,20 +38,48 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID, bra
         }
     }
 
-    const __handelUpdateOrderState = async (orderID: any) => {
+    const __handleSchangeStatusOfSampleProduct = async (childID: any, itemSample: SampleModelInterface) => {
+        console.log('itemSample', itemSample);
         try {
             const bodyRequest = {
-                orderID: orderID,
-                status: 'START_PRODUCING'
+                orderStageID: itemSample.orderStageID,
+                orderID: childID,
+                brandID: itemSample.brandID,
+                description: itemSample.description || '',
+                imageUrl: itemSample.imageUrl || '',
+                video: itemSample.video || '',
+                status: true,
             }
+
             console.log('bodyRequest: ', bodyRequest);
+
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.SampleProduct + functionEndpoints.SampleProduct.updateSampleProductStatus}/${itemSample.sampleModelID}`, bodyRequest);
+            if (response.status === 200) {
+                console.log('detail order: ', response.data);
+                console.log(response.message);
+                await __handelUpdateOrderState(childID, itemSample);
+            }
+            else {
+                console.log('detail error: ', response.message);
+                toast.error(`${response.message}`, { autoClose: 4000 });
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(`${error}`, { autoClose: 4000 });
+        }
+    }
+
+    const __handelUpdateOrderState = async (orderParentID: any, itemData: SampleModelInterface) => {
+        try {
+            const bodyRequest = {
+                orderID: orderParentID,
+                status: itemData.stage
+            }
+            console.log('bodyRequest 2: ', bodyRequest);
             const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
                 toast.success(`${response.message}`, { autoClose: 4000 });
-                setTimeout(() => {
-                    window.location.reload();
-                }, 2000)
             } else {
                 console.log('detail error: ', response.message);
                 toast.error(`${response.message}`, { autoClose: 4000 });
@@ -78,20 +106,27 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID, bra
                     className="relative bg-white w-full max-w-4xl rounded-xl shadow-2xl p-8 max-h-[90vh] overflow-y-auto"
                     onClick={(e: any) => e.stopPropagation()}
                 >
-                    <button
+                    {/* <button
                         onClick={onClose}
                         className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition duration-150"
                         aria-label="Close modal"
                     >
                         <FaTimes size={24} />
-                    </button>
-                    <h2 className="text-2xl font-bold text-indigo-700 mb-6 shadow-text">View Sample Data</h2>
+                    </button> */}
+                    <IoMdCloseCircleOutline
+                        cursor="pointer"
+                        size={20}
+                        color="red"
+                        onClick={onClose}
+                        style={{ position: 'absolute', right: 20, top: 20 }}
+                    />
+                    <h2 className="text-lg font-bold text-indigo-700 mb-6 shadow-text">View Sample Data</h2>
 
                     <div className="flex justify-between items-center mb-6 bg-indigo-50 p-4 rounded-lg">
                         <div className="flex items-center">
                             <FaClipboardCheck className="text-indigo-500 mr-2" size={20} />
-                            <span className="font-semibold text-gray-700">Order ID:</span>
-                            <p className="text-xl font-bold text-indigo-700 ml-2">{orderID}</p>
+                            <span className=" text-sm font-semibold text-gray-700">Order ID:</span>
+                            <p className="text-sm font-bold text-indigo-700 ml-2">{orderID}</p>
                         </div>
                     </div>
 
@@ -99,7 +134,7 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID, bra
                         <>
                             <Tabs
                                 value={activeTab}
-                                onChange={(_, newValue) => setActiveTab(newValue)}
+                                onChange={(_: any, newValue: any) => setActiveTab(newValue)}
                                 variant="scrollable"
                                 scrollButtons="auto"
                                 className="mb-6"
@@ -111,7 +146,7 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID, bra
 
                             {sampleProductData.map((item, index) => (
                                 <TabPanel key={item.sampleModelID} value={activeTab} index={index}>
-                                    <SampleCard item={item} onAccept={() => __handelUpdateOrderState(item.orderID)} onReject={onClose} />
+                                    <SampleCard item={item} onAccept={(item) => __handleSchangeStatusOfSampleProduct(item.orderID, item)} onReject={onClose} />
                                 </TabPanel>
                             ))}
                         </>
@@ -132,22 +167,22 @@ const TabPanel: React.FC<{ children: React.ReactNode; value: number; index: numb
     );
 };
 
-const SampleCard: React.FC<{ item: SampleModelInterface; onAccept: () => void; onReject: () => void }> = ({ item, onAccept, onReject }) => {
+const SampleCard: React.FC<{ item: SampleModelInterface; onAccept: (item: SampleModelInterface) => void; onReject?: () => void }> = ({ item, onAccept, onReject }) => {
     return (
         <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-xl font-semibold text-indigo-700 mb-4">Sample Model ID: {item.sampleModelID}</h3>
+            <h3 className="text-sm font-semibold text-indigo-700 mb-4">Sample Model ID: {item.sampleModelID}</h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 {[
-                    { icon: FaUser, label: 'Sub Order ID', value: item.orderID },
-                    { icon: FaBuilding, label: 'Brand ID', value: item.brandID },
+                    { icon: FaUser, label: 'Stage', value: item.stage },
+                    { icon: FaBuilding, label: 'Brand', value: item.brandName },
                     { icon: FaCalendar, label: 'Create Date', value: item.createDate },
                     { icon: FaCalendarCheck, label: 'Last Modified Date', value: item.lastModifiedDate || 'N/A' },
                 ].map((detail, index) => (
                     <div key={index} className="bg-gray-50 p-3 rounded-lg">
                         <p className="text-gray-600 flex items-center mb-1">
                             <detail.icon className="mr-2 text-indigo-500" size={16} />
-                            <span className="font-semibold">{detail.label}:</span>
+                            <span className="text-sm font-semibold">{detail.label}:</span>
                         </p>
                         <p className="text-sm font-bold text-gray-800">{detail.value}</p>
                     </div>
@@ -161,14 +196,15 @@ const SampleCard: React.FC<{ item: SampleModelInterface; onAccept: () => void; o
                 </p>
             </div>
 
+            <h4 className="text-lg font-semibold text-gray-700 mb-2">Sample Image</h4>
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0 md:space-x-4">
                 {item.imageUrl && (
-                    <div className="flex-1">
-                        <h4 className="text-lg font-semibold text-gray-700 mb-2">Sample Image</h4>
+                    <div className="flex items-center justify-center content-center">
                         <img
                             src={item.imageUrl}
                             alt="Sample"
-                            className="w-full h-64 object-cover rounded-lg shadow-md"
+                            className="object-cover rounded-lg shadow-md"
+                            style={{ width: 400, height: 450, margin: '0 auto' }}
                         />
                     </div>
                 )}
@@ -180,25 +216,29 @@ const SampleCard: React.FC<{ item: SampleModelInterface; onAccept: () => void; o
                             src={item.video}
                             controls
                             className="w-full h-64 object-cover rounded-lg shadow-md"
+                            style={{ width: 400, height: 450, margin: '0 auto' }}
                         />
                     </div>
                 )}
             </div>
 
-            <div className="flex justify-end space-x-4 mt-6">
-                <button
-                    onClick={onReject}
-                    className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-150 focus:outline-none focus:ring-2 focus:ring-red-400"
-                >
-                    Reject
-                </button>
-                <button
-                    onClick={onAccept}
-                    className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-150 focus:outline-none focus:ring-2 focus:ring-green-400"
-                >
-                    Accept
-                </button>
-            </div>
+            {!item.status && (
+
+                <div className="flex justify-end space-x-4 mt-6">
+                    <button
+                        onClick={onReject}
+                        className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-150 focus:outline-none focus:ring-2 focus:ring-red-400"
+                    >
+                        Reject
+                    </button>
+                    <button
+                        onClick={() => onAccept(item)}
+                        className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-150 focus:outline-none focus:ring-2 focus:ring-green-400"
+                    >
+                        Accept
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

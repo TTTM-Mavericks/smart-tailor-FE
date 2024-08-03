@@ -17,6 +17,7 @@ import { UserInterface } from '../../../../models/UserModel';
 import BrandUpdateSampleProductDialog from '../../GlobalComponent/Dialog/UpdateSampleProduct/BrandUpdateSampleProductDialog';
 import { __handleAddCommasToNumber } from '../../../../utils/NumbericUtils';
 import BrandUploadProgcessSampleProduct from '../../GlobalComponent/Dialog/UploadProgcessSampleProduct/BrandUploadProgcessSampleProduct';
+import { StageInterface } from '../../../../models/OrderModel';
 
 /**
  * 
@@ -201,7 +202,23 @@ const BrandOrderFields: React.FC<{
     const [selectedOrderID, setSelectedOrderID] = useState<string | null>(null);
     const [isUploadSampleDialogOpen, setIsUploadSampleDialogOpen] = useState(false);
     const [selectedStep, setSelectedStep] = useState<{ orderID: string, step: string } | null>(null);
+    const [progressSteps, setProgressStep] = useState<StageInterface[]>();
+    const [stageIdStart, setStageIdStart] = useState<string>();
 
+    const customSortOrder = [
+        'START_PRODUCING',
+        'FINISH_FIRST_STAGE',
+        'FINISH_SECOND_STAGE',
+        'COMPLETED'
+    ];
+
+    const sortStages = (stages: StageInterface[]) => {
+        return stages.sort((a, b) => {
+            const indexA = customSortOrder.indexOf(a.stage);
+            const indexB = customSortOrder.indexOf(b.stage);
+            return indexA - indexB;
+        });
+    };
 
 
     useEffect(() => {
@@ -209,10 +226,32 @@ const BrandOrderFields: React.FC<{
         if (!userStorage) return;
         const userParse: UserInterface = JSON.parse(userStorage)
         setUseAuth(userParse);
-    }, [])
+    }, []);
+
+    const __handleLoadProgressStep = async (subOrderId: any) => {
+        setIsLoading(true);
+        try {
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderStageById}/${subOrderId}`);
+            if (response.status === 200) {
+                setIsLoading(false);
+                const sortedData = sortStages(response.data);
+                setProgressStep(sortedData);
+            }
+            else {
+                console.log('detail error: ', response.message);
+                toast.error(`${response.message}`, { autoClose: 4000 });
+            }
+        } catch (error) {
+            console.log('error: ', error);
+            toast.error(`${error}`, { autoClose: 4000 });
+            navigate('/error404');
+        }
+
+    }
 
     const __handleOpenUpdateProcessDialog = (orderDetail: BrandOrder) => {
         setOpenOrderDetail(orderDetail);
+        __handleLoadProgressStep(orderDetail.orderID)
     };
 
     const __handleCloseUpdateProcessDialog = () => {
@@ -229,9 +268,14 @@ const BrandOrderFields: React.FC<{
         setSelectedStep(null);
     };
 
-    const calculateProgressWidth = (status: string) => {
-        const index = progressSteps.indexOf(status);
-        return ((index + 1) / progressSteps.length) * 100;
+    const __handleCalculateProgressWidth = (status: string) => {
+        if (!progressSteps || progressSteps.length === 0) return 0;
+
+        const completedIndex = progressSteps.findIndex(step => step.stage === status);
+
+        if (completedIndex === - 1) return 0;
+
+        return ((completedIndex + 1) / progressSteps.length) * 130;
     };
 
     const __handelUpdateOrderState = async (orderID: any, step: string) => {
@@ -279,9 +323,27 @@ const BrandOrderFields: React.FC<{
         fetchDesignDetails();
     }, [order.orderID]);
 
-    const __handleOpenInputSampleProductDialog = (orderID: any) => {
+    const __handleOpenInputSampleProductDialog = async (orderID: any) => {
         setSelectedOrderID(orderID);
         setIsDialogOpen(true);
+
+        try {
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderStageById}/${orderID}`);
+            if (response.status === 200) {
+                setIsLoading(false);
+                const sortedData = sortStages(response.data);
+                const stageStart: StageInterface = response.data.find((item: StageInterface) => item.stage === 'START_PRODUCING')
+                setStageIdStart(stageStart.stageId)
+            }
+            else {
+                console.log('detail error: ', response.message);
+                toast.error(`${response.message}`, { autoClose: 4000 });
+            }
+        } catch (error) {
+            console.log('error: ', error);
+            toast.error(`${error}`, { autoClose: 4000 });
+        }
+
     };
 
     const __handleCloseInputSampleProductDialog = () => {
@@ -292,13 +354,13 @@ const BrandOrderFields: React.FC<{
     return (
         <div className="bg-white mb-8 shadow-lg rounded-lg p-6 transition duration-300 ease-in-out transform hover:shadow-xl">
 
-            <h3 className="text-xl font-semibold mb-3 text-indigo-700">Type order: {order.orderType}</h3>
+            <h3 className="text-sm font-semibold mb-3 text-indigo-700">Type order: {order.orderType}</h3>
             <div className="flex justify-between">
                 <div className="w-1/2">
                     <div className="flex">
                         <div className="flex-shrink-0">
                             {isLoading ? (
-                                <p>Loading image...</p>
+                                <p className='text-sm'>Loading image...</p>
                             ) : designDetails && designDetails.imageUrl ? (
                                 <div className="mb-4">
                                     <img
@@ -312,25 +374,25 @@ const BrandOrderFields: React.FC<{
                             )}
                         </div>
                         <div className="ml-4">
-                            <p className="text-gray-600 mb-2">Order ID: {order.orderID}</p>
-                            <p className="text-gray-600 mb-2">
-                                Order Status: <span className={`mb-2 ${getStatusColor(order.orderStatus)} font-bold`}>{order.orderStatus}</span>
+                            <p className="text-sm text-gray-600 mb-2">Order ID: {order.orderID}</p>
+                            <p className="text-sm text-gray-600 mb-2">
+                                Order Status: <span className={` mb-2 ${getStatusColor(order.orderStatus)} font-bold`}>{order.orderStatus}</span>
                             </p>
                             <div className="mt-4">
                                 {order.detailList.map((detail, index) => (
-                                    <p key={index} className="text-gray-600">
+                                    <p key={index} className="text-sm text-gray-600">
                                         Size {detail.size.sizeName}: Quantity {detail.quantity}
                                     </p>
                                 ))}
                             </div>
-                            <p className="text-gray-700 mt-4">Price: {__handleAddCommasToNumber(order.totalPrice)} VND</p>
+                            <p className="text-gray-700 mt-4 text-sm">Price: {__handleAddCommasToNumber(order.totalPrice)} VND</p>
                         </div>
                     </div>
                 </div>
                 <div className="w-1/2">
-                    <p className="text-gray-600 mb-2">Customer: {order.buyerName}</p>
-                    <p className="text-gray-600 mb-2">Date: {order.createDate}</p>
-                    <p className="text-gray-600 mb-2">
+                    <p className="text-gray-600 mb-2 text-sm">Customer: {order.buyerName}</p>
+                    <p className="text-gray-600 mb-2 text-sm">Date: {order.createDate}</p>
+                    <p className="text-gray-600 mb-2 text-sm">
                         Address: {order.address}, {order.ward}, {order.district}, {order.province}
                     </p>
                 </div>
@@ -358,7 +420,7 @@ const BrandOrderFields: React.FC<{
                             Update sampleData
                         </button>
                         {selectedOrderID === order.orderID && (
-                            <BrandUpdateSampleProductDialog isOpen={isDialogOpen} orderID={order.orderID} brandID={userAuth?.userID} onClose={__handleCloseInputSampleProductDialog}></BrandUpdateSampleProductDialog>
+                            <BrandUpdateSampleProductDialog stageID={stageIdStart} isOpen={isDialogOpen} orderID={order.orderID} brandID={userAuth?.userID} onClose={__handleCloseInputSampleProductDialog}></BrandUpdateSampleProductDialog>
                         )}
                     </>
                 )}
@@ -412,29 +474,59 @@ const BrandOrderFields: React.FC<{
                         <DialogContent dividers>
                             <div className="pt-4 mb-20">
                                 <p className="text-sm text-gray-600 mb-2">Progress Date: {order.productionCompletionDate}</p>
+                                <div className="flex justify-between text-sm mb-2">
+                                    {progressSteps?.map((step, index) => {
+                                        // const isCompleted = index < step.indexOf(order.orderStatus) + 1;
+                                        // const isCurrent = index === progressSteps.indexOf(step.status) + 1;
+                                        const isClickable = index >= 1 && index <= 99;
+                                        return (
+                                            <p key={index} className={`text-center px-6 py-2 `}>
+                                                <p
+                                                    className=" flex justify-center items-center px-6 py-2 text-white rounded-md transition duration-200 ml-auto"
+                                                    style={{
+                                                        color: !step.status ? '#CBCBCB' : secondaryColor
+                                                    }}
+                                                >
+                                                    {step.currentQuantity} / {order.quantity}
+                                                </p>
+                                                {selectedStep?.orderID === order.orderID && selectedStep.step === step.stage && (
+                                                    <BrandUploadProgcessSampleProduct
+                                                        step={step.stage}
+                                                        orderID={selectedStep?.orderID}
+                                                        isOpen={true}
+                                                        onClose={__handleCloseUpLoadProcessSampleProductDialog}
+                                                    >
+                                                    </BrandUploadProgcessSampleProduct>
+                                                )}
+                                            </p>
+                                        );
+                                    })}
+                                </div>
                                 <div className="relative w-full h-2 bg-gray-200 rounded-full mb-4">
-                                    <div className="absolute top-0 left-0 h-2 bg-indigo-600 rounded-full" style={{ width: `${calculateProgressWidth(order.orderStatus)}%` }}></div>
+                                    <div className="absolute top-0 left-0 h-2 bg-indigo-600 rounded-full" style={{ width: `${__handleCalculateProgressWidth(order.orderStatus)}%` }}></div>
                                 </div>
                                 <div className="flex justify-between text-sm">
-                                    {progressSteps.map((step, index) => {
-                                        const isCompleted = index < progressSteps.indexOf(order.orderStatus) + 1;
-                                        const isCurrent = index === progressSteps.indexOf(order.orderStatus) + 1;
-                                        const isClickable = index >= 2 && index <= 4;
+                                    {progressSteps?.map((step, index) => {
+                                        // const isCompleted = index < step.indexOf(order.orderStatus) + 1;
+                                        // const isCurrent = index === progressSteps.indexOf(step.status) + 1;
+                                        const isClickable = index >= 1 && index <= 99;
                                         return (
-                                            <p key={index} className={`text-center ${isCompleted ? 'text-green-600' : isCurrent ? 'text-indigo-600' : 'text-gray-400'}`}>
+                                            <p key={index} className={`text-center `}>
                                                 <button
                                                     className=" flex justify-center items-center px-4 py-2 text-white rounded-md transition duration-200 ml-auto"
                                                     style={{
-                                                        backgroundColor: isCompleted ? '#CBCBCB' : isCurrent ? secondaryColor : '#CBCBCB',
+                                                        backgroundColor: step.status ? '#CBCBCB' : secondaryColor
                                                     }}
-                                                    onClick={isCurrent && isClickable ? () => __handleOpenUpLoadProcessSampleProductDialog(order.orderID, step) : () => console.log('none')} // Add your click handler here
+                                                    onClick={isClickable ? () => __handleOpenUpLoadProcessSampleProductDialog(order.orderID, step.stage) : () => console.log('none')} // Add your click handler here
                                                 >
-                                                    {isCompleted && (<FaCheck color={greenColor} style={{ marginRight: 10 }} size={12}></FaCheck>)}
-                                                    {step}
+                                                    {step.status && (<FaCheck color={greenColor} style={{ marginRight: 10 }} size={12}></FaCheck>)}
+                                                    {step.stage}
                                                 </button>
-                                                {selectedStep?.orderID === order.orderID && selectedStep.step === step && (
+                                                {selectedStep?.orderID === order.orderID && selectedStep.step === step.stage && (
                                                     <BrandUploadProgcessSampleProduct
-                                                        step={step}
+                                                        brandID={userAuth?.userID}
+                                                        step={step.stage}
+                                                        stageID={step.stageId}
                                                         orderID={selectedStep?.orderID}
                                                         isOpen={true}
                                                         onClose={__handleCloseUpLoadProcessSampleProductDialog}

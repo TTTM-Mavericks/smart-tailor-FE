@@ -92,7 +92,6 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
     // ---------------FunctionHandler---------------//
 
     const __handleFetchOrderDetails = async (orderId: string) => {
-        console.log('vô');
         try {
             const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getAllSubOrder}/${orderId}`);
             if (response.status === 200) {
@@ -344,7 +343,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                         {/* <img className="w-32 h-28 md:w-35 md:h-40 rounded-lg shadow-md" src={orderDetail?.designResponse.imageUrl} alt={`Image `} /> */}
                                     </div>
                                     <div className="ml-0 md:ml-6 mt-4 md:mt-0 flex-grow" style={{ position: 'relative' }}>
-                                        <p className="text-sm text-gray-500 pb-2">ID: #<span> {payment.paymentID}</span></p>
+                                        <p className="text-sm text-gray-500 pb-2">ID: <span> {payment.paymentID}</span></p>
                                         <p className="text-sm text-gray-500 pb-2">Amount: <span> {__handleAddCommasToNumber(payment.paymentAmount)} VND</span></p>
                                         <p className="text-sm text-gray-500 pb-2">Create at: <span> {payment.payOSResponse.data.createdAt}</span></p>
 

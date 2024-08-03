@@ -12,10 +12,11 @@ type Props = {
     orderID?: string;
     brandID?: any;
     onSubmit?: () => void;
-    step?: string
+    step?: string,
+    stageID?: any,
 };
 
-const BrandUploadProgcessSampleProduct: React.FC<Props> = ({ isOpen, onClose, orderID, brandID, onSubmit, step }) => {
+const BrandUploadProgcessSampleProduct: React.FC<Props> = ({ isOpen, onClose, orderID, brandID, onSubmit, step, stageID }) => {
     const [description, setDescription] = useState<string>('');
     const [images, setImages] = useState<File[]>([]);
     const [videos, setVideos] = useState<File[]>([]);
@@ -82,7 +83,8 @@ const BrandUploadProgcessSampleProduct: React.FC<Props> = ({ isOpen, onClose, or
 
             try {
                 const bodyRequest = {
-                    subOrderID: orderID,
+                    orderStageID: stageID,
+                    orderID: orderID,
                     brandID: brandID,
                     description: description || '',
                     imageUrl: imageBase64s[0] || '',
@@ -96,9 +98,7 @@ const BrandUploadProgcessSampleProduct: React.FC<Props> = ({ isOpen, onClose, or
                     console.log('detail order: ', response.data);
                     toast.success(`${response.message}`, { autoClose: 4000 });
                     console.log(response.message);
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 2000)
+
                 }
                 else {
                     console.log('detail error: ', response.message);

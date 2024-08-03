@@ -90,7 +90,24 @@ export interface SampleModelInterface {
     video: string;
     createDate: string;
     lastModifiedDate: string | null;
+    stage?: string;
+    stageId: any;
+    brandName?: string;
+    status?: boolean;
+    orderStageID?: any
 }
+
+export interface StageInterface {
+    stageId: string;
+    orderID: string;
+    stage: string;
+    currentQuantity: number;
+    remainingQuantity: number;
+    status: boolean;
+    createdDate: string;
+    lastModifiedDate: string | null;
+}
+
 
 
 

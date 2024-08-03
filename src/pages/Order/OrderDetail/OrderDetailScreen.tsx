@@ -2,16 +2,16 @@ import React, { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import HeaderComponent from '../../../components/Header/HeaderComponent';
 import FooterComponent from '../../../components/Footer/FooterComponent';
-import { Dialog, DialogContent, DialogTitle, IconButton, Typography } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { greenColor, primaryColor, redColor, whiteColor } from '../../../root/ColorSystem';
+import { greenColor, primaryColor, redColor, secondaryColor, whiteColor } from '../../../root/ColorSystem';
 import VerticalLinearStepperComponent from '../Components/ProgressBar/VerticalStepperComponent';
 import style from './OrderDetailStyles.module.scss'
 import CancelOrderPolicyDialogComponent from '../../../components/Dialog/PolicyDialog/CancelOrderPolicyDialogComponent';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import { useNavigate, useParams } from 'react-router-dom';
-import { OrderDetailInterface, OrderInterface } from '../../../models/OrderModel';
+import { OrderDetailInterface, OrderInterface, StageInterface } from '../../../models/OrderModel';
 import { CustomerReportOrderDialogComponent, PaymentOrderDialogComponent } from '../../../components';
 import { PaymentOrderInterface } from '../../../models/PaymentModel';
 import { __handleAddCommasToNumber } from '../../../utils/NumbericUtils';
@@ -19,6 +19,20 @@ import LoadingComponent from '../../../components/Loading/LoadingComponent';
 import ChangeAddressDialogComponent from '../OrderProduct/ChangeAddressDialogComponent';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
 import ViewProgessOfProductDialog from '../Components/Dialog/ViewProgessOfProduct/ViewProgessOfProductDialog';
+import { toast } from 'react-toastify';
+import { FaCheck } from 'react-icons/fa';
+
+
+export interface EstimatedStageInterface {
+    estimatedQuantityFinishFirstStage: number;
+    estimatedDateFinishFirstStage: string;
+    estimatedQuantityFinishSecondStage: number;
+    estimatedDateFinishSecondStage: string;
+    estimatedQuantityFinishCompleteStage: number;
+    estimatedDateFinishCompleteStage: string;
+}
+
+
 
 const OrderDetailScreen: React.FC = () => {
     // TODO MUTIL LANGUAGE
@@ -42,6 +56,28 @@ const OrderDetailScreen: React.FC = () => {
     const [isOpenReasonCancelDialog, setIsOpenReasonCancelDialog] = useState<boolean>(false);
     const [selectedStep, setSelectedStep] = useState<{ orderID: any, step: string } | null>(null);
     const [isUploadSampleDialogOpen, setIsUploadSampleDialogOpen] = useState(false);
+    const [progressSteps, setProgressStep] = useState<StageInterface[]>();
+    const [timeline, setTimeLine] = useState<EstimatedStageInterface>();
+    const [isCancelConfirmDialog, setIsCancelConfirmDialog] = useState<boolean>(false);
+    const [isOpenReportOrderCanceledDialog, setIsOpenReportOrderCanceledDialog] = useState<boolean>(false);
+    const [isOpenViewHistory, setIsOpenViewHistory] = useState<boolean>(false);
+    const [selectedStage, setSelectedStage] = useState<string>();
+
+
+    const customSortOrder = [
+        'START_PRODUCING',
+        'FINISH_FIRST_STAGE',
+        'FINISH_SECOND_STAGE',
+        'COMPLETED'
+    ];
+
+    const sortStages = (stages: StageInterface[]) => {
+        return stages.sort((a, b) => {
+            const indexA = customSortOrder.indexOf(a.stage);
+            const indexB = customSortOrder.indexOf(b.stage);
+            return indexA - indexB;
+        });
+    };
 
 
     const { id } = useParams();
@@ -115,6 +151,59 @@ const OrderDetailScreen: React.FC = () => {
     // ---------------FunctionHandler---------------//
 
     //+++++ API +++++//
+
+
+
+    const __handleFetchTimeLine = async (parentId: any) => {
+        setIsLoading(true);
+        try {
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderTimeLineByParentId}/${parentId}`);
+            if (response.status === 200) {
+                setIsLoading(false);
+                setTimeLine(response.data);
+            }
+            else {
+                console.log('detail error: ', response.message);
+                toast.error(`${response.message}`, { autoClose: 4000 });
+            }
+        } catch (error) {
+            console.log('error: ', error);
+            toast.error(`${error}`, { autoClose: 4000 });
+            navigate('/error404');
+        }
+
+    }
+
+    const __handleLoadProgressStep = async (subOrderId: any) => {
+        setIsLoading(true);
+        try {
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderStageById}/${subOrderId}`);
+            if (response.status === 200) {
+                setIsLoading(false);
+                const sortedData = sortStages(response.data);
+                setProgressStep(sortedData);
+            }
+            else {
+                console.log('detail error: ', response.message);
+                toast.error(`${response.message}`, { autoClose: 4000 });
+            }
+        } catch (error) {
+            console.log('error: ', error);
+            toast.error(`${error}`, { autoClose: 4000 });
+            navigate('/error404');
+        }
+
+    }
+
+    const calculateProgressWidth = () => {
+        if (!progressSteps) return;
+        const completedSteps = progressSteps.filter(step => step.status).length;
+        return (completedSteps / progressSteps.length) * 150;
+    };
+
+    const progressWidth = calculateProgressWidth();
+
+
     /**
      * Handle get order detail data
      */
@@ -126,7 +215,9 @@ const OrderDetailScreen: React.FC = () => {
                 console.log('detail order: ', response.data);
                 setOrderDetail(response.data);
                 setPayment(response.data.paymentList);
-                setIsLoading(false)
+                setIsLoading(false);
+                await __handleLoadProgressStep(response.data.orderID);
+                await __handleFetchTimeLine(response.data.orderID);
             }
             else {
                 console.log('detail order: ', response.message);
@@ -139,6 +230,15 @@ const OrderDetailScreen: React.FC = () => {
         }
     }
 
+    const __handleCalculateProgressWidth = (status: string) => {
+        if (!progressSteps || progressSteps.length === 0) return 0;
+
+        const completedIndex = progressSteps.findIndex(step => step.stage === status);
+
+        if (completedIndex === - 1) return 0;
+
+        return ((completedIndex + 1) / progressSteps.length) * 200;
+    };
 
     /**
      * Close order policy dialog
@@ -164,28 +264,37 @@ const OrderDetailScreen: React.FC = () => {
     /**
      * Handle cancel order click
      */
-    const _handleCancelOrder = () => {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "Do you really want to cancel the order?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, cancel it!',
-            customClass: {
-                popup: style.high__zindex,
+    const _handleCancelOrder = async () => {
+        setIsLoading(true);
+        try {
+            const bodyRequest = {
+                orderID: orderDetail?.orderID,
+                status: 'CANCEL'
             }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire(
-                    'Cancelled!',
-                    'Your order has been cancelled.',
-                    'success'
-                )
+            console.log('bodyRequest: ', bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            if (response.status === 200) {
+                console.log('detail order: ', response.data);
+                setIsLoading(false);
+                toast.success(`${response.message}`, { autoClose: 4000 });
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
             }
-        })
+            else {
+                console.log('detail error: ', response.message);
+                toast.error(`${response.message}`, { autoClose: 4000 });
+            }
+        } catch (error) {
+            console.log('error: ', error);
+            toast.error(`${error}`, { autoClose: 4000 });
+            navigate('/error404');
+        }
     };
+
+    const __handleOpenConfirmCalcelDialog = () => {
+        setIsOpenReportOrderCanceledDialog(true);
+    }
 
     /**
  * Handle cancel order click
@@ -262,6 +371,12 @@ const OrderDetailScreen: React.FC = () => {
         setSelectedStep(null);
     };
 
+    const __handleOpenViewHistory = (stateId: any) => {
+        setIsOpenViewHistory(true);
+        setSelectedStage(stateId)
+
+    }
+
     return (
         <div className={`${style.orderDetail__container}`} >
             <HeaderComponent />
@@ -271,7 +386,7 @@ const OrderDetailScreen: React.FC = () => {
                     <VerticalLinearStepperComponent status={orderDetail?.orderStatus}></VerticalLinearStepperComponent>
                 </div>
                 <div className={`${style.orderDetail__container__detail} px-12 bg-white md:flex-row`}>
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-2">
                         <h6 className="text-2xl font-bold text-gray-800 mb-4 md:mb-0">{t(codeLanguage + '000191')}</h6>
                         <a href="/order_history" className="text-sm text-indigo-600 hover:text-indigo-800 transition duration-200">{t(codeLanguage + '000192')} &rarr;</a>
                     </div>
@@ -363,7 +478,7 @@ const OrderDetailScreen: React.FC = () => {
                     </div>
 
                     {/* Progress Bar */}
-                    <div className="border-t pt-4 mb-20">
+                    {/* <div className="border-t pt-4 mb-20">
                         <p className="text-sm text-gray-600 mb-1 mt-3 w-full">
                             <span className='font-semibold text-gray-600'>Expected complete at: </span>
                             <span style={{ fontWeight: "normal" }}>{orderDetail?.expectedProductCompletionDate}</span>
@@ -376,16 +491,70 @@ const OrderDetailScreen: React.FC = () => {
                                 <>
                                     <p key={index} onClick={() => index <= orderDetails.currentStep ? __handleOpenProcessSampleProductDialog(orderDetail?.orderID, step) : {}} className={`text-center ${index <= orderDetails.currentStep ? 'text-indigo-600' : 'text-gray-400'} cursor-pointer`}>{step}</p>
                                     {selectedStep?.step === step && (
-                                        <ViewProgessOfProductDialog orderID={orderDetail?.orderID} isOpen={true} onClose={__handleCloseProcessSampleProductDialog} ></ViewProgessOfProductDialog>
                                     )}
                                 </>
                             ))}
                         </div>
 
-                    </div>
+                    </div> */}
+
+                    {timeline && progressSteps && orderDetail?.orderStatus !== 'CANCEL' && (
 
 
-                    {orderDetail?.paymentList && orderDetail?.paymentList?.length > 0 && (
+
+                        <div className="pt-4 mb-20">
+                            {/* <p className="text-sm text-gray-600 mb-1 mt-3 w-full">
+                            <span className='font-semibold text-gray-600'>Expected complete at: </span>
+                            <span style={{ fontWeight: "normal" }}>{orderDetail?.expectedProductCompletionDate}</span>
+                        </p> */}
+                            <div className="flex justify-between text-sm mb-2">
+                                <span className={`text-indigo-600`}>
+                                    {timeline?.estimatedDateFinishFirstStage}
+                                </span>
+                                <span className={`text-indigo-600`}>
+                                    {timeline?.estimatedDateFinishSecondStage}
+                                </span >
+                                <span className={`text-indigo-600`}>
+                                    {timeline?.estimatedDateFinishCompleteStage}
+                                </span>
+
+                            </div>
+                            <div className="relative w-full h-2 bg-gray-200 rounded-full mb-2">
+                                <div className="absolute top-0 left-0 h-2 bg-indigo-600 rounded-full" style={{ width: `${progressWidth}%` }}></div>
+                            </div>
+                            {/* <div className="flex justify-between text-sm">
+                                <span className={`text-indigo-600`}>
+                                    {timeline?.estimatedQuantityFinishFirstStage} products
+                                </span>
+                                <span className={`text-indigo-600`}>
+                                    {timeline?.estimatedQuantityFinishSecondStage} products
+                                </span >
+                                <span className={`text-indigo-600`}>
+                                    {timeline?.estimatedQuantityFinishCompleteStage} products
+                                </span>
+                            </div> */}
+                            <div className="flex justify-between text-sm">
+
+                                {progressSteps?.map((step, index) => {
+                                    const isCurrentStep = step.status;
+                                    return (
+                                        <>
+                                            <p onClick={() => __handleOpenViewHistory(step.stageId)} key={index} className={`text-center ${isCurrentStep ? 'text-indigo-600' : 'text-gray-400'} cursor-pointer`}>
+                                                {step.currentQuantity} / {orderDetail?.quantity} products
+                                            </p>
+                                            {selectedStage === step.stageId && (
+                                                <ViewProgessOfProductDialog stageId={step.stageId} orderID={orderDetail?.orderID} isOpen={isOpenViewHistory} onClose={() => setIsOpenViewHistory(false)} ></ViewProgessOfProductDialog>
+                                            )}
+
+                                        </>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
+
+
+                    {orderDetail?.paymentList && orderDetail?.paymentList?.length > 0 && orderDetail.orderStatus !== 'CANCEL' && (
                         <>
 
                             <div className="mt-10 border-t pt-4">
@@ -503,10 +672,27 @@ const OrderDetailScreen: React.FC = () => {
             </div>
 
             {/* DIALOG */}
-            <CancelOrderPolicyDialogComponent onClick={_handleCancelOrder} onClose={__handleCloseCancelOrderPolicyDilog} isOpen={isOpenCancelOrderPolicyDialog}></CancelOrderPolicyDialogComponent>
+            <CancelOrderPolicyDialogComponent onClick={__handleOpenConfirmCalcelDialog} onClose={__handleCloseCancelOrderPolicyDilog} isOpen={isOpenCancelOrderPolicyDialog}></CancelOrderPolicyDialogComponent>
             <PaymentOrderDialogComponent paymentData={payment} onClick={_handlePaymentOrder} onClose={__handleClosePaymentOrderDilog} isOpen={isOpenPaymentOrderDialog}></PaymentOrderDialogComponent>
-            <ChangeAddressDialogComponent onSelectedAddressData={(address) => __handleGetSelectedAdress(address)} isOpen={isChangeAddressDialogOpen} onClose={() => __handleOpenChangeAddressDialog(false)}></ChangeAddressDialogComponent>
-            <CustomerReportOrderDialogComponent orderID={orderDetail?.orderID} onClose={__handleCloseReportDialog} isOpen={isOpenReportOrderDialog}></CustomerReportOrderDialogComponent>
+            <ChangeAddressDialogComponent
+                onSelectedAddressData={(address) => __handleGetSelectedAdress(address)}
+                isOpen={isChangeAddressDialogOpen} onClose={() => __handleOpenChangeAddressDialog(false)}
+            ></ChangeAddressDialogComponent>
+
+            <CustomerReportOrderDialogComponent
+                isCancelOrder={false}
+                orderID={orderDetail?.orderID}
+                onClose={__handleCloseReportDialog}
+                isOpen={isOpenReportOrderDialog}
+            ></CustomerReportOrderDialogComponent>
+
+            <CustomerReportOrderDialogComponent
+                isCancelOrder={true}
+                orderID={orderDetail?.orderID}
+                onClose={() => setIsOpenReportOrderCanceledDialog(false)}
+                isOpen={isOpenReportOrderCanceledDialog}
+                onClickReportAndCancel={_handleCancelOrder}
+            ></CustomerReportOrderDialogComponent>
 
             <Dialog open={isOpenRatingDialog}>
                 <DialogTitle>
@@ -582,17 +768,42 @@ const OrderDetailScreen: React.FC = () => {
                 </DialogContent>
             </Dialog>
 
-            {/* <Dialog open={isOpenPaymentOrderDialog} aria-labelledby="popup-dialog-title" maxWidth="lg" fullWidth>
-                <DialogTitle id="popup-dialog-title">Facebook</DialogTitle>
-                <DialogContent dividers>
-                    <iframe
-                        src="https://pay.payos.vn/web/cdd33a1073ca4240aa13a4af031163ac"
-                        style={{ width: '100%', height: '80vh', border: 'none' }}
-                        title="Facebook"
+            <Dialog open={isCancelConfirmDialog} aria-labelledby="popup-dialog-title" maxWidth="xs" fullWidth>
+                <DialogTitle id="popup-dialog-title">
+                    Confirm cancel order
+                    <IoMdCloseCircleOutline
+                        cursor="pointer"
+                        size={20}
+                        color={redColor}
+                        onClick={() => setIsCancelConfirmDialog(false)}
+                        style={{ position: 'absolute', right: 20, top: 20 }}
                     />
+                </DialogTitle>
+                <DialogContent >
+                    <div>
+                        You still want to cancel this order?
+                    </div>
                 </DialogContent>
-                
-            </Dialog> */}
+                <DialogActions>
+
+                    <button
+                        type="submit"
+                        className="px-5 py-2.5 text-sm font-medium text-white"
+                        onClick={_handleCancelOrder}
+                        style={{
+                            borderRadius: 4,
+                            color: whiteColor,
+                            backgroundColor: redColor,
+                        }}
+                    >
+                        Cancel
+                    </button>
+                </DialogActions>
+
+
+
+
+            </Dialog>
 
             <FooterComponent />
 
