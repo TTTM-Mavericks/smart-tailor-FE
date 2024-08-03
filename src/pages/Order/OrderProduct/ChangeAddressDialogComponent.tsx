@@ -336,7 +336,7 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
                                                     type="text"
                                                     id="full_name"
                                                     className="mt-1 block w-full px-3 py-2 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500"
-                                                    placeholder="Your first name"
+                                                    placeholder="Your full name"
                                                     name="fullName"
                                                     value={profileData.fullName}
                                                     onChange={_handleChange}

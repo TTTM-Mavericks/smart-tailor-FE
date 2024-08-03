@@ -508,15 +508,25 @@ const OrderDetailScreen: React.FC = () => {
                             <span style={{ fontWeight: "normal" }}>{orderDetail?.expectedProductCompletionDate}</span>
                         </p> */}
                             <div className="flex justify-between text-sm mb-2">
-                                <span className={`text-indigo-600`}>
-                                    {timeline?.estimatedDateFinishFirstStage}
-                                </span>
-                                <span className={`text-indigo-600`}>
-                                    {timeline?.estimatedDateFinishSecondStage}
-                                </span >
-                                <span className={`text-indigo-600`}>
-                                    {timeline?.estimatedDateFinishCompleteStage}
-                                </span>
+                                <p className='flex'>
+                                    <span>ET: </span>
+                                    <span className={`text-indigo-600 ml-1`}>
+                                        {timeline?.estimatedDateFinishFirstStage}
+                                    </span>
+                                </p>
+                                <p className='flex'>
+                                    <span>ET: </span>
+                                    <span className={`text-indigo-600 ml-1`}>
+                                        {timeline?.estimatedDateFinishSecondStage}
+                                    </span >
+                                </p>
+                                <p className='flex'>
+                                    <span>ET: </span>
+                                    <span className={`text-indigo-600 ml-1`}>
+                                        {timeline?.estimatedDateFinishCompleteStage}
+                                    </span>
+                                </p>
+
 
                             </div>
                             <div className="relative w-full h-2 bg-gray-200 rounded-full mb-2">

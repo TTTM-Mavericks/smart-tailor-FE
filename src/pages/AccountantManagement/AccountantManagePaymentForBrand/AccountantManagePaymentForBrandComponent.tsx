@@ -41,7 +41,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
     const [selectedDate, setSelectedDate] = React.useState('Modify date');
     const [selectedRelevance, setSelectedRelevance] = React.useState('Liên quan nhất');
     const [activeTab, setActiveTab] = useState('All');
-    const [orderChild, setOrderChild] = useState<{ [orderId: string]: OrderDetailInterface }>({});
+    const [orderChild, setOrderChild] = useState<{ [orderId: string]: OrderDetailInterface[] }>({});
 
 
     const options = ['Option 1', 'Option 2', 'Option 3'];
@@ -59,8 +59,8 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
 
         Object.keys(isExtendTransaction).forEach(orderId => {
             __handleFetchOrderDetails(orderId);
-            if (isExtendTransaction[orderId] === true && !orderChild[orderId]) {
-            }
+            // if (isExtendTransaction[orderId] === true && !orderChild[orderId]) {
+            // }
         });
     }, [isExtendTransaction]);
 
@@ -92,6 +92,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
     // ---------------FunctionHandler---------------//
 
     const __handleFetchOrderDetails = async (orderId: string) => {
+        console.log('hehehehe');
         try {
             const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getAllSubOrder}/${orderId}`);
             if (response.status === 200) {
@@ -109,7 +110,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
     const __handleFetchOrderData = async (userID: any) => {
         setIsLoading(true)
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getDeliveredOrder}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getAllOrder}`);
             if (response.status === 200) {
                 console.log(response.data);
                 setOrderDetailList(response.data);
@@ -276,7 +277,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                     {orderDetailList?.map((orderDetail) => (
                         <div className="bg-white rounded-xl shadow-md p-4 md:p-6 mb-4 md:mb-8 transform transition-all hover:shadow-lg">
                             <div className="flex flex-col md:flex-row items-start md:items-center mb-4 md:mb-6" >
-                                
+
                                 <div className="mb-4 md:mb-0 w-max ">
                                     <h2 className="text-1xl md:text-1xl font-bold text-gray-800 pb-2">{t(codeLanguage + '000193')} </h2>
                                     <p className="text-sm text-gray-500 pb-2"> {orderDetail?.orderID}</p>
@@ -337,39 +338,31 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                 <div className='mt-10'></div>
                             )}
 
-                            {isExtendTransaction[orderDetail?.orderID || '1'] && orderDetail?.paymentList?.map((payment, itemIndex) => (
+                            {isExtendTransaction[orderDetail?.orderID || '1'] && orderChild[orderDetail.orderID]?.map((order, itemIndex) => (
                                 <div key={itemIndex} className="flex flex-col md:flex-row items-start md:items-center mb-4 md:mb-6 border-b pb-4 md:pb-6">
                                     <div className="flex-shrink-0">
                                         {/* <img className="w-32 h-28 md:w-35 md:h-40 rounded-lg shadow-md" src={orderDetail?.designResponse.imageUrl} alt={`Image `} /> */}
                                     </div>
                                     <div className="ml-0 md:ml-6 mt-4 md:mt-0 flex-grow" style={{ position: 'relative' }}>
-                                        <p className="text-sm text-gray-500 pb-2">ID: <span> {payment.paymentID}</span></p>
-                                        <p className="text-sm text-gray-500 pb-2">Amount: <span> {__handleAddCommasToNumber(payment.paymentAmount)} VND</span></p>
-                                        <p className="text-sm text-gray-500 pb-2">Create at: <span> {payment.payOSResponse.data.createdAt}</span></p>
+                                        <p className="text-sm text-gray-500 pb-2">ID: <span> {order.orderID}</span></p>
+                                        <p className="text-sm text-gray-500 pb-2">Type: <span> {order.orderType}</span></p>
+                                        <p className="text-sm text-gray-500 pb-2">Total price: <span> {__handleAddCommasToNumber(order.totalPrice)} VND</span></p>
+                                        <p className="text-sm text-gray-500 pb-4">Details:
+                                            {order.detailList?.map((detail) => (
+                                                <div className='ml-14 grid grid-cols-7 gap-1 pt-0'>
+                                                    <p className="text-sm text-gray-500 pb-2">Size: {detail.size?.sizeName}</p>
+                                                    <p className="text-sm text-gray-500 pb-2">Quantity: {detail.quantity}</p>
+                                                </div>
+                                            ))}
+                                        </p>
 
                                         <p
 
                                             className={`${style.orderHistory__viewInvoice__button} ml-2 md:ml-4 px-3 py-2 md:px-4 md:py-2`}
-                                            onClick={() => __handleViewInvoiceClick(payment)}
                                         >
                                             View transaction
                                         </p>
-                                        <div className="flex flex-col md:flex-row items-start md:items-center">
-                                            {renderStatusIcon(payment)}
-                                            <div className="ml-0 md:ml-auto mt-4 md:mt-0  px-3 py-2 md:px-4 md:py-2">
 
-                                                {!payment.paymentStatus && (
-                                                    <button
-                                                        className={`${style.orderHistory__payment__button} ml-2 md:ml-4 px-3 py-2 md:px-4 md:py-2 `}
-                                                        onClick={() => __handleOpenPaymentDialog(payment.paymentID)}
-                                                    >
-                                                        Payment
-                                                    </button>
-                                                )}
-                                                <PaymentOrderDialogComponent isOpen={isOpenPaymentDialog[payment.paymentID] === true} onClose={() => __handleClosePaymentDialog(payment.paymentID)} paymentData={orderDetail.paymentList} ></PaymentOrderDialogComponent>
-
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             ))}
