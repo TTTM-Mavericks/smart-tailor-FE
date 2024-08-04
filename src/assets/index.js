@@ -18,7 +18,8 @@ import shirtFrontDesign from './clothes/shirt-front-design.png';
 import shirtBackDesign from './clothes/shirt-back-design.png';
 import signUpBackground from './system/signup-background.jpg';
 import shirtSleeve from './clothes/shirt-sleeve.png'
-
+import mbBankLogo from './system/mbbank_logo.png'
+import bankImg from './system/bank_img.png'
 
 
 
@@ -45,5 +46,7 @@ export {
     longSkirtModel,
     shirtBackDesign,
     signUpBackground,
-    shirtSleeve
+    shirtSleeve,
+    mbBankLogo,
+    bankImg
 };

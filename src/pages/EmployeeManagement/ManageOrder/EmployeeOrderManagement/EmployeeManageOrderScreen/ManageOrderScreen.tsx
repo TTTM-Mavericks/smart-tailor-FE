@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa';
-import { ArrowDropDown } from '@mui/icons-material';
+import { ArrowDropDown, BrandingWatermark } from '@mui/icons-material';
 import axios from 'axios';
-import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
+import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { EmployeeOrder, ImageList } from '../../../../../models/EmployeeManageOrderModel';
 import { motion } from 'framer-motion'
 import { toast } from 'react-toastify';
@@ -14,6 +14,8 @@ import { UserInterface } from '../../../../../models/UserModel';
 import Cookies from 'js-cookie';
 import BrandUpdateSampleProductDialog from '../../../../BrandManagement/GlobalComponent/Dialog/UpdateSampleProduct/BrandUpdateSampleProductDialog';
 import ViewSampleUpdateDialog from './ViewSampleUpdateDialog';
+import { IoMdCloseCircleOutline } from 'react-icons/io';
+import { __handlegetRatingStyle, __handlegetStatusBackgroundBoolean } from '../../../../../utils/ElementUtils';
 
 /**
  * 
@@ -112,7 +114,7 @@ const DesignDetails: React.FC<{ design: any }> = ({ design }) => {
 
     return (
         <div className="mt-4 p-4 rounded-lg">
-            <h4 className="text-lg font-semibold mb-4">Part of Designs</h4>
+            <h4 className="text-sm font-semibold mb-4">Part of Designs</h4>
             {design.partOfDesign.map((part: any) => (
                 <div key={part.partOfDesignID} className="flex items-start mb-4 pb-4 border-b border-gray-300 last:border-b-0">
 
@@ -124,9 +126,9 @@ const DesignDetails: React.FC<{ design: any }> = ({ design }) => {
                         />
                     </div>
                     <div>
-                        <p className="font-medium">Part name: {part.partOfDesignName}</p>
-                        <p>Material name: {part.material?.materialName || 'N/A'}</p>
-                        <p>HS code: {part.material?.hsCode || 'N/A'}</p>
+                        <p className="text-sm font-medium">Part name: {part.partOfDesignName}</p>
+                        <p className='text-sm'>Material name: {part.material?.materialName || 'N/A'}</p>
+                        <p className='text-sm'>HS code: {part.material?.hsCode || 'N/A'}</p>
                     </div>
                     {(part?.itemMasks && part?.itemMasks?.length > 0) && (
                         <div className="ml-auto">
@@ -210,45 +212,45 @@ const EmployeeOrderFields: React.FC<{
 
     return (
         <div className="bg-white mb-8 shadow-lg rounded-lg p-6 transition duration-300 ease-in-out transform hover:shadow-xl">
-            <h3 className="text-xl font-semibold mb-3 text-indigo-700">Type order: {order.orderType}</h3>
+            <h3 className="text-sm font-semibold mb-3 text-indigo-700">Type order: {order.orderType}</h3>
             <div className="flex justify-between">
                 <div className="w-1/2">
                     <div className="flex">
                         <div className="flex-shrink-0">
                             {isLoading ? (
-                                <p>Loading image...</p>
+                                <p className='text-sm'>Loading image...</p>
                             ) : designDetails && designDetails.imageUrl ? (
                                 <div className="mb-4">
                                     <img
                                         src={designDetails.imageUrl}
                                         alt="Model"
-                                        className="mt-2 w-40 h-52 rounded-lg"
+                                        className="mt-0 w-40 h-52 rounded-lg"
                                     />
                                 </div>
                             ) : (
                                 <p>No image available</p>
                             )}
                         </div>
-                        <div className="ml-4">
-                            <p className="text-gray-600 mb-2">Order ID: {order.orderID}</p>
-                            <p className="text-gray-600 mb-2">
+                        <div className="ml-4 mt-10">
+                            <p className="text-gray-600 mb-2 text-sm">Order ID: {order.orderID}</p>
+                            <p className="text-gray-600 mb-2 text-sm">
                                 Order Status: <span className={`mb-2 ${getStatusColor(order.orderStatus)} font-bold`}>{order.orderStatus}</span>
                             </p>
                             <div className="mt-4">
                                 {order.detailList.map((detail, index) => (
-                                    <p key={index} className="text-gray-600">
+                                    <p key={index} className="text-gray-600 text-sm">
                                         Size {detail.size.sizeName}: Quantity {detail.quantity}
                                     </p>
                                 ))}
                             </div>
-                            <p className="text-gray-700 mt-4">Price: {__handleAddCommasToNumber(order.totalPrice)} VND</p>
+                            <p className="text-gray-700 mt-4 text-sm">Price: {__handleAddCommasToNumber(order.totalPrice)} VND</p>
                         </div>
                     </div>
                 </div>
-                <div className="w-1/2">
-                    <p className="text-gray-600 mb-2">Customer: {order.buyerName}</p>
-                    <p className="text-gray-600 mb-2">Date: {order.createDate}</p>
-                    <p className="text-gray-600 mb-2">
+                <div className="w-1/2 mt-10 pl-28">
+                    <p className="text-gray-600 mb-2 text-sm">Customer: {order.buyerName}</p>
+                    <p className="text-gray-600 mb-2 text-sm">Date: {order.createDate}</p>
+                    <p className="text-gray-600 mb-2 text-sm">
                         Address: {order.address}, {order.ward}, {order.district}, {order.province}
                     </p>
                 </div>
@@ -257,7 +259,7 @@ const EmployeeOrderFields: React.FC<{
                 <ArrowDropDown
                     className="cursor-pointer mr-2"
                 />
-                <span style={{ fontWeight: "bold" }}>Show Design Details</span>
+                <span style={{ fontSize: 14, fontWeight: "bold" }}>Show Design Details</span>
             </div>
             {showDesignDetails && (
                 <DesignDetails design={designDetails} />
@@ -265,7 +267,7 @@ const EmployeeOrderFields: React.FC<{
             <div className="mt-6 flex justify-end">
                 <button
                     onClick={() => __handleOpenInputSampleProductDialog(order.orderID)}
-                    className="bg-indigo-500 text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"
+                    className="bg-indigo-500 text-sm text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"
                     style={{
                         borderRadius: 4,
                         backgroundColor: yellowColor
@@ -277,7 +279,7 @@ const EmployeeOrderFields: React.FC<{
 
                 <button
                     onClick={() => onViewDetails(order, designDetails)}
-                    className="bg-indigo-500 text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"
+                    className="bg-indigo-500 text-sm text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"
                     style={{
                         borderRadius: 4,
                         backgroundColor: secondaryColor
@@ -287,7 +289,7 @@ const EmployeeOrderFields: React.FC<{
                 </button>
                 <button
                     onClick={() => onUpdatedOrderPending(order.orderID)}
-                    className="bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300"
+                    className="bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300"
                     style={{
                         borderRadius: 4,
                         backgroundColor: primaryColor
@@ -318,7 +320,14 @@ function isOrderImageListArray(orderImageList: ImageList | ImageList[]): orderIm
  */
 const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; onUpdatedOrderPending: (orderID: string) => void, designDetails: any }> = ({ order, onClose, onUpdatedOrderPending, designDetails }) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [orderChild, setOrderChild] = useState<{ [orderId: string]: OrderDetailInterface[] }>({});
 
+
+    useEffect(() => {
+        __handleFetchOrderDetails(order.orderID);
+    }, [order])
+
+    // TODO
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'NOT_VERIFY': return 'text-gray-600';
@@ -348,6 +357,22 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
         }
     };
 
+    const __handleFetchOrderDetails = async (orderId: string) => {
+        console.log('hehehehe');
+        try {
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getAllSubOrder}/${orderId}`);
+            if (response.status === 200) {
+                setOrderChild(prevState => ({
+                    ...prevState,
+                    [orderId]: response.data // Assuming response.data is an array of OrderDetailInterface
+                }));
+                console.log(response.data);
+            }
+        } catch (error) {
+            console.error(`Error fetching details for order ${orderId}:`, error);
+        }
+    };
+
     return (
         <motion.div
             initial={{ opacity: 0 }}
@@ -363,21 +388,28 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
                 className="relative bg-white w-full max-w-2xl rounded-xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto"
                 onClick={e => e.stopPropagation()}
             >
-                <button
+                {/* <button
                     onClick={onClose}
                     className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition duration-150"
                     aria-label="Close modal"
                 >
                     <FaTimes size={20} />
-                </button>
+                </button> */}
+                <IoMdCloseCircleOutline
+                    cursor="pointer"
+                    size={20}
+                    color="red"
+                    onClick={onClose}
+                    style={{ position: 'absolute', right: 20, top: 20 }}
+                />
 
-                <h2 className="text-xl font-bold text-indigo-700 mb-4 shadow-text">Order Brand Details</h2>
+                <h2 className="text-md font-bold text-indigo-700 mb-4 shadow-text">Order Brand Details</h2>
 
                 <div className="flex justify-between items-center mb-4 bg-indigo-50 p-3 rounded-lg">
                     <div className="flex items-center">
                         <FaClipboardCheck className="text-indigo-500" size={16} />
                         <span className="font-semibold text-gray-700 text-sm">Order ID:</span>
-                        <p className="text-lg font-bold text-indigo-700 ml-2">{order.orderID}</p>
+                        <p className="text-sm font-bold text-indigo-700 ml-2">{order.orderID}</p>
                     </div>
                 </div>
 
@@ -410,12 +442,6 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
                     ))}
                 </div>
 
-                <div className="mb-6">
-                    <h3 className="text-xs font-semibold text-gray-700 mb-2">Buyer Name</h3>
-                    <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-200 shadow-inner">
-                        {order.buyerName}
-                    </p>
-                </div>
                 {designDetails && (
                     <div className="mb-6 flex justify-center">
                         <div className="text-center">
@@ -454,24 +480,47 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
                     </div>
                 )}
 
-                <div className="flex justify-end space-x-3">
-                    <button
-                        onClick={onClose}
-                        className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-150 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm"
-                    >
-                        Close
-                    </button>
-                    <button
-                        onClick={() => onUpdatedOrderPending(order.orderID)}
-                        className={`px-4 py-2 rounded-lg text-white transition duration-150 focus:outline-none focus:ring-2 text-sm ${order.orderStatus
-                            ? 'bg-green-500 hover:bg-green-600 focus:ring-green-400 cursor-not-allowed'
-                            : 'bg-indigo-500 hover:bg-indigo-600 focus:ring-indigo-400'
-                            }`}
-                        disabled={order.orderStatus}
-                    >
-                        {order.orderStatus ? 'Already Resolved' : 'Mark as Resolved'}
-                    </button>
+                <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-gray-600 flex items-center mb-1 text-xs">
+                        <BrandingWatermark className="mr-2 text-indigo-500" size={14} />
+                        <span className="font-semibold">Brand list:</span>
+                    </p>
+                   
                 </div>
+                {orderChild[order.orderID] && orderChild[order.orderID]?.map((order, itemIndex) => (
+                    <div key={itemIndex} className="flex flex-col md:flex-row items-start md:items-center mt-10 mb-4 md:mb-6 border-b pb-4 md:pb-6">
+                        <div className="flex-shrink-0">
+                            {/* <img className="w-32 h-28 md:w-35 md:h-40 rounded-lg shadow-md" src={orderDetail?.designResponse.imageUrl} alt={`Image `} /> */}
+                        </div>
+                        <div className="ml-0 md:ml-6 mt-4 md:mt-0 flex-grow" style={{ position: 'relative' }}>
+                            <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Sub ID: <span className="text-sm text-gray-500 pb-2"> {order.orderID}</span></p>
+                            <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Type: <span className="text-sm text-blue-700 pb-2"> {order.orderType}</span></p>
+                            <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Brand ID: <span className="text-sm text-gray-500 pb-2">{order.brand?.brandID}</span></p>
+                            <p style={{ fontWeight: '500' }} className="text-sm text-black flex content-center items-center">Brand:
+                                <p style={{ fontWeight: '500' }} className="text-sm text-black flex content-center items-center pb-2">
+                                    <img src={order.brand?.user.imageUrl} style={{ width: 30, height: 30, borderRadius: 90, marginLeft: 5, marginRight: 5 }}></img>
+                                    <p className={`${__handlegetRatingStyle(order.brand?.rating)} text-sm text-gray-500`} > {order.brand?.brandName}</p>
+                                </p>
+                            </p>
+                            <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Total price: <span className="text-sm text-gray-500 pb-2"> {__handleAddCommasToNumber(order.totalPrice)} VND</span></p>
+                            <p style={{ fontWeight: '500' }} className="text-sm text-black pb-4">Details:
+                                {order.detailList?.map((detail: any) => (
+                                    <div className='ml-14 grid grid-cols-5 gap-5 pt-0'>
+                                        <p className="text-sm text-gray-500 pb-2">Size: {detail.size?.sizeName}</p>
+                                        <p className="text-sm text-gray-500 pb-2">Quantity: {detail.quantity}</p>
+                                    </div>
+                                ))}
+                            </p>
+
+
+
+
+
+                        </div>
+                    </div>
+                ))}
+
+
             </motion.div>
         </motion.div>
     );

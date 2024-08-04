@@ -12,10 +12,11 @@ import { use } from 'i18next';
 type Props = {
     isOpen: boolean;
     onClose: () => void;
-    onClick?: () => void;
+    onClickReportAndCancel?: () => Promise<void>;
     orderID?: any;
+    isCancelOrder?: boolean
 }
-const CustomerReportOrderDialogComponent: React.FC<Props> = ({ isOpen, onClose, onClick, orderID }) => {
+const CustomerReportOrderDialogComponent: React.FC<Props> = ({ isOpen, onClose, onClickReportAndCancel, orderID, isCancelOrder }) => {
 
     //TODO MUTIL LANGUAGE
 
@@ -92,6 +93,9 @@ const CustomerReportOrderDialogComponent: React.FC<Props> = ({ isOpen, onClose, 
             if (response.status === 200) {
                 setIsLoadingPage(false);
                 toast.success(`${response.message}`, { autoClose: 4000 });
+                if (isCancelOrder && onClickReportAndCancel) {
+                    await onClickReportAndCancel()
+                }
                 setTimeout(() => {
                     window.location.reload();
                 }, 3000);
@@ -103,6 +107,10 @@ const CustomerReportOrderDialogComponent: React.FC<Props> = ({ isOpen, onClose, 
             setIsLoadingPage(false);
         }
     };
+
+    const __handleOnclickReportAndCancel = async () => {
+
+    }
 
 
     return (
@@ -123,40 +131,42 @@ const CustomerReportOrderDialogComponent: React.FC<Props> = ({ isOpen, onClose, 
                     <div className="w-full max-w-3xl bg-white p-6 shadow-md rounded-md mt-6">
                         <h2 className="text-md font-semibold mb-4 ">Order {orderID}</h2>
                         <form onSubmit={__handleSubmit}>
-                            <div className="mb-4">
-                                <label className="block text-gray-700 font-semibold mb-2">
-                                    Upload Images
-                                </label>
-                                <input
-                                    type="file"
-                                    multiple
-                                    accept="image/*"
-                                    onChange={__handleImageChange}
-                                    className="w-full p-2 border border-gray-300 rounded-md"
-                                />
-                                <span style={{ fontSize: 13, color: errorColor }}>{errorImg}</span>
-                                <div className="mt-2 flex flex-wrap gap-4">
-                                    {images.map((image, index) => (
-                                        <div key={index} className="relative">
-                                            <img
-                                                src={URL.createObjectURL(image)}
-                                                alt={`Upload Preview ${index + 1}`}
-                                                className="w-32 h-36 object-cover rounded-md"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => __handleRemoveImage(index)}
-                                                className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full hover:bg-red-700 transition-colors"
-                                            >
-                                                <IoMdTrash size={16} />
-                                            </button>
-                                        </div>
-                                    ))}
+                            {!isCancelOrder && (
+                                <div className="mb-4">
+                                    <label className="block text-gray-700 font-semibold mb-2">
+                                        Upload Images
+                                    </label>
+                                    <input
+                                        type="file"
+                                        multiple
+                                        accept="image/*"
+                                        onChange={__handleImageChange}
+                                        className="w-full p-2 border border-gray-300 rounded-md"
+                                    />
+                                    <span style={{ fontSize: 13, color: errorColor }}>{errorImg}</span>
+                                    <div className="mt-2 flex flex-wrap gap-4">
+                                        {images.map((image, index) => (
+                                            <div key={index} className="relative">
+                                                <img
+                                                    src={URL.createObjectURL(image)}
+                                                    alt={`Upload Preview ${index + 1}`}
+                                                    className="w-32 h-36 object-cover rounded-md"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => __handleRemoveImage(index)}
+                                                    className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full hover:bg-red-700 transition-colors"
+                                                >
+                                                    <IoMdTrash size={16} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                             <div className="mb-4">
                                 <label htmlFor="comment" className="block text-gray-700 font-semibold mb-2">
-                                    Comment
+                                   {isCancelOrder ? 'Reasons' : 'Comments'}
                                 </label>
                                 <textarea
                                     id="comment"
@@ -182,7 +192,7 @@ const CustomerReportOrderDialogComponent: React.FC<Props> = ({ isOpen, onClose, 
                             marginRight: 10,
                             backgroundColor: primaryColor,
                         }}
-                        onClick={__handleReportOrder}
+                        onClick={() => __handleReportOrder()}
                     >
                         Submit
                     </button>

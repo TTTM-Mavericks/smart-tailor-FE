@@ -12,10 +12,11 @@ type Props = {
     isOpen: boolean;
     onClose?: () => void;
     orderID?: string;
-    brandID?: any
+    brandID?: any,
+    stageId?: any
 };
 
-const ViewProgessOfProductDialog: React.FC<Props> = ({ isOpen, onClose, orderID, brandID }) => {
+const ViewProgessOfProductDialog: React.FC<Props> = ({ isOpen, onClose, orderID, brandID, stageId }) => {
     const [description, setDescription] = useState<string>('');
     const [images, setImages] = useState<File[]>([]);
     const [videos, setVideos] = useState<File[]>([]);
@@ -27,58 +28,30 @@ const ViewProgessOfProductDialog: React.FC<Props> = ({ isOpen, onClose, orderID,
 
     useEffect(() => {
         if (!isOpen) return
-        __handleFetchOrderData()
+        __handleViewHistory(orderID, stageId)
     }, [isOpen])
 
-    const __handleFetchOrderData = async () => {
-        // setIsLoading(true)
+
+    const __handleViewHistory = async (orderId: any, stageId: any) => {
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.SampleProduct + functionEndpoints.SampleProduct.getSamplePriductByParentOrderID}/${orderID}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.SampleProduct + functionEndpoints.SampleProduct.getsampleProductDataByParentOrderId}/${orderId}/${stageId}`);
             if (response.status === 200) {
-                console.log(response.data);
-                // setOrderDetailList(response.data);
-                // setIsLoading(false)
-                setSampleProductData(response.data);
-            } else {
-                toast.error(`${response.message}`, { autoClose: 4000 });
-                console.log(response.message);
-            }
-            console.log(response);
-        } catch (error) {
-            toast.error(`${error}`, { autoClose: 4000 });
-            console.log(error);
-
-        }
-    }
-
-
-    const __handelUpdateOrderState = async (orderID: any) => {
-        try {
-            const bodyRequest = {
-                orderID: orderID,
-                status: 'START_PRODUCING'
-            }
-            console.log('bodyRequest: ', bodyRequest);
-            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
-            if (response.status === 200) {
-                console.log('detail order: ', response.data);
-                toast.success(`${response.message}`, { autoClose: 4000 });
-                setTimeout(() => {
-                    window.location.reload();
-                }, 2000)
+                setSampleProductData(response.data)
             }
             else {
                 console.log('detail error: ', response.message);
-                toast.error(`${response.message}`, { autoClose: 4000 });
             }
         } catch (error) {
             console.log('error: ', error);
             toast.error(`${error}`, { autoClose: 4000 });
         }
+
     }
 
+
+
     return (
-        <Dialog open={isOpen} maxWidth="lg" fullWidth>
+        <Dialog open={isOpen} maxWidth="lg" fullWidth >
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -93,31 +66,39 @@ const ViewProgessOfProductDialog: React.FC<Props> = ({ isOpen, onClose, orderID,
                     className="relative bg-white w-full max-w-4xl rounded-xl shadow-2xl p-8 max-h-[90vh] overflow-y-auto"
                     onClick={(e: any) => e.stopPropagation()}
                 >
-                    <button
+                    {/* <button
                         onClick={onClose}
                         className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition duration-150"
                         aria-label="Close modal"
                     >
                         <FaTimes size={24} />
-                    </button>
-                    <h2 className="text-2xl font-bold text-indigo-700 mb-6 shadow-text">View Sample Data</h2>
+                    </button> */}
+                    <IoMdCloseCircleOutline
+                        cursor="pointer"
+                        size={20}
+                        color="red"
+                        onClick={onClose}
+                        style={{ position: 'absolute', right: 20, top: 20 }}
+                    />
+                    <h2 className="text-lg font-bold text-indigo-700 mb-6 shadow-text">View Sample Data</h2>
 
                     <div className="flex justify-between items-center mb-6 bg-indigo-50 p-4 rounded-lg">
                         <div className="flex items-center">
                             <FaClipboardCheck className="text-indigo-500 mr-2" size={20} />
-                            <span className="font-semibold text-gray-700">Order ID:</span>
+                            <span className="text-sm font-semibold text-gray-700">Order ID:</span>
+                            <span className="text-sm ml-2 font-bold text-indigo-700">{orderID}</span>
                         </div>
-                        <p className="text-xl font-bold text-indigo-700">{orderID}</p>
                     </div>
 
                     {sampleProductData && sampleProductData.length > 0 ? (
                         <>
                             <Tabs
                                 value={activeTab}
-                                onChange={(_, newValue) => setActiveTab(newValue)}
+                                onChange={(_: any, newValue: any) => setActiveTab(newValue)}
                                 variant="scrollable"
                                 scrollButtons="auto"
-                                className="mb-6"
+                                className="text-sm ml-2 font-bold text-indigo-700"
+
                             >
                                 {sampleProductData.map((item, index) => (
                                     <Tab key={item.sampleModelID} label={`Sample ${index + 1}`} />
@@ -126,7 +107,7 @@ const ViewProgessOfProductDialog: React.FC<Props> = ({ isOpen, onClose, orderID,
 
                             {sampleProductData.map((item, index) => (
                                 <TabPanel key={item.sampleModelID} value={activeTab} index={index}>
-                                    <SampleCard item={item} onAccept={() => __handelUpdateOrderState(item.orderID)} onReject={onClose} />
+                                    <SampleCard item={item} />
                                 </TabPanel>
                             ))}
                         </>
@@ -147,73 +128,51 @@ const TabPanel: React.FC<{ children: React.ReactNode; value: number; index: numb
     );
 };
 
-const SampleCard: React.FC<{ item: SampleModelInterface; onAccept: () => void; onReject: () => void }> = ({ item, onAccept, onReject }) => {
+const SampleCard: React.FC<{ item: SampleModelInterface; onAccept?: () => void; onReject?: () => void }> = ({ item, onAccept, onReject }) => {
     return (
         <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-xl font-semibold text-indigo-700 mb-4">Sample Model ID: {item.sampleModelID}</h3>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 {[
-                    { icon: FaUser, label: 'Sub Order ID', value: item.orderID },
-                    { icon: FaBuilding, label: 'Brand ID', value: item.brandID },
                     { icon: FaCalendar, label: 'Create Date', value: item.createDate },
                     { icon: FaCalendarCheck, label: 'Last Modified Date', value: item.lastModifiedDate || 'N/A' },
                 ].map((detail, index) => (
                     <div key={index} className="bg-gray-50 p-3 rounded-lg">
                         <p className="text-gray-600 flex items-center mb-1">
                             <detail.icon className="mr-2 text-indigo-500" size={16} />
-                            <span className="font-semibold">{detail.label}:</span>
+                            <span className=" text-sm font-semibold">{detail.label}:</span>
+                            <p className="ml-2 text-sm font-bold text-gray-800">{detail.value}</p>
                         </p>
-                        <p className="text-sm font-bold text-gray-800">{detail.value}</p>
                     </div>
                 ))}
-            </div>
-
-            <div className="mb-6">
-                <h4 className="text-lg font-semibold text-gray-700 mb-2">Description</h4>
-                <p className="text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-200 shadow-inner">
-                    {item.description}
-                </p>
             </div>
 
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0 md:space-x-4">
                 {item.imageUrl && (
                     <div className="flex-1">
-                        <h4 className="text-lg font-semibold text-gray-700 mb-2">Sample Image</h4>
+                        <h4 className="text-md font-semibold text-gray-700 mb-2">Sample Image</h4>
                         <img
                             src={item.imageUrl}
                             alt="Sample"
-                            className="w-full h-64 object-cover rounded-lg shadow-md"
+                            className="object-cover rounded-lg shadow-md"
+                            style={{ width: 400, height: 450, margin: '0 auto' }}
                         />
                     </div>
                 )}
 
                 {item.video && (
                     <div className="flex-1">
-                        <h4 className="text-lg font-semibold text-gray-700 mb-2">Sample Video</h4>
+                        <h4 className="text-md font-semibold text-gray-700 mb-2">Sample Video</h4>
                         <video
                             src={item.video}
                             controls
                             className="w-full h-64 object-cover rounded-lg shadow-md"
+                            style={{ width: 400, height: 450, margin: '0 auto' }}
                         />
                     </div>
                 )}
             </div>
 
-            <div className="flex justify-end space-x-4 mt-6">
-                <button
-                    onClick={onReject}
-                    className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-150 focus:outline-none focus:ring-2 focus:ring-red-400"
-                >
-                    Reject
-                </button>
-                <button
-                    onClick={onAccept}
-                    className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-150 focus:outline-none focus:ring-2 focus:ring-green-400"
-                >
-                    Accept
-                </button>
-            </div>
+
         </div>
     );
 };

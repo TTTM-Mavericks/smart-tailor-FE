@@ -310,9 +310,10 @@ const OrderHistory: React.FC = () => {
                                                         backgroundColor:
                                                             orderDetail?.orderStatus === 'PENDING' ? secondaryColor
                                                                 : orderDetail?.orderStatus === 'DELIVERED' ? greenColor
-                                                                    : orderDetail?.orderStatus === 'DEPOSIT' ? secondaryColor
-                                                                        : orderDetail?.orderStatus === 'PROCESSING' ? secondaryColor
-                                                                            : redColor,
+                                                                    : orderDetail?.orderStatus === 'COMPLETED' ? greenColor
+                                                                        : orderDetail?.orderStatus === 'DEPOSIT' ? secondaryColor
+                                                                            : orderDetail?.orderStatus === 'PROCESSING' ? secondaryColor
+                                                                                : redColor,
                                                         opacity: 1,
                                                         color: whiteColor
                                                     }
@@ -355,7 +356,7 @@ const OrderHistory: React.FC = () => {
                                         {/* <img className="w-32 h-28 md:w-35 md:h-40 rounded-lg shadow-md" src={orderDetail?.designResponse.imageUrl} alt={`Image `} /> */}
                                     </div>
                                     <div className="ml-0 md:ml-6 mt-4 md:mt-0 flex-grow" style={{ position: 'relative' }}>
-                                        <p className="text-sm text-gray-500 pb-2">ID: #<span> {payment.paymentID}</span></p>
+                                        <p className="text-sm text-gray-500 pb-2">ID: <span> {payment.paymentID}</span></p>
                                         <p className="text-sm text-gray-500 pb-2">Amount: <span> {__handleAddCommasToNumber(payment.payOSResponse.data.amount)} VND</span></p>
                                         <p className="text-sm text-gray-500 pb-2">Create at: <span> {payment.payOSResponse.data.createdAt}</span></p>
 

@@ -1,5 +1,6 @@
 import { DesignDetailInterface, DesignInterface } from "./DesignModel";
 import { PaymentOrderInterface } from "./PaymentModel";
+import { BrandInterface, UserInterface } from "./UserModel";
 
 
 export interface PaymentInterface {
@@ -72,7 +73,8 @@ export interface OrderDetailInterface {
     buyerName: string | null;
     designResponse: DesignInterface;
     detailList?: DesignDetailInterface[];
-    paymentList?: PaymentOrderInterface[]
+    paymentList?: PaymentOrderInterface[];
+    brand?: BrandInterface
 }
 
 export interface OrderRequestDetailInterface {
@@ -90,7 +92,24 @@ export interface SampleModelInterface {
     video: string;
     createDate: string;
     lastModifiedDate: string | null;
+    stage?: string;
+    stageId: any;
+    brandName?: string;
+    status?: boolean;
+    orderStageID?: any
 }
+
+export interface StageInterface {
+    stageId: string;
+    orderID: string;
+    stage: string;
+    currentQuantity: number;
+    remainingQuantity: number;
+    status: boolean;
+    createdDate: string;
+    lastModifiedDate: string | null;
+}
+
 
 
 
