@@ -59,37 +59,26 @@ const Shirt = ({ isDefault }) => {
 
     useEffect(() => {
         const loadDecals = async () => {
-            const promises = deCalData.reduce((acc, decalGroup) => {
-                acc.push(...decalGroup.items.map(async (item) => {
+            deCalData.forEach(decalGroup => {
+                decalGroup.items.forEach(async (item) => {
                     try {
                         const texture = await loadTexture(item.imageUrl);
-                        return { ...item, texture };
+                        setDecalData(prev => prev.map(group =>
+                            group.key === decalGroup.key
+                                ? { ...group, items: group.items.map(i => i.itemMaskID === item.itemMaskID ? { ...i, texture } : i) }
+                                : group
+                        ));
                     } catch (error) {
                         console.error(`Failed to load texture for item ${item.itemMaskID}`, error);
-                        return null;
                     }
-                }));
-                return acc;
-            }, []);
-
-            const results = await Promise.all(promises);
-            setDecalData((prev) => {
-                return prev.map((decalGroup, index) => {
-                    return {
-                        ...decalGroup,
-                        items: decalGroup.items.map((item, itemIndex) => {
-                            return results[index * decalGroup.items.length + itemIndex] || item;
-                        })
-                    };
                 });
             });
         };
 
-        if (deCalData && deCalData.length > 0) {
+        if (deCalData.length > 0) {
             loadDecals();
         }
-    }, [modelData]);
-
+    }, [deCalData]);
 
     useFrame((state, delta) => easing.dampC(materials.lambert1.color, snap.color, 0.25, delta))
 
@@ -144,7 +133,7 @@ const Shirt = ({ isDefault }) => {
     };
 
     return (
-        <group key={stateString}>
+        <group key={JSON.stringify(snap)}>
             <mesh
                 castShadow
                 geometry={nodes.T_Shirt_male.geometry}
@@ -153,28 +142,33 @@ const Shirt = ({ isDefault }) => {
                 scale={[6, 6, 6]}
                 dispose={null}
             >
-
-                {!snap.isFullTexture && deCalData && deCalData.map((decalGroup) => (
-                    decalGroup.items.map((item) => (
-                        <Decal
-                            position={__handleFixPosition(item, decalGroup.key)}
-                            key={item.itemMaskID}
-                            rotation={[0, 0, -degreesToEuler(item.rotate)]}
-                            scale={__handleScale(item)}
-                            map={item.texture}
-                            // depthTest={true}
-                            depthWrite={true}
-                            dispose={true}
-                            renderOrder={item.indexZ}
-                        />
+                {!snap.isFullTexture && deCalData.map(decalGroup => (
+                    decalGroup.items.map(item => (
+                        item.texture ? (
+                            <Decal
+                                key={item.itemMaskID}
+                                position={__handleFixPosition(item, decalGroup.key)}
+                                rotation={[0, 0, -degreesToEuler(item.rotate)]}
+                                scale={__handleScale(item)}
+                                map={item.texture}
+                                depthWrite={true}
+                                renderOrder={item.indexZ}
+                            />
+                        ) : null
                     ))
                 ))}
-                {snap.isFullTexture && deCalData && deCalData.map((decalGroup) => (
-                    decalGroup.items.map((item) => (
-                        <meshStandardMaterial map={item.texture} depthWrite={true} renderOrder={item.indexZ}></meshStandardMaterial>
+                {snap.isFullTexture && deCalData.map(decalGroup => (
+                    decalGroup.items.map(item => (
+                        item.texture ? (
+                            <meshStandardMaterial
+                                key={item.itemMaskID}
+                                map={item.texture}
+                                depthWrite={true}
+                                renderOrder={item.indexZ}
+                            />
+                        ) : null
                     ))
                 ))}
-
             </mesh>
         </group>
     );

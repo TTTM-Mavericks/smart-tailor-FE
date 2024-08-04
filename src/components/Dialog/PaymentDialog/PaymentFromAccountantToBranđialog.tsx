@@ -15,7 +15,7 @@ import styles from './PaymentOrderDialogComponentStyle.module.scss'
 import { PaymentOrderInterface } from '../../../models/PaymentModel';
 import { __handleAddCommasToNumber } from '../../../utils/NumbericUtils';
 import QRCode from "react-qr-code";
-import { mbBankLogo } from '../../../assets';
+import { bankImg, mbBankLogo } from '../../../assets';
 
 type CancelOrderPolicyDialogProps = {
     isOpen: boolean;
@@ -33,7 +33,7 @@ interface PaymentFormData {
 }
 
 
-const PaymentOrderDialogComponent: React.FC<CancelOrderPolicyDialogProps> = ({ isOpen, onClose, onClick, paymentData }) => {
+const PaymentFromAccountantToBranđialog: React.FC<CancelOrderPolicyDialogProps> = ({ isOpen, onClose, onClick, paymentData }) => {
 
     //TODO MUTIL LANGUAGE
 
@@ -51,6 +51,7 @@ const PaymentOrderDialogComponent: React.FC<CancelOrderPolicyDialogProps> = ({ i
         // const result = paymentData?.find((item) => item.paymentType === 'DEPOSIT');
         if (paymentData) {
             setPaymentInfor(paymentData[0]);
+            console.log(paymentData[0].paymentURl);
         }
     },
         [paymentData])
@@ -58,7 +59,7 @@ const PaymentOrderDialogComponent: React.FC<CancelOrderPolicyDialogProps> = ({ i
     // ---------------FunctionHandler---------------//
     const __handleMoveToPayOSPaymentDetail = () => {
         if (paymentInfor) {
-            window.location.href = paymentInfor?.payOSResponse.data.checkoutUrl;
+            window.open(paymentInfor?.paymentURl, '_blank');
         }
     }
 
@@ -94,7 +95,7 @@ const PaymentOrderDialogComponent: React.FC<CancelOrderPolicyDialogProps> = ({ i
                 {selectedTab === 'QR Code' ? (
                     <div className="flex justify-center items-center w-96 h-full px-32" style={{ width: 450 }}>
                         <div className="relative flex justify-center items-center w-80 h-80 transform transition-transform duration-300 hover:scale-110">
-                            <QRCode value={paymentInfor?.payOSResponse.data.qrCode || ''} />
+                            <QRCode value={paymentInfor?.paymentURl || ''} />
                             <div
                                 className="absolute flex items-center justify-center w-20 h-20 rounded-full transform transition-transform duration-300 hover:scale-110 cursor-pointer"
                                 style={{ backgroundColor: primaryColor, color: whiteColor, fontWeight: 500, opacity: 0.9 }}
@@ -105,10 +106,12 @@ const PaymentOrderDialogComponent: React.FC<CancelOrderPolicyDialogProps> = ({ i
                         </div>
                     </div>
 
+
+
                 ) : (
                     <div className="space-y-4 h-full p-4 bg-white rounded-lg shadow-md" style={{ width: 450 }}>
                         <div className="flex w-3/4 items-center space-x-2">
-                            <img style={{ borderRadius: 90 }} src={mbBankLogo} alt="Bank Logo" className="w-8 h-8" />
+                            <img style={{ borderRadius: 90 }} src={bankImg} alt="Bank Logo" className="w-8 h-8" />
                             <div>
                                 <div className="text-sm font-medium">{paymentInfor?.paymentRecipientBankCode}</div>
                             </div>
@@ -174,4 +177,4 @@ const PaymentOrderDialogComponent: React.FC<CancelOrderPolicyDialogProps> = ({ i
     );
 };
 
-export default PaymentOrderDialogComponent;
+export default PaymentFromAccountantToBranđialog;

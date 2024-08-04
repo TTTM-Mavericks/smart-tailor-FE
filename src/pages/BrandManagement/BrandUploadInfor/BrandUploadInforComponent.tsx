@@ -10,6 +10,7 @@ import Swal from 'sweetalert2';
 import { UserInterface } from '../../../models/UserModel';
 import { toast } from 'react-toastify';
 import LoadingComponent from '../../../components/Loading/LoadingComponent';
+import ViewSampleBrandUpdateDialog from './Test';
 
 const UploadBrandInforForm = () => {
     const { id } = useParams<{ id: string }>();
@@ -22,6 +23,10 @@ const UploadBrandInforForm = () => {
     const [country, setCountrySelect] = useState([])
     const [activeOption, setActiveOption] = useState('monthly');
     const [isLoading, setIsLoading] = useState<boolean>(false);
+
+    const [taxCode, setTaxCode] = useState('');
+    const [taxCodeError, setTaxCodeError] = useState('');
+    const [taxCodeValidated, setTaxCodeValidated] = useState(false);
 
     const [formErrors, setFormErrors] = useState({
         brandName: '',
@@ -59,7 +64,6 @@ const UploadBrandInforForm = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [files, setFiles] = useState<File[]>([]);
     const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-    // const userAuthData = localStorage.getItem('userAuth') as string;
     let brandAuth: any = null;
 
     const BRANDROLECHECK = Cookies.get('userAuth');
@@ -68,16 +72,12 @@ const UploadBrandInforForm = () => {
         try {
             brandAuth = JSON.parse(BRANDROLECHECK);
             const { userID, email, fullName, language, phoneNumber, roleName, imageUrl, userStatus } = brandAuth;
-            // Your code that uses the parsed data
         } catch (error) {
             console.error('Error parsing JSON:', error);
-            // Handle the error, perhaps by setting default values or showing an error message
         }
     } else {
         console.error('userAuth cookie is not set');
-        // Handle the case when the cookie does not exist
     }
-
 
     let brandFromSignUp: any = null
     // Get BrandID from session
@@ -132,7 +132,8 @@ const UploadBrandInforForm = () => {
         district: '',
         ward: '',
         qrPayment: 'https://img.vietqr.io/image/970423-34561662002-compact.jpg',
-        brandImages: []
+        brandImages: [],
+        taxCode: 0
     });
 
     const [banks, setBanks] = useState<Bank[]>([]);
@@ -263,8 +264,8 @@ const UploadBrandInforForm = () => {
                 },
                 {
                     headers: {
-                        'x-client-id': 'df864cd3-00fc-4879-a682-9cfc72bf9ddc',
-                        'x-api-key': 'ffe26089-0906-487e-afc1-db31b7d72e56',
+                        'x-client-id': 'a7b3e81a-99f5-4954-9093-78cf98e6aa90',
+                        'x-api-key': 'd746181c-b2be-42ff-a3ee-76cb750c177e',
                     },
                 }
             );
@@ -385,19 +386,42 @@ const UploadBrandInforForm = () => {
         }
     };
 
+    const validateTaxCode = async () => {
+        try {
+            const response = await axios.get(`https://api.vietqr.io/v2/business/${formData.taxCode}`);
+            if (response.data.desc === "Success - Thành công") {
+                setTaxCodeError('');
+                setTaxCodeValidated(true);
+                // Update formData with the tax code
+                setFormData(prevData => ({
+                    ...prevData,
+                    taxCode: formData.taxCode // Convert to number if needed
+                }));
+                toast.success('Tax code validated successfully!');
+            } else {
+                toast.error('Tax code validation failed!');
+                setTaxCodeValidated(false);
+            }
+        } catch (error) {
+            toast.error('Tax code validation failed!');
+            setTaxCodeValidated(false);
+        }
+    };
+
     const _handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
 
-        if (!validateForm()) {
+        if (!validateForm() || !taxCodeValidated) {
             Swal.fire({
                 icon: 'error',
                 title: 'Validation Error',
-                text: 'Please correct the errors in the form',
+                text: 'Please correct the errors in the form and validate the tax code',
             });
             setIsLoading(false);
             return;
         }
+
 
         let uploadedImages: BrandImages[] = [];
 
@@ -433,7 +457,7 @@ const UploadBrandInforForm = () => {
             console.log('Profile uploaded successfully:', response.data);
 
             if (response.status === 200) {
-                setIsLoading(false); // Set loading to false if status is 200
+                setIsLoading(false);
             }
 
             Swal.fire({
@@ -442,10 +466,10 @@ const UploadBrandInforForm = () => {
                 text: 'Brand profile uploaded successfully',
             });
             setActiveStep(2);
-            // window.location.href = `/brand/waiting_process_information`;
+            window.location.href = `/brand/waiting_process_information`;
 
         } catch (error) {
-            setIsLoading(false); // Always set loading to false on error
+            setIsLoading(false);
             console.error('Error uploading profile', error);
             Swal.fire({
                 icon: 'error',
@@ -456,7 +480,6 @@ const UploadBrandInforForm = () => {
         }
     }
 
-
     // ---------------Fetch Account Name on Account Number Change---------------//
     useEffect(() => {
         if (formData.accountNumber && selectedBank) {
@@ -464,7 +487,7 @@ const UploadBrandInforForm = () => {
                 fetchAccountName();
             }, 1000); // Delay of 1 second
 
-            return () => clearTimeout(timer); // Cleanup the timer on component unmount or when accountNumber changes
+            return () => clearTimeout(timer);
         }
     }, [formData.accountNumber, selectedBank]);
 
@@ -590,41 +613,9 @@ const UploadBrandInforForm = () => {
                         {selectedOption === 'yearly' && renderCheckmark()}
                     </div>
                 </div>
-                <h2 className="text-2xl font-bold mb-6">Payment information</h2>
+                <h2 className="text-2xl font-bold mb-6">Upload information</h2>
 
-                {/* Image Array */}
-                <div className="flex flex-wrap gap-4 mb-4">
-                    {previewUrls.map((url, index) => (
-                        <div key={url} className="relative w-40 h-40 rounded-lg overflow-hidden">
-                            <img src={url} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
-                            <button
-                                onClick={() => {
-                                    const newFiles = files.filter((_, i) => i !== index);
-                                    const newPreviewUrls = previewUrls.filter((_, i) => i !== index);
-                                    setFiles(newFiles);
-                                    setPreviewUrls(newPreviewUrls);
-                                }}
-                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
-                            >
-                                X
-                            </button>
-                        </div>
-                    ))}
-                    <div
-                        onClick={() => fileInputRef.current?.click()}
-                        className="w-40 h-40 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer"
-                    >
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            className="hidden"
-                            onChange={_handleChanges}
-                            accept="image/*"
-                            multiple
-                        />
-                        <span className="text-4xl text-gray-400">+</span>
-                    </div>
-                </div>
+
                 {/* Form Input POST */}
                 <form className="space-y-4" onSubmit={_handleSubmit}>
                     <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4">
@@ -740,7 +731,7 @@ const UploadBrandInforForm = () => {
                         )}
                     </div>
 
-                    <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4">
+                    {/* <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4">
                         <select
                             className="appearance-none mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
@@ -749,6 +740,68 @@ const UploadBrandInforForm = () => {
                                 <option key={country} value={country}>{country}</option>
                             ))}
                         </select>
+                    </div> */}
+
+                    <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4">
+                        <div className="flex-1 flex flex-col">
+                            <input
+                                type="text"
+                                name="taxCode"
+                                id="taxCode"
+                                value={formData.taxCode}
+                                onChange={_handleChange}
+                                className={`p-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${taxCodeError ? 'border-red-500' : ''}`}
+                                placeholder="Enter tax code"
+                            />
+                            {taxCodeError && <p className="text-red-500 text-sm mt-1">{taxCodeError}</p>}
+                        </div>
+                        <button
+                            type="button"
+                            onClick={validateTaxCode}
+                            className="p-4 text-white rounded bg-orange-600 hover:bg-orange-700 text-white font-bold transition-colors duration-300"
+                        >
+                            Validate Tax Code
+                        </button>
+                    </div>
+
+                    {/* Image Array */}
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4 mb-4">
+                        {previewUrls.map((url, index) => (
+                            <div key={url} className="relative aspect-square rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+                                <img src={url} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
+                                <button
+                                    onClick={() => {
+                                        const newFiles = files.filter((_, i) => i !== index);
+                                        const newPreviewUrls = previewUrls.filter((_, i) => i !== index);
+                                        setFiles(newFiles);
+                                        setPreviewUrls(newPreviewUrls);
+                                    }}
+                                    className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 transition-colors"
+                                    aria-label="Remove image"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        ))}
+                        <div
+                            onClick={() => fileInputRef.current?.click()}
+                            className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors"
+                        >
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                className="hidden"
+                                onChange={_handleChanges}
+                                accept="image/*"
+                                multiple
+                            />
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                            <span className="text-sm text-gray-500">Add Image</span>
+                        </div>
                     </div>
                     <button type="submit" className="w-full p-4 text-white rounded bg-orange-600 hover:bg-orange-700 text-white font-bold transition-colors duration-300">Upload Information</button>
                 </form>

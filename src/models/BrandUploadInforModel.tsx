@@ -42,7 +42,8 @@ export interface FormDataBrandInformation {
     district: string,
     ward: string,
     qrPayment: string,
-    brandImages: BrandImages[]
+    brandImages: BrandImages[],
+    taxCode: number
 }
 
 export interface BrandImages {
