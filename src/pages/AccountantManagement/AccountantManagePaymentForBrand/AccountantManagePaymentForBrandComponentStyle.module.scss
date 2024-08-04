@@ -85,6 +85,15 @@
     }
 }
 
+.orderHistory__viewInvoice__buttonPayment{
+    color: $secondaryColor;
+    border-radius: 4px;
+    position: absolute;
+    top: 0;
+    right: 0px;
+    font-size: 14px;
+}
+
 .button {
     @apply inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500;
 }

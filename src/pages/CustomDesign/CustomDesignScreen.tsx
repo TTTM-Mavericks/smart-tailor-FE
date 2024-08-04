@@ -165,11 +165,11 @@ function CustomDesignScreen() {
     console.log('Received updatePart from child: ', updatePart);
     setUpdatePartData(updatePart);
     setPartOfClothData(updatePart);
-    // const result = updatePart?.find((item: PartOfDesignInterface) => item.partOfDesignID === selectedPartOfCloth?.partOfDesignID);
-    // if (result) {
-    //   console.log('selectedPartOfCloth change: ', result.itemMasks);
-    //   setSelectedStamp(result.itemMasks)
-    // }
+    const result = updatePart?.find((item: PartOfDesignInterface) => item.partOfDesignID === selectedPartOfCloth?.partOfDesignID);
+    if (result) {
+      console.log('selectedPartOfCloth change: ', result.itemMasks);
+      setSelectedStamp(result.itemMasks)
+    }
     state.modelData = updatePart
 
   }, []);
@@ -288,9 +288,9 @@ function CustomDesignScreen() {
   }, [selectedStamp, selectedPartOfCloth]);
 
 
-  // useEffect(() => {
-  //   setSelectedStamp(selectedStamp);
-  // }, [selectedStamp])
+  useEffect(() => {
+    setSelectedStamp(selectedStamp);
+  }, [selectedStamp])
 
   useEffect(() => {
     __handleGetAllSystemImageStamps()
@@ -648,7 +648,6 @@ function CustomDesignScreen() {
       result.partOfDesignID = selectedPartOfCloth?.partOfDesignID;
       result.indexZ = 1;
       result.zIndex = 1;
-      console.log('adddddddd   before: ', selectedStamp);
 
       // setSelectedPartOfCloth(selectedPartOfCloth);
 
@@ -667,7 +666,6 @@ function CustomDesignScreen() {
           // Add new item
 
           const addItemArr = [...prevSelectedStamp, { ...result, partOfDesignID: selectedPartOfCloth?.partOfDesignID }];
-          console.log('adddddddd   after: ', addItemArr);
           return addItemArr;
         }
       });

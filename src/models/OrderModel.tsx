@@ -1,5 +1,6 @@
 import { DesignDetailInterface, DesignInterface } from "./DesignModel";
 import { PaymentOrderInterface } from "./PaymentModel";
+import { BrandInterface, UserInterface } from "./UserModel";
 
 
 export interface PaymentInterface {
@@ -72,7 +73,8 @@ export interface OrderDetailInterface {
     buyerName: string | null;
     designResponse: DesignInterface;
     detailList?: DesignDetailInterface[];
-    paymentList?: PaymentOrderInterface[]
+    paymentList?: PaymentOrderInterface[];
+    brand?: BrandInterface
 }
 
 export interface OrderRequestDetailInterface {

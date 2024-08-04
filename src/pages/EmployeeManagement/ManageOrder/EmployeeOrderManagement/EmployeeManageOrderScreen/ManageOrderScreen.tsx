@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa';
-import { ArrowDropDown } from '@mui/icons-material';
+import { ArrowDropDown, BrandingWatermark } from '@mui/icons-material';
 import axios from 'axios';
-import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
+import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { EmployeeOrder, ImageList } from '../../../../../models/EmployeeManageOrderModel';
 import { motion } from 'framer-motion'
 import { toast } from 'react-toastify';
@@ -15,6 +15,7 @@ import Cookies from 'js-cookie';
 import BrandUpdateSampleProductDialog from '../../../../BrandManagement/GlobalComponent/Dialog/UpdateSampleProduct/BrandUpdateSampleProductDialog';
 import ViewSampleUpdateDialog from './ViewSampleUpdateDialog';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
+import { __handlegetRatingStyle, __handlegetStatusBackgroundBoolean } from '../../../../../utils/ElementUtils';
 
 /**
  * 
@@ -258,7 +259,7 @@ const EmployeeOrderFields: React.FC<{
                 <ArrowDropDown
                     className="cursor-pointer mr-2"
                 />
-                <span style={{fontSize: 14, fontWeight: "bold" }}>Show Design Details</span>
+                <span style={{ fontSize: 14, fontWeight: "bold" }}>Show Design Details</span>
             </div>
             {showDesignDetails && (
                 <DesignDetails design={designDetails} />
@@ -319,7 +320,14 @@ function isOrderImageListArray(orderImageList: ImageList | ImageList[]): orderIm
  */
 const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; onUpdatedOrderPending: (orderID: string) => void, designDetails: any }> = ({ order, onClose, onUpdatedOrderPending, designDetails }) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [orderChild, setOrderChild] = useState<{ [orderId: string]: OrderDetailInterface[] }>({});
 
+
+    useEffect(() => {
+        __handleFetchOrderDetails(order.orderID);
+    }, [order])
+
+    // TODO
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'NOT_VERIFY': return 'text-gray-600';
@@ -346,6 +354,22 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
             setCurrentImageIndex((prevIndex) =>
                 prevIndex === 0 ? order.orderImageList.length - 1 : prevIndex - 1
             );
+        }
+    };
+
+    const __handleFetchOrderDetails = async (orderId: string) => {
+        console.log('hehehehe');
+        try {
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getAllSubOrder}/${orderId}`);
+            if (response.status === 200) {
+                setOrderChild(prevState => ({
+                    ...prevState,
+                    [orderId]: response.data // Assuming response.data is an array of OrderDetailInterface
+                }));
+                console.log(response.data);
+            }
+        } catch (error) {
+            console.error(`Error fetching details for order ${orderId}:`, error);
         }
     };
 
@@ -418,12 +442,6 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
                     ))}
                 </div>
 
-                <div className="mb-6">
-                    <h3 className="text-xs font-semibold text-gray-700 mb-2">Buyer Name</h3>
-                    <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-200 shadow-inner">
-                        {order.buyerName}
-                    </p>
-                </div>
                 {designDetails && (
                     <div className="mb-6 flex justify-center">
                         <div className="text-center">
@@ -462,24 +480,47 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
                     </div>
                 )}
 
-                <div className="flex justify-end space-x-3">
-                    <button
-                        onClick={onClose}
-                        className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-150 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm"
-                    >
-                        Close
-                    </button>
-                    <button
-                        onClick={() => onUpdatedOrderPending(order.orderID)}
-                        className={`px-4 py-2 rounded-lg text-white transition duration-150 focus:outline-none focus:ring-2 text-sm ${order.orderStatus
-                            ? 'bg-green-500 hover:bg-green-600 focus:ring-green-400 cursor-not-allowed'
-                            : 'bg-indigo-500 hover:bg-indigo-600 focus:ring-indigo-400'
-                            }`}
-                        disabled={order.orderStatus}
-                    >
-                        {order.orderStatus ? 'Already Resolved' : 'Mark as Resolved'}
-                    </button>
+                <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-gray-600 flex items-center mb-1 text-xs">
+                        <BrandingWatermark className="mr-2 text-indigo-500" size={14} />
+                        <span className="font-semibold">Brand list:</span>
+                    </p>
+                   
                 </div>
+                {orderChild[order.orderID] && orderChild[order.orderID]?.map((order, itemIndex) => (
+                    <div key={itemIndex} className="flex flex-col md:flex-row items-start md:items-center mt-10 mb-4 md:mb-6 border-b pb-4 md:pb-6">
+                        <div className="flex-shrink-0">
+                            {/* <img className="w-32 h-28 md:w-35 md:h-40 rounded-lg shadow-md" src={orderDetail?.designResponse.imageUrl} alt={`Image `} /> */}
+                        </div>
+                        <div className="ml-0 md:ml-6 mt-4 md:mt-0 flex-grow" style={{ position: 'relative' }}>
+                            <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Sub ID: <span className="text-sm text-gray-500 pb-2"> {order.orderID}</span></p>
+                            <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Type: <span className="text-sm text-blue-700 pb-2"> {order.orderType}</span></p>
+                            <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Brand ID: <span className="text-sm text-gray-500 pb-2">{order.brand?.brandID}</span></p>
+                            <p style={{ fontWeight: '500' }} className="text-sm text-black flex content-center items-center">Brand:
+                                <p style={{ fontWeight: '500' }} className="text-sm text-black flex content-center items-center pb-2">
+                                    <img src={order.brand?.user.imageUrl} style={{ width: 30, height: 30, borderRadius: 90, marginLeft: 5, marginRight: 5 }}></img>
+                                    <p className={`${__handlegetRatingStyle(order.brand?.rating)} text-sm text-gray-500`} > {order.brand?.brandName}</p>
+                                </p>
+                            </p>
+                            <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Total price: <span className="text-sm text-gray-500 pb-2"> {__handleAddCommasToNumber(order.totalPrice)} VND</span></p>
+                            <p style={{ fontWeight: '500' }} className="text-sm text-black pb-4">Details:
+                                {order.detailList?.map((detail: any) => (
+                                    <div className='ml-14 grid grid-cols-5 gap-5 pt-0'>
+                                        <p className="text-sm text-gray-500 pb-2">Size: {detail.size?.sizeName}</p>
+                                        <p className="text-sm text-gray-500 pb-2">Quantity: {detail.quantity}</p>
+                                    </div>
+                                ))}
+                            </p>
+
+
+
+
+
+                        </div>
+                    </div>
+                ))}
+
+
             </motion.div>
         </motion.div>
     );
