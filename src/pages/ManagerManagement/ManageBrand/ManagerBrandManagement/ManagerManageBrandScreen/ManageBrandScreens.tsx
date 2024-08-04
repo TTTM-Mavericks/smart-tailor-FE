@@ -24,8 +24,8 @@ const StyledDialog = styled(Dialog)(({ theme }) => ({
 }));
 
 const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.common.white,
+    // backgroundColor: theme.palette.primary.main,
+    color: theme.palette.common.black,
     padding: theme.spacing(2),
 }));
 
@@ -41,7 +41,7 @@ const StyledDialogContent = styled(DialogContent)(({ theme }) => ({
         background: theme.palette.background.paper,
     },
     '&::-webkit-scrollbar-thumb': {
-        background: theme.palette.primary.main,
+        // background: theme.palette.primary.gray,
         borderRadius: '4px',
     },
     '&::-webkit-scrollbar-thumb:hover': {
@@ -451,7 +451,7 @@ const ManageBrand: React.FC = () => {
                         onClick={handleCloseDialog}
                         sx={{ position: 'absolute', right: 8, top: 8, color: 'white' }}
                     >
-                        <CloseIcon />
+                        <CancelOutlined sx={{ color: "red" }} />
                     </IconButton>
                 </StyledDialogTitle>
                 <StyledDialogContent>
