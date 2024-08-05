@@ -28,6 +28,9 @@ const UploadBrandInforForm = () => {
     const [taxCodeError, setTaxCodeError] = useState('');
     const [taxCodeValidated, setTaxCodeValidated] = useState(false);
 
+    const [businessType, setBusinessType] = useState('individual');
+    const [taxCodeData, setTaxCodeData] = useState<any>(null);
+
     const [formErrors, setFormErrors] = useState({
         brandName: '',
         accountNumber: '',
@@ -387,23 +390,53 @@ const UploadBrandInforForm = () => {
     };
 
     const validateTaxCode = async () => {
+        if (businessType === 'individual') {
+            setFormData((prevData: any) => ({
+                ...prevData,
+                taxCode: null
+            }));
+            return;
+        }
+
         try {
             const response = await axios.get(`https://api.vietqr.io/v2/business/${formData.taxCode}`);
-            if (response.data.desc === "Success - Thành công") {
+            if (response.data.code === "00" && response.data.desc === "Success - Thành công") {
                 setTaxCodeError('');
                 setTaxCodeValidated(true);
-                // Update formData with the tax code
+                setTaxCodeData(response.data.data);
+                console.log("bebe " + taxCodeData);
+
                 setFormData(prevData => ({
                     ...prevData,
-                    taxCode: formData.taxCode // Convert to number if needed
+                    taxCode: formData.taxCode,
+                    brandName: response.data.data.name,
+                    address: response.data.data.address
                 }));
                 toast.success('Tax code validated successfully!');
             } else {
-                toast.error('Can not find the tax code! Please try again!');
+                toast.error('Invalid tax code. Please try again!');
                 setTaxCodeValidated(false);
+                setTaxCodeData(null);
             }
         } catch (error) {
-            toast.error('Can not find the tax code! Please try again!');
+            toast.error('Error validating tax code. Please try again!');
+            setTaxCodeValidated(false);
+            setTaxCodeData(null);
+        }
+    };
+
+    console.log("bebe1 " + JSON.stringify(taxCodeData));
+
+    const handleBusinessTypeChange = (e: any) => {
+        setBusinessType(e.target.value);
+        if (e.target.value === 'individual') {
+            setFormData((prevData: any) => ({
+                ...prevData,
+                taxCode: null
+            }));
+            setTaxCodeValidated(true);
+            setTaxCodeData(null);
+        } else {
             setTaxCodeValidated(false);
         }
     };
@@ -743,26 +776,49 @@ const UploadBrandInforForm = () => {
                     </div> */}
 
                     <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4">
-                        <div className="flex-1 flex flex-col">
-                            <input
-                                type="text"
-                                name="taxCode"
-                                id="taxCode"
-                                value={formData.taxCode}
-                                onChange={_handleChange}
-                                className={`p-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${taxCodeError ? 'border-red-500' : ''}`}
-                                placeholder="Enter tax code"
-                            />
-                            {taxCodeError && <p className="text-red-500 text-sm mt-1">{taxCodeError}</p>}
-                        </div>
-                        <button
-                            type="button"
-                            onClick={validateTaxCode}
-                            className="p-4 text-white rounded bg-orange-600 hover:bg-orange-700 text-white font-bold transition-colors duration-300"
+                        <select
+                            name="businessType"
+                            value={businessType}
+                            onChange={handleBusinessTypeChange}
+                            className="flex-1 p-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
-                            Validate Tax Code
-                        </button>
+                            <option value="individual">Individual</option>
+                            <option value="company">Company</option>
+                        </select>
                     </div>
+
+                    {businessType === 'company' && (
+                        <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4">
+                            <div className="flex-1 flex flex-col">
+                                <input
+                                    type="text"
+                                    name="taxCode"
+                                    id="taxCode"
+                                    value={formData.taxCode || ''}
+                                    onChange={_handleChange}
+                                    className={`p-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${taxCodeError ? 'border-red-500' : ''}`}
+                                    placeholder="Enter tax code"
+                                />
+                                {taxCodeError && <p className="text-red-500 text-sm mt-1">{taxCodeError}</p>}
+                            </div>
+                            <button
+                                type="button"
+                                onClick={validateTaxCode}
+                                className="p-4 text-white rounded bg-orange-600 hover:bg-orange-700 text-white font-bold transition-colors duration-300"
+                            >
+                                Validate Tax Code
+                            </button>
+                        </div>
+                    )}
+
+                    {taxCodeData && (
+                        <div className="mt-4 p-4 bg-gray-100 rounded-lg">
+                            <h3 className="font-bold mb-2">Tax Code Information:</h3>
+                            <p><strong>Name:</strong> {taxCodeData.name}</p>
+                            {/* <p><strong>International Name:</strong> {taxCodeData.internationalName}</p> */}
+                            <p><strong>Address:</strong> {taxCodeData.address}</p>
+                        </div>
+                    )}
 
                     {/* Image Array */}
                     <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4 mb-4">
