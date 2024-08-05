@@ -399,11 +399,11 @@ const UploadBrandInforForm = () => {
                 }));
                 toast.success('Tax code validated successfully!');
             } else {
-                toast.error('Tax code validation failed!');
+                toast.error('Can not find the tax code! Please try again!');
                 setTaxCodeValidated(false);
             }
         } catch (error) {
-            toast.error('Tax code validation failed!');
+            toast.error('Can not find the tax code! Please try again!');
             setTaxCodeValidated(false);
         }
     };

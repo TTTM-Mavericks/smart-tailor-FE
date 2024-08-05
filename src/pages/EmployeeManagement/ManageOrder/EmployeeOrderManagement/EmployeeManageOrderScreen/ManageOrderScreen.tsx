@@ -16,6 +16,7 @@ import BrandUpdateSampleProductDialog from '../../../../BrandManagement/GlobalCo
 import ViewSampleUpdateDialog from './ViewSampleUpdateDialog';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
 import { __handlegetRatingStyle, __handlegetStatusBackgroundBoolean } from '../../../../../utils/ElementUtils';
+import { OrderDetailInterface } from '../../../../../models/OrderModel';
 
 /**
  * 
@@ -555,6 +556,7 @@ const EmployeeManageOrder: React.FC = () => {
 
     useEffect(() => {
         const apiUrl = `${baseURL}${versionEndpoints.v1}${featuresEndpoints.order}${functionEndpoints.order.getAllOrder}`;
+        setIsLoading(true);
         axios.get(apiUrl)
             .then(response => {
                 if (response.status !== 200) {
@@ -571,7 +573,8 @@ const EmployeeManageOrder: React.FC = () => {
                     console.error('Invalid data format:', responseData);
                 }
             })
-            .catch(error => console.error('Error fetching data:', error));
+            .catch(error => console.error('Error fetching data:', error))
+            .finally(() => setIsLoading(false));
     }, []);
 
     useEffect(() => {
@@ -735,165 +738,172 @@ const EmployeeManageOrder: React.FC = () => {
 
     return (
         <div className='-mt-8'>
-            <LoadingComponent isLoading={isLoading} time={5000}></LoadingComponent>
-
-            <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 bg-white p-6 rounded-lg shadow-lg">
-                <div className="flex flex-col">
-                    <label htmlFor="filterSelect" className="mb-2 text-sm font-medium text-gray-700">Select Filter</label>
-                    <select
-                        id="filterSelect"
-                        name="selectedFilter"
-                        value={filters.selectedFilter}
-                        onChange={handleFilterChange}
-                        className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
-                    >
-                        <option value="date">Date</option>
-                        <option value="orderID">Order ID</option>
-                        <option value="name">Brand Name</option>
-                        <option value="orderStatus">Order Status</option>
-                    </select>
+            {isLoading ? (
+                <div className="flex justify-center items-center h-screen">
+                    <LoadingComponent isLoading={isLoading} />
                 </div>
+            ) : (
+                <>
 
-                {filters.selectedFilter === 'date' && (
-                    <div className="flex flex-col">
-                        <label htmlFor="dateFilter" className="mb-2 text-sm font-medium text-gray-700">Date</label>
-                        <input
-                            id="dateFilter"
-                            type="date"
-                            name="date"
-                            value={filters.date}
-                            onChange={handleFilterChange}
-                            className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
-                        />
+                    <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 bg-white p-6 rounded-lg shadow-lg">
+                        <div className="flex flex-col">
+                            <label htmlFor="filterSelect" className="mb-2 text-sm font-medium text-gray-700">Select Filter</label>
+                            <select
+                                id="filterSelect"
+                                name="selectedFilter"
+                                value={filters.selectedFilter}
+                                onChange={handleFilterChange}
+                                className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
+                            >
+                                <option value="date">Date</option>
+                                <option value="orderID">Order ID</option>
+                                <option value="name">Brand Name</option>
+                                <option value="orderStatus">Order Status</option>
+                            </select>
+                        </div>
+
+                        {filters.selectedFilter === 'date' && (
+                            <div className="flex flex-col">
+                                <label htmlFor="dateFilter" className="mb-2 text-sm font-medium text-gray-700">Date</label>
+                                <input
+                                    id="dateFilter"
+                                    type="date"
+                                    name="date"
+                                    value={filters.date}
+                                    onChange={handleFilterChange}
+                                    className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
+                                />
+                            </div>
+                        )}
+
+                        {filters.selectedFilter === 'orderID' && (
+                            <div className="flex flex-col">
+                                <label htmlFor="orderIDFilter" className="mb-2 text-sm font-medium text-gray-700">Order ID</label>
+                                <input
+                                    id="orderIDFilter"
+                                    type="text"
+                                    name="orderID"
+                                    value={filters.orderID}
+                                    placeholder="Filter by Order ID..."
+                                    onChange={handleFilterChange}
+                                    className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
+                                />
+                            </div>
+                        )}
+
+                        {filters.selectedFilter === 'name' && (
+                            <div className="flex flex-col">
+                                <label htmlFor="brandNameFilter" className="mb-2 text-sm font-medium text-gray-700">Brand Name</label>
+                                <input
+                                    id="brandNameFilter"
+                                    type="text"
+                                    name="name"
+                                    value={filters.name}
+                                    placeholder="Filter by brand name..."
+                                    onChange={handleFilterChange}
+                                    className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
+                                />
+                            </div>
+                        )}
+
+                        {filters.selectedFilter === 'orderStatus' && (
+                            <div className="flex flex-col">
+                                <label htmlFor="orderStatusFilter" className="mb-2 text-sm font-medium text-gray-700">Order Status</label>
+                                <select
+                                    id="orderStatusFilter"
+                                    name="orderStatus"
+                                    value={filters.orderStatus}
+                                    onChange={handleFilterChange}
+                                    className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
+                                >
+                                    <option value="">All Order Statuses</option>
+                                    <option value="NOT_VERIFY">Not Verify</option>
+                                    <option value="PENDING">Pending</option>
+                                    <option value="DEPOSIT">Deposit</option>
+                                    <option value="PROCESSING">Processing</option>
+                                    <option value="CANCEL">Cancel</option>
+                                    <option value="COMPLETED">Completed</option>
+                                    <option value="DELIVERED">Delivered</option>
+                                </select>
+                            </div>
+                        )}
                     </div>
-                )}
 
-                {filters.selectedFilter === 'orderID' && (
-                    <div className="flex flex-col">
-                        <label htmlFor="orderIDFilter" className="mb-2 text-sm font-medium text-gray-700">Order ID</label>
-                        <input
-                            id="orderIDFilter"
-                            type="text"
-                            name="orderID"
-                            value={filters.orderID}
-                            placeholder="Filter by Order ID..."
-                            onChange={handleFilterChange}
-                            className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
-                        />
+                    <div >
+                        {currentOrders.map(order => (
+                            <EmployeeOrderFields key={order.orderID} order={order} onViewDetails={handleViewDetails} onUpdatedOrderPending={handleUpdateOrder} />
+                        ))}
                     </div>
-                )}
 
-                {filters.selectedFilter === 'name' && (
-                    <div className="flex flex-col">
-                        <label htmlFor="brandNameFilter" className="mb-2 text-sm font-medium text-gray-700">Brand Name</label>
-                        <input
-                            id="brandNameFilter"
-                            type="text"
-                            name="name"
-                            value={filters.name}
-                            placeholder="Filter by brand name..."
-                            onChange={handleFilterChange}
-                            className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
-                        />
-                    </div>
-                )}
-
-                {filters.selectedFilter === 'orderStatus' && (
-                    <div className="flex flex-col">
-                        <label htmlFor="orderStatusFilter" className="mb-2 text-sm font-medium text-gray-700">Order Status</label>
+                    <div className="mt-8 flex flex-wrap items-center justify-center space-x-4">
                         <select
-                            id="orderStatusFilter"
-                            name="orderStatus"
-                            value={filters.orderStatus}
-                            onChange={handleFilterChange}
-                            className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
+                            value={itemsPerPage}
+                            onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                            className="border rounded-md px-3 py-2 text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:border-orange-500"
                         >
-                            <option value="">All Order Statuses</option>
-                            <option value="NOT_VERIFY">Not Verify</option>
-                            <option value="PENDING">Pending</option>
-                            <option value="DEPOSIT">Deposit</option>
-                            <option value="PROCESSING">Processing</option>
-                            <option value="CANCEL">Cancel</option>
-                            <option value="COMPLETED">Completed</option>
-                            <option value="DELIVERED">Delivered</option>
+                            <option value={5}>5/page</option>
+                            <option value={10}>10/page</option>
+                            <option value={20}>20/page</option>
+                            <option value={50}>50/page</option>
                         </select>
+
+                        <button
+                            onClick={() => paginate(currentPage - 1)}
+                            disabled={currentPage === 1}
+                            className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                        >
+                            &lt;
+                        </button>
+
+                        {renderPageNumbers().map((number, index) => (
+                            <button
+                                key={index}
+                                onClick={() => typeof number === 'number' && paginate(number)}
+                                className={`px-3 py-2 rounded-md ${number === currentPage
+                                    ? 'bg-orange-500 text-white'
+                                    : 'text-gray-700 hover:bg-gray-100'
+                                    } ${number === '...' ? 'cursor-default' : ''}`}
+                            >
+                                {number}
+                            </button>
+                        ))}
+
+                        <button
+                            onClick={() => paginate(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                            className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                        >
+                            &gt;
+                        </button>
+
+                        <div className="flex items-center space-x-2 mt-4 sm:mt-0">
+                            <span className="text-gray-600">Go to</span>
+                            <input
+                                type="text"
+                                className="border border-gray-300 rounded-md w-16 px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                value={goToPage}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoToPage(e.target.value)}
+                                onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                                    if (e.key === 'Enter') {
+                                        const page = Math.max(1, Math.min(parseInt(goToPage), totalPages));
+                                        if (!isNaN(page)) {
+                                            paginate(page);
+                                        }
+                                    }
+                                }}
+                            />
+                        </div>
                     </div>
-                )}
-            </div>
 
-            <div >
-                {currentOrders.map(order => (
-                    <EmployeeOrderFields key={order.orderID} order={order} onViewDetails={handleViewDetails} onUpdatedOrderPending={handleUpdateOrder} />
-                ))}
-            </div>
-
-            <div className="mt-8 flex flex-wrap items-center justify-center space-x-4">
-                <select
-                    value={itemsPerPage}
-                    onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-                    className="border rounded-md px-3 py-2 text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:border-orange-500"
-                >
-                    <option value={5}>5/page</option>
-                    <option value={10}>10/page</option>
-                    <option value={20}>20/page</option>
-                    <option value={50}>50/page</option>
-                </select>
-
-                <button
-                    onClick={() => paginate(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
-                >
-                    &lt;
-                </button>
-
-                {renderPageNumbers().map((number, index) => (
-                    <button
-                        key={index}
-                        onClick={() => typeof number === 'number' && paginate(number)}
-                        className={`px-3 py-2 rounded-md ${number === currentPage
-                            ? 'bg-orange-500 text-white'
-                            : 'text-gray-700 hover:bg-gray-100'
-                            } ${number === '...' ? 'cursor-default' : ''}`}
-                    >
-                        {number}
-                    </button>
-                ))}
-
-                <button
-                    onClick={() => paginate(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
-                >
-                    &gt;
-                </button>
-
-                <div className="flex items-center space-x-2 mt-4 sm:mt-0">
-                    <span className="text-gray-600">Go to</span>
-                    <input
-                        type="text"
-                        className="border border-gray-300 rounded-md w-16 px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                        value={goToPage}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoToPage(e.target.value)}
-                        onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                            if (e.key === 'Enter') {
-                                const page = Math.max(1, Math.min(parseInt(goToPage), totalPages));
-                                if (!isNaN(page)) {
-                                    paginate(page);
-                                }
-                            }
-                        }}
-                    />
-                </div>
-            </div>
-
-            {isModalOpen && selectedOrder && (
-                <EmployeeOrderModal
-                    designDetails={designDetails}
-                    order={selectedOrder}
-                    onClose={handleCloseModal}
-                    onUpdatedOrderPending={handleMarkResolved}
-                />
+                    {isModalOpen && selectedOrder && (
+                        <EmployeeOrderModal
+                            designDetails={designDetails}
+                            order={selectedOrder}
+                            onClose={handleCloseModal}
+                            onUpdatedOrderPending={handleMarkResolved}
+                        />
+                    )}
+                </>
             )}
         </div>
     );
