@@ -386,34 +386,16 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
 
         errorCheckGet.forEach((error: any) => {
             error.errorMessage.forEach((message: any) => {
-                if (message.startsWith('Material_Name')) {
-                    // If the message starts with "Brand Material", extract the row index
-                    const match = message.match(/Material_Name at row Index (\d+) (.*)/);
-                    if (match) {
-                        const rowIndex = parseInt(match[1], 10);
-                        const actualRowIndex = rowIndex + 1;
-
-                        // Mark all columns for this row as erroneous
-                        allColumns.forEach(column => {
-                            const key = `${actualRowIndex}-${column}`;
-                            if (!errorMap.has(key)) {
-                                errorMap.set(key, []);
-                            }
-                            errorMap.get(key).push(message);
-                        });
-                        errorRows.add(actualRowIndex);
+                const match = message.match(/(Category_Name|Material_Name|HS_Code|Unit|Base_Price) at row Index (\d+) (.*)/);
+                if (match) {
+                    const [_, column, rowIndex, errorDetail] = match;
+                    const actualRowIndex = parseInt(rowIndex, 10) + 1; // Adjust row index to match Excel rows
+                    const key = `${actualRowIndex}-${column}`;
+                    if (!errorMap.has(key)) {
+                        errorMap.set(key, []);
                     }
-                } else {
-                    const match = message.match(/(HS_Code|Unit|Base_Price|Category_Name|Material_Name) at row Index (\d+) (.*)!/);
-                    if (match) {
-                        const [_, column, rowIndex, errorDetail] = match;
-                        const key = `${parseInt(rowIndex, 10) + 1}-${column}`;  // Adjust row index to match Excel rows
-                        if (!errorMap.has(key)) {
-                            errorMap.set(key, []);
-                        }
-                        errorMap.get(key).push(message);  // Store full error message
-                        errorRows.add(parseInt(rowIndex, 10) + 1);  // Add the row number to errorRows
-                    }
+                    errorMap.get(key).push(message);
+                    errorRows.add(actualRowIndex);
                 }
             });
         });
@@ -502,7 +484,8 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                 }}
                 onClick={_handleDownloadSampleExcelFile}
             >
-                {t(codeLanguage + '000053')}
+                {/* {t(codeLanguage + '000053')} */}
+                Download Error Data
             </Button>
 
             <div style={{ display: "flex" }}>
