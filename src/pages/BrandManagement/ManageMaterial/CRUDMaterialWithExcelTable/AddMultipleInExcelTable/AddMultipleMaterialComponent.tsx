@@ -583,7 +583,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                             }}
                             onClick={_handleDownloadBrandErrorData}
                         >
-                            Download Data
+                            Download Error Data
                         </Button>
                     </div>
                 )

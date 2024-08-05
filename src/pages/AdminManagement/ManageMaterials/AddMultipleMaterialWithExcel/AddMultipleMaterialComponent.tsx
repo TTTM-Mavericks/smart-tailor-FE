@@ -485,7 +485,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                 onClick={_handleDownloadSampleExcelFile}
             >
                 {/* {t(codeLanguage + '000053')} */}
-                Download Error Data
+                Download Excel Sample File
             </Button>
 
             <div style={{ display: "flex" }}>
