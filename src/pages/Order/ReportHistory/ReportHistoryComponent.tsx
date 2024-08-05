@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import './ManageReportStyles.module.scss'
+import './ReportHistoryScreenStyle.module.scss'
 import { motion } from 'framer-motion';
 import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import { Report, ReportImageList } from '../../../../../models/EmployeeManageReportModel';
-import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import axios from 'axios';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
-import { greenColor, redColor, secondaryColor } from '../../../../../root/ColorSystem';
 import Select from 'react-select';
+import { Report, ReportImageList } from '../../../models/EmployeeManageReportModel';
+import { greenColor, redColor, secondaryColor } from '../../../root/ColorSystem';
+import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
+import Cookies from 'js-cookie';
+import { UserInterface } from '../../../models/UserModel';
 
 const getStatusColor = (status: string) => {
     switch (status) {
@@ -36,7 +38,7 @@ const OrderReport: React.FC<{
     onMarkResolved: (reportID: string) => void;
 }> = ({ report, onViewDetails, onMarkResolved }) => (
     <div className="bg-white mb-8 shadow-lg rounded-lg p-6 transition duration-300 ease-in-out transform hover:shadow-xl">
-        <h3 className="font-semibold mb-3 text-indigo-700 text-sm">Type Report: {report.typeOfReport}</h3>
+        <h3 className="font-semibold mb-3 text-indigo-700  text-sm">Type Report: {report.typeOfReport}</h3>
         <div className="flex justify-between">
             <div className="w-1/2">
                 <p className="text-gray-600 mb-2 text-sm">Customer: {report.orderResponse.buyerName}</p>
@@ -83,16 +85,7 @@ const OrderReport: React.FC<{
             >
                 View Details
             </button>
-            <button
-                onClick={() => onMarkResolved(report.reportID)}
-                className="bg-green-500 text-white text-sm px-4 py-2 rounded-full hover:bg-green-600 transition duration-300"
-                style={{
-                    borderRadius: 4,
-                    backgroundColor: greenColor
-                }}
-            >
-                Mark as Resolved
-            </button>
+            
         </div>
     </div>
 );
@@ -156,13 +149,13 @@ const ReportModal: React.FC<{ report: Report; onClose: () => void; onMarkResolve
                     style={{ position: 'absolute', right: 20, top: 20 }}
                 />
 
-                <h2 className="text-sm  font-bold text-indigo-700 mb-6 shadow-text">Order Report Details</h2>
+                <h2 className="text-sm font-bold text-indigo-700 mb-6 shadow-text ">Order Report Details</h2>
 
-                <div className="flex justify-between items-center mb-6 bg-indigo-50 p-4 rounded-lg">
+                <div className="text-sm flex justify-between items-center mb-6 bg-indigo-50 p-4 rounded-lg">
                     <div className="flex items-center">
                         <FaClipboardCheck className="text-indigo-500 mr-2" size={20} />
-                        <span className="text-sm  font-semibold text-gray-700">Order ID:</span>
-                        <p className="text-sm font-bold text-indigo-700 ml-2">{report.reportID}</p>
+                        <span className=" text-sm font-semibold text-gray-700">Order ID:</span>
+                    <p className="text-sm font-bold text-indigo-700 ml-2">{report.reportID}</p>
                     </div>
                 </div>
 
@@ -184,9 +177,9 @@ const ReportModal: React.FC<{ report: Report; onClose: () => void; onMarkResolve
                         }
                     ].map((item, index) => (
                         <div key={index} className="bg-gray-50 p-4 rounded-lg">
-                            <p className="text-sm text-gray-600 flex items-center mb-2">
+                            <p className="text-gray-600 flex items-center mb-2">
                                 <item.icon className="mr-2 text-indigo-500" />
-                                <span className="text-sm font-semibold">{item.label}:</span>
+                                <span className=" text-sm font-semibold">{item.label}:</span>
                             </p>
                             <p className={`text-sm  font-bold ${item.customClass || 'text-gray-800'}`}>
                                 {item.value}
@@ -197,7 +190,7 @@ const ReportModal: React.FC<{ report: Report; onClose: () => void; onMarkResolve
 
                 <div className="mb-8">
                     <h3 className="text-sm  font-semibold text-gray-700 mb-3">Description</h3>
-                    <p className="text-sm text-gray-600 bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-inner">
+                    <p className="text-gray-600 bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-inner">
                         {report.content}
                     </p>
                 </div>
@@ -227,25 +220,12 @@ const ReportModal: React.FC<{ report: Report; onClose: () => void; onMarkResolve
                     </div>
                 )}
 
-                {/* <div className="flex justify-end space-x-4">
-
-                    <button
-                        onClick={() => onMarkResolved(report.reportID)}
-                        className={`px-6 py-3 rounded-lg text-white transition duration-150 focus:outline-none focus:ring-2 ${report.reportStatus
-                            ? 'bg-green-500 hover:bg-green-600 focus:ring-green-400 cursor-not-allowed'
-                            : 'bg-indigo-500 hover:bg-indigo-600 focus:ring-indigo-400'
-                            }`}
-                        disabled={report.reportStatus}
-                    >
-                        {report.reportStatus ? 'Already Resolved' : 'Mark as Resolved'}
-                    </button>
-                </div> */}
             </motion.div>
         </motion.div>
     );
 };
 
-const EmployeeManageReport: React.FC = () => {
+const ReportHistoryComponent: React.FC = () => {
     const [reports, setReports] = useState<Report[]>([]);
     const [filteredReports, setFilteredReports] = useState<Report[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -272,7 +252,12 @@ const EmployeeManageReport: React.FC = () => {
         { value: 'Order Status', label: 'Order Status' }
     ];
     useEffect(() => {
-        const apiUrl = `${baseURL}${versionEndpoints.v1}${featuresEndpoints.report}${functionEndpoints.report.getAllReport}`;
+
+        const userStorage = Cookies.get('userAuth');
+        if (!userStorage) return;
+        const userParse: UserInterface = JSON.parse(userStorage);
+
+        const apiUrl = `${baseURL}${versionEndpoints.v1}${featuresEndpoints.report}${functionEndpoints.report.getReportByUserID}/${userParse.userID}`;
         axios.get(apiUrl)
             .then(response => {
                 if (response.status !== 200) {
@@ -396,7 +381,6 @@ const EmployeeManageReport: React.FC = () => {
             <div style={{ width: "100%" }}>
                 <div className="flex flex-col">
                     <div className="mb-6">
-                        <label htmlFor="filterSelect" className="block mb-2 text-lg font-semibold text-gray-700">Select Filters</label>
                         <Select
                             isMulti
                             name="filters"
@@ -548,4 +532,4 @@ const EmployeeManageReport: React.FC = () => {
     );
 };
 
-export default EmployeeManageReport;
+export default ReportHistoryComponent;

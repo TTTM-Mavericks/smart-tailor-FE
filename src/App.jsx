@@ -40,6 +40,8 @@ import CreateDesignComponent from './pages/CustomDesign/Components/CreateDesign/
 import DesignCollectionScreen from './pages/DesignCollection/DesignCollectionContainer/DesignCollectionScreen';
 import { DashboardAccountantScreens } from './pages/AccountantManagement';
 import ToogleComponent from './pages/AccountantManagement/GlobalComponent/Toogle/ToogleComponent';
+import ReportHistorySreen from './pages/Order/ReportHistory/ReportHistorySreen';
+
 
 
 const tokenIsValid = (token) => {
@@ -140,6 +142,8 @@ function App() {
           <Route path='/order_detail/:id' element={<OrderDetailScreen></OrderDetailScreen>} />
           <Route path='/order_history' element={<OrderHistory></OrderHistory>} />
           <Route path='/design_detail/:id' element={<OrderProductScreen></OrderProductScreen>} />
+          <Route path='/report_history' element={<ReportHistorySreen></ReportHistorySreen>} />
+
 
           {/* Manager dashboard route */}
           <Route path='/manager' element={<DashboardManagerMangeExpertTailoring />} />

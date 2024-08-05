@@ -180,7 +180,9 @@ export const functionEndpoints = {
     getAllReport: '/get-all-report',
     createReport: '/create-report',
     getReportByOrderID: '/get-all-report-by-order-id',
-    createOrderReport: '/create-report'
+    createOrderReport: '/create-report',
+    getReportByUserID: '/get-all-report-by-user-id',
+
   },
   systemPropertise: {
     getAllSystemPropertise: '/get-all-system-properties'
