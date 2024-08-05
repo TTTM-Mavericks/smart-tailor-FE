@@ -20,6 +20,9 @@ import style from './EmployeeManageOrderStyle.module.scss'
 import { OrderDetailInterface } from '../../../../../models/OrderModel';
 import { CircularProgress } from '@mui/material';
 import { CustomerReportOrderDialogComponent } from '../../../../../components';
+import Select from 'react-select';
+
+
 /**
  * 
  * @param status 
@@ -656,21 +659,31 @@ const EmployeeManageOrder: React.FC = () => {
     const [filteredOrders, setFilteredOrders] = useState<EmployeeOrder[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [ordersPerPage] = useState(6);
-    const [filters, setFilters] = useState({
-        selectedFilter: 'date',
-        date: '',
-        status: '',
-        name: '',
-        orderStatus: '',
-        orderID: '',
-    });
+    // const [filters, setFilters] = useState({
+    //     selectedFilter: 'date',
+    //     date: '',
+    //     status: '',
+    //     name: '',
+    //     orderStatus: '',
+    //     orderID: '',
+    // });
     const [selectedOrder, setSelectedOrder] = useState<EmployeeOrder | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [itemsPerPage, setItemsPerPage] = useState(20);
     const [goToPage, setGoToPage] = useState('1');
     const [designDetails, setDesignDetails] = useState<any>(null)
     const [isLoading, setIsLoading] = React.useState<boolean>(false);
-
+    const [filters, setFilters] = useState({
+        orderID: '',
+        createDate: '',
+        status: ''
+    });
+    const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+    const filterOptions = [
+        { value: 'Date', label: 'Date' },
+        { value: 'Order ID', label: 'Order ID' },
+        { value: 'Order Status', label: 'Order Status' }
+    ];
     useEffect(() => {
         const apiUrl = `${baseURL}${versionEndpoints.v1}${featuresEndpoints.order}${functionEndpoints.order.getAllOrder}`;
         setIsLoading(true);
@@ -685,6 +698,7 @@ const EmployeeManageOrder: React.FC = () => {
                 if (responseData && Array.isArray(responseData.data)) {
                     const subOrders = responseData.data.filter((order: any) => order.orderType === FILTERED_ORDER_TYPE);
                     setOrder(subOrders);
+                    setFilteredOrders(subOrders); // Add this line
                     console.log("Data received:", subOrders);
                 } else {
                     console.error('Invalid data format:', responseData);
@@ -695,7 +709,8 @@ const EmployeeManageOrder: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        applyFilters();
+        const filtered = order.filter(applyFilters);
+        setFilteredOrders(filtered);
     }, [filters, order]);
 
     const handleUpdateOrder = async (orderID: string) => {
@@ -731,50 +746,29 @@ const EmployeeManageOrder: React.FC = () => {
 
     const FILTERED_ORDER_TYPE = "PARENT_ORDER";
 
-    const applyFilters = () => {
-        let filtered = order.filter(order => order.orderType === FILTERED_ORDER_TYPE);
-
-        switch (filters.selectedFilter) {
-            case 'date':
-                if (filters.date) {
-                    const filterDate = new Date(filters.date);
-                    filtered = filtered.filter(order => {
-                        const orderDate = new Date(order.createDate.split(' ')[0]);
-                        return orderDate.toDateString() === filterDate.toDateString();
-                    });
-                }
-                break;
-            case 'orderID':
-                if (filters.orderID) {
-                    filtered = filtered.filter(order =>
-                        order.orderID.toLowerCase().includes(filters.orderID.toLowerCase())
-                    );
-                }
-                break;
-            case 'name':
-                if (filters.name) {
-                    filtered = filtered.filter(order =>
-                        order.orderType.toLowerCase().includes(filters.name.toLowerCase())
-                    );
-                }
-                break;
-            case 'orderStatus':
-                if (filters.orderStatus !== '') {
-                    filtered = filtered.filter(order => order.orderStatus === filters.orderStatus);
-                }
-                break;
-        }
-
-        setFilteredOrders(filtered);
-        setCurrentPage(1);
+    /**
+   * 
+   * @param event 
+   * Filter With the select 
+  */
+    const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = event.target;
+        setFilters(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
-        setFilters(prevFilters => ({
-            ...prevFilters,
-            [name]: value,
-        }));
+
+    /**
+     * 
+     * @param orderDetail 
+     * @returns 
+     * Apply the filter to the render with card
+     */
+    const applyFilters = (orderDetail: EmployeeOrder) => {
+        return (
+            (filters.orderID === '' || orderDetail.orderID.includes(filters.orderID)) &&
+            (filters.createDate === '' || (orderDetail.expectedStartDate?.includes(filters.createDate) ?? false)) &&
+            (filters.status === '' || orderDetail.orderStatus === filters.status)
+        );
     };
 
     const indexOfLastReport = currentPage * itemsPerPage;
@@ -862,93 +856,87 @@ const EmployeeManageOrder: React.FC = () => {
             ) : (
                 <>
 
-                    <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 bg-white p-6 rounded-lg shadow-lg">
+                    <div style={{ width: "100%" }}>
                         <div className="flex flex-col">
-                            <label htmlFor="filterSelect" className="mb-2 text-sm font-medium text-gray-700">Select Filter</label>
-                            <select
-                                id="filterSelect"
-                                name="selectedFilter"
-                                value={filters.selectedFilter}
-                                onChange={handleFilterChange}
-                                className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
-                            >
-                                <option value="date">Date</option>
-                                <option value="orderID">Order ID</option>
-                                <option value="name">Brand Name</option>
-                                <option value="orderStatus">Order Status</option>
-                            </select>
+                            <div className="mb-6">
+                                <label htmlFor="filterSelect" className="block mb-2 text-lg font-semibold text-gray-700">Select Filters</label>
+                                <Select
+                                    isMulti
+                                    name="filters"
+                                    options={filterOptions}
+                                    className="basic-multi-select"
+                                    classNamePrefix="select"
+                                    value={filterOptions.filter(option => selectedFilters.includes(option.value))}
+                                    onChange={(selectedOptions: any) => {
+                                        setSelectedFilters(selectedOptions.map((option: any) => option.value));
+                                    }}
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                                {selectedFilters.includes('Date') && (
+                                    <div className="filter-item">
+                                        <label htmlFor="dateFilter" className="block mb-2 text-sm font-medium text-gray-700">Date</label>
+                                        <input
+                                            type="date"
+                                            id="dateFilter"
+                                            name="createDate"
+                                            value={filters.createDate}
+                                            onChange={handleFilterChange}
+                                            className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
+                                        />
+                                    </div>
+                                )}
+
+                                {selectedFilters.includes('Order ID') && (
+                                    <div className="filter-item">
+                                        <label htmlFor="orderIdFilter" className="block mb-2 text-sm font-medium text-gray-700">Order ID</label>
+                                        <input
+                                            type="text"
+                                            id="orderIdFilter"
+                                            name="orderID"
+                                            value={filters.orderID}
+                                            onChange={handleFilterChange}
+                                            placeholder="Enter Order ID"
+                                            className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
+                                        />
+                                    </div>
+                                )}
+
+                                {selectedFilters.includes('Order Status') && (
+                                    <div className="filter-item">
+                                        <label htmlFor="statusFilter" className="block mb-2 text-sm font-medium text-gray-700">Order Status</label>
+                                        <select
+                                            id="statusFilter"
+                                            name="status"
+                                            value={filters.status}
+                                            onChange={handleFilterChange}
+                                            className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
+                                        >
+                                            <option value="">All Order Statuses</option>
+                                            <option value="NOT_VERIFY">Not Verify</option>
+                                            <option value="PENDING">Pending</option>
+                                            <option value="DEPOSIT">Deposit</option>
+                                            <option value="PROCESSING">Processing</option>
+                                            <option value="CANCEL">Cancel</option>
+                                            <option value="COMPLETED">Completed</option>
+                                            <option value="DELIVERED">Delivered</option>
+                                        </select>
+                                    </div>
+                                )}
+                            </div>
+
                         </div>
-
-                        {filters.selectedFilter === 'date' && (
-                            <div className="flex flex-col">
-                                <label htmlFor="dateFilter" className="mb-2 text-sm font-medium text-gray-700">Date</label>
-                                <input
-                                    id="dateFilter"
-                                    type="date"
-                                    name="date"
-                                    value={filters.date}
-                                    onChange={handleFilterChange}
-                                    className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
-                                />
-                            </div>
-                        )}
-
-                        {filters.selectedFilter === 'orderID' && (
-                            <div className="flex flex-col">
-                                <label htmlFor="orderIDFilter" className="mb-2 text-sm font-medium text-gray-700">Order ID</label>
-                                <input
-                                    id="orderIDFilter"
-                                    type="text"
-                                    name="orderID"
-                                    value={filters.orderID}
-                                    placeholder="Filter by Order ID..."
-                                    onChange={handleFilterChange}
-                                    className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
-                                />
-                            </div>
-                        )}
-
-                        {filters.selectedFilter === 'name' && (
-                            <div className="flex flex-col">
-                                <label htmlFor="brandNameFilter" className="mb-2 text-sm font-medium text-gray-700">Brand Name</label>
-                                <input
-                                    id="brandNameFilter"
-                                    type="text"
-                                    name="name"
-                                    value={filters.name}
-                                    placeholder="Filter by brand name..."
-                                    onChange={handleFilterChange}
-                                    className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
-                                />
-                            </div>
-                        )}
-
-                        {filters.selectedFilter === 'orderStatus' && (
-                            <div className="flex flex-col">
-                                <label htmlFor="orderStatusFilter" className="mb-2 text-sm font-medium text-gray-700">Order Status</label>
-                                <select
-                                    id="orderStatusFilter"
-                                    name="orderStatus"
-                                    value={filters.orderStatus}
-                                    onChange={handleFilterChange}
-                                    className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
-                                >
-                                    <option value="">All Order Statuses</option>
-                                    <option value="NOT_VERIFY">Not Verify</option>
-                                    <option value="PENDING">Pending</option>
-                                    <option value="DEPOSIT">Deposit</option>
-                                    <option value="PROCESSING">Processing</option>
-                                    <option value="CANCEL">Cancel</option>
-                                    <option value="COMPLETED">Completed</option>
-                                    <option value="DELIVERED">Delivered</option>
-                                </select>
-                            </div>
-                        )}
                     </div>
 
                     <div >
                         {currentOrders.map(order => (
-                            <EmployeeOrderFields key={order.orderID} order={order} onViewDetails={handleViewDetails} onUpdatedOrderPending={handleUpdateOrder} />
+                            <EmployeeOrderFields
+                                key={order.orderID}
+                                order={order}
+                                onViewDetails={handleViewDetails}
+                                onUpdatedOrderPending={handleUpdateOrder}
+                            />
                         ))}
                     </div>
 
