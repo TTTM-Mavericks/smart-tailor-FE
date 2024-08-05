@@ -365,29 +365,25 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
             // Assuming errorCheckGet is available in this context
             errorCheckGet.forEach((error: any) => {
                 error.errorMessage.forEach((message: any) => {
-                    if (message.startsWith('Brand Material')) {
-                        // If the message starts with "Brand Material", extract the row index
-                        const match = message.match(/Brand Material .* at row Index (\d+)/);
-                        if (match) {
-                            const rowIndex = parseInt(match[1], 10);
-                            const actualRowIndex = rowIndex + 1;
+                    const materialNameMatch = message.match(/Material_Name at row Index (\d+) not found/);
+                    if (materialNameMatch) {
+                        const rowIndex = parseInt(materialNameMatch[1], 10);
+                        const actualRowIndex = rowIndex + 1; // Adjust index to match Excel rows
 
-                            // Mark all columns for this row as erroneous
-                            allColumns.forEach(column => {
-                                const key = `${actualRowIndex}-${column}`;
-                                if (!errorMap.has(key)) {
-                                    errorMap.set(key, []);
-                                }
-                                errorMap.get(key).push(message);
-                            });
-                            errorRows.add(actualRowIndex);
-                        }
+                        // Mark all columns for this row as erroneous
+                        allColumns.forEach(column => {
+                            const key = `${actualRowIndex}-${column}`;
+                            if (!errorMap.has(key)) {
+                                errorMap.set(key, []);
+                            }
+                            errorMap.get(key).push(message);
+                        });
+                        errorRows.add(actualRowIndex);
                     } else {
-                        // For other errors, continue with the existing logic
                         const match = message.match(/(Category_Name|Material_Name|HS_Code|Unit|Base_Price|Brand_Price) at row Index (\d+) (.*)!/);
                         if (match) {
                             const [_, column, rowIndex, errorDetail] = match;
-                            const actualRowIndex = parseInt(rowIndex, 10) + 1;
+                            const actualRowIndex = parseInt(rowIndex, 10) + 1; // Adjust index to match Excel rows
                             const key = `${actualRowIndex}-${column}`;
                             if (!errorMap.has(key)) {
                                 errorMap.set(key, []);

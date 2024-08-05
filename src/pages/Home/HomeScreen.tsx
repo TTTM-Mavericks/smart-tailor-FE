@@ -154,7 +154,7 @@ const HomeScreen = () => {
     function getBasePricesForDesign(data: any, designID: any) {
         const design = data.find((item: any) => item.designID === designID);
         if (!design) return [];
-        return design.partOfDesign.map((part: any) => part.material.basePrice);
+        return design.partOfDesign.map((part: any) => part.material?.basePrice);
     }
 
     function sumBasePrices(prices: any) {
