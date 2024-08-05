@@ -12,6 +12,7 @@ import BrandManageOrder from '../../ManageOrder/BrandOrderManagement/ManageOrder
 import BrandProductivityInputDialog from '../../GlobalComponent/Dialog/BrandProductivity/BrandProductivityInputDialog';
 import { IconButton } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
+import BrandManageTransactionComponent from '../../BrandManageTransaction/BrandManageTransactionComponent';
 
 const DashboardManageMaterialScreen = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -124,6 +125,8 @@ const DashboardManageMaterialScreen = () => {
                 return <ManageMaterialComponent />;
             case 'manage_order_request':
                 return <OrderRequestScreen />;
+            case 'manage_brand_trandsactions':
+                return <BrandManageTransactionComponent />;
             default:
                 return <ManageMaterialComponent />;
         }

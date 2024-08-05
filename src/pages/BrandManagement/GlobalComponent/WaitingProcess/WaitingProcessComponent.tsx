@@ -101,7 +101,7 @@ const WaitingProcessComponent: React.FC = () => {
                         </span>
                     </motion.div>
                     <p className="text-xl text-gray-600 mb-8 text-center">
-                        We're currently reviewing your application. We'll update you via email at {brandInfo?.email}.
+                        We're currently reviewing your application. We'll update you via email.
                     </p>
                     <div className="space-y-6">
                         {steps.map((step, index) => (

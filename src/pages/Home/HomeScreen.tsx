@@ -480,7 +480,7 @@ const HomeScreen = () => {
                                         <div className='flex'>
                                             <div className="flex space-x-2 mb-2 ml-3">
                                                 <span className="px-2 py-1 bg-purple-600 text-white text-xs rounded-full">
-                                                    {product.expertTailoring.expertTailoringName}
+                                                    {product?.expertTailoring?.expertTailoringName}
                                                 </span>
                                             </div>
 

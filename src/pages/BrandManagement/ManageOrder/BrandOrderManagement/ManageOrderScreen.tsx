@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { greenColor, primaryColor, secondaryColor, yellowColor } from '../../../../root/ColorSystem';
+import { greenColor, primaryColor, redColor, secondaryColor, yellowColor } from '../../../../root/ColorSystem';
 import PartOfDesignInformationDialogComponent from '../../BrandOrderManagement/PartOfDesignInformationDialogComponent';
 import LoadingComponent from '../../../../components/Loading/LoadingComponent';
 import Cookies from 'js-cookie';
@@ -19,6 +19,8 @@ import { __handleAddCommasToNumber } from '../../../../utils/NumbericUtils';
 import BrandUploadProgcessSampleProduct from '../../GlobalComponent/Dialog/UploadProgcessSampleProduct/BrandUploadProgcessSampleProduct';
 import { StageInterface } from '../../../../models/OrderModel';
 import style from './ManageOrderBrandStyle.module.scss'
+import { CustomerReportOrderDialogComponent } from '../../../../components';
+import { EstimatedStageInterface } from '../../../Order/OrderDetail/OrderDetailScreen';
 /**
  * 
  * @param status 
@@ -204,6 +206,9 @@ const BrandOrderFields: React.FC<{
     const [selectedStep, setSelectedStep] = useState<{ orderID: string, step: string } | null>(null);
     const [progressSteps, setProgressStep] = useState<StageInterface[]>();
     const [stageIdStart, setStageIdStart] = useState<string>();
+    const [isOpenReportOrderCanceledDialog, setIsOpenReportOrderCanceledDialog] = useState<boolean>(false);
+    const [timeline, setTimeLine] = useState<EstimatedStageInterface>();
+
 
     const customSortOrder = [
         'START_PRODUCING',
@@ -249,9 +254,29 @@ const BrandOrderFields: React.FC<{
 
     }
 
+    const __handleFetchTimeLine = async (parentId: any) => {
+        try {
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderTimeLineByParentId}/${parentId}`);
+            if (response.status === 200) {
+                setIsLoading(false);
+                setTimeLine(response.data);
+            }
+            else {
+                console.log('detail error: ', response.message);
+                toast.error(`${response.message}`, { autoClose: 4000 });
+            }
+        } catch (error) {
+            console.log('error: ', error);
+            toast.error(`${error}`, { autoClose: 4000 });
+            navigate('/error404');
+        }
+
+    }
+
     const __handleOpenUpdateProcessDialog = (orderDetail: BrandOrder) => {
         setOpenOrderDetail(orderDetail);
-        __handleLoadProgressStep(orderDetail.orderID)
+        __handleLoadProgressStep(orderDetail.orderID);
+        __handleFetchTimeLine(orderDetail.parentOrderID);
     };
 
     const __handleCloseUpdateProcessDialog = () => {
@@ -351,9 +376,43 @@ const BrandOrderFields: React.FC<{
         setSelectedOrderID(null);
     };
 
+    const __handleOpenReportDialog = () => {
+        console.log('open');
+        setIsOpenReportOrderCanceledDialog(true);
+    }
+
+    /**
+     * Handle cancel order click
+     */
+    const _handleCancelOrder = async (orderDetail: any) => {
+        setIsLoading(true)
+        try {
+            const bodyRequest = {
+                orderID: orderDetail?.orderID,
+                status: 'CANCEL'
+            }
+            console.log('bodyRequest: ', bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            if (response.status === 200) {
+                console.log('detail order: ', response.data);
+                toast.success(`${response.message}`, { autoClose: 4000 });
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            }
+            else {
+                console.log('detail error: ', response.message);
+                toast.error(`${response.message}`, { autoClose: 4000 });
+            }
+        } catch (error) {
+            console.log('error: ', error);
+            toast.error(`${error}`, { autoClose: 4000 });
+        }
+    };
+
     return (
         <div className="bg-white mb-8 shadow-lg rounded-lg p-6 transition duration-300 ease-in-out transform hover:shadow-xl">
-
+            <LoadingComponent isLoading={isLoading}></LoadingComponent>
             <h3 className="text-sm font-semibold mb-3 text-indigo-700">Type order: {order.orderType}</h3>
             <div className="flex justify-between">
                 <div className="w-1/2">
@@ -425,7 +484,28 @@ const BrandOrderFields: React.FC<{
                     </>
                 )}
 
+                {order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCEL' && (
 
+                    <button
+                        onClick={() => __handleOpenReportDialog()}
+                        className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4"
+                        style={{
+                            borderRadius: 4,
+                            backgroundColor: redColor
+                        }}
+                    >
+                        Cancel
+                    </button>
+                )}
+
+
+                <CustomerReportOrderDialogComponent
+                    isCancelOrder={true}
+                    orderID={order?.orderID}
+                    onClose={() => setIsOpenReportOrderCanceledDialog(false)}
+                    isOpen={isOpenReportOrderCanceledDialog}
+                    onClickReportAndCancel={() => _handleCancelOrder(order)}
+                ></CustomerReportOrderDialogComponent>
 
                 <button
                     onClick={() => onViewDetails(order, designDetails)}
@@ -438,16 +518,18 @@ const BrandOrderFields: React.FC<{
                     View Details
                 </button>
 
-                <button
-                    onClick={() => __handleOpenUpdateProcessDialog(order)}
-                    className="bg-green-500 text-sm text-white px-4 py-2  hover:bg-green-600 transition duration-300"
-                    style={{
-                        borderRadius: 4,
-                        backgroundColor: greenColor
-                    }}
-                >
-                    Update process
-                </button>
+                {order.orderStatus !== 'CANCEL'&& order.orderStatus !== 'COMPLETED'  && (
+                    <button
+                        onClick={() => __handleOpenUpdateProcessDialog(order)}
+                        className="bg-green-500 text-sm text-white px-4 py-2  hover:bg-green-600 transition duration-300"
+                        style={{
+                            borderRadius: 4,
+                            backgroundColor: greenColor
+                        }}
+                    >
+                        Update process
+                    </button>
+                )}
             </div>
 
             {/* Progress Bar */}
@@ -473,8 +555,36 @@ const BrandOrderFields: React.FC<{
                         />
                         <DialogContent dividers>
                             <div className="pt-4 mb-20">
-                                <p className="text-sm text-gray-600 mb-2">Progress Date: {order.productionCompletionDate}</p>
-                                <div className="flex justify-between text-sm mb-2">
+
+                                <div className="flex justify-between text-sm mb-0 ml-0">
+                                    <p className='flex'>
+                                        <span>ET: </span>
+                                        <span className={`text-indigo-600 ml-1`}>
+                                            dd-mm-yyy 00:00:00
+                                        </span>
+                                    </p>
+                                    <p className='flex'>
+                                        <span>ET: </span>
+                                        <span className={`text-indigo-600 ml-1`}>
+                                            {timeline?.estimatedDateFinishFirstStage}
+                                        </span>
+                                    </p>
+                                    <p className='flex'>
+                                        <span>ET: </span>
+                                        <span className={`text-indigo-600 ml-1`}>
+                                            {timeline?.estimatedDateFinishSecondStage}
+                                        </span >
+                                    </p>
+                                    <p className='flex'>
+                                        <span>ET: </span>
+                                        <span className={`text-indigo-600 ml-1`}>
+                                            {timeline?.estimatedDateFinishCompleteStage}
+                                        </span>
+                                    </p>
+
+
+                                </div>
+                                <div className="flex justify-between text-sm mb-0 ml-0">
                                     {progressSteps?.map((step, index) => {
                                         // const isCompleted = index < step.indexOf(order.orderStatus) + 1;
                                         // const isCurrent = index === progressSteps.indexOf(step.status) + 1;
@@ -659,7 +769,7 @@ const BrandOrderModal: React.FC<{ order: BrandOrder; onClose: () => void; onMark
                         ))}
                     </div>
 
-                   
+
                 </div>
 
 

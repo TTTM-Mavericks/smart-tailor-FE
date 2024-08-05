@@ -166,10 +166,10 @@ function CustomDesignScreen() {
     setUpdatePartData(updatePart);
     setPartOfClothData(updatePart);
     const result = updatePart?.find((item: PartOfDesignInterface) => item.partOfDesignID === selectedPartOfCloth?.partOfDesignID);
-    if (result) {
-      console.log('selectedPartOfCloth change: ', result.itemMasks);
-      setSelectedStamp(result.itemMasks)
-    }
+    // if (result) {
+    //   console.log('selectedPartOfCloth change: ', result.itemMasks);
+    //   setSelectedStamp(result.itemMasks)
+    // }
     state.modelData = updatePart
 
   }, []);
@@ -237,7 +237,7 @@ function CustomDesignScreen() {
   }, [selectedLanguage]);
 
   useEffect(() => {
-    // setSelectedPartOfCloth(selectedPartOfCloth);
+    setSelectedPartOfCloth(selectedPartOfCloth);
     const result = partOfClothData?.find((item: PartOfDesignInterface) => item.partOfDesignName === selectedPartOfCloth?.partOfDesignName);
     if (result) {
       console.log('selectedPartOfCloth change: ', result.itemMasks);
@@ -405,7 +405,7 @@ function CustomDesignScreen() {
         setTypeOfModelID(response.data.expertTailoring.expertTailoringID);
         setColorModel(response.data.color);
         setTitleDesign(response.data.titleDesign);
-        // state.color = response.data.color;
+        state.color = response.data.color;
         // state.modelData = response.data.partOfDesign
         setIsLoadingPage(false);
 

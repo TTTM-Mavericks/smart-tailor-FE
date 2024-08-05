@@ -68,12 +68,14 @@ const OrderDetailScreen: React.FC = () => {
 
 
 
-    const customSortOrder = [
-        'START_PRODUCING',
-        'FINISH_FIRST_STAGE',
-        'FINISH_SECOND_STAGE',
-        'COMPLETED'
-    ];
+    // const customSortOrder = [
+    //     'START_PRODUCING',
+    //     'FINISH_FIRST_STAGE',
+    //     'FINISH_SECOND_STAGE',
+    //     'COMPLETED'
+    // ];
+
+    const customSortOrder = ["DEPOSIT", "PROCESSING", "COMPLETED"];
 
     const sortStages = (stages: StageInterface[]) => {
         return stages.sort((a, b) => {
@@ -82,6 +84,7 @@ const OrderDetailScreen: React.FC = () => {
             return indexA - indexB;
         });
     };
+
 
 
     const { id } = useParams();
@@ -495,7 +498,7 @@ const OrderDetailScreen: React.FC = () => {
                             </div>
                         </div>
 
-                        {orderDetail?.orderStatus !== 'DELIVERY' && (
+                        {orderDetail?.orderStatus !== 'DELIVERED' && (
                             <div className="flex flex-col md:flex-row md:ml-6 w-1/3">
                                 <div className="md:w-1/2 mt-4 md:mt-0" style={{ margin: '0 auto' }}>
                                     <p className="font-medium text-gray-600">Buyer</p>
@@ -595,9 +598,24 @@ const OrderDetailScreen: React.FC = () => {
                                     );
                                 })}
                             </div>
+
                         </div>
+
                     )}
 
+
+                    {orderDetail?.orderStatus === 'PENDING' && (
+                        <div className="flex justify-end mt-4">
+                            <button
+                                onClick={() => __handleOpenConfirmCalcelDialog()}
+                                className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200 mr-4"
+                                style={{ backgroundColor: redColor }}
+                            >
+                                Cancel
+                            </button>
+
+                        </div>
+                    )}
 
                     {orderDetail?.paymentList && orderDetail?.paymentList?.length > 0 && orderDetail.orderStatus !== 'CANCEL' && (
                         <>
@@ -657,7 +675,7 @@ const OrderDetailScreen: React.FC = () => {
                                     className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200 mr-4"
                                     style={{ backgroundColor: redColor }}
                                 >
-                                    {t(codeLanguage + '000205')}
+                                    Cancel
                                 </button>
 
                                 <button
@@ -696,6 +714,8 @@ const OrderDetailScreen: React.FC = () => {
 
                         </div>
                     )}
+
+
 
 
                     {showScrollButton && (

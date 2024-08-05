@@ -35,12 +35,13 @@ const OrderReport: React.FC<{
     onMarkResolved: (reportID: string) => void;
 }> = ({ report, onViewDetails, onMarkResolved }) => (
     <div className="bg-white mb-8 shadow-lg rounded-lg p-6 transition duration-300 ease-in-out transform hover:shadow-xl">
-        <h3 className="text-xl font-semibold mb-3 text-indigo-700">Type Report: {report.typeOfReport}</h3>
+        <h3 className="font-semibold mb-3 text-indigo-700 text-sm">Type Report: {report.typeOfReport}</h3>
         <div className="flex justify-between">
             <div className="w-1/2">
-                <p className="text-gray-600 mb-2">Customer: {report.orderResponse.buyerName}</p>
-                <p className="text-gray-600 mb-2">Date: {report.createDate}</p>
-                <p className="text-gray-600 mb-2">
+                <p className="text-gray-600 mb-2 text-sm">Customer: {report.orderResponse.buyerName}</p>
+                <p className="text-gray-600 mb-2 text-sm">Date: {report.createDate}</p>
+                <p className="text-gray-700 mt-2 text-sm">Content: {report.content}</p>
+                <p className="text-gray-600 mt-2 text-sm">
                     Status Report:{' '}
                     <span
                         className={`ml-2 font-semibold px-2 py-1 rounded-full ${report.reportStatus ? 'bg-green-200 text-green-800' : 'bg-yellow-200 text-yellow-800'
@@ -51,29 +52,29 @@ const OrderReport: React.FC<{
                 </p>
                 <div className="mt-4">
                     {report.orderResponse.detailList.map((detail, index) => (
-                        <p key={index} className="text-gray-600">
+                        <p key={index} className="text-gray-600 text-sm">
                             Size {detail.size.sizeName}: Quantity {detail.quantity}
                         </p>
                     ))}
                 </div>
             </div>
             <div className="w-1/2">
-                <p className="text-gray-600 mb-2">Order ID: {report.orderResponse.orderID}</p>
-                <p className="text-gray-600 mb-2">
+                <p className="text-gray-600 mb-2 text-sm">Order ID: {report.orderResponse.orderID}</p>
+                <p className="text-gray-600 mb-2 text-sm">
                     Order Status: <span className={`mb-2 ${getStatusColor(report.orderResponse.orderStatus)} font-bold`}>{report.orderResponse.orderStatus}</span>
                 </p>
-                <p className="text-gray-600 mb-2">Total Quantity: {report.orderResponse.quantity}</p>
-                <p className="text-gray-600 mb-2">
+                <p className="text-gray-600 mb-2 text-sm">Total Quantity: {report.orderResponse.quantity}</p>
+                <p className="text-gray-600 mb-2 text-sm">
                     Address: {report.orderResponse.address}, {report.orderResponse.ward}, {report.orderResponse.district},{' '}
                     {report.orderResponse.province}
                 </p>
-                <p className="text-gray-700 mt-4">Content: {report.content}</p>
+
             </div>
         </div>
         <div className="mt-6 flex justify-end">
             <button
                 onClick={() => onViewDetails(report)}
-                className="bg-indigo-500 text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"
+                className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4"
                 style={{
                     borderRadius: 4,
                     backgroundColor: secondaryColor
@@ -83,7 +84,7 @@ const OrderReport: React.FC<{
             </button>
             <button
                 onClick={() => onMarkResolved(report.reportID)}
-                className="bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300"
+                className="bg-green-500 text-white text-sm px-4 py-2 rounded-full hover:bg-green-600 transition duration-300"
                 style={{
                     borderRadius: 4,
                     backgroundColor: greenColor
@@ -419,12 +420,12 @@ const EmployeeManageReport: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col">
-                    <label htmlFor="brandNameFilter" className="mb-2 text-sm font-medium text-gray-700">Brand Name</label>
+                    <label htmlFor="brandNameFilter" className="mb-2 text-sm font-medium text-gray-700">Type</label>
                     <input
                         id="brandNameFilter"
                         type="text"
                         name="name"
-                        placeholder="Filter by brand name..."
+                        placeholder="Filter by type name..."
                         onChange={handleFilterChange}
                         className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
                     />
