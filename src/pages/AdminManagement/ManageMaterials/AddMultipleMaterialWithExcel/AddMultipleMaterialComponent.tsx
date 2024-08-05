@@ -534,7 +534,6 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>HS CODE</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Unit</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Base Price</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Error Check</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Action</th>
                                 </tr>
                             </thead>
@@ -546,52 +545,6 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                                         <td style={{ border: '1px solid #ddd', padding: '8px', color: data.HS_Code ? colors.primary[200] : 'red' }}>{data.HS_Code || 'Null Hs Code'}</td>
                                         <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Unit ? colors.primary[200] : 'red' }}>{data.Unit || 'Null Unit'}</td>
                                         <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Base_Price ? colors.primary[200] : 'red' }}>{data.Base_Price || 'Null Base Price'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.error ? 'red' : 'green' }}>
-                                            {(() => {
-                                                const hasNullValues = Object.values(data).some(value => value === null || value === undefined);
-                                                const isCategoryNameNull = data.Category_Name === null || data.Category_Name === undefined || typeof data.Category_Name !== 'string';
-                                                const isMaterialNameNull = data.Material_Name === null || data.Material_Name === undefined || typeof data.Material_Name !== 'string';
-                                                const isHsCodeNullOrNotString = data.HS_Code === null || data.HS_Code === undefined || typeof data.HS_Code !== 'number' || data.HS_Code <= 0;
-                                                const isBasePriceNullOrNotNumberOrZero = data.Base_Price === null || data.Base_Price === undefined || typeof data.Base_Price !== 'number' || data.Base_Price <= 0;
-                                                const isUnitNullOrNotString = data.Unit === null || data.Unit === undefined || typeof data.Unit !== 'string';
-
-                                                const isUnitNumber = () => {
-                                                    if (typeof data.Unit === 'number') {
-                                                        return true;
-                                                    }
-                                                    return false;
-                                                };
-
-                                                const isDuplicate = excelData.some((item, i) => {
-                                                    if (i !== index) {
-                                                        return item.Category_Name === data.Category_Name && item.Material_Name === data.Material_Name;
-                                                    }
-                                                    return false;
-                                                });
-
-                                                if (hasNullValues || isCategoryNameNull || isMaterialNameNull || isHsCodeNullOrNotString || isBasePriceNullOrNotNumberOrZero || isUnitNullOrNotString || isDuplicate || isUnitNumber()) {
-                                                    const errorMessage = [];
-                                                    if (hasNullValues) errorMessage.push('Null Values');
-                                                    if (isCategoryNameNull) errorMessage.push('Category Name Is Null');
-                                                    if (isBasePriceNullOrNotNumberOrZero) errorMessage.push('Base Price Is Invalid');
-                                                    if (isMaterialNameNull) errorMessage.push('Material Name Is Null');
-                                                    if (isUnitNullOrNotString) errorMessage.push('Unit Is Invalid');
-                                                    if (isHsCodeNullOrNotString) errorMessage.push('HS Code Is Invalid');
-                                                    if (isDuplicate) errorMessage.push('Duplicate Entry');
-                                                    if (isUnitNumber()) errorMessage.push('Invalid Type of Unit');
-
-                                                    return (
-                                                        <div style={{ color: 'red' }}>
-                                                            <ErrorOutline style={{ color: 'red' }} />
-                                                            {errorMessage.join(', ')}
-                                                        </div>
-                                                    );
-                                                } else {
-                                                    return <CheckCircleRounded style={{ color: 'green' }} />;
-                                                }
-                                            })()}
-
-                                        </td>
                                         <td style={{ border: '1px solid #ddd', padding: '8px' }}>
                                             <div style={{ display: "flex" }}>
                                                 <EditIcon style={{ color: "blue", cursor: "pointer" }} onClick={() => confirmEdit(index)} />

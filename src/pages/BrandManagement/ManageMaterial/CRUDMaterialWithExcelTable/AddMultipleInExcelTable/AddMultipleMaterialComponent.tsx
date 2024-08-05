@@ -1,7 +1,7 @@
 import * as React from 'react';
 import DownloadIcon from '@mui/icons-material/CloudDownload';
 import { Box, Button, IconButton, Modal, Typography } from '@mui/material';
-import { Cancel, CheckCircleRounded, Close, ErrorOutline } from '@mui/icons-material';
+import { Cancel, CheckCircleRounded, Close } from '@mui/icons-material';
 import * as XLSX from "xlsx-js-style";
 import { tokens } from '../../../../../theme';
 import { useTheme } from "@mui/material";
@@ -18,7 +18,6 @@ import { toast, ToastContainer } from 'react-toastify';
 import Swal from 'sweetalert2';
 import Cookies from 'js-cookie';
 import { UserInterface } from '../../../../../models/UserModel';
-import { get } from 'core-js/core/dict';
 
 // const BRANDNAME = localStorage.getItem('brandName')
 
@@ -601,7 +600,6 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Unit</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Base Price</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Brand Price</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Error Check</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Action</th>
                                 </tr>
                             </thead>
@@ -614,25 +612,6 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                                         <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Unit ? colors.primary[200] : 'red' }}>{data.Unit || 'Null Unit'}</td>
                                         <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Base_Price ? colors.primary[200] : 'red' }}>{data.Base_Price || 'Null Base Price'}</td>
                                         <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Brand_Price ? colors.primary[200] : 'red' }}>{data.Brand_Price || 'Null Price'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>
-                                            {(() => {
-                                                const hasNullValues = Object.values(data).some(value => value === null || value === '' || value === undefined);
-                                                if (hasNullValues) {
-                                                    const errorMessage = [];
-                                                    if (hasNullValues) errorMessage.push('Null Values');
-
-                                                    return (
-                                                        <div style={{ color: 'red' }}>
-                                                            <ErrorOutline style={{ color: 'red' }} />
-                                                            {errorMessage.join(', ')}
-                                                        </div>
-                                                    );
-                                                } else {
-                                                    return <CheckCircleRounded style={{ color: 'green' }} />;
-                                                }
-                                            })()}
-                                        </td>
-
                                         <td style={{ border: '1px solid #ddd', padding: '8px' }}>
                                             <div style={{ display: "flex" }}>
                                                 <EditIcon style={{ color: "blue", cursor: "pointer" }} onClick={() => confirmEdit(index)} />

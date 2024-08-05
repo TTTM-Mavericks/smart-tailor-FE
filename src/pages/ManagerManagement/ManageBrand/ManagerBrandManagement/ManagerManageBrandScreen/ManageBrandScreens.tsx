@@ -316,7 +316,7 @@ const ManageBrand: React.FC = () => {
                 <Box display="flex" alignItems="center">
                     <Box
                         component="img"
-                        src={params.row.imageUrl}
+                        src={params.row.user.imageUrl}
                         alt={params.row.brandName}
                         sx={{
                             width: 40,
