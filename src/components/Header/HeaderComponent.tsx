@@ -218,9 +218,10 @@ export default function HeaderComponent() {
       const authToken = Cookies.get('token');
       const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.signout}`, authToken);
       if (response.status === 200) {
-        localStorage.clear();
         Cookies.remove('token');
         Cookies.remove('refreshToken');
+        Cookies.remove('userAuth');
+
         window.location.href = '/auth/signin'
 
       } else {

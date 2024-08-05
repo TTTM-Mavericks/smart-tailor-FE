@@ -634,7 +634,7 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                                 <Autocomplete
                                     id="tags-outlined"
                                     options={fabricMaterialList || []} // Ensure options is always defined
-                                    getOptionLabel={(option) => `${option.materialName} (${__handleAddCommasToNumber(option.minPrice)} - ${__handleAddCommasToNumber(option.maxPrice)})`}
+                                    getOptionLabel={(option) => `${option.materialName} (${__handleAddCommasToNumber(option.minPrice)} - ${__handleAddCommasToNumber(option.maxPrice)} VND) `}
                                     filterSelectedOptions
                                     value={fabricMaterialList?.find((item) => item.materialID === fabric.find((fabricItem) => fabricItem.partId === selectedPartOfDesign?.partOfDesignID)?.fabric) || null}
                                     onChange={(event, newValue) => {
@@ -703,7 +703,7 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                                                 getOptionLabel={(option) => {
                                                     // Check if the option is not null or undefined
                                                     if (option && typeof option === 'object' && 'materialName' in option) {
-                                                        return `${option.materialName} (${__handleAddCommasToNumber(option.minPrice)} - ${__handleAddCommasToNumber(option.maxPrice)})`;
+                                                        return `${option.materialName} (${__handleAddCommasToNumber(option.minPrice)} - ${__handleAddCommasToNumber(option.maxPrice)} VND) `;
                                                     }
                                                     return ''; // Return an empty string if the option is not valid
                                                 }}

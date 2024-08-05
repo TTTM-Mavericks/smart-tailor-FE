@@ -8,7 +8,7 @@ import { motion } from 'framer-motion'
 import { toast } from 'react-toastify';
 import LoadingComponent from '../../../../../components/Loading/LoadingComponent';
 import PartOfDesignInformationDialogComponent from '../../../../BrandManagement/BrandOrderManagement/PartOfDesignInformationDialogComponent';
-import { greenColor, primaryColor, redColor, secondaryColor, yellowColor } from '../../../../../root/ColorSystem';
+import { blackColor, greenColor, primaryColor, redColor, secondaryColor, yellowColor } from '../../../../../root/ColorSystem';
 import { __handleAddCommasToNumber } from '../../../../../utils/NumbericUtils';
 import { UserInterface } from '../../../../../models/UserModel';
 import Cookies from 'js-cookie';
@@ -216,8 +216,34 @@ const EmployeeOrderFields: React.FC<{
         setSelectedOrderID(null);
     };
 
+    const __handleUpdateOrderDelivery = async (orderId: any) => {
+        setIsLoading(true)
+        try {
+            const bodyRequest = {
+                orderID: orderId,
+                status: 'DELIVERED'
+            }
+            console.log('bodyRequest: ', bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            if (response.status === 200) {
+                toast.success(`${response.message}`, { autoClose: 4000 });
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            }
+            else {
+                console.log('detail error: ', response.message);
+                toast.error(`${response.message}`, { autoClose: 4000 });
+            }
+        } catch (error) {
+            console.log('error: ', error);
+            toast.error(`${error}`, { autoClose: 4000 });
+        }
+    }
+
     return (
         <div className="bg-white mb-8 shadow-lg rounded-lg p-6 transition duration-300 ease-in-out transform hover:shadow-xl">
+            <LoadingComponent isLoading={isLoading}></LoadingComponent>
             <h3 className="text-sm font-semibold mb-3 text-indigo-700">Type order: {order.orderType}</h3>
             <div className="flex justify-between">
                 <div className="w-1/2">
@@ -293,16 +319,33 @@ const EmployeeOrderFields: React.FC<{
                 >
                     View details
                 </button>
-                <button
-                    onClick={() => onUpdatedOrderPending(order.orderID)}
-                    className="bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300"
-                    style={{
-                        borderRadius: 4,
-                        backgroundColor: primaryColor
-                    }}
-                >
-                    Verify order
-                </button>
+                {order.orderStatus !== 'COMPLETED' && (
+
+                    <button
+                        onClick={() => onUpdatedOrderPending(order.orderID)}
+                        className="bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300"
+                        style={{
+                            borderRadius: 4,
+                            backgroundColor: primaryColor
+                        }}
+                    >
+                        Verify order
+                    </button>
+                )}
+
+                {order.orderStatus === 'COMPLETED' && (
+
+                    <button
+                        onClick={() => __handleUpdateOrderDelivery(order.orderID)}
+                        className="bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300"
+                        style={{
+                            borderRadius: 4,
+                            backgroundColor: greenColor
+                        }}
+                    >
+                        Delivery
+                    </button>
+                )}
             </div>
         </div>
     );
@@ -329,6 +372,7 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
     const [orderChild, setOrderChild] = useState<{ [orderId: string]: OrderDetailInterface[] }>({});
     const [isOpenReportOrderDialog, setIsOpenReportOrderDialog] = useState<boolean>(false);
     const [isOpenReportOrderCanceledDialog, setIsOpenReportOrderCanceledDialog] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
 
 
@@ -361,7 +405,7 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
             case 'COMPLETED': return greenColor;
             case 'FINISH_FIRST_STAGE': return primaryColor;
             case 'FINISH_SECOND_STAGE': return primaryColor;
-            default: return 'text-gray-600';
+            default: return blackColor;
         }
     };
 
@@ -404,6 +448,7 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
      * Handle cancel order click
      */
     const _handleCancelOrder = async (orderDetail: any) => {
+        setIsLoading(true)
         try {
             const bodyRequest = {
                 orderID: orderDetail?.orderID,
@@ -436,6 +481,7 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
             className={`${style.custom__scrollbar} fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm overflow-y-auto h-full w-full flex items-center justify-center p-4 z-50`}
             onClick={onClose}
         >
+            <LoadingComponent isLoading={isLoading}></LoadingComponent>
             <motion.div
                 initial={{ scale: 0.9, y: 50 }}
                 animate={{ scale: 1, y: 0 }}
@@ -609,12 +655,12 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
                             </p>
 
                         </div>
-                        {order.orderStatus !== 'COMPELETD' && (
+                        {order.orderStatus !== 'COMPLETED' && (
                             <>
                                 <button
                                     onClick={() => __handleOpenReportDialog()}
-                                    className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200 mr-4"
-                                    style={{ backgroundColor: redColor, position: 'absolute', top: 0, right: 10 }}
+                                    className="px-3 py-1 text-white rounded-md hover:bg-red-700 transition duration-200 mr-4"
+                                    style={{ backgroundColor: redColor, position: 'absolute', bottom: 20, right: 10, fontSize: 12 }}
                                 >
                                     CANCEL BRAND
                                 </button>

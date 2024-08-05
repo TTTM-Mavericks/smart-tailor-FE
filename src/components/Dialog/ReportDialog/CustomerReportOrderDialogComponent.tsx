@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { errorColor, primaryColor, redColor, whiteColor } from '../../../root/ColorSystem';
 import styles from './CustomerReportOrderDialogComponentStyle.module.scss'
@@ -8,6 +8,8 @@ import { OrderDetailInterface } from '../../../models/OrderModel';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import { toast } from 'react-toastify';
 import { use } from 'i18next';
+import Cookies from 'js-cookie';
+import { UserInterface } from '../../../models/UserModel';
 
 type Props = {
     isOpen: boolean;
@@ -25,12 +27,23 @@ const CustomerReportOrderDialogComponent: React.FC<Props> = ({ isOpen, onClose, 
     const [comment, setComment] = useState<string>('');
     const [isLoadingPage, setIsLoadingPage] = useState<boolean>(false);
     const [errorImg, setErrorImg] = useState<string>('');
+    const [userAuth, setUserAuth] = useState<UserInterface>();
+
 
 
 
     // ---------------Usable Variable---------------//
 
     // ---------------UseEffect---------------//
+
+    useEffect(() => {
+        const userStorage = Cookies.get('userAuth');
+        if (userStorage) {
+            const userParse: UserInterface = JSON.parse(userStorage);
+            setUserAuth(userParse)
+
+        }
+    }, [])
 
     // ---------------FunctionHandler---------------//
 
@@ -79,9 +92,11 @@ const CustomerReportOrderDialogComponent: React.FC<Props> = ({ isOpen, onClose, 
                 reportImageUrl: imageBase64s[index]
             }));
 
+
             const bodyData = {
                 typeOfReport: isCancelOrder ? 'CANCEL_ORDER' : "REPORT_ORDER",
                 orderID,
+                userID: userAuth?.userID,
                 content: comment,
                 reportImageList
             };
@@ -164,7 +179,7 @@ const CustomerReportOrderDialogComponent: React.FC<Props> = ({ isOpen, onClose, 
                             )}
                             <div className="mb-4">
                                 <label htmlFor="comment" className="block text-gray-700 font-semibold mb-2">
-                                   {isCancelOrder ? 'Reasons' : 'Comments'}
+                                    {isCancelOrder ? 'Reasons' : 'Comments'}
                                 </label>
                                 <textarea
                                     id="comment"
