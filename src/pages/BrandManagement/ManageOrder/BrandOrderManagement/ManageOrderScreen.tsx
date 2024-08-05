@@ -77,7 +77,7 @@ const DesignModal: React.FC<{ part: any; onClose: () => void }> = ({ part, onClo
 
                 <div className="bg-white p-6 rounded-lg max-w-2xl w-full">
                     <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-bold">{part.partOfDesignName}</h2>
+                        <h2 className="text-xl font-bold" style={{ fontSize: "13px" }}>{part.partOfDesignName}</h2>
                         <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -624,8 +624,8 @@ const BrandOrderModal: React.FC<{ order: BrandOrder; onClose: () => void; onMark
                 <div className="flex justify-between items-center mb-4 bg-indigo-50 p-3 rounded-lg">
                     <div className="flex items-center">
                         <FaClipboardCheck className="text-indigo-500" size={16} />
-                        <span className="font-semibold text-gray-700 text-sm">Order ID:</span>
-                        <p className="text-sm font-bold text-indigo-700">{order.orderID}</p>
+                        <span className="font-semibold text-gray-700 text-sm" style={{ fontSize: "13px" }}>Order ID:</span>
+                        <p className="text-sm font-bold text-indigo-700" style={{ fontSize: "13px" }}>{order.orderID}</p>
                     </div>
                 </div>
 
@@ -651,7 +651,7 @@ const BrandOrderModal: React.FC<{ order: BrandOrder; onClose: () => void; onMark
                                 <item.icon className="mr-2 text-indigo-500" size={14} />
                                 <span className="font-semibold">{item.label}:</span>
                             </p>
-                            <p className={`text-sm font-bold ${item.customClass || 'text-gray-800'}`}>
+                            <p className={`text-sm font-bold ${item.customClass || 'text-gray-800'}`} style={{ fontSize: "13px" }}>
                                 {item.value}
                             </p>
                         </div>
@@ -659,8 +659,8 @@ const BrandOrderModal: React.FC<{ order: BrandOrder; onClose: () => void; onMark
                 </div>
 
                 <div className="mb-6">
-                    <h3 className="text-xs font-semibold text-gray-700 mb-2">Buyer Name</h3>
-                    <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-200 shadow-inner">
+                    <h3 className="text-xs font-semibold text-gray-700 mb-2" style={{ fontSize: "13px" }}>Buyer Name</h3>
+                    <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-200 shadow-inner" style={{ fontSize: "13px" }}>
                         {order.buyerName}
                     </p>
                 </div>
@@ -678,7 +678,7 @@ const BrandOrderModal: React.FC<{ order: BrandOrder; onClose: () => void; onMark
 
                 {isOrderImageListArray(order.orderImageList) && order.orderImageList.length > 0 && (
                     <div className="mb-6">
-                        <h3 className="text-lg font-semibold text-gray-700 mb-2">Report Images</h3>
+                        <h3 className="text-lg font-semibold text-gray-700 mb-2" style={{ fontSize: "13px" }}>Report Images</h3>
                         <div className="relative">
                             <img
                                 src={order.orderImageList[currentImageIndex].orderImageUrl}

@@ -8,41 +8,20 @@ import { useTranslation } from 'react-i18next';
 const LineChart = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const color = theme.palette
+    const color = theme.palette;
 
     const [option, setOption] = useState("month");
 
     const filteredData = option === "month" ? dataLineChart : [];
-    console.log("filter data" + filteredData + option);
+    console.log("filter data", filteredData, option);
 
     const _handleChange = (e: any) => {
-        setOption(e.target.value)
-    }
-    // const [dataLineChart, setDataLineChart] = useState([])
-    // const [error, setError] = useState<string | null>(null);
+        setOption(e.target.value);
+    };
 
-    // useEffect(() => {
-    //     const apiURL = "";
-    //     fetch(apiURL)
-    //         .then(response => {
-    //             if (!response.ok) {
-    //                 throw new Error('Failed to fetch data');
-    //             }
-    //             return response.json();
-    //         })
-    //         .then((data) => {
-    //             setDataLineChart(data)
-    //         })
-    //         .catch(err => {
-    //             setError(err.message);
-    //         })
-    // }, [])
-
-    // Get language in local storage
     const selectedLanguage = localStorage.getItem('language');
     const codeLanguage = selectedLanguage?.toUpperCase();
 
-    // Using i18n
     const { t, i18n } = useTranslation();
     useEffect(() => {
         if (selectedLanguage !== null) {
@@ -71,7 +50,7 @@ const LineChart = () => {
                             },
                         }}
                     >
-                        <MenuItem value="month"> {t(`${codeLanguage}000041`)}</MenuItem>
+                        <MenuItem value="month">{t(`${codeLanguage}000041`)}</MenuItem>
                         <MenuItem value="week">{t(`${codeLanguage}000042`)}</MenuItem>
                         <MenuItem value="year">{t(`${codeLanguage}000043`)}</MenuItem>
                     </Select>
@@ -112,7 +91,6 @@ const LineChart = () => {
                         },
                     },
                 }}
-
                 animate={false}
                 tooltip={({ point }) => (
                     <div
@@ -131,7 +109,6 @@ const LineChart = () => {
                 colors={{ scheme: 'nivo' }}
                 defs={[]}
                 layers={['grid', 'markers', 'axes', 'areas', 'crosshair', 'lines', 'points', 'slices', 'mesh', 'legends']}
-                sliceTooltip={{ text: 'Some tooltip text' }}
                 debugSlices={false}
                 enableSlices={false}
                 debugMesh={false}
@@ -139,9 +116,7 @@ const LineChart = () => {
                 lineWidth={3}
                 areaBaselineValue={0}
                 areaBlendMode={"normal"}
-                areaOpacity={10}
-                borderColor=""
-                role=""
+                areaOpacity={0.1} // Adjusted from 10 to 0.1 as opacity should be between 0 and 1
                 crosshairType="bottom"
                 enablePoints
                 enablePointLabel={false}
@@ -161,7 +136,6 @@ const LineChart = () => {
                 axisTop={null}
                 axisRight={null}
                 axisBottom={{
-                    orient: "bottom",
                     tickSize: 0,
                     tickPadding: 10,
                     tickRotation: 0,
@@ -183,36 +157,35 @@ const LineChart = () => {
                 pointBorderWidth={2}
                 pointBorderColor={{ from: "serieColor" }}
                 pointLabel="data.yFormatted"
-                pointLabelYOffset={- 12}
+                pointLabelYOffset={-12}
                 enableTouchCrosshair={true}
                 useMesh={true}
-                legends={
-                    [
-                        {
-                            anchor: "bottom-right",
-                            direction: "column",
-                            justify: false,
-                            translateX: 100,
-                            translateY: 0,
-                            itemsSpacing: 0,
-                            itemDirection: "left-to-right",
-                            itemWidth: 80,
-                            itemHeight: 20,
-                            itemOpacity: 0.75,
-                            symbolSize: 12,
-                            symbolShape: "circle",
-                            symbolBorderColor: colors.primary[200],
-                            effects: [
-                                {
-                                    on: "hover",
-                                    style: {
-                                        itemBackground: colors.primary[100],
-                                        itemOpacity: 1,
-                                    },
+                legends={[
+                    {
+                        anchor: "bottom-right",
+                        direction: "column",
+                        justify: false,
+                        translateX: 100,
+                        translateY: 0,
+                        itemsSpacing: 0,
+                        itemDirection: "left-to-right",
+                        itemWidth: 80,
+                        itemHeight: 20,
+                        itemOpacity: 0.75,
+                        symbolSize: 12,
+                        symbolShape: "circle",
+                        symbolBorderColor: colors.primary[200],
+                        effects: [
+                            {
+                                on: "hover",
+                                style: {
+                                    itemBackground: colors.primary[100],
+                                    itemOpacity: 1,
                                 },
-                            ],
-                        },
-                    ]}
+                            },
+                        ],
+                    },
+                ]}
             />
         </>
     );

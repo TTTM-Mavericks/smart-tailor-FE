@@ -16,6 +16,7 @@ import BrandUpdateSampleProductDialog from '../../../../BrandManagement/GlobalCo
 import ViewSampleUpdateDialog from './ViewSampleUpdateDialog';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
 import { __handlegetRatingStyle, __handlegetStatusBackgroundBoolean } from '../../../../../utils/ElementUtils';
+import { OrderDetailInterface } from '../../../../../models/OrderModel';
 
 /**
  * 
@@ -63,7 +64,7 @@ const DesignModal: React.FC<{ part: any; onClose: () => void }> = ({ part, onClo
 
                 <div className="bg-white p-6 rounded-lg max-w-2xl w-full">
                     <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-bold">{part.partOfDesignName}</h2>
+                        <h2 className="text-xl font-bold" style={{ fontSize: "13px" }}>{part.partOfDesignName}</h2>
                         <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -75,7 +76,7 @@ const DesignModal: React.FC<{ part: any; onClose: () => void }> = ({ part, onClo
                             <img src={part.successImageUrl || '/placeholder-image.png'} alt={part.partOfDesignName} className="w-full h-auto object-contain" />
                         </div>
                         <div className="w-1/2 pl-4">
-                            <h3 className="text-lg font-semibold mb-2">Item Masks</h3>
+                            <h3 className="text-lg font-semibold mb-2" style={{ fontSize: "13px" }}>Item Masks</h3>
                             <div className="bg-gray-100 p-4 rounded">
                                 {part?.itemMasks && part.itemMasks.map((mask: any) => (
                                     <div>
@@ -83,10 +84,10 @@ const DesignModal: React.FC<{ part: any; onClose: () => void }> = ({ part, onClo
                                             {mask.imageUrl && <img src={mask.imageUrl} alt="Mask Image" style={{ width: 70, height: 80 }} />}
                                         </div>
                                         <div>
-                                            <p><strong>Item Mask Name:</strong> {mask.itemMaskName}</p>
-                                            <p><strong>Type:</strong> {mask.typeOfItem}</p>
-                                            <p><strong>Position:</strong> X: {mask.positionX}, Y: {mask.positionY}</p>
-                                            <p><strong>Scale:</strong> X: {mask.scaleX}, Y: {mask.scaleY}</p>
+                                            <p style={{ fontSize: "13px" }}><strong>Item Mask Name:</strong> {mask.itemMaskName}</p>
+                                            <p style={{ fontSize: "13px" }}><strong>Type:</strong> {mask.typeOfItem}</p>
+                                            <p style={{ fontSize: "13px" }}><strong>Position:</strong> X: {mask.positionX}, Y: {mask.positionY}</p>
+                                            <p style={{ fontSize: "13px" }}><strong>Scale:</strong> X: {mask.scaleX}, Y: {mask.scaleY}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -228,7 +229,7 @@ const EmployeeOrderFields: React.FC<{
                                     />
                                 </div>
                             ) : (
-                                <p>No image available</p>
+                                <p style={{ fontSize: "13px" }}>No image available</p>
                             )}
                         </div>
                         <div className="ml-4 mt-10">
@@ -433,9 +434,9 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
                         <div key={index} className="bg-gray-50 p-3 rounded-lg">
                             <p className="text-gray-600 flex items-center mb-1 text-xs">
                                 <item.icon className="mr-2 text-indigo-500" size={14} />
-                                <span className="font-semibold">{item.label}:</span>
+                                <span className="font-semibold" style={{ fontSize: "13px" }}>{item.label}:</span>
                             </p>
-                            <p className={`text-sm font-bold ${item.customClass || 'text-gray-800'}`}>
+                            <p className={`text-sm font-bold ${item.customClass || 'text-gray-800'}`} style={{ fontSize: "13px" }}>
                                 {item.value}
                             </p>
                         </div>
@@ -456,7 +457,7 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
 
                 {isOrderImageListArray(order.orderImageList) && order.orderImageList.length > 0 && (
                     <div className="mb-6">
-                        <h3 className="text-lg font-semibold text-gray-700 mb-2">Report Images</h3>
+                        <h3 className="text-lg font-semibold text-gray-700 mb-2" style={{ fontSize: "13px" }}>Report Images</h3>
                         <div className="relative">
                             <img
                                 src={order.orderImageList[currentImageIndex].orderImageUrl}
@@ -485,7 +486,7 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
                         <BrandingWatermark className="mr-2 text-indigo-500" size={14} />
                         <span className="font-semibold">Brand list:</span>
                     </p>
-                   
+
                 </div>
                 {orderChild[order.orderID] && orderChild[order.orderID]?.map((order, itemIndex) => (
                     <div key={itemIndex} className="flex flex-col md:flex-row items-start md:items-center mt-10 mb-4 md:mb-6 border-b pb-4 md:pb-6">
@@ -555,6 +556,7 @@ const EmployeeManageOrder: React.FC = () => {
 
     useEffect(() => {
         const apiUrl = `${baseURL}${versionEndpoints.v1}${featuresEndpoints.order}${functionEndpoints.order.getAllOrder}`;
+        setIsLoading(true);
         axios.get(apiUrl)
             .then(response => {
                 if (response.status !== 200) {
@@ -571,7 +573,8 @@ const EmployeeManageOrder: React.FC = () => {
                     console.error('Invalid data format:', responseData);
                 }
             })
-            .catch(error => console.error('Error fetching data:', error));
+            .catch(error => console.error('Error fetching data:', error))
+            .finally(() => setIsLoading(false));
     }, []);
 
     useEffect(() => {
@@ -735,165 +738,172 @@ const EmployeeManageOrder: React.FC = () => {
 
     return (
         <div className='-mt-8'>
-            <LoadingComponent isLoading={isLoading} time={5000}></LoadingComponent>
-
-            <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 bg-white p-6 rounded-lg shadow-lg">
-                <div className="flex flex-col">
-                    <label htmlFor="filterSelect" className="mb-2 text-sm font-medium text-gray-700">Select Filter</label>
-                    <select
-                        id="filterSelect"
-                        name="selectedFilter"
-                        value={filters.selectedFilter}
-                        onChange={handleFilterChange}
-                        className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
-                    >
-                        <option value="date">Date</option>
-                        <option value="orderID">Order ID</option>
-                        <option value="name">Brand Name</option>
-                        <option value="orderStatus">Order Status</option>
-                    </select>
+            {isLoading ? (
+                <div className="flex justify-center items-center h-screen">
+                    <LoadingComponent isLoading={isLoading} />
                 </div>
+            ) : (
+                <>
 
-                {filters.selectedFilter === 'date' && (
-                    <div className="flex flex-col">
-                        <label htmlFor="dateFilter" className="mb-2 text-sm font-medium text-gray-700">Date</label>
-                        <input
-                            id="dateFilter"
-                            type="date"
-                            name="date"
-                            value={filters.date}
-                            onChange={handleFilterChange}
-                            className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
-                        />
+                    <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 bg-white p-6 rounded-lg shadow-lg">
+                        <div className="flex flex-col">
+                            <label htmlFor="filterSelect" className="mb-2 text-sm font-medium text-gray-700">Select Filter</label>
+                            <select
+                                id="filterSelect"
+                                name="selectedFilter"
+                                value={filters.selectedFilter}
+                                onChange={handleFilterChange}
+                                className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
+                            >
+                                <option value="date">Date</option>
+                                <option value="orderID">Order ID</option>
+                                <option value="name">Brand Name</option>
+                                <option value="orderStatus">Order Status</option>
+                            </select>
+                        </div>
+
+                        {filters.selectedFilter === 'date' && (
+                            <div className="flex flex-col">
+                                <label htmlFor="dateFilter" className="mb-2 text-sm font-medium text-gray-700">Date</label>
+                                <input
+                                    id="dateFilter"
+                                    type="date"
+                                    name="date"
+                                    value={filters.date}
+                                    onChange={handleFilterChange}
+                                    className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
+                                />
+                            </div>
+                        )}
+
+                        {filters.selectedFilter === 'orderID' && (
+                            <div className="flex flex-col">
+                                <label htmlFor="orderIDFilter" className="mb-2 text-sm font-medium text-gray-700">Order ID</label>
+                                <input
+                                    id="orderIDFilter"
+                                    type="text"
+                                    name="orderID"
+                                    value={filters.orderID}
+                                    placeholder="Filter by Order ID..."
+                                    onChange={handleFilterChange}
+                                    className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
+                                />
+                            </div>
+                        )}
+
+                        {filters.selectedFilter === 'name' && (
+                            <div className="flex flex-col">
+                                <label htmlFor="brandNameFilter" className="mb-2 text-sm font-medium text-gray-700">Brand Name</label>
+                                <input
+                                    id="brandNameFilter"
+                                    type="text"
+                                    name="name"
+                                    value={filters.name}
+                                    placeholder="Filter by brand name..."
+                                    onChange={handleFilterChange}
+                                    className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
+                                />
+                            </div>
+                        )}
+
+                        {filters.selectedFilter === 'orderStatus' && (
+                            <div className="flex flex-col">
+                                <label htmlFor="orderStatusFilter" className="mb-2 text-sm font-medium text-gray-700">Order Status</label>
+                                <select
+                                    id="orderStatusFilter"
+                                    name="orderStatus"
+                                    value={filters.orderStatus}
+                                    onChange={handleFilterChange}
+                                    className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
+                                >
+                                    <option value="">All Order Statuses</option>
+                                    <option value="NOT_VERIFY">Not Verify</option>
+                                    <option value="PENDING">Pending</option>
+                                    <option value="DEPOSIT">Deposit</option>
+                                    <option value="PROCESSING">Processing</option>
+                                    <option value="CANCEL">Cancel</option>
+                                    <option value="COMPLETED">Completed</option>
+                                    <option value="DELIVERED">Delivered</option>
+                                </select>
+                            </div>
+                        )}
                     </div>
-                )}
 
-                {filters.selectedFilter === 'orderID' && (
-                    <div className="flex flex-col">
-                        <label htmlFor="orderIDFilter" className="mb-2 text-sm font-medium text-gray-700">Order ID</label>
-                        <input
-                            id="orderIDFilter"
-                            type="text"
-                            name="orderID"
-                            value={filters.orderID}
-                            placeholder="Filter by Order ID..."
-                            onChange={handleFilterChange}
-                            className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
-                        />
+                    <div >
+                        {currentOrders.map(order => (
+                            <EmployeeOrderFields key={order.orderID} order={order} onViewDetails={handleViewDetails} onUpdatedOrderPending={handleUpdateOrder} />
+                        ))}
                     </div>
-                )}
 
-                {filters.selectedFilter === 'name' && (
-                    <div className="flex flex-col">
-                        <label htmlFor="brandNameFilter" className="mb-2 text-sm font-medium text-gray-700">Brand Name</label>
-                        <input
-                            id="brandNameFilter"
-                            type="text"
-                            name="name"
-                            value={filters.name}
-                            placeholder="Filter by brand name..."
-                            onChange={handleFilterChange}
-                            className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
-                        />
-                    </div>
-                )}
-
-                {filters.selectedFilter === 'orderStatus' && (
-                    <div className="flex flex-col">
-                        <label htmlFor="orderStatusFilter" className="mb-2 text-sm font-medium text-gray-700">Order Status</label>
+                    <div className="mt-8 flex flex-wrap items-center justify-center space-x-4">
                         <select
-                            id="orderStatusFilter"
-                            name="orderStatus"
-                            value={filters.orderStatus}
-                            onChange={handleFilterChange}
-                            className="px-4 py-2 rounded-lg border-2 border-black-300 focus:outline-none focus:ring-black-300"
+                            value={itemsPerPage}
+                            onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                            className="border rounded-md px-3 py-2 text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:border-orange-500"
                         >
-                            <option value="">All Order Statuses</option>
-                            <option value="NOT_VERIFY">Not Verify</option>
-                            <option value="PENDING">Pending</option>
-                            <option value="DEPOSIT">Deposit</option>
-                            <option value="PROCESSING">Processing</option>
-                            <option value="CANCEL">Cancel</option>
-                            <option value="COMPLETED">Completed</option>
-                            <option value="DELIVERED">Delivered</option>
+                            <option value={5}>5/page</option>
+                            <option value={10}>10/page</option>
+                            <option value={20}>20/page</option>
+                            <option value={50}>50/page</option>
                         </select>
+
+                        <button
+                            onClick={() => paginate(currentPage - 1)}
+                            disabled={currentPage === 1}
+                            className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                        >
+                            &lt;
+                        </button>
+
+                        {renderPageNumbers().map((number, index) => (
+                            <button
+                                key={index}
+                                onClick={() => typeof number === 'number' && paginate(number)}
+                                className={`px-3 py-2 rounded-md ${number === currentPage
+                                    ? 'bg-orange-500 text-white'
+                                    : 'text-gray-700 hover:bg-gray-100'
+                                    } ${number === '...' ? 'cursor-default' : ''}`}
+                            >
+                                {number}
+                            </button>
+                        ))}
+
+                        <button
+                            onClick={() => paginate(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                            className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                        >
+                            &gt;
+                        </button>
+
+                        <div className="flex items-center space-x-2 mt-4 sm:mt-0">
+                            <span className="text-gray-600">Go to</span>
+                            <input
+                                type="text"
+                                className="border border-gray-300 rounded-md w-16 px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                value={goToPage}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoToPage(e.target.value)}
+                                onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                                    if (e.key === 'Enter') {
+                                        const page = Math.max(1, Math.min(parseInt(goToPage), totalPages));
+                                        if (!isNaN(page)) {
+                                            paginate(page);
+                                        }
+                                    }
+                                }}
+                            />
+                        </div>
                     </div>
-                )}
-            </div>
 
-            <div >
-                {currentOrders.map(order => (
-                    <EmployeeOrderFields key={order.orderID} order={order} onViewDetails={handleViewDetails} onUpdatedOrderPending={handleUpdateOrder} />
-                ))}
-            </div>
-
-            <div className="mt-8 flex flex-wrap items-center justify-center space-x-4">
-                <select
-                    value={itemsPerPage}
-                    onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-                    className="border rounded-md px-3 py-2 text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:border-orange-500"
-                >
-                    <option value={5}>5/page</option>
-                    <option value={10}>10/page</option>
-                    <option value={20}>20/page</option>
-                    <option value={50}>50/page</option>
-                </select>
-
-                <button
-                    onClick={() => paginate(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
-                >
-                    &lt;
-                </button>
-
-                {renderPageNumbers().map((number, index) => (
-                    <button
-                        key={index}
-                        onClick={() => typeof number === 'number' && paginate(number)}
-                        className={`px-3 py-2 rounded-md ${number === currentPage
-                            ? 'bg-orange-500 text-white'
-                            : 'text-gray-700 hover:bg-gray-100'
-                            } ${number === '...' ? 'cursor-default' : ''}`}
-                    >
-                        {number}
-                    </button>
-                ))}
-
-                <button
-                    onClick={() => paginate(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
-                >
-                    &gt;
-                </button>
-
-                <div className="flex items-center space-x-2 mt-4 sm:mt-0">
-                    <span className="text-gray-600">Go to</span>
-                    <input
-                        type="text"
-                        className="border border-gray-300 rounded-md w-16 px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                        value={goToPage}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoToPage(e.target.value)}
-                        onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                            if (e.key === 'Enter') {
-                                const page = Math.max(1, Math.min(parseInt(goToPage), totalPages));
-                                if (!isNaN(page)) {
-                                    paginate(page);
-                                }
-                            }
-                        }}
-                    />
-                </div>
-            </div>
-
-            {isModalOpen && selectedOrder && (
-                <EmployeeOrderModal
-                    designDetails={designDetails}
-                    order={selectedOrder}
-                    onClose={handleCloseModal}
-                    onUpdatedOrderPending={handleMarkResolved}
-                />
+                    {isModalOpen && selectedOrder && (
+                        <EmployeeOrderModal
+                            designDetails={designDetails}
+                            order={selectedOrder}
+                            onClose={handleCloseModal}
+                            onUpdatedOrderPending={handleMarkResolved}
+                        />
+                    )}
+                </>
             )}
         </div>
     );

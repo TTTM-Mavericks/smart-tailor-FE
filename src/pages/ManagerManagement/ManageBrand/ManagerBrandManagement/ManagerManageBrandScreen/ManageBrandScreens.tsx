@@ -1,39 +1,113 @@
 import * as React from "react";
-import { Box, IconButton } from "@mui/material";
+import { Box, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Grid, Paper, Divider, Modal, Fade, Backdrop } from "@mui/material";
 import { DataGrid, GridToolbar, GridColDef } from "@mui/x-data-grid";
 import { tokens } from "../../../../../theme";
-import { useTheme } from "@mui/material";
+import { useTheme, styled } from "@mui/material/styles";
 import { useTranslation } from 'react-i18next';
 import Swal from "sweetalert2";
 import axios from "axios";
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { Brand } from "../../../../../models/ManagerBrandModel";
-import { CancelOutlined, CheckCircleOutline } from "@mui/icons-material";
+import {
+    CancelOutlined,
+    CheckCircleOutline,
+    Close as CloseIcon,
+    ArrowBack,
+    ArrowForward,
+} from "@mui/icons-material";
 
-// Make Style of popup
-const style = {
+const StyledDialog = styled(Dialog)(({ theme }) => ({
+    '& .MuiDialog-paper': {
+        borderRadius: 16,
+        overflow: 'hidden',
+    },
+}));
+
+const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
+    // backgroundColor: theme.palette.primary.main,
+    color: theme.palette.common.black,
+    padding: theme.spacing(2),
+}));
+
+const StyledDialogContent = styled(DialogContent)(({ theme }) => ({
+    backgroundColor: theme.palette.background.default,
+    padding: theme.spacing(3),
+    maxHeight: '70vh',
+    overflowY: 'auto',
+    '&::-webkit-scrollbar': {
+        width: '8px',
+    },
+    '&::-webkit-scrollbar-track': {
+        background: theme.palette.background.paper,
+    },
+    '&::-webkit-scrollbar-thumb': {
+        // background: theme.palette.primary.gray,
+        borderRadius: '4px',
+    },
+    '&::-webkit-scrollbar-thumb:hover': {
+        background: theme.palette.primary.dark,
+    },
+}));
+
+const StyledPaper = styled(Paper)(({ theme }) => ({
+    backgroundColor: theme.palette.background.paper,
+    borderRadius: 12,
+    padding: theme.spacing(3),
+    boxShadow: theme.shadows[5],
+}));
+
+const SectionTitle = styled(Typography)(({ theme }) => ({
+    color: theme.palette.success.main,
+    fontWeight: 600,
+    marginBottom: theme.spacing(2),
+}));
+
+const InfoItem = styled(Typography)(({ theme }) => ({
+    marginBottom: theme.spacing(1),
+}));
+
+const ImageThumbnail = styled('img')({
+    width: '100px',
+    height: '100px',
+    objectFit: 'cover',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    transition: 'transform 0.3s ease-in-out',
+    '&:hover': {
+        transform: 'scale(1.05)',
+    },
+});
+
+const ModalImage = styled('img')({
+    maxWidth: '100%',
+    maxHeight: '80vh',
+    objectFit: 'contain',
+    borderRadius: '8px',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+});
+
+const NavigationButton = styled(IconButton)(({ theme }) => ({
     position: 'absolute',
     top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: "50%",
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-    borderRadius: "20px"
-};
+    transform: 'translateY(-50%)',
+    backgroundColor: 'rgba(255,255,255,0.3)',
+    '&:hover': {
+        backgroundColor: 'rgba(255,255,255,0.5)',
+    },
+}));
 
 const ManageBrand: React.FC = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [data, setData] = React.useState<Brand[]>([]);
-    // Get language in local storage
     const selectedLanguage = localStorage.getItem('language');
     const codeLanguage = selectedLanguage?.toUpperCase();
-
-    // Using i18n
     const { t, i18n } = useTranslation();
+    const [selectedBrand, setSelectedBrand] = React.useState<any>(null);
+    const [openDialog, setOpenDialog] = React.useState(false);
+    const [openImageModal, setOpenImageModal] = React.useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = React.useState(0);
+
     React.useEffect(() => {
         if (selectedLanguage !== null) {
             i18n.changeLanguage(selectedLanguage);
@@ -65,17 +139,32 @@ const ManageBrand: React.FC = () => {
             .catch(error => console.error('Error fetching data:', error));
     }, []);
 
+    const handleRowClick = async (params: any) => {
+        try {
+            const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.getBrandByID}/${params.row.userID}`;
+            const response = await axios.get(apiUrl);
+            if (response.status === 200) {
+                setSelectedBrand(response.data.data);
+                setOpenDialog(true);
+            }
+        } catch (error) {
+            console.error('Error fetching brand details:', error);
+            Swal.fire('Error', 'Failed to fetch brand details', 'error');
+        }
+    };
+
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+    };
+
     const _handleAcceptBrand = async (brandID: string) => {
         try {
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.acceptBrand}`;
-
             const response = await axios.get(apiUrl + `/${brandID}`)
             console.log("brandID" + brandID);
-
             if (!response.data) {
                 throw new Error('Error accepting brand');
             }
-
             return response;
         } catch (error) {
             throw error;
@@ -86,20 +175,17 @@ const ManageBrand: React.FC = () => {
         try {
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.rejectBrand}`;
             console.log("brandid: " + brandID);
-
             const response = await axios.get(apiUrl + `/${brandID}`)
-
             if (!response.data) {
                 throw new Error('Error rejecting brand');
             }
-
             return response;
         } catch (error) {
             throw error;
         }
     };
 
-    const _hanldeConfirmAccept = async (id: number) => {
+    const _hanldeConfirmAccept = async (id: string) => {
         try {
             const result = await Swal.fire({
                 title: `Confirm Accept`,
@@ -109,27 +195,22 @@ const ManageBrand: React.FC = () => {
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
                 confirmButtonText: `Yes I want to accept`,
-                cancelButtonText: `${t(codeLanguage + '000055')}`
+                cancelButtonText: `${t(codeLanguage + '000055')}`,
+                customClass: {
+                    container: 'swal-on-top'
+                }
             });
 
             if (result.isConfirmed) {
-                const response = await _handleAcceptBrand(id.toString());
+                const response = await _handleAcceptBrand(id);
                 if (response.status === 200) {
                     Swal.fire(
                         `Accept Brand Success`,
                         `Brand Has Been Accepted Successfully`,
                         'success'
                     );
-
                     localStorage.setItem(`brandAction_${id}`, 'true');
-
-                    setData((prevData: Brand[]) =>
-                        prevData.map((brand) =>
-                            brand.userID === id
-                                ? { ...brand, userStatus: 'ACCEPTED', actionTaken: true }
-                                : brand
-                        )
-                    );
+                    handleCloseDialog(); // Close the dialog here
                 }
             } else {
                 Swal.fire(
@@ -137,6 +218,7 @@ const ManageBrand: React.FC = () => {
                     `You Cancelled Accept Brand`,
                     'error'
                 );
+                handleCloseDialog(); // Close the dialog here
             }
         } catch (error: any) {
             console.error('Error:', error);
@@ -145,10 +227,11 @@ const ManageBrand: React.FC = () => {
                 `${error.message || 'Unknown error'}`,
                 'error'
             );
+            handleCloseDialog(); // Close the dialog here
         }
     };
 
-    const _hanldeConfirmDeny = async (id: number) => {
+    const _hanldeConfirmDeny = async (id: string) => {
         try {
             const result = await Swal.fire({
                 title: `Confirm Reject`,
@@ -158,27 +241,22 @@ const ManageBrand: React.FC = () => {
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
                 confirmButtonText: `Yes I want to reject`,
-                cancelButtonText: `${t(codeLanguage + '000055')}`
+                cancelButtonText: `${t(codeLanguage + '000055')}`,
+                customClass: {
+                    container: 'swal-on-top'
+                }
             });
 
             if (result.isConfirmed) {
-                const response = await _handleDenyBrand(id.toString());
+                const response = await _handleDenyBrand(id);
                 if (response.status === 200) {
                     Swal.fire(
                         `Reject Brand Success`,
                         `Brand Has Been Rejected Successfully`,
                         'success'
                     );
-
                     localStorage.setItem(`brandAction_${id}`, 'true');
-
-                    setData((prevData: Brand[]) =>
-                        prevData.map((brand) =>
-                            brand.userID === id
-                                ? { ...brand, userStatus: 'REJECTED', actionTaken: true }
-                                : brand
-                        )
-                    );
+                    handleCloseDialog(); // Close the dialog here
                 }
             } else {
                 Swal.fire(
@@ -186,6 +264,7 @@ const ManageBrand: React.FC = () => {
                     `You Cancelled Reject Brand`,
                     'error'
                 );
+                handleCloseDialog(); // Close the dialog here
             }
         } catch (error: any) {
             console.error('Error:', error);
@@ -194,7 +273,30 @@ const ManageBrand: React.FC = () => {
                 `${error.message || 'Unknown error'}`,
                 'error'
             );
+            handleCloseDialog(); // Close the dialog here
         }
+    };
+
+    const handleImageClick = (imageUrl: string) => {
+        const index = selectedBrand.images.findIndex((img: any) => img.imageUrl === imageUrl);
+        setCurrentImageIndex(index);
+        setOpenImageModal(true);
+    };
+
+    const handleNextImage = () => {
+        setCurrentImageIndex((prevIndex) =>
+            (prevIndex + 1) % selectedBrand.images.length
+        );
+    };
+
+    const handlePreviousImage = () => {
+        setCurrentImageIndex((prevIndex) =>
+            (prevIndex - 1 + selectedBrand.images.length) % selectedBrand.images.length
+        );
+    };
+
+    const handleCloseImageModal = () => {
+        setOpenImageModal(false);
     };
 
     const columns: GridColDef[] = [
@@ -244,15 +346,13 @@ const ManageBrand: React.FC = () => {
                 <Box
                     sx={{
                         backgroundColor: params.value === 'ACTIVE' ? '#e8f5e9' : '#ffebee',
-                        color: params.value === 'ACTIVE' ? '#4caf50' : '#e8f5e9',
+                        color: params.value === 'ACTIVE' ? '#4caf50' : '#f44336',
                         borderRadius: '16px',
-                        padding: '1px 5px',
+                        padding: '4px 8px',
                         fontSize: '0.75rem',
                         display: 'flex',
                         alignItems: 'center',
                         gap: '4px',
-                        height: "50%",
-                        marginTop: "20%"
                     }}
                 >
                     <Box
@@ -267,30 +367,34 @@ const ManageBrand: React.FC = () => {
                 </Box>
             )
         },
-        {
-            field: "actions",
-            headerName: "Actions",
-            flex: 1,
-            sortable: false,
-            renderCell: (params) => {
-                if (params.row.userStatus === "ACTIVE" && !params.row.actionTaken) {
-                    return (
-                        <Box>
-                            <IconButton onClick={() => _hanldeConfirmAccept(params.row.userID)}>
-                                <CheckCircleOutline htmlColor="green" />
-                            </IconButton>
-                            <IconButton onClick={() => _hanldeConfirmDeny(params.row.userID)}>
-                                <CancelOutlined htmlColor={colors.primary[300]} />
-                            </IconButton>
-                        </Box>
-                    );
-                }
-                return null;
-            }
-        }
     ];
 
     const getRowId = (row: any) => `${row.userID}-${row.email}-${row.fullName}`;
+
+    const getBrandStatusStyle = (status: any) => {
+        switch (status) {
+            case 'REJECT':
+                return {
+                    backgroundColor: '#FFEBEE',
+                    color: '#D32F2F'
+                };
+            case 'ACCEPT':
+                return {
+                    backgroundColor: '#E8F5E9',
+                    color: '#388E3C'
+                };
+            case 'PENDING':
+                return {
+                    backgroundColor: '#FFF3E0',
+                    color: '#F57C00'
+                };
+            default:
+                return {
+                    backgroundColor: '#E0E0E0',
+                    color: '#757575'
+                };
+        }
+    };
 
     return (
         <Box m="20px">
@@ -335,8 +439,213 @@ const ManageBrand: React.FC = () => {
                     slots={{ toolbar: GridToolbar }}
                     disableRowSelectionOnClick
                     getRowId={getRowId}
+                    onRowClick={handleRowClick}
                 />
             </Box>
+
+            <StyledDialog open={openDialog} onClose={handleCloseDialog} maxWidth="md" fullWidth>
+                <StyledDialogTitle>
+                    Brand Details
+                    <IconButton
+                        aria-label="close"
+                        onClick={handleCloseDialog}
+                        sx={{ position: 'absolute', right: 8, top: 8, color: 'white' }}
+                    >
+                        <CancelOutlined sx={{ color: "red" }} />
+                    </IconButton>
+                </StyledDialogTitle>
+                <StyledDialogContent>
+                    {selectedBrand && (
+                        <StyledPaper elevation={3}>
+                            <Grid container spacing={3}>
+                                <Grid item xs={12} md={6}>
+                                    <SectionTitle variant="h6">Brand Information</SectionTitle>
+                                    <InfoItem><strong>Brand ID:</strong> {selectedBrand.brandID}</InfoItem>
+                                    <InfoItem><strong>Brand Name:</strong> {selectedBrand.brandName}</InfoItem>
+                                    <InfoItem>
+                                        <strong>Brand Status:</strong>{" "}
+                                        <Box
+                                            component="span"
+                                            sx={{
+                                                display: 'inline-block',
+                                                padding: '4px 8px',
+                                                borderRadius: '4px',
+                                                fontWeight: 'bold',
+                                                ...getBrandStatusStyle(selectedBrand.brandStatus)
+                                            }}
+                                        >
+                                            {selectedBrand.brandStatus}
+                                        </Box>
+                                    </InfoItem>
+                                    <InfoItem><strong>Create Date:</strong> {selectedBrand.createDate}</InfoItem>
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <SectionTitle variant="h6">User Information</SectionTitle>
+                                    <InfoItem><strong>Email:</strong> {selectedBrand.user.email}</InfoItem>
+                                    <InfoItem><strong>Full Name:</strong> {selectedBrand.user.fullName}</InfoItem>
+                                    <InfoItem><strong>Phone Number:</strong> {selectedBrand.user.phoneNumber}</InfoItem>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Divider sx={{ my: 2 }} />
+                                    <SectionTitle variant="h6">Bank Information</SectionTitle>
+                                    <InfoItem><strong>Bank Name:</strong> {selectedBrand.bankName}</InfoItem>
+                                    <InfoItem><strong>Account Number:</strong> {selectedBrand.accountNumber}</InfoItem>
+                                    <InfoItem><strong>Account Name:</strong> {selectedBrand.accountName}</InfoItem>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <SectionTitle variant="h6">Address</SectionTitle>
+                                    <InfoItem>{`${selectedBrand.address}, ${selectedBrand.ward}, ${selectedBrand.district}, ${selectedBrand.province}`}</InfoItem>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <SectionTitle variant="h6">Images</SectionTitle>
+                                    <Box display="flex" flexWrap="wrap" gap={2}>
+                                        {selectedBrand.images.map((image: any, index: number) => (
+                                            <ImageThumbnail
+                                                key={index}
+                                                src={image.imageUrl}
+                                                alt={`Brand Image ${index + 1}`}
+                                                onClick={() => handleImageClick(image.imageUrl)}
+                                            />
+                                        ))}
+                                    </Box>
+                                </Grid>
+                            </Grid>
+                        </StyledPaper>
+                    )}
+                </StyledDialogContent>
+                <DialogActions sx={{ padding: 2, justifyContent: 'flex-end' }}>
+                    <Button
+                        onClick={() => _hanldeConfirmAccept(selectedBrand.brandID)}
+                        variant="contained"
+                        startIcon={<CheckCircleOutline />}
+                        sx={{ backgroundColor: "green", '&:hover': { backgroundColor: "darkgreen" } }}
+                        disabled={selectedBrand?.brandStatus !== 'PENDING'}
+                    >
+                        Accept Brand
+                    </Button>
+                    <Button
+                        onClick={() => _hanldeConfirmDeny(selectedBrand.brandID)}
+                        variant="contained"
+                        startIcon={<CancelOutlined />}
+                        sx={{ backgroundColor: "red", '&:hover': { backgroundColor: "darkred" } }}
+                        disabled={selectedBrand?.brandStatus !== 'PENDING'}
+                    >
+                        Reject Brand
+                    </Button>
+                </DialogActions>
+            </StyledDialog>
+            <Modal
+                open={openImageModal}
+                onClose={handleCloseImageModal}
+                closeAfterTransition
+                BackdropComponent={Backdrop}
+                BackdropProps={{
+                    timeout: 500,
+                }}
+            >
+                <Fade in={openImageModal}>
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            bgcolor: 'background.paper',
+                            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
+                            outline: 'none',
+                            borderRadius: 4,
+                            textAlign: 'center',
+                            width: '95%',
+                            maxWidth: '1200px',
+                            height: '90vh',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'center',
+                            overflow: 'hidden',
+                        }}
+                    >
+                        <Box
+                            position="relative"
+                            width="100%"
+                            height="calc(100% - 80px)"
+                            sx={{
+                                backgroundColor: 'rgba(0,0,0,0.03)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <ModalImage
+                                src={selectedBrand?.images[currentImageIndex]?.imageUrl}
+                                alt="Enlarged brand image"
+                                sx={{
+                                    maxWidth: '100%',
+                                    maxHeight: '100%',
+                                    objectFit: 'contain',
+                                    boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                                    transition: 'transform 0.3s ease-in-out',
+                                    '&:hover': {
+                                        transform: 'scale(1.02)',
+                                    },
+                                }}
+                            />
+                            <NavigationButton
+                                onClick={handlePreviousImage}
+                                sx={{
+                                    left: 20,
+                                    backgroundColor: 'rgba(255,255,255,0.7)',
+                                    '&:hover': { backgroundColor: 'rgba(255,255,255,0.9)' },
+                                }}
+                            >
+                                <ArrowBack />
+                            </NavigationButton>
+                            <NavigationButton
+                                onClick={handleNextImage}
+                                sx={{
+                                    right: 20,
+                                    backgroundColor: 'rgba(255,255,255,0.7)',
+                                    '&:hover': { backgroundColor: 'rgba(255,255,255,0.9)' },
+                                }}
+                            >
+                                <ArrowForward />
+                            </NavigationButton>
+                        </Box>
+                        <Box sx={{
+                            height: '80px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            backgroundColor: 'background.default',
+                            borderTop: '1px solid rgba(0,0,0,0.1)',
+                        }}>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
+                                Image {currentImageIndex + 1} of {selectedBrand?.images.length}
+                            </Typography>
+                            <Button
+                                onClick={handleCloseImageModal}
+                                variant="contained"
+                                sx={{
+                                    backgroundColor: "#EA580C",
+                                    '&:hover': { backgroundColor: "#D04A08" },
+                                    px: 4,
+                                    py: 1,
+                                    borderRadius: 2,
+                                }}
+                            >
+                                Close
+                            </Button>
+                        </Box>
+                    </Box>
+                </Fade>
+            </Modal>
+            <style>
+                {`
+                    .swal-on-top {
+                        z-index: 9999 !important;
+                    }
+                `}
+            </style>
         </Box>
     );
 };

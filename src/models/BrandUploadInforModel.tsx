@@ -42,5 +42,11 @@ export interface FormDataBrandInformation {
     district: string,
     ward: string,
     qrPayment: string,
-    // imageURL: string[]
+    brandImages: BrandImages[],
+    taxCode: number
+}
+
+export interface BrandImages {
+    imageUrl: string,
+    imageDescription: string
 }

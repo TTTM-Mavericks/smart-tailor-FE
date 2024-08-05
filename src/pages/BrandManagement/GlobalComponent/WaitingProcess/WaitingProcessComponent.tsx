@@ -1,193 +1,144 @@
-import React, { useEffect, useState } from 'react';
-import api, { baseURL, featuresEndpoints, functionEndpoints, isAuthenticated, versionEndpoints } from '../../../../api/ApiConfig';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
-import { UserInterface } from '../../../../models/UserModel';
 import Cookies from 'js-cookie';
+import { motion } from 'framer-motion';
+import { baseURL, versionEndpoints, featuresEndpoints, functionEndpoints } from '../../../../api/ApiConfig';
+import { UserInterface } from '../../../../models/UserModel';
+
 const WaitingProcessComponent: React.FC = () => {
-    const dotsAnimation = `
-        @keyframes hideUnhide {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0;
-            }
-        }
-    `;
-    let brandAuth: any = null;
-
-    const BRANDROLECHECK = Cookies.get('userAuth');
-
-    if (BRANDROLECHECK) {
-        try {
-            brandAuth = JSON.parse(BRANDROLECHECK);
-            const { userID, email, fullName, language, phoneNumber, roleName, imageUrl, userStatus } = brandAuth;
-            // Your code that uses the parsed data
-        } catch (error) {
-            console.error('Error parsing JSON:', error);
-            // Handle the error, perhaps by setting default values or showing an error message
-        }
-    } else {
-        console.error('userAuth cookie is not set');
-        // Handle the case when the cookie does not exist
-    }
-
-
-    let brandFromSignUp: any = null
-    // Get BrandID from session
-    const getBrandFromSingUp = sessionStorage.getItem('userRegister') as string | null;
-
-    if (getBrandFromSingUp) {
-        const BRANDFROMSIGNUPPARSE: UserInterface = JSON.parse(getBrandFromSingUp);
-        const brandID = BRANDFROMSIGNUPPARSE.userID;
-        const brandEmail = BRANDFROMSIGNUPPARSE.email;
-        brandFromSignUp = { brandID, brandEmail }
-        console.log(brandFromSignUp);
-
-        console.log('Brand ID:', brandID);
-        console.log('Brand Email:', brandEmail);
-    } else {
-        console.error('No user data found in session storage');
-    }
-    // Get ID When something null
-    const getID = () => {
-        if (!brandAuth || brandAuth.userID === null || brandAuth.userID === undefined || brandAuth.userID === '') {
-            return brandFromSignUp.brandID;
-        } else {
-            return brandAuth.userID;
-        }
-    };
-
-    console.log("huhuuhu:" + getID());
-
-    // Get Email When Email Null
-    const getEmail = () => {
-        if (!brandAuth || brandAuth.email === null || brandAuth.email === undefined || brandAuth.email === '') {
-            return brandFromSignUp.brandEmail;
-        } else {
-            return brandAuth.email;
-        }
-    };
-
     const [statusBrandInformation, setStatusBrandInformation] = useState(() => {
-        // Initialize state from localStorage or default to 'PENDING'
         return localStorage.getItem('brandStatus') || 'PENDING';
     });
 
+    const [brandInfo, setBrandInfo] = useState<{ userID: string, email: string } | null>(null);
+
     useEffect(() => {
-        // Save status to localStorage whenever it changes
+        const BRANDROLECHECK = Cookies.get('userAuth');
+        const getBrandFromSingUp = sessionStorage.getItem('userRegister');
+
+        if (BRANDROLECHECK) {
+            try {
+                const parsedAuth = JSON.parse(BRANDROLECHECK);
+                setBrandInfo({
+                    userID: parsedAuth.userID,
+                    email: parsedAuth.email
+                });
+            } catch (error) {
+                console.error('Error parsing userAuth cookie:', error);
+            }
+        } else if (getBrandFromSingUp) {
+            try {
+                const parsedSignUp: UserInterface = JSON.parse(getBrandFromSingUp);
+                setBrandInfo({
+                    userID: parsedSignUp.userID,
+                    email: parsedSignUp.email
+                });
+            } catch (error) {
+                console.error('Error parsing userRegister from sessionStorage:', error);
+            }
+        } else {
+            console.error('No user data found');
+        }
+    }, []);
+
+    useEffect(() => {
         localStorage.setItem('brandStatus', statusBrandInformation);
     }, [statusBrandInformation]);
 
-    async function fetchBrandInformation() {
-        try {
-            const response = await axios.get(`${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.getBrandByID}/${getID()}`);
-            const brandStatus = response.data.data.brandStatus;
-            console.log(brandStatus);
+    const fetchBrandInformation = useCallback(async () => {
+        if (!brandInfo) return;
 
-            if (brandStatus === "PENDING") {
-                setStatusBrandInformation("PENDING");
-                console.log(brandStatus);
-            } else if (brandStatus === "ACCEPT") {
-                setStatusBrandInformation("ACCEPT");
+        try {
+            const response = await axios.get(`${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.getBrandByID}/${brandInfo.userID}`);
+            const brandStatus = response.data.data.brandStatus;
+            setStatusBrandInformation(brandStatus);
+            if (brandStatus === "ACCEPT") {
                 window.location.href = "/brand";
-                console.log(brandStatus);
-            } else if (brandStatus === "REJECT") {
-                setStatusBrandInformation("REJECT");
-                console.log(brandStatus);
             }
         } catch (error) {
             console.error("Error fetching brand information:", error);
         }
-    }
+    }, [brandInfo]);
 
     useEffect(() => {
         fetchBrandInformation();
-
-        const interval = setInterval(async () => {
-            await fetchBrandInformation();
-
-            // Stop calling the function if the status is no longer "PENDING"
-            if (statusBrandInformation !== "PENDING") {
-                clearInterval(interval);
-            }
-        }, 10000); // 10000 milliseconds = 10 seconds
-
-        // Clean up the interval on component unmount
+        const interval = setInterval(fetchBrandInformation, 10000);
         return () => clearInterval(interval);
-    }, [statusBrandInformation]);
+    }, [fetchBrandInformation]);
+
+    const statusColors = {
+        PENDING: 'bg-yellow-100 text-yellow-700',
+        ACCEPT: 'bg-green-100 text-green-700',
+        REJECT: 'bg-red-100 text-red-700'
+    };
+
+    const steps = [
+        { label: 'Application received', completed: true },
+        { label: 'Review completed', completed: statusBrandInformation !== 'PENDING' },
+        { label: 'Decision made', completed: statusBrandInformation === 'ACCEPT' || statusBrandInformation === 'REJECT' }
+    ];
 
     return (
-        <div className="bg-gradient-to-r from-orange-200 to-yellow-100 min-h-screen flex items-center justify-center">
-            <style>
-                {`
-                    ${dotsAnimation}
-                    .dot {
-                        animation: hideUnhide 1.5s infinite;
-                        font-size: 4rem; /* Increased the font size */
-                        color: gray;
-                    }
-                    .dot:nth-child(2) {
-                        animation-delay: 0.5s;
-                    }
-                    .dot:nth-child(3) {
-                        animation-delay: 1s;
-                    }
-                `}
-            </style>
-            <div className="w-full max-w-4xl p-8 m-4 bg-white shadow-2xl rounded-3xl transform hover:scale-105 transition-transform duration-500 animate-fade-in-up">
-                <div className="text-center pt-8">
-                    <div className="flex justify-center items-center mb-4">
-                        <h4 className="text-5xl font-extrabold animate-bounce" style={{ color: "#E96208" }}>{statusBrandInformation}</h4>
-                        <div className="flex space-x-1 ml-2 -mt-8">
-                            <p className="dot">.</p>
-                            <p className="dot">.</p>
-                            <p className="dot">.</p>
-                        </div>
-                    </div>
-                    <p className="text-2xl font-medium py-8 text-gray-700">
-                        Your information had been sent to the system
+        <div className="bg-gradient-to-br from-orange-100 to-yellow-50 min-h-screen flex items-center justify-center p-4">
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="w-full max-w-3xl bg-white rounded-3xl shadow-2xl overflow-hidden"
+            >
+                <div className="p-8 md:p-12">
+                    <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6 text-center">
+                        Application Status
+                    </h2>
+                    <motion.div
+                        className="flex justify-center items-center mb-8"
+                        initial={{ scale: 0.8 }}
+                        animate={{ scale: 1 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <span className={`text-2xl font-semibold px-6 py-3 rounded-full ${statusColors[statusBrandInformation as keyof typeof statusColors]}`}>
+                            {statusBrandInformation}
+                        </span>
+                    </motion.div>
+                    <p className="text-xl text-gray-600 mb-8 text-center">
+                        We're currently reviewing your application. We'll update you via email at {brandInfo?.email}.
                     </p>
-                    <p className="text-2xl pb-8 px-12 font-medium text-gray-600">
-                        Waiting for the approval or rejection by the system. We will send the result to your email.
-                    </p>
-                    <div className="flex justify-center space-x-6">
-                        <button
-                            style={{
-                                background: 'linear-gradient(to right, #E96208, #E96208)',
-                                color: 'white',
-                                fontWeight: 'bold',
-                                padding: '0.75rem 1.5rem',
-                                borderRadius: '9999px',
-                                transform: 'scale(1)',
-                                transition: 'transform 0.3s',
-                                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
-                            }}
-                            onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.1)')}
-                            onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-                        >
-                            <a href='/' style={{ color: 'inherit', textDecoration: 'none' }}>HOME</a>
-                        </button>
-                        <button
-                            style={{
-                                background: 'linear-gradient(to right, #E96208, #E96208)',
-                                color: 'white',
-                                fontWeight: 'bold',
-                                padding: '0.75rem 1.5rem',
-                                borderRadius: '9999px',
-                                transform: 'scale(1)',
-                                transition: 'transform 0.3s',
-                                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
-                            }}
-                            onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.1)')}
-                            onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-                        >
-                            <a href='/' style={{ color: 'inherit', textDecoration: 'none' }}>Contact Us</a>
-                        </button>
-
+                    <div className="space-y-6">
+                        {steps.map((step, index) => (
+                            <motion.div
+                                key={index}
+                                className="flex items-center"
+                                initial={{ x: -20, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                transition={{ delay: index * 0.1 }}
+                            >
+                                <div className={`w-10 h-10 ${step.completed ? 'bg-orange-500' : 'bg-gray-300'} rounded-full flex items-center justify-center mr-4 transition-colors duration-300`}>
+                                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                                <p className="text-lg text-gray-700">{step.label}</p>
+                            </motion.div>
+                        ))}
                     </div>
                 </div>
-            </div>
+                <div className="bg-gray-50 px-8 py-6 flex justify-center space-x-4">
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="px-6 py-3 bg-orange-500 text-white font-semibold rounded-full transition duration-300 shadow-md"
+                    >
+                        <a href='/' className="text-inherit no-underline">Home</a>
+                    </motion.button>
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-full transition duration-300 shadow-md"
+                    >
+                        <a href='/' className="text-inherit no-underline">Contact Us</a>
+                    </motion.button>
+                </div>
+            </motion.div>
         </div>
     );
 };

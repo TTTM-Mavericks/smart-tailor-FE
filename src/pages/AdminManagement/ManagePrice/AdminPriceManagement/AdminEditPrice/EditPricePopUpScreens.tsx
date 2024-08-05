@@ -57,7 +57,6 @@ const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, e
             }
 
             if (response.status === 200) {
-                updateLaborQuantity({ ...formData, laborQuantityID });
                 Swal.fire(
                     'Edit Price Success!',
                     'Please check the information!',

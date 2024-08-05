@@ -66,7 +66,7 @@ export default function FilterProductScreen() {
     const [productsPerPage, setProductsPerPage] = useState(8);
     const [productData, setProductData] = useState<any>([]);
     const [totalPages, setTotalPages] = useState(1);
-    const [goToPage, setGoToPage] = useState(currentPage);
+    const [goToPage, setGoToPage] = useState(currentPage.toString());
 
     useEffect(() => {
         setGoToPage(currentPage.toString());

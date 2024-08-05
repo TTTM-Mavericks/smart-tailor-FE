@@ -56,6 +56,8 @@ const EditMCategoryPopUpScreens: React.FC<EditCategoryPopUpScreenFormProps> = ({
             }
 
             if (response.data.status === 200) {
+                editClose()
+
                 updateCategory({ ...formData });
                 Swal.fire(
                     `Updated Category Success!`,
@@ -65,6 +67,8 @@ const EditMCategoryPopUpScreens: React.FC<EditCategoryPopUpScreenFormProps> = ({
             }
 
             if (response.data.status === 409) {
+                editClose()
+
                 Swal.fire(
                     `Updated Category Fail!`,
                     `Updated Category Fail!`,
@@ -73,6 +77,8 @@ const EditMCategoryPopUpScreens: React.FC<EditCategoryPopUpScreenFormProps> = ({
             }
 
             if (response.data.status === 400) {
+                editClose()
+
                 Swal.fire(
                     `Updated Category Fail!`,
                     `Updated Category Fail!`,
@@ -84,6 +90,8 @@ const EditMCategoryPopUpScreens: React.FC<EditCategoryPopUpScreenFormProps> = ({
 
             editClose(); // Close the edit modal after successful update
         } catch (error) {
+            editClose()
+
             console.error('Update Error:', error);
             Swal.fire(
                 `Updated Category Fail!`,

@@ -13,8 +13,8 @@ interface AddLaborQuantityWithHandsFormProps {
 
 const AddPriceManual: React.FC<AddLaborQuantityWithHandsFormProps> = ({ closeCard, addNewLaborQuantity }) => {
     const [prices, setPrices] = useState<EditLaborQuantity[]>([
-        { laborQuantityMinQuantity: 1, laborQuantityMaxQuantity: 10, laborQuantityMinPrice: 140, laborQuantityMaxPrice: 160 },
-        { laborQuantityMinQuantity: 11, laborQuantityMaxQuantity: 20, laborQuantityMinPrice: 160, laborQuantityMaxPrice: 180 }
+        { laborQuantityMinQuantity: 1, laborQuantityMaxQuantity: 10, laborQuantityMinPrice: 140, laborQuantityMaxPrice: 160, laborCostPerQuantity: 0 },
+        { laborQuantityMinQuantity: 11, laborQuantityMaxQuantity: 20, laborQuantityMinPrice: 160, laborQuantityMaxPrice: 180, laborCostPerQuantity: 0 }
     ]);
 
     const handlePriceChange = (index: number, event: ChangeEvent<HTMLInputElement>) => {
@@ -27,7 +27,7 @@ const AddPriceManual: React.FC<AddLaborQuantityWithHandsFormProps> = ({ closeCar
     };
 
     const addNewPriceRow = () => {
-        setPrices([...prices, { laborQuantityMinQuantity: 0, laborQuantityMaxQuantity: 0, laborQuantityMinPrice: 0, laborQuantityMaxPrice: 0 }]);
+        setPrices([...prices, { laborQuantityMinQuantity: 0, laborQuantityMaxQuantity: 0, laborQuantityMinPrice: 0, laborQuantityMaxPrice: 0, laborCostPerQuantity: 0 }]);
     };
 
     const removePriceRow = (index: number) => {

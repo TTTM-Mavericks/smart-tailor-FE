@@ -71,12 +71,14 @@ const AddEachCategoryWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
 
             if (response.data.status === 200) {
                 addNewCategory(formData);
+                closeCard()
                 Swal.fire(
                     'Add Success!',
                     'Categories have been added!',
                     'success'
                 );
             } else {
+                closeCard()
                 Swal.fire(
                     'Add Category Fail!',
                     'Please check information!',
@@ -84,6 +86,7 @@ const AddEachCategoryWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
                 );
             }
         } catch (err: any) {
+            closeCard()
             console.error('Error:', err);
             Swal.fire(
                 'Add Category Fail!',

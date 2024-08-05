@@ -20,20 +20,18 @@ import PaymentInformationDialogComponent from '../../Order/Components/Dialog/Pay
 import PaymentFromAccountantToBranđialog from '../../../components/Dialog/PaymentDialog/PaymentFromAccountantToBranđialog';
 import { __handlegetRatingStyle, __handlegetStatusBackgroundBoolean } from '../../../utils/ElementUtils';
 import '../../../index.css'
-const AccountantManagePaymentForBrandComponent: React.FC = () => {
-    // TODO MUTIL LANGUAGE
+import Select from 'react-select';
 
+const AccountantManagePaymentForBrandComponent: React.FC = () => {
     // ---------------UseState---------------//
     const [showScrollButton, setShowScrollButton] = useState<boolean>(false);
     const [isOpenPaymentInforDialog, setIsOpenPaymentInformationDialog] = useState<boolean>(false);
     const [currentPaymentData, setCurrentPaymentData] = useState<PaymentInterface | PaymentOrderInterface>();
-    // const [isExtendTransaction, setIsExtendTransaction] = useState<{ orderID: string, isExtend: boolean } | null>(null);
     const [isExtendTransaction, setIsExtendTransaction] = useState<{ [orderId: string]: boolean }>({});
     const [orderDetailList, setOrderDetailList] = useState<OrderDetailInterface[]>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [userAuth, setUserAuth] = useState<UserInterface>();
     const [isOpenPaymentDialog, setIsOpenPaymentDialog] = useState<{ [key: string]: boolean }>({});
-
     const [selectedOwner, setSelectedOwner] = React.useState('Owner');
     const [selectedCategory, setSelectedCategory] = React.useState('Category');
     const [selectedDate, setSelectedDate] = React.useState('Modify date');
@@ -42,14 +40,19 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
     const [orderChild, setOrderChild] = useState<{ [orderId: string]: OrderDetailInterface[] }>({});
     const [selectedOrder, setSelectedOrder] = useState<any>();
     const [isOpenPaymentForBrandDialog, setIsOpenPaymentForBrandDialog] = useState<boolean>(false);
-
-
     const options = ['Option 1', 'Option 2', 'Option 3'];
-
-
-
+    const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+    const [filters, setFilters] = useState({
+        orderID: '',
+        createDate: '',
+        status: ''
+    });
+    const filterOptions = [
+        { value: 'Date', label: 'Date' },
+        { value: 'Order ID', label: 'Order ID' },
+        { value: 'Order Status', label: 'Order Status' }
+    ];
     // ---------------UseEffect---------------//
-
     useEffect(() => {
 
         console.log('orderChild: ', orderChild);
@@ -59,8 +62,6 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
 
         Object.keys(isExtendTransaction).forEach(orderId => {
             __handleFetchOrderDetails(orderId);
-            // if (isExtendTransaction[orderId] === true && !orderChild[orderId]) {
-            // }
         });
     }, [isExtendTransaction]);
 
@@ -90,7 +91,6 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
     }, []);
 
     // ---------------FunctionHandler---------------//
-
     const __handleFetchOrderDetails = async (orderId: string) => {
         console.log('hehehehe');
         try {
@@ -274,24 +274,187 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
         setIsOpenPaymentForBrandDialog(true);
     }
 
+    /**
+     * 
+     * @param event 
+     * Filter With the select 
+     */
+    const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = event.target;
+        setFilters(prev => ({ ...prev, [name]: value }));
+    };
 
+
+    /**
+     * 
+     * @param orderDetail 
+     * @returns 
+     * Apply the filter to the render with card
+     */
+    const applyFilters = (orderDetail: OrderDetailInterface) => {
+        return (
+            (filters.orderID === '' || orderDetail.orderID.includes(filters.orderID)) &&
+            (filters.createDate === '' || (orderDetail.expectedStartDate?.includes(filters.createDate) ?? false)) &&
+            (filters.status === '' || orderDetail.orderStatus === filters.status)
+        );
+    };
 
     return (
         <div>
             <LoadingComponent isLoading={isLoading}></LoadingComponent>
             {/* <ToastContainer></ToastContainer> */}
             <div className={`${style.orderHistory__container}`}>
-
                 <div style={{ width: '100%' }} className="max-w-6xl mx-auto p-4 md:p-6 min-h-screen">
+                    <div className="mb-6">
+                        <label htmlFor="filterSelect" className="block mb-2 text-lg font-semibold text-gray-700">Select Filters</label>
+                        <Select
+                            isMulti
+                            name="filters"
+                            options={filterOptions}
+                            className="basic-multi-select"
+                            classNamePrefix="select"
+                            value={filterOptions.filter(option => selectedFilters.includes(option.value))}
+                            onChange={(selectedOptions) => {
+                                setSelectedFilters(selectedOptions.map(option => option.value));
+                            }}
+                        />
+                    </div>
 
-                    {orderDetailList?.map((orderDetail) => (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                        {selectedFilters.includes('Date') && (
+                            <div className="filter-item">
+                                <label htmlFor="dateFilter" className="block mb-2 text-sm font-medium text-gray-700">Date</label>
+                                <input
+                                    type="date"
+                                    id="dateFilter"
+                                    name="createDate"
+                                    value={filters.createDate}
+                                    onChange={handleFilterChange}
+                                    className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
+                                />
+                            </div>
+                        )}
+
+                        {selectedFilters.includes('Order ID') && (
+                            <div className="filter-item">
+                                <label htmlFor="orderIdFilter" className="block mb-2 text-sm font-medium text-gray-700">Order ID</label>
+                                <input
+                                    type="text"
+                                    id="orderIdFilter"
+                                    name="orderID"
+                                    value={filters.orderID}
+                                    onChange={handleFilterChange}
+                                    placeholder="Enter Order ID"
+                                    className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
+                                />
+                            </div>
+                        )}
+
+                        {selectedFilters.includes('Order Status') && (
+                            <div className="filter-item">
+                                <label htmlFor="statusFilter" className="block mb-2 text-sm font-medium text-gray-700">Order Status</label>
+                                <select
+                                    id="statusFilter"
+                                    name="status"
+                                    value={filters.status}
+                                    onChange={handleFilterChange}
+                                    className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
+                                >
+                                    <option value="">All Order Statuses</option>
+                                    <option value="NOT_VERIFY">Not Verify</option>
+                                    <option value="PENDING">Pending</option>
+                                    <option value="DEPOSIT">Deposit</option>
+                                    <option value="PROCESSING">Processing</option>
+                                    <option value="CANCEL">Cancel</option>
+                                    <option value="COMPLETED">Completed</option>
+                                    <option value="DELIVERED">Delivered</option>
+                                </select>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+                        <div className="mb-6">
+                            <label htmlFor="filterSelect" className="block mb-2 text-lg font-semibold text-gray-700">Select Filters</label>
+                            <select
+                                id="filterSelect"
+                                multiple
+                                value={selectedFilters}
+                                onChange={(e) => setSelectedFilters(Array.from(e.target.selectedOptions, option => option.value))}
+                                className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
+                            >
+                                <option value="Date">Date</option>
+                                <option value="Order ID">Order ID</option>
+                                <option value="Order Status">Order Status</option>
+                            </select>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                            {selectedFilters.includes('Date') && (
+                                <div className="filter-item">
+                                    <label htmlFor="dateFilter" className="block mb-2 text-sm font-medium text-gray-700">Date</label>
+                                    <input
+                                        type="date"
+                                        id="dateFilter"
+                                        name="createDate"
+                                        value={filters.createDate}
+                                        onChange={handleFilterChange}
+                                        className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
+                                    />
+                                </div>
+                            )}
+
+                            {selectedFilters.includes('Order ID') && (
+                                <div className="filter-item">
+                                    <label htmlFor="orderIdFilter" className="block mb-2 text-sm font-medium text-gray-700">Order ID</label>
+                                    <input
+                                        type="text"
+                                        id="orderIdFilter"
+                                        name="orderID"
+                                        value={filters.orderID}
+                                        onChange={handleFilterChange}
+                                        placeholder="Enter Order ID"
+                                        className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
+                                    />
+                                </div>
+                            )}
+
+                            {selectedFilters.includes('Order Status') && (
+                                <div className="filter-item">
+                                    <label htmlFor="statusFilter" className="block mb-2 text-sm font-medium text-gray-700">Order Status</label>
+                                    <select
+                                        id="statusFilter"
+                                        name="status"
+                                        value={filters.status}
+                                        onChange={handleFilterChange}
+                                        className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
+                                    >
+                                        <option value="">All Order Statuses</option>
+                                        <option value="NOT_VERIFY">Not Verify</option>
+                                        <option value="PENDING">Pending</option>
+                                        <option value="DEPOSIT">Deposit</option>
+                                        <option value="PROCESSING">Processing</option>
+                                        <option value="CANCEL">Cancel</option>
+                                        <option value="COMPLETED">Completed</option>
+                                        <option value="DELIVERED">Delivered</option>
+                                    </select>
+                                </div>
+                            )}
+                        </div>
+                    </div> */}
+
+                    {orderDetailList?.filter(applyFilters).map((orderDetail) => (
                         <div className="bg-white rounded-xl shadow-md p-4 md:p-6 mb-4 md:mb-8 transform transition-all hover:shadow-lg">
                             <div className="flex flex-col md:flex-row items-start md:items-center mb-4 md:mb-6" >
-
                                 <div className="mb-4 md:mb-0 w-max ">
                                     <h2 className="text-1xl md:text-1xl font-bold text-gray-800 pb-2">{t(codeLanguage + '000193')} </h2>
                                     <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2" >Order ID: <span className="text-sm text-gray-500 pb-2">{orderDetail?.orderID}</span></p>
-                                    <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Create date: <span className="text-sm text-gray-500 pb-2">{orderDetail?.expectedStartDate}</span></p>
+                                    <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">
+                                        Create date:
+                                        <span className="text-sm text-gray-500 pb-2">
+                                            {orderDetail.expectedStartDate !== null ? orderDetail.expectedStartDate : 'N/A'}
+                                        </span>
+                                    </p>
                                     <div style={{
                                         display: 'flex',
                                         alignContent: 'center',
@@ -317,10 +480,8 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                     }
                                                 } />
                                         </Stack>
-                                        {/* <p className="text-sm text-gray-500"></p> */}
                                     </div>
                                 </div>
-
                             </div>
                             <button
                                 onClick={() => __handleExtendTranscation(orderDetail?.orderID)}
@@ -332,9 +493,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                 ) : (
                                     <FaAngleDown />
                                 )}
-
                             </button>
-
                             <div style={{ width: '100%' }}>
                                 {isExtendTransaction[orderDetail?.orderID || '1'] && !orderChild[orderDetail.orderID] && (
                                     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
@@ -342,12 +501,9 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                     </div>
                                 )}
                             </div>
-
-
                             {isExtendTransaction[orderDetail?.orderID || '1'] && orderChild[orderDetail.orderID]?.map((order, itemIndex) => (
                                 <div key={itemIndex} className="flex flex-col md:flex-row items-start md:items-center mt-10 mb-4 md:mb-6 border-b pb-4 md:pb-6">
                                     <div className="flex-shrink-0">
-                                        {/* <img className="w-32 h-28 md:w-35 md:h-40 rounded-lg shadow-md" src={orderDetail?.designResponse.imageUrl} alt={`Image `} /> */}
                                     </div>
                                     <div className="ml-0 md:ml-6 mt-4 md:mt-0 flex-grow" style={{ position: 'relative' }}>
                                         <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">ID: <span className="text-sm text-gray-500 pb-2"> {order.orderID}</span></p>
@@ -399,9 +555,6 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                 <span className="font-medium text-white">Payment</span>
                                             </button>
                                         </div>
-
-
-
                                         {selectedOrder === order.orderID && (
                                             <PaymentFromAccountantToBranđialog onClose={__handleClosePaymentForBrandialog} isOpen={true} paymentData={order.paymentList}></PaymentFromAccountantToBranđialog>
                                         )}
@@ -411,7 +564,6 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                             ))}
                         </div>
                     ))}
-
                     {showScrollButton && (
                         <IconButton
                             style={{
@@ -429,7 +581,6 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                     )}
                 </div>
             </div>
-
             {/* Dialog */}
             {currentPaymentData && (
                 <PaymentInformationDialogComponent
@@ -439,7 +590,6 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                 />
             )}
         </div>
-
     );
 };
 

@@ -8,7 +8,6 @@ import jsPDF from "jspdf";
 import { useTranslation } from 'react-i18next';
 import autoTable from 'jspdf-autotable';
 import { UserOptions } from 'jspdf-autotable';
-import LogoPDF from '../../../assets/system/smart-tailor_logo.png'
 
 interface ExtendedUserOptions extends UserOptions {
     columnWidths?: number[];
@@ -73,7 +72,7 @@ const ManageInvoiceScreen: React.FC = () => {
         doc.setFillColor(244, 245, 239); // White color
         doc.rect(0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height, 'F');
 
-        const imgData = LogoPDF;
+        const imgData = "../../../assets/system/smart-tailor_logo.png";
         const imgWidth = 40;
         const imgHeight = 40;
         doc.addImage(imgData, 'PNG', 15, 10, imgWidth, imgHeight);
@@ -389,7 +388,7 @@ const ManageInvoiceScreen: React.FC = () => {
                         <div>
                             {/* Image and Title */}
                             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
-                                <img src={LogoPDF} style={{ height: '150px', marginRight: '20px' }} alt="Logo" />
+                                <img src="../../../assets/system/smart-tailor_logo.png" style={{ height: '150px', marginRight: '20px' }} alt="Logo" />
                                 <h1 style={{ fontSize: '50px', fontWeight: 'bolder', marginLeft: 'auto', fontFamily: "cursive", marginRight: "12%" }}>INVOICE</h1>
                             </div>
 
@@ -459,7 +458,7 @@ const ManageInvoiceScreen: React.FC = () => {
                                     <tr>
                                         <td></td>
                                         <td></td>
-                                        <td colSpan="1" style={{ padding: '10px', fontWeight: "bolder" }}>
+                                        <td colSpan={1} style={{ padding: '10px', fontWeight: "bolder" }}>
                                             Sub Total
                                         </td>
                                         <td style={{ padding: '10px', fontWeight: "bolder" }}>$1231321</td>
@@ -467,7 +466,7 @@ const ManageInvoiceScreen: React.FC = () => {
                                     <tr>
                                         <td></td>
                                         <td></td>
-                                        <td colSpan="1" style={{ padding: '10px', fontWeight: "bolder" }}>
+                                        <td colSpan={1} style={{ padding: '10px', fontWeight: "bolder" }}>
                                             Tax (0%)
                                         </td>
                                         <td style={{ padding: '10px', fontWeight: "bolder" }}>$0</td>
@@ -475,7 +474,7 @@ const ManageInvoiceScreen: React.FC = () => {
                                     <tr style={{ borderTop: '3px solid #202020', borderBottom: '3px solid #202020' }}>
                                         <td></td>
                                         <td></td>
-                                        <td colSpan="1" style={{ padding: '10px', fontWeight: "bolder" }}>
+                                        <td colSpan={1} style={{ padding: '10px', fontWeight: "bolder" }}>
                                             TOTAL
                                         </td>
                                         <td style={{ padding: '10px', fontWeight: "bolder" }}>$1231321</td>
