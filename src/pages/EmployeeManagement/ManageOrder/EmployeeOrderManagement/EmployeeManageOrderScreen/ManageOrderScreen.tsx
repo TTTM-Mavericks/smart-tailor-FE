@@ -180,6 +180,8 @@ const EmployeeOrderFields: React.FC<{
     const [userAuth, setUseAuth] = useState<UserInterface>();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedOrderID, setSelectedOrderID] = useState<string | null>(null);
+    const [isOpenReportOrderCanceledDialog, setIsOpenReportOrderCanceledDialog] = useState<boolean>(false);
+
 
 
     useEffect(() => {
@@ -241,6 +243,40 @@ const EmployeeOrderFields: React.FC<{
         }
     }
 
+    const __handleOpenReportDialog = () => {
+        console.log('open');
+        setIsOpenReportOrderCanceledDialog(true);
+    }
+
+    /**
+     * Handle cancel order click
+     */
+    const _handleCancelOrder = async (orderDetail: any) => {
+        setIsLoading(true)
+        try {
+            const bodyRequest = {
+                orderID: orderDetail?.orderID,
+                status: 'CANCEL'
+            }
+            console.log('bodyRequest: ', bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            if (response.status === 200) {
+                console.log('detail order: ', response.data);
+                toast.success(`${response.message}`, { autoClose: 4000 });
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            }
+            else {
+                console.log('detail error: ', response.message);
+                toast.error(`${response.message}`, { autoClose: 4000 });
+            }
+        } catch (error) {
+            console.log('error: ', error);
+            toast.error(`${error}`, { autoClose: 4000 });
+        }
+    };
+
     return (
         <div className="bg-white mb-8 shadow-lg rounded-lg p-6 transition duration-300 ease-in-out transform hover:shadow-xl">
             <LoadingComponent isLoading={isLoading}></LoadingComponent>
@@ -297,6 +333,29 @@ const EmployeeOrderFields: React.FC<{
                 <DesignDetails design={designDetails} />
             )}
             <div className="mt-6 flex justify-end">
+
+                {order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCEL' && (
+
+                    <button
+                        onClick={() => __handleOpenReportDialog()}
+                        className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4"
+                        style={{
+                            borderRadius: 4,
+                            backgroundColor: redColor
+                        }}
+                    >
+                        Cancel
+                    </button>
+                )}
+
+                <CustomerReportOrderDialogComponent
+                    isCancelOrder={true}
+                    orderID={order?.orderID}
+                    onClose={() => setIsOpenReportOrderCanceledDialog(false)}
+                    isOpen={isOpenReportOrderCanceledDialog}
+                    onClickReportAndCancel={() => _handleCancelOrder(order)}
+                ></CustomerReportOrderDialogComponent>
+
                 <button
                     onClick={() => __handleOpenInputSampleProductDialog(order.orderID)}
                     className="bg-indigo-500 text-sm text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"

@@ -1,3 +1,5 @@
+import { UserInterface } from "./UserModel";
+
 export interface Report {
     reportID: string;
     typeOfReport: string;
@@ -6,7 +8,8 @@ export interface Report {
     reportStatus: string,
     reportImageList: ReportImageList,
     createDate: string,
-    lastModifiedDate: string
+    lastModifiedDate: string,
+    userResponse?: UserInterface
 }
 
 export interface OrderResponse {

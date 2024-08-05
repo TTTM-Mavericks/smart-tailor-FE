@@ -23,6 +23,7 @@ import { toast } from 'react-toastify';
 import { FaCheck } from 'react-icons/fa';
 import { UserInterface } from '../../../models/UserModel';
 import Cookies from 'js-cookie';
+import { Report } from '../../../models/EmployeeManageReportModel';
 
 
 export interface EstimatedStageInterface {
@@ -65,6 +66,7 @@ const OrderDetailScreen: React.FC = () => {
     const [isOpenViewHistory, setIsOpenViewHistory] = useState<boolean>(false);
     const [selectedStage, setSelectedStage] = useState<string>();
     const [userAuth, setUserAuth] = useState<UserInterface>();
+    const [reportReason, setReportReason] = useState<Report[]>([]);
 
 
 
@@ -415,6 +417,25 @@ const OrderDetailScreen: React.FC = () => {
 
     }
 
+    const __handleGetCancelReasonDetail = async () => {
+        setIsOpenReasonCancelDialog(true)
+        setIsLoading(true);
+        try {
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.report + functionEndpoints.report.getReportByOrderID}/${orderDetail?.orderID}`);
+            if (response.status === 200) {
+                console.log('detail order: ', response.data);
+                setReportReason(response.data);
+                setIsLoading(false);
+
+            }
+            else {
+                console.log('detail order: ', response.message);
+            }
+        } catch (error) {
+            console.log('error: ', error);
+        }
+    }
+
     return (
         <div className={`${style.orderDetail__container}`} >
             <HeaderComponent />
@@ -491,7 +512,7 @@ const OrderDetailScreen: React.FC = () => {
                                     <div className={style.orderDetail__orderStatus__tag} style={orderDetail?.orderStatus === 'CANCEL' ? { backgroundColor: redColor } : (orderDetail?.orderStatus === 'COMPLETED' || orderDetail?.orderStatus === 'DELIVERED') ? { backgroundColor: greenColor } : {}}>{orderDetail?.orderStatus}</div>
                                     {orderDetail?.orderStatus === 'CANCEL' && (
                                         <div className="ml-10">
-                                            <a onClick={() => setIsOpenReasonCancelDialog(!isOpenReasonCancelDialog)} className="text-sm text-indigo-600 hover:text-indigo-800 transition duration-200 cursor-pointer">View reasons</a>
+                                            <a onClick={() => __handleGetCancelReasonDetail()} className="text-sm text-indigo-600 hover:text-indigo-800 transition duration-200 cursor-pointer">View reasons</a>
                                         </div>
                                     )}
                                 </div>
@@ -604,7 +625,7 @@ const OrderDetailScreen: React.FC = () => {
                     )}
 
 
-                    {orderDetail?.orderStatus === 'PENDING' && (
+                    {orderDetail?.orderStatus === 'PENDING' || orderDetail?.orderStatus === 'NOT_VERIFY' && (
                         <div className="flex justify-end mt-4">
                             <button
                                 onClick={() => __handleOpenConfirmCalcelDialog()}
@@ -833,6 +854,14 @@ const OrderDetailScreen: React.FC = () => {
                         <li>To cancel an order, customers must submit a cancellation request through our website or contact our customer service directly.</li>
                         <li>The cancellation notice must include the order number and the reason for cancellation.</li>
                     </Typography>
+
+                    {reportReason.map((report) => (
+
+                        <div className="p-4 border-b border-gray-200">
+                            <strong>Reason for Cancellation</strong>
+                            <p>{report.content}</p>
+                        </div>
+                    ))}
                 </DialogContent>
             </Dialog>
 

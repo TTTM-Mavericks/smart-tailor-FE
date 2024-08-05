@@ -1,0 +1,139 @@
+.shadow-text {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.custom-scrollbar {
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #be1c1c;
+        border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #d73838;
+        border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: #9e3434;
+    }
+}
+
+.custom-select {
+    min-width: 350px;
+}
+
+.custom-select select {
+    appearance: none;
+    width: 100%;
+    font-size: 1.15rem;
+    padding: 0.675em 6em 0.675em 1em;
+    background-color: #fff;
+    border: 1px solid #caced1;
+    border-radius: 0.25rem;
+    color: #000;
+    cursor: pointer;
+}
+
+@import '../../../index.module.scss';
+
+.orderHistory__container {
+    width: 90%;
+    display: flex;
+    margin: 0 auto;
+
+    &__menuBar {
+        width: 30%;
+    }
+}
+
+.orderHistory__payment__button {
+    background-color: $primaryColor;
+    color: $whiteColor;
+    border-radius: 4px;
+
+    &:hover {
+        scale: 1.05;
+        transition: 0.5s;
+    }
+}
+
+.orderHistory__viewInvoice__button {
+    color: $secondaryColor;
+    text-decoration: underline;
+    border-radius: 4px;
+    position: absolute;
+    top: 0;
+    right: 0px;
+    font-size: 14px;
+
+    &:hover {
+        scale: 1.05;
+        transition: 0.5s;
+        cursor: pointer;
+    }
+}
+
+.orderHistory__viewOrder__button {
+    color: $secondaryColor;
+    text-decoration: underline;
+    border-radius: 4px;
+    position: absolute;
+    top: 0;
+    right: 0px;
+    font-size: 14px;
+
+    &:hover {
+        scale: 1.05;
+        transition: 0.5s;
+    }
+}
+
+.orderHistory__reOrder__button {
+    background-color: $redColor;
+    color: $whiteColor;
+    border-radius: 4px;
+    width: 150px;
+
+    &:hover {
+        scale: 1.05;
+        transition: 0.5s;
+    }
+}
+
+.orderHistory__transactionLable {
+    display: flex;
+    align-items: center;
+}
+
+.gradientBackground {
+    height: 150px;
+    display: flex;
+    background: linear-gradient(90deg, rgba(128, 203, 196, 1) 0%, rgba(148, 187, 233, 1) 100%);
+    border-radius: 10px;
+
+    .textStyle {
+        padding-left: 50px;
+        padding-top: 80px;
+        font-size: 30px;
+        font-weight: bold;
+
+        /* Tailwind utilities for text styling */
+    }
+}
+
+.button {
+    @apply inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500;
+}
+
+/* styleComponent.module.scss */
+.tab {
+    @apply inline-flex items-center justify-center px-4 py-2 border-b-2 text-sm font-medium text-gray-700 hover:text-gray-900 cursor-pointer;
+}
+
+.activeTab {
+    @apply text-black border-purple-500;
+}

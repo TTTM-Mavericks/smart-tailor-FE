@@ -720,7 +720,7 @@ const OrderProductScreen = () => {
                                     </div>
                                     <div className="flex justify-between items-center w-full">
                                         <p className="text-sm light:text-white leading-4 text-gray-800">Discount <span className="bg-gray-200 p-1 text-xs font-medium light:bg-white light:text-gray-800 leading-3 text-gray-800">Quantity (0%) </span></p>
-                                        <p className="text-sm light:text-gray-300 leading-4 text-gray-600">-{((materialPrice?.min + materialPrice?.max) / 2 * 0 / 100) ==0 ? __handleAddCommasToNumber((materialPrice?.min + materialPrice?.max) / 2 * 0 / 100) : '0'} VND</p>
+                                        <p className="text-sm light:text-gray-300 leading-4 text-gray-600">-{((materialPrice?.min + materialPrice?.max) / 2 * 0 / 100) == 0 ? __handleAddCommasToNumber((materialPrice?.min + materialPrice?.max) / 2 * 0 / 100) : '0'} VND</p>
                                     </div>
                                     <div className="flex justify-between items-center w-full">
                                         <p className="text-sm light:text-white leading-4 text-gray-800">Shipping</p>
@@ -730,9 +730,8 @@ const OrderProductScreen = () => {
                                 <div className="flex justify-between items-center w-full">
                                     <p className="text-base light:text-white font-semibold leading-4 text-gray-800">Total</p>
                                     <div>
-                                        <span style={{ color: greenColor, fontWeight: 400 }} className="text-gray-600">{__handleAddCommasToNumber(__handleRoundToThreeDecimalPlaces(__handleCalculateTotalMin(materialPrice?.min, materialPrice?.max, 2)))}</span>
-                                        <span> - </span>
-                                        <span style={{ color: redColor, fontWeight: 400 }} className="text-gray-600">{__handleAddCommasToNumber(__handleRoundToThreeDecimalPlaces(__handleCalculateTotalMax(materialPrice?.min, materialPrice?.max, 2)))} VND</span>
+                                        <span> ~ </span>
+                                        <span style={{ color: redColor, fontWeight: 400 }} className="text-gray-600">{__handleAddCommasToNumber(__handleCalculateTotalMax(materialPrice?.min, materialPrice?.max, 2))} VND</span>
                                     </div>
 
                                 </div>
