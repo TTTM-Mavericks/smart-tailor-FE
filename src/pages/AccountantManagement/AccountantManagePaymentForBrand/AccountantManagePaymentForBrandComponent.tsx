@@ -21,6 +21,167 @@ import PaymentFromAccountantToBranđialog from '../../../components/Dialog/Payme
 import { __handlegetRatingStyle, __handlegetStatusBackgroundBoolean } from '../../../utils/ElementUtils';
 import '../../../index.css'
 import Select from 'react-select';
+import { DesignInterface } from '../../../models/DesignModel';
+
+interface AccountantOrderInterface {
+    orderID: string;
+    paymentStatus: boolean;
+    quantity: number;
+    rating: number;
+    orderStatus: string;
+    orderType: string;
+    address: string;
+    province: string;
+    district: string;
+    ward: string;
+    phone: string;
+    buyerName: string;
+    totalPrice: number;
+    expectedStartDate: string;
+    expectedProductCompletionDate: string;
+    estimatedDeliveryDate: string | null;
+    productionStartDate: string | null;
+    productionCompletionDate: string | null;
+    createDate: string;
+    detailList: Detail[];
+    subOrderList: SubOrder[];
+    paymentList: Payment[];
+    designResponse?: DesignInterface
+}
+
+interface Detail {
+    designDetailId: string;
+    quantity: number;
+    size: Size;
+    detailStatus: boolean;
+}
+
+interface Size {
+    sizeID: string;
+    sizeName: string;
+    status: boolean;
+    createDate: string;
+    lastModifiedDate: string | null;
+}
+
+interface SubOrder {
+    orderID: string;
+    brand: Brand;
+    parentOrderID: string;
+    quantity: number;
+    orderStatus: string;
+    rating: number | null;
+    orderType: string;
+    address: string;
+    province: string;
+    district: string;
+    ward: string;
+    phone: string;
+    buyerName: string;
+    totalPrice: number;
+    expectedStartDate: string;
+    expectedProductCompletionDate: string;
+    estimatedDeliveryDate: string | null;
+    productionStartDate: string;
+    productionCompletionDate: string;
+    detailList: Detail[];
+    paymentList: Payment[];
+}
+
+interface Brand {
+    brandID: string;
+    user: User;
+    brandName: string;
+    brandStatus: string;
+    rating: number;
+    numberOfRatings: number;
+    totalRatingScore: number;
+    bankName: string;
+    accountNumber: string;
+    accountName: string;
+    address: string;
+    province: string;
+    district: string;
+    ward: string;
+    numberOfViolations: number;
+    createDate: string;
+    lastModifiedDate: string;
+    images: string[];
+    qr_Payment: string;
+}
+
+interface User {
+    userID: string;
+    email: string;
+    fullName: string;
+    language: string;
+    phoneNumber: string;
+    provider: string;
+    userStatus: string;
+    roleName: string | null;
+    imageUrl: string;
+    createDate: string;
+    lastModifiedDate: string | null;
+}
+
+interface Payment {
+    paymentID: string;
+    paymentSenderID: string | null;
+    paymentSenderName: string;
+    paymentSenderBankCode: string;
+    paymentSenderBankNumber: string;
+    paymentRecipientID: string | null;
+    paymentRecipientName: string;
+    paymentRecipientBankCode: string;
+    paymentRecipientBankNumber: string;
+    paymentAmount: number;
+    paymentMethod: string | null;
+    paymentStatus: boolean;
+    paymentType: string;
+    orderID: string;
+    paymentURl: string | null;
+    payOSResponse: PayOSResponse | null;
+    createDate: string;
+}
+
+interface PayOSResponse {
+    code: string;
+    desc: string;
+    data: PayOSResponseData;
+    signature: string;
+}
+
+interface PayOSResponseData {
+    id: string;
+    orderCode: number;
+    amount: number;
+    amountPaid: number;
+    amountRemaining: number;
+    status: string;
+    transactions: Transaction[];
+    createdAt: string;
+    canceledAt: string | null;
+    cancellationReason: string | null;
+    checkoutUrl: string;
+    qrCode: string;
+}
+
+interface Transaction {
+    accountNumber: string;
+    amount: number;
+    counterAccountBankId: string | null;
+    counterAccountBankName: string | null;
+    counterAccountName: string | null;
+    counterAccountNumber: string | null;
+    description: string;
+    reference: string;
+    transactionDateTime: string;
+    virtualAccountName: string | null;
+    virtualAccountNumber: string;
+}
+
+
+    // TODO MUTIL LANGUAGE
 
 const AccountantManagePaymentForBrandComponent: React.FC = () => {
     // ---------------UseState---------------//
@@ -28,7 +189,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
     const [isOpenPaymentInforDialog, setIsOpenPaymentInformationDialog] = useState<boolean>(false);
     const [currentPaymentData, setCurrentPaymentData] = useState<PaymentInterface | PaymentOrderInterface>();
     const [isExtendTransaction, setIsExtendTransaction] = useState<{ [orderId: string]: boolean }>({});
-    const [orderDetailList, setOrderDetailList] = useState<OrderDetailInterface[]>();
+    // const [orderDetailList, setOrderDetailList] = useState<OrderDetailInterface[]>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [userAuth, setUserAuth] = useState<UserInterface>();
     const [isOpenPaymentDialog, setIsOpenPaymentDialog] = useState<{ [key: string]: boolean }>({});
@@ -37,7 +198,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
     const [selectedDate, setSelectedDate] = React.useState('Modify date');
     const [selectedRelevance, setSelectedRelevance] = React.useState('Liên quan nhất');
     const [activeTab, setActiveTab] = useState('All');
-    const [orderChild, setOrderChild] = useState<{ [orderId: string]: OrderDetailInterface[] }>({});
+    const [orderChild, setOrderChild] = useState<{ [orderId: string]: OrderDetailInterface[] | SubOrder[] }>({});
     const [selectedOrder, setSelectedOrder] = useState<any>();
     const [isOpenPaymentForBrandDialog, setIsOpenPaymentForBrandDialog] = useState<boolean>(false);
     const options = ['Option 1', 'Option 2', 'Option 3'];
@@ -57,13 +218,22 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
 
         console.log('orderChild: ', orderChild);
     }, [orderChild]);
+    const [fulldataOrderResposne, setFulldataOrderResposne] = useState<AccountantOrderInterface[]>([]);
+
+
+
+    // ---------------UseEffect---------------//
+
 
     useEffect(() => {
 
+        console.log(orderChild);
         Object.keys(isExtendTransaction).forEach(orderId => {
-            __handleFetchOrderDetails(orderId);
+            // __handleFetchOrderDetails(orderId);
+            // if (isExtendTransaction[orderId] === true && !orderChild[orderId]) {
+            // }
         });
-    }, [isExtendTransaction]);
+    }, [orderChild]);
 
     /**
      * Move to Top When scroll down
@@ -91,30 +261,39 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
     }, []);
 
     // ---------------FunctionHandler---------------//
-    const __handleFetchOrderDetails = async (orderId: string) => {
-        console.log('hehehehe');
-        try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getAllSubOrder}/${orderId}`);
-            if (response.status === 200) {
-                setOrderChild(prevState => ({
-                    ...prevState,
-                    [orderId]: response.data // Assuming response.data is an array of OrderDetailInterface
-                }));
-                console.log(response.data);
-            }
-        } catch (error) {
-            console.error(`Error fetching details for order ${orderId}:`, error);
-        }
-    };
+
+    // const __handleFetchOrderDetails = async (orderId: string) => {
+    //     console.log('hehehehe');
+    //     try {
+    //         const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getAllSubOrder}/${orderId}`);
+    //         if (response.status === 200) {
+    //             setOrderChild(prevState => ({
+    //                 ...prevState,
+    //                 [orderId]: response.data // Assuming response.data is an array of OrderDetailInterface
+    //             }));
+    //             console.log(response.data);
+    //         }
+    //     } catch (error) {
+    //         console.error(`Error fetching details for order ${orderId}:`, error);
+    //     }
+    // };
 
     const __handleFetchOrderData = async (userID: any) => {
         setIsLoading(true)
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getAllOrder}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getFullOrderAccountant}`);
             if (response.status === 200) {
                 console.log(response.data);
-                setOrderDetailList(response.data);
-                setIsLoading(false)
+                // setOrderDetailList(response.data);
+                console.log('response.data.orderID: ', response.data.orderID);
+                setFulldataOrderResposne(response.data);
+                response.data.forEach((order: AccountantOrderInterface) => {
+                    setOrderChild(prevState => ({
+                        ...prevState,
+                        [order.orderID]: order.subOrderList // Ensure order.subOrderList is an array of OrderDetailInterface
+                    }));
+                });
+                setIsLoading(false);
             } else {
                 toast.error(`${response.message}`, { autoClose: 4000 });
                 console.log(response.message);
@@ -291,7 +470,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
      * @returns 
      * Apply the filter to the render with card
      */
-    const applyFilters = (orderDetail: OrderDetailInterface) => {
+    const applyFilters = (orderDetail: AccountantOrderInterface) => {
         return (
             (filters.orderID === '' || orderDetail.orderID.includes(filters.orderID)) &&
             (filters.createDate === '' || (orderDetail.expectedStartDate?.includes(filters.createDate) ?? false)) &&
@@ -314,8 +493,8 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                             className="basic-multi-select"
                             classNamePrefix="select"
                             value={filterOptions.filter(option => selectedFilters.includes(option.value))}
-                            onChange={(selectedOptions) => {
-                                setSelectedFilters(selectedOptions.map(option => option.value));
+                            onChange={(selectedOptions: any) => {
+                                setSelectedFilters(selectedOptions.map((option: any) => option.value));
                             }}
                         />
                     </div>
@@ -443,18 +622,15 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                         </div>
                     </div> */}
 
-                    {orderDetailList?.filter(applyFilters).map((orderDetail) => (
+                    {fulldataOrderResposne?.filter(applyFilters).map((orderDetail) => (
+                    // {fulldataOrderResposne?.map((orderDetail) => (
                         <div className="bg-white rounded-xl shadow-md p-4 md:p-6 mb-4 md:mb-8 transform transition-all hover:shadow-lg">
                             <div className="flex flex-col md:flex-row items-start md:items-center mb-4 md:mb-6" >
                                 <div className="mb-4 md:mb-0 w-max ">
                                     <h2 className="text-1xl md:text-1xl font-bold text-gray-800 pb-2">{t(codeLanguage + '000193')} </h2>
                                     <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2" >Order ID: <span className="text-sm text-gray-500 pb-2">{orderDetail?.orderID}</span></p>
-                                    <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">
-                                        Create date:
-                                        <span className="text-sm text-gray-500 pb-2">
-                                            {orderDetail.expectedStartDate !== null ? orderDetail.expectedStartDate : 'N/A'}
-                                        </span>
-                                    </p>
+                                    <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Desgin ID: <span className="text-sm text-gray-500 pb-2">{orderDetail.designResponse?.designID}</span></p>
+                                    <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Create date: <span className="text-sm text-gray-500 pb-2">{orderDetail?.expectedStartDate}</span></p>
                                     <div style={{
                                         display: 'flex',
                                         alignContent: 'center',
@@ -481,6 +657,22 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                 } />
                                         </Stack>
                                     </div>
+                                    <div style={{
+                                        display: 'flex',
+                                        alignContent: 'center',
+                                        alignItems: 'center',
+                                    }} >
+                                        <p style={{ fontWeight: '500' }} className="text-sm text-black">Payment status: </p>
+                                        <Stack direction="row" spacing={5} padding={1}>
+                                            <Chip
+                                                label={`${orderDetail?.paymentStatus && orderDetail.paymentStatus ? 'PAID' : 'PENDING'} `}
+                                                variant="filled"
+                                                style={
+                                                    __handlegetStatusBackgroundBoolean(orderDetail?.paymentStatus && orderDetail.paymentStatus ? true : false)
+                                                } />
+                                        </Stack>
+                                        {/* <p className="text-sm text-gray-500"></p> */}
+                                    </div>
                                 </div>
                             </div>
                             <button
@@ -497,7 +689,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                             <div style={{ width: '100%' }}>
                                 {isExtendTransaction[orderDetail?.orderID || '1'] && !orderChild[orderDetail.orderID] && (
                                     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                                        <CircularProgress size={20} />
+                                        {/* <CircularProgress size={20} /> */}
                                     </div>
                                 )}
                             </div>
@@ -506,15 +698,17 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                     <div className="flex-shrink-0">
                                     </div>
                                     <div className="ml-0 md:ml-6 mt-4 md:mt-0 flex-grow" style={{ position: 'relative' }}>
-                                        <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">ID: <span className="text-sm text-gray-500 pb-2"> {order.orderID}</span></p>
+                                        <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Sub ID: <span className="text-sm text-gray-500 pb-2"> {order.orderID}</span></p>
                                         <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Type: <span className="text-sm text-blue-700 pb-2"> {order.orderType}</span></p>
                                         <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Brand ID: <span className="text-sm text-gray-500 pb-2">{order.brand?.brandID}</span></p>
                                         <p style={{ fontWeight: '500' }} className="text-sm text-black flex content-center items-center">Brand:
-                                            <p style={{ fontWeight: '500' }} className="text-sm text-black flex content-center items-center pb-2">
+                                            <p style={{ fontWeight: '500' }} className="text-sm text-black flex content-center items-center">
                                                 <img src={order.brand?.user.imageUrl} style={{ width: 30, height: 30, borderRadius: 90, marginLeft: 5, marginRight: 5 }}></img>
                                                 <p className={`${__handlegetRatingStyle(order.brand?.rating)} text-sm text-gray-500`} > {order.brand?.brandName}</p>
                                             </p>
                                         </p>
+                                        <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Rating: <span className="text-sm text-gray-500 pb-2">{order.brand?.rating}</span></p>
+
                                         <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Total price: <span className="text-sm text-gray-500 pb-2"> {__handleAddCommasToNumber(order.totalPrice)} VND</span></p>
                                         <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2 flex content-center items-center">Status:
                                             <button

@@ -18,7 +18,7 @@ import BrandUpdateSampleProductDialog from '../../GlobalComponent/Dialog/UpdateS
 import { __handleAddCommasToNumber } from '../../../../utils/NumbericUtils';
 import BrandUploadProgcessSampleProduct from '../../GlobalComponent/Dialog/UploadProgcessSampleProduct/BrandUploadProgcessSampleProduct';
 import { StageInterface } from '../../../../models/OrderModel';
-
+import style from './ManageOrderBrandStyle.module.scss'
 /**
  * 
  * @param status 
@@ -601,14 +601,14 @@ const BrandOrderModal: React.FC<{ order: BrandOrder; onClose: () => void; onMark
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm overflow-y-auto h-full w-full flex items-center justify-center p-4 z-50"
+            className={`${style.custom__scrollbar} fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm overflow-y-auto h-full w-full flex items-center justify-center p-4 z-50`}
             onClick={onClose}
         >
             <motion.div
                 initial={{ scale: 0.9, y: 50 }}
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.9, y: 50 }}
-                className="relative bg-white w-full max-w-2xl rounded-xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto"
+                className={`${style.custom__scrollbar}relative bg-white w-full max-w-2xl rounded-xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto`}
                 onClick={e => e.stopPropagation()}
             >
                 <button
@@ -619,109 +619,126 @@ const BrandOrderModal: React.FC<{ order: BrandOrder; onClose: () => void; onMark
                     <FaTimes size={20} />
                 </button>
 
-                <h2 className="text-xl font-bold text-indigo-700 mb-4 shadow-text">Order Brand Details</h2>
+                <div className={`${style.employeeManagerOrderDialog__content}`}>
 
-                <div className="flex justify-between items-center mb-4 bg-indigo-50 p-3 rounded-lg">
-                    <div className="flex items-center">
-                        <FaClipboardCheck className="text-indigo-500" size={16} />
-                        <span className="font-semibold text-gray-700 text-sm" style={{ fontSize: "13px" }}>Order ID:</span>
-                        <p className="text-sm font-bold text-indigo-700" style={{ fontSize: "13px" }}>{order.orderID}</p>
-                    </div>
-                </div>
+                    <h2 className="text-xl font-bold text-indigo-700 mb-4 shadow-text">Order Brand Details</h2>
+                    <div className="flex justify-between items-center mb-4 bg-indigo-50 p-3 rounded-lg">
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    {[
-                        { icon: FaUser, label: 'Customer', value: order.buyerName },
-                        { icon: FaCalendar, label: 'Date', value: order.createDate },
-                        {
-                            icon: FaExclamationCircle,
-                            label: 'Report Status',
-                            value: order.orderStatus ? 'Read' : 'Unread',
-                            customClass: order.orderStatus ? 'text-green-600' : 'text-yellow-600'
-                        },
-                        {
-                            icon: FaExclamationCircle,
-                            label: 'Order Status',
-                            value: order.orderStatus,
-                            customClass: getStatusColor(order.orderStatus)
-                        }
-                    ].map((item, index) => (
-                        <div key={index} className="bg-gray-50 p-3 rounded-lg">
-                            <p className="text-gray-600 flex items-center mb-1 text-xs">
-                                <item.icon className="mr-2 text-indigo-500" size={14} />
-                                <span className="font-semibold">{item.label}:</span>
-                            </p>
-                            <p className={`text-sm font-bold ${item.customClass || 'text-gray-800'}`} style={{ fontSize: "13px" }}>
-                                {item.value}
-                            </p>
-                        </div>
-                    ))}
-                </div>
-
-                <div className="mb-6">
-                    <h3 className="text-xs font-semibold text-gray-700 mb-2" style={{ fontSize: "13px" }}>Buyer Name</h3>
-                    <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-200 shadow-inner" style={{ fontSize: "13px" }}>
-                        {order.buyerName}
-                    </p>
-                </div>
-                {designDetails && (
-                    <div className="mb-6 flex justify-center">
-                        <div className="text-center">
-                            <img
-                                src={designDetails.imageUrl}
-                                alt="Model"
-                                className="max-w-full h-auto rounded-lg"
-                            />
+                        <div className="flex items-center">
+                            <FaClipboardCheck className="text-indigo-500" size={16} />
+                            <span className="font-semibold text-gray-700 text-sm" style={{ fontSize: "13px" }}>Order ID:</span>
+                            <p className="text-sm font-bold text-indigo-700" style={{ fontSize: "13px" }}>{order.orderID}</p>
                         </div>
                     </div>
-                )}
 
-                {isOrderImageListArray(order.orderImageList) && order.orderImageList.length > 0 && (
-                    <div className="mb-6">
-                        <h3 className="text-lg font-semibold text-gray-700 mb-2" style={{ fontSize: "13px" }}>Report Images</h3>
-                        <div className="relative">
-                            <img
-                                src={order.orderImageList[currentImageIndex].orderImageUrl}
-                                alt={order.orderImageList[currentImageIndex].orderImageName}
-                                className="w-full h-48 object-cover rounded-lg"
-                            />
-                            {order.orderImageList.length > 1 && (
-                                <>
-                                    <button onClick={prevImage} className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 rounded-full">
-                                        <FaChevronLeft size={14} />
-                                    </button>
-                                    <button onClick={nextImage} className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 rounded-full">
-                                        <FaChevronRight size={14} />
-                                    </button>
-                                </>
-                            )}
-                        </div>
-                        <p className="text-center mt-2 text-gray-600 text-xs">
-                            {order.orderImageList[currentImageIndex].orderImageName}
-                        </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        {[
+                            { icon: FaCalendar, label: 'Date', value: order.createDate },
+                            {
+                                icon: FaExclamationCircle,
+                                label: 'Report Status',
+                                value: order.orderStatus ? 'Read' : 'Unread',
+                                customClass: order.orderStatus ? 'text-green-600' : 'text-yellow-600'
+                            },
+                            {
+                                icon: FaExclamationCircle,
+                                label: 'Order Status',
+                                value: order.orderStatus,
+                                customClass: getStatusColor(order.orderStatus)
+                            }
+                        ].map((item, index) => (
+                            <div key={index} className="bg-gray-50 p-3 rounded-lg">
+                                <p className="text-gray-600 flex items-center mb-1 text-xs">
+                                    <item.icon className="mr-2 text-indigo-500" size={14} />
+                                    <span className="font-semibold">{item.label}:</span>
+                                </p>
+                                <p className={`text-sm font-bold ${item.customClass || 'text-gray-800'}`} style={{ fontSize: "13px" }}>
+                                    {item.value}
+                                </p>
+                            </div>
+                        ))}
                     </div>
-                )}
 
-                <div className="flex justify-end space-x-3">
-                    <button
-                        onClick={onClose}
-                        className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-150 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm"
-                    >
-                        Close
-                    </button>
-                    <button
-                        onClick={() => onMarkResolved(order.orderID)}
-                        className={`px-4 py-2 rounded-lg text-white transition duration-150 focus:outline-none focus:ring-2 text-sm ${order.orderStatus
-                            ? 'bg-green-500 hover:bg-green-600 focus:ring-green-400 cursor-not-allowed'
-                            : 'bg-indigo-500 hover:bg-indigo-600 focus:ring-indigo-400'
-                            }`}
-                        disabled={order.orderStatus}
-                    >
-                        {order.orderStatus ? 'Already Resolved' : 'Mark as Resolved'}
-                    </button>
+                   
                 </div>
+
+
+                {
+                    designDetails && (
+                        <div className="mb-6 flex justify-center">
+                            <div className="text-center">
+                                <img
+                                    src={designDetails.imageUrl}
+                                    alt="Model"
+                                    className="max-w-full h-auto rounded-lg"
+                                />
+                            </div>
+
+                        </div>)}
+
+                {
+                    isOrderImageListArray(order.orderImageList) && order.orderImageList.length > 0 && (
+                        <div className="mb-6">
+                            <h3 className="text-lg font-semibold text-gray-700 mb-2" style={{ fontSize: "13px" }}>Report Images</h3>
+                            <div className="relative">
+                                <img
+                                    src={order.orderImageList[currentImageIndex].orderImageUrl}
+                                    alt={order.orderImageList[currentImageIndex].orderImageName}
+                                    className="w-full h-48 object-cover rounded-lg"
+                                />
+                                {order.orderImageList.length > 1 && (
+                                    <>
+                                        <button onClick={prevImage} className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 rounded-full">
+                                            <FaChevronLeft size={14} />
+                                        </button>
+                                        <button onClick={nextImage} className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 rounded-full">
+                                            <FaChevronRight size={14} />
+                                        </button>
+                                    </>
+                                )}
+
+                                {designDetails && (
+                                    <div className="mb-6 flex justify-center">
+                                        <div className="text-center">
+                                            <img
+                                                src={designDetails.imageUrl}
+                                                alt="Model"
+                                                className="max-w-full h-auto rounded-lg"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {isOrderImageListArray(order.orderImageList) && order.orderImageList.length > 0 && (
+                                    <div className="mb-6">
+                                        <h3 className="text-lg font-semibold text-gray-700 mb-2">Report Images</h3>
+                                        <div className="relative">
+                                            <img
+                                                src={order.orderImageList[currentImageIndex].orderImageUrl}
+                                                alt={order.orderImageList[currentImageIndex].orderImageName}
+                                                className="w-full h-48 object-cover rounded-lg"
+                                            />
+                                            {order.orderImageList.length > 1 && (
+                                                <>
+                                                    <button onClick={prevImage} className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 rounded-full">
+                                                        <FaChevronLeft size={14} />
+                                                    </button>
+                                                    <button onClick={nextImage} className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 rounded-full">
+                                                        <FaChevronRight size={14} />
+                                                    </button>
+                                                </>
+                                            )}
+                                        </div>
+                                        <p className="text-center mt-2 text-gray-600 text-xs">
+                                            {order.orderImageList[currentImageIndex].orderImageName}
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
             </motion.div>
-        </motion.div>
+        </motion.div >
     );
 };
 /**

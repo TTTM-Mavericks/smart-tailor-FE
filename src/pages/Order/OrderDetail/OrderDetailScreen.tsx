@@ -21,6 +21,8 @@ import { IoMdCloseCircleOutline } from 'react-icons/io';
 import ViewProgessOfProductDialog from '../Components/Dialog/ViewProgessOfProduct/ViewProgessOfProductDialog';
 import { toast } from 'react-toastify';
 import { FaCheck } from 'react-icons/fa';
+import { UserInterface } from '../../../models/UserModel';
+import Cookies from 'js-cookie';
 
 
 export interface EstimatedStageInterface {
@@ -62,6 +64,8 @@ const OrderDetailScreen: React.FC = () => {
     const [isOpenReportOrderCanceledDialog, setIsOpenReportOrderCanceledDialog] = useState<boolean>(false);
     const [isOpenViewHistory, setIsOpenViewHistory] = useState<boolean>(false);
     const [selectedStage, setSelectedStage] = useState<string>();
+    const [userAuth, setUserAuth] = useState<UserInterface>();
+
 
 
     const customSortOrder = [
@@ -118,7 +122,7 @@ const OrderDetailScreen: React.FC = () => {
     // ---------------UseEffect---------------//
 
     useEffect(() => {
-        if (orderDetail?.orderStatus === 'SUCESSFULL') {
+        if (orderDetail?.orderStatus === 'DELIVERED') {
             setIsOpenRatingDialog(true);
         }
     }, [orderDetail])
@@ -127,6 +131,14 @@ const OrderDetailScreen: React.FC = () => {
      * Move to Top When scroll down
      */
     useEffect(() => {
+        const userStorage = Cookies.get('userAuth');
+        if (userStorage) {
+            const userParse: UserInterface = JSON.parse(userStorage);
+            setUserAuth(userParse);
+        }
+
+
+
         const handleScroll = () => {
             if (window.scrollY > 200) {
                 setShowScrollButton(true);
@@ -146,6 +158,7 @@ const OrderDetailScreen: React.FC = () => {
 
     useEffect(() => {
         __handleGetOrderDetail();
+
     }, [])
 
     // ---------------FunctionHandler---------------//
@@ -155,7 +168,6 @@ const OrderDetailScreen: React.FC = () => {
 
 
     const __handleFetchTimeLine = async (parentId: any) => {
-        setIsLoading(true);
         try {
             const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderTimeLineByParentId}/${parentId}`);
             if (response.status === 200) {
@@ -175,7 +187,6 @@ const OrderDetailScreen: React.FC = () => {
     }
 
     const __handleLoadProgressStep = async (subOrderId: any) => {
-        setIsLoading(true);
         try {
             const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderStageById}/${subOrderId}`);
             if (response.status === 200) {
@@ -333,10 +344,34 @@ const OrderDetailScreen: React.FC = () => {
         console.log(isOpen);
     }
 
-    const __handleSubmitRating = () => {
-        if (rating !== null) {
-            setRating(null);
-            setComment('');
+    const __handleSubmitRating = async () => {
+        setIsLoading(true);
+
+        try {
+            const bodyRequest = {
+                userID: userAuth?.userID,
+                parentOrderID: orderDetail?.orderID,
+                rating: rating,
+
+            }
+            console.log('bodyRequest: ', bodyRequest);
+
+            const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.ratingOrder}`, bodyRequest);
+            if (response.status === 200) {
+                console.log('detail order: ', response.data);
+                toast.success(`${response.message}`, { autoClose: 4000 });
+                window.location.reload();
+
+            }
+            else {
+                console.log('detail error: ', response.message);
+                toast.error(`${response.message}`, { autoClose: 4000 });
+            }
+            setIsOpenRatingDialog(false);
+
+        } catch (error) {
+            console.log(error);
+            toast.error(`${error}`, { autoClose: 4000 });
         }
     }
 
@@ -357,7 +392,7 @@ const OrderDetailScreen: React.FC = () => {
     }
 
     const __handleRatingOrder = () => {
-        setIsOpenRatingDialog(false);
+        __handleSubmitRating();
     }
 
 
@@ -704,46 +739,49 @@ const OrderDetailScreen: React.FC = () => {
                 onClickReportAndCancel={_handleCancelOrder}
             ></CustomerReportOrderDialogComponent>
 
-            <Dialog open={isOpenRatingDialog}>
-                <DialogTitle>
-                    <h2 className="text-md font-semibold mb-4 ">Rating</h2>
-                </DialogTitle>
+            {orderDetail?.orderStatus === 'DELIVERED' && (
 
-                <DialogContent style={{ textAlign: 'center' }} >
-                    <form onSubmit={__handleSubmitRating} className='flex items-center mt-0 px-12'>
-                        <div className="flex items-center mb-4">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                                <button
-                                    key={star}
-                                    type="button"
-                                    className={`text-2xl mr-1 ${rating && rating >= star ? 'text-yellow-500' : 'text-gray-400'}`}
-                                    onClick={() => setRating(star)}
-                                >
-                                    ★
-                                </button>
-                            ))}
-                        </div>
+                <Dialog open={isOpenRatingDialog}>
+                    <DialogTitle>
+                        <h2 className="text-md font-semibold mb-4 ">Rating</h2>
+                    </DialogTitle>
 
-                    </form>
+                    <DialogContent style={{ textAlign: 'center' }} >
+                        <form className='flex items-center mt-0 px-12'>
+                            <div className="flex items-center mb-4">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                    <button
+                                        key={star}
+                                        type="button"
+                                        className={`text-2xl mr-1 ${rating && rating >= star ? 'text-yellow-500' : 'text-gray-400'}`}
+                                        onClick={() => setRating(star)}
+                                    >
+                                        ★
+                                    </button>
+                                ))}
+                            </div>
 
-                    <button
-                        type="submit"
-                        className="px-5 py-2.5 text-sm font-medium text-white"
-                        onClick={__handleRatingOrder}
-                        style={{
-                            border: `1px solid ${primaryColor}`,
-                            borderRadius: 4,
-                            color: whiteColor,
-                            marginBottom: 10,
-                            marginRight: 10,
-                            backgroundColor: primaryColor,
-                            margin: '0 auto'
-                        }}
-                    >
-                        Submit
-                    </button>
-                </DialogContent>
-            </Dialog>
+                        </form>
+
+                        <button
+                            type="submit"
+                            className="px-5 py-2.5 text-sm font-medium text-white"
+                            onClick={__handleSubmitRating}
+                            style={{
+                                border: `1px solid ${primaryColor}`,
+                                borderRadius: 4,
+                                color: whiteColor,
+                                marginBottom: 10,
+                                marginRight: 10,
+                                backgroundColor: primaryColor,
+                                margin: '0 auto'
+                            }}
+                        >
+                            Submit
+                        </button>
+                    </DialogContent>
+                </Dialog>
+            )}
 
             {/* Cancel reason dialog */}
 

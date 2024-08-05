@@ -20,3 +20,58 @@
         /* Color when hovering over the scrollbar thumb */
     }
 }
+
+.employeeManagerOrderDialog__content {
+    overflow: none;
+}
+
+.employeeManagerOrderDialog__content::-webkit-scrollbar {
+    width: 3px;
+}
+
+.employeeManagerOrderDialog__content::-webkit-scrollbar-track {
+    background: #ccc;
+    /* Replace $grayColor1 with actual color */
+    border-radius: 10px;
+}
+
+.employeeManagerOrderDialog__content::-webkit-scrollbar-thumb {
+    background: #7b7b7b;
+    border-radius: 10px;
+}
+
+.employeeManagerOrderDialog__content::-webkit-scrollbar-thumb:hover {
+    background: #7b7b7b;
+    /* Color when hovering over the scrollbar thumb */
+}
+
+/* Custom scrollbar styles */
+.custom__scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #9c9a9a #f5f5f5;
+    border-radius: 4px;
+    /* thumb color, track color */
+}
+
+.custom__scrollbar::-webkit-scrollbar {
+    width: 2px;
+    border-radius: 4px;
+
+}
+
+.custom__scrollbar::-webkit-scrollbar-track {
+    background: #f5f5f5;
+    border-radius: 10px;
+    border-radius: 4px;
+
+}
+
+.custom__scrollbar::-webkit-scrollbar-thumb {
+    background-color: #949393;
+    border-radius: 10px;
+    border: 2px solid #f5f5f5;
+}
+
+.custom__scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #9c9a9a;
+}
