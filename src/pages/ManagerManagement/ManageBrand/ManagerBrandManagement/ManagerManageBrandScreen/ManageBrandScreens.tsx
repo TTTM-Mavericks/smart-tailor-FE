@@ -115,7 +115,7 @@ const ManageBrand: React.FC = () => {
     }, [selectedLanguage, i18n]);
 
     React.useEffect(() => {
-        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.user + functionEndpoints.user.getAllBrand}`;
+        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.getAllBrandInformation}`;
 
         axios.get(apiUrl)
             .then(response => {
@@ -128,7 +128,7 @@ const ManageBrand: React.FC = () => {
                 if (responseData && Array.isArray(responseData.data)) {
                     const updatedData = responseData.data.map((brand: Brand) => ({
                         ...brand,
-                        actionTaken: brand.userStatus !== "ACTIVE" || localStorage.getItem(`brandAction_${brand.userID}`) === 'true'
+                        actionTaken: brand.brandStatus !== "ACCEPT" || localStorage.getItem(`brandAction_${brand.brandID}`) === 'true'
                     }));
                     setData(updatedData);
                     console.log("Data received:", updatedData);
@@ -141,7 +141,7 @@ const ManageBrand: React.FC = () => {
 
     const handleRowClick = async (params: any) => {
         try {
-            const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.getBrandByID}/${params.row.userID}`;
+            const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.getBrandByID}/${params.row.brandID}`;
             const response = await axios.get(apiUrl);
             if (response.status === 200) {
                 setSelectedBrand(response.data.data);
@@ -300,9 +300,15 @@ const ManageBrand: React.FC = () => {
     };
 
     const columns: GridColDef[] = [
-        { field: "email", headerName: "Email", flex: 1, headerAlign: "left" },
         {
-            field: "fullName",
+            field: "email",
+            headerName: "Email",
+            flex: 1,
+            headerAlign: "left",
+            renderCell: (params) => params.row.user.email,
+        },
+        {
+            field: "brandName",
             headerAlign: "left",
             headerName: "Brand Name",
             flex: 1,
@@ -311,7 +317,7 @@ const ManageBrand: React.FC = () => {
                     <Box
                         component="img"
                         src={params.row.imageUrl}
-                        alt={params.row.fullName}
+                        alt={params.row.brandName}
                         sx={{
                             width: 40,
                             height: 40,
@@ -320,33 +326,36 @@ const ManageBrand: React.FC = () => {
                             mr: 2
                         }}
                     />
-                    {params.row.fullName}
+                    {params.row.brandName}
                 </Box>
             )
         },
         {
-            field: "phoneNumber",
-            headerName: "Phone Number",
+            field: "accountNumber",
+            headerName: "Account Number",
             flex: 1,
             headerAlign: "center",
             align: "center",
         },
         {
-            field: "provider",
-            headerName: "Provider",
+            field: "phoneNumber",
+            headerName: "Phone Number",
+            flex: 1,
+            renderCell: (params) => params.row.user.phoneNumber,
         },
         {
+            flex: 1,
             field: "createDate",
             headerName: "Date Create"
         },
         {
-            field: "userStatus",
-            headerName: "User Status",
+            field: "brandStatus",
+            headerName: "Brand Status",
             renderCell: (params) => (
                 <Box
                     sx={{
-                        backgroundColor: params.value === 'ACTIVE' ? '#e8f5e9' : '#ffebee',
-                        color: params.value === 'ACTIVE' ? '#4caf50' : '#f44336',
+                        backgroundColor: params.value === 'ACCEPT' ? '#e8f5e9' : '#ffebee',
+                        color: params.value === 'ACCEPT' ? '#4caf50' : '#f44336',
                         borderRadius: '16px',
                         padding: '4px 8px',
                         fontSize: '0.75rem',
@@ -360,7 +369,7 @@ const ManageBrand: React.FC = () => {
                             width: '6px',
                             height: '6px',
                             borderRadius: '50%',
-                            backgroundColor: params.value === 'ACTIVE' ? '#4caf50' : '#f44336',
+                            backgroundColor: params.value === 'ACCEPT' ? '#4caf50' : '#f44336',
                         }}
                     />
                     {params.value}
@@ -369,7 +378,7 @@ const ManageBrand: React.FC = () => {
         },
     ];
 
-    const getRowId = (row: any) => `${row.userID}-${row.email}-${row.fullName}`;
+    const getRowId = (row: any) => `${row.brandID}-${row.brandName}-${row.brandStatus}`;
 
     const getBrandStatusStyle = (status: any) => {
         switch (status) {

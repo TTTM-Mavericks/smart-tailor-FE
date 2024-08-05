@@ -73,7 +73,8 @@ export const functionEndpoints = {
     acceptBrand: '/accept-brand',
     rejectBrand: '/reject-brand',
     getBrandByID: '/get-brand',
-    getBrandInformationByBrandID: '/get-brand-information-by-brand-id'
+    getBrandInformationByBrandID: '/get-brand-information-by-brand-id',
+    getAllBrandInformation: '/get-all-brand-information'
   },
   customer: {
     updateProfile: '/update-customer-profile'
