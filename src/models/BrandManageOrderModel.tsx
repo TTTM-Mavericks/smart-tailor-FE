@@ -19,7 +19,7 @@ export interface BrandOrder {
     detailList: DetailList[],
     paymentList: string,
     createDate: string,
-    orderImageList: ImageList
+    orderImageList: ImageList[]
 }
 
 export interface DetailList {

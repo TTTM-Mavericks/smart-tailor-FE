@@ -181,7 +181,7 @@ interface Transaction {
 }
 
 
-    // TODO MUTIL LANGUAGE
+// TODO MUTIL LANGUAGE
 
 const AccountantManagePaymentForBrandComponent: React.FC = () => {
     // ---------------UseState---------------//
@@ -227,13 +227,9 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
 
     useEffect(() => {
 
-        console.log(orderChild);
-        Object.keys(isExtendTransaction).forEach(orderId => {
-            // __handleFetchOrderDetails(orderId);
-            // if (isExtendTransaction[orderId] === true && !orderChild[orderId]) {
-            // }
-        });
-    }, [orderChild]);
+        __handleFetchOrderData();
+
+    }, []);
 
     /**
      * Move to Top When scroll down
@@ -243,7 +239,6 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
         if (userStorage) {
             const userParse: UserInterface = JSON.parse(userStorage);
             setUserAuth(userParse)
-            __handleFetchOrderData(userParse.userID);
         }
         const handleScroll = () => {
             if (window.scrollY > 200) {
@@ -278,14 +273,13 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
     //     }
     // };
 
-    const __handleFetchOrderData = async (userID: any) => {
+    const __handleFetchOrderData = async () => {
         setIsLoading(true)
         try {
             const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getFullOrderAccountant}`);
             if (response.status === 200) {
                 console.log(response.data);
                 // setOrderDetailList(response.data);
-                console.log('response.data.orderID: ', response.data.orderID);
                 setFulldataOrderResposne(response.data);
                 response.data.forEach((order: AccountantOrderInterface) => {
                     setOrderChild(prevState => ({
@@ -623,7 +617,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                     </div> */}
 
                     {fulldataOrderResposne?.filter(applyFilters).map((orderDetail) => (
-                    // {fulldataOrderResposne?.map((orderDetail) => (
+                        // {fulldataOrderResposne?.map((orderDetail) => (
                         <div className="bg-white rounded-xl shadow-md p-4 md:p-6 mb-4 md:mb-8 transform transition-all hover:shadow-lg">
                             <div className="flex flex-col md:flex-row items-start md:items-center mb-4 md:mb-6" >
                                 <div className="mb-4 md:mb-0 w-max ">
