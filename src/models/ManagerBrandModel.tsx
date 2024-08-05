@@ -1,4 +1,15 @@
 export interface Brand {
+    brandID: string,
+    brandName: string,
+    brandStatus: string,
+    rating: number,
+    bankName: string,
+    actionTaken: boolean;
+    user: User,
+    createDate: string
+}
+
+export interface User {
     userID: string,
     email: string,
     fullName: string,
@@ -8,7 +19,6 @@ export interface Brand {
     userStatus: string,
     roleName: string,
     imageUrl: string,
-    actionTaken: boolean;
 }
 
 export interface EditBrand {
