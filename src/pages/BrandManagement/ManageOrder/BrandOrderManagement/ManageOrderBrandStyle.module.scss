@@ -1,4 +1,4 @@
-@import'../../../../../index.module.scss';
+@import'../../../../index.module.scss';
 
 .sampleModel__dialogContent {
     &::-webkit-scrollbar {
@@ -46,32 +46,26 @@
 }
 
 /* Custom scrollbar styles */
-.custom__scrollbar {
+.custom-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: #9c9a9a #f5f5f5;
-    border-radius: 4px;
-    /* thumb color, track color */
+    scrollbar-color: #7b7b7b #f5f5f5; /* thumb color, track color */
 }
 
-.custom__scrollbar::-webkit-scrollbar {
-    width: 2px;
-    border-radius: 4px;
-
+.custom-scrollbar::-webkit-scrollbar {
+    width: 5px;
 }
 
-.custom__scrollbar::-webkit-scrollbar-track {
+.custom-scrollbar::-webkit-scrollbar-track {
     background: #f5f5f5;
     border-radius: 10px;
-    border-radius: 4px;
-
 }
 
-.custom__scrollbar::-webkit-scrollbar-thumb {
-    background-color: #949393;
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #7b7b7b;
     border-radius: 10px;
     border: 2px solid #f5f5f5;
 }
 
-.custom__scrollbar::-webkit-scrollbar-thumb:hover {
-    background-color: #9c9a9a;
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
 }

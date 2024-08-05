@@ -74,7 +74,8 @@ export interface OrderDetailInterface {
     designResponse: DesignInterface;
     detailList?: DesignDetailInterface[];
     paymentList?: PaymentOrderInterface[];
-    brand?: BrandInterface
+    brand?: BrandInterface,
+    orderImageList: any
 }
 
 export interface OrderRequestDetailInterface {

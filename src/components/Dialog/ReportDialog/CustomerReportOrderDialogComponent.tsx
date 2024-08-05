@@ -80,13 +80,11 @@ const CustomerReportOrderDialogComponent: React.FC<Props> = ({ isOpen, onClose, 
             }));
 
             const bodyData = {
-                typeOfReport: "Order report",
+                typeOfReport: isCancelOrder ? 'CANCEL_ORDER' : "REPORT_ORDER",
                 orderID,
                 content: comment,
                 reportImageList
             };
-
-            console.log('bodyData: ', bodyData);
 
             const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.report + functionEndpoints.report.createOrderReport}`, bodyData);
 

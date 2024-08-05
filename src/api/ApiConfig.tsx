@@ -138,7 +138,9 @@ export const functionEndpoints = {
     getAllSubOrder: '/get-all-order',
     getDeliveredOrder: '/get-all-delivery-order',
     getOrderStageById: '/get-order-stage-by-id',
-    getOrderTimeLineByParentId: '/order-time-line-by-parent-order-id'
+    getOrderTimeLineByParentId: '/order-time-line-by-parent-order-id',
+    getFullOrderAccountant: '/get-full-of-order',
+    ratingOrder: '/rating-order'
   },
   sizeExpertTailoring: {
     getAllSizeExpertTailoringByExperId: '/get-all-size-by-expert-tailoring-id',

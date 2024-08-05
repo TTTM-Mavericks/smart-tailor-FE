@@ -95,7 +95,6 @@ const BrandUpdateSampleProductDialog: React.FC<Props> = ({ isOpen, onClose, orde
                 if (response.status === 200) {
                     console.log('detail order: ', response.data);
                     toast.success(`${response.message}`, { autoClose: 4000 });
-                    console.log(response.message);
 
                 }
                 else {
@@ -106,9 +105,6 @@ const BrandUpdateSampleProductDialog: React.FC<Props> = ({ isOpen, onClose, orde
                 console.log(error);
                 toast.error(`${error}`, { autoClose: 4000 });
             }
-
-
-
 
             // Perform your API call with the base64 data if needed
         } catch (error) {

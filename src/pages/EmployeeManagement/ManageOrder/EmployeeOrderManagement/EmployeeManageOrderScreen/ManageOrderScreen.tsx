@@ -8,7 +8,7 @@ import { motion } from 'framer-motion'
 import { toast } from 'react-toastify';
 import LoadingComponent from '../../../../../components/Loading/LoadingComponent';
 import PartOfDesignInformationDialogComponent from '../../../../BrandManagement/BrandOrderManagement/PartOfDesignInformationDialogComponent';
-import { primaryColor, secondaryColor, yellowColor } from '../../../../../root/ColorSystem';
+import { greenColor, primaryColor, redColor, secondaryColor, yellowColor } from '../../../../../root/ColorSystem';
 import { __handleAddCommasToNumber } from '../../../../../utils/NumbericUtils';
 import { UserInterface } from '../../../../../models/UserModel';
 import Cookies from 'js-cookie';
@@ -16,8 +16,10 @@ import BrandUpdateSampleProductDialog from '../../../../BrandManagement/GlobalCo
 import ViewSampleUpdateDialog from './ViewSampleUpdateDialog';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
 import { __handlegetRatingStyle, __handlegetStatusBackgroundBoolean } from '../../../../../utils/ElementUtils';
+import style from './EmployeeManageOrderStyle.module.scss'
 import { OrderDetailInterface } from '../../../../../models/OrderModel';
-
+import { CircularProgress } from '@mui/material';
+import { CustomerReportOrderDialogComponent } from '../../../../../components';
 /**
  * 
  * @param status 
@@ -322,6 +324,10 @@ function isOrderImageListArray(orderImageList: ImageList | ImageList[]): orderIm
 const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; onUpdatedOrderPending: (orderID: string) => void, designDetails: any }> = ({ order, onClose, onUpdatedOrderPending, designDetails }) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [orderChild, setOrderChild] = useState<{ [orderId: string]: OrderDetailInterface[] }>({});
+    const [isOpenReportOrderDialog, setIsOpenReportOrderDialog] = useState<boolean>(false);
+    const [isOpenReportOrderCanceledDialog, setIsOpenReportOrderCanceledDialog] = useState<boolean>(false);
+
+
 
 
     useEffect(() => {
@@ -338,6 +344,20 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
             case 'CANCEL': return 'text-red-600';
             case 'COMPLETED': return 'text-green-600';
             case 'DELIVERED': return 'text-indigo-600';
+            default: return 'text-gray-600';
+        }
+    };
+
+    const getStatusColorOfSubOrder = (status: string) => {
+        switch (status) {
+            case 'NOT_VERIFY': return 'text-gray-600';
+            case 'PENDING': return 'text-yellow-600';
+            case 'START_PRODUCING': return secondaryColor;
+            case 'PROCESSING': return 'text-orange-600';
+            case 'CANCEL': return redColor;
+            case 'COMPLETED': return greenColor;
+            case 'FINISH_FIRST_STAGE': return primaryColor;
+            case 'FINISH_SECOND_STAGE': return primaryColor;
             default: return 'text-gray-600';
         }
     };
@@ -359,7 +379,6 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
     };
 
     const __handleFetchOrderDetails = async (orderId: string) => {
-        console.log('hehehehe');
         try {
             const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getAllSubOrder}/${orderId}`);
             if (response.status === 200) {
@@ -367,10 +386,42 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
                     ...prevState,
                     [orderId]: response.data // Assuming response.data is an array of OrderDetailInterface
                 }));
-                console.log(response.data);
             }
         } catch (error) {
             console.error(`Error fetching details for order ${orderId}:`, error);
+        }
+    };
+
+    const __handleOpenReportDialog = () => {
+        console.log('open');
+        setIsOpenReportOrderCanceledDialog(true);
+    }
+
+    /**
+     * Handle cancel order click
+     */
+    const _handleCancelOrder = async (orderDetail: any) => {
+        try {
+            const bodyRequest = {
+                orderID: orderDetail?.orderID,
+                status: 'CANCEL'
+            }
+            console.log('bodyRequest: ', bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            if (response.status === 200) {
+                console.log('detail order: ', response.data);
+                toast.success(`${response.message}`, { autoClose: 4000 });
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            }
+            else {
+                console.log('detail error: ', response.message);
+                toast.error(`${response.message}`, { autoClose: 4000 });
+            }
+        } catch (error) {
+            console.log('error: ', error);
+            toast.error(`${error}`, { autoClose: 4000 });
         }
     };
 
@@ -379,14 +430,14 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm overflow-y-auto h-full w-full flex items-center justify-center p-4 z-50"
+            className={`${style.custom__scrollbar} fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm overflow-y-auto h-full w-full flex items-center justify-center p-4 z-50`}
             onClick={onClose}
         >
             <motion.div
                 initial={{ scale: 0.9, y: 50 }}
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.9, y: 50 }}
-                className="relative bg-white w-full max-w-2xl rounded-xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto"
+                className={`${style.custom__scrollbar} relative bg-white w-full max-w-2xl rounded-xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto`}
                 onClick={e => e.stopPropagation()}
             >
                 {/* <button
@@ -404,82 +455,82 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
                     style={{ position: 'absolute', right: 20, top: 20 }}
                 />
 
-                <h2 className="text-md font-bold text-indigo-700 mb-4 shadow-text">Order Brand Details</h2>
+                <div className={`${style.employeeManagerOrderDialog__content}`}>
+                    <h2 className="text-md font-bold text-indigo-700 mb-4 shadow-text">Order Brand Details</h2>
 
-                <div className="flex justify-between items-center mb-4 bg-indigo-50 p-3 rounded-lg">
-                    <div className="flex items-center">
-                        <FaClipboardCheck className="text-indigo-500" size={16} />
-                        <span className="font-semibold text-gray-700 text-sm">Order ID:</span>
-                        <p className="text-sm font-bold text-indigo-700 ml-2">{order.orderID}</p>
+                    <div className="flex justify-between items-center mb-4 bg-indigo-50 p-3 rounded-lg">
+                        <div className="flex items-center">
+                            <FaClipboardCheck className="text-indigo-500" size={16} />
+                            <span className="font-semibold text-gray-700 text-sm">Order ID:</span>
+                            <p className="text-sm font-bold text-indigo-700 ml-2">{order.orderID}</p>
+                        </div>
                     </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        {[
+                            { icon: FaUser, label: 'Customer', value: order.buyerName },
+                            { icon: FaCalendar, label: 'Create date', value: order.createDate },
+                            { icon: FaCalendar, label: 'Expected start at', value: order.expectedStartDate },
+                            { icon: FaCalendar, label: 'Expected complete at', value: order.expectedProductCompletionDate },
+                            {
+                                icon: FaExclamationCircle,
+                                label: 'Order Status',
+                                value: order.orderStatus,
+                                customClass: getStatusColor(order.orderStatus)
+                            }
+                        ].map((item, index) => (
+                            <div key={index} className="bg-gray-50 p-3 rounded-lg">
+                                <p className="text-gray-600 flex items-center mb-1 text-xs">
+                                    <item.icon className="mr-2 text-indigo-500" size={14} />
+                                    <span className="font-semibold" style={{ fontSize: "13px" }}>{item.label}:</span>
+                                </p>
+                                <p className={`text-sm font-bold ${item.customClass || 'text-gray-800'}`} style={{ fontSize: "13px" }}>
+                                    {item.value}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+
+                    {designDetails && (
+                        <div className="mb-6 flex justify-center">
+                            <div className="text-center">
+                                <img
+                                    src={designDetails.imageUrl}
+                                    alt="Model"
+                                    className="max-w-full h-auto rounded-lg"
+                                />
+                            </div>
+                        </div>
+                    )}
+
+
+                    {isOrderImageListArray(order.orderImageList) && order.orderImageList.length > 0 && (
+                        <div className="mb-6">
+                            <h3 className="text-lg font-semibold text-gray-700 mb-2" style={{ fontSize: "13px" }}>Report Images</h3>
+                            <div className="relative">
+                                <img
+                                    src={order.orderImageList[currentImageIndex].orderImageUrl}
+                                    alt={order.orderImageList[currentImageIndex].orderImageName}
+                                    className="w-full h-48 object-cover rounded-lg"
+                                />
+                                {order.orderImageList.length > 1 && (
+                                    <>
+                                        <button onClick={prevImage} className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 rounded-full">
+                                            <FaChevronLeft size={14} />
+                                        </button>
+                                        <button onClick={nextImage} className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 rounded-full">
+                                            <FaChevronRight size={14} />
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+                            <p className="text-center mt-2 text-gray-600 text-xs">
+                                {order.orderImageList[currentImageIndex].orderImageName}
+                            </p>
+                        </div>
+                    )}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    {[
-                        { icon: FaUser, label: 'Customer', value: order.buyerName },
-                        { icon: FaCalendar, label: 'Date', value: order.createDate },
-                        {
-                            icon: FaExclamationCircle,
-                            label: 'Report Status',
-                            value: order.orderStatus ? 'Read' : 'Unread',
-                            customClass: order.orderStatus ? 'text-green-600' : 'text-yellow-600'
-                        },
-                        {
-                            icon: FaExclamationCircle,
-                            label: 'Order Status',
-                            value: order.orderStatus,
-                            customClass: getStatusColor(order.orderStatus)
-                        }
-                    ].map((item, index) => (
-                        <div key={index} className="bg-gray-50 p-3 rounded-lg">
-                            <p className="text-gray-600 flex items-center mb-1 text-xs">
-                                <item.icon className="mr-2 text-indigo-500" size={14} />
-                                <span className="font-semibold" style={{ fontSize: "13px" }}>{item.label}:</span>
-                            </p>
-                            <p className={`text-sm font-bold ${item.customClass || 'text-gray-800'}`} style={{ fontSize: "13px" }}>
-                                {item.value}
-                            </p>
-                        </div>
-                    ))}
-                </div>
-
-                {designDetails && (
-                    <div className="mb-6 flex justify-center">
-                        <div className="text-center">
-                            <img
-                                src={designDetails.imageUrl}
-                                alt="Model"
-                                className="max-w-full h-auto rounded-lg"
-                            />
-                        </div>
-                    </div>
-                )}
-
-                {isOrderImageListArray(order.orderImageList) && order.orderImageList.length > 0 && (
-                    <div className="mb-6">
-                        <h3 className="text-lg font-semibold text-gray-700 mb-2" style={{ fontSize: "13px" }}>Report Images</h3>
-                        <div className="relative">
-                            <img
-                                src={order.orderImageList[currentImageIndex].orderImageUrl}
-                                alt={order.orderImageList[currentImageIndex].orderImageName}
-                                className="w-full h-48 object-cover rounded-lg"
-                            />
-                            {order.orderImageList.length > 1 && (
-                                <>
-                                    <button onClick={prevImage} className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 rounded-full">
-                                        <FaChevronLeft size={14} />
-                                    </button>
-                                    <button onClick={nextImage} className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 rounded-full">
-                                        <FaChevronRight size={14} />
-                                    </button>
-                                </>
-                            )}
-                        </div>
-                        <p className="text-center mt-2 text-gray-600 text-xs">
-                            {order.orderImageList[currentImageIndex].orderImageName}
-                        </p>
-                    </div>
-                )}
 
                 <div className="bg-gray-50 p-3 rounded-lg">
                     <p className="text-gray-600 flex items-center mb-1 text-xs">
@@ -488,24 +539,65 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
                     </p>
 
                 </div>
-                {orderChild[order.orderID] && orderChild[order.orderID]?.map((order, itemIndex) => (
-                    <div key={itemIndex} className="flex flex-col md:flex-row items-start md:items-center mt-10 mb-4 md:mb-6 border-b pb-4 md:pb-6">
+
+
+                {/* {isOrderImageListArray(order.orderImageList) && order.orderImageList.length > 0 && (
+                            <div className="mb-6">
+                                <h3 className="text-lg font-semibold text-gray-700 mb-2">Report Images</h3>
+                                <div className="relative">
+                                    <img
+                                        src={order.orderImageList[currentImageIndex].orderImageUrl}
+                                        alt={order.orderImageList[currentImageIndex].orderImageName}
+                                        className="w-full h-48 object-cover rounded-lg"
+                                    />
+                                    {order.orderImageList.length > 1 && (
+                                        <>
+                                            <button onClick={prevImage} className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 rounded-full">
+                                                <FaChevronLeft size={14} />
+                                            </button>
+                                            <button onClick={nextImage} className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 rounded-full">
+                                                <FaChevronRight size={14} />
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+                                <p className="text-center mt-2 text-gray-600 text-xs">
+                                    {order.orderImageList[currentImageIndex].orderImageName}
+                                </p>
+                            </div>
+                        )} */}
+
+                {orderChild[order.orderID] ? orderChild[order.orderID]?.map((order, itemIndex) => (
+                    <div key={itemIndex} className=" relative flex flex-col md:flex-row items-start md:items-center mt-10 mb-4 md:mb-6 border-b pb-4 md:pb-6">
                         <div className="flex-shrink-0">
-                            {/* <img className="w-32 h-28 md:w-35 md:h-40 rounded-lg shadow-md" src={orderDetail?.designResponse.imageUrl} alt={`Image `} /> */}
                         </div>
                         <div className="ml-0 md:ml-6 mt-4 md:mt-0 flex-grow" style={{ position: 'relative' }}>
                             <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Sub ID: <span className="text-sm text-gray-500 pb-2"> {order.orderID}</span></p>
                             <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Type: <span className="text-sm text-blue-700 pb-2"> {order.orderType}</span></p>
                             <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Brand ID: <span className="text-sm text-gray-500 pb-2">{order.brand?.brandID}</span></p>
                             <p style={{ fontWeight: '500' }} className="text-sm text-black flex content-center items-center">Brand:
-                                <p style={{ fontWeight: '500' }} className="text-sm text-black flex content-center items-center pb-2">
+                                <p style={{ fontWeight: '500' }} className="text-sm text-black flex content-center items-center">
                                     <img src={order.brand?.user.imageUrl} style={{ width: 30, height: 30, borderRadius: 90, marginLeft: 5, marginRight: 5 }}></img>
                                     <p className={`${__handlegetRatingStyle(order.brand?.rating)} text-sm text-gray-500`} > {order.brand?.brandName}</p>
                                 </p>
                             </p>
+                            <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Rating: <span className="text-sm text-gray-500 pb-2">{order.brand?.rating}</span></p>
+
                             <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Total price: <span className="text-sm text-gray-500 pb-2"> {__handleAddCommasToNumber(order.totalPrice)} VND</span></p>
+                            <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Expected start at: <span className="text-sm text-gray-500 pb-2"> {order.expectedStartDate}</span></p>
+                            <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Expected complete at: <span className="text-sm text-gray-500 pb-2"> {order.expectedProductCompletionDate}</span></p>
+
+                            <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2 flex content-center items-center">Status:
+                                <button
+                                    className={`py-1 px-3 rounded-full ml-2 text-white `}
+                                    style={{ backgroundColor: getStatusColorOfSubOrder(order.orderStatus) }}
+                                >
+                                    {order.orderStatus}
+
+                                </button>
+                            </p>
                             <p style={{ fontWeight: '500' }} className="text-sm text-black pb-4">Details:
-                                {order.detailList?.map((detail: any) => (
+                                {order.detailList?.map((detail) => (
                                     <div className='ml-14 grid grid-cols-5 gap-5 pt-0'>
                                         <p className="text-sm text-gray-500 pb-2">Size: {detail.size?.sizeName}</p>
                                         <p className="text-sm text-gray-500 pb-2">Quantity: {detail.quantity}</p>
@@ -513,13 +605,38 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
                                 ))}
                             </p>
 
-
-
-
+                        </div>
+                        {order.orderStatus !== 'COMPELETD' && (
+                            <>
+                                <button
+                                    onClick={() => __handleOpenReportDialog()}
+                                    className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200 mr-4"
+                                    style={{ backgroundColor: redColor, position: 'absolute', top: 0, right: 10 }}
+                                >
+                                    CANCEL BRAND
+                                </button>
+                            </>
+                        )}
+                        <CustomerReportOrderDialogComponent
+                            isCancelOrder={true}
+                            orderID={order?.orderID}
+                            onClose={() => setIsOpenReportOrderCanceledDialog(false)}
+                            isOpen={isOpenReportOrderCanceledDialog}
+                            onClickReportAndCancel={() => _handleCancelOrder(order)}
+                        ></CustomerReportOrderDialogComponent>
+                    </div>
+                )
+                ) : (
+                    <div style={{ width: '100%', marginTop: 10 }}>
+                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+                            <CircularProgress size={20} />
+                            <p className="text-sm text-gray-500 pl-3">Loading brands</p>
 
                         </div>
                     </div>
-                ))}
+                )}
+
+
 
 
             </motion.div>
