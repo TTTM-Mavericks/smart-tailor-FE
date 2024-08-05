@@ -741,7 +741,7 @@ const OrderDetailScreen: React.FC = () => {
 
             {orderDetail?.orderStatus === 'DELIVERED' && (
 
-                <Dialog open={isOpenRatingDialog}>
+                <Dialog open={isOpenRatingDialog} onClose={() => setIsOpenRatingDialog(false)}>
                     <DialogTitle>
                         <h2 className="text-md font-semibold mb-4 ">Rating</h2>
                     </DialogTitle>
