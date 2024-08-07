@@ -3,7 +3,7 @@ import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaChevronLef
 import { ArrowDropDown, BrandingWatermark } from '@mui/icons-material';
 import axios from 'axios';
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
-import { EmployeeOrder, ImageList } from '../../../../../models/EmployeeManageOrderModel';
+import { EmployeeOrder, EmployeeOrderTable, ImageList } from '../../../../../models/EmployeeManageOrderModel';
 import { motion } from 'framer-motion'
 import { toast } from 'react-toastify';
 import LoadingComponent from '../../../../../components/Loading/LoadingComponent';
@@ -743,12 +743,206 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
                         </div>
                     </div>
                 )}
-
-
-
-
             </motion.div>
         </motion.div>
+    );
+};
+
+/**
+ * 
+ * @param param0 
+ * @returns 
+ * Order Table
+ */
+interface OrderTableProps {
+    orders: EmployeeOrderTable[];
+    onViewDetails: (order: EmployeeOrderTable, design: any) => void;
+    onUpdatedOrderPending: (orderID: string) => void;
+}
+
+const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdatedOrderPending }) => {
+    const [showDesignDetails, setShowDesignDetails] = useState(false);
+    const [designDetails, setDesignDetails] = useState<any>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [userAuth, setUseAuth] = useState<UserInterface>();
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [selectedOrderID, setSelectedOrderID] = useState<string | null>(null);
+    const [isOpenReportOrderCanceledDialog, setIsOpenReportOrderCanceledDialog] = useState<boolean>(false);
+    const [openActions, setOpenActions] = useState<string | null>(null);
+
+    useEffect(() => {
+        const userStorage = Cookies.get('userAuth');
+        if (!userStorage) return;
+        const userParse: UserInterface = JSON.parse(userStorage);
+        setUseAuth(userParse);
+    }, []);
+
+    const fetchDesignDetails = async (orderID: string) => {
+        setIsLoading(true);
+        try {
+            const response = await axios.get(`${baseURL + versionEndpoints.v1 + featuresEndpoints.designDetail + functionEndpoints.designDetail.getAllInforOrderDetail + `/${orderID}`}`);
+            setDesignDetails(response.data.data.design);
+            onViewDetails(orders.find(order => order.orderID === orderID)!, response.data.data.design);
+        } catch (error) {
+            console.error('Error fetching design details:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const __handleOpenInputSampleProductDialog = (orderID: string) => {
+        setSelectedOrderID(orderID);
+        setIsDialogOpen(true);
+    };
+
+    const __handleCloseInputSampleProductDialog = () => {
+        setIsDialogOpen(false);
+        setSelectedOrderID(null);
+    };
+
+    const __handleUpdateOrderDelivery = async (orderID: string) => {
+        setIsLoading(true);
+        try {
+            const bodyRequest = { orderID, status: 'DELIVERED' };
+            const response = await axios.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            if (response.status === 200) {
+                toast.success(`${response.data.message}`, { autoClose: 4000 });
+                onUpdatedOrderPending(orderID);
+            } else {
+                toast.error(`${response.data.message}`, { autoClose: 4000 });
+            }
+        } catch (error) {
+            toast.error(`${error}`, { autoClose: 4000 });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const __handleOpenReportDialog = (orderId: string) => {
+        setIsOpenReportOrderCanceledDialog(true);
+    };
+
+    const _handleCancelOrder = async (orderID: string) => {
+        setIsLoading(true);
+        try {
+            const bodyRequest = { orderID, status: 'CANCEL' };
+            const response = await axios.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            if (response.status === 200) {
+                toast.success(`${response.data.message}`, { autoClose: 4000 });
+                onUpdatedOrderPending(orderID);
+            } else {
+                toast.error(`${response.data.message}`, { autoClose: 4000 });
+            }
+        } catch (error) {
+            toast.error(`${error}`, { autoClose: 4000 });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'DELIVERED':
+                return 'bg-green-100 text-green-800';
+            case 'PENDING':
+                return 'bg-yellow-100 text-yellow-800';
+            case 'CANCEL':
+                return 'bg-red-100 text-red-800';
+            default:
+                return 'bg-gray-100 text-gray-800';
+        }
+    };
+
+    const toggleActions = (orderID: string) => {
+        if (openActions === orderID) {
+            setOpenActions(null);
+        } else {
+            setOpenActions(orderID);
+        }
+    };
+
+    return (
+        <>
+            <div className="overflow-x-auto shadow-md sm:rounded-lg">
+                <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                    <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th scope="col" className="px-6 py-3">Order ID</th>
+                            <th scope="col" className="px-6 py-3">Customer</th>
+                            <th scope="col" className="px-6 py-3">Date</th>
+                            <th scope="col" className="px-6 py-3">Status</th>
+                            <th scope="col" className="px-6 py-3">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {orders.map((order) => (
+                            <tr key={order.orderID} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{order.orderID}</td>
+                                <td className="px-6 py-4">{order.buyerName}</td>
+                                <td className="px-6 py-4">{order.createDate}</td>
+                                <td className="px-6 py-4">
+                                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.orderStatus)}`}>
+                                        {order.orderStatus}
+                                    </span>
+                                </td>
+                                <td className="px-6 py-4">
+                                    <button
+                                        onClick={() => toggleActions(order.orderID)}
+                                        className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                                    >
+                                        ...
+                                    </button>
+                                    {openActions === order.orderID && (
+                                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 dark:bg-gray-700">
+                                            <button
+                                                onClick={() => onViewDetails(order, null)}
+                                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600"
+                                            >
+                                                View Details
+                                            </button>
+                                            <button
+                                                onClick={() => __handleOpenInputSampleProductDialog(order.orderID)}
+                                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600"
+                                            >
+                                                View Sample Data
+                                            </button>
+                                            <button
+                                                onClick={() => onUpdatedOrderPending(order.orderID)}
+                                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600"
+                                            >
+                                                Verify Order
+                                            </button>
+                                            <button
+                                                onClick={() => __handleOpenReportDialog(order.orderID)}
+                                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    )}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+            <ViewSampleUpdateDialog
+                isOpen={isDialogOpen}
+                orderID={selectedOrderID!}
+                brandID={userAuth?.userID}
+                onClose={__handleCloseInputSampleProductDialog}
+            />
+            <CustomerReportOrderDialogComponent
+                isCancelOrder={true}
+                orderID={selectedOrderID!}
+                onClose={() => setIsOpenReportOrderCanceledDialog(false)}
+                isOpen={isOpenReportOrderCanceledDialog}
+                onClickReportAndCancel={async () => {
+                    await _handleCancelOrder(selectedOrderID!);
+                    setIsOpenReportOrderCanceledDialog(false);
+                }}
+            />
+        </>
     );
 };
 
@@ -952,6 +1146,12 @@ const EmployeeManageOrder: React.FC = () => {
         handleCloseModal();
     };
 
+    const [isTableView, setIsTableView] = useState(true);
+
+    const toggleView = () => {
+        setIsTableView(!isTableView);
+    };
+
     return (
         <div className='-mt-8'>
             {isLoading ? (
@@ -960,6 +1160,15 @@ const EmployeeManageOrder: React.FC = () => {
                 </div>
             ) : (
                 <>
+                    <div className="flex mt-5">
+                        <button
+                            onClick={toggleView}
+                            className="ml-auto px-4 py-2 text-white rounded"
+                            style={{ backgroundColor: `${primaryColor}` }}
+                        >
+                            Switch to {isTableView ? 'Card' : 'Table'} View
+                        </button>
+                    </div>
 
                     <div style={{ width: "100%" }}>
                         <div className="flex flex-col">
@@ -1034,16 +1243,24 @@ const EmployeeManageOrder: React.FC = () => {
                         </div>
                     </div>
 
-                    <div >
-                        {currentOrders.map(order => (
-                            <EmployeeOrderFields
-                                key={order.orderID}
-                                order={order}
-                                onViewDetails={handleViewDetails}
-                                onUpdatedOrderPending={handleUpdateOrder}
-                            />
-                        ))}
-                    </div>
+                    {isTableView ? (
+                        <OrderTable
+                            orders={currentOrders}
+                            onViewDetails={handleViewDetails}
+                            onUpdatedOrderPending={handleUpdateOrder}
+                        />
+                    ) : (
+                        <div >
+                            {currentOrders.map(order => (
+                                <EmployeeOrderFields
+                                    key={order.orderID}
+                                    order={order}
+                                    onViewDetails={handleViewDetails}
+                                    onUpdatedOrderPending={handleUpdateOrder}
+                                />
+                            ))}
+                        </div>
+                    )}
 
                     <div className="mt-8 flex flex-wrap items-center justify-center space-x-4">
                         <select
