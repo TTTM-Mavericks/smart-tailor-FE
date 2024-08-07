@@ -41,7 +41,7 @@ const AdminConfiguration = () => {
         <div className='-mt-8'>
             <ToastContainer />
             <div className="flex items-center mb-8">
-                <FaCog className="text-3xl text-blue-600 mr-4" />
+                <FaCog className="text-3xl text-blue-600 mr-4" style={{ color: "#E96208" }} />
                 <h2 className="text-3xl font-bold text-gray-800">Cấu hình hệ thống</h2>
             </div>
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -169,7 +169,7 @@ const AdminConfiguration = () => {
                 <div className="flex justify-end">
                     <button
                         type="submit"
-                        className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300"
+                        className="flex items-center px-6 py-3 bg-orange-600 text-white rounded-md hover:bg-orange-700 focus:outline-none focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300"
                     >
                         <FaSave className="mr-2" />
                         Lưu cấu hình

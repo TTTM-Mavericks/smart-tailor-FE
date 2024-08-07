@@ -1,7 +1,7 @@
 import * as React from 'react';
 import DownloadIcon from '@mui/icons-material/CloudDownload';
 import { Box, Button, IconButton, Modal, Typography } from '@mui/material';
-import { Cancel, CheckCircleRounded, Close, ErrorOutline } from '@mui/icons-material';
+import { Cancel, CancelOutlined, CheckCircleRounded, Close, ErrorOutline } from '@mui/icons-material';
 import * as XLSX from "xlsx-js-style";
 import { tokens } from '../../../../theme';
 import { useTheme } from "@mui/material";
@@ -458,18 +458,20 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                 {t(codeLanguage + '000052')}
             </Typography>
             <IconButton
-                style={{
-                    position: 'absolute',
-                    top: '10px',
-                    right: '10px',
-                    backgroundColor: '#E96208',
-                    borderRadius: '50%',
-                    padding: '5px',
-                    color: "white"
-                }}
+                aria-label="close"
                 onClick={closeMultipleCard}
+                sx={{
+                    position: 'absolute',
+                    right: 16,
+                    top: 16,
+                    color: '#EC6208',
+                    transition: 'transform 0.2s',
+                    '&:hover': {
+                        transform: 'scale(1.1)',
+                    },
+                }}
             >
-                <Close />
+                <CancelOutlined />
             </IconButton>
             <Button
                 variant="contained"
@@ -510,10 +512,10 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                             endIcon={<DownloadIcon />}
                             style={{
                                 color: 'white',
-                                marginBottom: '2%',
+                                marginBottom: '20px',
                                 boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
                                 backgroundColor: '#E96208',
-                                marginRight: "-250%",
+                                marginLeft: "20px"
                             }}
                             onClick={_handleDownloadErrorData}
                         >

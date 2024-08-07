@@ -3,16 +3,13 @@ import { DataGrid, GridToolbar, GridColDef } from "@mui/x-data-grid";
 import { tokens } from "../../../../../theme";
 import { useTheme } from "@mui/material";
 import * as React from "react";
-import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import Swal from "sweetalert2";
 import EditPricePopUpScreens from "../BrandEditPrice/EditPricePopUpScreens";
 import { Add } from "@mui/icons-material";
 import AddPriceManual from "../../AddManualPrice/AddPriceScreens";
 import { useTranslation } from 'react-i18next';
-import { Category } from "../../../../../models/AdminCategoryExcelModel";
 import axios from "axios";
-import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
+import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { LaborQuantity } from "../../../../../models/LaborQuantityModel";
 
 // Make Style of popup
@@ -231,8 +228,35 @@ const ManagePrice: React.FC = () => {
         },
         {
             field: "laborQuantityStatus",
-            headerName: "status",
+            headerName: "Status",
             flex: 1,
+            renderCell: (params) => (
+                <Box
+                    sx={{
+                        backgroundColor: params.value === 'Active' ? '#ffebee' : '#e8f5e9',
+                        color: params.value === 'Active' ? '#f44336' : '#4caf50',
+                        borderRadius: '16px',
+                        padding: '1px 5px',
+                        fontSize: '0.75rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        height: "50%",
+                        marginTop: "10%",
+                        width: "50%"
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                            backgroundColor: params.value === 'Active' ? '#f44336' : '#4caf50',
+                        }}
+                    />
+                    {params.row.status ? 'INACTIVE' : 'ACTIVE'}
+                </Box>
+            )
         },
         {
             field: "actions",
@@ -297,55 +321,58 @@ const ManagePrice: React.FC = () => {
                     aria-controls={open ? 'basic-menu' : undefined}
                     aria-haspopup="true"
                     aria-expanded={open ? 'true' : undefined}
-                    onClick={_handleClick}
+                    onClick={_handleAddOpen}
                     endIcon={<Add />}
                     variant="contained"
                     color="primary"
-                    style={{ backgroundColor: `${colors.primary[300]} !important`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
+                    style={{ backgroundColor: `#E96208`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
                 >
                     {t(codeLanguage + '000048')}
                 </Button>
-                <Menu
-                    id="basic-menu"
-                    anchorEl={anchorEl}
-                    open={open}
-                    onClose={_handleClose}
-                    MenuListProps={{
-                        'aria-labelledby': 'basic-button',
+
+                <Modal
+                    open={addOpenOrClose}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                >
+                    <Box sx={{
+                        backgroundColor: colors.primary[100], position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: "50%",
+                        bgcolor: 'background.paper',
+                        border: '2px solid #000',
+                        boxShadow: 24,
+                        p: 4,
+                        borderRadius: "20px"
+                    }}>
+                        <AddPriceManual closeCard={_handleAddClose} addNewLaborQuantity={_handleAddLaborQuantity} />
+                    </Box>
+                </Modal>
+                <Box
+                    sx={{
+                        height: "100%",  // Adjust height as needed
+                        width: '100%',  // Adjust width as needed
+                        '& .MuiDataGrid-row:nth-of-type(odd)': {
+                            backgroundColor: '#D7E7FF !important',  // Change background color to blue for odd rows
+                        },
+                        '& .MuiDataGrid-row:nth-of-type(even)': {
+                            backgroundColor: '#FFFFFF !important',  // Change background color to red for even rows
+                        },
+                        '& .MuiDataGrid-columnHeaderTitle': {
+                            fontWeight: 'bolder',  // Make header text bolder
+                        }
                     }}
                 >
-                    <MenuItem >
-                        <div onClick={_handleAddOpen}>{t(codeLanguage + '000049')}</div>
-                        <Modal
-                            open={addOpenOrClose}
-                            aria-labelledby="modal-modal-title"
-                            aria-describedby="modal-modal-description"
-                        >
-                            <Box sx={{
-                                backgroundColor: colors.primary[100], position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: "50%",
-                                bgcolor: 'background.paper',
-                                border: '2px solid #000',
-                                boxShadow: 24,
-                                p: 4,
-                                borderRadius: "20px"
-                            }}>
-                                <AddPriceManual closeCard={_handleAddClose} addNewLaborQuantity={_handleAddLaborQuantity} />
-                            </Box>
-                        </Modal>
-                    </MenuItem>
-                </Menu>
-
-                <DataGrid
-                    rows={data}
-                    columns={columns}
-                    slots={{ toolbar: GridToolbar }}
-                    disableRowSelectionOnClick
-                    getRowId={getRowId}
-                />
+                    <DataGrid
+                        rows={data}
+                        columns={columns}
+                        slots={{ toolbar: GridToolbar }}
+                        disableRowSelectionOnClick
+                        getRowId={getRowId}
+                    />
+                </Box>
                 <Modal
                     open={editopen}
                     aria-labelledby="modal-modal-title"

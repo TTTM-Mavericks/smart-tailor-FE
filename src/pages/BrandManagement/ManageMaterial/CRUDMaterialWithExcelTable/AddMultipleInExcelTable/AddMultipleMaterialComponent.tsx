@@ -1,7 +1,7 @@
 import * as React from 'react';
 import DownloadIcon from '@mui/icons-material/CloudDownload';
 import { Box, Button, IconButton, Modal, Typography } from '@mui/material';
-import { Cancel, CheckCircleRounded, Close } from '@mui/icons-material';
+import { Cancel, CancelOutlined, CheckCircleRounded, Close } from '@mui/icons-material';
 import * as XLSX from "xlsx-js-style";
 import { tokens } from '../../../../../theme';
 import { useTheme } from "@mui/material";
@@ -309,156 +309,136 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
      * Download CSV File for the Brand to save in the local computer
      */
     const _handleDownloadBrandErrorData = async () => {
-        try {
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Brand Material');
+        const workBook = new ExcelJS.Workbook();
+        const worksheet = workBook.addWorksheet('Brand Material');
 
-            // Define the columns and headers
-            worksheet.columns = [
-                { header: 'Category_Name', key: 'Category_Name', width: 25 },
-                { header: 'Material_Name', key: 'Material_Name', width: 25 },
-                { header: 'HS_Code', key: 'HS_Code', width: 20 },
-                { header: 'Unit', key: 'Unit', width: 20 },
-                { header: 'Base_Price', key: 'Base_Price', width: 20 },
-                { header: 'Brand_Price', key: 'Brand_Price', width: 20 }
-            ];
+        // Define the columns and headers
+        worksheet.columns = [
+            { header: 'Category_Name', key: 'Category_Name', width: 25 },
+            { header: 'Material_Name', key: 'Material_Name', width: 25 },
+            { header: 'HS_Code', key: 'HS_Code', width: 20 },
+            { header: 'Unit', key: 'Unit', width: 20 },
+            { header: 'Base_Price', key: 'Base_Price', width: 20 },
+            { header: 'Brand_Price', key: 'Brand_Price', width: 20 }
+        ];
 
-            // Insert a custom header row above the defined columns
-            worksheet.insertRow(1, ['BRAND MATERIAL ERRORS']);
+        // Insert a custom header row above the defined columns
+        worksheet.insertRow(1, ['BRAND MATERIAL ERRORS']);
 
-            // Merge cells for the custom header row
-            worksheet.mergeCells('A1:F1');
-            worksheet.autoFilter = 'A2:F2';  // Apply filter to the actual header row
+        // Merge cells for the custom header row
+        worksheet.mergeCells('A1:F1');
+        worksheet.autoFilter = 'A2:F2';  // Apply filter to the actual header row
 
-            // Set styles for the custom header row
-            const customHeaderRow = worksheet.getRow(1);
-            customHeaderRow.height = 30;
-            customHeaderRow.eachCell(cell => {
-                cell.font = { bold: true, size: 16, color: { argb: 'FFFFFFFF' } };
-                cell.alignment = { vertical: 'middle', horizontal: 'center' };
-                cell.fill = {
-                    type: 'pattern',
-                    pattern: 'solid',
-                    fgColor: { argb: 'FFFF0000' }  // Red background
-                };
-            });
+        // Set styles for the custom header row
+        const customHeaderRow = worksheet.getRow(1);
+        customHeaderRow.height = 30;
+        customHeaderRow.eachCell(cell => {
+            cell.font = { bold: true, size: 16, color: { argb: 'FFFFFFFF' } };
+            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFFF0000' }  // Red background
+            };
+        });
 
-            // Set styles for column header row
-            worksheet.getRow(2).eachCell(cell => {
-                cell.font = { bold: true };
-                cell.alignment = { vertical: 'middle', horizontal: 'center' };
-                cell.fill = {
-                    type: 'pattern',
-                    pattern: 'solid',
-                    fgColor: { argb: 'FFD3D3D3' }  // Light grey background
-                };
-            });
+        // Set styles for column header row
+        worksheet.getRow(2).eachCell(cell => {
+            cell.font = { bold: true };
+            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFD3D3D3' }  // Light grey background
+            };
+        });
 
-            // Create a map to store error messages for each cell
-            const errorMap = new Map();
-            // Create a set to store the row numbers with errors
-            const errorRows = new Set();
+        // Create a map to store error messages for each cell
+        const errorMap = new Map();
+        // Create a set to store the row numbers with errors
+        const errorRows = new Set();
+        // Create a set to store the row numbers with "Brand Material is existed" error
+        const existingBrandMaterialRows = new Set();
 
-            const allColumns = ['Category_Name', 'Material_Name', 'HS_Code', 'Unit', 'Base_Price', 'Brand_Price'];
+        const allColumns = ['Category_Name', 'Material_Name', 'HS_Code', 'Unit', 'Base_Price', 'Brand_Price'];
 
-            // Assuming errorCheckGet is available in this context
-            errorCheckGet.forEach((error: any) => {
-                error.errorMessage.forEach((message: any) => {
-                    const materialNameMatch = message.match(/Material_Name at row Index (\d+) not found/);
-                    if (materialNameMatch) {
-                        const rowIndex = parseInt(materialNameMatch[1], 10);
-                        const actualRowIndex = rowIndex + 1; // Adjust index to match Excel rows
-
-                        // Mark all columns for this row as erroneous
-                        allColumns.forEach(column => {
-                            const key = `${actualRowIndex}-${column}`;
-                            if (!errorMap.has(key)) {
-                                errorMap.set(key, []);
-                            }
-                            errorMap.get(key).push(message);
-                        });
+        errorCheckGet.forEach((error: any) => {
+            error.errorMessage.forEach((message: any) => {
+                if (message.includes("Brand Material is existed at row Index")) {
+                    const rowIndexMatch = message.match(/at row Index (\d+)/);
+                    if (rowIndexMatch) {
+                        const rowIndex = parseInt(rowIndexMatch[1], 10);
+                        const actualRowIndex = rowIndex + 1; // Adjust row index to match Excel rows
+                        existingBrandMaterialRows.add(actualRowIndex);
                         errorRows.add(actualRowIndex);
-                    } else {
-                        const match = message.match(/(Category_Name|Material_Name|HS_Code|Unit|Base_Price|Brand_Price) at row Index (\d+) (.*)!/);
-                        if (match) {
-                            const [_, column, rowIndex, errorDetail] = match;
-                            const actualRowIndex = parseInt(rowIndex, 10) + 1; // Adjust index to match Excel rows
-                            const key = `${actualRowIndex}-${column}`;
-                            if (!errorMap.has(key)) {
-                                errorMap.set(key, []);
-                            }
-                            errorMap.get(key).push(message);
-                            errorRows.add(actualRowIndex);
-                        }
                     }
-                });
-            });
-
-            // Add only error rows to the worksheet
-            excelData.forEach((rowData, rowIndex) => {
-                if (errorRows.has(rowIndex + 4)) {
-                    const row = worksheet.addRow(rowData);
-
-                    worksheet.columns.forEach((column, colIndex) => {
-                        const cell = row.getCell(colIndex + 1);
-                        const errorKey = `${rowIndex + 4}-${column.key}`;
-
-                        if (cell.value === null) {
-                            cell.value = 'NULL';
-                            cell.font = { color: { argb: 'FF808080' } };
-                            cell.fill = {
-                                type: 'pattern',
-                                pattern: 'solid',
-                                fgColor: { argb: 'FFFFFF00' },
-                            };
+                } else {
+                    const match = message.match(/(Category_Name|Material_Name|HS_Code|Unit|Base_Price|Brand_Price) at row Index (\d+) (.*)/);
+                    if (match) {
+                        const [_, column, rowIndex, errorDetail] = match;
+                        const actualRowIndex = parseInt(rowIndex, 10) + 1; // Adjust row index to match Excel rows
+                        const key = `${actualRowIndex}-${column}`;
+                        if (!errorMap.has(key)) {
+                            errorMap.set(key, []);
                         }
-
-                        if (errorMap.has(errorKey)) {
-                            const errors = errorMap.get(errorKey);
-                            cell.value = {
-                                richText: [
-                                    { text: `${cell.value || ''}\n`, font: { color: { argb: '000000' } } },
-                                    { text: `Error: ${errors.join('\n')}`, font: { color: { argb: 'FFFF0000' } } }
-                                ]
-                            };
-                            cell.fill = {
-                                type: 'pattern',
-                                pattern: 'solid',
-                                fgColor: { argb: 'FFFFFF00' },
-                            };
-                        }
-
-                        // Additional check for Brand_Price
-                        if (column.key === 'Brand_Price') {
-                            const value = cell.value as number | undefined;
-                            if (value === undefined || value < 0) {
-                                cell.fill = {
-                                    type: 'pattern',
-                                    pattern: 'solid',
-                                    fgColor: { argb: 'FFFFFF00' }
-                                };
-                                cell.value = {
-                                    richText: [
-                                        { text: `${value}\n`, font: { color: { argb: '000000' } } },
-                                        { text: 'Error: Price must be more than 0', font: { color: { argb: 'FFFF0000' } } }
-                                    ]
-                                };
-                            }
-                        }
-
-                        cell.alignment = { wrapText: true, vertical: 'top' };
-                    });
+                        errorMap.get(key).push(message);
+                        errorRows.add(actualRowIndex);
+                    }
                 }
             });
+        });
 
-            // Generate and save the file
-            const buffer = await workbook.xlsx.writeBuffer();
-            const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-            saveAs(blob, "Brand_Material_Errors.xlsx");
-        } catch (error) {
-            console.error("Error generating Excel file:", error);
-            alert("Error generating Excel file. Please try again.");
-        }
+        // Add only error rows to the worksheet
+        excelData.forEach((rowData, rowIndex) => {
+            if (errorRows.has(rowIndex + 4)) {  // Check if this row is in the errorRows set
+                const row = worksheet.addRow(rowData);
+
+                // Apply error formatting to cells with errors
+                worksheet.columns.forEach((column, colIndex) => {
+                    const cell = row.getCell(colIndex + 1);
+                    const errorKey = `${rowIndex + 4}-${column.key}`;  // Adjust rowIndex to match error messages
+
+                    // Handle null values
+                    if (cell.value === null) {
+                        cell.value = 'NULL';
+                        cell.font = { color: { argb: 'FF808080' } };  // Gray color for NULL values
+                    }
+
+                    if (existingBrandMaterialRows.has(rowIndex + 4)) {
+                        cell.fill = {
+                            type: 'pattern',
+                            pattern: 'solid',
+                            fgColor: { argb: 'FFFFFF00' },  // Yellow fill for entire row
+                        };
+
+                        cell.value = {
+                            richText: [
+                                { text: `${cell.value || ''}\n`, font: { color: { argb: '000000' } } },
+                                { text: `Error: Brand Material already exists`, font: { color: { argb: 'FFFF0000' } } }
+                            ]
+                        };
+                    } else if (errorMap.has(errorKey)) {
+                        const errors = errorMap.get(errorKey);
+                        cell.value = {
+                            richText: [
+                                { text: `${cell.value || ''}\n`, font: { color: { argb: '000000' } } },
+                                { text: `Error: ${errors.join('\n')}`, font: { color: { argb: 'FFFF0000' } } }  // Red text for errors
+                            ]
+                        };
+                        cell.fill = {
+                            type: 'pattern',
+                            pattern: 'solid',
+                            fgColor: { argb: 'FFFFFF00' },  // Yellow fill for errors
+                        };
+                    }
+                    cell.alignment = { wrapText: true, vertical: 'top' };  // Enable text wrapping and align to top for all cells
+                });
+            }
+        });
+
+        const buf = await workBook.xlsx.writeBuffer();
+        const blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+        saveAs(blob, "Brand_Material_Errors.xlsx");
     };
 
     /**
@@ -524,18 +504,20 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                 {t(codeLanguage + '000216')}
             </Typography>
             <IconButton
-                style={{
-                    position: 'absolute',
-                    top: '10px',
-                    right: '10px',
-                    backgroundColor: '#E96208',
-                    borderRadius: '50%',
-                    padding: '5px',
-                    color: "white"
-                }}
+                aria-label="close"
                 onClick={closeMultipleCard}
+                sx={{
+                    position: 'absolute',
+                    right: 16,
+                    top: 16,
+                    color: '#EC6208',
+                    transition: 'transform 0.2s',
+                    '&:hover': {
+                        transform: 'scale(1.1)',
+                    },
+                }}
             >
-                <Close />
+                <CancelOutlined />
             </IconButton>
             <Button
                 variant="contained"

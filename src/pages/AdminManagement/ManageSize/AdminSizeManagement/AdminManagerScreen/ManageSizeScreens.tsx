@@ -227,7 +227,7 @@ const ManageSizes: React.FC = () => {
                             aria-controls={open ? 'basic-menu' : undefined}
                             aria-haspopup="true"
                             aria-expanded={open ? 'true' : undefined}
-                            onClick={_handleClick}
+                            onClick={_handleAddOpen}
                             endIcon={<Add />}
                             variant="contained"
                             color="primary"
@@ -235,19 +235,6 @@ const ManageSizes: React.FC = () => {
                         >
                             ADD
                         </Button>
-                        <Menu
-                            id="basic-menu"
-                            anchorEl={anchorEl}
-                            open={open}
-                            onClose={_handleClose}
-                            MenuListProps={{
-                                'aria-labelledby': 'basic-button',
-                            }}
-                        >
-                            <MenuItem onClick={_handleAddOpen}>
-                                ADD MANUAL
-                            </MenuItem>
-                        </Menu>
                         <Modal
                             open={addOpen}
                             onClose={_handleAddClose}
