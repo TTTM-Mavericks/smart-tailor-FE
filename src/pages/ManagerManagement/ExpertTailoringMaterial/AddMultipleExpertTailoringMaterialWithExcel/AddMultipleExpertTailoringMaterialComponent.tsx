@@ -1,7 +1,7 @@
 import * as React from 'react';
 import DownloadIcon from '@mui/icons-material/CloudDownload';
 import { Box, Button, IconButton, Modal, Typography } from '@mui/material';
-import { Cancel, CheckCircleRounded, Close, ErrorOutline } from '@mui/icons-material';
+import { Cancel, CancelOutlined, CheckCircleRounded, Close, ErrorOutline } from '@mui/icons-material';
 import * as XLSX from "xlsx-js-style";
 import { tokens } from '../../../../theme';
 import { useTheme } from "@mui/material";
@@ -17,6 +17,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import { swatch } from '../../../../assets';
 import Swal from 'sweetalert2';
 import { ExcelData } from '../../../../models/ManagerExpertTaloringMaterialModel';
+import { greenColor, redColor } from '../../../../root/ColorSystem';
 
 interface AddExpertTailoringMaterialWithMultipleExcelFormProps {
     closeMultipleCard: () => void;
@@ -474,21 +475,24 @@ const AddMultipleExpertTailoringMaterialComponentWithExcel: React.FC<AddExpertTa
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px', maxHeight: '80vh', overflowY: 'auto', position: "relative" }}>
             <Typography variant="h5" align="center" marginBottom={"20px"}>
-                {t(codeLanguage + '000052')}
+                Add New Expert Tailoring Material With Excel
             </Typography>
             <IconButton
-                style={{
-                    position: 'absolute',
-                    top: '10px',
-                    right: '10px',
-                    backgroundColor: '#E96208',
-                    borderRadius: '50%',
-                    padding: '5px',
-                    color: "white"
-                }}
+                aria-label="close"
                 onClick={closeMultipleCard}
+                sx={{
+                    position: 'absolute',
+                    right: 16,
+                    top: 16,
+                    color: '#EC6208',
+                    transition: 'all 0.2s',
+                    '&:hover': {
+                        transform: 'scale(1.1)',
+                        bgcolor: 'rgba(236, 98, 8, 0.1)',
+                    },
+                }}
             >
-                <Close />
+                <CancelOutlined />
             </IconButton>
             <Button
                 variant="contained"
@@ -530,12 +534,12 @@ const AddMultipleExpertTailoringMaterialComponentWithExcel: React.FC<AddExpertTa
                                 color: 'white',
                                 marginBottom: '20px',
                                 boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                                backgroundColor: '#E96208',
+                                backgroundColor: `${redColor}`,
                                 marginLeft: "20px"
                             }}
                             onClick={_handleDownloadErrorData}
                         >
-                            Download Data
+                            Download Error Data
                         </Button>
                     </div>
                 )
@@ -550,7 +554,6 @@ const AddMultipleExpertTailoringMaterialComponentWithExcel: React.FC<AddExpertTa
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Category Name</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Material Name</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Expert Tailoring Name</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Error Check</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Action</th>
                                 </tr>
                             </thead>
@@ -560,38 +563,6 @@ const AddMultipleExpertTailoringMaterialComponentWithExcel: React.FC<AddExpertTa
                                         <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Category_Name ? colors.primary[200] : 'red' }} >{data.Category_Name || 'Null Category Name'}</td>
                                         <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Material_Name ? colors.primary[200] : 'red' }}>{data.Material_Name || 'Null Material Name'}</td>
                                         <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Expert_Tailoring_Name ? colors.primary[200] : 'red' }}>{data.Expert_Tailoring_Name || 'Null Material Name'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.error ? 'red' : 'green' }}>
-                                            {(() => {
-                                                const hasNullValues = Object.values(data).some(value => value === null || value === undefined);
-                                                const isExpertTailoringNameNullOrNumber = data.Expert_Tailoring_Name === null || data.Expert_Tailoring_Name === undefined || typeof data.Expert_Tailoring_Name !== 'string';
-                                                const isSizeImageURLNullOrNumber = data.Expert_Tailoring_Name === null || data.Expert_Tailoring_Name === undefined || typeof data.Expert_Tailoring_Name !== 'string';
-
-                                                const isDuplicate = excelData.some((item, i) => {
-                                                    if (i !== index) {
-                                                        return item.Category_Name === data.Category_Name && item.Material_Name === data.Material_Name;
-                                                    }
-                                                    return false;
-                                                });
-
-                                                if (hasNullValues || isExpertTailoringNameNullOrNumber || isSizeImageURLNullOrNumber || isDuplicate) {
-                                                    const errorMessage = [];
-                                                    if (hasNullValues) errorMessage.push('Null Values');
-                                                    if (isSizeImageURLNullOrNumber) errorMessage.push('Size Image URL Is Invalid');
-                                                    if (isExpertTailoringNameNullOrNumber) errorMessage.push('Expert Tailoring Name Is Invalid');
-                                                    if (isDuplicate) errorMessage.push('Duplicate Entry');
-
-                                                    return (
-                                                        <div style={{ color: 'red' }}>
-                                                            <ErrorOutline style={{ color: 'red' }} />
-                                                            {errorMessage.join(', ')}
-                                                        </div>
-                                                    );
-                                                } else {
-                                                    return <CheckCircleRounded style={{ color: 'green' }} />;
-                                                }
-                                            })()}
-
-                                        </td>
                                         <td style={{ border: '1px solid #ddd', padding: '8px' }}>
                                             <div style={{ display: "flex" }}>
                                                 {/* <EditIcon style={{ color: "blue", cursor: "pointer" }} onClick={() => confirmEdit(index)} /> */}
@@ -627,7 +598,7 @@ const AddMultipleExpertTailoringMaterialComponentWithExcel: React.FC<AddExpertTa
                         color="primary"
                         onClick={closeMultipleCard}
                         endIcon={<Cancel />}
-                        style={{ backgroundColor: '#088FE9', color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
+                        style={{ backgroundColor: `${redColor}`, color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
                     >
                         {t(codeLanguage + '000055')}
                     </Button>
@@ -638,7 +609,7 @@ const AddMultipleExpertTailoringMaterialComponentWithExcel: React.FC<AddExpertTa
                         color="primary"
                         onClick={_handleConfirm}
                         endIcon={<CheckCircleRounded />}
-                        style={{ backgroundColor: '#E96208', color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
+                        style={{ backgroundColor: `${greenColor}`, color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
                     >
                         {t(codeLanguage + '000056')}
                     </Button>

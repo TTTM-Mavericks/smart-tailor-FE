@@ -17,6 +17,7 @@ import { UpdateMaterial } from "../../../../models/BrandMaterialExcelModel";
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import { UserInterface } from "../../../../models/UserModel";
 import Cookies from "js-cookie";
+import { greenColor } from "../../../../root/ColorSystem";
 const brand_name = "LA LA LISA BRAND"
 
 // Make Style of popup
@@ -285,6 +286,12 @@ const ManageMaterialComponent: React.FC = () => {
             type: "number",
             headerAlign: "left",
             align: "left",
+            flex: 1,
+        },
+        {
+            field: "unit",
+            headerName: "Unit",
+            flex: 1,
         },
         {
             field: "brandPrice",
@@ -292,11 +299,6 @@ const ManageMaterialComponent: React.FC = () => {
             type: "number",
             headerAlign: "left",
             align: "left",
-        },
-        {
-            field: "unit",
-            headerName: "Unit",
-            flex: 1,
         },
         {
             field: "actions",
@@ -308,9 +310,6 @@ const ManageMaterialComponent: React.FC = () => {
                     <IconButton onClick={() => _handleEditClick(params.row.categoryName, params.row.materialName, params.row.hsCode, params.row.unit, params.row.brandPrice, params.row.basePrice, params.row.brandName)}>
                         <EditIcon htmlColor="#E96208" />
                     </IconButton>
-                    {/* <IconButton onClick={() => _hanldeConfirmDelete(params.row.id)}>
-                        <DeleteIcon htmlColor={colors.primary[300]} />
-                    </IconButton> */}
                 </Box>
             )
         }
@@ -364,7 +363,7 @@ const ManageMaterialComponent: React.FC = () => {
                     endIcon={<Add />}
                     variant="contained"
                     color="primary"
-                    style={{ backgroundColor: `#E96208`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
+                    style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
                 >
                     {t(codeLanguage + '000048')}
                 </Button>

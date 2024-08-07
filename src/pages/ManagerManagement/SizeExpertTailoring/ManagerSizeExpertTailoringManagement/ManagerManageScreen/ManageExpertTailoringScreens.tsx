@@ -16,6 +16,7 @@ import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from 
 import { AddExpertTailoring, ExpertTailoring } from "../../../../../models/ManagerExpertTailoringModel";
 import { ExpertTailoringEdit } from "../../../../../models/ManagerExpertTailoringModel";
 import { AddSizeExpertTailoring, SizeExpertTailoring, SizeExpertTailoringEdit } from "../../../../../models/ManagerSizeExpertTailoringModel";
+import { greenColor } from "../../../../../root/ColorSystem";
 
 // Make Style of popup
 const style = {
@@ -216,22 +217,18 @@ const ManageSizeExpertTailoring: React.FC = () => {
             flex: 1,
         },
         {
-            field: "minFabric",
-            headerName: "Min Fabric",
+            field: "ratio",
+            headerName: "Ratio",
             headerAlign: "left",
             align: "left",
+            flex: 1,
         },
         {
-            field: "maxFabric",
-            headerName: "Max Fabric",
+            field: "createDate",
+            headerName: "Create Date",
             headerAlign: "left",
             align: "left",
-        },
-        {
-            field: "unit",
-            headerName: "Unit",
-            headerAlign: "left",
-            align: "left",
+            flex: 1,
         },
         {
             field: "actions",
@@ -241,7 +238,7 @@ const ManageSizeExpertTailoring: React.FC = () => {
             renderCell: (params) => (
                 <Box>
                     <IconButton onClick={() => _handleEditClick(params.row.expertTailoringID, params.row.expertTailoringName, params.row.sizeName, params.row.minFabric, params.row.maxFabric, params.row.unit)}>
-                        <EditIcon />
+                        <EditIcon htmlColor="#E96208" />
                     </IconButton>
                     {params.row.status ? (
                         <IconButton onClick={() => _hanldeConfirmDelete(params.row.expertTailoringID)}>
@@ -305,7 +302,7 @@ const ManageSizeExpertTailoring: React.FC = () => {
                     endIcon={<Add />}
                     variant="contained"
                     color="primary"
-                    style={{ backgroundColor: `#E96208`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
+                    style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
                 >
                     {t(codeLanguage + '000048')}
                 </Button>

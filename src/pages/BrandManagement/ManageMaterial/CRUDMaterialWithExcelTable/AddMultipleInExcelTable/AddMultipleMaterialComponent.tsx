@@ -18,6 +18,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import Swal from 'sweetalert2';
 import Cookies from 'js-cookie';
 import { UserInterface } from '../../../../../models/UserModel';
+import { greenColor, redColor } from '../../../../../root/ColorSystem';
 
 // const BRANDNAME = localStorage.getItem('brandName')
 
@@ -501,7 +502,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px', maxHeight: '80vh', overflowY: 'auto', position: "relative" }}>
             <Typography variant="h5" align="center" marginBottom={"20px"}>
-                {t(codeLanguage + '000216')}
+                Add Brand Price By Excel
             </Typography>
             <IconButton
                 aria-label="close"
@@ -559,7 +560,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                                 color: 'white',
                                 marginBottom: '20px',
                                 boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                                backgroundColor: '#E96208',
+                                backgroundColor: `${redColor}`,
                                 marginLeft: "20px"
                             }}
                             onClick={_handleDownloadBrandErrorData}
@@ -628,7 +629,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                         color="primary"
                         onClick={closeMultipleCard}
                         endIcon={<Cancel />}
-                        style={{ backgroundColor: '#FF3232', color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
+                        style={{ backgroundColor: `${redColor}`, color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
                     >
                         {t(codeLanguage + '000055')}
                     </Button>
@@ -639,7 +640,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                         color="primary"
                         onClick={_handleUploadData}
                         endIcon={<CheckCircleRounded />}
-                        style={{ backgroundColor: 'green', color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
+                        style={{ backgroundColor: `${greenColor}`, color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
                     >
                         {t(codeLanguage + '000056')}
                     </Button>

@@ -6,6 +6,9 @@ import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { LaborQuantity } from "../../../../../models/LaborQuantityModel";
+import { CancelOutlined } from "@mui/icons-material";
+import { primaryColor, redColor } from "../../../../../root/ColorSystem";
+import { borderColor } from "@mui/system";
 
 interface EditPricePopUpScreenFormProps {
     fid: {
@@ -88,14 +91,26 @@ const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, e
     return (
         <Box style={{ height: '250px', overflowY: 'auto' }}>
             <Typography variant="h5" align="left">
-                {t(codeLanguage + '000068') || 'Edit Labor Quantity'}
+                Edit Price
             </Typography>
             <IconButton
-                style={{ position: "absolute", top: 0, right: 0 }}
+                aria-label="close"
                 onClick={editClose}
+                sx={{
+                    position: 'absolute',
+                    right: 16,
+                    top: 16,
+                    color: '#EC6208',
+                    transition: 'all 0.2s',
+                    '&:hover': {
+                        transform: 'scale(1.1)',
+                        bgcolor: 'rgba(236, 98, 8, 0.1)',
+                    },
+                }}
             >
-                <CloseIcon />
+                <CancelOutlined />
             </IconButton>
+
             <Box height={20} />
             <Grid container spacing={4}>
                 <Grid item xs={6}>
@@ -151,20 +166,44 @@ const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, e
                     />
                 </Grid>
             </Grid>
-            <Box textAlign="center" alignItems="center" marginTop="3rem">
-                <Button
-                    onClick={_handleSubmit}
-                    style={{ backgroundColor: "#5858FA", width: "60%", borderRadius: "8px", color: "#FFFFFF" }}
-                >
-                    {t(codeLanguage + '000060') || 'Submit'}
-                </Button>
-                <Button
-                    onClick={editClose}
-                    style={{ borderRadius: "8px", border: "1px solid black", color: "black", marginLeft: "1rem" }}
-                >
-                    {t(codeLanguage + '000055') || 'Cancel'}
-                </Button>
-            </Box>
+            <Grid container spacing={2} sx={{ mt: 4 }}>
+                <Grid item xs={6}>
+                    <Button
+                        onClick={editClose}
+                        variant="outlined"
+                        fullWidth
+                        sx={{
+                            bgcolor: `${redColor}`,
+                            borderRadius: '8px',
+                            color: '#FFFFFF',
+                            borderColor: "white",
+                            '&:hover': {
+                                bgcolor: `${redColor}`,
+                                borderColor: `${primaryColor}`,  // Primary color on hover
+                            },
+                        }}
+                    >
+                        {t(codeLanguage + '000055')}
+                    </Button>
+                </Grid>
+                <Grid item xs={6}>
+                    <Button
+                        onClick={_handleSubmit}
+                        variant="contained"
+                        fullWidth
+                        sx={{
+                            bgcolor: `${primaryColor}`,
+                            borderRadius: '8px',
+                            color: '#FFFFFF',
+                            '&:hover': {
+                                bgcolor: `${primaryColor}`,
+                            },
+                        }}
+                    >
+                        {t(codeLanguage + '000060')}
+                    </Button>
+                </Grid>
+            </Grid>
         </Box>
     );
 };

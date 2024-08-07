@@ -16,6 +16,7 @@ import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from 
 import { AddExpertTailoring, ExpertTailoring } from "../../../../../models/ManagerExpertTailoringModel";
 import { ExpertTailoringEdit } from "../../../../../models/ManagerExpertTailoringModel";
 import { AddExpertTailoringMaterial, ExpertTailoringMaterial } from "../../../../../models/ManagerExpertTaloringMaterialModel";
+import { greenColor } from "../../../../../root/ColorSystem";
 
 // Make Style of popup
 const style = {
@@ -198,8 +199,6 @@ const ManageExpertTailoringMaterial: React.FC = () => {
         }
     };
 
-
-
     const columns: GridColDef[] = [
         {
             field: "expertTailoringName",
@@ -217,10 +216,43 @@ const ManageExpertTailoringMaterial: React.FC = () => {
             flex: 1,
         },
         {
+            field: "createDate",
+            headerName: "Create Date",
+            headerAlign: "left",
+            align: "left",
+            flex: 1,
+        },
+        {
             field: "status",
             headerName: "Status",
             headerAlign: "left",
             align: "left",
+            renderCell: (params) => (
+                <Box
+                    sx={{
+                        backgroundColor: params.value === true ? '#e8f5e9' : '#ffebee',
+                        color: params.value === true ? '#4caf50' : '#f44336',
+                        borderRadius: '16px',
+                        padding: '1px 5px',
+                        fontSize: '0.75rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        height: "50%",
+                        marginTop: "10%"
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                            backgroundColor: params.value === true ? '#4caf50' : '#f44336',
+                        }}
+                    />
+                    {params.value === true ? 'ACTIVE' : 'INACTIVE'}
+                </Box>
+            )
         },
         {
             field: "actions",
@@ -294,7 +326,7 @@ const ManageExpertTailoringMaterial: React.FC = () => {
                     endIcon={<Add />}
                     variant="contained"
                     color="primary"
-                    style={{ backgroundColor: `#E96208`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
+                    style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
                 >
                     {t(codeLanguage + '000048')}
                 </Button>

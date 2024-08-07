@@ -326,7 +326,7 @@ const ManageMaterials: React.FC = () => {
             renderCell: (params) => (
                 <Box>
                     <IconButton onClick={() => _handleEditClick(params.row.materialID, params.row.categoryName, params.row.materialName, params.row.hsCode, params.row.basePrice, params.row.unit)}>
-                        <EditIcon />
+                        <EditIcon htmlColor='#E96208' />
                     </IconButton>
                     {params.row.status ? (
                         <IconButton onClick={() => _hanldeConfirmUpdateStatus(params.row.materialID)}>

@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import axios from "axios";
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { LaborQuantity } from "../../../../../models/LaborQuantityModel";
+import { greenColor } from "../../../../../root/ColorSystem";
 
 // Make Style of popup
 const style = {
@@ -217,13 +218,13 @@ const ManagePrice: React.FC = () => {
             flex: 1,
         },
         {
-            field: "laborCostPerQuantity",
-            headerName: "Brand Price",
+            field: "laborQuantityMaxPrice",
+            headerName: "Max Price",
             flex: 1,
         },
         {
-            field: "laborQuantityMaxPrice",
-            headerName: "Max Price",
+            field: "laborCostPerQuantity",
+            headerName: "Brand Price",
             flex: 1,
         },
         {
@@ -266,7 +267,7 @@ const ManagePrice: React.FC = () => {
             renderCell: (params) => (
                 <Box>
                     <IconButton onClick={() => _handleEditClick(params.row.laborQuantityID, params.row.laborQuantityMinQuantity, params.row.laborQuantityMaxQuantity, params.row.laborQuantityMinPrice, params.row.laborQuantityMaxPrice, params.row.laborCostPerQuantity)}>
-                        <EditIcon />
+                        <EditIcon htmlColor="#E96208" />
                     </IconButton>
                     {/* <IconButton onClick={() => _hanldeConfirmDelete(params.row.categoryID)}>
                         <DeleteIcon htmlColor={colors.primary[300]} />
@@ -325,7 +326,7 @@ const ManagePrice: React.FC = () => {
                     endIcon={<Add />}
                     variant="contained"
                     color="primary"
-                    style={{ backgroundColor: `#E96208`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
+                    style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
                 >
                     {t(codeLanguage + '000048')}
                 </Button>
