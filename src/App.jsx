@@ -41,6 +41,7 @@ import DesignCollectionScreen from './pages/DesignCollection/DesignCollectionCon
 import { DashboardAccountantScreens } from './pages/AccountantManagement';
 import ToogleComponent from './pages/AccountantManagement/GlobalComponent/Toogle/ToogleComponent';
 import ReportHistorySreen from './pages/Order/ReportHistory/ReportHistorySreen';
+import AboutUs from './pages/AboutUs/test';
 
 
 
@@ -160,6 +161,7 @@ function App() {
 
           {/* Test */}
           <Route path='/test' element={<ToogleComponent></ToogleComponent>} />
+          <Route path='/bs' element={<AboutUs />} />
         </Routes>
       </BrowserRouter>
     </div>
