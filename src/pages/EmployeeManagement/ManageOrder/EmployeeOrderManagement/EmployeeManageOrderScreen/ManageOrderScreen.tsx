@@ -457,7 +457,7 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
     const getStatusColorOfSubOrder = (status: string) => {
         switch (status) {
             case 'NOT_VERIFY': return 'text-gray-600';
-            case 'PENDING': return 'text-yellow-600';
+            case 'PENDING': return yellowColor;
             case 'START_PRODUCING': return secondaryColor;
             case 'PROCESSING': return 'text-orange-600';
             case 'CANCEL': return redColor;
