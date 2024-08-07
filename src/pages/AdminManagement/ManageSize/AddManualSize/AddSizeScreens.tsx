@@ -6,6 +6,7 @@ import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from 
 import { AddSize } from '../../../../models/AdminManageSizeModel';
 import { AddCircleOutline, CancelOutlined, RemoveCircleOutline } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
+import { primaryColor } from '../../../../root/ColorSystem';
 
 interface AddSizeManualProps {
     closeCard: () => void;
@@ -145,7 +146,8 @@ const AddSizeManual: React.FC<AddSizeManualProps> = ({ closeCard, addNewSizes })
                 <button
                     type="button"
                     onClick={_handleSubmit}
-                    className="bg-gradient-to-r from-orange-500 to-orange-600 text-white py-2 px-4 rounded-md hover:from-orange-600 hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
+                    style={{ backgroundColor: `${primaryColor}` }}
+                    className="text-white py-2 px-4 rounded-md hover:from-orange-600 hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
                 >
                     Submit
                 </button>

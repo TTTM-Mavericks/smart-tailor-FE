@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import axios from "axios";
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { AddSize, Sizes } from "../../../../../models/AdminManageSizeModel";
+import { greenColor } from "../../../../../root/ColorSystem";
 // Make Style of popup
 const style = {
     position: 'absolute',
@@ -231,7 +232,7 @@ const ManageSizes: React.FC = () => {
                             endIcon={<Add />}
                             variant="contained"
                             color="primary"
-                            style={{ backgroundColor: `#E96208`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
+                            style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
                         >
                             ADD
                         </Button>

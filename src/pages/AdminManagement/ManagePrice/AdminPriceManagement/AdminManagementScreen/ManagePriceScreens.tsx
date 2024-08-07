@@ -15,6 +15,7 @@ import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } 
 import { EditLaborQuantity, LaborQuantity } from "../../../../../models/LaborQuantityModel";
 import EditPricePopUpScreens from "../AdminEditPrice/EditPricePopUpScreens";
 import { margin } from "@mui/system";
+import { greenColor } from "../../../../../root/ColorSystem";
 
 // Make Style of popup
 const style = {
@@ -291,7 +292,7 @@ const AdminManagePrice: React.FC = () => {
                             endIcon={<Add />}
                             variant="contained"
                             color="primary"
-                            style={{ backgroundColor: `#E96208`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
+                            style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
                         >
                             ADD
                         </Button>
@@ -307,7 +308,6 @@ const AdminManagePrice: React.FC = () => {
                                 transform: 'translate(-50%, -50%)',
                                 width: "50%",
                                 bgcolor: 'background.paper',
-                                border: '2px solid #000',
                                 boxShadow: 24,
                                 p: 4,
                                 borderRadius: "20px"

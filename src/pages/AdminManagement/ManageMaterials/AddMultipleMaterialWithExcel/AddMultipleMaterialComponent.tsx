@@ -16,6 +16,7 @@ import ExcelJS from 'exceljs';
 import { toast, ToastContainer } from 'react-toastify';
 import Swal from 'sweetalert2';
 import { margin } from '@mui/system';
+import { greenColor, redColor } from '../../../../root/ColorSystem';
 
 interface AddMaterialWithMultipleExcelFormProps {
     closeMultipleCard: () => void;
@@ -514,7 +515,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                                 color: 'white',
                                 marginBottom: '20px',
                                 boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                                backgroundColor: '#E96208',
+                                backgroundColor: `${redColor}`,
                                 marginLeft: "20px"
                             }}
                             onClick={_handleDownloadErrorData}
@@ -582,7 +583,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                         color="primary"
                         onClick={closeMultipleCard}
                         endIcon={<Cancel />}
-                        style={{ backgroundColor: '#FF3232', color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
+                        style={{ backgroundColor: `${redColor}`, color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
                     >
                         {t(codeLanguage + '000055')}
                     </Button>
@@ -593,7 +594,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                         color="primary"
                         onClick={_handleUploadData}
                         endIcon={<CheckCircleRounded />}
-                        style={{ backgroundColor: 'green', color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
+                        style={{ backgroundColor: `${greenColor}`, color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
                     >
                         {t(codeLanguage + '000056')}
                     </Button>

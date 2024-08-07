@@ -15,6 +15,7 @@ import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from 
 import { AddCategory } from '../../../../models/AdminCategoryExcelModel';
 import { borderRadius, display, height } from '@mui/system';
 import { AddCircleOutline, CancelOutlined, RemoveCircleOutline } from '@mui/icons-material';
+import { primaryColor } from '../../../../root/ColorSystem';
 
 interface AddMaterialWithHandsFormProps {
     closeCard: () => void;
@@ -138,7 +139,8 @@ const AddEachCategoryWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
                 <button
                     type="button"
                     onClick={_handleSubmit}
-                    className="bg-gradient-to-r from-orange-500 to-orange-600 text-white py-2 px-4 rounded-md hover:from-orange-600 hover:to-orange-700"
+                    style={{ backgroundColor: `${primaryColor}` }}
+                    className="text-white py-2 px-4 rounded-md hover:from-orange-600 hover:to-orange-700"
                 >
                     Submit
                 </button>

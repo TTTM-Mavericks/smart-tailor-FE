@@ -17,6 +17,7 @@ import ExcelJS from 'exceljs';
 import { toast, ToastContainer } from 'react-toastify';
 import { swatch } from '../../../../assets';
 import Swal from 'sweetalert2';
+import { greenColor, redColor } from '../../../../root/ColorSystem';
 
 interface AddExpertTailoringWithMultipleExcelFormProps {
     closeMultipleCard: () => void;
@@ -535,12 +536,12 @@ const AddMultipleExpertTailoringComponentWithExcel: React.FC<AddExpertTailoringW
                                 color: 'white',
                                 marginBottom: '20px',
                                 boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                                backgroundColor: '#E96208',
+                                backgroundColor: `${redColor}`,
                                 marginLeft: "20px"
                             }}
                             onClick={_handleDownloadErrorData}
                         >
-                            Download Data
+                            Download Error Data
                         </Button>
                     </div>
                 )
@@ -629,7 +630,7 @@ const AddMultipleExpertTailoringComponentWithExcel: React.FC<AddExpertTailoringW
                         color="primary"
                         onClick={closeMultipleCard}
                         endIcon={<Cancel />}
-                        style={{ backgroundColor: '#088FE9', color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
+                        style={{ backgroundColor: `${redColor}`, color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
                     >
                         {t(codeLanguage + '000055')}
                     </Button>
@@ -640,7 +641,7 @@ const AddMultipleExpertTailoringComponentWithExcel: React.FC<AddExpertTailoringW
                         color="primary"
                         onClick={_handleConfirm}
                         endIcon={<CheckCircleRounded />}
-                        style={{ backgroundColor: '#E96208', color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
+                        style={{ backgroundColor: `${greenColor}`, color: 'white', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}
                     >
                         {t(codeLanguage + '000056')}
                     </Button>

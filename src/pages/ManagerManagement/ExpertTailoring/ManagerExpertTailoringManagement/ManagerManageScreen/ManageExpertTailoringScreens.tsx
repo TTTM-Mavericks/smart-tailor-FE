@@ -241,7 +241,7 @@ const ManageExpertTailoring: React.FC = () => {
     const getRowId = (row: any) => `${row.expertTailoringID}-${row.expertTailoringName}-${row.sizeImageUrl}`;
 
     return (
-        <Box m="20px">
+        <Box m="20px" style={{ marginTop: "-5%" }}>
             <Box
                 m="40px 0 0 0"
                 height="75vh"
@@ -313,7 +313,6 @@ const ManageExpertTailoring: React.FC = () => {
                                 transform: 'translate(-50%, -50%)',
                                 width: "50%",
                                 bgcolor: 'background.paper',
-                                border: '2px solid #000',
                                 boxShadow: 24,
                                 p: 4,
                                 borderRadius: "20px"
@@ -337,7 +336,6 @@ const ManageExpertTailoring: React.FC = () => {
                                 transform: 'translate(-50%, -50%)',
                                 width: "70%",
                                 bgcolor: colors.primary[100],
-                                border: '2px solid #000',
                                 boxShadow: 24,
                                 p: 4,
                                 borderRadius: "20px"
