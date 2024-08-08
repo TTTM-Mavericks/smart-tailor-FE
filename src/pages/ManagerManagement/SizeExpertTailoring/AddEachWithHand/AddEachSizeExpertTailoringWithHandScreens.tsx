@@ -18,6 +18,8 @@ import axios from 'axios';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import { toast, ToastContainer } from 'react-toastify';
 import { AddSizeExpertTailoring } from '../../../../models/ManagerSizeExpertTailoringModel';
+import { CancelOutlined } from '@mui/icons-material';
+import { primaryColor } from '../../../../root/ColorSystem';
 
 interface AddSizeExpertTailoringWithHandsFormProps {
     closeCard: () => void;
@@ -283,97 +285,121 @@ const AddEachSizeExpertTailoringWithHand: React.FC<AddSizeExpertTailoringWithHan
             <div className="relative w-full p-8 bg-white rounded-xl z-10">
                 <div className="text-center relative">
                     <Typography variant="h6" align="center" gutterBottom>
-                        {t(codeLanguage + '000051')}
+                        Add New Size Expert Tailoring
                     </Typography>
                     <p className="mt-1 text-xs text-gray-400">Add a new expert tailoring below</p>
-                    <IconButton style={{ position: 'absolute', top: '10px', right: '10px' }} onClick={closeCard}>
-                        <CloseIcon />
+                    <IconButton
+                        aria-label="close"
+                        onClick={closeCard}
+                        sx={{
+                            position: 'absolute',
+                            right: 16,
+                            top: 16,
+                            color: '#EC6208',
+                            transition: 'all 0.2s',
+                            '&:hover': {
+                                transform: 'scale(1.1)',
+                                bgcolor: 'rgba(236, 98, 8, 0.1)',
+                            },
+                        }}
+                    >
+                        <CancelOutlined />
                     </IconButton>
                 </div>
-                <form className="mt-6 space-y-2" action="#" method="POST">
-                    <div className="grid grid-cols-1 space-y-1">
-                        <FormControl fullWidth>
-                            <InputLabel id="expertTailoring-select-label">Expert Tailoring Name</InputLabel>
-                            <Select
-                                labelId="expertTailoring-select-label"
-                                id="expertTailoring-select"
-                                name="expertTailoringName"
-                                value={formData.expertTailoringName}
+                <form className="mt-6 space-y-4" action="#" method="POST">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <FormControl fullWidth>
+                                <InputLabel id="expertTailoring-select-label">Expert Tailoring Name</InputLabel>
+                                <Select
+                                    labelId="expertTailoring-select-label"
+                                    id="expertTailoring-select"
+                                    name="expertTailoringName"
+                                    value={formData.expertTailoringName}
+                                    onChange={_handleChange}
+                                    label="Expert Tailoring Name"
+                                >
+                                    {expertTailoringName.map((expertTailoring, index) => (
+                                        <MenuItem key={index} value={expertTailoring}>
+                                            {expertTailoring}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </div>
+
+                        <div>
+                            <FormControl fullWidth>
+                                <InputLabel id="size-select-label">Size Name</InputLabel>
+                                <Select
+                                    labelId="size-select-label"
+                                    id="size-select"
+                                    name="sizeName"
+                                    value={formData.sizeName}
+                                    onChange={_handleChange}
+                                    label="Size Name"
+                                >
+                                    {sizeName.map((size, index) => (
+                                        <MenuItem key={index} value={size}>
+                                            {size}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </div>
+
+                        <div>
+                            <TextField
+                                fullWidth
+                                label="Min Fabric"
+                                variant="outlined"
+                                size="small"
+                                name="minFabric"
+                                type="number"
+                                value={formData.minFabric}
                                 onChange={_handleChange}
-                                label="Expert Tailoring Name"
-                            >
-                                {expertTailoringName.map((expertTailoring, index) => (
-                                    <MenuItem key={index} value={expertTailoring}>
-                                        {expertTailoring}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </div>
+                            />
+                        </div>
 
-                    <div className="grid grid-cols-1 space-y-1">
-                        <FormControl fullWidth>
-                            <InputLabel id="expertTailoring-select-label">Size Name</InputLabel>
-                            <Select
-                                labelId="expertTailoring-select-label"
-                                id="expertTailoring-select"
-                                name="sizeName"
-                                value={formData.sizeName}
+                        <div>
+                            <TextField
+                                fullWidth
+                                label="Max Fabric"
+                                variant="outlined"
+                                size="small"
+                                name="maxFabric"
+                                type="number"
+                                value={formData.maxFabric}
                                 onChange={_handleChange}
-                                label="Expert Tailoring Name"
-                            >
-                                {sizeName.map((expertTailoring, index) => (
-                                    <MenuItem key={index} value={expertTailoring}>
-                                        {expertTailoring}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                            />
+                        </div>
+
+                        <div className="md:col-span-2">
+                            <TextField
+                                fullWidth
+                                label="Unit"
+                                variant="outlined"
+                                size="small"
+                                name="unit"
+                                type="text"
+                                value={formData.unit}
+                                onChange={_handleChange}
+                            />
+                        </div>
                     </div>
-                    <TextField
-                        fullWidth
-                        label="Min Fabric"
-                        variant="outlined"
-                        size="small"
-                        name="minFabric"
-                        type="number"
-                        value={formData.minFabric}
-                        onChange={_handleChange}
-                    />
-
-                    <TextField
-                        fullWidth
-                        label="Max Fabric"
-                        variant="outlined"
-                        size="small"
-                        name="maxFabric"
-                        type="number"
-                        value={formData.maxFabric}
-                        onChange={_handleChange}
-                    />
-
-                    <TextField
-                        fullWidth
-                        label="Unit"
-                        variant="outlined"
-                        size="small"
-                        name="unit"
-                        type="text"
-                        value={formData.unit}
-                        onChange={_handleChange}
-                    />
 
                     <Button
                         type="submit"
                         className="my-4 w-full flex justify-center bg-blue-500 text-gray-100 p-3 rounded-full tracking-wide font-semibold focus:outline-none focus:shadow-outline hover:bg-blue-600 shadow-lg cursor-pointer transition ease-in duration-300"
                         onClick={_handleAdd}
-                        style={{ backgroundColor: '#EC6208', color: 'white' }}
+                        style={{ backgroundColor: `${primaryColor}`, color: 'white' }}
                     >
                         Upload
                     </Button>
                 </form>
             </div>
         </div>
+
 
     );
 }

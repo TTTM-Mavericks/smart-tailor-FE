@@ -3,7 +3,7 @@ import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaChevronLef
 import { ArrowDropDown, BrandingWatermark } from '@mui/icons-material';
 import axios from 'axios';
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
-import { EmployeeOrder, ImageList } from '../../../../../models/EmployeeManageOrderModel';
+import { EmployeeOrder, EmployeeOrderTable, ImageList } from '../../../../../models/EmployeeManageOrderModel';
 import { motion } from 'framer-motion'
 import { toast } from 'react-toastify';
 import LoadingComponent from '../../../../../components/Loading/LoadingComponent';
@@ -18,9 +18,12 @@ import { IoMdCloseCircleOutline } from 'react-icons/io';
 import { __handlegetRatingStyle, __handlegetStatusBackgroundBoolean } from '../../../../../utils/ElementUtils';
 import style from './EmployeeManageOrderStyle.module.scss'
 import { OrderDetailInterface } from '../../../../../models/OrderModel';
-import { CircularProgress } from '@mui/material';
+import { Box, CircularProgress, useTheme } from '@mui/material';
 import { CustomerReportOrderDialogComponent } from '../../../../../components';
 import Select from 'react-select';
+import { width } from '@mui/system';
+import { DataGrid, GridColDef, GridRenderCellParams, GridToolbar } from '@mui/x-data-grid';
+import { tokens } from '../../../../../theme';
 
 
 /**
@@ -743,12 +746,260 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
                         </div>
                     </div>
                 )}
-
-
-
-
             </motion.div>
         </motion.div>
+    );
+};
+
+/**
+ * 
+ * @param param0 
+ * @returns 
+ * Order Table
+ */
+interface OrderTableProps {
+    orders: EmployeeOrderTable[];
+    onViewDetails: (order: EmployeeOrderTable, design: any) => void;
+    onUpdatedOrderPending: (orderID: string) => void;
+}
+
+const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdatedOrderPending }) => {
+    const [showDesignDetails, setShowDesignDetails] = useState(false);
+    const [designDetails, setDesignDetails] = useState<any>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [userAuth, setUseAuth] = useState<UserInterface>();
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [selectedOrderID, setSelectedOrderID] = useState<string | null>(null);
+    const [isOpenReportOrderCanceledDialog, setIsOpenReportOrderCanceledDialog] = useState<boolean>(false);
+    const [openActions, setOpenActions] = useState<string | null>(null);
+
+    useEffect(() => {
+        const userStorage = Cookies.get('userAuth');
+        if (!userStorage) return;
+        const userParse: UserInterface = JSON.parse(userStorage);
+        setUseAuth(userParse);
+    }, []);
+
+    const fetchDesignDetails = async (orderID: string) => {
+        setIsLoading(true);
+        try {
+            const response = await axios.get(`${baseURL + versionEndpoints.v1 + featuresEndpoints.designDetail + functionEndpoints.designDetail.getAllInforOrderDetail + `/${orderID}`}`);
+            setDesignDetails(response.data.data.design);
+            onViewDetails(orders.find(order => order.orderID === orderID)!, response.data.data.design);
+        } catch (error) {
+            console.error('Error fetching design details:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const __handleOpenInputSampleProductDialog = (orderID: string) => {
+        setSelectedOrderID(orderID);
+        setIsDialogOpen(true);
+    };
+
+    const __handleCloseInputSampleProductDialog = () => {
+        setIsDialogOpen(false);
+        setSelectedOrderID(null);
+    };
+
+    const __handleUpdateOrderDelivery = async (orderID: string) => {
+        setIsLoading(true);
+        try {
+            const bodyRequest = { orderID, status: 'DELIVERED' };
+            const response = await axios.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            if (response.status === 200) {
+                toast.success(`${response.data.message}`, { autoClose: 4000 });
+                onUpdatedOrderPending(orderID);
+            } else {
+                toast.error(`${response.data.message}`, { autoClose: 4000 });
+            }
+        } catch (error) {
+            toast.error(`${error}`, { autoClose: 4000 });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const __handleOpenReportDialog = (orderId: string) => {
+        setIsOpenReportOrderCanceledDialog(true);
+    };
+
+    const _handleCancelOrder = async (orderID: string) => {
+        setIsLoading(true);
+        try {
+            const bodyRequest = { orderID, status: 'CANCEL' };
+            const response = await axios.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            if (response.status === 200) {
+                toast.success(`${response.data.message}`, { autoClose: 4000 });
+                onUpdatedOrderPending(orderID);
+            } else {
+                toast.error(`${response.data.message}`, { autoClose: 4000 });
+            }
+        } catch (error) {
+            toast.error(`${error}`, { autoClose: 4000 });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'DELIVERED':
+                return 'bg-green-100 text-green-800';
+            case 'PENDING':
+                return 'bg-yellow-100 text-yellow-800';
+            case 'CANCEL':
+                return 'bg-red-100 text-red-800';
+            default:
+                return 'bg-gray-100 text-gray-800';
+        }
+    };
+
+    const toggleActions = (orderID: string) => {
+        if (openActions === orderID) {
+            setOpenActions(null);
+        } else {
+            setOpenActions(orderID);
+        }
+    };
+
+    const columns: GridColDef[] = [
+        { field: 'orderID', headerName: 'Order ID', width: 150 },
+        { field: 'buyerName', headerName: 'Customer', width: 150 },
+        { field: 'address', headerName: 'Address', width: 150 },
+        { field: 'phone', headerName: 'phone', width: 150 },
+        { field: 'expectedStartDate', headerName: 'Date', width: 200 },
+        {
+            field: 'orderStatus',
+            headerName: 'Status',
+            width: 150,
+            renderCell: (params: GridRenderCellParams) => (
+                <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(params.value)}`}>
+                    {params.value}
+                </span>
+            )
+        },
+        {
+            field: 'actions',
+            headerName: 'Actions',
+            width: 150,
+            renderCell: (params: GridRenderCellParams) => (
+                <div>
+                    <button
+                        onClick={() => toggleActions(params.row.orderID)}
+                        className="font-medium text-blue-600 "
+                    >
+                        ...
+                    </button>
+                    {openActions === params.row.orderID && (
+                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+                            <button
+                                onClick={() => onViewDetails(params.row, null)}
+                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 "
+                            >
+                                View Details
+                            </button>
+                            <button
+                                onClick={() => __handleOpenInputSampleProductDialog(params.row.orderID)}
+                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            >
+                                View Sample Data
+                            </button>
+                            <button
+                                onClick={() => onUpdatedOrderPending(params.row.orderID)}
+                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            >
+                                Verify Order
+                            </button>
+                            <button
+                                onClick={() => __handleOpenReportDialog(params.row.orderID)}
+                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    )}
+                </div>
+            )
+        }
+    ];
+
+    const getRowId = (row: any) => `${row.orderID}`;
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
+    return (
+        <>
+            <div className="overflow-x-auto shadow-md sm:rounded-lg -mt-6">
+                <Box
+                    sx={{
+                        height: "75vh",  // Adjust height as needed
+                        width: '100%',  // Adjust width as needed
+                        '& .MuiDataGrid-row:nth-of-type(odd)': {
+                            backgroundColor: '#D7E7FF !important',  // Change background color to blue for odd rows
+                        },
+                        '& .MuiDataGrid-row:nth-of-type(even)': {
+                            backgroundColor: '#FFFFFF !important',  // Change background color to red for even rows
+                        },
+                        '& .MuiDataGrid-columnHeaderTitle': {
+                            fontWeight: 'bolder',  // Make header text bolder
+                        },
+                        "& .MuiDataGrid-root": {
+                            border: "none",
+                        },
+                        "& .MuiDataGrid-cell": {
+                            borderBottom: "none",
+                        },
+                        "& .name-column--cell": {
+                            color: colors.primary[300],
+                        },
+                        "& .MuiDataGrid-columnHeaders": {
+                            backgroundColor: colors.primary[300],
+                            borderBottom: "none",
+                        },
+                        "& .MuiDataGrid-virtualScroller": {
+                            backgroundColor: colors.primary[100],
+                        },
+                        "& .MuiDataGrid-footerContainer": {
+                            borderTop: "none",
+                            backgroundColor: colors.primary[100],
+                        },
+                        "& .MuiCheckbox-root": {
+                            color: `${colors.primary[100]} !important`,
+                        },
+                        "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+                            color: `${colors.primary[200]} !important`,
+                        },
+                        "& .MuiBadge-badge": {
+                            display: "none !important"
+                        }
+                    }}
+                >
+                    <DataGrid
+                        rows={orders}
+                        columns={columns}
+                        slots={{ toolbar: GridToolbar }}
+                        getRowId={getRowId}
+                    />
+                </Box>
+            </div>
+            <ViewSampleUpdateDialog
+                isOpen={isDialogOpen}
+                orderID={selectedOrderID!}
+                brandID={userAuth?.userID}
+                onClose={__handleCloseInputSampleProductDialog}
+            />
+            <CustomerReportOrderDialogComponent
+                isCancelOrder={true}
+                orderID={selectedOrderID!}
+                onClose={() => setIsOpenReportOrderCanceledDialog(false)}
+                isOpen={isOpenReportOrderCanceledDialog}
+                onClickReportAndCancel={async () => {
+                    await _handleCancelOrder(selectedOrderID!);
+                    setIsOpenReportOrderCanceledDialog(false);
+                }}
+            />
+        </>
     );
 };
 
@@ -952,6 +1203,12 @@ const EmployeeManageOrder: React.FC = () => {
         handleCloseModal();
     };
 
+    const [isTableView, setIsTableView] = useState(false);
+
+    const toggleView = () => {
+        setIsTableView(!isTableView);
+    };
+
     return (
         <div className='-mt-8'>
             {isLoading ? (
@@ -960,22 +1217,38 @@ const EmployeeManageOrder: React.FC = () => {
                 </div>
             ) : (
                 <>
-
                     <div style={{ width: "100%" }}>
                         <div className="flex flex-col">
                             <div className="mb-6">
-                                <label htmlFor="filterSelect" className="block mb-2 text-lg font-semibold text-gray-700">Select Filters</label>
-                                <Select
-                                    isMulti
-                                    name="filters"
-                                    options={filterOptions}
-                                    className="basic-multi-select"
-                                    classNamePrefix="select"
-                                    value={filterOptions.filter(option => selectedFilters.includes(option.value))}
-                                    onChange={(selectedOptions: any) => {
-                                        setSelectedFilters(selectedOptions.map((option: any) => option.value));
-                                    }}
-                                />
+                                <div className="flex mt-5">
+                                    <div className="w-7/10" style={{ width: "80%" }}>
+                                        <Select
+                                            isMulti
+                                            name="filters"
+                                            options={filterOptions}
+                                            className="basic-multi-select"
+                                            classNamePrefix="select"
+                                            value={filterOptions.filter(option => selectedFilters.includes(option.value))}
+                                            onChange={(selectedOptions: any) => {
+                                                setSelectedFilters(selectedOptions.map((option: any) => option.value));
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="flex border border-gray-300 rounded-md overflow-hidden" style={{ marginLeft: "auto" }}>
+                                        <button
+                                            className={`px-4 py-2 ${!isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'}`}
+                                            onClick={() => setIsTableView(false)}
+                                        >
+                                            Card
+                                        </button>
+                                        <button
+                                            className={`px-4 py-2 ${isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'}`}
+                                            onClick={() => setIsTableView(true)}
+                                        >
+                                            Table
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
@@ -1034,76 +1307,83 @@ const EmployeeManageOrder: React.FC = () => {
                         </div>
                     </div>
 
-                    <div >
-                        {currentOrders.map(order => (
-                            <EmployeeOrderFields
-                                key={order.orderID}
-                                order={order}
-                                onViewDetails={handleViewDetails}
-                                onUpdatedOrderPending={handleUpdateOrder}
-                            />
-                        ))}
-                    </div>
+                    {isTableView ? (
+                        <OrderTable
+                            orders={currentOrders}
+                            onViewDetails={handleViewDetails}
+                            onUpdatedOrderPending={handleUpdateOrder}
+                        />
+                    ) : (
+                        <div>
+                            {currentOrders.map(order => (
+                                <EmployeeOrderFields
+                                    key={order.orderID}
+                                    order={order}
+                                    onViewDetails={handleViewDetails}
+                                    onUpdatedOrderPending={handleUpdateOrder}
+                                />
+                            ))}
+                            <div className="mt-8 flex flex-wrap items-center justify-center space-x-4">
+                                <select
+                                    value={itemsPerPage}
+                                    onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                                    className="border rounded-md px-3 py-2 text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:border-orange-500"
+                                >
+                                    <option value={5}>5/page</option>
+                                    <option value={10}>10/page</option>
+                                    <option value={20}>20/page</option>
+                                    <option value={50}>50/page</option>
+                                </select>
 
-                    <div className="mt-8 flex flex-wrap items-center justify-center space-x-4">
-                        <select
-                            value={itemsPerPage}
-                            onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-                            className="border rounded-md px-3 py-2 text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:border-orange-500"
-                        >
-                            <option value={5}>5/page</option>
-                            <option value={10}>10/page</option>
-                            <option value={20}>20/page</option>
-                            <option value={50}>50/page</option>
-                        </select>
+                                <button
+                                    onClick={() => paginate(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                    className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                                >
+                                    &lt;
+                                </button>
 
-                        <button
-                            onClick={() => paginate(currentPage - 1)}
-                            disabled={currentPage === 1}
-                            className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
-                        >
-                            &lt;
-                        </button>
+                                {renderPageNumbers().map((number, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => typeof number === 'number' && paginate(number)}
+                                        className={`px-3 py-2 rounded-md ${number === currentPage
+                                            ? 'bg-orange-500 text-white'
+                                            : 'text-gray-700 hover:bg-gray-100'
+                                            } ${number === '...' ? 'cursor-default' : ''}`}
+                                    >
+                                        {number}
+                                    </button>
+                                ))}
 
-                        {renderPageNumbers().map((number, index) => (
-                            <button
-                                key={index}
-                                onClick={() => typeof number === 'number' && paginate(number)}
-                                className={`px-3 py-2 rounded-md ${number === currentPage
-                                    ? 'bg-orange-500 text-white'
-                                    : 'text-gray-700 hover:bg-gray-100'
-                                    } ${number === '...' ? 'cursor-default' : ''}`}
-                            >
-                                {number}
-                            </button>
-                        ))}
+                                <button
+                                    onClick={() => paginate(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                    className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                                >
+                                    &gt;
+                                </button>
 
-                        <button
-                            onClick={() => paginate(currentPage + 1)}
-                            disabled={currentPage === totalPages}
-                            className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
-                        >
-                            &gt;
-                        </button>
-
-                        <div className="flex items-center space-x-2 mt-4 sm:mt-0">
-                            <span className="text-gray-600">Go to</span>
-                            <input
-                                type="text"
-                                className="border border-gray-300 rounded-md w-16 px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                value={goToPage}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoToPage(e.target.value)}
-                                onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                                    if (e.key === 'Enter') {
-                                        const page = Math.max(1, Math.min(parseInt(goToPage), totalPages));
-                                        if (!isNaN(page)) {
-                                            paginate(page);
-                                        }
-                                    }
-                                }}
-                            />
+                                <div className="flex items-center space-x-2 mt-4 sm:mt-0">
+                                    <span className="text-gray-600">Go to</span>
+                                    <input
+                                        type="text"
+                                        className="border border-gray-300 rounded-md w-16 px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                        value={goToPage}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoToPage(e.target.value)}
+                                        onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                                            if (e.key === 'Enter') {
+                                                const page = Math.max(1, Math.min(parseInt(goToPage), totalPages));
+                                                if (!isNaN(page)) {
+                                                    paginate(page);
+                                                }
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {isModalOpen && selectedOrder && (
                         <EmployeeOrderModal
@@ -1114,8 +1394,9 @@ const EmployeeManageOrder: React.FC = () => {
                         />
                     )}
                 </>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 };
 

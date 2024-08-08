@@ -3,9 +3,9 @@ import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaChevronLef
 import { ArrowDropDown } from '@mui/icons-material';
 import axios from 'axios';
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
-import { BrandOrder, ImageList } from '../../../../models/BrandManageOrderModel';
+import { BrandOrder, BrandOrderTable, ImageList } from '../../../../models/BrandManageOrderModel';
 import { motion } from 'framer-motion'
-import { Dialog, DialogContent, DialogTitle } from '@mui/material';
+import { Box, Dialog, DialogContent, DialogTitle, useTheme } from '@mui/material';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -22,6 +22,8 @@ import style from './ManageOrderBrandStyle.module.scss'
 import { CustomerReportOrderDialogComponent } from '../../../../components';
 import { EstimatedStageInterface } from '../../../Order/OrderDetail/OrderDetailScreen';
 import Select from 'react-select';
+import { DataGrid, GridColDef, GridRenderCellParams, GridToolbar } from '@mui/x-data-grid';
+import { tokens } from '../../../../theme';
 
 /**
  * 
@@ -520,7 +522,7 @@ const BrandOrderFields: React.FC<{
                     View Details
                 </button>
 
-                {order.orderStatus !== 'CANCEL'&& order.orderStatus !== 'COMPLETED'  && (
+                {order.orderStatus !== 'CANCEL' && order.orderStatus !== 'COMPLETED' && (
                     <button
                         onClick={() => __handleOpenUpdateProcessDialog(order)}
                         className="bg-green-500 text-sm text-white px-4 py-2  hover:bg-green-600 transition duration-300"
@@ -652,8 +654,6 @@ const BrandOrderFields: React.FC<{
                             </div>
                         </DialogContent>
                     </Dialog>
-
-
                 </>
             )}
         </div>
@@ -770,11 +770,7 @@ const BrandOrderModal: React.FC<{ order: BrandOrder; onClose: () => void; onMark
                             </div>
                         ))}
                     </div>
-
-
                 </div>
-
-
                 {
                     designDetails && (
                         <div className="mb-6 flex justify-center">
@@ -853,6 +849,328 @@ const BrandOrderModal: React.FC<{ order: BrandOrder; onClose: () => void; onMark
         </motion.div >
     );
 };
+
+/**
+ * 
+ * @param param0 
+ * @returns 
+ * Order Table
+ */
+interface OrderTableProps {
+    orders: BrandOrderTable[];
+    onViewDetails: (order: BrandOrderTable, design: any) => void;
+    onUpdatedOrderPending: (orderID: string) => void;
+}
+
+const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdatedOrderPending }) => {
+    const [showDesignDetails, setShowDesignDetails] = useState(false);
+    const [designDetails, setDesignDetails] = useState<any>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [userAuth, setUseAuth] = useState<UserInterface>();
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isOpenReportOrderCanceledDialog, setIsOpenReportOrderCanceledDialog] = useState<boolean>(false);
+    const [openActions, setOpenActions] = useState<string | null>(null);
+
+    useEffect(() => {
+        const userStorage = Cookies.get('userAuth');
+        if (!userStorage) return;
+        const userParse: UserInterface = JSON.parse(userStorage);
+        setUseAuth(userParse);
+    }, []);
+
+    const fetchDesignDetails = async (orderID: string) => {
+        setIsLoading(true);
+        try {
+            const response = await axios.get(`${baseURL + versionEndpoints.v1 + featuresEndpoints.designDetail + functionEndpoints.designDetail.getAllInforOrderDetail + `/${orderID}`}`);
+            setDesignDetails(response.data.data.design);
+            onViewDetails(orders.find(order => order.orderID === orderID)!, response.data.data.design);
+        } catch (error) {
+            console.error('Error fetching design details:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const __handleCloseInputSampleProductDialog = () => {
+        setIsDialogOpen(false);
+        setSelectedOrderID(null);
+    };
+
+    const [openUpdateProcessDialog, setOpenUpdateProcessDialog] = useState<BrandOrderTable | null>(null);
+    const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
+    const [selectedOrderID, setSelectedOrderID] = useState<string | null>(null);
+
+    const __handleOpenReportDialog = (orderId: string) => {
+        setSelectedOrderID(orderId);
+        setIsReportDialogOpen(true);
+    };
+
+    const _handleCancelOrder = async (orderID: string) => {
+        setIsLoading(true);
+        try {
+            const bodyRequest = { orderID, status: 'CANCEL' };
+            const response = await axios.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            if (response.status === 200) {
+                toast.success(`${response.data.message}`, { autoClose: 4000 });
+                onUpdatedOrderPending(orderID);
+            } else {
+                toast.error(`${response.data.message}`, { autoClose: 4000 });
+            }
+        } catch (error) {
+            toast.error(`${error}`, { autoClose: 4000 });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'DELIVERED':
+                return 'bg-green-100 text-green-800';
+            case 'PENDING':
+                return 'bg-yellow-100 text-yellow-800';
+            case 'CANCEL':
+                return 'bg-red-100 text-red-800';
+            default:
+                return 'bg-gray-100 text-gray-800';
+        }
+    };
+
+    const toggleActions = (orderID: string) => {
+        if (openActions === orderID) {
+            setOpenActions(null);
+        } else {
+            setOpenActions(orderID);
+        }
+    };
+
+    const [progressSteps, setProgressStep] = useState<StageInterface[]>();
+    const [selectedStep, setSelectedStep] = useState<{ orderID: string, step: string } | null>(null);
+    const [isUploadSampleDialogOpen, setIsUploadSampleDialogOpen] = useState(false);
+    const [timeline, setTimeLine] = useState<EstimatedStageInterface>();
+
+    const __handleOpenUpdateProcessDialog = async (order: BrandOrderTable) => {
+        setOpenUpdateProcessDialog(order);
+        await __handleLoadProgressStep(order.orderID);
+        await __handleFetchTimeLine(order.parentOrderID);
+    };
+
+    const __handleCloseUpdateProcessDialog = () => {
+        setOpenUpdateProcessDialog(null);
+    };
+
+    const __handleLoadProgressStep = async (subOrderId: string) => {
+        setIsLoading(true);
+        try {
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderStageById}/${subOrderId}`);
+            if (response.status === 200) {
+                setIsLoading(false);
+                const sortedData = sortStages(response.data);
+                setProgressStep(sortedData);
+            } else {
+                console.log('detail error: ', response.message);
+                toast.error(`${response.message}`, { autoClose: 4000 });
+            }
+        } catch (error) {
+            console.log('error: ', error);
+            toast.error(`${error}`, { autoClose: 4000 });
+        }
+    };
+
+    const __handleFetchTimeLine = async (parentId: string) => {
+        try {
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderTimeLineByParentId}/${parentId}`);
+            if (response.status === 200) {
+                setIsLoading(false);
+                setTimeLine(response.data);
+            } else {
+                console.log('detail error: ', response.message);
+                toast.error(`${response.message}`, { autoClose: 4000 });
+            }
+        } catch (error) {
+            console.log('error: ', error);
+            toast.error(`${error}`, { autoClose: 4000 });
+        }
+    };
+
+    const __handleOpenUpLoadProcessSampleProductDialog = (orderId: string, step: string) => {
+        setIsUploadSampleDialogOpen(true);
+        setSelectedStep({ orderID: orderId, step: step });
+    };
+
+    const __handleOpenInputSampleProductDialog = async (orderID: any) => {
+        setSelectedOrderID(orderID);
+        setIsDialogOpen(true);
+
+        try {
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderStageById}/${orderID}`);
+            if (response.status === 200) {
+                setIsLoading(false);
+                const sortedData = sortStages(response.data);
+                const stageStart: StageInterface = response.data.find((item: StageInterface) => item.stage === 'START_PRODUCING')
+                setStageIdStart(stageStart.stageId)
+            }
+            else {
+                console.log('detail error: ', response.message);
+                toast.error(`${response.message}`, { autoClose: 4000 });
+            }
+        } catch (error) {
+            console.log('error: ', error);
+            toast.error(`${error}`, { autoClose: 4000 });
+        }
+
+    };
+
+    const __handleCloseUpLoadProcessSampleProductDialog = () => {
+        setIsUploadSampleDialogOpen(false);
+        setSelectedStep(null);
+    };
+
+    const sortStages = (stages: StageInterface[]) => {
+        const customSortOrder = ['START_PRODUCING', 'FINISH_FIRST_STAGE', 'FINISH_SECOND_STAGE', 'COMPLETED'];
+        return stages.sort((a, b) => {
+            const indexA = customSortOrder.indexOf(a.stage);
+            const indexB = customSortOrder.indexOf(b.stage);
+            return indexA - indexB;
+        });
+    };
+
+    const [stageIdStart, setStageIdStart] = useState<string>();
+
+    const columns: GridColDef[] = [
+        { field: 'orderID', headerName: 'Order ID', width: 150 },
+        { field: 'buyerName', headerName: 'Customer', width: 150 },
+        { field: 'address', headerName: 'Address', width: 150 },
+        { field: 'phone', headerName: 'phone', width: 150 },
+        { field: 'expectedStartDate', headerName: 'Date', width: 200 },
+        {
+            field: 'orderStatus',
+            headerName: 'Status',
+            width: 150,
+            renderCell: (params: GridRenderCellParams) => (
+                <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(params.value)}`}>
+                    {params.value}
+                </span>
+            )
+        },
+        {
+            field: 'actions',
+            headerName: 'Actions',
+            width: 200,
+            renderCell: (params: GridRenderCellParams) => (
+                <div>
+                    <button
+                        onClick={() => toggleActions(params.row.orderID)}
+                        className="font-medium text-blue-600"
+                    >
+                        ...
+                    </button>
+                    {openActions === params.row.orderID && (
+                        <div className="absolute  w-48 bg-white rounded-md shadow-lg z-10">
+                            <button
+                                onClick={() => onViewDetails(params.row, null)}
+                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            >
+                                View Details
+                            </button>
+                            <button
+                                onClick={() => __handleOpenUpdateProcessDialog(params.row)}
+                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            >
+                                Update Process
+                            </button>
+                            <button
+                                onClick={() => __handleOpenReportDialog(params.row.orderID)}
+                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    )}
+                </div>
+            )
+        }
+    ];
+
+    const getRowId = (row: any) => `${row.orderID}`;
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
+    return (
+        <>
+            <div className="overflow-x-auto shadow-md sm:rounded-lg -mt-6">
+                <Box
+                    sx={{
+                        height: "75vh",  // Adjust height as needed
+                        width: '100%',  // Adjust width as needed
+                        '& .MuiDataGrid-row:nth-of-type(odd)': {
+                            backgroundColor: '#D7E7FF !important',  // Change background color to blue for odd rows
+                        },
+                        '& .MuiDataGrid-row:nth-of-type(even)': {
+                            backgroundColor: '#FFFFFF !important',  // Change background color to red for even rows
+                        },
+                        '& .MuiDataGrid-columnHeaderTitle': {
+                            fontWeight: 'bolder',  // Make header text bolder
+                        },
+                        "& .MuiDataGrid-root": {
+                            border: "none",
+                        },
+                        "& .MuiDataGrid-cell": {
+                            borderBottom: "none",
+                        },
+                        "& .name-column--cell": {
+                            color: colors.primary[300],
+                        },
+                        "& .MuiDataGrid-columnHeaders": {
+                            backgroundColor: colors.primary[300],
+                            borderBottom: "none",
+                        },
+                        "& .MuiDataGrid-virtualScroller": {
+                            backgroundColor: colors.primary[100],
+                        },
+                        "& .MuiDataGrid-footerContainer": {
+                            borderTop: "none",
+                            backgroundColor: colors.primary[100],
+                        },
+                        "& .MuiCheckbox-root": {
+                            color: `${colors.primary[100]} !important`,
+                        },
+                        "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+                            color: `${colors.primary[200]} !important`,
+                        },
+                        "& .MuiBadge-badge": {
+                            display: "none !important"
+                        }
+                    }}
+                >
+                    <DataGrid
+                        rows={orders}
+                        columns={columns}
+                        slots={{ toolbar: GridToolbar }}
+                        getRowId={getRowId}
+                    />
+                </Box>
+            </div>
+            {openUpdateProcessDialog && (
+                <Dialog open={true} onClose={__handleCloseUpdateProcessDialog} maxWidth="lg" fullWidth>
+                </Dialog>
+            )}
+
+            {/* Cancel Order Dialog */}
+            <CustomerReportOrderDialogComponent
+                isCancelOrder={true}
+                orderID={selectedOrderID!}
+                onClose={() => setIsReportDialogOpen(false)}
+                isOpen={isReportDialogOpen}
+                onClickReportAndCancel={async () => {
+                    await _handleCancelOrder(selectedOrderID!);
+                    setIsReportDialogOpen(false);
+                }}
+            />
+        </>
+    );
+};
+
+
 /**
  * 
  * @returns 
@@ -1029,6 +1347,12 @@ const BrandManageOrder: React.FC = () => {
         handleCloseModal();
     };
 
+    const [isTableView, setIsTableView] = useState(false);
+
+    const toggleView = () => {
+        setIsTableView(!isTableView);
+    };
+
     return (
         <div className='-mt-8'>
             {isLoading ? (
@@ -1040,18 +1364,35 @@ const BrandManageOrder: React.FC = () => {
                     <div style={{ width: "100%" }}>
                         <div className="flex flex-col">
                             <div className="mb-6">
-                                <label htmlFor="filterSelect" className="block mb-2 text-lg font-semibold text-gray-700">Select Filters</label>
-                                <Select
-                                    isMulti
-                                    name="filters"
-                                    options={filterOptions}
-                                    className="basic-multi-select"
-                                    classNamePrefix="select"
-                                    value={filterOptions.filter(option => selectedFilters.includes(option.value))}
-                                    onChange={(selectedOptions: any) => {
-                                        setSelectedFilters(selectedOptions.map((option: any) => option.value));
-                                    }}
-                                />
+                                <div className="flex mt-5">
+                                    <div className="w-7/10" style={{ width: "80%" }}>
+                                        <Select
+                                            isMulti
+                                            name="filters"
+                                            options={filterOptions}
+                                            className="basic-multi-select"
+                                            classNamePrefix="select"
+                                            value={filterOptions.filter(option => selectedFilters.includes(option.value))}
+                                            onChange={(selectedOptions: any) => {
+                                                setSelectedFilters(selectedOptions.map((option: any) => option.value));
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="flex border border-gray-300 rounded-md overflow-hidden" style={{ marginLeft: "auto" }}>
+                                        <button
+                                            className={`px-4 py-2 ${!isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'}`}
+                                            onClick={() => setIsTableView(false)}
+                                        >
+                                            Card
+                                        </button>
+                                        <button
+                                            className={`px-4 py-2 ${isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'}`}
+                                            onClick={() => setIsTableView(true)}
+                                        >
+                                            Table
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
@@ -1111,76 +1452,90 @@ const BrandManageOrder: React.FC = () => {
                     </div>
 
                     <div>
-                        {currentOrders.map(order => (
-                            <BrandOrderFields
-                                key={order.orderID}
-                                order={order}
+                        {isTableView ? (
+                            <OrderTable
+                                orders={currentOrders}
                                 onViewDetails={handleViewDetails}
-                                onMarkResolved={handleMarkResolved}
-                            />
-                        ))}
-                    </div>
-
-                    <div className="mt-8 flex flex-wrap items-center justify-center space-x-4">
-                        <select
-                            value={itemsPerPage}
-                            onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-                            className="border rounded-md px-3 py-2 text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:border-orange-500"
-                        >
-                            <option value={5}>5/page</option>
-                            <option value={10}>10/page</option>
-                            <option value={20}>20/page</option>
-                            <option value={50}>50/page</option>
-                        </select>
-
-                        <button
-                            onClick={() => paginate(currentPage - 1)}
-                            disabled={currentPage === 1}
-                            className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
-                        >
-                            &lt;
-                        </button>
-
-                        {renderPageNumbers().map((number, index) => (
-                            <button
-                                key={index}
-                                onClick={() => typeof number === 'number' && paginate(number)}
-                                className={`px-3 py-2 rounded-md ${number === currentPage
-                                    ? 'bg-orange-500 text-white'
-                                    : 'text-gray-700 hover:bg-gray-100'
-                                    } ${number === '...' ? 'cursor-default' : ''}`}
-                            >
-                                {number}
-                            </button>
-                        ))}
-
-                        <button
-                            onClick={() => paginate(currentPage + 1)}
-                            disabled={currentPage === totalPages}
-                            className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
-                        >
-                            &gt;
-                        </button>
-
-                        <div className="flex items-center space-x-2 mt-4 sm:mt-0">
-                            <span className="text-gray-600">Go to</span>
-                            <input
-                                type="text"
-                                className="border border-gray-300 rounded-md w-16 px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                value={goToPage}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoToPage(e.target.value)}
-                                onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                                    if (e.key === 'Enter') {
-                                        const page = Math.max(1, Math.min(parseInt(goToPage), totalPages));
-                                        if (!isNaN(page)) {
-                                            paginate(page);
-                                        }
-                                    }
+                                onUpdatedOrderPending={(orderID) => {
+                                    setOrder(prevOrders => prevOrders.map(order =>
+                                        order.orderID === orderID ? { ...order, orderStatus: 'CANCEL' } : order
+                                    ));
                                 }}
                             />
-                        </div>
-                    </div>
+                        ) : (
+                            <div>
+                                {
+                                    currentOrders.map(order => (
+                                        <BrandOrderFields
+                                            key={order.orderID}
+                                            order={order}
+                                            onViewDetails={handleViewDetails}
+                                            onMarkResolved={handleMarkResolved}
+                                        />
+                                    ))
+                                }
+                                <div className="mt-8 flex flex-wrap items-center justify-center space-x-4">
+                                    <select
+                                        value={itemsPerPage}
+                                        onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                                        className="border rounded-md px-3 py-2 text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:border-orange-500"
+                                    >
+                                        <option value={5}>5/page</option>
+                                        <option value={10}>10/page</option>
+                                        <option value={20}>20/page</option>
+                                        <option value={50}>50/page</option>
+                                    </select>
 
+                                    <button
+                                        onClick={() => paginate(currentPage - 1)}
+                                        disabled={currentPage === 1}
+                                        className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                                    >
+                                        &lt;
+                                    </button>
+
+                                    {renderPageNumbers().map((number, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => typeof number === 'number' && paginate(number)}
+                                            className={`px-3 py-2 rounded-md ${number === currentPage
+                                                ? 'bg-orange-500 text-white'
+                                                : 'text-gray-700 hover:bg-gray-100'
+                                                } ${number === '...' ? 'cursor-default' : ''}`}
+                                        >
+                                            {number}
+                                        </button>
+                                    ))}
+
+                                    <button
+                                        onClick={() => paginate(currentPage + 1)}
+                                        disabled={currentPage === totalPages}
+                                        className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                                    >
+                                        &gt;
+                                    </button>
+
+                                    <div className="flex items-center space-x-2 mt-4 sm:mt-0">
+                                        <span className="text-gray-600">Go to</span>
+                                        <input
+                                            type="text"
+                                            className="border border-gray-300 rounded-md w-16 px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                            value={goToPage}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoToPage(e.target.value)}
+                                            onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                                                if (e.key === 'Enter') {
+                                                    const page = Math.max(1, Math.min(parseInt(goToPage), totalPages));
+                                                    if (!isNaN(page)) {
+                                                        paginate(page);
+                                                    }
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                     {isModalOpen && selectedOrder && (
                         <BrandOrderModal
                             designDetails={designDetails}

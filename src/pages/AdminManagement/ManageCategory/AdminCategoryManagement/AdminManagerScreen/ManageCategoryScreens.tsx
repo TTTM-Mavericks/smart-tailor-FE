@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { AddCategory, Category } from "../../../../../models/AdminCategoryExcelModel";
 import axios from "axios";
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
+import { greenColor } from "../../../../../root/ColorSystem";
 
 // Make Style of popup
 const style = {
@@ -259,51 +260,37 @@ const ManageCategories: React.FC = () => {
                     <div style={{ marginLeft: "25%" }}>
                         <Button
                             id="basic-button"
-                            aria-controls={open ? 'basic-menu' : undefined}
-                            aria-haspopup="true"
-                            aria-expanded={open ? 'true' : undefined}
-                            onClick={_handleClick}
+                            onClick={_handleAddOpen}
                             endIcon={<Add />}
                             variant="contained"
                             color="primary"
-                            style={{ backgroundColor: `#E96208`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
+                            style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
                         >
                             ADD
                         </Button>
-                        <Menu
-                            id="basic-menu"
-                            anchorEl={anchorEl}
-                            open={open}
-                            onClose={_handleClose}
-                            MenuListProps={{
-                                'aria-labelledby': 'basic-button',
-                            }}
-                        >
 
-                            <MenuItem >
-                                <div onClick={_handleAddOpen}>ADD MANUAL</div>
-                                <Modal
-                                    open={addOpenOrClose}
-                                    aria-labelledby="modal-modal-title"
-                                    aria-describedby="modal-modal-description"
-                                >
-                                    <Box sx={{
-                                        backgroundColor: colors.primary[100], position: 'absolute',
-                                        top: '50%',
-                                        left: '50%',
-                                        transform: 'translate(-50%, -50%)',
-                                        width: "50%",
-                                        bgcolor: 'background.paper',
-                                        border: '2px solid #000',
-                                        boxShadow: 24,
-                                        p: 4,
-                                        borderRadius: "20px"
-                                    }}>
-                                        <AddEachCategoryWithHand closeCard={_handleAddClose} addNewCategory={_handleAddCategory} />
-                                    </Box>
-                                </Modal>
-                            </MenuItem>
-                        </Menu>
+                        <Modal
+                            open={addOpenOrClose}
+                            onClose={_handleAddClose}
+                            aria-labelledby="modal-modal-title"
+                            aria-describedby="modal-modal-description"
+                        >
+                            <Box sx={{
+                                backgroundColor: colors.primary[100],
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                width: "50%",
+                                bgcolor: 'background.paper',
+                                border: '2px solid #000',
+                                boxShadow: 24,
+                                p: 4,
+                                borderRadius: "20px"
+                            }}>
+                                <AddEachCategoryWithHand closeCard={_handleAddClose} addNewCategory={_handleAddCategory} />
+                            </Box>
+                        </Modal>
                     </div>
                 </div>
 
@@ -325,7 +312,7 @@ const ManageCategories: React.FC = () => {
                     <DataGrid
                         rows={data}
                         columns={columns}
-                        // slots={{ toolbar: GridToolbar }}
+                        slots={{ toolbar: GridToolbar }}
                         disableRowSelectionOnClick
                         getRowId={getRowId}
                     />

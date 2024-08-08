@@ -8,6 +8,9 @@ import { UpdateMaterial } from "../../../../../models/BrandMaterialExcelModel";
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import Cookies from "js-cookie";
 import { UserInterface } from "../../../../../models/UserModel";
+import { CancelOutlined } from "@mui/icons-material";
+import { primaryColor, redColor } from "../../../../../root/ColorSystem";
+import { borderColor, width } from "@mui/system";
 
 interface EditMaterialPopUpScreenFormProps {
     fid: {
@@ -128,110 +131,133 @@ const EditMaterialPopUpScreens: React.FC<EditMaterialPopUpScreenFormProps> = ({ 
     };
 
     return (
-        <Box style={{ height: '500px', overflowY: 'auto' }}>
+        <Box>
             <Typography variant="h5" align="left">
                 Edit Brand Price
             </Typography>
             <IconButton
-                style={{ position: "absolute", top: 0, right: 0 }}
+                aria-label="close"
                 onClick={editClose}
+                sx={{
+                    position: 'absolute',
+                    right: 16,
+                    top: 16,
+                    color: '#EC6208',
+                    transition: 'all 0.2s',
+                    '&:hover': {
+                        transform: 'scale(1.1)',
+                        bgcolor: 'rgba(236, 98, 8, 0.1)',
+                    },
+                }}
             >
-                <CloseIcon />
+                <CancelOutlined />
             </IconButton>
-            <Box height={50} />
-            <Grid container spacing={4}>
-                <Grid item xs={11}>
+            <Box height={30} />
+            <Grid container spacing={3}>
+                <Grid item xs={6}>
                     <TextField
                         name="categoryName"
                         id="categoryName"
                         label="Category Name"
                         variant="outlined"
                         size="small"
-                        sx={{ minWidth: "100%" }}
+                        fullWidth
                         value={formData.categoryName}
                         onChange={_handleChange}
                         disabled={true}
                     />
                 </Grid>
-                <Grid item xs={11}>
+                <Grid item xs={6}>
                     <TextField
                         name="materialName"
                         id="materialName"
                         label="Material Name"
                         variant="outlined"
                         size="small"
-                        sx={{ minWidth: "100%" }}
+                        fullWidth
                         value={formData.materialName}
                         disabled={true}
                         onChange={_handleChange}
                     />
                 </Grid>
-                <Grid item xs={11}>
+                <Grid item xs={6}>
                     <TextField
                         name="basePrice"
                         id="basePrice"
                         label="Base Price"
                         variant="outlined"
                         size="small"
-                        sx={{ minWidth: "100%" }}
+                        fullWidth
                         value={formData.basePrice}
                         disabled={true}
                         onChange={_handleChange}
                     />
                 </Grid>
-                <Grid item xs={11}>
+                <Grid item xs={6}>
                     <TextField
                         name="unit"
                         id="unit"
                         label="Unit"
                         variant="outlined"
                         size="small"
-                        sx={{ minWidth: "100%" }}
+                        fullWidth
                         disabled={true}
                         value={formData.unit}
                         onChange={_handleChange}
                     />
                 </Grid>
-                <Grid item xs={11}>
+                <Grid item xs={6}>
                     <TextField
                         name="hsCode"
                         id="hsCode"
                         label="HS Code"
                         variant="outlined"
                         size="small"
-                        sx={{ minWidth: "100%" }}
+                        fullWidth
                         disabled={true}
                         value={formData.hsCode}
                         onChange={_handleChange}
                     />
                 </Grid>
-                <Grid item xs={11}>
+                <Grid item xs={6}>
                     <TextField
                         name="brandPrice"
                         id="brandPrice"
                         label="Brand Price"
                         variant="outlined"
                         size="small"
-                        sx={{ minWidth: "100%" }}
+                        fullWidth
                         value={formData.brandPrice}
                         onChange={_handleChange}
                     />
                 </Grid>
             </Grid>
-            <div onClick={editClose} style={{ textAlign: "center", alignItems: "center", marginTop: "3rem" }}>
-                <Button
-                    onClick={_handleSubmit}
-                    style={{ backgroundColor: "#E96208", width: "80%", borderRadius: "8px", marginLeft: "-10%", marginRight: "2%", color: "#FFFFFF" }}
-                >
-                    {t(codeLanguage + '000060')}
-                </Button>
-                <Button
-                    style={{ borderRadius: "8px", border: "1px solid black", color: "black" }}
-                >
-                    {t(codeLanguage + '000055')}
-                </Button>
-            </div>
+            <Box mt={4}>
+                <Grid container spacing={2}>
+                    <Grid item xs={6}>
+                        <Button
+                            onClick={editClose}
+                            variant="outlined"
+                            fullWidth
+                            style={{ borderRadius: "8px", color: "white", backgroundColor: `${redColor}`, borderColor: "white" }}
+                        >
+                            {t(codeLanguage + '000055')}
+                        </Button>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Button
+                            onClick={_handleSubmit}
+                            variant="contained"
+                            fullWidth
+                            style={{ backgroundColor: `${primaryColor}`, borderRadius: "8px", color: "#FFFFFF" }}
+                        >
+                            {t(codeLanguage + '000060')}
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Box>
         </Box>
+
     );
 }
 

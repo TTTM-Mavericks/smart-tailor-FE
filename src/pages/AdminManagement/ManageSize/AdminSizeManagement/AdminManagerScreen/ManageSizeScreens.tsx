@@ -1,5 +1,5 @@
 import { Box, Button, IconButton, Menu, MenuItem, Modal } from "@mui/material";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../../../../theme";
 import { useTheme } from "@mui/material";
 import * as React from "react";
@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import axios from "axios";
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { AddSize, Sizes } from "../../../../../models/AdminManageSizeModel";
+import { greenColor } from "../../../../../root/ColorSystem";
 // Make Style of popup
 const style = {
     position: 'absolute',
@@ -227,27 +228,14 @@ const ManageSizes: React.FC = () => {
                             aria-controls={open ? 'basic-menu' : undefined}
                             aria-haspopup="true"
                             aria-expanded={open ? 'true' : undefined}
-                            onClick={_handleClick}
+                            onClick={_handleAddOpen}
                             endIcon={<Add />}
                             variant="contained"
                             color="primary"
-                            style={{ backgroundColor: `#E96208`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
+                            style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
                         >
                             ADD
                         </Button>
-                        <Menu
-                            id="basic-menu"
-                            anchorEl={anchorEl}
-                            open={open}
-                            onClose={_handleClose}
-                            MenuListProps={{
-                                'aria-labelledby': 'basic-button',
-                            }}
-                        >
-                            <MenuItem onClick={_handleAddOpen}>
-                                ADD MANUAL
-                            </MenuItem>
-                        </Menu>
                         <Modal
                             open={addOpen}
                             onClose={_handleAddClose}
@@ -278,6 +266,7 @@ const ManageSizes: React.FC = () => {
                     <DataGrid
                         rows={data}
                         columns={columns}
+                        slots={{ toolbar: GridToolbar }}
                         disableRowSelectionOnClick
                         getRowId={getRowId}
                     />

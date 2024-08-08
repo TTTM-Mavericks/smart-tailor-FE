@@ -15,6 +15,7 @@ import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from 
 import { Category } from '../../../../models/AdminCategoryExcelModel';
 import { LaborQuantity } from '../../../../models/LaborQuantityModel';
 import { BrandLaborQuantity } from '../../../../models/BrandLaborQuantityModel';
+import { CancelOutlined } from '@mui/icons-material';
 
 interface AddPriceWithHandsFormProps {
     closeCard: () => void;
@@ -164,12 +165,14 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
 
             if (response.data.status === 200) {
                 // addNewLaborQuantity(formData);
+                closeCard()
                 Swal.fire(
                     'Add Success!',
                     'Labor quantity has been added!',
                     'success'
                 );
             } else {
+                closeCard()
                 Swal.fire(
                     'Add Failed!',
                     'Please check the information!',
@@ -177,7 +180,7 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
                 );
             }
         } catch (err: any) {
-            console.error('Error:', err);
+            closeCard()
             Swal.fire(
                 'Add Failed!',
                 'Please check the information!',
@@ -188,19 +191,26 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
 
     return (
         <div>
-            <IconButton
-                style={{ position: 'absolute', top: 0, right: 0 }}
+            <button
+                type="button"
+                className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
                 onClick={closeCard}
             >
-                <CloseIcon />
-            </IconButton>
+                <IconButton
+                    aria-label="close"
+                    onClick={closeCard}
+                    sx={{ position: 'absolute', right: 8, top: 8, color: 'white' }}
+                >
+                    <CancelOutlined sx={{ color: "red" }} />
+                </IconButton>
+            </button>
             <div>
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr>
-                            <th className="border-b py-2 font-semibold">Quantity</th>
-                            <th className="border-b py-2 font-semibold">Base Price</th>
-                            <th className="border-b py-2 font-semibold">Brand Price</th>
+                            <th className="border-b py-2 font-semibold" style={{ paddingLeft: "30px" }}>Quantity</th>
+                            <th className="border-b py-2 font-semibold" style={{ paddingLeft: "20px" }}>Base Price</th>
+                            <th className="border-b py-2 font-semibold" style={{ paddingLeft: "90px" }}>Brand Price</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -225,7 +235,7 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
                     <button
                         type="submit"
                         onClick={handleSubmit}
-                        className="mt-4 w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                        className="mt-4 w-full px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                     >
                         Submit
                     </button>

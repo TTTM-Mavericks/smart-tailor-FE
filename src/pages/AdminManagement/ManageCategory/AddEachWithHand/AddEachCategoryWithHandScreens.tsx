@@ -13,7 +13,9 @@ import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import { AddCategory } from '../../../../models/AdminCategoryExcelModel';
-import { borderRadius, display } from '@mui/system';
+import { borderRadius, display, height } from '@mui/system';
+import { AddCircleOutline, CancelOutlined, RemoveCircleOutline } from '@mui/icons-material';
+import { primaryColor } from '../../../../root/ColorSystem';
 
 interface AddMaterialWithHandsFormProps {
     closeCard: () => void;
@@ -97,46 +99,53 @@ const AddEachCategoryWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
     };
 
     return (
-        <Box style={{ overflowY: 'auto', overflowX: 'hidden', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-            <div>
-                <Typography variant="h5" align="center">
-                    ADD NEW CATEGORY
-                </Typography>
-                <IconButton style={{ position: 'absolute', top: 0, right: 0 }} onClick={closeCard}>
-                    <CloseIcon />
-                </IconButton>
-                <Box height={50} />
-                <Grid container spacing={3}>
-                    {formData.map((category, index) => (
-                        <Grid item xs={12} key={index} style={{ display: "flex" }}>
-                            <TextField
-                                fullWidth
-                                label={`Category ${index + 1}`}
-                                variant="outlined"
-                                size="small"
-                                value={category.categoryNames}
-                                onChange={(e: any) => _handleFormChange(index, e)}
-                            />
-                            <Button
-                                type="button"
-                                onClick={() => _handleRemoveCategory(index)}
-                                style={{ backgroundColor: "red", color: "white", borderRadius: "10px", marginLeft: "10px" }}
-                            >
-                                Remove
-                            </Button>
-                        </Grid>
-                    ))}
-                </Grid>
-                <div style={{ textAlign: 'center', alignItems: 'center', marginTop: '3rem' }}>
-                    <Button onClick={_handleAddCategory} style={{ backgroundColor: "#EC6208", color: "white" }}>
-                        Add Category
-                    </Button>
-                    <Button onClick={_handleSubmit} style={{ backgroundColor: "#EC6208", color: "white", marginLeft: '1rem' }}>
-                        Submit
-                    </Button>
-                </div>
+        <div>
+            <IconButton
+                aria-label="close"
+                onClick={closeCard}
+                sx={{ position: 'absolute', right: 8, top: 8, color: 'white' }}
+            >
+                <CancelOutlined sx={{ color: "red" }} />
+            </IconButton>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">Add Sizes</h2>
+            <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+                {formData.map((category, index) => (
+                    <div key={index} className="flex items-center space-x-2">
+                        <input
+                            type="text"
+                            placeholder={`Category ${index + 1}`}
+                            value={category.categoryNames}
+                            onChange={(e) => _handleFormChange(index, e)}
+                            className="flex-grow p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                        />
+                        <button
+                            onClick={() => _handleRemoveCategory(index)}
+                            className="text-red-500 hover:text-red-700 transition-colors duration-200"
+                        >
+                            <RemoveCircleOutline />
+                        </button>
+                    </div>
+                ))}
             </div>
-        </Box>
+            <div className="mt-6 flex justify-between items-center">
+                <button
+                    type="button"
+                    onClick={_handleAddCategory}
+                    className="flex items-center space-x-1 text-orange-600 hover:text-orange-600 transition-colors duration-200"
+                >
+                    <AddCircleOutline />
+                    <span>Add Category</span>
+                </button>
+                <button
+                    type="button"
+                    onClick={_handleSubmit}
+                    style={{ backgroundColor: `${primaryColor}` }}
+                    className="text-white py-2 px-4 rounded-md hover:from-orange-600 hover:to-orange-700"
+                >
+                    Submit
+                </button>
+            </div>
+        </div>
     );
 };
 

@@ -6,6 +6,8 @@ import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { LaborQuantity } from "../../../../../models/LaborQuantityModel";
+import { CancelOutlined } from "@mui/icons-material";
+import { primaryColor, redColor } from "../../../../../root/ColorSystem";
 
 interface EditPricePopUpScreenFormProps {
     fid: {
@@ -109,26 +111,80 @@ const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, e
     };
 
     return (
-        <Box style={{ height: '500px', overflowY: 'auto' }}>
-            <Typography variant="h5" align="left">
-                {t(codeLanguage + '000068')}
+        <Box
+            sx={{
+                position: 'relative',
+                padding: 3,
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+            }}
+        >
+            <Typography variant="h5" sx={{ mb: 2 }}>
+                Edit Brand Price
             </Typography>
+
             <IconButton
-                style={{ position: "absolute", top: 0, right: 0 }}
+                aria-label="close"
                 onClick={editClose}
+                sx={{
+                    position: 'absolute',
+                    right: 16,
+                    top: 16,
+                    color: '#EC6208',
+                    transition: 'all 0.2s',
+                    '&:hover': {
+                        transform: 'scale(1.1)',
+                        bgcolor: 'rgba(236, 98, 8, 0.1)',
+                    },
+                }}
             >
-                <CloseIcon />
+                <CancelOutlined />
             </IconButton>
-            <Box height={50} />
-            <Grid container spacing={4}>
-                <Grid item xs={11}>
-                    <TextField name="brandLaborCostPerQuantity" id="brandLaborCostPerQuantity" label="Brand Labor Cost Per Quantity" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={formData.brandLaborCostPerQuantity} onChange={_handleChange} />
-                </Grid>
-            </Grid>
-            <div style={{ textAlign: "center", alignItems: "center", marginTop: "3rem" }}>
-                <Button onClick={_handleSubmit} style={{ backgroundColor: "#5858FA", width: "60%", borderRadius: "8px", color: "#FFFFFF" }}>{t(codeLanguage + '000060')}</Button>
-                <Button onClick={editClose} style={{ borderRadius: "8px", border: "1px solid black", color: "black", marginLeft: "1rem" }}>{t(codeLanguage + '000055')}</Button>
-            </div>
+
+            <TextField
+                name="brandLaborCostPerQuantity"
+                id="brandLaborCostPerQuantity"
+                label="Brand Labor Cost Per Quantity"
+                variant="outlined"
+                size="small"
+                fullWidth
+                value={formData.brandLaborCostPerQuantity}
+                onChange={_handleChange}
+                sx={{ mb: 4 }}
+            />
+
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    gap: 2,
+                    mt: 'auto',
+                }}
+            >
+                <Button
+                    onClick={editClose}
+                    variant="contained"
+                    sx={{
+                        flex: 1,
+                        bgcolor: redColor,
+                        '&:hover': { bgcolor: redColor },
+                    }}
+                >
+                    {t(codeLanguage + '000055')}
+                </Button>
+                <Button
+                    onClick={_handleSubmit}
+                    variant="contained"
+                    sx={{
+                        flex: 1,
+                        bgcolor: primaryColor,
+                        '&:hover': { bgcolor: primaryColor },
+                    }}
+                >
+                    {t(codeLanguage + '000060')}
+                </Button>
+            </Box>
         </Box>
     );
 }

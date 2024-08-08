@@ -15,6 +15,7 @@ import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } 
 import { EditLaborQuantity, LaborQuantity } from "../../../../../models/LaborQuantityModel";
 import EditPricePopUpScreens from "../AdminEditPrice/EditPricePopUpScreens";
 import { margin } from "@mui/system";
+import { greenColor } from "../../../../../root/ColorSystem";
 
 // Make Style of popup
 const style = {
@@ -287,47 +288,34 @@ const AdminManagePrice: React.FC = () => {
                             aria-controls={open ? 'basic-menu' : undefined}
                             aria-haspopup="true"
                             aria-expanded={open ? 'true' : undefined}
-                            onClick={_handleClick}
+                            onClick={_handleAddOpen}
                             endIcon={<Add />}
                             variant="contained"
                             color="primary"
-                            style={{ backgroundColor: `#E96208`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
+                            style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
                         >
                             ADD
                         </Button>
-                        <Menu
-                            id="basic-menu"
-                            anchorEl={anchorEl}
-                            open={open}
-                            onClose={_handleClose}
-                            MenuListProps={{
-                                'aria-labelledby': 'basic-button',
-                            }}
+                        <Modal
+                            open={addOpenOrClose}
+                            aria-labelledby="modal-modal-title"
+                            aria-describedby="modal-modal-description"
                         >
-                            <MenuItem >
-                                <div onClick={_handleAddOpen}>{t(codeLanguage + '000049')}</div>
-                                <Modal
-                                    open={addOpenOrClose}
-                                    aria-labelledby="modal-modal-title"
-                                    aria-describedby="modal-modal-description"
-                                >
-                                    <Box sx={{
-                                        backgroundColor: colors.primary[100], position: 'absolute',
-                                        top: '50%',
-                                        left: '50%',
-                                        transform: 'translate(-50%, -50%)',
-                                        width: "50%",
-                                        bgcolor: 'background.paper',
-                                        border: '2px solid #000',
-                                        boxShadow: 24,
-                                        p: 4,
-                                        borderRadius: "20px"
-                                    }}>
-                                        <AddPriceManual closeCard={_handleAddClose} addNewLaborQuantity={_handleAddLaborQuantity} />
-                                    </Box>
-                                </Modal>
-                            </MenuItem>
-                        </Menu>
+                            <Box sx={{
+                                backgroundColor: colors.primary[100], position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                width: "50%",
+                                bgcolor: 'background.paper',
+                                boxShadow: 24,
+                                p: 4,
+                                borderRadius: "20px"
+                            }}>
+                                <AddPriceManual closeCard={_handleAddClose} addNewLaborQuantity={_handleAddLaborQuantity} />
+                            </Box>
+                        </Modal>
+
                     </div>
                 </div>
 

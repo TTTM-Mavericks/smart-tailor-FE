@@ -8,13 +8,7 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { Brand } from "../../../../../models/ManagerBrandModel";
-import {
-    CancelOutlined,
-    CheckCircleOutline,
-    Close as CloseIcon,
-    ArrowBack,
-    ArrowForward,
-} from "@mui/icons-material";
+import { CancelOutlined, CheckCircleOutline, ArrowBack, ArrowForward } from "@mui/icons-material";
 
 const StyledDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialog-paper': {
@@ -130,6 +124,12 @@ const ManageBrand: React.FC = () => {
                         ...brand,
                         actionTaken: brand.brandStatus !== "ACCEPT" || localStorage.getItem(`brandAction_${brand.brandID}`) === 'true'
                     }));
+
+                    // Sort data by createDate in descending order
+                    updatedData.sort((a: Brand, b: Brand) => {
+                        return new Date(b.createDate).getTime() - new Date(a.createDate).getTime();
+                    });
+
                     setData(updatedData);
                     console.log("Data received:", updatedData);
                 } else {
@@ -138,6 +138,7 @@ const ManageBrand: React.FC = () => {
             })
             .catch(error => console.error('Error fetching data:', error));
     }, []);
+
 
     const handleRowClick = async (params: any) => {
         try {
@@ -357,11 +358,13 @@ const ManageBrand: React.FC = () => {
                         backgroundColor: params.value === 'ACCEPT' ? '#e8f5e9' : '#ffebee',
                         color: params.value === 'ACCEPT' ? '#4caf50' : '#f44336',
                         borderRadius: '16px',
-                        padding: '4px 8px',
+                        padding: '1px 5px',
                         fontSize: '0.75rem',
                         display: 'flex',
                         alignItems: 'center',
                         gap: '4px',
+                        height: "50%",
+                        marginTop: "10%"
                     }}
                 >
                     <Box
@@ -406,7 +409,7 @@ const ManageBrand: React.FC = () => {
     };
 
     return (
-        <Box m="20px">
+        <Box m="20px" style={{ marginTop: "-5%" }}>
             <Box
                 m="40px 0 0 0"
                 height="75vh"
@@ -439,6 +442,14 @@ const ManageBrand: React.FC = () => {
                     },
                     "& .MuiBadge-badge": {
                         display: "none !important"
+                    }, '& .MuiDataGrid-row:nth-of-type(odd)': {
+                        backgroundColor: '#D7E7FF !important',  // Change background color to blue for odd rows
+                    },
+                    '& .MuiDataGrid-row:nth-of-type(even)': {
+                        backgroundColor: '#FFFFFF !important',  // Change background color to red for even rows
+                    },
+                    '& .MuiDataGrid-columnHeaderTitle': {
+                        fontWeight: 'bolder',  // Make header text bolder
                     }
                 }}
             >
