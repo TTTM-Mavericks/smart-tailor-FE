@@ -1,4 +1,4 @@
-import { Box, Button, IconButton, Menu, MenuItem, Modal, Typography } from "@mui/material";
+import { Box, Button, IconButton, Menu, MenuItem, Modal } from "@mui/material";
 import { DataGrid, GridToolbar, GridColDef } from "@mui/x-data-grid";
 import { tokens } from "../../../../../theme";
 import { useTheme } from "@mui/material";
@@ -7,14 +7,14 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Swal from "sweetalert2";
 import EditMaterialPopUpScreens from "../AdminEditMaterial/EditMaterialPopUpScreens";
-import { Add, RestoreFromTrashOutlined, RestoreFromTrashSharp, UndoOutlined } from "@mui/icons-material";
+import { Add, UndoOutlined } from "@mui/icons-material";
 import AddEachMaterialsWithHand from "../../AddEachWithHand/AddEachMaterialWithHandScreens";
 import AddMultipleComponentWithExcel from "../../AddMultipleMaterialWithExcel/AddMultipleMaterialComponent";
 import { useTranslation } from 'react-i18next';
-import { AddExcelMaterial, AddMaterial, ExcelData, Material } from "../../../../../models/AdminMaterialExcelModel";
+import { AddExcelMaterial, AddMaterial, Material } from "../../../../../models/AdminMaterialExcelModel";
 import axios from "axios";
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
-import { height, margin } from "@mui/system";
+import { greenColor } from "../../../../../root/ColorSystem";
 const style = {
     position: 'absolute',
     top: '50%',
@@ -287,35 +287,35 @@ const ManageMaterials: React.FC = () => {
         },
         {
             field: "status",
-            headerName: "status",
+            headerName: "Status",
             flex: 1,
             renderCell: (params) => (
                 <Box
                     sx={{
+                        backgroundColor: params.value === 'Active' ? '#ffebee' : '#e8f5e9',
+                        color: params.value === 'Active' ? '#f44336' : '#4caf50',
+                        borderRadius: '16px',
+                        padding: '1px 5px',
+                        fontSize: '0.75rem',
                         display: 'flex',
                         alignItems: 'center',
+                        gap: '4px',
+                        height: "50%",
+                        marginTop: "10%",
+                        width: "50%"
                     }}
                 >
                     <Box
                         sx={{
-                            width: '8px',
-                            height: '8px',
+                            width: '6px',
+                            height: '6px',
                             borderRadius: '50%',
-                            backgroundColor: params.row.status ? '#4caf50' : '#f44336',
-                            marginRight: '8px',
+                            backgroundColor: params.value === 'Active' ? '#f44336' : '#4caf50',
                         }}
                     />
-                    <Typography
-                        variant="caption"
-                        sx={{
-                            color: params.row.status ? '#4caf50' : '#f44336',
-                            fontWeight: 'medium',
-                        }}
-                    >
-                        {params.row.status ? 'Active' : 'Inactive'}
-                    </Typography>
+                    {params.row.status ? 'ACTIVE' : 'INACTIVE'}
                 </Box>
-            ),
+            )
         },
 
         {
@@ -326,7 +326,7 @@ const ManageMaterials: React.FC = () => {
             renderCell: (params) => (
                 <Box>
                     <IconButton onClick={() => _handleEditClick(params.row.materialID, params.row.categoryName, params.row.materialName, params.row.hsCode, params.row.basePrice, params.row.unit)}>
-                        <EditIcon />
+                        <EditIcon htmlColor='#E96208' />
                     </IconButton>
                     {params.row.status ? (
                         <IconButton onClick={() => _hanldeConfirmUpdateStatus(params.row.materialID)}>
@@ -391,7 +391,7 @@ const ManageMaterials: React.FC = () => {
                 }}
             >
                 <div className="container" style={{ display: "flex", marginTop: "-5%" }}>
-                    <h1 style={{ fontWeight: "bolder", fontSize: "20px" }}>
+                    <h1 style={{ fontWeight: "bolder", fontSize: "20px", marginLeft: "35%" }}>
                         Manage Material Table
                     </h1>
                     <div>
@@ -404,7 +404,7 @@ const ManageMaterials: React.FC = () => {
                             endIcon={<Add />}
                             variant="contained"
                             color="primary"
-                            style={{ backgroundColor: `#E96208`, color: `${colors.primary[200]} !important`, marginLeft: "20%" }}
+                            style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "450%" }}
                         >
                             ADD
                         </Button>
@@ -418,7 +418,7 @@ const ManageMaterials: React.FC = () => {
                             }}
                         >
                             <MenuItem >
-                                <div onClick={_handleAddOpen}>ADD MANUAL</div>
+                                <div onClick={_handleAddOpen}>Add Manual</div>
                                 <Modal
                                     open={addOpenOrClose}
                                     aria-labelledby="modal-modal-title"
@@ -431,7 +431,6 @@ const ManageMaterials: React.FC = () => {
                                         transform: 'translate(-50%, -50%)',
                                         width: "50%",
                                         bgcolor: 'background.paper',
-                                        border: '2px solid #000',
                                         boxShadow: 24,
                                         p: 4,
                                         borderRadius: "20px"
@@ -455,7 +454,6 @@ const ManageMaterials: React.FC = () => {
                                         transform: 'translate(-50%, -50%)',
                                         width: "70%",
                                         bgcolor: colors.primary[100],
-                                        border: '2px solid #000',
                                         boxShadow: 24,
                                         p: 4,
                                         borderRadius: "20px",

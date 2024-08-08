@@ -17,6 +17,7 @@ import axios from 'axios';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import { toast, ToastContainer } from 'react-toastify';
 import { AddExpertTailoringMaterial } from '../../../../models/ManagerExpertTaloringMaterialModel';
+import { CancelOutlined } from '@mui/icons-material';
 
 interface AddExpertTailoringWithHandsFormProps {
     closeCard: () => void;
@@ -152,11 +153,25 @@ const AddEachExpertTailoringWithHand: React.FC<AddExpertTailoringWithHandsFormPr
             <div className="relative w-full p-8 bg-white rounded-xl z-10">
                 <div className="text-center relative">
                     <Typography variant="h6" align="center" gutterBottom>
-                        {t(codeLanguage + '000051')}
+                        Add New Expert Tailoring Material
                     </Typography>
                     <p className="mt-1 text-xs text-gray-400">Add a new expert tailoring below</p>
-                    <IconButton style={{ position: 'absolute', top: '10px', right: '10px' }} onClick={closeCard}>
-                        <CloseIcon />
+                    <IconButton
+                        aria-label="close"
+                        onClick={closeCard}
+                        sx={{
+                            position: 'absolute',
+                            right: 16,
+                            top: 16,
+                            color: '#EC6208',
+                            transition: 'all 0.2s',
+                            '&:hover': {
+                                transform: 'scale(1.1)',
+                                bgcolor: 'rgba(236, 98, 8, 0.1)',
+                            },
+                        }}
+                    >
+                        <CancelOutlined />
                     </IconButton>
                 </div>
                 <form className="mt-6 space-y-2" onSubmit={_handleAdd}>

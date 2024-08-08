@@ -44,3 +44,27 @@ export interface ImageList {
     createDate: string,
     lastModifiedDate: string
 }
+
+export interface BrandOrderTable {
+    orderID: string,
+    parentOrderID: string,
+    quantity: number,
+    orderStatus: string,
+    orderType: string,
+    address: string,
+    province: string,
+    district: string,
+    ward: string,
+    phone: string,
+    buyerName: string,
+    totalPrice: number,
+    expectedStartDate: string,
+    expectedProductCompletionDate: string,
+    estimatedDeliveryDate: string,
+    productionStartDate: string,
+    productionCompletionDate: string,
+    detailList: DetailList[],
+    paymentList: string,
+    createDate: string,
+    orderImageList: ImageList[]
+}

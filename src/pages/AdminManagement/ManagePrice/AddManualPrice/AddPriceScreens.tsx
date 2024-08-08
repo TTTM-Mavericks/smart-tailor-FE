@@ -5,6 +5,8 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import { EditLaborQuantity } from '../../../../models/LaborQuantityModel';
+import { AddCircleOutline, CancelOutlined, RemoveCircleOutline } from '@mui/icons-material';
+import { primaryColor } from '../../../../root/ColorSystem';
 
 interface AddLaborQuantityWithHandsFormProps {
     closeCard: () => void;
@@ -38,8 +40,8 @@ const AddPriceManual: React.FC<AddLaborQuantityWithHandsFormProps> = ({ closeCar
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.labor_quantity + functionEndpoints.laborQantity.addNewLaborQuantity}`;
         try {
             const response = await axios.post(apiUrl, { laborQuantityRequests: prices });
-
             if (response.data.status === 200) {
+                closeCard();
                 Swal.fire(
                     'Add Success!',
                     'Labor quantity has been added!',
@@ -47,43 +49,41 @@ const AddPriceManual: React.FC<AddLaborQuantityWithHandsFormProps> = ({ closeCar
                 );
                 addNewLaborQuantity(prices);
             } else {
+                closeCard();
                 Swal.fire(
                     'Add Labor Quantity Failed!',
                     'Please check the information!',
                     'error'
-                ).then(() => {
-                    closeCard();
-                });
+                )
             }
         } catch (err: any) {
-            console.error('Error:', err);
+            closeCard();
             Swal.fire(
                 'Add Labor Quantity Failed!',
                 'Please check the information!',
                 'error'
-            ).then(() => {
-                closeCard();
-            });
+            );
         }
     };
 
     return (
         <div>
             <IconButton
-                style={{ position: 'absolute', top: 0, right: 0 }}
+                aria-label="close"
                 onClick={closeCard}
+                sx={{ position: 'absolute', right: 8, top: 8, color: 'white' }}
             >
-                <CloseIcon />
+                <CancelOutlined sx={{ color: "red" }} />
             </IconButton>
-            <div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">Add Price</h2>
+            <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr>
-                            <th className="border-b py-2 font-semibold">Min Quantity</th>
-                            <th className="border-b py-2 font-semibold">Max Quantity</th>
-                            <th className="border-b py-2 font-semibold">Min Price</th>
-                            <th className="border-b py-2 font-semibold">Max Price</th>
-                            <th className="border-b py-2 font-semibold">Actions</th>
+                            <th className="border-b py-2 font-semibold" style={{ paddingLeft: "30px" }}>Min Quantity</th>
+                            <th className="border-b py-2 font-semibold" style={{ paddingLeft: "30px" }}>Max Quantity</th>
+                            <th className="border-b py-2 font-semibold" style={{ paddingLeft: "30px" }}>Min Price</th>
+                            <th className="border-b py-2 font-semibold" style={{ paddingLeft: "30px" }}>Max Price</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -133,33 +133,33 @@ const AddPriceManual: React.FC<AddLaborQuantityWithHandsFormProps> = ({ closeCar
                                     <button
                                         type="button"
                                         onClick={() => removePriceRow(index)}
-                                        className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+                                        className="text-red-500 hover:text-red-700 transition-colors duration-200"
                                     >
-                                        Remove
+                                        <RemoveCircleOutline />
                                     </button>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
-                <div style={{ display: "flex" }}>
-                    <button
-                        type="button"
-                        onClick={addNewPriceRow}
-                        className="mt-4 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
-                    >
-                        Add More
-                    </button>
-                    <div onClick={closeCard}>
-                        <button
-                            type="submit"
-                            onClick={handleSubmit}
-                            className="mt-4 ml-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-                        >
-                            Submit
-                        </button>
-                    </div>
-                </div>
+            </div>
+            <div className="mt-6 flex justify-between items-center">
+                <button
+                    type="button"
+                    onClick={addNewPriceRow}
+                    className="flex items-center space-x-1 text-orange-600 hover:text-orange-600 transition-colors duration-200"
+                >
+                    <AddCircleOutline />
+                    <span>Add Labor Quantity</span>
+                </button>
+                <button
+                    type="button"
+                    onClick={handleSubmit}
+                    style={{ backgroundColor: `${primaryColor}` }}
+                    className="text-white py-2 px-4 rounded-md hover:from-orange-600 hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
+                >
+                    Submit
+                </button>
             </div>
         </div>
     );

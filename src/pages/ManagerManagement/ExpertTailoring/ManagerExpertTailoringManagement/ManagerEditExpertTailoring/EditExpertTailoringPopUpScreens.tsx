@@ -7,6 +7,8 @@ import axios from 'axios';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { ExpertTailoringEdit } from "../../../../../models/ManagerExpertTailoringModel";
 import { ToastContainer, toast } from "react-toastify";
+import { primaryColor, redColor } from "../../../../../root/ColorSystem";
+import { CancelOutlined } from "@mui/icons-material";
 
 interface EditExpertTailoringPopUpScreenFormProps {
     fid: {
@@ -217,11 +219,25 @@ const EditExpertTailoringPopUpScreens: React.FC<EditExpertTailoringPopUpScreenFo
                 <div className="relative w-full p-8 bg-white rounded-xl z-10">
                     <div className="text-center relative">
                         <Typography variant="h6" align="center" gutterBottom>
-                            Add New Expert Tailoring
+                            Edit Expert Tailoring
                         </Typography>
                         <p className="mt-1 text-xs text-gray-400">Add a new expert tailoring below</p>
-                        <IconButton style={{ position: 'absolute', top: '10px', right: '10px' }} onClick={editClose}>
-                            <CloseIcon />
+                        <IconButton
+                            aria-label="close"
+                            onClick={editClose}
+                            sx={{
+                                position: 'absolute',
+                                right: 16,
+                                top: 16,
+                                color: '#EC6208',
+                                transition: 'all 0.2s',
+                                '&:hover': {
+                                    transform: 'scale(1.1)',
+                                    bgcolor: 'rgba(236, 98, 8, 0.1)',
+                                },
+                            }}
+                        >
+                            <CancelOutlined />
                         </IconButton>
                     </div>
                     <form className="mt-6 space-y-2" action="#" method="POST">
@@ -283,8 +299,8 @@ const EditExpertTailoringPopUpScreens: React.FC<EditExpertTailoringPopUpScreenFo
                 </div>
             </div>
             <div style={{ textAlign: "center", alignItems: "center", marginTop: 0, bottom: 0 }}>
-                <Button onClick={_handleSubmit} style={{ backgroundColor: "#E96208", width: "78%", borderRadius: "8px", color: "#FFFFFF" }}>{t(codeLanguage + '000060')}</Button>
-                <Button onClick={editClose} style={{ borderRadius: "8px", border: "1px solid black", color: "black", marginLeft: "1rem" }}>{t(codeLanguage + '000055')}</Button>
+                <Button onClick={editClose} style={{ borderRadius: "8px", color: "white", backgroundColor: `${redColor}` }}>{t(codeLanguage + '000055')}</Button>
+                <Button onClick={_handleSubmit} style={{ backgroundColor: `${primaryColor}`, width: "78%", borderRadius: "8px", color: "#FFFFFF", marginLeft: "1rem" }}>{t(codeLanguage + '000060')}</Button>
             </div>
         </Box>
     );

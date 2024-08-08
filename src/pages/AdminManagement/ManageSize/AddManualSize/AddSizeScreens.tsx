@@ -4,6 +4,9 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import { AddSize } from '../../../../models/AdminManageSizeModel';
+import { AddCircleOutline, CancelOutlined, RemoveCircleOutline } from '@mui/icons-material';
+import { IconButton } from '@mui/material';
+import { primaryColor } from '../../../../root/ColorSystem';
 
 interface AddSizeManualProps {
     closeCard: () => void;
@@ -13,8 +16,9 @@ interface AddSizeManualProps {
 const AddSizeManual: React.FC<AddSizeManualProps> = ({ closeCard, addNewSizes }) => {
     // ---------------UseState Variable---------------//
     const [sizes, setSizes] = useState<AddSize[]>([
+        { sizeName: "S" },
         { sizeName: "M" },
-        { sizeName: "S" }
+        { sizeName: "L" },
     ]);
 
     // ---------------FunctionHandler---------------//
@@ -67,6 +71,7 @@ const AddSizeManual: React.FC<AddSizeManualProps> = ({ closeCard, addNewSizes })
             const response = await axios.post(apiUrl, { sizeRequestList: sizes });
 
             if (response.data.status === 200) {
+                closeCard();
                 Swal.fire(
                     'Add Size Success!',
                     'Size has been added!',
@@ -74,76 +79,78 @@ const AddSizeManual: React.FC<AddSizeManualProps> = ({ closeCard, addNewSizes })
                 );
                 addNewSizes(sizes); // Pass new sizes here
             } else {
+                closeCard();
                 Swal.fire(
                     'Add Size Failed!',
                     'Please check the information!',
                     'error'
-                ).then(() => {
-                    closeCard();
-                });
+                )
             }
         } catch (err: any) {
-            console.error('Error:', err);
+            closeCard();
             Swal.fire(
                 'Add Size Failed!',
                 'Please check the information!',
                 'error'
-            ).then(() => {
-                closeCard();
-            });
+            )
         }
     };
 
     return (
-        <div className="h-52 overflow-y-auto overflow-x-hidden scrollbar-none relative p-4 bg-white shadow-md rounded-md">
+        <div>
             <button
                 type="button"
-                className="absolute top-0 right-2 text-gray-500 hover:text-gray-700"
+                className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
                 onClick={closeCard}
             >
-                <CloseIcon />
+                <IconButton
+                    aria-label="close"
+                    onClick={closeCard}
+                    sx={{ position: 'absolute', right: 8, top: 8, color: 'white' }}
+                >
+                    <CancelOutlined sx={{ color: "red" }} />
+                </IconButton>
             </button>
-            {sizes.map((size, index) => (
-                <div key={index} className="mb-4 flex items-center">
-                    <div className="flex-1">
-                        <label htmlFor={`size-${index}`} className="block text-sm font-medium text-gray-700 mb-1">
-                            Size {index + 1}:
-                        </label>
-                        <input
-                            type="text"
-                            name='sizeName'
-                            value={size.sizeName}
-                            onChange={(event) => _handleSizeChange(index, event)}
-                            placeholder="Enter size (e.g., S, M, L)"
-                            className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                        />
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">Add Sizes</h2>
+            <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+                {sizes.map((size, index) => (
+                    <div key={index} className="flex items-center space-x-2">
+                        <div className="flex-grow">
+                            <input
+                                type="text"
+                                value={size.sizeName}
+                                onChange={(event) => _handleSizeChange(index, event)}
+                                placeholder="Enter size (e.g., S, M, L)"
+                                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                            />
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => _handleRemoveSize(index)}
+                            className="text-red-500 hover:text-red-700 transition-colors duration-200"
+                        >
+                            <RemoveCircleOutline />
+                        </button>
                     </div>
-                    <button
-                        type="button"
-                        onClick={() => _handleRemoveSize(index)}
-                        className="ml-4 bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                    >
-                        Remove
-                    </button>
-                </div>
-            ))}
-            <div className="flex space-x-4">
+                ))}
+            </div>
+            <div className="mt-6 flex justify-between items-center">
                 <button
                     type="button"
                     onClick={_handleAddSize}
-                    className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    className="flex items-center space-x-1 text-orange-600 hover:text-orange-600 transition-colors duration-200"
                 >
-                    Add Size
+                    <AddCircleOutline />
+                    <span>Add Size</span>
                 </button>
-                <div onClick={closeCard}>
-                    <button
-                        type="button"
-                        onClick={_handleSubmit}
-                        className="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                    >
-                        Submit
-                    </button>
-                </div>
+                <button
+                    type="button"
+                    onClick={_handleSubmit}
+                    style={{ backgroundColor: `${primaryColor}` }}
+                    className="text-white py-2 px-4 rounded-md hover:from-orange-600 hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
+                >
+                    Submit
+                </button>
             </div>
         </div>
     );

@@ -6,7 +6,7 @@ export interface Report {
     orderResponse: OrderResponse;
     content: string,
     reportStatus: string,
-    reportImageList: ReportImageList,
+    reportImageList: ReportImageList[],
     createDate: string,
     lastModifiedDate: string,
     userResponse?: UserInterface
@@ -55,4 +55,16 @@ export interface ReportImageList {
     reportImageUrl: string,
     createDate: string,
     lastModifiedDate: string
+}
+
+export interface ReportTable {
+    reportID: string;
+    typeOfReport: string;
+    orderResponse: OrderResponse;
+    content: string,
+    reportStatus: string,
+    reportImageList: ReportImageList[],
+    createDate: string,
+    lastModifiedDate: string,
+    userResponse?: UserInterface
 }

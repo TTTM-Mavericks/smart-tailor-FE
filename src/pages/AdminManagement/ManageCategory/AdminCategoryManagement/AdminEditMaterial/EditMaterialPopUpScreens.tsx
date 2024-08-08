@@ -6,6 +6,8 @@ import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { Category } from "../../../../../models/AdminCategoryExcelModel";
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
+import { CancelOutlined } from "@mui/icons-material";
+import { primaryColor, redColor } from "../../../../../root/ColorSystem";
 
 interface EditCategoryPopUpScreenFormProps {
     fid: {
@@ -102,27 +104,97 @@ const EditMCategoryPopUpScreens: React.FC<EditCategoryPopUpScreenFormProps> = ({
     };
 
     return (
-        <Box style={{ height: '222px', overflowY: 'auto' }}>
+        <Box
+            sx={{
+                height: '222px',
+                overflowY: 'auto',
+                position: 'relative',
+                padding: 3,
+                '&::-webkit-scrollbar': {
+                    display: 'none',
+                },
+                scrollbarWidth: 'none', // For Firefox
+            }}
+        >
             <Typography variant="h5" align="left">
                 Edit Category
             </Typography>
+
             <IconButton
-                style={{ position: "absolute", top: 0, right: 0 }}
+                aria-label="close"
                 onClick={editClose}
+                sx={{
+                    position: 'absolute',
+                    right: 16,
+                    top: 16,
+                    color: '#EC6208',
+                    transition: 'all 0.2s',
+                    '&:hover': {
+                        transform: 'scale(1.1)',
+                        bgcolor: 'rgba(236, 98, 8, 0.1)',
+                    },
+                }}
             >
-                <CloseIcon />
+                <CancelOutlined />
             </IconButton>
-            <Box height={50} />
-            <Grid container spacing={4}>
-                <Grid item xs={11}>
-                    <TextField name="categoryName" id="categoryName" label="Category Name" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={formData.categoryName} onChange={_handleChange} />
+
+            <Box mt={6}>
+                <Grid container spacing={4}>
+                    <Grid item xs={12}>
+                        <TextField
+                            name="categoryName"
+                            id="categoryName"
+                            label="Category Name"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            value={formData.categoryName}
+                            onChange={_handleChange}
+                        />
+                    </Grid>
                 </Grid>
-            </Grid>
-            <div style={{ textAlign: "center", alignItems: "center", marginTop: "3rem" }}>
-                <Button onClick={_handleSubmit} style={{ backgroundColor: "#E96208", width: "80%", borderRadius: "8px", color: "#FFFFFF" }}>{t(codeLanguage + '000060')}</Button>
-                <Button onClick={editClose} style={{ borderRadius: "8px", border: "1px solid black", color: "black", marginLeft: "2rem" }}>{t(codeLanguage + '000055')}</Button>
-            </div>
+            </Box>
+
+            <Box
+                mt={4}
+                display="flex"
+                justifyContent="center"
+                gap={2}
+            >
+                <Button
+                    onClick={editClose}
+                    variant="outlined"
+                    sx={{
+                        borderRadius: "8px",
+                        borderColor: "white",
+                        color: "white",
+                        backgroundColor: `${redColor}`,
+                        '&:hover': {
+                            borderColor: "white",
+                            bgcolor: `${redColor}`,
+                        },
+                    }}
+                >
+                    {t(codeLanguage + '000055')}
+                </Button>
+                <Button
+                    onClick={_handleSubmit}
+                    variant="contained"
+                    sx={{
+                        backgroundColor: `${primaryColor}`,
+                        width: "85%",
+                        borderRadius: "8px",
+                        color: "#FFFFFF",
+                        '&:hover': {
+                            bgcolor: `${primaryColor}`,
+                        },
+                    }}
+                >
+                    {t(codeLanguage + '000060')}
+                </Button>
+            </Box>
         </Box>
+
     );
 }
 

@@ -266,6 +266,15 @@ const ManageCustomer: React.FC = () => {
                     },
                     "& .MuiBadge-badge": {
                         display: "none !important"
+                    },
+                    '& .MuiDataGrid-row:nth-of-type(odd)': {
+                        backgroundColor: '#D7E7FF !important',  // Change background color to blue for odd rows
+                    },
+                    '& .MuiDataGrid-row:nth-of-type(even)': {
+                        backgroundColor: '#FFFFFF !important',  // Change background color to red for even rows
+                    },
+                    '& .MuiDataGrid-columnHeaderTitle': {
+                        fontWeight: 'bolder',  // Make header text bolder
                     }
                 }}
             >

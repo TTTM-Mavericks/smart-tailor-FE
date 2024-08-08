@@ -1,5 +1,8 @@
 import { BellAlertIcon } from '@heroicons/react/24/outline';
+import Cookies from 'js-cookie';
 import React from 'react';
+import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
+import { toast } from 'react-toastify';
 
 interface NavbarProps {
     toggleMenu: () => void;
@@ -9,6 +12,27 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ toggleMenu, menu, popperOpen, togglePopper }) => {
+    const __handleLogout = async () => {
+        try {
+            const authToken = Cookies.get('token');
+            const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.signout}`, authToken);
+            if (response.status === 200) {
+                Cookies.remove('token');
+                Cookies.remove('refreshToken');
+                Cookies.remove('userAuth');
+
+                window.location.href = '/auth/signin'
+
+            } else {
+                toast.error(`${response.message}`, { autoClose: 4000 });
+            }
+            console.log(response);
+
+        } catch (error: any) {
+            console.error('Error posting data:', error);
+            toast.error(`${error}`, { autoClose: 4000 });
+        }
+    }
     return (
         <div className="p-4 xl:ml-80">
             <nav className="block w-full max-w-full bg-transparent text-white shadow-none rounded-xl transition-all px-0 py-1">
@@ -105,9 +129,8 @@ const Navbar: React.FC<NavbarProps> = ({ toggleMenu, menu, popperOpen, togglePop
                     >
                         <h3 className="text-lg font-semibold mb-4">Admin Account</h3>
                         <ul>
-                            <li className="py-1">Profile</li>
                             <li className="py-1">Settings</li>
-                            <li className="py-1">Logout</li>
+                            <li className="py-1" onClick={__handleLogout} style={{ cursor: "pointer" }}>Logout</li>
                         </ul>
                     </div>
                 )}

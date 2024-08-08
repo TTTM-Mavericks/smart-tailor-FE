@@ -6,6 +6,8 @@ import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { Sizes } from "../../../../../models/AdminManageSizeModel";
+import { CancelOutlined } from "@mui/icons-material";
+import { primaryColor, redColor } from "../../../../../root/ColorSystem";
 
 interface EditSizePopUpScreenFormProps {
     fid: {
@@ -103,23 +105,34 @@ const EditSizePopUpScreens: React.FC<EditSizePopUpScreenFormProps> = ({ fid, edi
     return (
         <Box style={{ height: '222px', overflowY: 'auto' }}>
             <Typography variant="h5" align="left">
-                {t(codeLanguage + '000068')}
+                Edit Size
             </Typography>
             <IconButton
-                style={{ position: "absolute", top: 0, right: 0 }}
+                aria-label="close"
                 onClick={editClose}
+                sx={{
+                    position: 'absolute',
+                    right: 16,
+                    top: 16,
+                    color: '#EC6208',
+                    transition: 'all 0.2s',
+                    '&:hover': {
+                        transform: 'scale(1.1)',
+                        bgcolor: 'rgba(236, 98, 8, 0.1)',
+                    },
+                }}
             >
-                <CloseIcon />
+                <CancelOutlined />
             </IconButton>
             <Box height={50} />
             <Grid container spacing={4}>
-                <Grid item xs={11}>
+                <Grid item xs={12}>
                     <TextField name="sizeName" id="sizeName" label="Size Name" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={formData.sizeName} onChange={_handleChange} />
                 </Grid>
             </Grid>
             <div style={{ textAlign: "center", alignItems: "center", marginTop: "3rem" }}>
-                <Button onClick={_handleSubmit} style={{ backgroundColor: "#E96208", width: "80%", borderRadius: "8px", color: "#FFFFFF" }}>{t(codeLanguage + '000060')}</Button>
-                <Button onClick={editClose} style={{ borderRadius: "8px", border: "1px solid black", color: "black", marginLeft: "1rem" }}>{t(codeLanguage + '000055')}</Button>
+                <Button onClick={editClose} style={{ borderRadius: "8px", color: "white", backgroundColor: `${redColor}`, }}>{t(codeLanguage + '000055')}</Button>
+                <Button onClick={_handleSubmit} style={{ backgroundColor: `${primaryColor}`, width: "85%", borderRadius: "8px", color: "#FFFFFF", marginLeft: "1rem" }}>{t(codeLanguage + '000060')}</Button>
             </div>
         </Box>
     );

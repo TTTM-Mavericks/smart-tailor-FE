@@ -10,7 +10,8 @@ import {
     Select,
     InputLabel,
     MenuItem,
-    SelectChangeEvent
+    SelectChangeEvent,
+    Container
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import Swal from 'sweetalert2';
@@ -18,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { AddMaterial, Material } from '../../../../models/AdminMaterialExcelModel';
 import axios from 'axios';
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
+import { CancelOutlined } from '@mui/icons-material';
 
 interface AddMaterialWithHandsFormProps {
     closeCard: () => void;
@@ -135,102 +137,110 @@ const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
     };
 
     return (
-        <Box style={{
-            height: '500px',
-            overflowY: 'auto',
-            overflowX: 'hidden',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-            '&::WebkitScrollbar': {
-                width: 0,
-                backgroundColor: '#f5f5f5',
-            }
-        }}>
-            <div>
-                <Typography variant="h5" align="center">
-                    Add New Category And Material Manual
+        <Box>
+            <Container maxWidth="md">
+                <Typography variant="h4" align="center">
+                    Add Material
                 </Typography>
-                <IconButton style={{ position: 'absolute', top: 0, right: 0 }} onClick={closeCard}>
-                    <CloseIcon />
-                </IconButton>
-                <Box height={50} />
-                <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                        <FormControl fullWidth>
-                            <InputLabel id="category-select-label">Category Name</InputLabel>
-                            <Select
-                                labelId="category-select-label"
-                                id="category-select"
-                                name="categoryName"
-                                value={formData.categoryName}
-                                onChange={_handleFormChange}
-                                label="Category Name"
-                            >
-                                {categoryData.map((category, index) => (
-                                    <MenuItem key={index} value={category}>
-                                        {category}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Grid>
-                    <Grid item xs={12}>
-                        <TextField
-                            fullWidth
-                            label="Material Name"
-                            variant="outlined"
-                            size="small"
-                            name="materialName"
-                            value={formData.materialName}
-                            onChange={_handleFormChange}
-                        />
-                    </Grid>
 
-                    <Grid item xs={12}>
-                        <TextField
-                            fullWidth
-                            label="Unit"
-                            variant="outlined"
-                            size="small"
-                            name="unit"
-                            value={formData.unit}
-                            onChange={_handleFormChange}
-                        />
-                    </Grid>
-
-                    <Grid item xs={12}>
-                        <TextField
-                            fullWidth
-                            label="HS Code"
-                            variant="outlined"
-                            size="small"
-                            name="hsCode"
-                            value={formData.hsCode}
-                            onChange={_handleFormChange}
-                        />
-                    </Grid>
-
-                    <Grid item xs={12}>
-                        <TextField
-                            fullWidth
-                            label="Base Price"
-                            variant="outlined"
-                            size="small"
-                            name="basePrice"
-                            value={formData.basePrice}
-                            onChange={_handleFormChange}
-                        />
-                    </Grid>
-                </Grid>
-                <div
+                <IconButton
+                    aria-label="close"
                     onClick={closeCard}
-                    style={{ textAlign: 'center', alignItems: 'center', marginTop: '3rem' }}
+                    sx={{
+                        position: 'absolute',
+                        right: 16,
+                        top: 16,
+                        color: '#EC6208',
+                        transition: 'transform 0.2s',
+                        '&:hover': {
+                            transform: 'scale(1.1)',
+                        },
+                    }}
                 >
-                    <Button onClick={_handleSubmit} style={{ backgroundColor: "#EC6208", color: "white" }}>
+                    <CancelOutlined />
+                </IconButton>
+
+                <Box my={4}>
+                    <Grid container spacing={3}>
+                        <Grid item xs={12} sm={6}>
+                            <FormControl fullWidth variant="outlined">
+                                <InputLabel id="category-select-label">Category Name</InputLabel>
+                                <Select
+                                    labelId="category-select-label"
+                                    id="category-select"
+                                    name="categoryName"
+                                    value={formData.categoryName}
+                                    onChange={_handleFormChange}
+                                    label="Category Name"
+                                >
+                                    {categoryData.map((category, index) => (
+                                        <MenuItem key={index} value={category}>
+                                            {category}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+
+                        {['Material Name', 'Unit', 'HS Code'].map((label, index) => (
+                            <Grid item xs={12} sm={6} key={label}>
+                                <TextField
+                                    fullWidth
+                                    label={label}
+                                    variant="outlined"
+                                    name={label.toLowerCase().replace(' ', '')}
+                                    value={formData[label.toLowerCase().replace(' ', '')]}
+                                    onChange={_handleFormChange}
+                                    InputProps={{
+                                        sx: {
+                                            '&:hover fieldset': {
+                                                borderColor: '#EC6208',
+                                            },
+                                            '&.Mui-focused fieldset': {
+                                                borderColor: '#EC6208',
+                                            },
+                                        },
+                                    }}
+                                />
+                            </Grid>
+                        ))}
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                label="Base Price"
+                                variant="outlined"
+                                size="small"
+                                name="basePrice"
+                                value={formData.basePrice}
+                                onChange={_handleFormChange}
+                            />
+                        </Grid>
+                    </Grid>
+                </Box>
+
+                <Box mt={4}>
+                    <Button
+                        onClick={_handleSubmit}
+                        variant="contained"
+                        fullWidth
+                        sx={{
+                            backgroundColor: "#EC6208",
+                            color: "white",
+                            fontWeight: 'bold',
+                            padding: '12px',
+                            borderRadius: '8px',
+                            boxShadow: '0 4px 6px rgba(236, 98, 8, 0.2)',
+                            transition: 'all 0.3s',
+                            '&:hover': {
+                                backgroundColor: "#d55500",
+                                boxShadow: '0 6px 8px rgba(236, 98, 8, 0.3)',
+                            },
+                        }}
+                    >
                         Submit
                     </Button>
-                </div>
-            </div>
+                </Box>
+            </Container>
         </Box>
     );
 }
