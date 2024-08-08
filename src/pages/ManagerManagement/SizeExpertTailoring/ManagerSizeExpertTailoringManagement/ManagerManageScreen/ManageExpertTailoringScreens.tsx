@@ -294,7 +294,7 @@ const ManageSizeExpertTailoring: React.FC = () => {
                 }}
             >
                 <div className="container" style={{ display: "flex", marginTop: "-5%" }}>
-                    <h1 style={{ fontWeight: "bolder", fontSize: "20px", marginLeft: "25%" }}>
+                    <h1 style={{ fontWeight: "bolder", fontSize: "20px", marginLeft: "10px" }}>
                         Manage Size Expert Tailoring Table
                     </h1>
                     <Button
@@ -306,7 +306,7 @@ const ManageSizeExpertTailoring: React.FC = () => {
                         endIcon={<Add />}
                         variant="contained"
                         color="primary"
-                        style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "30%" }}
+                        style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "55%" }}
                     >
                         {t(codeLanguage + '000048')}
                     </Button>

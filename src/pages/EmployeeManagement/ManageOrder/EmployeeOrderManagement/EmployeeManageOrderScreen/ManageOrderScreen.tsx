@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa';
-import { ArrowDropDown, BrandingWatermark } from '@mui/icons-material';
+import { ArrowDropDown, BrandingWatermark, Cancel, Verified, ViewAgenda, ViewAgendaOutlined, Visibility } from '@mui/icons-material';
 import axios from 'axios';
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { EmployeeOrder, EmployeeOrderTable, ImageList } from '../../../../../models/EmployeeManageOrderModel';
@@ -18,7 +18,7 @@ import { IoMdCloseCircleOutline } from 'react-icons/io';
 import { __handlegetRatingStyle, __handlegetStatusBackgroundBoolean } from '../../../../../utils/ElementUtils';
 import style from './EmployeeManageOrderStyle.module.scss'
 import { OrderDetailInterface } from '../../../../../models/OrderModel';
-import { Box, CircularProgress, useTheme } from '@mui/material';
+import { Box, CircularProgress, IconButton, Tooltip, useTheme } from '@mui/material';
 import { CustomerReportOrderDialogComponent } from '../../../../../components';
 import Select from 'react-select';
 import { width } from '@mui/system';
@@ -890,34 +890,30 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
                         onClick={() => toggleActions(params.row.orderID)}
                         className="font-medium text-blue-600 "
                     >
-                        ...
+                        More <ArrowDropDown />
                     </button>
                     {openActions === params.row.orderID && (
                         <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
-                            <button
-                                onClick={() => onViewDetails(params.row, null)}
-                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 "
-                            >
-                                View Details
-                            </button>
-                            <button
-                                onClick={() => __handleOpenInputSampleProductDialog(params.row.orderID)}
-                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            >
-                                View Sample Data
-                            </button>
-                            <button
-                                onClick={() => onUpdatedOrderPending(params.row.orderID)}
-                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            >
-                                Verify Order
-                            </button>
-                            <button
-                                onClick={() => __handleOpenReportDialog(params.row.orderID)}
-                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            >
-                                Cancel
-                            </button>
+                            <Tooltip title="View Details">
+                                <IconButton onClick={() => onViewDetails(params.row, null)}>
+                                    <Visibility />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="View Sample Data">
+                                <IconButton onClick={() => __handleOpenInputSampleProductDialog(params.row.orderID)}>
+                                    <ViewAgendaOutlined />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Verify Order">
+                                <IconButton onClick={() => onUpdatedOrderPending(params.row.orderID)}>
+                                    <Verified />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Cancel">
+                                <IconButton onClick={() => __handleOpenReportDialog(params.row.orderID)}>
+                                    <Cancel />
+                                </IconButton>
+                            </Tooltip>
                         </div>
                     )}
                 </div>

@@ -386,12 +386,11 @@ const ManageMaterials: React.FC = () => {
                     },
                     '& .MuiDataGrid-toolbarContainer': {
                         padding: '10px',
-                        marginLeft: '60%'
                     }
                 }}
             >
                 <div className="container" style={{ display: "flex", marginTop: "-5%" }}>
-                    <h1 style={{ fontWeight: "bolder", fontSize: "20px", marginLeft: "35%" }}>
+                    <h1 style={{ fontWeight: "bolder", fontSize: "20px", marginLeft: "1%" }}>
                         Manage Material Table
                     </h1>
                     <div>
@@ -404,7 +403,7 @@ const ManageMaterials: React.FC = () => {
                             endIcon={<Add />}
                             variant="contained"
                             color="primary"
-                            style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "450%" }}
+                            style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "900%" }}
                         >
                             ADD
                         </Button>
