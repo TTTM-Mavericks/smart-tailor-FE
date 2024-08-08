@@ -1064,21 +1064,24 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
                 <div>
                     <button
                         onClick={() => toggleActions(params.row.orderID)}
-                        className="font-medium text-blue-600 "
+                        className="font-medium text-green-600 "
                     >
                         More <ArrowDropDown />
                     </button>
                     {openActions === params.row.orderID && (
                         <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
                             <Tooltip title="View Details">
-                                <IconButton onClick={() => onViewDetails(params.row, designDetails)}>
+                                <IconButton onClick={() => onViewDetails(params.row, designDetails)} style={{ color: 'blue' }}>
                                     <Visibility />
                                 </IconButton>
                             </Tooltip>
 
                             {params.row.orderStatus !== 'CANCEL' && params.row.orderStatus !== 'COMPLETED' && (
                                 <Tooltip title="Update Process">
-                                    <IconButton onClick={() => __handleOpenUpdateProcessDialog(params.row)}>
+                                    <IconButton
+                                        onClick={() => __handleOpenUpdateProcessDialog(params.row)}
+                                        style={{ color: 'teal' }}
+                                    >
                                         <ViewAgendaOutlined />
                                     </IconButton>
                                 </Tooltip>
@@ -1086,7 +1089,10 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
 
                             {params.row.orderStatus === 'CHECKING_SAMPLE_DATA' && (
                                 <Tooltip title="Update Sample Data">
-                                    <IconButton onClick={() => __handleOpenInputSampleProductDialog(params.row.orderID)}>
+                                    <IconButton
+                                        onClick={() => __handleOpenInputSampleProductDialog(params.row.orderID)}
+                                        style={{ color: 'pink' }}
+                                    >
                                         <Verified />
                                     </IconButton>
                                 </Tooltip>
@@ -1097,7 +1103,10 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
                             )}
                             {params.row.orderStatus !== 'COMPLETED' && params.row.orderStatus !== 'CANCEL' && (
                                 <Tooltip title="Cancel">
-                                    <IconButton onClick={() => __handleOpenReportDialog()}>
+                                    <IconButton
+                                        onClick={() => __handleOpenReportDialog()}
+                                        style={{ color: 'crimson' }}
+                                    >
                                         <Cancel />
                                     </IconButton>
                                 </Tooltip>

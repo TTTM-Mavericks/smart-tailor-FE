@@ -313,19 +313,22 @@ const ReportTables: React.FC<ReportTableProps> = ({ reports, onViewDetails, onUp
                 <div>
                     <button
                         onClick={() => toggleActions(params.row.reportID)}
-                        className="font-medium text-blue-600 "
+                        className="font-medium text-green-600 "
                     >
                         More <ArrowDropDown />
                     </button>
                     {openActions === params.row.reportID && (
                         <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
                             <Tooltip title="View Details">
-                                <IconButton onClick={() => onViewDetails(params.row)}>
+                                <IconButton onClick={() => onViewDetails(params.row)} style={{ color: 'blue' }}>
                                     <Visibility />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Mark as Resolved">
-                                <IconButton onClick={() => onUpdatedOrderPending(params.row.orderResponse.orderID)}>
+                                <IconButton
+                                    onClick={() => onUpdatedOrderPending(params.row.orderResponse.orderID)}
+                                    style={{ color: 'purple' }}
+                                >
                                     <MarkChatRead />
                                 </IconButton>
                             </Tooltip>

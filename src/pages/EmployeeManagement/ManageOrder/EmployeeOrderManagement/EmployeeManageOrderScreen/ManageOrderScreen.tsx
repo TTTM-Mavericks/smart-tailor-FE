@@ -888,29 +888,29 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
                 <div>
                     <button
                         onClick={() => toggleActions(params.row.orderID)}
-                        className="font-medium text-blue-600 "
+                        className="font-medium text-green-600 "
                     >
                         More <ArrowDropDown />
                     </button>
                     {openActions === params.row.orderID && (
                         <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
                             <Tooltip title="View Details">
-                                <IconButton onClick={() => onViewDetails(params.row, null)}>
+                                <IconButton onClick={() => onViewDetails(params.row, null)} style={{ color: 'blue' }}>
                                     <Visibility />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="View Sample Data">
-                                <IconButton onClick={() => __handleOpenInputSampleProductDialog(params.row.orderID)}>
+                                <IconButton onClick={() => __handleOpenInputSampleProductDialog(params.row.orderID)} style={{ color: 'green' }}>
                                     <ViewAgendaOutlined />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Verify Order">
-                                <IconButton onClick={() => onUpdatedOrderPending(params.row.orderID)}>
+                                <IconButton onClick={() => onUpdatedOrderPending(params.row.orderID)} style={{ color: 'orange' }}>
                                     <Verified />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Cancel">
-                                <IconButton onClick={() => __handleOpenReportDialog(params.row.orderID)}>
+                                <IconButton onClick={() => __handleOpenReportDialog(params.row.orderID)} style={{ color: 'red' }}>
                                     <Cancel />
                                 </IconButton>
                             </Tooltip>
