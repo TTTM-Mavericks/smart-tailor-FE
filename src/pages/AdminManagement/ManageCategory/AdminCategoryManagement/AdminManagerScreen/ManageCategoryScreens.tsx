@@ -312,7 +312,7 @@ const ManageCategories: React.FC = () => {
                     <DataGrid
                         rows={data}
                         columns={columns}
-                        // slots={{ toolbar: GridToolbar }}
+                        slots={{ toolbar: GridToolbar }}
                         disableRowSelectionOnClick
                         getRowId={getRowId}
                     />

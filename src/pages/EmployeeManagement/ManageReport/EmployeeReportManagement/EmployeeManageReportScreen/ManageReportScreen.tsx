@@ -2,12 +2,18 @@ import React, { useState, useEffect } from 'react';
 import './ManageReportStyles.module.scss'
 import { motion } from 'framer-motion';
 import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import { Report, ReportImageList } from '../../../../../models/EmployeeManageReportModel';
+import { Report, ReportImageList, ReportTable } from '../../../../../models/EmployeeManageReportModel';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import axios from 'axios';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
 import { greenColor, redColor, secondaryColor } from '../../../../../root/ColorSystem';
 import Select from 'react-select';
+import { Box, useTheme } from '@mui/material';
+import { tokens } from '../../../../../theme';
+import { DataGrid, GridColDef, GridRenderCellParams, GridToolbar } from '@mui/x-data-grid';
+import { toast } from 'react-toastify';
+import { UserInterface } from '../../../../../models/UserModel';
+import Cookies from 'js-cookie';
 
 const getStatusColor = (status: string) => {
     switch (status) {
@@ -36,9 +42,10 @@ const OrderReport: React.FC<{
     onMarkResolved: (reportID: string) => void;
 }> = ({ report, onViewDetails, onMarkResolved }) => (
     <div className="bg-white mb-8 shadow-lg rounded-lg p-6 transition duration-300 ease-in-out transform hover:shadow-xl">
-        <h3 className="font-semibold mb-3 text-indigo-700 text-sm">Type Report: {report.typeOfReport}</h3>
+        <h3 className="font-semibold mb-3 text-indigo-700 text-sm">Report ID: {report.reportID}</h3>
         <div className="flex justify-between">
             <div className="w-1/2">
+                <p className="text-gray-600 mb-2 text-sm">Type Of Report: {report.typeOfReport}</p>
                 <p className="text-gray-600 mb-2 text-sm">Customer: {report.orderResponse.buyerName}</p>
                 <p className="text-gray-600 mb-2 text-sm">Date: {report.createDate}</p>
                 <p className="text-gray-700 mt-2 text-sm">Content: {report.content}</p>
@@ -161,7 +168,7 @@ const ReportModal: React.FC<{ report: Report; onClose: () => void; onMarkResolve
                 <div className="flex justify-between items-center mb-6 bg-indigo-50 p-4 rounded-lg">
                     <div className="flex items-center">
                         <FaClipboardCheck className="text-indigo-500 mr-2" size={20} />
-                        <span className="text-sm  font-semibold text-gray-700">Order ID:</span>
+                        <span className="text-sm  font-semibold text-gray-700">Report ID:</span>
                         <p className="text-sm font-bold text-indigo-700 ml-2">{report.reportID}</p>
                     </div>
                 </div>
@@ -245,6 +252,150 @@ const ReportModal: React.FC<{ report: Report; onClose: () => void; onMarkResolve
     );
 };
 
+/**
+ * 
+ * @param param0 
+ * @returns 
+ * Order Table
+ */
+interface ReportTableProps {
+    reports: ReportTable[];
+    onViewDetails: (report: ReportTable) => void;
+    onUpdatedOrderPending: (reportID: string) => void;
+}
+
+const ReportTables: React.FC<ReportTableProps> = ({ reports, onViewDetails, onUpdatedOrderPending }) => {
+    const [openActions, setOpenActions] = useState<string | null>(null);
+
+    const toggleActions = (reportID: string) => {
+        if (openActions === reportID) {
+            setOpenActions(null);
+        } else {
+            setOpenActions(reportID);
+        }
+    };
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'NOT_VERIFY': return 'bg-gray-100 text-gray-800';
+            case 'PENDING': return 'bg-yellow-100 text-yellow-800';
+            case 'DEPOSIT': return 'bg-blue-100 text-blue-800';
+            case 'PROCESSING': return 'bg-orange-100 text-orange-800';
+            case 'CANCEL': return 'bg-red-100 text-red-800';
+            case 'COMPLETED': return 'bg-green-100 text-green-800';
+            case 'DELIVERED': return 'bg-indigo-100 text-indigo-800';
+            default: return 'bg-gray-100 text-gray-800';
+        }
+    };
+
+    const columns: GridColDef[] = [
+        { field: 'reportID', headerName: 'Report ID', width: 150 },
+        { field: 'buyerName', headerName: 'Customer', width: 150, renderCell: (params) => params.row.orderResponse.buyerName },
+        { field: 'address', headerName: 'Address', width: 200, renderCell: (params) => params.row.orderResponse.address },
+        { field: 'phone', headerName: 'Phone', width: 120, renderCell: (params) => params.row.orderResponse.phone },
+        { field: 'expectedStartDate', headerName: 'Date', width: 150, renderCell: (params) => params.row.orderResponse.expectedStartDate },
+        {
+            field: 'orderStatus',
+            headerName: 'Order Status',
+            width: 150,
+            renderCell: (params: GridRenderCellParams) => (
+                <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(params.row.orderResponse.orderStatus)}`}>
+                    {params.row.orderResponse.orderStatus}
+                </span>
+            )
+        },
+        {
+            field: 'actions',
+            headerName: 'Actions',
+            width: 200,
+            renderCell: (params: GridRenderCellParams) => (
+                <div>
+                    <button
+                        onClick={() => toggleActions(params.row.reportID)}
+                        className="font-medium text-blue-600 "
+                    >
+                        ...
+                    </button>
+                    {openActions === params.row.reportID && (
+                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+                            <button
+                                onClick={() => onViewDetails(params.row)}
+                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            >
+                                View Details
+                            </button>
+                            <button
+                                onClick={() => onUpdatedOrderPending(params.row.orderResponse.orderID)}
+                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            >
+                                Mark as Resolved
+                            </button>
+                        </div>
+                    )}
+                </div>
+            )
+        }
+    ];
+
+    const getRowId = (row: any) => `${row.reportID}`;
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
+
+    return (
+        <Box
+            sx={{
+                height: "75vh",
+                width: '100%',
+                '& .MuiDataGrid-row:nth-of-type(odd)': {
+                    backgroundColor: '#D7E7FF !important',
+                },
+                '& .MuiDataGrid-row:nth-of-type(even)': {
+                    backgroundColor: '#FFFFFF !important',
+                },
+                '& .MuiDataGrid-columnHeaderTitle': {
+                    fontWeight: 'bolder',
+                },
+                "& .MuiDataGrid-root": {
+                    border: "none",
+                },
+                "& .MuiDataGrid-cell": {
+                    borderBottom: "none",
+                },
+                "& .name-column--cell": {
+                    color: colors.primary[300],
+                },
+                "& .MuiDataGrid-columnHeaders": {
+                    backgroundColor: colors.primary[300],
+                    borderBottom: "none",
+                },
+                "& .MuiDataGrid-virtualScroller": {
+                    backgroundColor: colors.primary[100],
+                },
+                "& .MuiDataGrid-footerContainer": {
+                    borderTop: "none",
+                    backgroundColor: colors.primary[100],
+                },
+                "& .MuiCheckbox-root": {
+                    color: `${colors.primary[100]} !important`,
+                },
+                "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+                    color: `${colors.primary[200]} !important`,
+                },
+                "& .MuiBadge-badge": {
+                    display: "none !important"
+                }
+            }}
+        >
+            <DataGrid
+                rows={reports}
+                columns={columns}
+                slots={{ toolbar: GridToolbar }}
+                getRowId={getRowId}
+            />
+        </Box>
+    );
+};
+
 const EmployeeManageReport: React.FC = () => {
     const [reports, setReports] = useState<Report[]>([]);
     const [filteredReports, setFilteredReports] = useState<Report[]>([]);
@@ -263,13 +414,15 @@ const EmployeeManageReport: React.FC = () => {
     const [filters, setFilters] = useState({
         orderID: '',
         createDate: '',
-        status: ''
+        status: '',
+        reportID: ''
     });
     const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
     const filterOptions = [
         { value: 'Date', label: 'Date' },
         { value: 'Order ID', label: 'Order ID' },
-        { value: 'Order Status', label: 'Order Status' }
+        { value: 'Report ID', label: 'Report ID' },
+        { value: 'Order Status', label: 'Order Status' },
     ];
     useEffect(() => {
         const apiUrl = `${baseURL}${versionEndpoints.v1}${featuresEndpoints.report}${functionEndpoints.report.getAllReport}`;
@@ -308,7 +461,6 @@ const EmployeeManageReport: React.FC = () => {
         setFilters(prev => ({ ...prev, [name]: value }));
     };
 
-
     /**
      * 
      * @param orderDetail 
@@ -319,7 +471,8 @@ const EmployeeManageReport: React.FC = () => {
         return (
             (filters.orderID === '' || report.orderResponse.orderID.includes(filters.orderID)) &&
             (filters.createDate === '' || (report.createDate?.includes(filters.createDate) ?? false)) &&
-            (filters.status === '' || report.orderResponse.orderStatus === filters.status)
+            (filters.status === '' || report.orderResponse.orderStatus === filters.status) &&
+            (filters.reportID === '' || report.reportID === filters.reportID)
         );
     };
 
@@ -391,23 +544,47 @@ const EmployeeManageReport: React.FC = () => {
         handleCloseModal();
     };
 
+    const [isTableView, setIsTableView] = useState(false);
+
+    const toggleView = () => {
+        setIsTableView(!isTableView);
+    };
+
+
     return (
         <div className='-mt-8'>
             <div style={{ width: "100%" }}>
                 <div className="flex flex-col">
                     <div className="mb-6">
-                        <label htmlFor="filterSelect" className="block mb-2 text-lg font-semibold text-gray-700">Select Filters</label>
-                        <Select
-                            isMulti
-                            name="filters"
-                            options={filterOptions}
-                            className="basic-multi-select"
-                            classNamePrefix="select"
-                            value={filterOptions.filter(option => selectedFilters.includes(option.value))}
-                            onChange={(selectedOptions: any) => {
-                                setSelectedFilters(selectedOptions.map((option: any) => option.value));
-                            }}
-                        />
+                        <div className="flex mt-5">
+                            <div className="w-7/10" style={{ width: "80%" }}>
+                                <Select
+                                    isMulti
+                                    name="filters"
+                                    options={filterOptions}
+                                    className="basic-multi-select"
+                                    classNamePrefix="select"
+                                    value={filterOptions.filter(option => selectedFilters.includes(option.value))}
+                                    onChange={(selectedOptions: any) => {
+                                        setSelectedFilters(selectedOptions.map((option: any) => option.value));
+                                    }}
+                                />
+                            </div>
+                            <div className="flex border border-gray-300 rounded-md overflow-hidden" style={{ marginLeft: "auto" }}>
+                                <button
+                                    className={`px-4 py-2 ${!isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'}`}
+                                    onClick={() => setIsTableView(false)}
+                                >
+                                    Card
+                                </button>
+                                <button
+                                    className={`px-4 py-2 ${isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'}`}
+                                    onClick={() => setIsTableView(true)}
+                                >
+                                    Table
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
@@ -433,6 +610,21 @@ const EmployeeManageReport: React.FC = () => {
                                     id="orderIdFilter"
                                     name="orderID"
                                     value={filters.orderID}
+                                    onChange={handleFilterChange}
+                                    placeholder="Enter Order ID"
+                                    className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
+                                />
+                            </div>
+                        )}
+
+                        {selectedFilters.includes('Report ID') && (
+                            <div className="filter-item">
+                                <label htmlFor="reportIdFilter" className="block mb-2 text-sm font-medium text-gray-700">Report ID</label>
+                                <input
+                                    type="text"
+                                    id="reportIdFilter"
+                                    name="reportID"
+                                    value={filters.reportID}
                                     onChange={handleFilterChange}
                                     placeholder="Enter Order ID"
                                     className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
@@ -467,76 +659,83 @@ const EmployeeManageReport: React.FC = () => {
             </div>
 
             <div>
-                {filteredReports.slice(indexOfFirstReport, indexOfLastReport).map(report => (
-                    <OrderReport
-                        key={report.reportID}
-                        report={report}
+                {isTableView ? (
+                    <ReportTables
+                        reports={filteredReports}
                         onViewDetails={handleViewDetails}
-                        onMarkResolved={handleMarkResolved}
+                        onUpdatedOrderPending={handleMarkResolved}
                     />
-                ))}
+                ) :
+                    (<div>
+                        {filteredReports.slice(indexOfFirstReport, indexOfLastReport).map(report => (
+                            <OrderReport
+                                key={report.reportID}
+                                report={report}
+                                onViewDetails={handleViewDetails}
+                                onMarkResolved={handleMarkResolved}
+                            />
+                        ))}
+                        <div className="mt-8 flex flex-wrap items-center justify-center space-x-4">
+                            <select
+                                value={itemsPerPage}
+                                onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                                className="border rounded-md px-3 py-2 text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:border-orange-500"
+                            >
+                                <option value={5}>5/page</option>
+                                <option value={10}>10/page</option>
+                                <option value={20}>20/page</option>
+                                <option value={50}>50/page</option>
+                            </select>
+
+                            <button
+                                onClick={() => paginate(currentPage - 1)}
+                                disabled={currentPage === 1}
+                                className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                            >
+                                &lt;
+                            </button>
+
+                            {renderPageNumbers().map((number, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => typeof number === 'number' && paginate(number)}
+                                    className={`px-3 py-2 rounded-md ${number === currentPage
+                                        ? 'bg-orange-500 text-white'
+                                        : 'text-gray-700 hover:bg-gray-100'
+                                        } ${number === '...' ? 'cursor-default' : ''}`}
+                                >
+                                    {number}
+                                </button>
+                            ))}
+
+                            <button
+                                onClick={() => paginate(currentPage + 1)}
+                                disabled={currentPage === totalPages}
+                                className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                            >
+                                &gt;
+                            </button>
+
+                            <div className="flex items-center space-x-2 mt-4 sm:mt-0">
+                                <span className="text-gray-600">Go to</span>
+                                <input
+                                    type="text"
+                                    className="border border-gray-300 rounded-md w-16 px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                    value={goToPage}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoToPage(e.target.value)}
+                                    onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                                        if (e.key === 'Enter') {
+                                            const page = Math.max(1, Math.min(parseInt(goToPage), totalPages));
+                                            if (!isNaN(page)) {
+                                                paginate(page);
+                                            }
+                                        }
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </div>)}
             </div>
-
-            <div className="mt-8 flex flex-wrap items-center justify-center space-x-4">
-                <select
-                    value={itemsPerPage}
-                    onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-                    className="border rounded-md px-3 py-2 text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:border-orange-500"
-                >
-                    <option value={5}>5/page</option>
-                    <option value={10}>10/page</option>
-                    <option value={20}>20/page</option>
-                    <option value={50}>50/page</option>
-                </select>
-
-                <button
-                    onClick={() => paginate(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
-                >
-                    &lt;
-                </button>
-
-                {renderPageNumbers().map((number, index) => (
-                    <button
-                        key={index}
-                        onClick={() => typeof number === 'number' && paginate(number)}
-                        className={`px-3 py-2 rounded-md ${number === currentPage
-                            ? 'bg-orange-500 text-white'
-                            : 'text-gray-700 hover:bg-gray-100'
-                            } ${number === '...' ? 'cursor-default' : ''}`}
-                    >
-                        {number}
-                    </button>
-                ))}
-
-                <button
-                    onClick={() => paginate(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
-                >
-                    &gt;
-                </button>
-
-                <div className="flex items-center space-x-2 mt-4 sm:mt-0">
-                    <span className="text-gray-600">Go to</span>
-                    <input
-                        type="text"
-                        className="border border-gray-300 rounded-md w-16 px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                        value={goToPage}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoToPage(e.target.value)}
-                        onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                            if (e.key === 'Enter') {
-                                const page = Math.max(1, Math.min(parseInt(goToPage), totalPages));
-                                if (!isNaN(page)) {
-                                    paginate(page);
-                                }
-                            }
-                        }}
-                    />
-                </div>
-            </div>
-
             {isModalOpen && selectedReport && (
                 <ReportModal
                     report={selectedReport}

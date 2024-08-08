@@ -1,5 +1,5 @@
 import { Box, Button, IconButton, Menu, MenuItem, Modal } from "@mui/material";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../../../../theme";
 import { useTheme } from "@mui/material";
 import * as React from "react";
@@ -266,6 +266,7 @@ const ManageSizes: React.FC = () => {
                     <DataGrid
                         rows={data}
                         columns={columns}
+                        slots={{ toolbar: GridToolbar }}
                         disableRowSelectionOnClick
                         getRowId={getRowId}
                     />

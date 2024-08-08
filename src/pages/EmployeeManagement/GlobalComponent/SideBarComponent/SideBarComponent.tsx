@@ -25,7 +25,7 @@ const Sidebar: React.FC<SidebarProps> = ({ menuOpen, toggleMenu, activeMenu, han
             </div>
             <div className="m-4">
                 <ul className="mb-4 flex flex-col gap-1">
-                    <li>
+                    {/* <li>
                         <Link to="/employee" onClick={() => handleMenuClick('employee_manage_customer')} className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'employee_manage_customer' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}>
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
                                 <path fillRule="evenodd" d="M8.25 6.75a3.75 3.75 0 117.5 0 3.75 3.75 0 01-7.5 0zM15.75 9.75a3 3 0 116 0 3 3 0 01-6 0zM2.25 9.75a3 3 0 116 0 3 3 0 01-6 0zM6.31 15.117A6.745 6.745 0 0112 12a6.745 6.745 0 016.709 3.117 6.516 6.516 0 01-2.285 2.312 6.673 6.673 0 01-3.424 1.191 6.673 6.673 0 01-3.424-1.191 6.516 6.516 0 01-2.285-2.312z" clipRule="evenodd" />
@@ -42,7 +42,7 @@ const Sidebar: React.FC<SidebarProps> = ({ menuOpen, toggleMenu, activeMenu, han
                             </svg>
                             <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">Manage Brand</p>
                         </div>
-                    </li>
+                    </li> */}
                     <li>
                         <div onClick={() => handleMenuClick('employee_manage_report')} className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'employee_manage_report' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}>
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
@@ -59,7 +59,7 @@ const Sidebar: React.FC<SidebarProps> = ({ menuOpen, toggleMenu, activeMenu, han
                             <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">Manage Order</p>
                         </div>
                     </li>
-                    <li>
+                    {/* <li>
                         <div onClick={() => handleMenuClick('employee_manage_transaction')} className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'employee_manage_transaction' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}>
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
                                 <path d="M10.464 8.746c.227-.18.497-.311.786-.394v2.795a2.252 2.252 0 01-.786-.393c-.394-.313-.546-.681-.546-1.004 0-.323.152-.691.546-1.004zM12.75 15.662v-2.824c.347.085.664.228.921.421.427.32.579.686.579.991 0 .305-.152.671-.579.991a2.534 2.534 0 01-.921.42z" />
@@ -67,7 +67,7 @@ const Sidebar: React.FC<SidebarProps> = ({ menuOpen, toggleMenu, activeMenu, han
                             </svg>
                             <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">Manage Transaction</p>
                         </div>
-                    </li>
+                    </li> */}
                     <li>
                         <div onClick={() => handleMenuClick('employee_manage_notification')} className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'employee_manage_notification' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}>
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">

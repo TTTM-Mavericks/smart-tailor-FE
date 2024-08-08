@@ -18,9 +18,12 @@ import { IoMdCloseCircleOutline } from 'react-icons/io';
 import { __handlegetRatingStyle, __handlegetStatusBackgroundBoolean } from '../../../../../utils/ElementUtils';
 import style from './EmployeeManageOrderStyle.module.scss'
 import { OrderDetailInterface } from '../../../../../models/OrderModel';
-import { CircularProgress } from '@mui/material';
+import { Box, CircularProgress, useTheme } from '@mui/material';
 import { CustomerReportOrderDialogComponent } from '../../../../../components';
 import Select from 'react-select';
+import { width } from '@mui/system';
+import { DataGrid, GridColDef, GridRenderCellParams, GridToolbar } from '@mui/x-data-grid';
+import { tokens } from '../../../../../theme';
 
 
 /**
@@ -861,70 +864,124 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
         }
     };
 
+    const columns: GridColDef[] = [
+        { field: 'orderID', headerName: 'Order ID', width: 150 },
+        { field: 'buyerName', headerName: 'Customer', width: 150 },
+        { field: 'address', headerName: 'Address', width: 150 },
+        { field: 'phone', headerName: 'phone', width: 150 },
+        { field: 'expectedStartDate', headerName: 'Date', width: 200 },
+        {
+            field: 'orderStatus',
+            headerName: 'Status',
+            width: 150,
+            renderCell: (params: GridRenderCellParams) => (
+                <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(params.value)}`}>
+                    {params.value}
+                </span>
+            )
+        },
+        {
+            field: 'actions',
+            headerName: 'Actions',
+            width: 150,
+            renderCell: (params: GridRenderCellParams) => (
+                <div>
+                    <button
+                        onClick={() => toggleActions(params.row.orderID)}
+                        className="font-medium text-blue-600 "
+                    >
+                        ...
+                    </button>
+                    {openActions === params.row.orderID && (
+                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+                            <button
+                                onClick={() => onViewDetails(params.row, null)}
+                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 "
+                            >
+                                View Details
+                            </button>
+                            <button
+                                onClick={() => __handleOpenInputSampleProductDialog(params.row.orderID)}
+                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            >
+                                View Sample Data
+                            </button>
+                            <button
+                                onClick={() => onUpdatedOrderPending(params.row.orderID)}
+                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            >
+                                Verify Order
+                            </button>
+                            <button
+                                onClick={() => __handleOpenReportDialog(params.row.orderID)}
+                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    )}
+                </div>
+            )
+        }
+    ];
+
+    const getRowId = (row: any) => `${row.orderID}`;
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
     return (
         <>
-            <div className="overflow-x-auto shadow-md sm:rounded-lg">
-                <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                    <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                        <tr>
-                            <th scope="col" className="px-6 py-3">Order ID</th>
-                            <th scope="col" className="px-6 py-3">Customer</th>
-                            <th scope="col" className="px-6 py-3">Date</th>
-                            <th scope="col" className="px-6 py-3">Status</th>
-                            <th scope="col" className="px-6 py-3">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {orders.map((order) => (
-                            <tr key={order.orderID} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{order.orderID}</td>
-                                <td className="px-6 py-4">{order.buyerName}</td>
-                                <td className="px-6 py-4">{order.createDate}</td>
-                                <td className="px-6 py-4">
-                                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.orderStatus)}`}>
-                                        {order.orderStatus}
-                                    </span>
-                                </td>
-                                <td className="px-6 py-4">
-                                    <button
-                                        onClick={() => toggleActions(order.orderID)}
-                                        className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                                    >
-                                        ...
-                                    </button>
-                                    {openActions === order.orderID && (
-                                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 dark:bg-gray-700">
-                                            <button
-                                                onClick={() => onViewDetails(order, null)}
-                                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600"
-                                            >
-                                                View Details
-                                            </button>
-                                            <button
-                                                onClick={() => __handleOpenInputSampleProductDialog(order.orderID)}
-                                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600"
-                                            >
-                                                View Sample Data
-                                            </button>
-                                            <button
-                                                onClick={() => onUpdatedOrderPending(order.orderID)}
-                                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600"
-                                            >
-                                                Verify Order
-                                            </button>
-                                            <button
-                                                onClick={() => __handleOpenReportDialog(order.orderID)}
-                                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600"
-                                            >
-                                                Cancel
-                                            </button>
-                                        </div>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+            <div className="overflow-x-auto shadow-md sm:rounded-lg -mt-6">
+                <Box
+                    sx={{
+                        height: "75vh",  // Adjust height as needed
+                        width: '100%',  // Adjust width as needed
+                        '& .MuiDataGrid-row:nth-of-type(odd)': {
+                            backgroundColor: '#D7E7FF !important',  // Change background color to blue for odd rows
+                        },
+                        '& .MuiDataGrid-row:nth-of-type(even)': {
+                            backgroundColor: '#FFFFFF !important',  // Change background color to red for even rows
+                        },
+                        '& .MuiDataGrid-columnHeaderTitle': {
+                            fontWeight: 'bolder',  // Make header text bolder
+                        },
+                        "& .MuiDataGrid-root": {
+                            border: "none",
+                        },
+                        "& .MuiDataGrid-cell": {
+                            borderBottom: "none",
+                        },
+                        "& .name-column--cell": {
+                            color: colors.primary[300],
+                        },
+                        "& .MuiDataGrid-columnHeaders": {
+                            backgroundColor: colors.primary[300],
+                            borderBottom: "none",
+                        },
+                        "& .MuiDataGrid-virtualScroller": {
+                            backgroundColor: colors.primary[100],
+                        },
+                        "& .MuiDataGrid-footerContainer": {
+                            borderTop: "none",
+                            backgroundColor: colors.primary[100],
+                        },
+                        "& .MuiCheckbox-root": {
+                            color: `${colors.primary[100]} !important`,
+                        },
+                        "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+                            color: `${colors.primary[200]} !important`,
+                        },
+                        "& .MuiBadge-badge": {
+                            display: "none !important"
+                        }
+                    }}
+                >
+                    <DataGrid
+                        rows={orders}
+                        columns={columns}
+                        slots={{ toolbar: GridToolbar }}
+                        getRowId={getRowId}
+                    />
+                </Box>
             </div>
             <ViewSampleUpdateDialog
                 isOpen={isDialogOpen}
@@ -1146,7 +1203,7 @@ const EmployeeManageOrder: React.FC = () => {
         handleCloseModal();
     };
 
-    const [isTableView, setIsTableView] = useState(true);
+    const [isTableView, setIsTableView] = useState(false);
 
     const toggleView = () => {
         setIsTableView(!isTableView);
@@ -1160,31 +1217,38 @@ const EmployeeManageOrder: React.FC = () => {
                 </div>
             ) : (
                 <>
-                    <div className="flex mt-5">
-                        <button
-                            onClick={toggleView}
-                            className="ml-auto px-4 py-2 text-white rounded"
-                            style={{ backgroundColor: `${primaryColor}` }}
-                        >
-                            Switch to {isTableView ? 'Card' : 'Table'} View
-                        </button>
-                    </div>
-
                     <div style={{ width: "100%" }}>
                         <div className="flex flex-col">
                             <div className="mb-6">
-                                <label htmlFor="filterSelect" className="block mb-2 text-lg font-semibold text-gray-700">Select Filters</label>
-                                <Select
-                                    isMulti
-                                    name="filters"
-                                    options={filterOptions}
-                                    className="basic-multi-select"
-                                    classNamePrefix="select"
-                                    value={filterOptions.filter(option => selectedFilters.includes(option.value))}
-                                    onChange={(selectedOptions: any) => {
-                                        setSelectedFilters(selectedOptions.map((option: any) => option.value));
-                                    }}
-                                />
+                                <div className="flex mt-5">
+                                    <div className="w-7/10" style={{ width: "80%" }}>
+                                        <Select
+                                            isMulti
+                                            name="filters"
+                                            options={filterOptions}
+                                            className="basic-multi-select"
+                                            classNamePrefix="select"
+                                            value={filterOptions.filter(option => selectedFilters.includes(option.value))}
+                                            onChange={(selectedOptions: any) => {
+                                                setSelectedFilters(selectedOptions.map((option: any) => option.value));
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="flex border border-gray-300 rounded-md overflow-hidden" style={{ marginLeft: "auto" }}>
+                                        <button
+                                            className={`px-4 py-2 ${!isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'}`}
+                                            onClick={() => setIsTableView(false)}
+                                        >
+                                            Card
+                                        </button>
+                                        <button
+                                            className={`px-4 py-2 ${isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'}`}
+                                            onClick={() => setIsTableView(true)}
+                                        >
+                                            Table
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
@@ -1250,7 +1314,7 @@ const EmployeeManageOrder: React.FC = () => {
                             onUpdatedOrderPending={handleUpdateOrder}
                         />
                     ) : (
-                        <div >
+                        <div>
                             {currentOrders.map(order => (
                                 <EmployeeOrderFields
                                     key={order.orderID}
@@ -1259,68 +1323,67 @@ const EmployeeManageOrder: React.FC = () => {
                                     onUpdatedOrderPending={handleUpdateOrder}
                                 />
                             ))}
+                            <div className="mt-8 flex flex-wrap items-center justify-center space-x-4">
+                                <select
+                                    value={itemsPerPage}
+                                    onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                                    className="border rounded-md px-3 py-2 text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:border-orange-500"
+                                >
+                                    <option value={5}>5/page</option>
+                                    <option value={10}>10/page</option>
+                                    <option value={20}>20/page</option>
+                                    <option value={50}>50/page</option>
+                                </select>
+
+                                <button
+                                    onClick={() => paginate(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                    className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                                >
+                                    &lt;
+                                </button>
+
+                                {renderPageNumbers().map((number, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => typeof number === 'number' && paginate(number)}
+                                        className={`px-3 py-2 rounded-md ${number === currentPage
+                                            ? 'bg-orange-500 text-white'
+                                            : 'text-gray-700 hover:bg-gray-100'
+                                            } ${number === '...' ? 'cursor-default' : ''}`}
+                                    >
+                                        {number}
+                                    </button>
+                                ))}
+
+                                <button
+                                    onClick={() => paginate(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                    className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                                >
+                                    &gt;
+                                </button>
+
+                                <div className="flex items-center space-x-2 mt-4 sm:mt-0">
+                                    <span className="text-gray-600">Go to</span>
+                                    <input
+                                        type="text"
+                                        className="border border-gray-300 rounded-md w-16 px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                        value={goToPage}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoToPage(e.target.value)}
+                                        onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                                            if (e.key === 'Enter') {
+                                                const page = Math.max(1, Math.min(parseInt(goToPage), totalPages));
+                                                if (!isNaN(page)) {
+                                                    paginate(page);
+                                                }
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            </div>
                         </div>
                     )}
-
-                    <div className="mt-8 flex flex-wrap items-center justify-center space-x-4">
-                        <select
-                            value={itemsPerPage}
-                            onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-                            className="border rounded-md px-3 py-2 text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:border-orange-500"
-                        >
-                            <option value={5}>5/page</option>
-                            <option value={10}>10/page</option>
-                            <option value={20}>20/page</option>
-                            <option value={50}>50/page</option>
-                        </select>
-
-                        <button
-                            onClick={() => paginate(currentPage - 1)}
-                            disabled={currentPage === 1}
-                            className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
-                        >
-                            &lt;
-                        </button>
-
-                        {renderPageNumbers().map((number, index) => (
-                            <button
-                                key={index}
-                                onClick={() => typeof number === 'number' && paginate(number)}
-                                className={`px-3 py-2 rounded-md ${number === currentPage
-                                    ? 'bg-orange-500 text-white'
-                                    : 'text-gray-700 hover:bg-gray-100'
-                                    } ${number === '...' ? 'cursor-default' : ''}`}
-                            >
-                                {number}
-                            </button>
-                        ))}
-
-                        <button
-                            onClick={() => paginate(currentPage + 1)}
-                            disabled={currentPage === totalPages}
-                            className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
-                        >
-                            &gt;
-                        </button>
-
-                        <div className="flex items-center space-x-2 mt-4 sm:mt-0">
-                            <span className="text-gray-600">Go to</span>
-                            <input
-                                type="text"
-                                className="border border-gray-300 rounded-md w-16 px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                value={goToPage}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoToPage(e.target.value)}
-                                onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                                    if (e.key === 'Enter') {
-                                        const page = Math.max(1, Math.min(parseInt(goToPage), totalPages));
-                                        if (!isNaN(page)) {
-                                            paginate(page);
-                                        }
-                                    }
-                                }}
-                            />
-                        </div>
-                    </div>
 
                     {isModalOpen && selectedOrder && (
                         <EmployeeOrderModal
@@ -1331,8 +1394,9 @@ const EmployeeManageOrder: React.FC = () => {
                         />
                     )}
                 </>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 };
 

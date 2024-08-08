@@ -318,7 +318,7 @@ const ManageMaterialComponent: React.FC = () => {
     const getRowId = (row: any) => `${row.id}-${row.materialName}`;
 
     return (
-        <Box m="20px" sx={{ marginTop: "-5%" }}>
+        <Box m="20px" sx={{ marginTop: "-6%" }}>
             <Box
                 m="40px 0 0 0"
                 height="75vh"
@@ -354,38 +354,43 @@ const ManageMaterialComponent: React.FC = () => {
                     }
                 }}
             >
-                <Button
-                    id="basic-button"
-                    aria-controls={open ? 'basic-menu' : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={open ? 'true' : undefined}
-                    onClick={_handleAddMultipleOpen}
-                    endIcon={<Add />}
-                    variant="contained"
-                    color="primary"
-                    style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
-                >
-                    {t(codeLanguage + '000048')}
-                </Button>
-                <Modal
-                    open={addMultiple}
-                    aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description"
-                >
-                    <Box sx={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        width: "70%",
-                        bgcolor: colors.primary[100],
-                        boxShadow: 24,
-                        p: 4,
-                        borderRadius: "20px"
-                    }}>
-                        <AddMultipleMaterialWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddMultipleMaterial} />
-                    </Box>
-                </Modal>
+                <div className="container" style={{ display: "flex", marginTop: "-5%" }}>
+                    <h1 style={{ fontWeight: "bolder", fontSize: "20px", marginLeft: "35%" }}>
+                        Manage Material Table
+                    </h1>
+                    <Button
+                        id="basic-button"
+                        aria-controls={open ? 'basic-menu' : undefined}
+                        aria-haspopup="true"
+                        aria-expanded={open ? 'true' : undefined}
+                        onClick={_handleAddMultipleOpen}
+                        endIcon={<Add />}
+                        variant="contained"
+                        color="primary"
+                        style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "30%" }}
+                    >
+                        {t(codeLanguage + '000048')}
+                    </Button>
+                    <Modal
+                        open={addMultiple}
+                        aria-labelledby="modal-modal-title"
+                        aria-describedby="modal-modal-description"
+                    >
+                        <Box sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            width: "70%",
+                            bgcolor: colors.primary[100],
+                            boxShadow: 24,
+                            p: 4,
+                            borderRadius: "20px"
+                        }}>
+                            <AddMultipleMaterialWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddMultipleMaterial} />
+                        </Box>
+                    </Modal>
+                </div>
                 <Box
                     sx={{
                         height: "100%",  // Adjust height as needed

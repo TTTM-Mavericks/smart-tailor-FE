@@ -309,75 +309,80 @@ const ManageExpertTailoring: React.FC = () => {
                     }
                 }}
             >
-                <Button
-                    id="basic-button"
-                    aria-controls={open ? 'basic-menu' : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={open ? 'true' : undefined}
-                    onClick={_handleClick}
-                    endIcon={<Add />}
-                    variant="contained"
-                    color="primary"
-                    style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
-                >
-                    {t(codeLanguage + '000048')}
-                </Button>
-                <Menu
-                    id="basic-menu"
-                    anchorEl={anchorEl}
-                    open={open}
-                    onClose={_handleClose}
-                    MenuListProps={{
-                        'aria-labelledby': 'basic-button',
-                    }}
-                >
-                    <MenuItem >
-                        <div onClick={_handleAddOpen}>{t(codeLanguage + '000049')}</div>
-                        <Modal
-                            open={addOpenOrClose}
-                            aria-labelledby="modal-modal-title"
-                            aria-describedby="modal-modal-description"
-                        >
-                            <Box sx={{
-                                backgroundColor: colors.primary[100], position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: "50%",
-                                bgcolor: 'background.paper',
-                                boxShadow: 24,
-                                p: 4,
-                                borderRadius: "20px"
-                            }}>
-                                <AddEachExpertTailoringWithHand closeCard={_handleAddClose} addNewExpertTailoring={_handleAddExpertTailoring} />
-                            </Box>
-                        </Modal>
-                    </MenuItem>
+                <div className="container" style={{ display: "flex", marginTop: "-5%" }}>
+                    <h1 style={{ fontWeight: "bolder", fontSize: "20px", marginLeft: "30%" }}>
+                        Manage Expert Tailoring Table
+                    </h1>
+                    <Button
+                        id="basic-button"
+                        aria-controls={open ? 'basic-menu' : undefined}
+                        aria-haspopup="true"
+                        aria-expanded={open ? 'true' : undefined}
+                        onClick={_handleClick}
+                        endIcon={<Add />}
+                        variant="contained"
+                        color="primary"
+                        style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "30%" }}
+                    >
+                        {t(codeLanguage + '000048')}
+                    </Button>
+                    <Menu
+                        id="basic-menu"
+                        anchorEl={anchorEl}
+                        open={open}
+                        onClose={_handleClose}
+                        MenuListProps={{
+                            'aria-labelledby': 'basic-button',
+                        }}
+                    >
+                        <MenuItem >
+                            <div onClick={_handleAddOpen}>{t(codeLanguage + '000049')}</div>
+                            <Modal
+                                open={addOpenOrClose}
+                                aria-labelledby="modal-modal-title"
+                                aria-describedby="modal-modal-description"
+                            >
+                                <Box sx={{
+                                    backgroundColor: colors.primary[100], position: 'absolute',
+                                    top: '50%',
+                                    left: '50%',
+                                    transform: 'translate(-50%, -50%)',
+                                    width: "50%",
+                                    bgcolor: 'background.paper',
+                                    boxShadow: 24,
+                                    p: 4,
+                                    borderRadius: "20px"
+                                }}>
+                                    <AddEachExpertTailoringWithHand closeCard={_handleAddClose} addNewExpertTailoring={_handleAddExpertTailoring} />
+                                </Box>
+                            </Modal>
+                        </MenuItem>
 
-                    <MenuItem>
-                        <div onClick={_handleAddMultipleOpen}>{t(codeLanguage + '000050')}</div>
-                        <Modal
-                            open={addMultiple}
-                            aria-labelledby="modal-modal-title"
-                            aria-describedby="modal-modal-description"
-                        >
-                            <Box sx={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: "70%",
-                                bgcolor: colors.primary[100],
-                                boxShadow: 24,
-                                p: 4,
-                                borderRadius: "20px"
-                            }}>
-                                <AddMultipleExpertTailoringComponentWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddExpertTailoring} />
-                            </Box>
-                        </Modal>
+                        <MenuItem>
+                            <div onClick={_handleAddMultipleOpen}>{t(codeLanguage + '000050')}</div>
+                            <Modal
+                                open={addMultiple}
+                                aria-labelledby="modal-modal-title"
+                                aria-describedby="modal-modal-description"
+                            >
+                                <Box sx={{
+                                    position: 'absolute',
+                                    top: '50%',
+                                    left: '50%',
+                                    transform: 'translate(-50%, -50%)',
+                                    width: "70%",
+                                    bgcolor: colors.primary[100],
+                                    boxShadow: 24,
+                                    p: 4,
+                                    borderRadius: "20px"
+                                }}>
+                                    <AddMultipleExpertTailoringComponentWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddExpertTailoring} />
+                                </Box>
+                            </Modal>
 
-                    </MenuItem>
-                </Menu>
+                        </MenuItem>
+                    </Menu>
+                </div>
                 <Box
                     sx={{
                         height: "100%",  // Adjust height as needed
