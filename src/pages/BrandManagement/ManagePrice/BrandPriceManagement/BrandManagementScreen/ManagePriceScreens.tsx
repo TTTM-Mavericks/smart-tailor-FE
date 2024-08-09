@@ -317,20 +317,24 @@ const ManagePrice: React.FC = () => {
                     }
                 }}
             >
-                <Button
-                    id="basic-button"
-                    aria-controls={open ? 'basic-menu' : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={open ? 'true' : undefined}
-                    onClick={_handleAddOpen}
-                    endIcon={<Add />}
-                    variant="contained"
-                    color="primary"
-                    style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
-                >
-                    {t(codeLanguage + '000048')}
-                </Button>
-
+                <div className="container" style={{ display: "flex", marginTop: "-5%" }}>
+                    <h1 style={{ fontWeight: "bolder", fontSize: "20px", marginLeft: "7px" }}>
+                        Manage Price Table
+                    </h1>
+                    <Button
+                        id="basic-button"
+                        aria-controls={open ? 'basic-menu' : undefined}
+                        aria-haspopup="true"
+                        aria-expanded={open ? 'true' : undefined}
+                        onClick={_handleAddOpen}
+                        endIcon={<Add />}
+                        variant="contained"
+                        color="primary"
+                        style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "70%" }}
+                    >
+                        {t(codeLanguage + '000048')}
+                    </Button>
+                </div>
                 <Modal
                     open={addOpenOrClose}
                     aria-labelledby="modal-modal-title"
