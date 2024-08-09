@@ -665,7 +665,7 @@ const OrderDetailScreen: React.FC = () => {
 
                     )}
 
-                    {orderDetail?.orderStatus !== 'NOT_VERIFY' && (
+                    {orderDetail?.orderStatus !== 'NOT_VERIFY' && orderDetail?.orderStatus !== 'CANCEL' && (
 
 
                         <div className="mt-0 border-t pt-4 flex">

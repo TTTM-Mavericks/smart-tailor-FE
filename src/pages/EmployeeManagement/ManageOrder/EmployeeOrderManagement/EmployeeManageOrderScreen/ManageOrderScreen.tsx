@@ -24,6 +24,7 @@ import Select from 'react-select';
 import { width } from '@mui/system';
 import { DataGrid, GridColDef, GridRenderCellParams, GridToolbar } from '@mui/x-data-grid';
 import { tokens } from '../../../../../theme';
+import { __handleGetDateTimeColor, __isNearCurrentDate } from '../../../../../utils/DateUtils';
 
 
 /**
@@ -682,49 +683,67 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
                     <div key={itemIndex} className=" relative flex flex-col md:flex-row items-start md:items-center mt-10 mb-4 md:mb-6 border-b pb-4 md:pb-6">
                         <div className="flex-shrink-0">
                         </div>
-                        <div className="ml-0 md:ml-6 mt-4 md:mt-0 flex-grow" style={{ position: 'relative' }}>
-                            <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Sub ID: <span className="text-sm text-gray-500 pb-2"> {order.orderID}</span></p>
-                            <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Type: <span className="text-sm text-blue-700 pb-2"> {order.orderType}</span></p>
-                            <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Brand ID: <span className="text-sm text-gray-500 pb-2">{order.brand?.brandID}</span></p>
-                            <p style={{ fontWeight: '500' }} className="text-sm text-black flex content-center items-center">Brand:
-                                <p style={{ fontWeight: '500' }} className="text-sm text-black flex content-center items-center">
-                                    <img src={order.brand?.user.imageUrl} style={{ width: 30, height: 30, borderRadius: 90, marginLeft: 5, marginRight: 5 }}></img>
-                                    <p className={`${__handlegetRatingStyle(order.brand?.rating)} text-sm text-gray-500`} > {order.brand?.brandName}</p>
+                        <div className="ml-0 md:ml-6 mt-4 md:mt-0 flex-grow grid grid-cols-1 md:grid-cols-2 gap-x-6" style={{ position: 'relative' }}>
+                            <div>
+                                <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">
+                                    Sub ID: <span className="text-sm text-gray-500 pb-2"> {order.orderID}</span>
                                 </p>
-                            </p>
-                            <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Rating: <span className="text-sm text-gray-500 pb-2">{order.brand?.rating}</span></p>
+                                <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">
+                                    Type: <span className="text-sm text-blue-700 pb-2"> {order.orderType}</span>
+                                </p>
+                                <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">
+                                    Brand ID: <span className="text-sm text-gray-500 pb-2">{order.brand?.brandID}</span>
+                                </p>
+                                <p style={{ fontWeight: '500' }} className="text-sm text-black flex content-center items-center">
+                                    Brand:
+                                    <span className="flex content-center items-center">
+                                        <img src={order.brand?.user.imageUrl} style={{ width: 30, height: 30, borderRadius: 90, marginLeft: 5, marginRight: 5 }} alt="Brand" />
+                                        <span className={`${__handlegetRatingStyle(order.brand?.rating)} text-sm text-gray-500`}> {order.brand?.brandName}</span>
+                                    </span>
+                                </p>
+                                <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">
+                                    Rating: <span className="text-sm text-gray-500 pb-2">{order.brand?.rating}</span>
+                                </p>
 
-                            <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Total price: <span className="text-sm text-gray-500 pb-2"> {__handleAddCommasToNumber(order.totalPrice)} VND</span></p>
-                            <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Expected start at: <span className="text-sm text-gray-500 pb-2"> {order.expectedStartDate}</span></p>
-                            <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Expected complete at: <span className="text-sm text-gray-500 pb-2"> {order.expectedProductCompletionDate}</span></p>
+                                <p style={{ fontWeight: '500' }} className="text-sm text-black pb-0">
+                                    Details:
+                                    {order.detailList?.map((detail, index) => (
+                                        <div key={index} className="ml-0 grid grid-cols-2 gap-x-10 pt-0">
+                                            <p className="text-sm text-gray-500 pb-2">Size: {detail.size?.sizeName}</p>
+                                            <p className="text-sm text-gray-500 pb-2">Quantity: {detail.quantity}</p>
+                                        </div>
+                                    ))}
+                                </p>
+                            </div>
 
-                            <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2 flex content-center items-center">Status:
-                                <button
-                                    className={`py-1 px-3 rounded-full ml-2 text-white `}
-                                    style={{ backgroundColor: getStatusColorOfSubOrder(order.orderStatus) }}
-                                >
-                                    {order.orderStatus}
-
-                                </button>
-                            </p>
-                            <p style={{ fontWeight: '500' }} className="text-sm text-black pb-4">Details:
-                                {order.detailList?.map((detail) => (
-                                    <div className='ml-14 grid grid-cols-5 gap-5 pt-0'>
-                                        <p className="text-sm text-gray-500 pb-2">Size: {detail.size?.sizeName}</p>
-                                        <p className="text-sm text-gray-500 pb-2">Quantity: {detail.quantity}</p>
-                                    </div>
-                                ))}
-                            </p>
+                            <div>
+                                <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">
+                                    Total price: <span className="text-sm text-gray-500 pb-2"> {__handleAddCommasToNumber(order.totalPrice)} VND</span>
+                                </p>
+                                <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">
+                                    Expected start at: <span className="text-sm text-gray-500 pb-2"> {order.expectedStartDate}</span>
+                                </p>
+                                <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">
+                                    Expected complete at: <span className={`text-sm pb-2 ${__handleGetDateTimeColor(order.expectedProductCompletionDate)}`}> {order.expectedProductCompletionDate}</span>
+                                </p>
+                                <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2 flex content-center items-center">
+                                    Status:
+                                    <button className={`py-1 px-3 rounded-full ml-2 text-white`} style={{ backgroundColor: getStatusColorOfSubOrder(order.orderStatus) }}>
+                                        {order.orderStatus}
+                                    </button>
+                                </p>
+                            </div>
 
                         </div>
+
                         {order.orderStatus !== 'COMPLETED' && (
                             <>
                                 <button
                                     onClick={() => __handleOpenReportDialog()}
-                                    className="px-3 py-1 text-white rounded-md hover:bg-red-700 transition duration-200 mr-4"
-                                    style={{ backgroundColor: redColor, position: 'absolute', bottom: 20, right: 10, fontSize: 12 }}
+                                    className="px-3 py-2 text-white rounded-md hover:bg-red-700 transition duration-200 mr-4"
+                                    style={{ backgroundColor: redColor, position: 'absolute', bottom: 10, right: 0, fontSize: 12 }}
                                 >
-                                    CANCEL BRAND
+                                    Cancel brand
                                 </button>
                             </>
                         )}
