@@ -318,7 +318,7 @@ const ManageExpertTailoringMaterial: React.FC = () => {
                 }}
             >
                 <div className="container" style={{ display: "flex", marginTop: "-5%" }}>
-                    <h1 style={{ fontWeight: "bolder", fontSize: "20px", marginLeft: "30%" }}>
+                    <h1 style={{ fontWeight: "bolder", fontSize: "20px", marginLeft: "10px" }}>
                         Manage Material Exper Tailoring Table
                     </h1>
                     <Button
@@ -330,7 +330,7 @@ const ManageExpertTailoringMaterial: React.FC = () => {
                         endIcon={<Add />}
                         variant="contained"
                         color="primary"
-                        style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "25%" }}
+                        style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "50%" }}
                     >
                         {t(codeLanguage + '000048')}
                     </Button>

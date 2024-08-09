@@ -279,7 +279,7 @@ const AdminManagePrice: React.FC = () => {
                 }}
             >
                 <div className="container" style={{ display: "flex" }}>
-                    <h1 style={{ fontWeight: "bolder", fontSize: "20px", marginLeft: "40%" }}>
+                    <h1 style={{ fontWeight: "bolder", fontSize: "20px", marginLeft: "10px" }}>
                         Manage Material Table
                     </h1>
                     <div style={{ marginLeft: "20%" }}>
@@ -292,7 +292,7 @@ const AdminManagePrice: React.FC = () => {
                             endIcon={<Add />}
                             variant="contained"
                             color="primary"
-                            style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
+                            style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "620%" }}
                         >
                             ADD
                         </Button>

@@ -355,7 +355,7 @@ const ManageMaterialComponent: React.FC = () => {
                 }}
             >
                 <div className="container" style={{ display: "flex", marginTop: "-5%" }}>
-                    <h1 style={{ fontWeight: "bolder", fontSize: "20px", marginLeft: "35%" }}>
+                    <h1 style={{ fontWeight: "bolder", fontSize: "20px", marginLeft: "7px" }}>
                         Manage Material Table
                     </h1>
                     <Button
@@ -367,7 +367,7 @@ const ManageMaterialComponent: React.FC = () => {
                         endIcon={<Add />}
                         variant="contained"
                         color="primary"
-                        style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "30%" }}
+                        style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "65%" }}
                     >
                         {t(codeLanguage + '000048')}
                     </Button>

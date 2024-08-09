@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaChevronLeft, FaChevronRight, FaTimes, FaCheck } from 'react-icons/fa';
-import { ArrowDropDown } from '@mui/icons-material';
+import { ArrowDropDown, Cancel, Update, UpdateOutlined, Verified, ViewAgendaOutlined, Visibility } from '@mui/icons-material';
 import axios from 'axios';
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import { BrandOrder, BrandOrderTable, ImageList } from '../../../../models/BrandManageOrderModel';
 import { motion } from 'framer-motion'
-import { Box, Dialog, DialogContent, DialogTitle, useTheme } from '@mui/material';
+import { Box, Dialog, DialogContent, DialogTitle, IconButton, Tooltip, useTheme } from '@mui/material';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -413,6 +413,13 @@ const BrandOrderFields: React.FC<{
             toast.error(`${error}`, { autoClose: 4000 });
         }
     };
+
+    useEffect(() => {
+        const userStorage = Cookies.get('userAuth');
+        if (!userStorage) return;
+        const userParse: UserInterface = JSON.parse(userStorage)
+        setUseAuth(userParse);
+    }, []);
 
     return (
         <div className="bg-white mb-8 shadow-lg rounded-lg p-6 transition duration-300 ease-in-out transform hover:shadow-xl">
@@ -863,27 +870,38 @@ interface OrderTableProps {
 }
 
 const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdatedOrderPending }) => {
-    const [showDesignDetails, setShowDesignDetails] = useState(false);
+    const [openActions, setOpenActions] = useState<string | null>(null);
     const [designDetails, setDesignDetails] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [userAuth, setUseAuth] = useState<UserInterface>();
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isOpenReportOrderCanceledDialog, setIsOpenReportOrderCanceledDialog] = useState<boolean>(false);
-    const [openActions, setOpenActions] = useState<string | null>(null);
+    const [selectedOrderID, setSelectedOrderID] = useState<string | null>(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [stageIdStart, setStageIdStart] = useState<string>();
+    const [userAuth, setUseAuth] = useState<UserInterface>();
+    const [openOrderDetail, setOpenOrderDetail] = useState<BrandOrderTable | null>(null);
+    const [progressSteps, setProgressStep] = useState<StageInterface[]>();
+    const navigate = useNavigate();
+    const [timeline, setTimeLine] = useState<EstimatedStageInterface>();
+    const customSortOrder = [
+        'START_PRODUCING',
+        'FINISH_FIRST_STAGE',
+        'FINISH_SECOND_STAGE',
+        'COMPLETED'
+    ];
 
-    useEffect(() => {
-        const userStorage = Cookies.get('userAuth');
-        if (!userStorage) return;
-        const userParse: UserInterface = JSON.parse(userStorage);
-        setUseAuth(userParse);
-    }, []);
+    const sortStages = (stages: StageInterface[]) => {
+        return stages.sort((a, b) => {
+            const indexA = customSortOrder.indexOf(a.stage);
+            const indexB = customSortOrder.indexOf(b.stage);
+            return indexA - indexB;
+        });
+    };
 
     const fetchDesignDetails = async (orderID: string) => {
         setIsLoading(true);
         try {
             const response = await axios.get(`${baseURL + versionEndpoints.v1 + featuresEndpoints.designDetail + functionEndpoints.designDetail.getAllInforOrderDetail + `/${orderID}`}`);
             setDesignDetails(response.data.data.design);
-            onViewDetails(orders.find(order => order.orderID === orderID)!, response.data.data.design);
         } catch (error) {
             console.error('Error fetching design details:', error);
         } finally {
@@ -891,50 +909,9 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
         }
     };
 
-    const __handleCloseInputSampleProductDialog = () => {
-        setIsDialogOpen(false);
-        setSelectedOrderID(null);
-    };
-
-    const [openUpdateProcessDialog, setOpenUpdateProcessDialog] = useState<BrandOrderTable | null>(null);
-    const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
-    const [selectedOrderID, setSelectedOrderID] = useState<string | null>(null);
-
-    const __handleOpenReportDialog = (orderId: string) => {
-        setSelectedOrderID(orderId);
-        setIsReportDialogOpen(true);
-    };
-
-    const _handleCancelOrder = async (orderID: string) => {
-        setIsLoading(true);
-        try {
-            const bodyRequest = { orderID, status: 'CANCEL' };
-            const response = await axios.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
-            if (response.status === 200) {
-                toast.success(`${response.data.message}`, { autoClose: 4000 });
-                onUpdatedOrderPending(orderID);
-            } else {
-                toast.error(`${response.data.message}`, { autoClose: 4000 });
-            }
-        } catch (error) {
-            toast.error(`${error}`, { autoClose: 4000 });
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case 'DELIVERED':
-                return 'bg-green-100 text-green-800';
-            case 'PENDING':
-                return 'bg-yellow-100 text-yellow-800';
-            case 'CANCEL':
-                return 'bg-red-100 text-red-800';
-            default:
-                return 'bg-gray-100 text-gray-800';
-        }
-    };
+    // useEffect(() => {
+    //     fetchDesignDetails();
+    // }, [orders.orderID]);
 
     const toggleActions = (orderID: string) => {
         if (openActions === orderID) {
@@ -944,30 +921,31 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
         }
     };
 
-    const [progressSteps, setProgressStep] = useState<StageInterface[]>();
-    const [selectedStep, setSelectedStep] = useState<{ orderID: string, step: string } | null>(null);
-    const [isUploadSampleDialogOpen, setIsUploadSampleDialogOpen] = useState(false);
-    const [timeline, setTimeLine] = useState<EstimatedStageInterface>();
+    const __handleOpenReportDialog = () => {
+        console.log('open');
+        setIsOpenReportOrderCanceledDialog(true);
+    }
 
-    const __handleOpenUpdateProcessDialog = async (order: BrandOrderTable) => {
-        setOpenUpdateProcessDialog(order);
-        await __handleLoadProgressStep(order.orderID);
-        await __handleFetchTimeLine(order.parentOrderID);
-    };
-
-    const __handleCloseUpdateProcessDialog = () => {
-        setOpenUpdateProcessDialog(null);
-    };
-
-    const __handleLoadProgressStep = async (subOrderId: string) => {
-        setIsLoading(true);
+    /**
+     * Handle cancel order click
+     */
+    const _handleCancelOrder = async (orderID: any) => {
+        setIsLoading(true)
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderStageById}/${subOrderId}`);
+            const bodyRequest = {
+                orderID: orderID,
+                status: 'CANCEL'
+            }
+            console.log('bodyRequest: ', bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
             if (response.status === 200) {
-                setIsLoading(false);
-                const sortedData = sortStages(response.data);
-                setProgressStep(sortedData);
-            } else {
+                console.log('detail order: ', response.data);
+                toast.success(`${response.message}`, { autoClose: 4000 });
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            }
+            else {
                 console.log('detail error: ', response.message);
                 toast.error(`${response.message}`, { autoClose: 4000 });
             }
@@ -975,27 +953,6 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
             console.log('error: ', error);
             toast.error(`${error}`, { autoClose: 4000 });
         }
-    };
-
-    const __handleFetchTimeLine = async (parentId: string) => {
-        try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderTimeLineByParentId}/${parentId}`);
-            if (response.status === 200) {
-                setIsLoading(false);
-                setTimeLine(response.data);
-            } else {
-                console.log('detail error: ', response.message);
-                toast.error(`${response.message}`, { autoClose: 4000 });
-            }
-        } catch (error) {
-            console.log('error: ', error);
-            toast.error(`${error}`, { autoClose: 4000 });
-        }
-    };
-
-    const __handleOpenUpLoadProcessSampleProductDialog = (orderId: string, step: string) => {
-        setIsUploadSampleDialogOpen(true);
-        setSelectedStep({ orderID: orderId, step: step });
     };
 
     const __handleOpenInputSampleProductDialog = async (orderID: any) => {
@@ -1021,21 +978,67 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
 
     };
 
-    const __handleCloseUpLoadProcessSampleProductDialog = () => {
-        setIsUploadSampleDialogOpen(false);
-        setSelectedStep(null);
+    const __handleCloseInputSampleProductDialog = () => {
+        setIsDialogOpen(false);
+        setSelectedOrderID(null);
     };
 
-    const sortStages = (stages: StageInterface[]) => {
-        const customSortOrder = ['START_PRODUCING', 'FINISH_FIRST_STAGE', 'FINISH_SECOND_STAGE', 'COMPLETED'];
-        return stages.sort((a, b) => {
-            const indexA = customSortOrder.indexOf(a.stage);
-            const indexB = customSortOrder.indexOf(b.stage);
-            return indexA - indexB;
-        });
+    const __handleLoadProgressStep = async (subOrderId: any) => {
+        setIsLoading(true);
+        try {
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderStageById}/${subOrderId}`);
+            if (response.status === 200) {
+                setIsLoading(false);
+                const sortedData = sortStages(response.data);
+                setProgressStep(sortedData);
+            }
+            else {
+                console.log('detail error: ', response.message);
+                toast.error(`${response.message}`, { autoClose: 4000 });
+            }
+        } catch (error) {
+            console.log('error: ', error);
+            toast.error(`${error}`, { autoClose: 4000 });
+            navigate('/error404');
+        }
+
+    }
+    const __handleFetchTimeLine = async (parentId: any) => {
+        try {
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderTimeLineByParentId}/${parentId}`);
+            if (response.status === 200) {
+                setIsLoading(false);
+                setTimeLine(response.data);
+            }
+            else {
+                console.log('detail error: ', response.message);
+                toast.error(`${response.message}`, { autoClose: 4000 });
+            }
+        } catch (error) {
+            console.log('error: ', error);
+            toast.error(`${error}`, { autoClose: 4000 });
+            navigate('/error404');
+        }
+    }
+
+    const __handleOpenUpdateProcessDialog = (orderDetail: BrandOrderTable) => {
+        setOpenOrderDetail(orderDetail);
+        __handleLoadProgressStep(orderDetail.orderID);
+        __handleFetchTimeLine(orderDetail.parentOrderID);
     };
 
-    const [stageIdStart, setStageIdStart] = useState<string>();
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'DELIVERED':
+                return 'bg-green-100 text-green-800';
+            case 'PENDING':
+                return 'bg-yellow-100 text-yellow-800';
+            case 'CANCEL':
+                return 'bg-red-100 text-red-800';
+            default:
+                return 'bg-gray-100 text-gray-800';
+        }
+    };
 
     const columns: GridColDef[] = [
         { field: 'orderID', headerName: 'Order ID', width: 150 },
@@ -1056,35 +1059,65 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
         {
             field: 'actions',
             headerName: 'Actions',
-            width: 200,
+            width: 150,
             renderCell: (params: GridRenderCellParams) => (
                 <div>
                     <button
                         onClick={() => toggleActions(params.row.orderID)}
-                        className="font-medium text-blue-600"
+                        className="font-medium text-green-600 "
                     >
-                        ...
+                        More <ArrowDropDown />
                     </button>
                     {openActions === params.row.orderID && (
-                        <div className="absolute  w-48 bg-white rounded-md shadow-lg z-10">
-                            <button
-                                onClick={() => onViewDetails(params.row, null)}
-                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            >
-                                View Details
-                            </button>
-                            <button
-                                onClick={() => __handleOpenUpdateProcessDialog(params.row)}
-                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            >
-                                Update Process
-                            </button>
-                            <button
-                                onClick={() => __handleOpenReportDialog(params.row.orderID)}
-                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            >
-                                Cancel
-                            </button>
+                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+                            <Tooltip title="View Details">
+                                <IconButton onClick={() => onViewDetails(params.row, designDetails)} style={{ color: 'blue' }}>
+                                    <Visibility />
+                                </IconButton>
+                            </Tooltip>
+
+                            {params.row.orderStatus !== 'CANCEL' && params.row.orderStatus !== 'COMPLETED' && (
+                                <Tooltip title="Update Process">
+                                    <IconButton
+                                        onClick={() => __handleOpenUpdateProcessDialog(params.row)}
+                                        style={{ color: 'teal' }}
+                                    >
+                                        <ViewAgendaOutlined />
+                                    </IconButton>
+                                </Tooltip>
+                            )}
+
+                            {params.row.orderStatus === 'CHECKING_SAMPLE_DATA' && (
+                                <Tooltip title="Update Sample Data">
+                                    <IconButton
+                                        onClick={() => __handleOpenInputSampleProductDialog(params.row.orderID)}
+                                        style={{ color: 'pink' }}
+                                    >
+                                        <Verified />
+                                    </IconButton>
+                                </Tooltip>
+                            )}
+                            {selectedOrderID === params.row.orderID && (
+                                <BrandUpdateSampleProductDialog stageID={stageIdStart} isOpen={isDialogOpen} orderID={params.row.orderID} brandID={userAuth?.userID} onClose={__handleCloseInputSampleProductDialog}></BrandUpdateSampleProductDialog>
+
+                            )}
+                            {params.row.orderStatus !== 'COMPLETED' && params.row.orderStatus !== 'CANCEL' && (
+                                <Tooltip title="Cancel">
+                                    <IconButton
+                                        onClick={() => __handleOpenReportDialog()}
+                                        style={{ color: 'crimson' }}
+                                    >
+                                        <Cancel />
+                                    </IconButton>
+                                </Tooltip>
+                            )}
+                            <CustomerReportOrderDialogComponent
+                                isCancelOrder={true}
+                                orderID={params.row.orderID}
+                                onClose={() => setIsOpenReportOrderCanceledDialog(false)}
+                                isOpen={isOpenReportOrderCanceledDialog}
+                                onClickReportAndCancel={() => _handleCancelOrder(orders)}
+                            ></CustomerReportOrderDialogComponent>
                         </div>
                     )}
                 </div>
@@ -1095,6 +1128,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
     const getRowId = (row: any) => `${row.orderID}`;
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+
     return (
         <>
             <div className="overflow-x-auto shadow-md sm:rounded-lg -mt-6">
@@ -1143,33 +1177,16 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
                     }}
                 >
                     <DataGrid
-                        rows={orders}
+                        rows={Array.isArray(orders) ? orders : [orders]}
                         columns={columns}
                         slots={{ toolbar: GridToolbar }}
                         getRowId={getRowId}
                     />
                 </Box>
             </div>
-            {openUpdateProcessDialog && (
-                <Dialog open={true} onClose={__handleCloseUpdateProcessDialog} maxWidth="lg" fullWidth>
-                </Dialog>
-            )}
-
-            {/* Cancel Order Dialog */}
-            <CustomerReportOrderDialogComponent
-                isCancelOrder={true}
-                orderID={selectedOrderID!}
-                onClose={() => setIsReportDialogOpen(false)}
-                isOpen={isReportDialogOpen}
-                onClickReportAndCancel={async () => {
-                    await _handleCancelOrder(selectedOrderID!);
-                    setIsReportDialogOpen(false);
-                }}
-            />
         </>
     );
 };
-
 
 /**
  * 
@@ -1456,11 +1473,7 @@ const BrandManageOrder: React.FC = () => {
                             <OrderTable
                                 orders={currentOrders}
                                 onViewDetails={handleViewDetails}
-                                onUpdatedOrderPending={(orderID) => {
-                                    setOrder(prevOrders => prevOrders.map(order =>
-                                        order.orderID === orderID ? { ...order, orderStatus: 'CANCEL' } : order
-                                    ));
-                                }}
+                                onUpdatedOrderPending={handleMarkResolved}
                             />
                         ) : (
                             <div>

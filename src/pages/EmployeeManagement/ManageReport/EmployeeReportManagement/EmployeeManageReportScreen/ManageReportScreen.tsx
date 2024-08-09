@@ -8,12 +8,13 @@ import axios from 'axios';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
 import { greenColor, redColor, secondaryColor } from '../../../../../root/ColorSystem';
 import Select from 'react-select';
-import { Box, useTheme } from '@mui/material';
+import { Box, IconButton, Tooltip, useTheme } from '@mui/material';
 import { tokens } from '../../../../../theme';
 import { DataGrid, GridColDef, GridRenderCellParams, GridToolbar } from '@mui/x-data-grid';
 import { toast } from 'react-toastify';
 import { UserInterface } from '../../../../../models/UserModel';
 import Cookies from 'js-cookie';
+import { ArrowDropDown, MarkChatRead, Visibility } from '@mui/icons-material';
 
 const getStatusColor = (status: string) => {
     switch (status) {
@@ -312,24 +313,25 @@ const ReportTables: React.FC<ReportTableProps> = ({ reports, onViewDetails, onUp
                 <div>
                     <button
                         onClick={() => toggleActions(params.row.reportID)}
-                        className="font-medium text-blue-600 "
+                        className="font-medium text-green-600 "
                     >
-                        ...
+                        More <ArrowDropDown />
                     </button>
                     {openActions === params.row.reportID && (
                         <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
-                            <button
-                                onClick={() => onViewDetails(params.row)}
-                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            >
-                                View Details
-                            </button>
-                            <button
-                                onClick={() => onUpdatedOrderPending(params.row.orderResponse.orderID)}
-                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            >
-                                Mark as Resolved
-                            </button>
+                            <Tooltip title="View Details">
+                                <IconButton onClick={() => onViewDetails(params.row)} style={{ color: 'blue' }}>
+                                    <Visibility />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Mark as Resolved">
+                                <IconButton
+                                    onClick={() => onUpdatedOrderPending(params.row.orderResponse.orderID)}
+                                    style={{ color: 'purple' }}
+                                >
+                                    <MarkChatRead />
+                                </IconButton>
+                            </Tooltip>
                         </div>
                     )}
                 </div>
