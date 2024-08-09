@@ -158,7 +158,7 @@ const EditMCategoryPopUpScreens: React.FC<EditCategoryPopUpScreenFormProps> = ({
             <Box
                 mt={4}
                 display="flex"
-                justifyContent="center"
+                justifyContent="right"
                 gap={2}
             >
                 <Button
@@ -173,6 +173,7 @@ const EditMCategoryPopUpScreens: React.FC<EditCategoryPopUpScreenFormProps> = ({
                             borderColor: "white",
                             bgcolor: `${redColor}`,
                         },
+                        width: "15%",
                     }}
                 >
                     {t(codeLanguage + '000055')}
@@ -182,7 +183,7 @@ const EditMCategoryPopUpScreens: React.FC<EditCategoryPopUpScreenFormProps> = ({
                     variant="contained"
                     sx={{
                         backgroundColor: `${primaryColor}`,
-                        width: "85%",
+                        width: "15%",
                         borderRadius: "8px",
                         color: "#FFFFFF",
                         '&:hover': {

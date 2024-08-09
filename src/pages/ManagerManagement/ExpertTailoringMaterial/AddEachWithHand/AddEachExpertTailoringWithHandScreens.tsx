@@ -231,13 +231,15 @@ const AddEachExpertTailoringWithHand: React.FC<AddExpertTailoringWithHandsFormPr
                             </Select>
                         </FormControl>
                     </div>
-                    <Button
-                        type="submit"
-                        className="my-4 w-full flex justify-center bg-blue-500 text-gray-100 p-3 rounded-full tracking-wide font-semibold focus:outline-none focus:shadow-outline hover:bg-blue-600 shadow-lg cursor-pointer transition ease-in duration-300"
-                        style={{ backgroundColor: '#EC6208', color: 'white' }}
-                    >
-                        Upload
-                    </Button>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
+                        <Button
+                            type="submit"
+                            className="my-4 flex justify-center bg-blue-500 text-gray-100 p-3 rounded-full tracking-wide font-semibold focus:outline-none focus:shadow-outline hover:bg-blue-600 shadow-lg cursor-pointer transition ease-in duration-300"
+                            style={{ backgroundColor: '#EC6208', color: 'white', width: '15%' }}  // Adjust width as needed
+                        >
+                            Upload
+                        </Button>
+                    </div>
                 </form>
             </div>
         </div>

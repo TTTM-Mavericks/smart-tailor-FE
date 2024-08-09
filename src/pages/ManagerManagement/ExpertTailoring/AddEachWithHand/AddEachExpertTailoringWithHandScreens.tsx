@@ -8,6 +8,7 @@ import {
     InputLabel,
     MenuItem,
     SelectChangeEvent,
+    Box,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import Swal from 'sweetalert2';
@@ -18,6 +19,7 @@ import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from 
 import { toast, ToastContainer } from 'react-toastify';
 import { CancelOutlined } from '@mui/icons-material';
 import { primaryColor } from '../../../../root/ColorSystem';
+import { width } from '@mui/system';
 
 interface AddExpertTailoringWithHandsFormProps {
     closeCard: () => void;
@@ -305,14 +307,16 @@ const AddEachExpertTailoringWithHand: React.FC<AddExpertTailoringWithHandsFormPr
                     <p className="text-xs text-gray-300">
                         <span style={{ color: 'red', fontWeight: "bolder" }}>File type: Images</span>
                     </p>
-                    <Button
-                        type="submit"
-                        className="my-4 w-full flex justify-center bg-blue-500 text-gray-100 p-3 rounded-full tracking-wide font-semibold focus:outline-none focus:shadow-outline hover:bg-blue-600 shadow-lg cursor-pointer transition ease-in duration-300"
-                        onClick={_handleAdd}
-                        style={{ backgroundColor: `${primaryColor}`, color: 'white' }}
-                    >
-                        Upload
-                    </Button>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4 }}>
+                        <Button
+                            type="submit"
+                            className="my-4 flex justify-center bg-blue-500 text-gray-100 p-3 rounded-full tracking-wide font-semibold focus:outline-none focus:shadow-outline hover:bg-blue-600 shadow-lg cursor-pointer transition ease-in duration-300"
+                            onClick={_handleAdd}
+                            sx={{ backgroundColor: primaryColor, color: 'white', width: '15%' }}
+                        >
+                            Upload
+                        </Button>
+                    </Box>
                 </form>
             </div>
         </div>

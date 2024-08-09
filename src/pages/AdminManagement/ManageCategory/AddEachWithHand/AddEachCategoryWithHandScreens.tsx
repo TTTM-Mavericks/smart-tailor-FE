@@ -107,7 +107,7 @@ const AddEachCategoryWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
             >
                 <CancelOutlined sx={{ color: "red" }} />
             </IconButton>
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">Add Sizes</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">Add Categories</h2>
             <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
                 {formData.map((category, index) => (
                     <div key={index} className="flex items-center space-x-2">

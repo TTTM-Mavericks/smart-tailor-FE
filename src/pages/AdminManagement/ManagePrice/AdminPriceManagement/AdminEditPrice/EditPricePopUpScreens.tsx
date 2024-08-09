@@ -166,8 +166,8 @@ const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, e
                     />
                 </Grid>
             </Grid>
-            <Grid container spacing={2} sx={{ mt: 4 }}>
-                <Grid item xs={6}>
+            <Grid container spacing={2} sx={{ mt: 4, justifyContent: 'flex-end' }}>
+                <Grid item xs={2}>
                     <Button
                         onClick={editClose}
                         variant="outlined"
@@ -186,7 +186,7 @@ const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, e
                         {t(codeLanguage + '000055')}
                     </Button>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={2}>
                     <Button
                         onClick={_handleSubmit}
                         variant="contained"

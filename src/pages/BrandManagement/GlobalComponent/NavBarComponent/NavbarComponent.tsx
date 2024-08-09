@@ -45,7 +45,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleMenu, menu, popperOpen, togglePop
     }
 
     const _handleProfile = () => {
-        window.location.href = '/auth/profilesetting';
+        window.location.href = '/customer';
     }
 
     return (
