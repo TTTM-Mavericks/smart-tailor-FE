@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Button, Chip, CircularProgress, IconButton, Tooltip, useTheme } from '@mui/material';
-import { ArrowDropDown, ArrowUpward, Cancel, Verified, ViewAgendaOutlined, Visibility } from '@mui/icons-material';
+import { Chip, CircularProgress, IconButton } from '@mui/material';
+import { ArrowUpward } from '@mui/icons-material';
 import { greenColor, primaryColor, redColor, secondaryColor, whiteColor } from '../../../root/ColorSystem';
 import style from './AccountantManagePaymentForBrandComponentStyle.module.scss'
 import { OrderDetailInterface, PaymentInterface } from '../../../models/OrderModel';
 import { fontWeight, Stack } from '@mui/system';
 import { FaAngleDown } from "react-icons/fa";
 import { FaAngleUp } from "react-icons/fa";
-import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
+import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import { toast } from 'react-toastify';
 import { PaymentOrderInterface } from '../../../models/PaymentModel';
 import LoadingComponent from '../../../components/Loading/LoadingComponent';
@@ -23,9 +23,6 @@ import '../../../index.css'
 import Select from 'react-select';
 import { DesignInterface } from '../../../models/DesignModel';
 import { __handleGetDateTimeColor } from '../../../utils/DateUtils';
-import { DataGrid, GridColDef, GridRenderCellParams, GridToolbar } from '@mui/x-data-grid';
-import { tokens } from '../../../theme';
-import axios from 'axios';
 
 interface AccountantOrderInterface {
     orderID: string;
@@ -183,6 +180,7 @@ interface Transaction {
     virtualAccountName: string | null;
     virtualAccountNumber: string;
 }
+
 
 // TODO MUTIL LANGUAGE
 
@@ -460,6 +458,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
         setFilters(prev => ({ ...prev, [name]: value }));
     };
 
+
     /**
      * 
      * @param orderDetail 
@@ -474,94 +473,25 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
         );
     };
 
-    const [isTableView, setIsTableView] = useState(false);
-
-    const toggleView = () => {
-        setIsTableView(!isTableView);
-    };
-
-    const columns: GridColDef[] = [
-        { field: 'orderID', headerName: 'Order ID', width: 130 },
-        { field: 'buyerName', headerName: 'Buyer Name', width: 150 },
-        { field: 'totalPrice', headerName: 'Total Price', width: 130, valueFormatter: (params: any) => `${__handleAddCommasToNumber(params.value)} VND` },
-        { field: 'expectedStartDate', headerName: 'Expected Start Date', width: 180 },
-        {
-            field: 'orderStatus', headerName: 'Order Status', width: 130,
-            renderCell: (params) => (
-                <Chip
-                    label={params.value}
-                    style={__handlegetStatusBackgroundBoolean(params.value === 'DELIVERED')}
-                />
-            )
-        },
-        {
-            field: 'paymentStatus', headerName: 'Payment Status', width: 130,
-            renderCell: (params) => (
-                <Chip
-                    label={params.value ? 'PAID' : 'PENDING'}
-                    style={__handlegetStatusBackgroundBoolean(params.value)}
-                />
-            )
-        },
-        {
-            field: 'actions', headerName: 'Actions', width: 200,
-            renderCell: (params) => (
-                <div>
-                    <Button
-                        onClick={() => __handleExtendTranscation(params.row.orderID)}
-                        style={{ marginRight: '10px' }}
-                    >
-                        View Transactions
-                    </Button>
-                    <Button
-                        onClick={() => __handleOpenPaymentForBrandialog(params.row.orderID)}
-                    >
-                        Payment
-                    </Button>
-                </div>
-            )
-        },
-    ];
-
-    const getRowId = (row: any) => `${row.orderID}`;
-    const theme = useTheme();
-    const colors = tokens(theme.palette.mode);
     return (
         <div>
             <LoadingComponent isLoading={isLoading}></LoadingComponent>
             {/* <ToastContainer></ToastContainer> */}
-            <div>
-                <div style={{ width: '100%' }} >
-                    <div className="mb-6 -mt-10">
-                        <div className="flex mt-5">
-                            <div className="w-7/10" style={{ width: "80%" }}>
-                                <Select
-                                    isMulti
-                                    name="filters"
-                                    options={filterOptions}
-                                    className="basic-multi-select"
-                                    classNamePrefix="select"
-                                    value={filterOptions.filter(option => selectedFilters.includes(option.value))}
-                                    onChange={(selectedOptions: any) => {
-                                        setSelectedFilters(selectedOptions.map((option: any) => option.value));
-                                    }}
-                                />
-                            </div>
-                            <div className="flex border border-gray-300 rounded-md overflow-hidden" style={{ marginLeft: "auto" }}>
-                                <button
-                                    className={`px-4 py-2 ${!isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'}`}
-                                    onClick={() => setIsTableView(false)}
-                                >
-                                    Card
-                                </button>
-                                <button
-                                    className={`px-4 py-2 ${isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'}`}
-                                    onClick={() => setIsTableView(true)}
-                                >
-                                    Table
-                                </button>
-                            </div>
-                        </div>
+            <div className={`${style.orderHistory__container}`}>
+                <div style={{ width: '100%' }} className="max-w-6xl mx-auto p-4 md:p-6 min-h-screen">
+                    <div className="mb-6">
+                        <label htmlFor="filterSelect" className="block mb-2 text-lg font-semibold text-gray-700">Select Filters</label>
+                        <Select
+                            isMulti
+                            name="filters"
+                            options={filterOptions}
+                            className="basic-multi-select"
+                            classNamePrefix="select"
+                            value={filterOptions.filter(option => selectedFilters.includes(option.value))}
+                            onChange={(selectedOptions: any) => {
+                                setSelectedFilters(selectedOptions.map((option: any) => option.value));
+                            }}
+                        />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
@@ -617,453 +547,291 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                         )}
                     </div>
 
-                    {isTableView ? (
-                        <div>
-                            <div style={{ height: 444, width: '100%' }}>
-                                <Box
-                                    sx={{
-                                        height: "75vh",  // Adjust height as needed
-                                        width: '100%',  // Adjust width as needed
-                                        '& .MuiDataGrid-row:nth-of-type(odd)': {
-                                            backgroundColor: '#D7E7FF !important',  // Change background color to blue for odd rows
-                                        },
-                                        '& .MuiDataGrid-row:nth-of-type(even)': {
-                                            backgroundColor: '#FFFFFF !important',  // Change background color to red for even rows
-                                        },
-                                        '& .MuiDataGrid-columnHeaderTitle': {
-                                            fontWeight: 'bolder',  // Make header text bolder
-                                        },
-                                        "& .MuiDataGrid-root": {
-                                            border: "none",
-                                        },
-                                        "& .MuiDataGrid-cell": {
-                                            borderBottom: "none",
-                                        },
-                                        "& .name-column--cell": {
-                                            color: colors.primary[300],
-                                        },
-                                        "& .MuiDataGrid-columnHeaders": {
-                                            backgroundColor: colors.primary[300],
-                                            borderBottom: "none",
-                                        },
-                                        "& .MuiDataGrid-virtualScroller": {
-                                            backgroundColor: colors.primary[100],
-                                        },
-                                        "& .MuiDataGrid-footerContainer": {
-                                            borderTop: "none",
-                                            backgroundColor: colors.primary[100],
-                                        },
-                                        "& .MuiCheckbox-root": {
-                                            color: `${colors.primary[100]} !important`,
-                                        },
-                                        "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-                                            color: `${colors.primary[200]} !important`,
-                                        },
-                                        "& .MuiBadge-badge": {
-                                            display: "none !important"
-                                        }
-                                    }}
-                                >
-                                    <DataGrid
-                                        rows={fulldataOrderResposne.filter(applyFilters)}
-                                        slots={{ toolbar: GridToolbar }}
-                                        columns={columns}
-                                        getRowId={(row) => row.orderID}
-                                    />
-                                </Box>
-                            </div>
-                        </div>
-                    ) : (
-                        <div>
-                            {fulldataOrderResposne?.filter(applyFilters).map((orderDetail) => (
-                                // {fulldataOrderResposne?.map((orderDetail) => (
-                                <div className="bg-white rounded-xl shadow-md p-4 md:p-6 mb-4 md:mb-8 transform transition-all hover:shadow-lg">
-                                    <div className="flex flex-col md:flex-row items-start md:items-center mb-2 md:mb-2" >
-                                        <div className="mb-4 md:mb-0 w-max">
-
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <div>
-                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                        Order ID:{" "}
-                                                        <span className="text-sm text-gray-500 pb-2">
-                                                            {orderDetail?.orderID}
-                                                        </span>
-                                                    </p>
-                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                        Design ID:{" "}
-                                                        <span className="text-sm text-gray-500 pb-2">
-                                                            {orderDetail.designResponse?.designID}
-                                                        </span>
-                                                    </p>
-                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                        Create date:{" "}
-                                                        <span className="text-sm text-gray-500 pb-2">
-                                                            {orderDetail?.expectedStartDate}
-                                                        </span>
-                                                    </p>
-                                                </div>
-                                                <div className='ml-32' style={{ marginTop: -10 }}>
-                                                    <div
-                                                        style={{
-                                                            display: "flex",
-                                                            alignContent: "center",
-                                                            alignItems: "center",
-                                                        }}
-                                                    >
-                                                        <p style={{ fontWeight: "500" }} className="text-sm text-black">
-                                                            Status:{" "}
-                                                        </p>
-                                                        <Stack direction="row" spacing={1} padding={1}>
-                                                            <Chip
-                                                                label={`${orderDetail?.orderStatus
-                                                                    } ${orderDetail?.orderStatus === "Cancel" ||
-                                                                        orderDetail?.orderStatus === "Delivered"
-                                                                        ? "at " + orderDetail?.expectedProductCompletionDate
-                                                                        : ""
-                                                                    }`}
-                                                                variant="filled"
-                                                                style={{
-                                                                    backgroundColor:
-                                                                        orderDetail?.orderStatus === "PENDING"
-                                                                            ? secondaryColor
-                                                                            : orderDetail?.orderStatus === "DELIVERED"
-                                                                                ? greenColor
-                                                                                : orderDetail?.orderStatus === "DEPOSIT"
-                                                                                    ? secondaryColor
-                                                                                    : orderDetail?.orderStatus === "PROCESSING"
-                                                                                        ? secondaryColor
-                                                                                        : redColor,
-                                                                    opacity: 1,
-                                                                    color: whiteColor,
-                                                                }}
-                                                            />
-                                                        </Stack>
-                                                    </div>
-                                                    <div
-                                                        style={{
-                                                            display: "flex",
-                                                            alignContent: "center",
-                                                            alignItems: "center",
-                                                        }}
-                                                    >
-                                                        <p style={{ fontWeight: "500" }} className="text-sm text-black">
-                                                            Payment status:{" "}
-                                                        </p>
-                                                        <Stack direction="row" spacing={5} padding={1}>
-                                                            <Chip
-                                                                label={`${orderDetail?.paymentStatus && orderDetail.paymentStatus
-                                                                    ? "PAID"
-                                                                    : "PENDING"
-                                                                    } `}
-                                                                variant="filled"
-                                                                style={__handlegetStatusBackgroundBoolean(
-                                                                    orderDetail?.paymentStatus && orderDetail.paymentStatus
-                                                                        ? true
-                                                                        : false
-                                                                )}
-                                                            />
-                                                        </Stack>
-                                                    </div>
-                                                </div>
-                                            </div>
+                    {fulldataOrderResposne?.filter(applyFilters).map((orderDetail) => (
+                        // {fulldataOrderResposne?.map((orderDetail) => (
+                        <div className="bg-white rounded-xl shadow-md p-4 md:p-6 mb-4 md:mb-8 transform transition-all hover:shadow-lg">
+                            <div className="flex flex-col md:flex-row items-start md:items-center mb-4 md:mb-6" >
+                                <div className="mb-4 md:mb-0 w-max">
+                                    
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                Order ID:{" "}
+                                                <span className="text-sm text-gray-500 pb-2">
+                                                    {orderDetail?.orderID}
+                                                </span>
+                                            </p>
+                                            <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                Design ID:{" "}
+                                                <span className="text-sm text-gray-500 pb-2">
+                                                    {orderDetail.designResponse?.designID}
+                                                </span>
+                                            </p>
+                                            <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                Create date:{" "}
+                                                <span className="text-sm text-gray-500 pb-2">
+                                                    {orderDetail?.expectedStartDate}
+                                                </span>
+                                            </p>
                                         </div>
-
-                                    </div>
-                                    <button
-                                        onClick={() => __handleExtendTranscation(orderDetail?.orderID)}
-                                        className={`${style.orderHistory__transactionLable}`}
-                                    >
-                                        <p className="text-sm md:text-sm font-bold text-gray-800 pr-5">Transactions</p>
-                                        {isExtendTransaction[orderDetail?.orderID || '1'] ? (
-                                            <FaAngleUp />
-                                        ) : (
-                                            <FaAngleDown />
-                                        )}
-                                    </button>
-                                    <div style={{ width: '100%' }}>
-                                        {isExtendTransaction[orderDetail?.orderID || '1'] && !orderChild[orderDetail.orderID] && (
-                                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                                                {/* <CircularProgress size={20} /> */}
-                                            </div>
-                                        )}
-                                    </div>
-                                    {isExtendTransaction[orderDetail?.orderID || '1'] && orderChild[orderDetail.orderID]?.map((order, itemIndex) => (
-                                        <div
-                                            key={itemIndex}
-                                            className="flex flex-col md:flex-row items-start md:items-center mt-10 mb-4 md:mb-6 border-b pb-4 md:pb-6"
-                                        >
-                                            <div className="flex-shrink-0"></div>
+                                        <div className='ml-32' style={{marginTop: -10}}>
                                             <div
-                                                className="ml-0 md:ml-6 mt-4 md:mt-0 flex-grow grid grid-cols-1 md:grid-cols-2 gap-4"
-                                                style={{ position: "relative" }}
+                                                style={{
+                                                    display: "flex",
+                                                    alignContent: "center",
+                                                    alignItems: "center",
+                                                }}
                                             >
-                                                <div>
-                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                        Sub ID:{" "}
-                                                        <span className="text-sm text-gray-500 pb-2">
-                                                            {order.orderID}
-                                                        </span>
-                                                    </p>
-                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                        Type:{" "}
-                                                        <span className="text-sm text-blue-700 pb-2">
-                                                            {order.orderType}
-                                                        </span>
-                                                    </p>
-                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                        Brand ID:{" "}
-                                                        <span className="text-sm text-gray-500 pb-2">
-                                                            {order.brand?.brandID}
-                                                        </span>
-                                                    </p>
-                                                    <p
-                                                        style={{ fontWeight: "500" }}
-                                                        className="text-sm text-black flex content-center items-center"
-                                                    >
-                                                        Brand:
-                                                        <p
-                                                            style={{ fontWeight: "500" }}
-                                                            className="text-sm text-black flex content-center items-center"
-                                                        >
-                                                            <img
-                                                                src={order.brand?.user.imageUrl}
-                                                                style={{
-                                                                    width: 30,
-                                                                    height: 30,
-                                                                    borderRadius: 90,
-                                                                    marginLeft: 5,
-                                                                    marginRight: 5,
-                                                                }}
-                                                            />
-                                                            <p
-                                                                className={`${__handlegetRatingStyle(
-                                                                    order.brand?.rating
-                                                                )} text-sm text-gray-500`}
-                                                            >
-                                                                {" "}
-                                                                {order.brand?.brandName}
-                                                            </p>
-                                                        </p>
-                                                    </p>
-                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                        Rating:{" "}
-                                                        <span className="text-sm text-gray-500 pb-2">
-                                                            {order.brand?.rating}
-                                                        </span>{" "}
-                                                        <span className="text-yellow-400 text-sm">★</span>
-                                                    </p>
-                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-4">
-                                                        Details:
-                                                        {order.detailList?.map((detail) => (
-                                                            <div className="grid grid-cols-4 gap-1 pt-0">
-                                                                <p className="text-sm text-gray-500 pb-2">
-                                                                    Size: {detail.size?.sizeName}
-                                                                </p>
-                                                                <p className="text-sm text-gray-500 pb-2">
-                                                                    Quantity: {detail.quantity}
-                                                                </p>
-                                                            </div>
-                                                        ))}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                        Total price:{" "}
-                                                        <span className="text-sm text-gray-500 pb-2">
-                                                            {__handleAddCommasToNumber(order.totalPrice)} VND
-                                                        </span>
-                                                    </p>
-                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                        Expected start at:{" "}
-                                                        <span className={`${__handleGetDateTimeColor(order.expectedStartDate)} text-sm pb-2`}>
-                                                            {order.expectedStartDate}
-                                                        </span>
-                                                    </p>
-                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                        Status:
-                                                        <button
-                                                            className="py-1 px-3 rounded-full ml-2"
-                                                            style={{
-                                                                backgroundColor:
-                                                                    orderDetail?.orderStatus === "PENDING"
-                                                                        ? secondaryColor
-                                                                        : orderDetail?.orderStatus === "DELIVERED"
-                                                                            ? greenColor
-                                                                            : orderDetail?.orderStatus === "DEPOSIT"
+                                                <p style={{ fontWeight: "500" }} className="text-sm text-black">
+                                                    Status:{" "}
+                                                </p>
+                                                <Stack direction="row" spacing={1} padding={1}>
+                                                    <Chip
+                                                        label={`${orderDetail?.orderStatus
+                                                            } ${orderDetail?.orderStatus === "Cancel" ||
+                                                                orderDetail?.orderStatus === "Delivered"
+                                                                ? "at " + orderDetail?.expectedProductCompletionDate
+                                                                : ""
+                                                            }`}
+                                                        variant="filled"
+                                                        style={{
+                                                            backgroundColor:
+                                                                orderDetail?.orderStatus === "PENDING"
+                                                                    ? secondaryColor
+                                                                    : orderDetail?.orderStatus === "DELIVERED"
+                                                                        ? greenColor
+                                                                        : orderDetail?.orderStatus === "DEPOSIT"
+                                                                            ? secondaryColor
+                                                                            : orderDetail?.orderStatus === "PROCESSING"
                                                                                 ? secondaryColor
-                                                                                : orderDetail?.orderStatus === "PROCESSING"
-                                                                                    ? secondaryColor
-                                                                                    : redColor,
-                                                                opacity: 1,
-                                                                color: whiteColor,
-                                                                fontSize: 11,
-                                                            }}
-                                                        >
-                                                            {orderDetail?.orderStatus}
-                                                        </button>
-                                                    </p>
-                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                        Payment status:
-                                                        <button
-                                                            className="py-1 px-3 rounded-full ml-2"
-                                                            style={__handlegetStatusBackgroundBoolean(
-                                                                order?.paymentList &&
-                                                                    order?.paymentList[0].paymentStatus
-                                                                    ? true
-                                                                    : false
-                                                            )}
-                                                        >
-                                                            {`${order?.paymentList &&
-                                                                order?.paymentList[0].paymentStatus
+                                                                                : redColor,
+                                                            opacity: 1,
+                                                            color: whiteColor,
+                                                        }}
+                                                    />
+                                                </Stack>
+                                            </div>
+                                            <div
+                                                style={{
+                                                    display: "flex",
+                                                    alignContent: "center",
+                                                    alignItems: "center",
+                                                }}
+                                            >
+                                                <p style={{ fontWeight: "500" }} className="text-sm text-black">
+                                                    Payment status:{" "}
+                                                </p>
+                                                <Stack direction="row" spacing={5} padding={1}>
+                                                    <Chip
+                                                        label={`${orderDetail?.paymentStatus && orderDetail.paymentStatus
                                                                 ? "PAID"
                                                                 : "PENDING"
-                                                                } `}
-                                                        </button>
-                                                    </p>
-
-                                                </div>
-                                                <div
-                                                    className={`${style.orderHistory__viewInvoice__buttonPayment}items-center justify-center`}
-                                                    style={{ textAlign: "center" }}
-                                                >
-                                                    <p
-                                                        className={`${style.orderHistory__viewInvoice__button} px-5 text-sm font-medium`}
-                                                    >
-                                                        <p className='mb-40'>View transaction</p>
-                                                        <button
-                                                            type="submit"
-                                                            className="px-5 py-2 text-sm font-medium text-white"
-                                                            style={{
-                                                                borderRadius: 4,
-                                                                color: whiteColor,
-                                                                marginBottom: 10,
-                                                                backgroundColor: primaryColor,
-                                                                textDecoration: "none",
-                                                            }}
-                                                            onClick={() => __handleOpenPaymentForBrandialog(order.orderID)}
-                                                        >
-                                                            <span className="font-medium text-white">Payment</span>
-                                                        </button>
-                                                    </p>
-
-                                                </div>
-                                                {selectedOrder === order.orderID && (
-                                                    <PaymentFromAccountantToBranđialog
-                                                        onClose={__handleClosePaymentForBrandialog}
-                                                        isOpen={true}
-                                                        paymentData={order.paymentList}
-                                                    ></PaymentFromAccountantToBranđialog>
-                                                )}
-                                            </div>
-                                            <button
-                                                onClick={() => __handleExtendTranscation(orderDetail?.orderID)}
-                                                className={`${style.orderHistory__transactionLable}`}
-                                            >
-                                                <p className="text-1xl md:text-1xl font-bold text-gray-800 pr-5">Transactions</p>
-                                                {isExtendTransaction[orderDetail?.orderID || '1'] ? (
-                                                    <FaAngleUp />
-                                                ) : (
-                                                    <FaAngleDown />
-                                                )}
-                                            </button>
-                                            <div style={{ width: '100%' }}>
-                                                {isExtendTransaction[orderDetail?.orderID || '1'] && !orderChild[orderDetail.orderID] && (
-                                                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                                                        {/* <CircularProgress size={20} /> */}
-                                                    </div>
-                                                )}
-                                            </div>
-                                            {isExtendTransaction[orderDetail?.orderID || '1'] && orderChild[orderDetail.orderID]?.map((order, itemIndex) => (
-                                                <div key={itemIndex} className="flex flex-col md:flex-row items-start md:items-center mt-10 mb-4 md:mb-6 border-b pb-4 md:pb-6">
-                                                    <div className="flex-shrink-0">
-                                                    </div>
-                                                    <div className="ml-0 md:ml-6 mt-4 md:mt-0 flex-grow" style={{ position: 'relative' }}>
-                                                        <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Sub ID: <span className="text-sm text-gray-500 pb-2"> {order.orderID}</span></p>
-                                                        <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Type: <span className="text-sm text-blue-700 pb-2"> {order.orderType}</span></p>
-                                                        <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Brand ID: <span className="text-sm text-gray-500 pb-2">{order.brand?.brandID}</span></p>
-                                                        <p style={{ fontWeight: '500' }} className="text-sm text-black flex content-center items-center">Brand:
-                                                            <p style={{ fontWeight: '500' }} className="text-sm text-black flex content-center items-center">
-                                                                <img src={order.brand?.user.imageUrl} style={{ width: 30, height: 30, borderRadius: 90, marginLeft: 5, marginRight: 5 }}></img>
-                                                                <p className={`${__handlegetRatingStyle(order.brand?.rating)} text-sm text-gray-500`} > {order.brand?.brandName}</p>
-                                                            </p>
-                                                        </p>
-                                                        <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Rating: <span className="text-sm text-gray-500 pb-2">{order.brand?.rating}</span> <span className='text-yellow-400 text-sm'>★</span></p>
-
-                                                        <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">Total price: <span className="text-sm text-gray-500 pb-2"> {__handleAddCommasToNumber(order.totalPrice)} VND</span></p>
-
-                                                        <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2 flex content-center items-center">Status:
-                                                            <button
-                                                                className='py-1 px-3 rounded-full ml-2'
-                                                                style={
-                                                                    {
-                                                                        backgroundColor:
-                                                                            orderDetail?.orderStatus === 'PENDING' ? secondaryColor
-                                                                                : orderDetail?.orderStatus === 'DELIVERED' ? greenColor
-                                                                                    : orderDetail?.orderStatus === 'DEPOSIT' ? secondaryColor
-                                                                                        : orderDetail?.orderStatus === 'PROCESSING' ? secondaryColor
-                                                                                            : redColor,
-                                                                        opacity: 1,
-                                                                        color: whiteColor,
-                                                                        fontSize: 11
-                                                                    }
-                                                                } >
-                                                                {orderDetail?.orderStatus}
-                                                            </button>
-                                                        </p>
-                                                        <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2 flex content-center items-center">Payment status:
-                                                            <button
-                                                                className='py-1 px-3 rounded-full ml-2'
-                                                                style={
-                                                                    __handlegetStatusBackgroundBoolean(order?.paymentList && order?.paymentList[0].paymentStatus ? true : false)
-                                                                } >
-                                                                {`${order?.paymentList && order?.paymentList[0].paymentStatus ? 'PAID' : 'PENDING'} `}
-
-                                                            </button>
-                                                        </p>
-                                                        <p style={{ fontWeight: '500' }} className="text-sm text-black pb-4">Details:
-                                                            {order.detailList?.map((detail) => (
-                                                                <div className='ml-14 grid grid-cols-7 gap-1 pt-0'>
-                                                                    <p className="text-sm text-gray-500 pb-2">Size: {detail.size?.sizeName}</p>
-                                                                    <p className="text-sm text-gray-500 pb-2">Quantity: {detail.quantity}</p>
-                                                                </div>
-                                                            ))}
-                                                        </p>
-
-                                                        <div
-                                                            className={`${style.orderHistory__viewInvoice__buttonPayment} flex flex-col items-center justify-center`}
-                                                            style={{ textAlign: 'center' }}
-                                                        >
-                                                            <p className={`${style.orderHistory__viewInvoice__button}px-5 py-2.5 text-sm font-medium`}>View transaction</p>
-                                                            <button
-                                                                type="submit"
-                                                                className="px-5 py-2 text-sm font-medium text-white"
-                                                                style={{
-                                                                    borderRadius: 4,
-                                                                    color: whiteColor,
-                                                                    marginBottom: 10,
-                                                                    backgroundColor: primaryColor,
-                                                                    textDecoration: 'none'
-                                                                }}
-                                                                onClick={() => __handleOpenPaymentForBrandialog(order.orderID)}
-                                                            >
-                                                                <span className="font-medium text-white">Payment</span>
-                                                            </button>
-                                                        </div>
-                                                        {selectedOrder === order.orderID && (
-                                                            <PaymentFromAccountantToBranđialog onClose={__handleClosePaymentForBrandialog} isOpen={true} paymentData={order.paymentList}></PaymentFromAccountantToBranđialog>
+                                                            } `}
+                                                        variant="filled"
+                                                        style={__handlegetStatusBackgroundBoolean(
+                                                            orderDetail?.paymentStatus && orderDetail.paymentStatus
+                                                                ? true
+                                                                : false
                                                         )}
-
-                                                    </div>
-                                                </div>
-                                            ))}
+                                                    />
+                                                </Stack>
+                                            </div>
                                         </div>
-
-                                    ))}
+                                    </div>
                                 </div>
+
+                            </div>
+                            <button
+                                onClick={() => __handleExtendTranscation(orderDetail?.orderID)}
+                                className={`${style.orderHistory__transactionLable}`}
+                            >
+                                <p className="text-sm md:text-sm font-bold text-gray-800 pr-5">Transactions</p>
+                                {isExtendTransaction[orderDetail?.orderID || '1'] ? (
+                                    <FaAngleUp />
+                                ) : (
+                                    <FaAngleDown />
+                                )}
+                            </button>
+                            <div style={{ width: '100%' }}>
+                                {isExtendTransaction[orderDetail?.orderID || '1'] && !orderChild[orderDetail.orderID] && (
+                                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+                                        {/* <CircularProgress size={20} /> */}
+                                    </div>
+                                )}
+                            </div>
+                            {isExtendTransaction[orderDetail?.orderID || '1'] && orderChild[orderDetail.orderID]?.map((order, itemIndex) => (
+                                <div
+                                    key={itemIndex}
+                                    className="flex flex-col md:flex-row items-start md:items-center mt-10 mb-4 md:mb-6 border-b pb-4 md:pb-6"
+                                >
+                                    <div className="flex-shrink-0"></div>
+                                    <div
+                                        className="ml-0 md:ml-6 mt-4 md:mt-0 flex-grow grid grid-cols-1 md:grid-cols-2 gap-4"
+                                        style={{ position: "relative" }}
+                                    >
+                                        <div>
+                                            <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                Sub ID:{" "}
+                                                <span className="text-sm text-gray-500 pb-2">
+                                                    {order.orderID}
+                                                </span>
+                                            </p>
+                                            <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                Type:{" "}
+                                                <span className="text-sm text-blue-700 pb-2">
+                                                    {order.orderType}
+                                                </span>
+                                            </p>
+                                            <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                Brand ID:{" "}
+                                                <span className="text-sm text-gray-500 pb-2">
+                                                    {order.brand?.brandID}
+                                                </span>
+                                            </p>
+                                            <p
+                                                style={{ fontWeight: "500" }}
+                                                className="text-sm text-black flex content-center items-center"
+                                            >
+                                                Brand:
+                                                <p
+                                                    style={{ fontWeight: "500" }}
+                                                    className="text-sm text-black flex content-center items-center"
+                                                >
+                                                    <img
+                                                        src={order.brand?.user.imageUrl}
+                                                        style={{
+                                                            width: 30,
+                                                            height: 30,
+                                                            borderRadius: 90,
+                                                            marginLeft: 5,
+                                                            marginRight: 5,
+                                                        }}
+                                                    />
+                                                    <p
+                                                        className={`${__handlegetRatingStyle(
+                                                            order.brand?.rating
+                                                        )} text-sm text-gray-500`}
+                                                    >
+                                                        {" "}
+                                                        {order.brand?.brandName}
+                                                    </p>
+                                                </p>
+                                            </p>
+                                            <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                Rating:{" "}
+                                                <span className="text-sm text-gray-500 pb-2">
+                                                    {order.brand?.rating}
+                                                </span>{" "}
+                                                <span className="text-yellow-400 text-sm">★</span>
+                                            </p>
+                                            <p style={{ fontWeight: "500" }} className="text-sm text-black pb-4">
+                                                Details:
+                                                {order.detailList?.map((detail) => (
+                                                    <div className="grid grid-cols-4 gap-1 pt-0">
+                                                        <p className="text-sm text-gray-500 pb-2">
+                                                            Size: {detail.size?.sizeName}
+                                                        </p>
+                                                        <p className="text-sm text-gray-500 pb-2">
+                                                            Quantity: {detail.quantity}
+                                                        </p>
+                                                    </div>
+                                                ))}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                Total price:{" "}
+                                                <span className="text-sm text-gray-500 pb-2">
+                                                    {__handleAddCommasToNumber(order.totalPrice)} VND
+                                                </span>
+                                            </p>
+                                            <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                Expected start at:{" "}
+                                                <span className={`${__handleGetDateTimeColor(order.expectedStartDate)} text-sm pb-2`}>
+                                                    {order.expectedStartDate}
+                                                </span>
+                                            </p>
+                                            <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                Status:
+                                                <button
+                                                    className="py-1 px-3 rounded-full ml-2"
+                                                    style={{
+                                                        backgroundColor:
+                                                            orderDetail?.orderStatus === "PENDING"
+                                                                ? secondaryColor
+                                                                : orderDetail?.orderStatus === "DELIVERED"
+                                                                    ? greenColor
+                                                                    : orderDetail?.orderStatus === "DEPOSIT"
+                                                                        ? secondaryColor
+                                                                        : orderDetail?.orderStatus === "PROCESSING"
+                                                                            ? secondaryColor
+                                                                            : redColor,
+                                                        opacity: 1,
+                                                        color: whiteColor,
+                                                        fontSize: 11,
+                                                    }}
+                                                >
+                                                    {orderDetail?.orderStatus}
+                                                </button>
+                                            </p>
+                                            <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                Payment status:
+                                                <button
+                                                    className="py-1 px-3 rounded-full ml-2"
+                                                    style={__handlegetStatusBackgroundBoolean(
+                                                        order?.paymentList &&
+                                                            order?.paymentList[0].paymentStatus
+                                                            ? true
+                                                            : false
+                                                    )}
+                                                >
+                                                    {`${order?.paymentList &&
+                                                        order?.paymentList[0].paymentStatus
+                                                        ? "PAID"
+                                                        : "PENDING"
+                                                        } `}
+                                                </button>
+                                            </p>
+
+                                        </div>
+                                        <div
+                                            className={`${style.orderHistory__viewInvoice__buttonPayment}items-center justify-center`}
+                                            style={{ textAlign: "center" }}
+                                        >
+                                            <p
+                                                className={`${style.orderHistory__viewInvoice__button} px-5 text-sm font-medium`}
+                                            >
+                                                <p className='mb-40'>View transaction</p>
+                                                <button
+                                                    type="submit"
+                                                    className="px-5 py-2 text-sm font-medium text-white"
+                                                    style={{
+                                                        borderRadius: 4,
+                                                        color: whiteColor,
+                                                        marginBottom: 10,
+                                                        backgroundColor: primaryColor,
+                                                        textDecoration: "none",
+                                                    }}
+                                                    onClick={() => __handleOpenPaymentForBrandialog(order.orderID)}
+                                                >
+                                                    <span className="font-medium text-white">Payment</span>
+                                                </button>
+                                            </p>
+
+                                        </div>
+                                        {selectedOrder === order.orderID && (
+                                            <PaymentFromAccountantToBranđialog
+                                                onClose={__handleClosePaymentForBrandialog}
+                                                isOpen={true}
+                                                paymentData={order.paymentList}
+                                            ></PaymentFromAccountantToBranđialog>
+                                        )}
+                                    </div>
+                                </div>
+
                             ))}
                         </div>
-                    )}
-
+                    ))}
                     {showScrollButton && (
                         <IconButton
                             style={{
