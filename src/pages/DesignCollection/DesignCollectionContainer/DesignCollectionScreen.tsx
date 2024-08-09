@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './DesignCollectionStyle.module.scss';
-import HeaderComponent from '../../../components/Header/HeaderComponent';
 import { Listbox, Transition } from '@headlessui/react';
 import { FaAngleDown, FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { UserInterface } from '../../../models/UserModel';
@@ -10,16 +9,14 @@ import { DesignInterface } from '../../../models/DesignModel';
 import { toast, ToastContainer } from 'react-toastify';
 import LoadingComponent from '../../../components/Loading/LoadingComponent';
 import { primaryColor } from '../../../root/ColorSystem';
+import Select from 'react-select';
 import FooterComponent from '../../../components/Footer/FooterComponent';
-
-
-
-
+import HeaderComponent from '../../../components/Header/HeaderComponent';
 
 const CardDesignComponent: React.FC<{ design: DesignInterface }> = ({ design }) => {
     return (
-        <div key={design.designID} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2" style={{width: 200, height: 250}}>
-            <div className="bg-white shadow-md rounded-lg overflow-hidden" style={{width: 200, height: 250}}>
+        <div key={design.designID} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2" style={{ width: 200, height: 250 }}>
+            <div className="bg-white shadow-md rounded-lg overflow-hidden" style={{ width: 200, height: 250 }}>
                 <img src={design.imageUrl} alt={design.titleDesign} className="w-full h-32 sm:h-48 object-cover" />
                 <div className="p-4">
                     <h3 className="text-gray-900 font-bold text-lg">{design.titleDesign}</h3>
@@ -32,9 +29,7 @@ const CardDesignComponent: React.FC<{ design: DesignInterface }> = ({ design }) 
 
 
 const DesignCollectionScreen = () => {
-
     // TODO MUTIL LANGUAGE
-
     // ---------------UseState Variable---------------//
     const [selectedOwner, setSelectedOwner] = React.useState('Owner');
     const [selectedCategory, setSelectedCategory] = React.useState('Category');
@@ -51,10 +46,7 @@ const DesignCollectionScreen = () => {
     const tabs = ['All', 'Folder', 'Design'];
     const options = ['Option 1', 'Option 2', 'Option 3'];
     const scrollContainerRef = useRef<HTMLDivElement>(null);
-
     // ---------------UseEffect---------------//
-
-    ;
 
     const scrollRight = () => {
         if (scrollContainerRef.current) {
@@ -123,8 +115,6 @@ const DesignCollectionScreen = () => {
         }
     }
 
-
-
     const renderDropdown = (selected: string, setSelected: React.Dispatch<React.SetStateAction<string>>) => (
         <Listbox value={selected} onChange={setSelected}>
             <div className="relative">
@@ -167,6 +157,44 @@ const DesignCollectionScreen = () => {
         </Listbox>
     );
 
+    const filterOptions = [
+        { value: 'Date', label: 'Date' },
+        { value: 'Order ID', label: 'Order ID' },
+        { value: 'Order Status', label: 'Order Status' },
+    ];
+
+    const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+    const [filters, setFilters] = useState({
+        createDate: '',
+        designID: '',
+        typeOfDesign: '',
+    });
+
+    /**
+     * 
+     * @param e 
+     */
+    const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setFilters(prevFilters => ({
+            ...prevFilters,
+            [name]: value
+        }));
+    };
+
+    /**
+     * 
+     * @param orderDetail 
+     * @returns 
+     * Filter
+     */
+    const applyFilters = (designDetail: DesignInterface) => {
+        return (
+            (filters.designID === '' || designDetail.designID.includes(filters.designID)) &&
+            (filters.createDate === '' || (designDetail.createDate?.includes(filters.createDate) ?? false)) &&
+            (filters.typeOfDesign === '' || designDetail.typeOfDesign === filters.typeOfDesign)
+        );
+    };
 
     return (
         <div>
@@ -175,9 +203,9 @@ const DesignCollectionScreen = () => {
             <LoadingComponent isLoading={isLoading}></LoadingComponent>
             <div className={`${styles.designCollection__container}`}>
                 <aside className={`${styles.designCollection__container__menuBer}`}>
-                    <div className="sticky top-20 p-4 text-sm border-r border-gray-200 h-full mt-10">
+                    <div className="sticky top-20 p-4 text-sm border-r border-gray-200 h-full mt-10 w-full">
                         <nav className="flex flex-col gap-3">
-                            <a href="/auth/profilesetting" className="px-4 py-3 font-semibold text-orange-900 bg-white border border-orange-100 rounded-lg hover:bg-orange-50">
+                            <a href="/auth/profilesetting" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
                                 Account Settings
                             </a>
                             <a href="#" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
@@ -185,6 +213,15 @@ const DesignCollectionScreen = () => {
                             </a>
                             <a href="/order_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
                                 Order History
+                            </a>
+                            <a href="/report_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
+                                Report History
+                            </a>
+                            <a href="/refund_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
+                                Refund History
+                            </a>
+                            <a href="/collection" className="px-4 py-3 font-semibold text-orange-900 bg-white border border-orange-100 rounded-lg hover:bg-orange-50">
+                                Collection
                             </a>
                         </nav>
                     </div>
@@ -195,7 +232,7 @@ const DesignCollectionScreen = () => {
                         <p className={styles.textStyle}>Designs</p>
                     </div>
 
-                    <div className='mt-10'>
+                    {/* <div className='mt-10'>
                         <div className="flex space-x-4">
                             {renderDropdown(selectedOwner, setSelectedOwner)}
                             {renderDropdown(selectedCategory, setSelectedCategory)}
@@ -215,6 +252,73 @@ const DesignCollectionScreen = () => {
                                 <span className="ml-2">Add new</span>
                             </div>
                         </div>
+                    </div> */}
+                    <div className="mb-6 mt-6">
+                        <label htmlFor="filterSelect" className="block mb-2 text-lg font-semibold text-gray-700">Select Filters</label>
+                        <Select
+                            isMulti
+                            name="filters"
+                            options={filterOptions}
+                            className="basic-multi-select"
+                            classNamePrefix="select"
+                            value={filterOptions.filter(option => selectedFilters.includes(option.value))}
+                            onChange={(selectedOptions: any) => {
+                                setSelectedFilters(selectedOptions.map((option: any) => option.value));
+                            }}
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                        {selectedFilters.includes('Date') && (
+                            <div className="filter-item">
+                                <label htmlFor="dateFilter" className="block mb-2 text-sm font-medium text-gray-700">Date</label>
+                                <input
+                                    type="date"
+                                    id="dateFilter"
+                                    name="createDate"
+                                    value={filters.createDate}
+                                    onChange={handleFilterChange}
+                                    className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
+                                />
+                            </div>
+                        )}
+
+                        {selectedFilters.includes('Design ID') && (
+                            <div className="filter-item">
+                                <label htmlFor="designIDFilter" className="block mb-2 text-sm font-medium text-gray-700">Order ID</label>
+                                <input
+                                    type="text"
+                                    id="designIDFilter"
+                                    name="designID"
+                                    value={filters.designID}
+                                    onChange={handleFilterChange}
+                                    placeholder="Enter Order ID"
+                                    className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
+                                />
+                            </div>
+                        )}
+
+                        {/* {selectedFilters.includes('Order Status') && (
+                            <div className="filter-item">
+                                <label htmlFor="statusFilter" className="block mb-2 text-sm font-medium text-gray-700">Order Status</label>
+                                <select
+                                    id="statusFilter"
+                                    name="status"
+                                    value={filters.status}
+                                    onChange={handleFilterChange}
+                                    className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
+                                >
+                                    <option value="">All Order Statuses</option>
+                                    <option value="NOT_VERIFY">Not Verify</option>
+                                    <option value="PENDING">Pending</option>
+                                    <option value="DEPOSIT">Deposit</option>
+                                    <option value="PROCESSING">Processing</option>
+                                    <option value="CANCEL">Cancel</option>
+                                    <option value="COMPLETED">Completed</option>
+                                    <option value="DELIVERED">Delivered</option>
+                                </select>
+                            </div>
+                        )} */}
                     </div>
 
                     <div className="flex space-x-4 mt-5">
@@ -228,12 +332,12 @@ const DesignCollectionScreen = () => {
                             </div>
                         ))}
                     </div>
-                    <div className="flex mt-5" style={{width:'fit-content'}}>
+                    <div className="flex mt-5" style={{ width: 'fit-content' }}>
                         <h2 className="text-2xl font-bold mb-4">Recent design</h2>
                     </div>
                     <div className="relative mt-5 w-full" >
                         <div className={`flex space-x-4 overflow-x-auto ${styles.scroll__container}`} ref={scrollContainerRef}>
-                            {designList?.map((design, index) => (
+                            {designList?.filter(applyFilters).map((design, index) => (
                                 <CardDesignComponent key={design.designID} design={design} />
                             ))}
                         </div>

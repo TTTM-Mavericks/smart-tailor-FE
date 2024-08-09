@@ -298,10 +298,32 @@ const EditExpertTailoringPopUpScreens: React.FC<EditExpertTailoringPopUpScreenFo
                     </form>
                 </div>
             </div>
-            <div style={{ textAlign: "center", alignItems: "center", marginTop: 0, bottom: 0 }}>
-                <Button onClick={editClose} style={{ borderRadius: "8px", color: "white", backgroundColor: `${redColor}` }}>{t(codeLanguage + '000055')}</Button>
-                <Button onClick={_handleSubmit} style={{ backgroundColor: `${primaryColor}`, width: "78%", borderRadius: "8px", color: "#FFFFFF", marginLeft: "1rem" }}>{t(codeLanguage + '000060')}</Button>
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 0, position: "relative", bottom: 0 }}>
+                <Button
+                    onClick={editClose}
+                    style={{
+                        borderRadius: "8px",
+                        color: "white",
+                        backgroundColor: `${redColor}`,
+                        width: "15%"
+                    }}
+                >
+                    {t(codeLanguage + '000055')}
+                </Button>
+                <Button
+                    onClick={_handleSubmit}
+                    style={{
+                        backgroundColor: `${primaryColor}`,
+                        width: "15%",
+                        borderRadius: "8px",
+                        color: "#FFFFFF",
+                        marginLeft: "1rem"
+                    }}
+                >
+                    {t(codeLanguage + '000060')}
+                </Button>
             </div>
+
         </Box>
     );
 }

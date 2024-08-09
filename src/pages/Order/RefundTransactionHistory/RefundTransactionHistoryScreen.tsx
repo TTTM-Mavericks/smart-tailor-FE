@@ -20,7 +20,7 @@ import { UserInterface } from '../../../models/UserModel';
 import { __handleAddCommasToNumber } from '../../../utils/NumbericUtils';
 import { PaymentOrderDialogComponent } from '../../../components';
 import { Listbox, Transition } from '@headlessui/react';
-
+import Select from 'react-select';
 
 const RefundTransactionHistoryScreen: React.FC = () => {
     // TODO MUTIL LANGUAGE
@@ -35,15 +35,50 @@ const RefundTransactionHistoryScreen: React.FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [userAuth, setUserAuth] = useState<UserInterface>();
     const [isOpenPaymentDialog, setIsOpenPaymentDialog] = useState<{ [key: string]: boolean }>({});
-
     const [selectedOwner, setSelectedOwner] = React.useState('Owner');
     const [selectedCategory, setSelectedCategory] = React.useState('Category');
     const [selectedDate, setSelectedDate] = React.useState('Modify date');
     const [selectedRelevance, setSelectedRelevance] = React.useState('Liên quan nhất');
     const [activeTab, setActiveTab] = useState('All');
-
-
     const options = ['Option 1', 'Option 2', 'Option 3'];
+    const filterOptions = [
+        { value: 'Date', label: 'Date' },
+        { value: 'Order ID', label: 'Order ID' },
+        { value: 'Order Status', label: 'Order Status' },
+    ];
+
+    const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+    const [filters, setFilters] = useState({
+        createDate: '',
+        orderID: '',
+        status: '',
+    });
+
+    /**
+     * 
+     * @param e 
+     */
+    const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setFilters(prevFilters => ({
+            ...prevFilters,
+            [name]: value
+        }));
+    };
+
+    /**
+     * 
+     * @param orderDetail 
+     * @returns 
+     * Filter
+     */
+    const applyFilters = (orderDetail: OrderDetailInterface) => {
+        return (
+            (filters.orderID === '' || orderDetail.orderID.includes(filters.orderID)) &&
+            (filters.createDate === '' || (orderDetail.expectedStartDate?.includes(filters.createDate) ?? false)) &&
+            (filters.status === '' || orderDetail.orderStatus === filters.status)
+        );
+    };
 
 
 
@@ -244,7 +279,7 @@ const RefundTransactionHistoryScreen: React.FC = () => {
                 <aside className={`${style.orderHistory__container__menuBar}`}>
                     <div className="sticky top-20 p-4 text-sm border-r border-gray-200 h-full mt-10">
                         <nav className="flex flex-col gap-3">
-                            <a href="/auth/profilesetting" className="px-4 py-3 font-semibold text-orange-900 bg-white border border-orange-100 rounded-lg hover:bg-orange-50">
+                            <a href="/auth/profilesetting" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
                                 Account Settings
                             </a>
                             <a href="#" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
@@ -252,6 +287,15 @@ const RefundTransactionHistoryScreen: React.FC = () => {
                             </a>
                             <a href="/order_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
                                 Order History
+                            </a>
+                            <a href="/report_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
+                                Report History
+                            </a>
+                            <a href="/refund_history" className="px-4 py-3 font-semibold text-orange-900 bg-white border border-orange-100 rounded-lg hover:bg-orange-50">
+                                Refund Transaction
+                            </a>
+                            <a href="/collection" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
+                                Collection
                             </a>
                         </nav>
                     </div>
@@ -266,23 +310,75 @@ const RefundTransactionHistoryScreen: React.FC = () => {
                         </span>
                     </div>
 
-                    <div className='my-10'>
-                        <div className="flex space-x-4">
-                            {renderDropdown(selectedOwner, setSelectedOwner)}
-                            {renderDropdown(selectedCategory, setSelectedCategory)}
-                            {renderDropdown(selectedDate, setSelectedDate)}
-                            <div className="flex space-x-2">
-                                <div className={`${style.button} flex items-center`}>
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                                    </svg>
-                                </div>
-                            </div>
-
-                        </div>
+                    <div className="mb-6 mt-6">
+                        <label htmlFor="filterSelect" className="block mb-2 text-lg font-semibold text-gray-700">Select Filters</label>
+                        <Select
+                            isMulti
+                            name="filters"
+                            options={filterOptions}
+                            className="basic-multi-select"
+                            classNamePrefix="select"
+                            value={filterOptions.filter(option => selectedFilters.includes(option.value))}
+                            onChange={(selectedOptions: any) => {
+                                setSelectedFilters(selectedOptions.map((option: any) => option.value));
+                            }}
+                        />
                     </div>
 
-                    {orderDetailList?.map((orderDetail) => (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                        {selectedFilters.includes('Date') && (
+                            <div className="filter-item">
+                                <label htmlFor="dateFilter" className="block mb-2 text-sm font-medium text-gray-700">Date</label>
+                                <input
+                                    type="date"
+                                    id="dateFilter"
+                                    name="createDate"
+                                    value={filters.createDate}
+                                    onChange={handleFilterChange}
+                                    className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
+                                />
+                            </div>
+                        )}
+
+                        {selectedFilters.includes('Order ID') && (
+                            <div className="filter-item">
+                                <label htmlFor="orderIdFilter" className="block mb-2 text-sm font-medium text-gray-700">Order ID</label>
+                                <input
+                                    type="text"
+                                    id="orderIdFilter"
+                                    name="orderID"
+                                    value={filters.orderID}
+                                    onChange={handleFilterChange}
+                                    placeholder="Enter Order ID"
+                                    className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
+                                />
+                            </div>
+                        )}
+
+                        {selectedFilters.includes('Order Status') && (
+                            <div className="filter-item">
+                                <label htmlFor="statusFilter" className="block mb-2 text-sm font-medium text-gray-700">Order Status</label>
+                                <select
+                                    id="statusFilter"
+                                    name="status"
+                                    value={filters.status}
+                                    onChange={handleFilterChange}
+                                    className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
+                                >
+                                    <option value="">All Order Statuses</option>
+                                    <option value="NOT_VERIFY">Not Verify</option>
+                                    <option value="PENDING">Pending</option>
+                                    <option value="DEPOSIT">Deposit</option>
+                                    <option value="PROCESSING">Processing</option>
+                                    <option value="CANCEL">Cancel</option>
+                                    <option value="COMPLETED">Completed</option>
+                                    <option value="DELIVERED">Delivered</option>
+                                </select>
+                            </div>
+                        )}
+                    </div>
+
+                    {orderDetailList?.filter(applyFilters).map((orderDetail) => (
                         <div className="bg-white rounded-xl shadow-md p-4 md:p-6 mb-4 md:mb-8 transform transition-all hover:shadow-lg">
                             <div className="flex flex-col md:flex-row items-start md:items-center mb-4 md:mb-6" >
                                 <div className="mb-4 md:mb-0 w-max">

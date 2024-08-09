@@ -20,6 +20,7 @@ import { AddMaterial, Material } from '../../../../models/AdminMaterialExcelMode
 import axios from 'axios';
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import { CancelOutlined } from '@mui/icons-material';
+import { width } from '@mui/system';
 
 interface AddMaterialWithHandsFormProps {
     closeCard: () => void;
@@ -218,7 +219,7 @@ const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
                     </Grid>
                 </Box>
 
-                <Box mt={4}>
+                <Box mt={4} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <Button
                         onClick={_handleSubmit}
                         variant="contained"
@@ -235,6 +236,7 @@ const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
                                 backgroundColor: "#d55500",
                                 boxShadow: '0 6px 8px rgba(236, 98, 8, 0.3)',
                             },
+                            width: "20%"
                         }}
                     >
                         Submit

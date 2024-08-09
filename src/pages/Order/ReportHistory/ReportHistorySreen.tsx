@@ -22,7 +22,6 @@ import { PaymentOrderDialogComponent } from '../../../components';
 import { Listbox, Transition } from '@headlessui/react';
 import ReportHistoryComponent from './ReportHistoryComponent';
 
-
 const ReportHistorySreen: React.FC = () => {
     // TODO MUTIL LANGUAGE
 
@@ -234,8 +233,6 @@ const ReportHistorySreen: React.FC = () => {
         </Listbox>
     );
 
-
-
     return (
         <div>
             <HeaderComponent />
@@ -245,7 +242,7 @@ const ReportHistorySreen: React.FC = () => {
                 <aside className={`${style.orderHistory__container__menuBar}`}>
                     <div className="sticky top-20 p-4 text-sm border-r border-gray-200 h-full mt-10">
                         <nav className="flex flex-col gap-3">
-                            <a href="/auth/profilesetting" className="px-4 py-3 font-semibold text-orange-900 bg-white border border-orange-100 rounded-lg hover:bg-orange-50">
+                            <a href="/auth/profilesetting" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
                                 Account Settings
                             </a>
                             <a href="#" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
@@ -253,6 +250,15 @@ const ReportHistorySreen: React.FC = () => {
                             </a>
                             <a href="/order_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
                                 Order History
+                            </a>
+                            <a href="/report_history" className="px-4 py-3 font-semibold text-orange-900 bg-white border border-orange-100 rounded-lg hover:bg-orange-50">
+                                Report History
+                            </a>
+                            <a href="/refund_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
+                                Refund History
+                            </a>
+                            <a href="/collection" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
+                                Collection
                             </a>
                         </nav>
                     </div>

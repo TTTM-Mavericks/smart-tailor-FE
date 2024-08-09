@@ -154,38 +154,44 @@ const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, e
                 sx={{ mb: 4 }}
             />
 
-            <Box
-                sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    gap: 2,
-                    mt: 'auto',
-                }}
-            >
-                <Button
-                    onClick={editClose}
-                    variant="contained"
-                    sx={{
-                        flex: 1,
-                        bgcolor: redColor,
-                        '&:hover': { bgcolor: redColor },
-                    }}
-                >
-                    {t(codeLanguage + '000055')}
-                </Button>
-                <Button
-                    onClick={_handleSubmit}
-                    variant="contained"
-                    sx={{
-                        flex: 1,
-                        bgcolor: primaryColor,
-                        '&:hover': { bgcolor: primaryColor },
-                    }}
-                >
-                    {t(codeLanguage + '000060')}
-                </Button>
-            </Box>
+            <Grid container spacing={2} sx={{ mt: 4, justifyContent: 'flex-end' }}>
+                <Grid item>
+                    <Button
+                        onClick={editClose}
+                        variant="outlined"
+                        sx={{
+                            bgcolor: redColor,
+                            borderRadius: '8px',
+                            color: '#FFFFFF',
+                            borderColor: 'white',
+                            '&:hover': {
+                                bgcolor: redColor,
+                                borderColor: primaryColor,  // Primary color on hover
+                            },
+                        }}
+                    >
+                        {t(codeLanguage + '000055')}
+                    </Button>
+                </Grid>
+                <Grid item>
+                    <Button
+                        onClick={_handleSubmit}
+                        variant="contained"
+                        sx={{
+                            bgcolor: primaryColor,
+                            borderRadius: '8px',
+                            color: '#FFFFFF',
+                            '&:hover': {
+                                bgcolor: primaryColor,
+                            },
+                        }}
+                    >
+                        {t(codeLanguage + '000060')}
+                    </Button>
+                </Grid>
+            </Grid>
         </Box>
+
     );
 }
 

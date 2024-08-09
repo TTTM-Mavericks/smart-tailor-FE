@@ -130,10 +130,32 @@ const EditSizePopUpScreens: React.FC<EditSizePopUpScreenFormProps> = ({ fid, edi
                     <TextField name="sizeName" id="sizeName" label="Size Name" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={formData.sizeName} onChange={_handleChange} />
                 </Grid>
             </Grid>
-            <div style={{ textAlign: "center", alignItems: "center", marginTop: "3rem" }}>
-                <Button onClick={editClose} style={{ borderRadius: "8px", color: "white", backgroundColor: `${redColor}`, }}>{t(codeLanguage + '000055')}</Button>
-                <Button onClick={_handleSubmit} style={{ backgroundColor: `${primaryColor}`, width: "85%", borderRadius: "8px", color: "#FFFFFF", marginLeft: "1rem" }}>{t(codeLanguage + '000060')}</Button>
+            <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginTop: "3rem" }}>
+                <Button
+                    onClick={editClose}
+                    style={{
+                        borderRadius: "8px",
+                        color: "white",
+                        backgroundColor: `${redColor}`,
+                        width: "15%"
+                    }}
+                >
+                    {t(codeLanguage + '000055')}
+                </Button>
+                <Button
+                    onClick={_handleSubmit}
+                    style={{
+                        backgroundColor: `${primaryColor}`,
+                        width: "15%",
+                        borderRadius: "8px",
+                        color: "#FFFFFF",
+                        marginLeft: "1rem"
+                    }}
+                >
+                    {t(codeLanguage + '000060')}
+                </Button>
             </div>
+
         </Box>
     );
 }

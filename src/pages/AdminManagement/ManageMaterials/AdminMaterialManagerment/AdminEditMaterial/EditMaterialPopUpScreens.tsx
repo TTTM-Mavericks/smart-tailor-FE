@@ -184,8 +184,8 @@ const EditMaterialPopUpScreens: React.FC<EditMaterialPopUpScreenFormProps> = ({ 
                 </Grid>
             </Grid>
 
-            <Grid container spacing={2} sx={{ mt: 4 }}>
-                <Grid item xs={6}>
+            <Grid container spacing={2} sx={{ mt: 4, justifyContent: "right" }}>
+                <Grid item xs={2}>
                     <Button
                         onClick={editClose}
                         variant="outlined"
@@ -204,7 +204,7 @@ const EditMaterialPopUpScreens: React.FC<EditMaterialPopUpScreenFormProps> = ({ 
                         {t(codeLanguage + '000055')}
                     </Button>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={2}>
                     <Button
                         onClick={_handleSubmit}
                         variant="contained"
