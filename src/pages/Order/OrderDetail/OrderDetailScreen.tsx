@@ -14,7 +14,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { OrderDetailInterface, OrderInterface, StageInterface } from '../../../models/OrderModel';
 import { CustomerReportOrderDialogComponent, PaymentOrderDialogComponent } from '../../../components';
 import { PaymentOrderInterface } from '../../../models/PaymentModel';
-import { __handleAddCommasToNumber } from '../../../utils/NumbericUtils';
+import { __handleAddCommasToNumber, __handleRoundToThreeDecimalPlaces } from '../../../utils/NumbericUtils';
 import LoadingComponent from '../../../components/Loading/LoadingComponent';
 import ChangeAddressDialogComponent from '../OrderProduct/ChangeAddressDialogComponent';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
@@ -24,6 +24,8 @@ import { FaCheck } from 'react-icons/fa';
 import { UserInterface } from '../../../models/UserModel';
 import Cookies from 'js-cookie';
 import { Report } from '../../../models/EmployeeManageReportModel';
+import { ghtkLogo } from '../../../assets';
+import { height } from '@mui/system';
 
 
 export interface EstimatedStageInterface {
@@ -34,6 +36,24 @@ export interface EstimatedStageInterface {
     estimatedQuantityFinishCompleteStage: number;
     estimatedDateFinishCompleteStage: string;
 }
+
+interface BrandDetailPriceResponseInterface {
+    brandID: string;
+    subOrderID: string;
+    brandPriceDeposit: string;
+    brandPriceFirstStage: string;
+    brandPriceSecondStage: string;
+}
+
+interface OrderPriceDetailInterface {
+    totalPriceOfParentOrder: string;
+    customerPriceDeposit: string;
+    customerPriceFirstStage: string;
+    customerSecondStage: string;
+    customerShippingFee: string | number | undefined;
+    brandDetailPriceResponseList: BrandDetailPriceResponseInterface[];
+}
+
 
 
 
@@ -67,6 +87,10 @@ const OrderDetailScreen: React.FC = () => {
     const [selectedStage, setSelectedStage] = useState<string>();
     const [userAuth, setUserAuth] = useState<UserInterface>();
     const [reportReason, setReportReason] = useState<Report[]>([]);
+    const [referencePrice, setReferencePrice] = useState<OrderPriceDetailInterface>();
+    const [isOpenSystemShippingPriceDialog, setIsOpenSystemShippingPriceDialog] = useState<boolean>(false);
+
+
 
 
 
@@ -171,6 +195,23 @@ const OrderDetailScreen: React.FC = () => {
     //+++++ API +++++//
 
 
+    const __handleReferencePrice = async (parentId: any) => {
+        try {
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.designDetail + functionEndpoints.designDetail.getTotalPriceByParentOrderId}/${parentId}`);
+            if (response.status === 200) {
+                setReferencePrice(response.data)
+            }
+            else {
+                console.log('detail error: ', response.message);
+                toast.error(`${response.message}`, { autoClose: 4000 });
+            }
+        } catch (error) {
+            console.log('error: ', error);
+            toast.error(`${error}`, { autoClose: 4000 });
+        }
+    }
+
+
 
     const __handleFetchTimeLine = async (parentId: any) => {
         try {
@@ -186,7 +227,6 @@ const OrderDetailScreen: React.FC = () => {
         } catch (error) {
             console.log('error: ', error);
             toast.error(`${error}`, { autoClose: 4000 });
-            navigate('/error404');
         }
 
     }
@@ -206,7 +246,6 @@ const OrderDetailScreen: React.FC = () => {
         } catch (error) {
             console.log('error: ', error);
             toast.error(`${error}`, { autoClose: 4000 });
-            navigate('/error404');
         }
 
     }
@@ -234,6 +273,8 @@ const OrderDetailScreen: React.FC = () => {
                 setIsLoading(false);
                 await __handleLoadProgressStep(response.data.orderID);
                 await __handleFetchTimeLine(response.data.orderID);
+                await __handleReferencePrice(response.data.orderID);
+
             }
             else {
                 console.log('detail order: ', response.message);
@@ -495,10 +536,10 @@ const OrderDetailScreen: React.FC = () => {
                                     </div>
                                 ))}
                             </div>
-                            <p className="text-sm text-gray-600 mb-1 mt-3 w-full">
+                            {/* <p className="text-sm text-gray-600 mb-1 mt-3 w-full">
                                 <span className='font-semibold text-gray-600'>Total price: </span>
                                 <span style={{ fontWeight: "bold", fontSize: 17 }}>{orderDetail?.totalPrice && orderDetail?.totalPrice > 0 ? __handleAddCommasToNumber(orderDetail?.totalPrice) + 'VND' : 'Waiting'} </span>
-                            </p>
+                            </p> */}
 
                             {orderDetail?.expectedStartDate && (
                                 <p className="text-sm text-gray-600 mb-1 mt-3 w-full">
@@ -561,7 +602,7 @@ const OrderDetailScreen: React.FC = () => {
 
 
 
-                        <div className="pt-4 mb-20">
+                        <div className="pt-4 mb-10">
                             {/* <p className="text-sm text-gray-600 mb-1 mt-3 w-full">
                             <span className='font-semibold text-gray-600'>Expected complete at: </span>
                             <span style={{ fontWeight: "normal" }}>{orderDetail?.expectedProductCompletionDate}</span>
@@ -624,91 +665,120 @@ const OrderDetailScreen: React.FC = () => {
 
                     )}
 
+                    {orderDetail?.orderStatus !== 'NOT_VERIFY' && (
 
-                    {orderDetail?.orderStatus === 'PENDING' || orderDetail?.orderStatus === 'NOT_VERIFY' && (
-                        <div className="flex justify-end mt-4">
-                            <button
-                                onClick={() => __handleOpenConfirmCalcelDialog()}
-                                className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200 mr-4"
-                                style={{ backgroundColor: redColor }}
-                            >
-                                Cancel
-                            </button>
 
-                        </div>
-                    )}
-
-                    {orderDetail?.paymentList && orderDetail?.paymentList?.length > 0 && orderDetail.orderStatus !== 'CANCEL' && (
-                        <>
-
-                            <div className="mt-10 border-t pt-4">
-                                <div className="flex flex-col md:flex-row justify-between">
-                                    <div className="w-full md:w-2/5 pr-0 md:pr-4 mb-4 md:mb-0">
-                                        <p className="font-medium text-gray-600">{t(codeLanguage + '000210')}</p>
-                                        <p className="text-gray-600 whitespace-pre-line">{orderDetails.billingAddress}</p>
+                        <div className="mt-0 border-t pt-4 flex">
+                            <div className={`w-full md:w-2/5 mt-6 md:mt-0 ${orderDetail?.paymentList && orderDetail?.paymentList?.length <= 0 && 'ml-auto'}`}>
+                                <div className="flex flex-col space-y-4">
+                                    <div className="flex justify-between border-b pb-2">
+                                        <p className="text-gray-600 text-sm">Deposit</p>
+                                        <p className="text-gray-600 text-sm">{referencePrice?.customerPriceDeposit ? __handleAddCommasToNumber(referencePrice?.customerPriceDeposit) : 'Loading'} VND</p>
                                     </div>
-                                    <div className="w-full md:w-2/5 pl-0 md:pl-4 mb-4 md:mb-0">
-                                        <p className="font-medium text-gray-600">{t(codeLanguage + '000211')}</p>
-                                        <div className="flex items-center">
-                                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAAfCAMAAACF8f6iAAAAdVBMVEX///8UNMsAJMkAKspca9YALMoAJskAD8cIL8oAIMgAHcioreYAFMextumiqOUAAMaMlN9GV9G+wuxLXNLv8Pp7hdxlctf6+/7Cxu3f4fbm6PiVnOLO0fHV1/PZ3PSco+RWZtU5TdCBit0tRM5vetkfOswnP839FUl8AAAB00lEQVQ4je1TW4KDIAwkIIKIj/q2rda27t7/iJsE63KE/dj5aIlJJiQThPjHn8KjbbcEkQfzjkY7ihZ/ZzS7R+uMf/YLO+chSbbikzlOQ6W1ria2EqnlIGajtSFWk1oAsL5kp1RayySqelUAqqZT5wH8IgoJ9iLEDS0rM6n8Ss4iQxJQ8X1rBbbli6dgn0L0ioi6CkBfiql4GY56UnXw1yjx7vADHdCRYRNvC1nDFexv0Oopjxy/GH1gmpAgPc2HxLD7GbQrJJVHTx+0XEJsGtI6XEAjDZXwfRdCsH27jebo6RQlhfTGTfmOLT3g10tKwzCPTwhyf2GFOHFxSCduR8KgQbIAiad5uI3OOHk30n39HGc6mrNlLQT9u9Db9E0SONyOxoHqBQklizgxwSI5qvcmWbG3ajwcJVJSWxcLab6uNJ0+TsQkOLQQTRYIAlBTlHamQaXOYVjkQ8xBJElnXAdibXhdSHa1U/qJ8zYMzevEGuGtqI/WfO2vXWHDZiFlrSHIs/8DO1F61swATw5DtCI+/xJlWF4RplPGiYWR0vHmL5WUuJzXKsPHoJWj6lkmTXh4c3WEfdCVeV6yQiueaEZdU+/JXtNzu5Lz2CA85uIffws/lusXjWNFJpAAAAAASUVORK5CYII=" alt="Visa" className="inline-block mr-2" />
-                                            <div>
-                                                <p className="text-gray-600">Ending with {orderDetails.paymentInfo.ending}</p>
-                                                <p className="text-gray-600">Expires {orderDetails.paymentInfo.expires}</p>
-                                            </div>
-                                        </div>
+                                    <div className="flex justify-between border-b pb-2">
+                                        <p className="text-gray-600 text-sm">Stage 1</p>
+                                        <p className="text-gray-600 text-sm">{referencePrice?.customerPriceFirstStage ? __handleAddCommasToNumber(referencePrice?.customerPriceFirstStage) : 'Loading'} VND</p>
                                     </div>
-                                    <div className="w-full md:w-3/5 mt-6 md:mt-0">
-                                        <div className="flex flex-col space-y-4">
+                                    <div className="flex justify-between border-b pb-2">
+                                        <p className="text-gray-600 text-sm">Stage 2</p>
+                                        <p className="text-gray-600 text-sm">{referencePrice?.customerSecondStage ? __handleAddCommasToNumber(referencePrice?.customerSecondStage) : 'Loading'} VND</p>
 
-                                            <div className="flex justify-between border-b pb-2">
-                                                {payment && payment[0].paymentType === 'DEPOSIT' && (
-                                                    <p className="text-gray-600">Deposit price</p>
-                                                )}
-                                                {payment && payment[0].paymentType === 'STAGE_1' && (
-                                                    <p className="text-gray-600">Stage 1 price</p>
-                                                )}
-                                                {payment && payment[0].paymentType === 'STAGE_2' && (
-                                                    <p className="text-gray-600">Stage 2 price</p>
-                                                )}
-                                                <p className="text-gray-600">{payment?.map((item) => {
-                                                    if (true) return __handleAddCommasToNumber(item.payOSResponse.data.amount)
-                                                })} VND</p>
+                                    </div>
+                                    <div className="flex justify-between border-b pb-2">
+                                        <p className="text-gray-600 text-sm">Shipping</p>
+                                        {referencePrice?.customerShippingFee !== '-1' ? (
+                                            <div className="text-gray-600 text-sm flex items-center justify-center">
+                                                <img src={ghtkLogo} style={{ width: 100, height: 15, marginRight: 20 }}></img>
+                                                <p className="text-gray-600 text-sm">
+                                                    {referencePrice?.customerShippingFee ? __handleAddCommasToNumber(referencePrice?.customerShippingFee) : 'Loading'} VND</p>
                                             </div>
-                                            <div className="flex justify-between border-b pb-2">
-                                                <p className="text-gray-600">Discount</p>
-                                                <p className="text-gray-600">0</p>
+
+                                        ) : (
+                                            <div className="text-gray-600 text-sm flex items-center justify-center">
+                                                <p className={`mr-2 flex items-center justify-center rounded-md bg-yellow-50 px-2 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10`}>
+                                                    Over weight delivery service. Pay later
+                                                </p>
+                                                <span onClick={() => setIsOpenSystemShippingPriceDialog(true)} style={{ cursor: 'pointer', textDecorationLine: 'underline', color: secondaryColor }}>View</span>
                                             </div>
-                                            <div className="flex justify-between font-semibold text-gray-900">
-                                                <p>{t(codeLanguage + '000206')}</p>
-                                                <p>{payment?.map((item) => {
-                                                    if (true) return __handleAddCommasToNumber(item.payOSResponse.data.amount)
-                                                })} VND</p>
-                                            </div>
-                                        </div>
+                                        )}
+                                    </div>
+                                    <div className="flex justify-between border-b pb-2" style={{ fontWeight: 'bold' }}>
+                                        <p className="text-gray-600 text-sm">Order Total</p>
+                                        <p className="text-gray-600 text-sm">{referencePrice?.totalPriceOfParentOrder ? __handleAddCommasToNumber(referencePrice?.totalPriceOfParentOrder) : 'Loading'} VND</p>
+
+                                    </div>
+                                    <div className="flex justify-between font-semibold text-gray-900">
+
                                     </div>
                                 </div>
+                                {orderDetail?.paymentList && orderDetail?.paymentList?.length <= 0 && (
+
+                                    <div className="flex justify-end mt-4">
+                                        <button
+                                            onClick={() => __handleOpenConfirmCalcelDialog()}
+                                            className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200 mr-4"
+                                            style={{ backgroundColor: redColor }}
+                                        >
+                                            Cancel
+                                        </button>
+
+                                    </div>
+                                )}
                             </div>
 
-                            {/* Cancel Order Button */}
-                            <div className="flex justify-end mt-4">
-                                <button
-                                    onClick={() => setIsOpenCancelOrderPolicyDialog(true)}
-                                    className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200 mr-4"
-                                    style={{ backgroundColor: redColor }}
-                                >
-                                    Cancel
-                                </button>
 
-                                <button
-                                    onClick={() => setIsOpenPaymentOrderDialog(true)}
-                                    className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200"
-                                    style={{ backgroundColor: greenColor }}
-                                >
-                                    Payment
-                                </button>
 
-                            </div>
-                        </>
+                            {orderDetail?.paymentList && orderDetail?.paymentList?.length > 0 && orderDetail.orderStatus !== 'CANCEL' && (
+
+                                <div className="w-full md:w-2/5 mt-6 md:mt-0 ml-auto">
+                                    <div className="flex flex-col space-y-4">
+
+                                        <div className="flex justify-between border-b pb-2">
+                                            {payment && payment[0].paymentType === 'DEPOSIT' && (
+                                                <p className="text-gray-600 text-sm">Deposit price</p>
+                                            )}
+                                            {payment && payment[0].paymentType === 'STAGE_1' && (
+                                                <p className="text-gray-600 text-sm">Stage 1 price</p>
+                                            )}
+                                            {payment && payment[0].paymentType === 'STAGE_2' && (
+                                                <p className="text-gray-600 text-sm">Stage 2 price</p>
+                                            )}
+                                            <p className="text-gray-600 text-sm">{payment?.map((item) => {
+                                                if (true) return __handleAddCommasToNumber(item.payOSResponse.data.amount)
+                                            })} VND</p>
+                                        </div>
+                                        <div className="flex justify-between border-b pb-2">
+                                            <p className="text-gray-600 text-sm">Discount</p>
+                                            <p className="text-gray-600 text-sm">0</p>
+                                        </div>
+                                        <div className="flex justify-between font-semibold text-gray-900">
+                                            <p className="text-gray-600 text-sm">Total</p>
+                                            <p className="text-gray-600 text-sm">{payment?.map((item) => {
+                                                if (true) return __handleAddCommasToNumber(item.payOSResponse.data.amount)
+                                            })} VND</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-end mt-4">
+                                        <button
+                                            onClick={() => setIsOpenCancelOrderPolicyDialog(true)}
+                                            className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200 mr-4"
+                                            style={{ backgroundColor: redColor }}
+                                        >
+                                            Cancel
+                                        </button>
+
+                                        <button
+                                            onClick={() => setIsOpenPaymentOrderDialog(true)}
+                                            className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200"
+                                            style={{ backgroundColor: greenColor }}
+                                        >
+                                            Payment
+                                        </button>
+                                    </div>
+                                </div>
+
+                            )}
+                        </div>
                     )}
                     {/* Billing and Payment Information Section */}
                     {orderDetail?.orderStatus === 'CANCEL' && (
@@ -765,6 +835,23 @@ const OrderDetailScreen: React.FC = () => {
                 isOpen={isChangeAddressDialogOpen} onClose={() => __handleOpenChangeAddressDialog(false)}
             ></ChangeAddressDialogComponent>
 
+            <Dialog open={isOpenSystemShippingPriceDialog} onClose={() => setIsOpenSystemShippingPriceDialog(false)}>
+                <DialogTitle>
+                    <h2 className="text-md font-semibold mb-4 ">System shipping price</h2>
+                    <IoMdCloseCircleOutline
+                        cursor="pointer"
+                        size={20}
+                        color={redColor}
+                        onClick={() => setIsOpenSystemShippingPriceDialog(false)}
+                        style={{ position: 'absolute', right: 20, top: 20 }}
+                    />
+                </DialogTitle>
+                <DialogContent >
+                    <img src='https://res.cloudinary.com/dby2saqmn/image/upload/v1723104960/size_information/e9abdgvmekwyiffcvuxf.png' style={{}}>
+                    </img>
+                </DialogContent>
+            </Dialog>
+
             <CustomerReportOrderDialogComponent
                 isCancelOrder={false}
                 orderID={orderDetail?.orderID}
@@ -780,49 +867,51 @@ const OrderDetailScreen: React.FC = () => {
                 onClickReportAndCancel={_handleCancelOrder}
             ></CustomerReportOrderDialogComponent>
 
-            {orderDetail?.orderStatus === 'DELIVERED' && (
+            {
+                orderDetail?.orderStatus === 'DELIVERED' && (
 
-                <Dialog open={isOpenRatingDialog} onClose={() => setIsOpenRatingDialog(false)}>
-                    <DialogTitle>
-                        <h2 className="text-md font-semibold mb-4 ">Rating</h2>
-                    </DialogTitle>
+                    <Dialog open={isOpenRatingDialog} onClose={() => setIsOpenRatingDialog(false)}>
+                        <DialogTitle>
+                            <h2 className="text-md font-semibold mb-4 ">Rating</h2>
+                        </DialogTitle>
 
-                    <DialogContent style={{ textAlign: 'center' }} >
-                        <form className='flex items-center mt-0 px-12'>
-                            <div className="flex items-center mb-4">
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                    <button
-                                        key={star}
-                                        type="button"
-                                        className={`text-2xl mr-1 ${rating && rating >= star ? 'text-yellow-500' : 'text-gray-400'}`}
-                                        onClick={() => setRating(star)}
-                                    >
-                                        ★
-                                    </button>
-                                ))}
-                            </div>
+                        <DialogContent style={{ textAlign: 'center' }} >
+                            <form className='flex items-center mt-0 px-12'>
+                                <div className="flex items-center mb-4">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <button
+                                            key={star}
+                                            type="button"
+                                            className={`text-2xl mr-1 ${rating && rating >= star ? 'text-yellow-500' : 'text-gray-400'}`}
+                                            onClick={() => setRating(star)}
+                                        >
+                                            ★
+                                        </button>
+                                    ))}
+                                </div>
 
-                        </form>
+                            </form>
 
-                        <button
-                            type="submit"
-                            className="px-5 py-2.5 text-sm font-medium text-white"
-                            onClick={__handleSubmitRating}
-                            style={{
-                                border: `1px solid ${primaryColor}`,
-                                borderRadius: 4,
-                                color: whiteColor,
-                                marginBottom: 10,
-                                marginRight: 10,
-                                backgroundColor: primaryColor,
-                                margin: '0 auto'
-                            }}
-                        >
-                            Submit
-                        </button>
-                    </DialogContent>
-                </Dialog>
-            )}
+                            <button
+                                type="submit"
+                                className="px-5 py-2.5 text-sm font-medium text-white"
+                                onClick={__handleSubmitRating}
+                                style={{
+                                    border: `1px solid ${primaryColor}`,
+                                    borderRadius: 4,
+                                    color: whiteColor,
+                                    marginBottom: 10,
+                                    marginRight: 10,
+                                    backgroundColor: primaryColor,
+                                    margin: '0 auto'
+                                }}
+                            >
+                                Submit
+                            </button>
+                        </DialogContent>
+                    </Dialog>
+                )
+            }
 
             {/* Cancel reason dialog */}
 
@@ -902,9 +991,11 @@ const OrderDetailScreen: React.FC = () => {
 
             </Dialog>
 
+
+
             <FooterComponent />
 
-        </div>
+        </div >
     );
 };
 
