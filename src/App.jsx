@@ -29,7 +29,8 @@ import {
   OrderDetailScreen,
   OrderHistory,
   OrderProductScreen,
-  PickedOrderScreen
+  PickedOrderScreen,
+  RefundTransactionHistoryScreen
 } from './pages/Order';
 
 import { DashboardManagerMangeExpertTailoring } from './pages/ManagerManagement';
@@ -144,6 +145,8 @@ function App() {
           <Route path='/order_history' element={<OrderHistory></OrderHistory>} />
           <Route path='/design_detail/:id' element={<OrderProductScreen></OrderProductScreen>} />
           <Route path='/report_history' element={<ReportHistorySreen></ReportHistorySreen>} />
+          <Route path='/refund_history' element={<RefundTransactionHistoryScreen></RefundTransactionHistoryScreen>} />
+
 
 
           {/* Manager dashboard route */}

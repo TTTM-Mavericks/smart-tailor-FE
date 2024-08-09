@@ -14,6 +14,7 @@ import { motion, useInView } from 'framer-motion';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../api/ApiConfig';
 import { IconButton } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
+import { DesignDetailInterface, DesignInterface } from '../../models/DesignModel';
 
 const HomeScreen = () => {
 
@@ -130,7 +131,7 @@ const HomeScreen = () => {
         window.location.href = '/product'
     }
 
-    const [designData, setDesignData] = useState<any>([])
+    const [designData, setDesignData] = useState<DesignInterface[]>([])
     useEffect(() => {
         const apiUrl = `${baseURL}${versionEndpoints.v1}/${featuresEndpoints.design}${functionEndpoints.design.getAllDesign}`;
         axios.get(apiUrl)
@@ -191,6 +192,39 @@ const HomeScreen = () => {
             window.removeEventListener('scroll', handleScroll);
         };
     }, []);
+
+    const ProductCard: React.FC<{ product: DesignInterface; isFeatured: boolean }> = ({ product, isFeatured }) => {
+        return (
+            <div className={`relative overflow-hidden rounded-md transition duration-300 ease-in-out shadow-lg ${isFeatured ? 'bg-blue-500 text-white' : 'bg-white hover:shadow-lg'}`}>
+                <div className="aspect-w-1 aspect-h-1 w-full">
+                    <img src={product.imageUrl} alt={product.imageUrl} className="object-cover object-center w-full h-full" />
+                </div>
+                <div className="p-4">
+                    <h3 className={`text-lg font-semibold truncate ${isFeatured ? 'text-white' : 'text-gray-900'}`}>{product.titleDesign}</h3>
+                    <div className="flex mb-3">
+                        <p className={`text-sm ${isFeatured ? 'text-gray-300' : 'text-gray-600'}`}>Color</p>
+                        <div className="flex space-x-1 mt-2">
+                            <div className="w-4 h-4 -mt-1 ml-2" style={{ backgroundColor: product.color, border: '1px solid black' }}></div>
+                        </div>
+                    </div>
+                    <Rating name="half-rating" defaultValue={2.5} precision={0.5} readOnly className={isFeatured ? 'text-white' : ''} />
+                    <div className="flex justify-between px-4 py-2">
+                        <span className={`px-2 py-1 text-xs rounded-full ${isFeatured ? 'bg-purple-300' : 'bg-purple-600 text-white'}`}>
+                            {product?.expertTailoring?.expertTailoringName}
+                        </span>
+                        <span className={`px-2 py-1 text-xs rounded-full ${isFeatured ? 'bg-green-300' : 'bg-green-600 text-white'}`}>
+                            {product.publicStatus ? 'REMAINS' : 'SOLD OUT'}
+                        </span>
+                    </div>
+                    <button className={`w-full py-2 mt-2 text-sm font-medium rounded-b-md ${isFeatured ? 'bg-yellow-400 text-white' : 'bg-yellow-500 hover:bg-yellow-600 text-white'}`}>
+                        ADD TO CART
+                    </button>
+                </div>
+                <a href={`/design/${product.designID}`} className="absolute inset-0 z-10"></a>
+            </div>
+        );
+    };
+
 
     return (
         <div>
@@ -449,7 +483,7 @@ const HomeScreen = () => {
                             {t(codeLanguage + '000180')}
                         </p>
                         <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-8">
-                            {designData.slice(0, 8).map((product: any) => {
+                            {/* {designData.slice(0, 8).map((product: any) => {
                                 const basePrices = getBasePricesForDesign(designData, product.designID);
                                 const totalBasePrice = sumBasePrices(basePrices);
                                 return (
@@ -493,7 +527,10 @@ const HomeScreen = () => {
                                         <a href={product.href} className="absolute inset-0 z-10"></a>
                                     </div>
                                 );
-                            })}
+                            })} */}
+                            {designData.slice(0, 8).map((product, index) => (
+                                <ProductCard key={product.designID} product={product} isFeatured={index === 1} />
+                            ))}
                         </div>
                     </div>
                 </motion.div>

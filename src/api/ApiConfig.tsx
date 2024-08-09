@@ -63,6 +63,7 @@ export const functionEndpoints = {
   designDetail: {
     addNewDesignDetail: '/add-new-design-detail',
     getAllInforOrderDetail: '/get-all-design-detail-by-order-id',
+    getTotalPriceByParentOrderId:'/calculate-total-price-by-parent-order-id'
   },
   brand: {
     addExcel: '/add-new-brand-material-by-excel-file',

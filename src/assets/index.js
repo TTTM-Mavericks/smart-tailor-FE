@@ -20,7 +20,7 @@ import signUpBackground from './system/signup-background.jpg';
 import shirtSleeve from './clothes/shirt-sleeve.png'
 import mbBankLogo from './system/mbbank_logo.png'
 import bankImg from './system/bank_img.png'
-
+import ghtkLogo from './system/GHTK_logo.png'
 
 
 
@@ -48,5 +48,6 @@ export {
     signUpBackground,
     shirtSleeve,
     mbBankLogo,
-    bankImg
+    bankImg,
+    ghtkLogo
 };
