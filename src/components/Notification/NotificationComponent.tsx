@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 export const NotificationComponent = () => {
     const [messages, setMessages] = useState<string[]>([]);
-    const websocketUrl = 'ws://localhost:6969/websocket?userid=1'; // Đảm bảo dùng 'ws' thay vì 'http'
+    const websocketUrl = 'ws://localhost:6969/websocket?userid=5k01bR19DF1093'; // Đảm bảo dùng 'ws' thay vì 'http'
 
     useEffect(() => {
         const websocket = new WebSocket(websocketUrl);
