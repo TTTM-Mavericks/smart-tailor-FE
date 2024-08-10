@@ -99,6 +99,13 @@ const ConditionalTokenRefreshDialog = () => {
   return !shouldHide ? <TokenRefreshDialogComponent /> : null;
 };
 
+export const __getToken = () => {
+  const tokenStorage = Cookies.get('token');
+  if (!tokenStorage) {
+    return;
+  } else
+    return tokenStorage
+}
 
 function App() {
   return (

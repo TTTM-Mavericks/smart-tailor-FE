@@ -119,7 +119,10 @@ const RefundTransactionHistoryScreen: React.FC = () => {
             const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderByUserId}/${userID}`);
             if (response.status === 200) {
                 console.log(response.data);
-                const dataResp = response.data.filter((item: any) => item.paymentList.length !== 0)
+                const dataResp = response.data.filter((item: any) => 
+                    item.paymentList.length !== 0 &&
+                    item.paymentList.some((payment: any) => payment.paymentType === 'ORDER_REFUND')
+                );
                 setOrderDetailList(dataResp);
                 setIsLoading(false)
             } else {
@@ -487,7 +490,7 @@ const RefundTransactionHistoryScreen: React.FC = () => {
                                                     </p>
                                                     <div className="flex flex-col md:flex-row items-start md:items-center">
                                                         {renderStatusIcon(payment)}
-                                                        <div className="ml-0 md:ml-auto mt-4 md:mt-0 px-3 py-2 md:px-4 md:py-2">
+                                                        {/* <div className="ml-0 md:ml-auto mt-4 md:mt-0 px-3 py-2 md:px-4 md:py-2">
                                                             {!payment.paymentStatus && (
                                                                 <button
                                                                     className={`${style.orderHistory__payment__button} ml-2 md:ml-4 px-3 py-2 md:px-4 md:py-2`}
@@ -501,7 +504,7 @@ const RefundTransactionHistoryScreen: React.FC = () => {
                                                                 onClose={() => __handleClosePaymentDialog(payment.paymentID)}
                                                                 paymentData={orderDetail.paymentList}
                                                             />
-                                                        </div>
+                                                        </div> */}
                                                     </div>
                                                 </div>
                                             </div>

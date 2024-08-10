@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Box, Button, Chip, CircularProgress, IconButton, useTheme } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
 import { greenColor, primaryColor, redColor, secondaryColor, whiteColor } from '../../../root/ColorSystem';
-import style from './AccountantManagePaymentForBrandComponentStyle.module.scss'
+import style from './AccountantManageRefundPaymentForBrandComponentStyle.module.scss'
 import { OrderDetailInterface, PaymentInterface } from '../../../models/OrderModel';
 import { fontWeight, Stack } from '@mui/system';
 import { FaAngleDown, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaUser } from "react-icons/fa";
@@ -371,7 +371,7 @@ const Tables: React.FC<TablesProps> = ({ table, onViewDetails }) => {
     );
 }
 
-const AccountantManagePaymentForBrandComponent: React.FC = () => {
+const AccountantManageRefundPaymentForBrandComponent: React.FC = () => {
     // ---------------UseState---------------//
     const [showScrollButton, setShowScrollButton] = useState<boolean>(false);
     const [isOpenPaymentInforDialog, setIsOpenPaymentInformationDialog] = useState<boolean>(false);
@@ -467,8 +467,12 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
             const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getFullOrderAccountant}`);
             if (response.status === 200) {
                 console.log(response.data);
+                const dataResp = response.data.filter((item: any) => 
+                    item.paymentList.length !== 0 &&
+                    item.paymentList.some((payment: any) => payment.typeOfPayment === 'ORDER_REFUND')
+                );
                 // setOrderDetailList(response.data);
-                setFulldataOrderResposne(response.data);
+                setFulldataOrderResposne(dataResp);
                 response.data.forEach((order: AccountantOrderInterface) => {
                     setOrderChild(prevState => ({
                         ...prevState,
@@ -1149,4 +1153,4 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
     );
 };
 
-export default AccountantManagePaymentForBrandComponent;
+export default AccountantManageRefundPaymentForBrandComponent;

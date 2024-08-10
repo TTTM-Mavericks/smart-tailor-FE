@@ -251,7 +251,7 @@ const HomeScreen = () => {
                                                     <svg className="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                                     </svg>
-                                                    <span>500+ clothing styles</span>
+                                                    <span>100+ clothing styles</span>
                                                 </li>
                                                 <li className="flex items-center">
                                                     <svg className="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -259,17 +259,12 @@ const HomeScreen = () => {
                                                     </svg>
                                                     <span>No inventory required</span>
                                                 </li>
+
                                                 <li className="flex items-center">
                                                     <svg className="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                                     </svg>
-                                                    <span>Fast design</span>
-                                                </li>
-                                                <li className="flex items-center">
-                                                    <svg className="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                                    </svg>
-                                                    <span>No discount</span>
+                                                    <span>Many discount</span>
                                                 </li>
                                             </ul>
                                             <ul className="space-y-2 ml-10">
@@ -283,19 +278,7 @@ const HomeScreen = () => {
                                                     <svg className="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                                     </svg>
-                                                    <span>Global dropshipping</span>
-                                                </li>
-                                                <li className="flex items-center">
-                                                    <svg className="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                                    </svg>
-                                                    <span>Shipping 100% fee total plus</span>
-                                                </li>
-                                                <li className="flex items-center">
-                                                    <svg className="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                                    </svg>
-                                                    <span>No gift</span>
+                                                    <span>Fast design</span>
                                                 </li>
                                             </ul>
                                         </div>
