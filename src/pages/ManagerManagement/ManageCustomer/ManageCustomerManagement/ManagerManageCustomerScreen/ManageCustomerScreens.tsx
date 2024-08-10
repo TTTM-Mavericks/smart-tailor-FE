@@ -217,7 +217,6 @@ const ManageCustomer: React.FC = () => {
                             width: '6px',
                             height: '6px',
                             borderRadius: '50%',
-                            backgroundColor: params.value === true ? '#f44336' : '#4caf50',
                         }}
                     />
                     {params.value === true ? 'INACTIVE' : 'ACTIVE'}

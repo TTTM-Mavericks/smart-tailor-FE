@@ -252,7 +252,6 @@ const ManageExpertTailoringMaterial: React.FC = () => {
                             width: '6px',
                             height: '6px',
                             borderRadius: '50%',
-                            backgroundColor: params.value === true ? '#4caf50' : '#f44336',
                         }}
                     />
                     {params.value === true ? 'ACTIVE' : 'INACTIVE'}

@@ -6,7 +6,7 @@ import { Report, ReportImageList, ReportTable } from '../../../../../models/Empl
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import axios from 'axios';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
-import { greenColor, redColor, secondaryColor } from '../../../../../root/ColorSystem';
+import { cancelColor, cancelColorText, completeColor, completeColorText, deliveredColor, deliveredColorText, deposisColor, deposisColorText, greenColor, pendingColor, pendingColorText, processingColor, processingColorText, redColor, secondaryColor, whiteColor } from '../../../../../root/ColorSystem';
 import Select from 'react-select';
 import { Box, IconButton, Tooltip, useTheme } from '@mui/material';
 import { tokens } from '../../../../../theme';
@@ -303,8 +303,29 @@ const ReportTables: React.FC<ReportTableProps> = ({ reports, onViewDetails, onUp
             renderCell: (params) => (
                 <Box
                     sx={{
-                        backgroundColor: params.value === true ? '#ffebee' : '#e8f5e9',
-                        color: params.value === true ? '#f44336' : '#4caf50',
+                        backgroundColor:
+                            params.value === "PENDING"
+                                ? pendingColor
+                                : params.value === "DELIVERED"
+                                    ? deliveredColor
+                                    : params.value === "DEPOSIT"
+                                        ? deposisColor
+                                        : params.value === "PROCESSING"
+                                            ? processingColor
+                                            : params.value === "COMPLETED"
+                                                ? completeColor
+                                                : cancelColor,
+                        color: params.value === "PENDING"
+                            ? pendingColorText
+                            : params.value === "DELIVERED"
+                                ? deliveredColorText
+                                : params.value === "DEPOSIT"
+                                    ? deposisColorText
+                                    : params.value === "PROCESSING"
+                                        ? processingColorText
+                                        : params.value === "COMPLETED"
+                                            ? completeColorText
+                                            : cancelColorText,
                         borderRadius: '16px',
                         padding: '1px 5px',
                         fontSize: '0.75rem',
@@ -320,10 +341,9 @@ const ReportTables: React.FC<ReportTableProps> = ({ reports, onViewDetails, onUp
                             width: '6px',
                             height: '6px',
                             borderRadius: '50%',
-                            backgroundColor: params.value === true ? '#f44336' : '#4caf50',
                         }}
                     />
-                    {params.value === true ? 'INACTIVE' : 'ACTIVE'}
+                    {params.row.orderResponse.orderStatus === null ? "NULL" : params.row.orderResponse.orderStatus}
                 </Box>
             )
         },

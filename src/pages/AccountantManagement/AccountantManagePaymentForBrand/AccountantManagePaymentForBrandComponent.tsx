@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, Button, Chip, CircularProgress, IconButton, useTheme } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
-import { greenColor, primaryColor, redColor, secondaryColor, whiteColor } from '../../../root/ColorSystem';
+import { cancelColor, cancelColorText, completeColor, completeColorText, deliveredColor, deliveredColorText, deposisColor, deposisColorText, greenColor, pendingColor, pendingColorText, primaryColor, processingColor, processingColorText, redColor, secondaryColor, whiteColor } from '../../../root/ColorSystem';
 import style from './AccountantManagePaymentForBrandComponentStyle.module.scss'
 import { OrderDetailInterface, PaymentInterface } from '../../../models/OrderModel';
 import { fontWeight, Stack } from '@mui/system';
@@ -464,8 +464,29 @@ const Tables: React.FC<TablesProps> = ({ table, onViewDetails }) => {
             renderCell: (params) => (
                 <Box
                     sx={{
-                        backgroundColor: params.value === true ? '#ffebee' : '#e8f5e9',
-                        color: params.value === true ? '#f44336' : '#4caf50',
+                        backgroundColor:
+                            params.value === "PENDING"
+                                ? pendingColor
+                                : params.value === "DELIVERED"
+                                    ? deliveredColor
+                                    : params.value === "DEPOSIT"
+                                        ? deposisColor
+                                        : params.value === "PROCESSING"
+                                            ? processingColor
+                                            : params.value === "COMPLETED"
+                                                ? completeColor
+                                                : cancelColor,
+                        color: params.value === "PENDING"
+                            ? pendingColorText
+                            : params.value === "DELIVERED"
+                                ? deliveredColorText
+                                : params.value === "DEPOSIT"
+                                    ? deposisColorText
+                                    : params.value === "PROCESSING"
+                                        ? processingColorText
+                                        : params.value === "COMPLETED"
+                                            ? completeColorText
+                                            : cancelColorText,
                         borderRadius: '16px',
                         padding: '1px 5px',
                         fontSize: '0.75rem',
@@ -481,10 +502,9 @@ const Tables: React.FC<TablesProps> = ({ table, onViewDetails }) => {
                             width: '6px',
                             height: '6px',
                             borderRadius: '50%',
-                            backgroundColor: params.value === true ? '#f44336' : '#4caf50',
                         }}
                     />
-                    {params.value === true ? 'INACTIVE' : 'ACTIVE'}
+                    {params.value}
                 </Box>
             )
         },

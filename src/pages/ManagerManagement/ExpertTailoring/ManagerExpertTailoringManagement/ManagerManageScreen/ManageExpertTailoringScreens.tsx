@@ -225,6 +225,7 @@ const ManageExpertTailoring: React.FC = () => {
                         backgroundColor: params.value === true ? '#e8f5e9' : '#ffebee',
                         color: params.value === true ? '#4caf50' : '#f44336',
                         borderRadius: '16px',
+
                         padding: '1px 5px',
                         fontSize: '0.75rem',
                         display: 'flex',
@@ -239,7 +240,6 @@ const ManageExpertTailoring: React.FC = () => {
                             width: '6px',
                             height: '6px',
                             borderRadius: '50%',
-                            backgroundColor: params.value === true ? '#4caf50' : '#f44336',
                         }}
                     />
                     {params.value === true ? 'ACTIVE' : 'INACTIVE'}

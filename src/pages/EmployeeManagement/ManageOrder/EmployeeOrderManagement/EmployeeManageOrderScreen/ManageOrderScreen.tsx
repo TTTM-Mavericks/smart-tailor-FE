@@ -8,7 +8,7 @@ import { motion } from 'framer-motion'
 import { toast } from 'react-toastify';
 import LoadingComponent from '../../../../../components/Loading/LoadingComponent';
 import PartOfDesignInformationDialogComponent from '../../../../BrandManagement/BrandOrderManagement/PartOfDesignInformationDialogComponent';
-import { blackColor, greenColor, primaryColor, redColor, secondaryColor, yellowColor } from '../../../../../root/ColorSystem';
+import { blackColor, cancelColor, cancelColorText, completeColor, completeColorText, deliveredColor, deliveredColorText, deposisColor, deposisColorText, greenColor, pendingColor, pendingColorText, primaryColor, processingColor, processingColorText, redColor, secondaryColor, whiteColor, yellowColor } from '../../../../../root/ColorSystem';
 import { __handleAddCommasToNumber } from '../../../../../utils/NumbericUtils';
 import { UserInterface } from '../../../../../models/UserModel';
 import Cookies from 'js-cookie';
@@ -897,8 +897,29 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
             renderCell: (params) => (
                 <Box
                     sx={{
-                        backgroundColor: params.value === true ? '#ffebee' : '#e8f5e9',
-                        color: params.value === true ? '#f44336' : '#4caf50',
+                        backgroundColor:
+                            params.value === "PENDING"
+                                ? pendingColor
+                                : params.value === "DELIVERED"
+                                    ? deliveredColor
+                                    : params.value === "DEPOSIT"
+                                        ? deposisColor
+                                        : params.value === "PROCESSING"
+                                            ? processingColor
+                                            : params.value === "COMPLETED"
+                                                ? completeColor
+                                                : cancelColor,
+                        color: params.value === "PENDING"
+                            ? pendingColorText
+                            : params.value === "DELIVERED"
+                                ? deliveredColorText
+                                : params.value === "DEPOSIT"
+                                    ? deposisColorText
+                                    : params.value === "PROCESSING"
+                                        ? processingColorText
+                                        : params.value === "COMPLETED"
+                                            ? completeColorText
+                                            : cancelColorText,
                         borderRadius: '16px',
                         padding: '1px 5px',
                         fontSize: '0.75rem',
@@ -914,10 +935,9 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
                             width: '6px',
                             height: '6px',
                             borderRadius: '50%',
-                            backgroundColor: params.value === true ? '#f44336' : '#4caf50',
                         }}
                     />
-                    {params.value === true ? 'INACTIVE' : 'ACTIVE'}
+                    {params.value}
                 </Box>
             )
         },

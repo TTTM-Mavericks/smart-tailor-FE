@@ -95,7 +95,7 @@ const BarChart = () => {
                     },
                 }}
                 keys={["hot dog", "burger", "sandwich", "kebab", "fries", "donut"]}
-                indexBy="brand"
+                indexBy="brandName"
                 margin={{ top: 50, right: 30, bottom: 50, left: 60 }}
                 padding={0.3}
                 valueScale={{ type: "linear" }}

@@ -372,7 +372,6 @@ const ManageBrand: React.FC = () => {
                             width: '6px',
                             height: '6px',
                             borderRadius: '50%',
-                            backgroundColor: params.value === 'ACCEPT' ? '#4caf50' : '#f44336',
                         }}
                     />
                     {params.value}
