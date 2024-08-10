@@ -18,6 +18,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import BrandUpdateSampleProductDialog from '../GlobalComponent/Dialog/UpdateSampleProduct/BrandUpdateSampleProductDialog';
 import BrandProductivityInputDialog from '../GlobalComponent/Dialog/BrandProductivity/BrandProductivityInputDialog';
 import LoadingComponent from '../../../components/Loading/LoadingComponent';
+import { __getToken } from '../../../App';
 
 const BrandManageOrderProcessingComponent: React.FC = () => {
     // TODO MUTIL LANGUAGE
@@ -136,7 +137,7 @@ const BrandManageOrderProcessingComponent: React.FC = () => {
     const __handleGetOrderDetail = async (id: any) => {
         setIsLoading(true);
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderByBrandId}/${id}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderByBrandId}/${id}`, null, __getToken());
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
                 setOrderDetailList(response.data);
@@ -279,7 +280,7 @@ const BrandManageOrderProcessingComponent: React.FC = () => {
                 status: step
             }
             console.log('bodyRequest: ', bodyRequest);
-            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest, __getToken());
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
                 setIsLoading(false);

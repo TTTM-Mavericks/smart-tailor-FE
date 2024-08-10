@@ -6,6 +6,7 @@ import api, { versionEndpoints, featuresEndpoints, functionEndpoints } from '../
 import { toast } from 'react-toastify';
 import { SampleModelInterface, StageInterface } from '../../../../../models/OrderModel';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
+import { __getToken } from '../../../../../App';
 
 type Props = {
     isOpen: boolean;
@@ -76,7 +77,7 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID, bra
                 status: itemData.stage
             }
             console.log('bodyRequest 2: ', bodyRequest);
-            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest, __getToken());
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
                 toast.success(`${response.message}`, { autoClose: 4000 });

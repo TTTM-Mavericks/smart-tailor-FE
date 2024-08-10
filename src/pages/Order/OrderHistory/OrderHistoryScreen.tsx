@@ -21,6 +21,7 @@ import { Listbox, Transition } from '@headlessui/react';
 import Select from 'react-select';
 import HeaderComponent from '../../../components/Header/HeaderComponent';
 import FooterComponent from '../../../components/Footer/FooterComponent';
+import { __getToken } from '../../../App';
 
 const OrderHistory: React.FC = () => {
     // TODO MUTIL LANGUAGE
@@ -109,7 +110,7 @@ const OrderHistory: React.FC = () => {
     const __handleFetchOrderData = async (userID: any) => {
         setIsLoading(true)
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderByUserId}/${userID}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderByUserId}/${userID}`, null, __getToken());
             if (response.status === 200) {
                 console.log(response.data);
                 setOrderDetailList(response.data);

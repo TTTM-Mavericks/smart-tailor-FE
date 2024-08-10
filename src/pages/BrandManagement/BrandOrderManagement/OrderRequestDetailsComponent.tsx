@@ -12,6 +12,7 @@ import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../
 import { toast } from 'react-toastify';
 import { UserInterface } from '../../../models/UserModel';
 import { useNavigate } from 'react-router-dom';
+import { __getToken } from '../../../App';
 
 interface OrderDetailsProps {
     order: OrderInterface;
@@ -302,7 +303,7 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
                 detailList: sizeQuantities.map((item) => (item.designDetailId))
             }
             console.log('bodyRequest: ', bodyRequest);
-            const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.brandPickOrder}`, bodyRequest);
+            const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.brandPickOrder}`, bodyRequest, __getToken());
             if (response.status === 200) {
                 console.log(response.data);
                 toast.success(`${response.message}`, { autoClose: 4000 });

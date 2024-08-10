@@ -163,6 +163,8 @@ const OrderDetailScreen: React.FC = () => {
      * Move to Top When scroll down
      */
     useEffect(() => {
+        __handleGetOrderDetail();
+
         const userStorage = Cookies.get('userAuth');
         if (userStorage) {
             const userParse: UserInterface = JSON.parse(userStorage);
@@ -194,13 +196,8 @@ const OrderDetailScreen: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        if (token) {
 
-            __handleGetOrderDetail(token);
-        }
-
-
-    }, [token])
+    }, [])
 
     // ---------------FunctionHandler---------------//
 
@@ -274,10 +271,10 @@ const OrderDetailScreen: React.FC = () => {
     /**
      * Handle get order detail data
      */
-    const __handleGetOrderDetail = async (token: any) => {
+    const __handleGetOrderDetail = async () => {
         setIsLoading(true);
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderDetailById}/${id}`, null, token);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderDetailById}/${id}`, null, __getToken());
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
                 setOrderDetail(response.data);
@@ -286,7 +283,6 @@ const OrderDetailScreen: React.FC = () => {
                 await __handleLoadProgressStep(response.data.orderID);
                 await __handleFetchTimeLine(response.data.orderID);
                 await __handleReferencePrice(response.data.orderID);
-
             }
             else {
                 console.log('detail order: ', response.message);
@@ -341,7 +337,7 @@ const OrderDetailScreen: React.FC = () => {
                 status: 'CANCEL'
             }
             console.log('bodyRequest: ', bodyRequest);
-            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest, __getToken());
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
                 setIsLoading(false);
@@ -474,7 +470,7 @@ const OrderDetailScreen: React.FC = () => {
         setIsOpenReasonCancelDialog(true)
         setIsLoading(true);
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.report + functionEndpoints.report.getReportByOrderID}/${orderDetail?.orderID}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.report + functionEndpoints.report.getReportByOrderID}/${orderDetail?.orderID}`, null, __getToken());
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
                 setReportReason(response.data);

@@ -27,6 +27,7 @@ import { color, motion } from 'framer-motion';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
 import { DataGrid, GridColDef, GridToolbar } from '@mui/x-data-grid';
 import { tokens } from '../../../theme';
+import { __getToken } from '../../../App';
 
 interface AccountantOrderInterface {
     orderID: string;
@@ -464,7 +465,7 @@ const AccountantManageRefundPaymentForBrandComponent: React.FC = () => {
     const __handleFetchOrderData = async () => {
         setIsLoading(true)
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getFullOrderAccountant}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getFullOrderAccountant}`, null, __getToken());
             if (response.status === 200) {
                 console.log(response.data);
                 const dataResp = response.data.filter((item: any) => 

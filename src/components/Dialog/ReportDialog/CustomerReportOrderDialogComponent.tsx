@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';
 import { use } from 'i18next';
 import Cookies from 'js-cookie';
 import { UserInterface } from '../../../models/UserModel';
+import { __getToken } from '../../../App';
 
 type Props = {
     isOpen: boolean;
@@ -101,7 +102,7 @@ const CustomerReportOrderDialogComponent: React.FC<Props> = ({ isOpen, onClose, 
                 reportImageList
             };
 
-            const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.report + functionEndpoints.report.createOrderReport}`, bodyData);
+            const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.report + functionEndpoints.report.createOrderReport}`, bodyData, __getToken());
 
             if (response.status === 200) {
                 setIsLoadingPage(false);

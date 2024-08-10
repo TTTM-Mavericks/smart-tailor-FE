@@ -21,6 +21,7 @@ import { __handleAddCommasToNumber } from '../../../utils/NumbericUtils';
 import { PaymentOrderDialogComponent } from '../../../components';
 import { Listbox, Transition } from '@headlessui/react';
 import Select from 'react-select';
+import { __getToken } from '../../../App';
 
 const RefundTransactionHistoryScreen: React.FC = () => {
     // TODO MUTIL LANGUAGE
@@ -116,7 +117,7 @@ const RefundTransactionHistoryScreen: React.FC = () => {
     const __handleFetchOrderData = async (userID: any) => {
         setIsLoading(true)
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderByUserId}/${userID}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderByUserId}/${userID}`, null, __getToken());
             if (response.status === 200) {
                 console.log(response.data);
                 const dataResp = response.data.filter((item: any) => 
