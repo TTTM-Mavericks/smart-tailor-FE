@@ -264,7 +264,7 @@ const BrandOrderFields: React.FC<{
             const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderTimeLineByParentId}/${parentId}`, null, __getToken());
             if (response.status === 200) {
                 setIsLoading(false);
-                setTimeLine(response.data);
+                // setTimeLine(response.data);
             }
             else {
                 console.log('detail error: ', response.message);
@@ -478,7 +478,7 @@ const BrandOrderFields: React.FC<{
                 <DesignDetails design={designDetails} />
             )}
             <div className="mt-6 flex justify-end">
-                {order.orderStatus === 'CHECKING_SAMPLE_DATA' && (
+                {/* {order.orderStatus === 'CHECKING_SAMPLE_DATA' && (
                     <>
                         <button
                             onClick={() => __handleOpenInputSampleProductDialog(order.orderID)}
@@ -494,7 +494,7 @@ const BrandOrderFields: React.FC<{
                             <BrandUpdateSampleProductDialog stageID={stageIdStart} isOpen={isDialogOpen} orderID={order.orderID} brandID={userAuth?.userID} onClose={__handleCloseInputSampleProductDialog}></BrandUpdateSampleProductDialog>
                         )}
                     </>
-                )}
+                )} */}
 
                 {order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCEL' && (
 
@@ -631,7 +631,7 @@ const BrandOrderFields: React.FC<{
                                     {progressSteps?.map((step, index) => {
                                         // const isCompleted = index < step.indexOf(order.orderStatus) + 1;
                                         // const isCurrent = index === progressSteps.indexOf(step.status) + 1;
-                                        const isClickable = index >= 1 && index <= 99;
+                                        const isClickable = !step.status;
                                         return (
                                             <p key={index} className={`text-center `}>
                                                 <button
@@ -1405,13 +1405,13 @@ const BrandManageOrder: React.FC = () => {
                                             className={`px-4 py-2 ${!isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'}`}
                                             onClick={() => setIsTableView(false)}
                                         >
-                                            Card
+                                            Card mode
                                         </button>
                                         <button
                                             className={`px-4 py-2 ${isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'}`}
                                             onClick={() => setIsTableView(true)}
                                         >
-                                            Table
+                                            List mode
                                         </button>
                                     </div>
                                 </div>

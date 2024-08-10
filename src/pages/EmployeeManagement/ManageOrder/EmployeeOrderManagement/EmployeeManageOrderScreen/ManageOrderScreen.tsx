@@ -282,6 +282,32 @@ const EmployeeOrderFields: React.FC<{
         }
     };
 
+    const __handleRejectOrder = async(orderDetail: any) => {
+        setIsLoading(true)
+        try {
+            const bodyRequest = {
+                orderID: orderDetail?.orderID,
+                status: 'CANCEL'
+            }
+            console.log('bodyRequest: ', bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest, __getToken());
+            if (response.status === 200) {
+                console.log('detail order: ', response.data);
+                toast.success(`${response.message}`, { autoClose: 4000 });
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            }
+            else {
+                console.log('detail error: ', response.message);
+                toast.error(`${response.message}`, { autoClose: 4000 });
+            }
+        } catch (error) {
+            console.log('error: ', error);
+            toast.error(`${error}`, { autoClose: 4000 });
+        }
+    }
+
     return (
         <div className="bg-white mb-8 shadow-lg rounded-lg p-6 transition duration-300 ease-in-out transform hover:shadow-xl">
             <LoadingComponent isLoading={isLoading}></LoadingComponent>
@@ -339,7 +365,7 @@ const EmployeeOrderFields: React.FC<{
             )}
             <div className="mt-6 flex justify-end">
 
-                {order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCEL' && (
+                {order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCEL' && order.orderStatus !== 'NOT_VERIFY' && (
 
                     <button
                         onClick={() => __handleOpenReportDialog()}
@@ -352,6 +378,8 @@ const EmployeeOrderFields: React.FC<{
                         Cancel
                     </button>
                 )}
+
+
 
                 <CustomerReportOrderDialogComponent
                     isCancelOrder={true}
@@ -383,19 +411,34 @@ const EmployeeOrderFields: React.FC<{
                 >
                     View details
                 </button>
-                {order.orderStatus !== 'COMPLETED' && (
 
+                {order.orderStatus === 'NOT_VERIFY' && (
                     <button
-                        onClick={() => onUpdatedOrderPending(order.orderID)}
-                        className="bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300"
+                        onClick={() => __handleRejectOrder(order.orderID)}
+                        className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4"
                         style={{
                             borderRadius: 4,
-                            backgroundColor: primaryColor
+                            backgroundColor: redColor
+                        }}
+                    >
+                        Reject order
+                    </button>
+                )}
+                
+                {order.orderStatus === 'NOT_VERIFY' && (
+                    <button
+                        onClick={() => onUpdatedOrderPending(order.orderID)}
+                        className="bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 mr-4"
+                        style={{
+                            borderRadius: 4,
+                            backgroundColor: greenColor
                         }}
                     >
                         Verify order
                     </button>
                 )}
+
+                
 
                 {order.orderStatus === 'COMPLETED' && (
 
@@ -1260,13 +1303,13 @@ const EmployeeManageOrder: React.FC = () => {
                                             className={`px-4 py-2 ${!isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'}`}
                                             onClick={() => setIsTableView(false)}
                                         >
-                                            Card
+                                            Card mode
                                         </button>
                                         <button
                                             className={`px-4 py-2 ${isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'}`}
                                             onClick={() => setIsTableView(true)}
                                         >
-                                            Table
+                                            List mode
                                         </button>
                                     </div>
                                 </div>
