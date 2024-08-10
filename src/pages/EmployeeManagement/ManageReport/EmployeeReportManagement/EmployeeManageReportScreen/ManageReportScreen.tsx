@@ -292,17 +292,39 @@ const ReportTables: React.FC<ReportTableProps> = ({ reports, onViewDetails, onUp
     const columns: GridColDef[] = [
         { field: 'reportID', headerName: 'Report ID', width: 150 },
         { field: 'buyerName', headerName: 'Customer', width: 150, renderCell: (params) => params.row.orderResponse.buyerName },
-        { field: 'address', headerName: 'Address', width: 200, renderCell: (params) => params.row.orderResponse.address },
+        { field: 'address', headerName: 'Address', width: 140, renderCell: (params) => params.row.orderResponse.address },
+        { field: 'province', headerName: 'Province', width: 140, renderCell: (params) => params.row.orderResponse.province },
         { field: 'phone', headerName: 'Phone', width: 120, renderCell: (params) => params.row.orderResponse.phone },
-        { field: 'expectedStartDate', headerName: 'Date', width: 150, renderCell: (params) => params.row.orderResponse.expectedStartDate },
+        { field: 'expectedStartDate', headerName: 'Date', width: 200, renderCell: (params) => params.row.orderResponse.expectedStartDate },
         {
             field: 'orderStatus',
             headerName: 'Order Status',
-            width: 150,
-            renderCell: (params: GridRenderCellParams) => (
-                <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(params.row.orderResponse.orderStatus)}`}>
-                    {params.row.orderResponse.orderStatus}
-                </span>
+            width: 100,
+            renderCell: (params) => (
+                <Box
+                    sx={{
+                        backgroundColor: params.value === true ? '#ffebee' : '#e8f5e9',
+                        color: params.value === true ? '#f44336' : '#4caf50',
+                        borderRadius: '16px',
+                        padding: '1px 5px',
+                        fontSize: '0.75rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        height: "50%",
+                        marginTop: "10%"
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                            backgroundColor: params.value === true ? '#f44336' : '#4caf50',
+                        }}
+                    />
+                    {params.value === true ? 'INACTIVE' : 'ACTIVE'}
+                </Box>
             )
         },
         {

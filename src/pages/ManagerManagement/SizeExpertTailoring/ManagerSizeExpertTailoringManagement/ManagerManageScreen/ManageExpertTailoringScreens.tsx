@@ -254,7 +254,7 @@ const ManageSizeExpertTailoring: React.FC = () => {
         }
     ];
 
-    const getRowId = (row: any) => `${row.expertTailoringID}-${row.expertTailoringName}-${row.sizeImageUrl}`;
+    const getRowId = (row: any) => `${row.expertTailoringID}-${row.expertTailoringName}-${row.sizeID}-${row.sizeName}-${row.ratio}`;
 
     return (
         <Box m="20px" style={{ marginTop: "-5%" }}>

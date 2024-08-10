@@ -201,6 +201,11 @@ const ManageExpertTailoringMaterial: React.FC = () => {
 
     const columns: GridColDef[] = [
         {
+            field: "expertTailoringID",
+            headerName: "ExpertTailoring ID",
+            flex: 1,
+        },
+        {
             field: "expertTailoringName",
             headerName: "ExpertTailoring Name",
             flex: 1,
@@ -261,9 +266,6 @@ const ManageExpertTailoringMaterial: React.FC = () => {
             sortable: false,
             renderCell: (params) => (
                 <Box>
-                    {/* <IconButton onClick={() => _handleEditClick(params.row.expertTailoringID, params.row.expertTailoringName, params.row.sizeImageUrl)}>
-                        <EditIcon />
-                    </IconButton> */}
                     {params.row.status ? (
                         <IconButton onClick={() => _hanldeConfirmDelete(params.row.expertTailoringID, params.row.materialID)}>
                             <DeleteIcon htmlColor={colors.primary[300]} />
@@ -278,7 +280,7 @@ const ManageExpertTailoringMaterial: React.FC = () => {
         }
     ];
 
-    const getRowId = (row: any) => `${row.expertTailoringID}-${row.expertTailoringName}-${row.sizeImageUrl}`;
+    const getRowId = (row: any) => `${row.expertTailoringID}-${row.categoryID}-${row.materialID}`;
 
     return (
         <Box m="20px" style={{ marginTop: "-5%" }}>
@@ -319,7 +321,7 @@ const ManageExpertTailoringMaterial: React.FC = () => {
             >
                 <div className="container" style={{ display: "flex", marginTop: "-5%" }}>
                     <h1 style={{ fontWeight: "bolder", fontSize: "20px", marginLeft: "10px" }}>
-                        Manage Material Exper Tailoring Table
+                        Manage Material Expert Tailoring Table
                     </h1>
                     <Button
                         id="basic-button"

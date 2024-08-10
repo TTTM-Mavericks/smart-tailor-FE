@@ -282,7 +282,7 @@ const EmployeeOrderFields: React.FC<{
     };
 
     return (
-        <div className="bg-white mb-8 shadow-lg rounded-lg p-6 transition duration-300 ease-in-out transform hover:shadow-xl">
+        <div className="bg-white mb-8 shadow-lg rounded-lg transition duration-300 ease-in-out transform hover:shadow-xl">
             <LoadingComponent isLoading={isLoading}></LoadingComponent>
             <h3 className="text-sm font-semibold mb-3 text-indigo-700">Type order: {order.orderType}</h3>
             <div className="flex justify-between">
@@ -319,7 +319,7 @@ const EmployeeOrderFields: React.FC<{
                         </div>
                     </div>
                 </div>
-                <div className="w-1/2 mt-10 pl-28">
+                <div className="w-1/2 mt-10">
                     <p className="text-gray-600 mb-2 text-sm">Customer: {order.buyerName}</p>
                     <p className="text-gray-600 mb-2 text-sm">Date: {order.createDate}</p>
                     <p className="text-gray-600 mb-2 text-sm">
@@ -362,7 +362,7 @@ const EmployeeOrderFields: React.FC<{
 
                 <button
                     onClick={() => __handleOpenInputSampleProductDialog(order.orderID)}
-                    className="bg-indigo-500 text-sm text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"
+                    className="mb-2 bg-indigo-500 text-sm text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"
                     style={{
                         borderRadius: 4,
                         backgroundColor: yellowColor
@@ -374,7 +374,7 @@ const EmployeeOrderFields: React.FC<{
 
                 <button
                     onClick={() => onViewDetails(order, designDetails)}
-                    className="bg-indigo-500 text-sm text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"
+                    className="mb-2 bg-indigo-500 text-sm text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"
                     style={{
                         borderRadius: 4,
                         backgroundColor: secondaryColor
@@ -386,7 +386,7 @@ const EmployeeOrderFields: React.FC<{
 
                     <button
                         onClick={() => onUpdatedOrderPending(order.orderID)}
-                        className="bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300"
+                        className="mb-2 bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 mr-4"
                         style={{
                             borderRadius: 4,
                             backgroundColor: primaryColor
@@ -400,7 +400,7 @@ const EmployeeOrderFields: React.FC<{
 
                     <button
                         onClick={() => __handleUpdateOrderDelivery(order.orderID)}
-                        className="bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300"
+                        className="mb-2 bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 mr-4"
                         style={{
                             borderRadius: 4,
                             backgroundColor: greenColor
@@ -887,16 +887,38 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
         { field: 'orderID', headerName: 'Order ID', width: 150 },
         { field: 'buyerName', headerName: 'Customer', width: 150 },
         { field: 'address', headerName: 'Address', width: 150 },
+        { field: 'province', headerName: 'Province', width: 150 },
         { field: 'phone', headerName: 'phone', width: 150 },
         { field: 'expectedStartDate', headerName: 'Date', width: 200 },
         {
             field: 'orderStatus',
             headerName: 'Status',
-            width: 150,
-            renderCell: (params: GridRenderCellParams) => (
-                <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(params.value)}`}>
-                    {params.value}
-                </span>
+            width: 100,
+            renderCell: (params) => (
+                <Box
+                    sx={{
+                        backgroundColor: params.value === true ? '#ffebee' : '#e8f5e9',
+                        color: params.value === true ? '#f44336' : '#4caf50',
+                        borderRadius: '16px',
+                        padding: '1px 5px',
+                        fontSize: '0.75rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        height: "50%",
+                        marginTop: "10%"
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                            backgroundColor: params.value === true ? '#f44336' : '#4caf50',
+                        }}
+                    />
+                    {params.value === true ? 'INACTIVE' : 'ACTIVE'}
+                </Box>
             )
         },
         {

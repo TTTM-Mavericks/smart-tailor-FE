@@ -5,9 +5,9 @@ import ManageExpertTailoring from '../ManagerExpertTailoringManagement/ManagerMa
 import ManageBrand from '../../ManageBrand/ManagerBrandManagement/ManagerManageBrandScreen/ManageBrandScreens';
 import ManageTask from '../../ManageTask/ManagerTaskManagement/ManagerManageTaskScreen/ManageTaskScreens';
 import ManageEmployee from '../../ManageEmployee/ManagerEmployeeManagement/ManagerManageEmployeeScreen/ManageEmployeeScreens';
-import ManageCustomer from '../../ManageCustomer/ManageCustomerManagement/ManagerManageCustomerScreen/ManageCustomerScreens';
 import ManageSizeExpertTailoring from '../../SizeExpertTailoring/ManagerSizeExpertTailoringManagement/ManagerManageScreen/ManageExpertTailoringScreens';
 import ManageExpertTailoringMaterial from '../../ExpertTailoringMaterial/ManagerExpertTailoringMaterialManagement/ManagerManageExpertTailoringMaterialScreen/ManageExpertTailoringMaterialScreens';
+import ManageCustomer from '../../ManageCustomer/ManageCustomerManagement/ManagerManageCustomerScreen/ManageCustomerScreens';
 
 const DashboardManagerMangeExpertTailoring = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -90,9 +90,9 @@ const DashboardManagerMangeExpertTailoring = () => {
                 return <ManageBrand />;
             case 'manager_manage_task':
                 return <ManageTask />;
-            case 'manager_manage_employee':
+            case 'manage_employee':
                 return <ManageEmployee />;
-            case 'manager_manage_customer':
+            case 'manage_customer':
                 return <ManageCustomer />;
             default:
                 return (

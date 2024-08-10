@@ -185,53 +185,20 @@ interface Transaction {
     virtualAccountNumber: string;
 }
 
-
 // TODO MUTIL LANGUAGE
 interface TransactionModalProps {
-    transaction: AccountantOrderInterface;
+    transaction: any;
     onClose: () => void;
 }
 
 const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClose }) => {
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case 'NOT_VERIFY': return 'bg-gray-200 text-gray-600';
-            case 'PENDING': return 'bg-yellow-100 text-yellow-600';
-            case 'CANCEL': return 'bg-red-100 text-red-600';
-            case 'COMPLETED': return 'bg-green-100 text-green-600';
-            case 'Completed': return 'bg-green-100 text-green-600';
-            case 'Not Completed': return 'bg-red-100 text-red-600';
-            default: return 'bg-red-100 text-red-600';
-        }
-    };
-
-    const brand = transaction.subOrderList.length > 0 ? transaction.subOrderList[0].brand : null;
-    const ratings = transaction.subOrderList.length > 0 ? transaction.subOrderList[0].brand : null;
-
-    const statusItems = [
-        { label: 'Sub ID', value: transaction.orderID },
-        { label: 'Type', value: transaction.orderType },
-        { label: 'Brand', value: brand ? brand.brandName : 'N/A' },
-        { label: 'Rating', value: ratings ? ratings.rating + '★' : 'N/A' },
-        { label: 'Quantity', value: transaction.quantity },
-        { label: 'Total Price', value: `${transaction.totalPrice} VND` },
-        { label: 'Expected Start', value: transaction.expectedStartDate },
-        {
-            label: 'Status',
-            value: transaction.orderStatus,
-            customClass: getStatusColor(transaction.orderStatus),
-        },
-        {
-            label: 'Payment Status',
-            value: transaction.paymentStatus ? 'COMPLETED' : 'PENDING',
-            customClass: getStatusColor(transaction.paymentStatus ? 'COMPLETED' : 'NOT_VERIFY'),
-        }
-    ];
-
-    const [selectedOrder, setSelectedOrder] = useState<any>();
+    const [isTransactionsExpanded, setIsTransactionsExpanded] = useState(true);
+    const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
     const [isOpenPaymentForBrandDialog, setIsOpenPaymentForBrandDialog] = useState<boolean>(false);
 
-    const __handleOpenPaymentForBrandialog = (orderId: any) => {
+    const toggleTransactions = () => setIsTransactionsExpanded(!isTransactionsExpanded);
+
+    const __handleOpenPaymentForBrandDialog = (orderId: string) => {
         setSelectedOrder(orderId);
         setIsOpenPaymentForBrandDialog(true);
     };
@@ -241,75 +208,243 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
         setIsOpenPaymentForBrandDialog(false);
     };
 
+    const safelyGetProperty = (obj: any, path: string) => {
+        return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+    };
+
     return (
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm overflow-y-auto h-full w-full flex items-center justify-center p-4 z-50"
+            className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm overflow-y-auto h-full w-full flex items-center justify-center p-4 z-50"
             onClick={onClose}
         >
             <motion.div
                 initial={{ scale: 0.9, y: 50 }}
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.9, y: 50 }}
-                className="relative bg-white w-full max-w-2xl rounded-xl shadow-lg p-8 max-h-[90vh] overflow-y-auto"
+                className="relative bg-white w-full max-w-3xl rounded-2xl shadow-2xl p-8 max-h-[90vh] overflow-y-auto"
                 onClick={e => e.stopPropagation()}
             >
                 <IoMdCloseCircleOutline
-                    size={24}
-                    color="red"
+                    size={28}
+                    className="absolute top-4 right-4 cursor-pointer text-red-500 hover:text-red-500 transition-colors"
                     onClick={onClose}
-                    className="absolute top-4 right-4 cursor-pointer"
                 />
 
-                <h2 className="text-2xl font-bold text-gray-700 mb-6">Order Report Details</h2>
+                <h2 className="text-2xl font-bold mb-6 text-gray-800">Transaction Details</h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    {statusItems.map((item, index) => (
-                        <div
+                <div className="grid grid-cols-2 gap-6 mb-8">
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                        <p className="text-sm text-gray-600 mb-1">Order ID</p>
+                        <p className="font-semibold">{transaction.orderID || 'N/A'}</p>
+                    </div>
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                        <p className="text-sm text-gray-600 mb-1">Design ID</p>
+                        <p className="font-semibold">{safelyGetProperty(transaction, 'designResponse.designID') || 'N/A'}</p>
+                    </div>
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                        <p className="text-sm text-gray-600 mb-1">Create Date</p>
+                        <p className="font-semibold">{transaction.createDate || 'N/A'}</p>
+                    </div>
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                        <p className="text-sm text-gray-600 mb-1">Status</p>
+                        <Chip label={transaction.orderStatus || 'N/A'} color="error" size="small" className="mt-1" />
+                    </div>
+                </div>
+
+                <div className="mb-6">
+                    <button
+                        onClick={toggleTransactions}
+                        className="flex items-center justify-between w-full text-left font-bold bg-blue-50 p-4 rounded-lg hover:bg-blue-100 transition-colors"
+                    >
+                        <span className="text-lg text-blue-700">Transactions</span>
+                        {isTransactionsExpanded ? <FaAngleUp className="text-blue-700" /> : <FaAngleDown className="text-blue-700" />}
+                    </button>
+
+                    {isTransactionsExpanded && (transaction.subOrderList || []).map((subOrder: any, index: number) => (
+                        <motion.div
                             key={index}
-                            className="flex items-center"
-                            style={{
-                                gridTemplateColumns: item.label === 'Status' || item.label === 'Payment Status' ? '30% auto' : '1fr auto'
-                            }}
+                            className="mt-4 p-6 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.1 }}
                         >
-                            <p className="text-sm text-gray-600 mb-1">
-                                <span className="font-semibold">{item.label}:</span>
-                            </p>
-                            <p className={`text-sm font-bold ${item.customClass || 'text-gray-800'} ml-2 px-3 rounded-full ${item.label === 'Status' || item.label === 'Payment Status' ? 'py-2' : ''}`}>
-                                {item.value}
-                            </p>
-                        </div>
+                            <div
+                                className="flex flex-col md:flex-row items-start md:items-center mt-10 mb-4 md:mb-6 border-b pb-4 md:pb-6"
+                            >
+                                <div className="flex-shrink-0"></div>
+                                <div
+                                    className="ml-0 md:ml-6 mt-4 md:mt-0 flex-grow grid grid-cols-1 md:grid-cols-2 gap-4"
+                                    style={{ position: "relative" }}
+                                >
+                                    <div>
+                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                            Sub ID:{" "}
+                                            <span className="text-sm text-gray-500 pb-2">
+                                                {subOrder.orderID}
+                                            </span>
+                                        </p>
+                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                            Type:{" "}
+                                            <span className="text-sm text-blue-700 pb-2">
+                                                {subOrder.orderType}
+                                            </span>
+                                        </p>
+                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                            Brand ID:{" "}
+                                            <span className="text-sm text-gray-500 pb-2">
+                                                {subOrder.brand?.brandID}
+                                            </span>
+                                        </p>
+                                        <p
+                                            style={{ fontWeight: "500" }}
+                                            className="text-sm text-black flex content-center items-center"
+                                        >
+                                            Brand:
+                                            <p
+                                                style={{ fontWeight: "500" }}
+                                                className="text-sm text-black flex content-center items-center"
+                                            >
+                                                <img
+                                                    src={subOrder.brand?.user.imageUrl}
+                                                    style={{
+                                                        width: 30,
+                                                        height: 30,
+                                                        borderRadius: 90,
+                                                        marginLeft: 5,
+                                                        marginRight: 5,
+                                                    }}
+                                                />
+                                                <p
+                                                    className={`${__handlegetRatingStyle(
+                                                        subOrder.brand?.rating
+                                                    )} text-sm text-gray-500`}
+                                                >
+                                                    {" "}
+                                                    {subOrder.brand?.brandName}
+                                                </p>
+                                            </p>
+                                        </p>
+                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                            Rating:{" "}
+                                            <span className="text-sm text-gray-500 pb-2">
+                                                {subOrder.brand?.rating}
+                                            </span>{" "}
+                                            <span className="text-yellow-400 text-sm">★</span>
+                                        </p>
+                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-4">
+                                            Details:
+                                            {subOrder.detailList?.map((detail: any) => (
+                                                <div className="grid grid-cols-4 gap-1 pt-0">
+                                                    <p className="text-sm text-gray-500 pb-2">
+                                                        Size: {detail.size?.sizeName}
+                                                    </p>
+                                                    <p className="text-sm text-gray-500 pb-2">
+                                                        Quantity: {detail.quantity}
+                                                    </p>
+                                                </div>
+                                            ))}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                            Total price:{" "}
+                                            <span className="text-sm text-gray-500 pb-2">
+                                                {__handleAddCommasToNumber(subOrder.totalPrice)} VND
+                                            </span>
+                                        </p>
+                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                            Expected start at:{" "}
+                                            <span className={`${__handleGetDateTimeColor(subOrder.expectedStartDate)} text-sm pb-2`}>
+                                                {subOrder.expectedStartDate}
+                                            </span>
+                                        </p>
+                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                            Status:
+                                            <button
+                                                className="py-1 px-3 rounded-full ml-2"
+                                                style={{
+                                                    backgroundColor:
+                                                        subOrder.orderDetail?.orderStatus === "PENDING"
+                                                            ? secondaryColor
+                                                            : subOrder.orderDetail?.orderStatus === "DELIVERED"
+                                                                ? greenColor
+                                                                : subOrder.orderDetail?.orderStatus === "DEPOSIT"
+                                                                    ? secondaryColor
+                                                                    : subOrder.orderDetail?.orderStatus === "PROCESSING"
+                                                                        ? secondaryColor
+                                                                        : redColor,
+                                                    opacity: 1,
+                                                    color: whiteColor,
+                                                    fontSize: 11,
+                                                }}
+                                            >
+                                                {subOrder.orderStatus}
+                                            </button>
+                                        </p>
+                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                            Payment status:
+                                            <button
+                                                className="py-1 px-3 rounded-full ml-2"
+                                                style={__handlegetStatusBackgroundBoolean(
+                                                    subOrder?.paymentList &&
+                                                        subOrder?.paymentList[0].paymentStatus
+                                                        ? true
+                                                        : false
+                                                )}
+                                            >
+                                                {`${subOrder?.paymentList &&
+                                                    subOrder?.paymentList[0].paymentStatus
+                                                    ? "PAID"
+                                                    : "PENDING"
+                                                    } `}
+                                            </button>
+                                        </p>
+
+                                    </div>
+                                    <div
+                                        className={`${style.orderHistory__viewInvoice__buttonPayment}items-center justify-center`}
+                                        style={{ textAlign: "center" }}
+                                    >
+                                        <p
+                                            className={`${style.orderHistory__viewInvoice__button} px-5 text-sm font-medium`}
+                                        >
+                                            <p className='mb-40'>View transaction</p>
+                                            <button
+                                                type="submit"
+                                                className="px-5 py-2 text-sm font-medium text-white"
+                                                style={{
+                                                    borderRadius: 4,
+                                                    color: whiteColor,
+                                                    marginBottom: 10,
+                                                    backgroundColor: primaryColor,
+                                                    textDecoration: "none",
+                                                }}
+                                                onClick={() => __handleOpenPaymentForBrandDialog(subOrder.orderID)}
+                                            >
+                                                <span className="font-medium text-white">Payment</span>
+                                            </button>
+                                        </p>
+
+                                    </div>
+                                </div>
+                            </div>
+                            {selectedOrder === subOrder.orderID && (
+                                <PaymentFromAccountantToBranđialog
+                                    onClose={__handleClosePaymentForBrandDialog}
+                                    isOpen={true}
+                                    paymentData={subOrder.paymentList}
+                                ></PaymentFromAccountantToBranđialog>
+                            )}
+                        </motion.div>
                     ))}
                 </div>
 
-                <div className="flex justify-end">
-                    <button
-                        type="submit"
-                        className="px-5 py-2 text-sm font-medium text-white"
-                        style={{
-                            borderRadius: 4,
-                            color: whiteColor,
-                            marginBottom: 10,
-                            backgroundColor: primaryColor,
-                            textDecoration: "none",
-                        }}
-                        onClick={() => __handleOpenPaymentForBrandialog(transaction.orderID)}
-                    >
-                        <span className="font-medium text-white">Payment</span>
-                    </button>
-                </div>
-
-                {selectedOrder === transaction.orderID && (
-                    <PaymentFromAccountantToBranđialog
-                        onClose={__handleClosePaymentForBrandDialog}
-                        isOpen={true}
-                        paymentData={transaction.paymentList}
-                    />
-                )}
             </motion.div>
         </motion.div>
+
     );
 };
 
@@ -319,15 +454,44 @@ interface TablesProps {
 }
 const Tables: React.FC<TablesProps> = ({ table, onViewDetails }) => {
     const columns: GridColDef[] = [
-        { field: 'orderID', headerName: 'Order ID', width: 130 },
-        { field: 'orderType', headerName: 'Type', width: 130 },
+        { field: 'orderID', headerName: 'Order ID', width: 130, flex: 1 },
+        { field: 'orderType', headerName: 'Type', width: 130, flex: 1 },
         { field: 'buyerName', headerName: 'Buyer Name', width: 150 },
         { field: 'totalPrice', headerName: 'Total Price', width: 130 },
         { field: 'expectedStartDate', headerName: 'Expected Start Date', width: 180 },
-        { field: 'orderStatus', headerName: 'Order Status', width: 130 },
+        {
+            field: 'orderStatus', headerName: 'Order Status', width: 100,
+            renderCell: (params) => (
+                <Box
+                    sx={{
+                        backgroundColor: params.value === true ? '#ffebee' : '#e8f5e9',
+                        color: params.value === true ? '#f44336' : '#4caf50',
+                        borderRadius: '16px',
+                        padding: '1px 5px',
+                        fontSize: '0.75rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        height: "50%",
+                        marginTop: "10%"
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                            backgroundColor: params.value === true ? '#f44336' : '#4caf50',
+                        }}
+                    />
+                    {params.value === true ? 'INACTIVE' : 'ACTIVE'}
+                </Box>
+            )
+        },
         {
             field: 'action',
             headerName: 'Action',
+            flex: 1,
             width: 150,
             renderCell: (params) => (
                 <Button
