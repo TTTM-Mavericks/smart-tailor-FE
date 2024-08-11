@@ -4,11 +4,12 @@ import { useSnapshot } from "valtio";
 
 import { EditorTabs, FilterTabs, DecalTypes } from "../../../config/TabSetting"
 import { download } from "../../../assets"
-import { downloadCanvasToImage, reader, urlToBase64 } from "../../../utils/DesignerUtils"
+import { __downloadCanvasToImage, reader, __urlToBase64 } from "../../../utils/DesignerUtils"
 import { fadeAnimation, slideAnimation } from "../../../config/MotionSetting";
-import { ColorPicker, FilePicker, CustomButton, Tab } from "../../../components";
-import state from "../../../store"
+// import { ColorPicker, FilePicker, CustomButton, Tab } from "../../../components";
 import styles from './Designer.module.scss'
+import state from "../../../store";
+import { ColorPicker, FilePicker, Tab } from "../../../components";
 
 const Designer = () => {
   const snap = useSnapshot(state);
@@ -21,9 +22,6 @@ const Designer = () => {
     stylishShirt: false
   })
 
-  useEffect(()=>{
-    console.log('file', file);
-  },[file])
 
   const generateTabContent = () => {
     switch (activeEditorTab) {
@@ -32,14 +30,13 @@ const Designer = () => {
       case "filepicker":
         return <FilePicker file={file} setFile={setFile} readFile={readFile} />
       case "download":
-        downloadCanvasToImage();
+        __downloadCanvasToImage();
       default:
         return null
     }
   }
 
   const handleDecals = (type, result) => {
-    console.log('result: ', result);
     const decalType = DecalTypes[type];
 
     state[decalType.stateProperty] = result;
@@ -52,14 +49,10 @@ const Designer = () => {
 
   const handleActiveFilterTab = (tabName) => {
     switch (tabName) {
-      case "logoShirt":
-        state.isLogoTexture = !activeFilterTab[tabName];
-        break;
       case "stylishShirt":
         state.isFullTexture = !activeFilterTab[tabName];
         break;
       default:
-        state.isLogoTexture = true;
         state.isFullTexture = false;
         break;
     }
@@ -103,7 +96,7 @@ const Designer = () => {
     //   })
 
     //   const data = await response.json();
-    //   const result = urlToBase64(data.image.data[0].url, (base64) => base64);
+    //   const result = __urlToBase64(data.image.data[0].url, (base64) => base64);
     // 
       
     //   // handleDecals(type, `data:image/png;base64,${result}`)

@@ -16,6 +16,7 @@ import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 import { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 interface ItemProps {
     title: string;
@@ -29,7 +30,7 @@ const Item: React.FC<ItemProps> = ({ title, to, icon, selected, setSelected }) =
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
-    const handleItemClick = () => {
+    const _handleItemClick = () => {
         setSelected(title);
         localStorage.setItem('selectedMenuItem', title);
     };
@@ -38,9 +39,9 @@ const Item: React.FC<ItemProps> = ({ title, to, icon, selected, setSelected }) =
         <MenuItem
             active={selected === title}
             style={{
-                color: colors.grey[100],
+                color: colors.primary[200],
             }}
-            onClick={handleItemClick}
+            onClick={_handleItemClick}
             icon={icon}
         >
             <Typography>{title}</Typography>
@@ -52,11 +53,7 @@ const Item: React.FC<ItemProps> = ({ title, to, icon, selected, setSelected }) =
 const SideBarComponent = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [selected, setSelected] = useState(() => {
-        // Retrieve the selected item from local storage or set the default state
-        const savedSelected = localStorage.getItem('selectedMenuItem');
-        return savedSelected || "Dashboard";
-    });
+
     const [isCollapsed, setIsCollapsed] = useState(() => {
         // Retrieve the state from local storage or set the default state
         const savedState = localStorage.getItem('sidebarCollapsed');
@@ -68,23 +65,41 @@ const SideBarComponent = () => {
         localStorage.setItem('sidebarCollapsed', JSON.stringify(isCollapsed));
     }, [isCollapsed]);
 
+    // Get language in local storage
+    const selectedLanguage = localStorage.getItem('language');
+    const codeLanguage = selectedLanguage?.toUpperCase();
+
+    // Using i18n
+    const { t, i18n } = useTranslation();
+    useEffect(() => {
+        if (selectedLanguage !== null) {
+            i18n.changeLanguage(selectedLanguage);
+        }
+    }, [selectedLanguage, i18n]);
+
+    const [selected, setSelected] = useState(() => {
+        const savedSelected = localStorage.getItem('selectedMenuItem');
+        return savedSelected || t(codeLanguage + '000019');
+    })
+
+
     return (
         <Box
             sx={{
                 "& .pro-sidebar-inner": {
-                    background: `${colors.primary[400]} !important`,
+                    background: `${colors.primary[600]} !important`,
                 },
                 "& .pro-icon-wrapper": {
-                    backgroundColor: "transparent !important",
+                    backgroundColor: `${colors.primary[600]} !important`,
                 },
                 "& .pro-inner-item": {
                     padding: "5px 35px 5px 20px !important",
                 },
                 "& .pro-inner-item:hover": {
-                    color: "#868dfb !important",
+                    color: "#E96208 !important",
                 },
                 "& .pro-menu-item.active": {
-                    color: "#6870fa !important",
+                    color: "#E96208 !important",
                 },
             }}
         >
@@ -96,7 +111,7 @@ const SideBarComponent = () => {
                         icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
                         style={{
                             margin: "10px 0 20px 0",
-                            color: colors.grey[100],
+                            color: colors.primary[300],
                         }}
                     >
                         {!isCollapsed && (
@@ -106,8 +121,8 @@ const SideBarComponent = () => {
                                 alignItems="center"
                                 ml="15px"
                             >
-                                <Typography variant="h6" color={colors.grey[100]}>
-                                    ADMINIS
+                                <Typography variant="h6" color={colors.primary[200]}>
+                                    {t(codeLanguage + '000034')}
                                 </Typography>
                                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                                     <MenuOutlinedIcon />
@@ -123,21 +138,13 @@ const SideBarComponent = () => {
                                     alt="profile-user"
                                     width="100px"
                                     height="100px"
-                                    src={`../../../../../src/assets/img/avatar.jpg`}
+                                    src={`https://smart-tailor-fe.pages.dev/assets/smart-tailor_logo-CUmlLF_X.png`}
                                     style={{ cursor: "pointer", borderRadius: "50%" }}
                                 />
                             </Box>
                             <Box textAlign="center">
-                                {/* <Typography
-                                    variant="h3"
-                                    color={colors.grey[100]}
-                                    fontWeight="bold"
-                                    sx={{ m: "10px 0 0 0" }}
-                                >
-                                    Tammt
-                                </Typography> */}
-                                <Typography variant="h5" color={colors.greenAccent[500]} sx={{ m: "10px 0 0 0" }}>
-                                    Admin TTTM
+                                <Typography variant="h5" color={colors.primary[200]} sx={{ m: "10px 0 0 0" }}>
+                                    {t(codeLanguage + '000035')}
                                 </Typography>
                             </Box>
                         </Box>
@@ -145,7 +152,7 @@ const SideBarComponent = () => {
 
                     <Box paddingLeft={isCollapsed ? undefined : "10%"}>
                         <Item
-                            title="Dashboard"
+                            title={t(codeLanguage + '000019')}
                             to="/admin"
                             icon={<HomeOutlinedIcon />}
                             selected={selected}
@@ -154,29 +161,36 @@ const SideBarComponent = () => {
 
                         <Typography
                             variant="h6"
-                            color={colors.grey[300]}
+                            color={colors.primary[300]}
                             sx={{ m: "15px 0 5px 20px" }}
                             style={{ fontSize: "15px" }}
                         >
-                            Data
+                            {t(codeLanguage + '000033')}
                         </Typography>
                         <Item
-                            title="Manage Users"
-                            to="/manager_user"
+                            title={t(codeLanguage + '000020')}
+                            to="/admin_manager_material"
                             icon={<PeopleOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
                         />
                         <Item
-                            title="Manage Employees"
+                            title={t(codeLanguage + '000215')}
+                            to="/admin_manager_category"
+                            icon={<PeopleOutlinedIcon />}
+                            selected={selected}
+                            setSelected={setSelected}
+                        />
+                        <Item
+                            title={t(codeLanguage + '000021')}
                             to="/contacts"
                             icon={<ContactsOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
                         />
                         <Item
-                            title="Manage Invoice"
-                            to="/invoices"
+                            title={t(codeLanguage + '000022')}
+                            to="/manage_invoice"
                             icon={<ReceiptOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
@@ -184,29 +198,29 @@ const SideBarComponent = () => {
 
                         <Typography
                             variant="h6"
-                            color={colors.grey[300]}
+                            color={colors.primary[300]}
                             sx={{ m: "15px 0 5px 20px" }}
                             style={{ fontSize: "15px" }}
                         >
-                            Pages
+                            {t(codeLanguage + '000032')}
                         </Typography>
                         <Item
-                            title="Manage Income"
+                            title={t(codeLanguage + '000023')}
                             to="/manage_income"
                             icon={<PersonOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
                         />
                         <Item
-                            title="Manage Revenue"
+                            title={t(codeLanguage + '000024')}
                             to="/manage_revenue"
                             icon={<CalendarTodayOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
                         />
                         <Item
-                            title="FAQ Page"
-                            to="/faq"
+                            title={t(codeLanguage + '000030')}
+                            to="/admin_faq"
                             icon={<HelpOutlineOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
@@ -214,36 +228,36 @@ const SideBarComponent = () => {
 
                         <Typography
                             variant="h6"
-                            color={colors.grey[300]}
+                            color={colors.primary[300]}
                             sx={{ m: "15px 0 5px 20px" }}
                             style={{ fontSize: "15px" }}
                         >
-                            Charts
+                            {t(codeLanguage + '000031')}
                         </Typography>
                         <Item
-                            title="Bar Chart"
-                            to="/bar"
+                            title={t(codeLanguage + '000026')}
+                            to="/bar_chart"
                             icon={<BarChartOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
                         />
                         <Item
-                            title="Pie Chart"
-                            to="/pie"
+                            title={t(codeLanguage + '000027')}
+                            to="/pie_chart"
                             icon={<PieChartOutlineOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
                         />
                         <Item
-                            title="Line Chart"
-                            to="/line"
+                            title={t(codeLanguage + '000028')}
+                            to="/line_chart"
                             icon={<TimelineOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
                         />
                         <Item
-                            title="Geography Chart"
-                            to="/geography"
+                            title={t(codeLanguage + '000029')}
+                            to="/geography_chart"
                             icon={<MapOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}

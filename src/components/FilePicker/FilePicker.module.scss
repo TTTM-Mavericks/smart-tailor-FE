@@ -1,15 +1,16 @@
+@import '../../index.module.scss';
+
+
 .filePickerContainer {
     display: flex;
-    position: absolute;
-    background-color: #D1D5DB;
-    left: 100%;
+    position: relative;
+    background-color: transparent;
     padding: 0.75rem;
-    margin-left: 0.75rem;
     flex-direction: column;
     border-radius: 0.375rem;
-    width: 195px;
+    width: 19em;
     height: 220px;
-    margin-top: 40vh;
+    // margin-top: 40vh;
     &__box {
         display: flex;
         flex-direction: column;

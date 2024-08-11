@@ -1,4 +1,4 @@
-import { Box, Button, IconButton, Menu, MenuItem, Modal } from "@mui/material";
+import { Box } from "@mui/material";
 import { DataGrid, GridToolbar, GridColDef } from "@mui/x-data-grid";
 import { tokens } from "../../../theme";
 import { useTheme } from "@mui/material";
@@ -41,9 +41,10 @@ const RecentTransactionComponent: React.FC = () => {
             field: "name",
             headerName: "Name",
             flex: 1,
-            cellClassName: "name-column--cell",
         },
         { field: "date", headerName: "Date", flex: 0.5 },
+        { field: "total", headerName: "Total" },
+        { field: "total", headerName: "Total" },
         { field: "total", headerName: "Total" },
 
     ];
@@ -65,24 +66,24 @@ const RecentTransactionComponent: React.FC = () => {
                         borderBottom: "none",
                     },
                     "& .name-column--cell": {
-                        color: colors.greenAccent[300],
+                        color: colors.primary[300],
                     },
                     "& .MuiDataGrid-columnHeaders": {
-                        backgroundColor: colors.blueAccent[700],
+                        backgroundColor: colors.primary[300],
                         borderBottom: "none",
                     },
                     "& .MuiDataGrid-virtualScroller": {
-                        backgroundColor: colors.primary[400],
+                        backgroundColor: colors.primary[100],
                     },
                     "& .MuiDataGrid-footerContainer": {
                         borderTop: "none",
-                        backgroundColor: colors.blueAccent[700],
+                        backgroundColor: colors.primary[100],
                     },
                     "& .MuiCheckbox-root": {
-                        color: `${colors.greenAccent[200]} !important`,
+                        color: `${colors.primary[100]} !important`,
                     },
                     "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-                        color: `${colors.grey[100]} !important`,
+                        color: `${colors.primary[200]} !important`,
                     },
                 }}
             >

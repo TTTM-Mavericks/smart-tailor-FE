@@ -1,0 +1,11 @@
+{
+    "email": "điền email vào đây",
+    "password": "điền pass vào đây",
+    "language": "điền ngôn ngữ vào đây",
+    "phoneNumber": "điền sđt vào đây",
+    "fullName": "điền full name vào đây",
+    "address": "điền địa chỉ vào đây",
+    "province": "điền tỉnh vào đây",
+    "provider": "LOCAL",
+    "district": "điền quận vào đây"
+}

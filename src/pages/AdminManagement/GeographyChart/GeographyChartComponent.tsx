@@ -1,11 +1,14 @@
-import { Box } from "@mui/material";
+import { Card, useTheme } from "@mui/material";
 import GeographyChart from "./GeographyChartScreens";
+import { tokens } from "../../../theme";
 
 const GeographyChartComponent = () => {
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
     return (
-        <Box>
+        <Card style={{ height: "100vh", backgroundColor: colors.primary[600], margin: "2%" }}>
             <GeographyChart />
-        </Box>
+        </Card>
     );
 };
 

@@ -1,0 +1,94 @@
+@import '../../../../index.module.scss';
+
+.materialDetail__container {
+    overflow: none;
+
+    &__itemMaskArea {
+        width: 50%;
+    }
+
+    &__itemMaskArea::-webkit-scrollbar {
+        width: 3px;
+        height: 20px;
+    }
+
+    &__itemMaskArea::-webkit-scrollbar-track {
+        background: $grayColor1;
+        border-radius: 10px;
+        height: 20px;
+    }
+
+    &__itemMaskArea::-webkit-scrollbar-thumb {
+        background: #7b7b7b;
+        border-radius: 10px;
+        height: 20px;
+    }
+
+    &__itemMaskArea::-webkit-scrollbar-thumb:hover {
+        background: #7b7b7b;
+        /* Color when hovering over the scrollbar thumb */
+    }
+
+
+}
+
+.materialDetail__content {
+
+    img {
+        width: 30px;
+        height: 40px;
+    }
+
+    &__itemMask {
+        img {
+            width: 30px;
+            height: 40px;
+            margin: 0 10px 0 10px;
+        }
+    }
+
+    &__button {
+        span {
+            font-size: 12px;
+
+        }
+    }
+
+    span {
+        font-size: 13px;
+    }
+
+    &__itemMask {
+        label {
+            font-size: 13px;
+        }
+    }
+}
+
+/* styles.module.scss */
+.materialDetail__partOfClothStep {
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 50px;
+}
+
+.stepLabel {
+    font-size: 12px; // Default font size for StepLabel,
+    cursor: pointer;
+}
+
+.stepLabelActive {
+    font-size: 14px; // Font size when step is active
+}
+
+.stepLabelRoot {
+    color: #6c757d; // Default color for StepLabel
+}
+
+.stepLabelActiveRoot {
+    color: #007bff; // Active step color
+}
+
+.MuiStepLabel-labelContainer span {
+    font-size: 10px !important;
+}

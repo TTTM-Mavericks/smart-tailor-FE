@@ -1,0 +1,89 @@
+@import '../../../index.module.scss';
+
+.orderRequest__detail__sizeDetail__quantity {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    p {
+        width: 200px;
+        font-size: 12px;
+        color: $secondaryColor;
+        margin-left: 10px;
+        text-decoration-line: underline;
+    }
+}
+
+.orderRequest__typoraphy {
+    font-size: 13px;
+    font-weight: bold;
+
+    strong {
+        font-size: 14px;
+    }
+
+}
+
+.orderRequest__button__accept {
+    background-color: $greenColor ;
+    border-radius: 4px;
+    margin: 0 auto;
+    color: $whiteColor;
+    width: 200px;
+    margin-bottom: 10px;
+
+    &:hover {
+        scale: 1.02;
+        transition: 0.5s;
+    }
+}
+
+.orderRequest__button__deny {
+    background-color: $whiteColor;
+    border-radius: 4px;
+    color: $redColor;
+    width: 200px;
+    margin-bottom: 10px;
+    border: 1px solid $redColor;
+
+    &:hover {
+        background-color: $redColor;
+        color: $whiteColor;
+        scale: 1.02;
+        transition: 0.5s;
+    }
+}
+
+// DIALOG
+.partOfDesignInfor__dialog__content{
+    height: 500px;
+    overflow: auto;
+    &::-webkit-scrollbar {
+        width: 3px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: $grayColor1;
+        border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #7b7b7b;
+        border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: #7b7b7b;
+        /* Color when hovering over the scrollbar thumb */
+    }
+}
+
+.orderRequest__typoraphy__dialog{
+    font-size: 11px;
+    font-weight: bold;
+
+    strong {
+        font-size: 11px;
+    }
+}
