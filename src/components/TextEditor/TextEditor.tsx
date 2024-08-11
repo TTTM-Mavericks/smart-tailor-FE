@@ -224,18 +224,6 @@ const TextEditor: React.FC<EditorProps> = ({ placeholder, onSetText }) => {
                 </span>
             </div>
 
-            <div className="angle-adjustment">
-                <input
-                    type="range"
-                    min="-180"
-                    max="180"
-                    value={angle}
-                    onChange={(e) => setAngle(parseInt(e.target.value))}
-                />
-                <button onClick={print}>Apply Curvature</button>
-            </div>
-
-
             <div className={styles.textEditor__button}>
                 <CustomButton
                     type="filled"
@@ -244,7 +232,7 @@ const TextEditor: React.FC<EditorProps> = ({ placeholder, onSetText }) => {
                     customStyles={`font-size: 0.75rem; line-height: 1rem; background-color: ${primaryColor}; width: 250'`}
                 />
             </div>
-            {__handleConvertHtmlToSvg(editorHtml)}
+            {/* {__handleConvertHtmlToSvg(editorHtml)} */}
 
         </div>
     );

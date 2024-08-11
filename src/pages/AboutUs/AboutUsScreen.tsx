@@ -6,7 +6,6 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import CarouselComponent from './CarouselComponent';
 import { motion, useInView } from 'framer-motion';
-import brandImage from '../../assets/img/landing-img/slider-bird1.jpg';
 import HeaderComponent from '../../components/Header/HeaderComponent';
 import FooterComponent from '../../components/Footer/FooterComponent';
 import { useTranslation } from 'react-i18next';
@@ -65,7 +64,6 @@ const StyledIcon = styled(Box)(({ theme }) => ({
     padding: theme.spacing(1),
     borderRadius: '50%',
 }));
-
 
 const StyledContainer = styled(Box)(({ theme }) => ({
     display: 'grid',
@@ -193,20 +191,15 @@ const AboutUsPage: React.FC = () => {
                         </Fade>
                     </Grid>
                     <Grid item xs={12} md={6} style={{ marginTop: "5%" }}>
-                        {/* <Fade in timeout={800}>
-                            <Typography variant="h3" gutterBottom style={{ marginLeft: "6%" }}>
-                                {t(codeLanguage + '000077')}
-                            </Typography>
-                        </Fade> */}
                         <StyledCardCarousel {...cardSettings}>
                             {[1, 2, 3, 4, 5, 6].map((_, index) => (
-                                <Fade in timeout={(index + 1) * 400} key={index} >
-                                    <StyledCard >
-                                        <CardActionArea >
+                                <Fade in timeout={(index + 1) * 400} key={index}>
+                                    <StyledCard>
+                                        <CardActionArea>
                                             <CardMedia
                                                 component="img"
                                                 height="300"
-                                                image={brandImage}
+                                                image="../../assets/img/landing-img/slider-bird1.jpg"
                                                 alt={`Product ${index + 1}`}
                                             />
                                             <CardContent>
@@ -225,7 +218,6 @@ const AboutUsPage: React.FC = () => {
                     </Grid>
                 </Grid>
             </StyledBox>
-
 
             <motion.div
                 ref={titleRef}
@@ -259,83 +251,17 @@ const AboutUsPage: React.FC = () => {
                                 <StyledIcon>
                                     <i className="fas fa-cut" />
                                 </StyledIcon>
-                                <Typography variant="h6" style={{ color: "black" }}>Custom Tailoring</Typography>
+                                <Typography variant="h6">
+                                    Service {index + 1}
+                                </Typography>
                             </StyledIconBox>
-                            <Typography variant="body2" style={{ color: "black" }}>
-                                We offer custom tailoring services to ensure a perfect fit and style for every client.
+                            <Typography variant="body2">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                             </Typography>
                         </motion.div>
                     </Grid>
                 ))}
             </Grid>
-
-            <StyledContainer ref={containerRef}>
-                <StyledTextContent
-                    initial={{ opacity: 0, x: -50 }}
-                    animate={isContainerVisible ? { opacity: 1, x: 0, transition: { duration: 0.5 } } : {}}
-                >
-                    <Typography variant="h2" gutterBottom style={{ color: "black" }}>
-                        {t(codeLanguage + '000081')}
-                    </Typography>
-                    <Typography variant="body1" style={{ color: "black" }}>
-                        {t(codeLanguage + '000082')}
-                    </Typography>
-                </StyledTextContent>
-
-                <motion.div
-                    initial={{ opacity: 0, x: 50 }}
-                    animate={isContainerVisible ? { opacity: 1, x: 0, transition: { duration: 0.5 } } : {}}
-                >
-                    <StyledGallery>
-                        {[
-                            'https://via.placeholder.com/300x400',
-                            'https://via.placeholder.com/300x400',
-                            'https://via.placeholder.com/300x400',
-                            'https://via.placeholder.com/600x400',
-                            'https://via.placeholder.com/300x400',
-                            'https://via.placeholder.com/300x400',
-                        ].map((image, index) => (
-                            <StyledImageBox key={index}>
-                                <img src={image} alt={`Image ${index + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                <StyledImageOverlay>
-                                    <Typography variant="h6">Image {index + 1}</Typography>
-                                </StyledImageOverlay>
-                            </StyledImageBox>
-                        ))}
-                    </StyledGallery>
-                </motion.div>
-            </StyledContainer>
-
-            <motion.div
-                ref={testimonialsRef}
-                initial={{ opacity: 0, y: 50 }}
-                animate={isTestimonialsVisible ? { opacity: 1, y: 0, transition: { duration: 0.5 } } : {}}
-            >
-                <Typography variant="h3" gutterBottom align="center" sx={{ marginTop: 20 }} style={{ color: "black" }}>
-                    {t(codeLanguage + '000083')}
-                </Typography>
-            </motion.div>
-
-            <Grid container spacing={3} sx={{ marginTop: 4, paddingLeft: 4, paddingRight: 4 }}>
-                {[1, 2, 3, 4, 5, 6].map((_, index) => (
-                    <Grid item xs={12} md={4} key={index}>
-                        <motion.div
-                            initial={{ opacity: 0, y: 50 }}
-                            animate={isTestimonialsVisible ? { opacity: 1, y: 0, transition: { delay: (index + 1) * 0.2, duration: 0.5 } } : {}}
-                        >
-                            <TestimonialCard>
-                                <Typography variant="body1">
-                                    "I had an amazing experience with this tailoring shop. They listened to my needs and created a perfect suit for me. The attention to detail and quality of work is truly exceptional."
-                                </Typography>
-                                <Typography variant="subtitle1" style={{ marginTop: 8 }}>
-                                    - ITMEBEBE
-                                </Typography>
-                            </TestimonialCard>
-                        </motion.div>
-                    </Grid>
-                ))}
-            </Grid>
-
 
             <motion.div
                 ref={teamRef}
@@ -343,26 +269,82 @@ const AboutUsPage: React.FC = () => {
                 animate={isTeamVisible ? { opacity: 1, y: 0, transition: { duration: 0.5 } } : {}}
             >
                 <Typography variant="h3" gutterBottom align="center" sx={{ marginTop: 20 }} style={{ color: "black" }}>
-                    {t(codeLanguage + '000084')}
+                    {t(codeLanguage + '000078')}
                 </Typography>
+                <Grid container spacing={4} sx={{ marginTop: 4, paddingLeft: 4, paddingRight: 4 }}>
+                    {[1, 2, 3, 4].map((_, index) => (
+                        <Grid item xs={12} md={3} key={index}>
+                            <StyledTeamMember>
+                                <StyledAvatar src="../../assets/img/landing-img/member1.jpg" alt={`Team Member ${index + 1}`} />
+                                <Typography variant="h6">
+                                    Member {index + 1}
+                                </Typography>
+                                <Typography variant="body2">
+                                    Position
+                                </Typography>
+                            </StyledTeamMember>
+                        </Grid>
+                    ))}
+                </Grid>
             </motion.div>
 
-            <Grid container spacing={3} sx={{ marginTop: 4, marginBottom: 10 }}>
-                {[1, 2, 3, 4].map((_, index) => (
-                    <Grid item xs={6} sm={3} key={index}>
-                        <motion.div
-                            initial={{ opacity: 0, y: 50 }}
-                            animate={isTeamVisible ? { opacity: 1, y: 0, transition: { delay: (index + 1) * 0.2, duration: 0.5 } } : {}}
-                        >
-                            <StyledTeamMember>
-                                <StyledAvatar src={`../../../../src/assets/img/avatar.jpg`} />
-                                <Typography variant="h6" style={{ color: "black" }}>Tam Thanh</Typography>
-                                <Typography variant="body2" style={{ color: "black" }}>Member Tailor</Typography>
-                            </StyledTeamMember>
-                        </motion.div>
-                    </Grid>
-                ))}
-            </Grid>
+            <motion.div
+                ref={testimonialsRef}
+                initial={{ opacity: 0, y: 50 }}
+                animate={isTestimonialsVisible ? { opacity: 1, y: 0, transition: { duration: 0.5 } } : {}}
+            >
+                <Typography variant="h3" gutterBottom align="center" sx={{ marginTop: 20 }} style={{ color: "black" }}>
+                    {t(codeLanguage + '000081')}
+                </Typography>
+                <Grid container spacing={4} sx={{ marginTop: 4, paddingLeft: 4, paddingRight: 4 }}>
+                    {[1, 2, 3].map((_, index) => (
+                        <Grid item xs={12} md={4} key={index}>
+                            <TestimonialCard>
+                                <Typography variant="body2" gutterBottom>
+                                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque euismod, urna eu tincidunt consectetur, nisi nisl aliquam odio, nec volutpat elit nunc vitae massa."
+                                </Typography>
+                                <Typography variant="h6">
+                                    Customer {index + 1}
+                                </Typography>
+                            </TestimonialCard>
+                        </Grid>
+                    ))}
+                </Grid>
+            </motion.div>
+
+            <motion.div
+                ref={containerRef}
+                initial={{ opacity: 0, y: 50 }}
+                animate={isContainerVisible ? { opacity: 1, y: 0, transition: { duration: 0.5 } } : {}}
+            >
+                <StyledContainer>
+                    <StyledTextContent>
+                        <Typography variant="h5" gutterBottom>
+                            {t(codeLanguage + '000082')}
+                        </Typography>
+                        <Typography variant="body1" paragraph>
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque euismod, urna eu tincidunt consectetur, nisi nisl aliquam odio, nec volutpat elit nunc vitae massa.
+                        </Typography>
+                    </StyledTextContent>
+                    <StyledGallery>
+                        {[1, 2, 3, 4, 5, 6].map((_, index) => (
+                            <StyledImageBox key={index}>
+                                <img
+                                    src={`../../assets/img/gallery-img/gallery${index + 1}.jpg`}
+                                    alt={`Gallery ${index + 1}`}
+                                    style={{ width: '100%', height: 'auto' }}
+                                />
+                                <StyledImageOverlay>
+                                    <Typography variant="h6">
+                                        Gallery {index + 1}
+                                    </Typography>
+                                </StyledImageOverlay>
+                            </StyledImageBox>
+                        ))}
+                    </StyledGallery>
+                </StyledContainer>
+            </motion.div>
+
             <FooterComponent />
         </div>
     );

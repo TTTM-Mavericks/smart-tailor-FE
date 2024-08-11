@@ -18,9 +18,7 @@ export default function FooterComponent() {
   }, [selectedLanguage, i18n]);
 
   return (
-    <div className="bg-white">
-
-
+    <div className="bg-white mt-20">
       <footer className="bg-white">
         <div className="mx-auto w-full max-w-screen-xl p-4 py-6 lg:py-8">
           <div className="md:flex md:justify-between">

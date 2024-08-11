@@ -17,6 +17,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import ImageMasonry from '../../../components/ImageMasonry/ImageMasonryCoponent';
 import { __validateEmail } from '../Utils';
 import { useNavigate } from 'react-router-dom';
+import BrandProductivityInputDialog from '../../BrandManagement/GlobalComponent/Dialog/BrandProductivity/BrandProductivityInputDialog';
 
 const defaultTheme = createTheme();
 
@@ -35,6 +36,7 @@ function SignInScreen() {
   const [isPasswordValidate, setIsPasswordValidate] = React.useState<boolean>(true);
   const [codeLanguage, setCodeLanguage] = React.useState<string>('EN');
   const [isLoading, setIsloading] = React.useState<boolean>(false);
+  const [showDialog, setShowDialog] = React.useState(false);
 
   // ---------------Usable Variable---------------//
   const { t, i18n } = useTranslation();
@@ -52,7 +54,7 @@ function SignInScreen() {
       const isValid = isAuthenticated(token);
       if (isValid) {
         navigate('/')
-      } 
+      }
     }
   }, []);
 
@@ -100,6 +102,26 @@ function SignInScreen() {
 
 
   /**
+   * 
+   * @param roleName 
+   * @returns 
+   */
+  const roleBasedRedirect = (roleName: string) => {
+    switch (roleName) {
+      case 'ADMIN':
+        return '/admin';
+      case 'EMPLOYEE':
+        return '/employee';
+      case 'MANAGER':
+        return '/manager';
+      case 'ACCOUNTANT':
+        return '/accountant';
+      default:
+        return '/';
+    }
+  };
+
+  /**
    * Handle signin
    * @param event 
    */
@@ -114,25 +136,65 @@ function SignInScreen() {
 
         const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.signin}`, requestData);
         if (response.status === 200) {
-          localStorage.setItem('userAuth', JSON.stringify(response.data.user));
-          const authToken = response.data.access_token;
-          const refreshToken = response.data.refresh_token;
-          Cookies.set('token', authToken);
-          Cookies.set('refreshToken', refreshToken);
-          setTimeout(() => {
-            window.location.href = '/'
-          }, 2000)
+          const { user, access_token, refresh_token } = response.data;
 
-        } else {
-          setIsloading(false);
-          toast.error(`${response.message}`, { autoClose: 3000 });
+          localStorage.setItem('userAuth', JSON.stringify(user));
+          Cookies.set('token', access_token);
+          Cookies.set('refreshToken', refresh_token);
+          Cookies.set('userAuth', JSON.stringify(user));
 
+          const redirectUrl = roleBasedRedirect(user.roleName);
+          console.log('User role:', user.roleName); // Debugging line
+          console.log('Redirect URL:', redirectUrl); // Debugging line
+
+          if (!localStorage.getItem('brandFirstLogin')) {
+            localStorage.setItem('brandFirstLogin', 'true');
+          }
+
+          if (localStorage.getItem('brandFirstLogin') === 'false') {
+            window.location.href = '/brand';
+            return;
+          }
+
+          // Check if user role is 'BRAND'
+          if (user.roleName === 'BRAND') {
+            try {
+              // Fetch brand data by ID
+              const fetchApiBrand = await api.get(
+                `${versionEndpoints.v1}${featuresEndpoints.brand}${functionEndpoints.brand.getBrandByID}/${user.userID}`
+              );
+              const { brandName, brandStatus } = fetchApiBrand.data;
+
+              // Navigate based on brand data
+              if (!brandName) {
+                window.location.href = `/brand/updateProfile/${user.userID}`;
+              } else if (brandStatus === 'PENDING') {
+                window.location.href = '/brand/waiting_process_information';
+              } else if (localStorage.getItem('brandFirstLogin') === 'false') {
+                window.location.href = '/brand';
+              } else {
+                localStorage.setItem('brandFirstLogin', 'true');
+                setTimeout(() => {
+                  window.location.href = '/brand';
+                }, 100);
+              }
+            } catch (error) {
+              console.error('Error fetching brand data:', error);
+            }
+          } else {
+            // Navigate to the appropriate page based on role
+            navigate(redirectUrl);
+          }
         }
-
       } catch (error: any) {
         console.error('Error posting data:', error);
+        if (error.response) {
+          toast.error(`${error.response.data.message || 'An error occurred'}`, { autoClose: 3000 });
+        } else {
+          toast.error('Network error. Please try again.', { autoClose: 3000 });
+        }
+      } finally {
         setIsloading(false);
-        toast.error(`${error}`, { autoClose: 3000 });
       }
     } else {
       setEmailErrorValidate(errorEmailValidate);
@@ -140,7 +202,6 @@ function SignInScreen() {
       toast.error(`Invalid Email or Password`, { autoClose: 3000 });
     }
   };
-
 
   const __handleLoginSuccess = (response: any) => {
     try {
@@ -161,6 +222,8 @@ function SignInScreen() {
             Cookies.set('refreshToken', refreshToken);
             axios.defaults.headers.common.Authorization = `Bearer ${authToken}`;
             localStorage.setItem('userAuth', JSON.stringify(resp.data.user));
+            Cookies.set('userAuth', JSON.stringify(resp.data.user));
+
           }
           setIsloading(true);
           setTimeout(() => {
@@ -273,7 +336,7 @@ function SignInScreen() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    borderRadius: 5
+                    borderRadius: 4
                   },
                 }}
                 cancel_on_tap_outside
@@ -342,6 +405,13 @@ function SignInScreen() {
           </Menu>
           {signInBox()}
         </div>
+        {showDialog && <BrandProductivityInputDialog
+          isOpen={showDialog}
+          onClose={() => {
+            setShowDialog(false);
+            window.location.href = '/brand';
+          }}
+        />}
       </ThemeProvider>
     </GoogleOAuthProvider>
   );

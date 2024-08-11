@@ -7,79 +7,83 @@ import { hoodieModel, longSkirtModel, shirtModel, skirtFullModel, womenSkirtBott
 import { Fragment, useState } from 'react'
 import ProductCard from '../../../../components/Card/ProductCard/ProductCard';
 import OptionFilterCompnent from '../../../../components/OptionFilter/OptionFilterCompnent';
+import { toast } from 'react-toastify';
+import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
+import { DesignInterface, ExpertTailoringInterface } from '../../../../models/DesignModel';
+import OptionFilterCompnentDialog from '../OptionFilter/OptionFilterCompnentDialog';
 
 
-const productData = [
-    {
-        id: 1,
-        imgUrl: shirtModel,
-        title: 'shirtModel',
-        brand: 'Sample',
-        rating: 5
+// const productData = [
+//     {
+//         id: 1,
+//         imgUrl: shirtModel,
+//         title: 'shirtModel',
+//         brand: 'Sample',
+//         rating: 5
 
-    },
-    {
-        id: 1,
-        imgUrl: hoodieModel,
-        title: 'hoodieModel',
-        brand: 'Sample',
-        rating: 5
+//     },
+//     {
+//         id: 1,
+//         imgUrl: hoodieModel,
+//         title: 'hoodieModel',
+//         brand: 'Sample',
+//         rating: 5
 
-    },
-    {
-        id: 1,
-        imgUrl: skirtFullModel,
-        title: 'skirtFullModel',
-        brand: 'Sample',
-        rating: 5
+//     },
+//     {
+//         id: 1,
+//         imgUrl: skirtFullModel,
+//         title: 'skirtFullModel',
+//         brand: 'Sample',
+//         rating: 5
 
-    },
-    {
-        id: 1,
-        imgUrl: womenSkirtTopModel,
-        title: 'womenSkirtTopModel',
-        brand: 'Sample',
-        rating: 5
+//     },
+//     {
+//         id: 1,
+//         imgUrl: womenSkirtTopModel,
+//         title: 'womenSkirtTopModel',
+//         brand: 'Sample',
+//         rating: 5
 
-    },
-    {
-        id: 1,
-        imgUrl: womenSkirtBottomModel,
-        title: 'womenSkirtBottomModel',
-        brand: 'Sample',
-        rating: 5
+//     },
+//     {
+//         id: 1,
+//         imgUrl: womenSkirtBottomModel,
+//         title: 'womenSkirtBottomModel',
+//         brand: 'Sample',
+//         rating: 5
 
-    },
-    {
-        id: 1,
-        imgUrl: longSkirtModel,
-        title: 'longSkirtModel',
-        brand: 'Sample',
-        rating: 5
+//     },
+//     {
+//         id: 1,
+//         imgUrl: longSkirtModel,
+//         title: 'longSkirtModel',
+//         brand: 'Sample',
+//         rating: 5
 
-    },
-    {
-        id: 1,
-        imgUrl: shirtModel,
-        title: 'shirtModel',
-        brand: 'Sample',
-        rating: 5
+//     },
+//     {
+//         id: 1,
+//         imgUrl: shirtModel,
+//         title: 'shirtModel',
+//         brand: 'Sample',
+//         rating: 5
 
-    },
-    {
-        id: 1,
-        imgUrl: shirtModel,
-        title: 'shirtModel',
-        brand: 'Sample',
-        rating: 5
+//     },
+//     {
+//         id: 1,
+//         imgUrl: shirtModel,
+//         title: 'shirtModel',
+//         brand: 'Sample',
+//         rating: 5
 
-    },
-]
+//     },
+// ]
 
 type Props = {
     isOpen: boolean;
     onClose: () => void;
-    onItemSelect: (item: string) => void;
+    onItemSelect: (item: string , id: any) => void;
 }
 
 function classNames(...classes: any) {
@@ -93,7 +97,15 @@ const ProductDialogComponent: React.FC<Props> = ({ isOpen, onClose, onItemSelect
     const [codeLanguage, setCodeLanguage] = useState('EN');
     const [isOpenProductDialog, setIsOpenProductDialog] = useState<boolean>(false);
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState<boolean>(false);
-    const [itemSelected, setItemSelected] = useState<string>('')
+    const [itemSelected, setItemSelected] = useState<string>('');
+    const [expertTailoringList, setExpertTailoringList] = useState<ExpertTailoringInterface[]>();
+    const [activeButton, setActiveButton] = useState<string | null>('blankSample');
+    const [productList, setProductList] = useState<DesignInterface[]>();
+    const [modelTypeFilter, setModelTypeFilter] = useState<string>('all');
+    const [filteredList, setFilteredList] = useState<ExpertTailoringInterface[]>();
+
+
+
 
     // ---------------Usable Variable---------------//
     const { t, i18n } = useTranslation();
@@ -120,17 +132,96 @@ const ProductDialogComponent: React.FC<Props> = ({ isOpen, onClose, onItemSelect
 
     }, [selectedLanguage]);
 
+    useEffect(() => {
+        if (activeButton === 'blankSample') {
+            __handleGetExpertTailoringList();
+        }
+        if (activeButton === 'products') {
+            __handleGetProductList();
+        }
+
+    }, [activeButton]);
+
+    useEffect(() => {
+        if (modelTypeFilter !== 'all') {
+            const filteredList = expertTailoringList?.filter(
+                (item) => item.expertTailoringName === modelTypeFilter
+            );
+            if (filteredList)
+                setFilteredList(filteredList);
+        } else {
+            setFilteredList(expertTailoringList);
+        }
+
+    }, [modelTypeFilter])
+
+
+
     // ---------------FunctionHandler---------------//
+
+    // +++++ API +++++ //
+    /**
+     * Handle get expertTailoring list
+     * @returns 
+     */
+    const __handleGetExpertTailoringList = async () => {
+        try {
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.expertTailoring + functionEndpoints.expertTailoring.getAllExpertTailoring}`);
+            if (response.status === 200) {
+                setExpertTailoringList(response.data)
+                setFilteredList(response.data);
+
+            }
+            else {
+                toast.error(`${response.message}`, { autoClose: 4000 });
+                return;
+            }
+        } catch (error) {
+            toast.error(`${error}`, { autoClose: 4000 });
+            console.log('error: ', error);
+        }
+    }
+
+    /**
+     * Handle get product list
+     * @returns 
+     */
+    const __handleGetProductList = async () => {
+        try {
+            const response = await api.get(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.getAllDesign}`);
+            if (response.status === 200) {
+                setProductList(response.data)
+            }
+            else {
+                toast.error(`${response.message}`, { autoClose: 4000 });
+                return;
+            }
+        } catch (error) {
+            toast.error(`${error}`, { autoClose: 4000 });
+            console.log('error: ', error);
+        }
+    }
+
+    // +++++ Function +++++ //
+
+    const handleButtonClick = (button: string) => {
+        setActiveButton(button);
+    };
+
     const __handleClose = () => {
         setIsOpenProductDialog(false);
         onClose();
     };
 
-    const __handleSelectItem = (item: any) => {
-        setItemSelected(item.title);
-        onItemSelect(item.title);
+    const __handleSelectItem = (item: ExpertTailoringInterface) => {
+        setItemSelected(item.expertTailoringName);
+        onItemSelect(item.expertTailoringName, item.expertTailoringID);
         __handleClose();
     };
+
+    const __handleGetOptionFilter = (modelType: string) => {
+        setModelTypeFilter(modelType)
+    }
 
 
 
@@ -161,25 +252,27 @@ const ProductDialogComponent: React.FC<Props> = ({ isOpen, onClose, onItemSelect
                 </div>
 
                 <div className={`${styles.dialog__area__navbar}`}>
-                    <div className={`${styles.dialog__area__navbar__option}`}>
+                    <div className={styles.dialog__area__navbar__option}>
                         <button
-                            className={` py-2 px-4 rounded inline-flex items-center`}
+                            className={`py-2 px-2  inline-flex items-center ${activeButton === 'blankSample' ? styles.active : ''}`}
+                            onClick={() => handleButtonClick('blankSample')}
                         >
-                            {t(codeLanguage + '000116')}
+                            {t(`${codeLanguage}000116`)}
                         </button>
 
                         <button
-                            className={` py-2 px-4 rounded inline-flex items-center`}
+                            className={`py-2 px-2  inline-flex items-center ${activeButton === 'products' ? styles.active : ''}`}
+                            onClick={() => handleButtonClick('products')}
                         >
                             Products
                         </button>
-                        
-                        <button
-                            className={` py-2 px-4 rounded inline-flex items-center`}
-                        >
-                            {t(codeLanguage + '000117')}
-                        </button>
 
+                        <button
+                            className={`py-2 px-2  inline-flex items-center ${activeButton === 'favorite' ? styles.active : ''}`}
+                            onClick={() => handleButtonClick('favorite')}
+                        >
+                            {t(`${codeLanguage}000117`)}
+                        </button>
                     </div>
 
 
@@ -187,16 +280,25 @@ const ProductDialogComponent: React.FC<Props> = ({ isOpen, onClose, onItemSelect
 
                 <div style={{ width: '100%', display: 'flex', height: '80%' }}>
                     <div className={`${styles.dialog__area__filter__container}`}>
-                        <OptionFilterCompnent></OptionFilterCompnent>
+                        <OptionFilterCompnentDialog onClickSelect={(option) => __handleGetOptionFilter(option)}></OptionFilterCompnentDialog>
                     </div>
 
                     <div className={`${styles.dialog__area__result__list}`}>
-                        {productData.map((item: any, key: any) => (
+                        {activeButton === 'blankSample' && filteredList?.map((item: any, key: any) => (
                             <ProductCard
                                 onClick={() => __handleSelectItem(item)}
                                 key={key}
                                 object={item}
-                                style={itemSelected === item.title ? { border: `2px solid ${primaryColor}`, borderRadius: 8 } : {}}
+                                style={itemSelected === item.title ? { border: `2px solid ${primaryColor}`, borderRadius: 4 } : {}}
+                            ></ProductCard>
+                        ))}
+
+                        {activeButton === 'products' && productList?.map((item: any, key: any) => (
+                            <ProductCard
+                                // onClick={() => __handleSelectItem(item)}
+                                key={key}
+                                object={item}
+                                style={itemSelected === item.title ? { border: `2px solid ${primaryColor}`, borderRadius: 4 } : {}}
                             ></ProductCard>
                         ))}
                     </div>

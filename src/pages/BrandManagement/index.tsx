@@ -8,6 +8,12 @@ import EditMultipleMaterialInExcelTable from "./ManageMaterial/CRUDMaterialWithE
 import DashboardManageMaterialScreen from "./ManageMaterial/DashboardManageMaterial/DashBoardManageMaterialComponent";
 import ManageMaterialComponent from "./ManageMaterial/MaterialManage/MaterialManageScreens";
 import EditMaterialPopUpScreens from "./ManageMaterial/MaterialManage/EditMaterial/EditMaterialPopUpScreens";
+import DashboardBrandManagePriceQuantityScreen from "./ManagePrice/BrandPriceManagement/DashboardBrandPrice/DashboardBrandPriceComponent";
+import OrderRequestScreen from './BrandOrderManagement/OrderRequestScreen';
+import BrandSignUpScreen from './BrandAuth/SignUpBrand/BrandSignUpScreen'
+import UploadBrandInforForm from "./BrandUploadInfor/BrandUploadInforComponent";
+import WaitingProcessComponent from "./GlobalComponent/WaitingProcess/WaitingProcessComponent";
+import BrandManageOrderProcessingComponent from './BrandOrderProcessing/BrandManageOrderProcessingComponent'
 
 export {
     DashboardBrandScreens,
@@ -19,5 +25,12 @@ export {
     AddMultipleMaterialWithExcel,
     EditMultipleMaterialInExcelTable,
     ManageMaterialComponent,
-    EditMaterialPopUpScreens
+    EditMaterialPopUpScreens,
+    DashboardBrandManagePriceQuantityScreen,
+    OrderRequestScreen,
+    BrandSignUpScreen,
+    UploadBrandInforForm,
+    WaitingProcessComponent,
+    BrandManageOrderProcessingComponent
+
 }

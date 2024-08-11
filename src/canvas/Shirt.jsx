@@ -1,16 +1,17 @@
 import { easing } from "maath";
 import { useFrame, useLoader } from "@react-three/fiber";
-import { useGLTF, Decal, useTexture } from "@react-three/drei";
+import { useGLTF, Decal } from "@react-three/drei";
 import { useSnapshot } from "valtio";
 import { useEffect, useState } from "react";
 import { TextureLoader } from "three";
 import state from "../store";
 
 
-const Shirt = ({isDefault}) => {
+const Shirt = ({ isDefault }) => {
+    const snap = useSnapshot(state)
 
     /** @type {[PartOfDesignInterface[], React.Dispatch<React.SetStateAction<PartOfDesignInterface[]>>]} */
-    const [modelData, setModelData] = useState();
+    const [modelData, setModelData] = useState(snap.modelData && snap.modelData || []);
 
     /** @type {[ItemMaskInterface[], React.Dispatch<React.SetStateAction<ItemMaskInterface[]>>]} */
     const [deCal, setDecal] = useState();
@@ -18,13 +19,12 @@ const Shirt = ({isDefault}) => {
     // /** @type {{key:string , items:[ItemMaskInterface[]}, React.Dispatch<React.SetStateAction<ItemMaskInterface[]>>]} */
     const [deCalData, setDecalData] = useState([]);
 
-    const snap = useSnapshot(state)
 
     const { nodes, materials } = useGLTF('/shirt_baked.glb');
 
-
     useEffect(() => {
-        if(isDefault) return;
+        console.log('materials: ', nodes);
+        if (isDefault) return;
         if (snap.modelData) {
             setModelData(snap.modelData);
 
@@ -33,8 +33,12 @@ const Shirt = ({isDefault}) => {
                 if (item.itemMasks) {
                     acc.push({ key: item.partOfDesignName, items: item.itemMasks });
                 }
+                console.log('snap.modelData hehehehe: ', snap.modelData);
+
+
                 return acc;
             }, []);
+            console.log('newDecals: ', newDecals);
 
             setDecalData(newDecals);
         }
@@ -55,37 +59,26 @@ const Shirt = ({isDefault}) => {
 
     useEffect(() => {
         const loadDecals = async () => {
-            const promises = deCalData.reduce((acc, decalGroup) => {
-                acc.push(...decalGroup.items.map(async (item) => {
+            deCalData.forEach(decalGroup => {
+                decalGroup.items.forEach(async (item) => {
                     try {
                         const texture = await loadTexture(item.imageUrl);
-                        return { ...item, texture };
+                        setDecalData(prev => prev.map(group =>
+                            group.key === decalGroup.key
+                                ? { ...group, items: group.items.map(i => i.itemMaskID === item.itemMaskID ? { ...i, texture } : i) }
+                                : group
+                        ));
                     } catch (error) {
                         console.error(`Failed to load texture for item ${item.itemMaskID}`, error);
-                        return null;
                     }
-                }));
-                return acc;
-            }, []);
-
-            const results = await Promise.all(promises);
-            setDecalData((prev) => {
-                return prev.map((decalGroup, index) => {
-                    return {
-                        ...decalGroup,
-                        items: decalGroup.items.map((item, itemIndex) => {
-                            return results[index * decalGroup.items.length + itemIndex] || item;
-                        })
-                    };
                 });
             });
         };
 
-        if (deCalData && deCalData.length > 0) {
+        if (deCalData.length > 0) {
             loadDecals();
         }
-    }, [modelData]);
-
+    }, [deCalData]);
 
     useFrame((state, delta) => easing.dampC(materials.lambert1.color, snap.color, 0.25, delta))
 
@@ -101,8 +94,15 @@ const Shirt = ({isDefault}) => {
             const offsetY = (A_height / 2) - (B_height / 2) - (firstItemMask.scaleY / A_height);
             let pos;
             pos = [
-                (firstItemMask.position.x - 130 + (firstItemMask.scaleX / 230) + (firstItemMask.scaleX-230)/2) / 1000 ,
-                -(firstItemMask.position.y - 80 + (firstItemMask.scaleY / 230) + (firstItemMask.scaleY-230)/2) / 1000 ,
+                // x =
+                key === 'LOGO_PART' || key === 'FRONT_CLOTH_PART' ? (firstItemMask.position.x - 130 + (firstItemMask.scaleX / 230) + (firstItemMask.scaleX - 230) / 2) / 1000
+                    : key === 'BACK_CLOTH_PART' ? -(firstItemMask.position.x - 130 + (firstItemMask.scaleX / 230) + (firstItemMask.scaleX - 230) / 2) / 1000 : 0
+                ,
+                // y=
+                key === 'LOGO_PART' || key === 'FRONT_CLOTH_PART' ? -(firstItemMask.position.y - 80 + (firstItemMask.scaleY / 230) + (firstItemMask.scaleY - 230) / 2) / 1000
+                    : key === 'BACK_CLOTH_PART' ? -(firstItemMask.position.y - 80 + (firstItemMask.scaleY / 230) + (firstItemMask.scaleY - 230) / 2) / 1000 : 0
+                ,
+                // z=
                 key === 'LOGO_PART' || key === 'FRONT_CLOTH_PART' ? 0.15
                     :
                     key === 'BACK_CLOTH_PART' ? -0.25
@@ -123,7 +123,7 @@ const Shirt = ({isDefault}) => {
 
     const degreesToEuler = (degrees) => {
         const radians = degrees * (Math.PI / 180);
-        return  radians;
+        return radians;
     };
 
 
@@ -133,7 +133,7 @@ const Shirt = ({isDefault}) => {
     };
 
     return (
-        <group key={stateString}>
+        <group key={JSON.stringify(snap)}>
             <mesh
                 castShadow
                 geometry={nodes.T_Shirt_male.geometry}
@@ -142,21 +142,33 @@ const Shirt = ({isDefault}) => {
                 scale={[6, 6, 6]}
                 dispose={null}
             >
-
-                {deCalData && deCalData.map((decalGroup) => (
-                    decalGroup.items.map((item) => (
-                        <Decal
-                            position={__handleFixPosition(item, decalGroup.key)}
-                            key={item.itemMaskID}
-                            rotation={[0, 0, -degreesToEuler(item.rotate)]}
-                            scale={__handleScale(item)}
-                            map={item.texture}
-                            depthTest={true}
-                            depthWrite={true}
-                        />
+                {!snap.isFullTexture && deCalData.map(decalGroup => (
+                    decalGroup.items.map(item => (
+                        item.texture ? (
+                            <Decal
+                                key={item.itemMaskID}
+                                position={__handleFixPosition(item, decalGroup.key)}
+                                rotation={[0, 0, -degreesToEuler(item.rotate)]}
+                                scale={__handleScale(item)}
+                                map={item.texture}
+                                depthWrite={true}
+                                renderOrder={item.indexZ}
+                            />
+                        ) : null
                     ))
                 ))}
-
+                {snap.isFullTexture && deCalData.map(decalGroup => (
+                    decalGroup.items.map(item => (
+                        item.texture ? (
+                            <meshStandardMaterial
+                                key={item.itemMaskID}
+                                map={item.texture}
+                                depthWrite={true}
+                                renderOrder={item.indexZ}
+                            />
+                        ) : null
+                    ))
+                ))}
             </mesh>
         </group>
     );

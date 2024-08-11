@@ -10,6 +10,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import CircularProgress from '@mui/material/CircularProgress';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import { toast, ToastContainer } from 'react-toastify';
+import { UserInterface } from '../../../models/UserModel';
 
 const defaultTheme = createTheme();
 const SECONDS_LEFT = 5
@@ -24,13 +25,19 @@ export default function VerifyEmailScreen() {
     const [isVerify, setIsVerify] = React.useState<boolean>(false);
     const [isLoading, setIsLoading] = React.useState<boolean>(false);
     const [isResend, setIsResend] = React.useState<boolean>(false);
-
+    const [userSession, setUserSession] = React.useState<UserInterface>();
     // ---------------Usable Variable---------------//
     const { t, i18n } = useTranslation();
     const { email } = useParams();
     const navigate = useNavigate();
 
     // ---------------UseEffect---------------//
+
+    React.useEffect(() => {
+
+
+    }, [email]);
+
     React.useEffect(() => {
         i18n.changeLanguage(selectedLanguage);
         localStorage.setItem('language', selectedLanguage);
@@ -80,9 +87,21 @@ export default function VerifyEmailScreen() {
                         setIsVerify(true);
                         setIsLoading(false);
                         clearInterval(intervalId);
-                        setTimeout(() => {
-                            navigate('/auth/signin');
-                        }, 5000)
+                        const user = sessionStorage.getItem('userRegister');
+                        if (user) {
+                            const userParse: UserInterface = JSON.parse(user);
+                            setUserSession(userParse);
+                            if (userParse?.roleName === 'BRAND') {
+                                setTimeout(() => {
+                                    navigate(`/brand/updateProfile/${userParse.userID}`);
+                                }, 5000)
+                            }
+                        }
+                        else {
+                            setTimeout(() => {
+                                navigate('/auth/signin');
+                            }, 5000)
+                        }
                     } else {
                         // toast.error(`${response.message}`, { autoClose: 4000 });
                     }
@@ -250,13 +269,13 @@ export default function VerifyEmailScreen() {
                                 )
                                     : (
                                         <button
-                                        type="submit"
-                                        className="flex h-11 w-full items-center justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                                        style={{ backgroundColor: greenColor }}
-                                    >
-                                       <CircularProgress className='mr-2' color={'primary'} style={{ width: 30, height: 30 }} /> Verify code is sending 
-                                    </button>
-                            )}
+                                            type="submit"
+                                            className="flex h-11 w-full items-center justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                            style={{ backgroundColor: greenColor }}
+                                        >
+                                            <CircularProgress className='mr-2' color={'primary'} style={{ width: 30, height: 30 }} /> Verify code is sending
+                                        </button>
+                                    )}
 
                             </div>
 

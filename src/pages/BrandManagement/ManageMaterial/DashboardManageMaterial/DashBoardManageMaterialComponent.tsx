@@ -1,45 +1,180 @@
-import TopbarBrandComponent from '../../GlobalComponent/TopBar/TopBarBrandComponent';
-import SideBarBrandComponent from '../../GlobalComponent/SideBar/SideBarBrandComponent';
-import { Box, CssBaseline, useMediaQuery, useTheme } from "@mui/material";
-import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
-import theme, { tokens } from '../../../../theme';
-import styles from "./DashBoardMaterialStyle.module.scss"
-import NotFound from '../../GlobalComponent/Error404/Error404Component';
+import React, { useEffect, useState, useRef } from 'react';
+import Sidebar from '../../GlobalComponent/SideBarComponent/SideBarComponent';
+import Navbar from '../../GlobalComponent/NavBarComponent/NavbarComponent';
 import ManageMaterialComponent from '../MaterialManage/MaterialManageScreens';
+import BrandProfileSetup from '../../BrandProfile/BrandProfileComponent';
+import ManagePrice from '../../ManagePrice/BrandPriceManagement/BrandManagementScreen/ManagePriceScreens';
+import OrderRequestScreen from '../../BrandOrderManagement/OrderRequestScreen';
+import UploadBrandInforForm from '../../BrandUploadInfor/BrandUploadInforComponent';
+import NotificationPage from '../../ManageNotification/NotificationPageComponent';
+import BrandManageOrderProcessingComponent from '../../BrandOrderProcessing/BrandManageOrderProcessingComponent';
+import BrandManageOrder from '../../ManageOrder/BrandOrderManagement/ManageOrderScreen';
+import BrandProductivityInputDialog from '../../GlobalComponent/Dialog/BrandProductivity/BrandProductivityInputDialog';
+import { IconButton } from '@mui/material';
+import { ArrowUpward } from '@mui/icons-material';
+import BrandManageTransactionComponent from '../../BrandManageTransaction/BrandManageTransactionComponent';
 
-export default function DashboardManageMaterialScreen() {
-    const theme1 = useTheme();
-    const smScreen = useMediaQuery(theme1.breakpoints.up("sm"));
-    const colors = tokens(theme1.palette.mode)
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+const DashboardManageMaterialScreen = () => {
+    const [menuOpen, setMenuOpen] = useState(false);
 
-    if (isMobile) {
-        return (
-            <NotFound />
-        );
+    const [activeMenu, setActiveMenu] = useState('manage_notification');
+    const [showScrollButton, setShowScrollButton] = useState<boolean>(false);
+    const [popperOpen, setPopperOpen] = useState<Record<string, boolean>>({});
+
+    const [showProductivityDialog, setShowProductivityDialog] = useState(false);
+    const [userAuth, setUserAuth] = useState<any>(null);
+    const checkPerformed = useRef(false);
+
+    const _handleScrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    useEffect(() => {
+        if (!checkPerformed.current) {
+            const isFirstLogin = localStorage.getItem('brandFirstLogin');
+            const dialogShown = sessionStorage.getItem('productivityDialogShown');
+            const userAuthData = JSON.parse(localStorage.getItem('userAuth') || '{}');
+            setUserAuth(userAuthData);
+
+            if (isFirstLogin === 'true' && dialogShown !== 'true') {
+                setShowProductivityDialog(true);
+                sessionStorage.setItem('productivityDialogShown', 'true');
+            }
+            checkPerformed.current = true;
+        }
+    }, []);
+
+    const handleCloseProductivityDialog = () => {
+        setShowProductivityDialog(false);
+        sessionStorage.setItem('productivityDialogShown', 'false');
+    };
+
+    const toggleMenu = () => {
+        setMenuOpen(!menuOpen);
+    };
+
+    useEffect(() => {
+        const savedActiveMenu = localStorage.getItem('brandActiveMenu');
+        if (savedActiveMenu) {
+            setActiveMenu(savedActiveMenu);
+        }
+    }, []);
+
+    const handleMenuClick = (menu: string) => {
+        setActiveMenu(menu);
+        localStorage.setItem('brandActiveMenu', menu);
     }
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (event.target instanceof Element) {
+                if (!event.target.closest('.popover')) {
+                    setPopperOpen({
+                        notification: false,
+                        user: false,
+                    });
+                }
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setShowScrollButton(window.scrollY > 200);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
+
+    const togglePopper = (key: string) => {
+        setPopperOpen((prev) => ({
+            notification: key === 'notification' ? !prev.notification : false,
+            user: key === 'user' ? !prev.user : false,
+        }));
+    };
+
+    const renderComponent = () => {
+        switch (activeMenu) {
+            case 'manage_notification':
+                return (
+                    <>
+                        <NotificationPage />
+                        {/* <UploadBrandInforForm /> */}
+                    </>
+
+                );
+            case 'brand_profile':
+                return <BrandProfileSetup />;
+            case 'manage_order':
+                return <BrandManageOrder />;
+            case 'manage_order_processing':
+                return <BrandManageOrderProcessingComponent />;
+            case 'manage_price':
+                return <ManagePrice />;
+            case 'manage_material':
+                return <ManageMaterialComponent />;
+            case 'manage_order_request':
+                return <OrderRequestScreen />;
+            case 'manage_brand_trandsactions':
+                return <BrandManageTransactionComponent />;
+            default:
+                return <ManageMaterialComponent />;
+        }
+    };
+
     return (
-        <CssVarsProvider theme={theme}>
-            <CssBaseline />
-            <div className={`${styles.dashboard}`}>
-                <SideBarBrandComponent />
-                <main className={`${styles.content}`}>
-                    <TopbarBrandComponent />
-                    <Box
-                        display="grid"
-                        gridTemplateColumns="repeat(12, 1fr)"
-                        gridAutoRows="140px"
-                        gap="20px"
-                    >
-                        <Box
-                            gridColumn="span 12"
-                            gridRow="span 2"
-                        >
-                            <ManageMaterialComponent />
-                        </Box>
-                    </Box>
+        <div className="flex">
+            <Sidebar
+                menuOpen={menuOpen}
+                toggleMenu={toggleMenu}
+                activeMenu={activeMenu}
+                handleMenuClick={handleMenuClick}
+            />
+            <div className="flex flex-col w-full">
+                <Navbar
+                    toggleMenu={toggleMenu}
+                    menu={activeMenu}
+                    popperOpen={popperOpen}
+                    togglePopper={togglePopper}
+                />
+                {showProductivityDialog && (
+                    <BrandProductivityInputDialog
+                        isOpen={showProductivityDialog}
+                        onClose={handleCloseProductivityDialog}
+                        brandID={userAuth?.userID}
+                    />
+                )}
+                <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
+                    {renderComponent()}
                 </main>
             </div>
-        </CssVarsProvider>
+            {showScrollButton && (
+                <IconButton
+                    style={{
+                        position: 'fixed',
+                        bottom: '20px',
+                        right: '20px',
+                        zIndex: 100,
+                        backgroundColor: "#E96208",
+                        color: "white"
+                    }}
+                    onClick={_handleScrollToTop}
+                >
+                    <ArrowUpward />
+                </IconButton>
+            )}
+        </div>
     );
-}
+};
+
+export default DashboardManageMaterialScreen;

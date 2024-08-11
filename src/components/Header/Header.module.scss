@@ -1,8 +1,10 @@
+@import '../../index.module.scss';
+
 .header__container {
     height: 100px;
-    position: fixed;
+    // position: absolute;
     z-index: 999;
-    width: 100vw;
+    // width: 100vw;
     top: 0;
 }
 
@@ -10,4 +12,34 @@
     height: 50;
     width: 50px;
     border-radius: 90px;
+}
+
+/* Add this CSS to your stylesheet */
+
+.notiMenu_content {
+    -ms-overflow-style: none;
+    /* Hide scrollbar for Internet Explorer and Edge */
+    scrollbar-width: none;
+    /* Hide scrollbar for Firefox */
+
+}
+
+.notiMenu_content::-webkit-scrollbar {
+    display: none;
+    /* Hide scrollbar */
+}
+
+.notiMenu_content::-webkit-scrollbar-track {
+    background: $grayColor1;
+    border-radius: 10px;
+}
+
+.notiMenu_content::-webkit-scrollbar-thumb {
+    background: #7b7b7b;
+    border-radius: 10px;
+}
+
+.notiMenu_content::-webkit-scrollbar-thumb:hover {
+    background: #7b7b7b;
+    /* Color when hovering over the scrollbar thumb */
 }

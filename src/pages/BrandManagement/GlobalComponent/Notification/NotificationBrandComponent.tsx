@@ -1,239 +1,301 @@
-import React, { useState, useEffect } from 'react';
-import { Stomp } from '@stomp/stompjs';
-import io from "socket.io-client";
-import { Button, Divider, IconButton, Menu, Badge, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
-import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 
-interface NotificationInterface {
-    notiID?: any;
-    baseUserID?: UserInterFace;
-    targetUserID?: string;
-    messageType?: string;
-    content?: string;
-    sender?: string;
-    action?: string;
-    actionID?: any;
-    message?: string;
-    status?: boolean;
-    dateTime?: string;
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Avatar, Card, CardContent, IconButton, Pagination, Typography } from '@mui/material';
+import { ArrowUpward } from '@mui/icons-material';
+import style from './NotificationBrandComponentStyle.module.scss'
+import { toast } from 'react-toastify';
+import Cookies from 'js-cookie';
+import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import { UserInterface } from '../../../../models/UserModel';
+import { NotificationInterface } from '../../../../models/NotificationModel';
+import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
+import LoadingComponent from '../../../../components/Loading/LoadingComponent';
+import { greenColor, primaryColor, whiteColor } from '../../../../root/ColorSystem';
+import { generateNotificationMessage } from '../../../../utils/ElementUtils';
+
+
+export interface NotificationRealtimeInterface {
+    sender: string;
+    recipient: string;
+    message: string;
+    type: string;
 }
 
-interface UserInterFace {
-    userID?: number;
-    username?: string;
-    password?: string;
-    dateOfBirth?: string;
-    phone?: string;
-    email?: string;
-    gender?: string;
-    role?: string;
-    subRole?: string;
-    imgUrl?: string;
-    status?: string;
-    language?: string;
-    isFirstLogin?: boolean;
-    followed?: boolean;
-}
 
-const NotificationBrandComponent = () => {
-    const [anchorOpenNotification, setAnchorOpenNotification] = React.useState<null | HTMLElement>(null);
-    const [data, setData] = useState<NotificationInterface[]>([]);
 
-    // Pop Up Notification
-    const [openPopup, setOpenPopup] = React.useState<boolean>(false);
+const NotificationBrandComponent: React.FC = () => {
+    // TODO MUTIL LANGUAGE
 
-    const _handleOpenPopup = () => {
-        setOpenPopup(true);
+    // ---------------UseState---------------//
+    const [showScrollButton, setShowScrollButton] = useState<boolean>(false);
+    const [isOpenPaymentInforDialog, setIsOpenPaymentInformationDialog] = useState<boolean>(false);
+    // const [isExtendTransaction, setIsExtendTransaction] = useState<{ orderID: string, isExtend: boolean } | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [userAuth, setUserAuth] = useState<UserInterface>();
+    const [notificationList, setNotificationList] = useState<NotificationInterface[]>([]);
+    const [messages, setMessages] = useState<NotificationInterface[]>([]);
+    const userStorage = Cookies.get('userAuth');
+    if (!userStorage) return;
+    const userParse: UserInterface = JSON.parse(userStorage)
+    const websocketUrl = `ws://localhost:6969/websocket?userid=${userParse.userID}`; // Đảm bảo dùng 'ws' thay vì 'http'
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5; // Adjust this as needed
+
+    // Calculate total pages
+    const totalPagesMessages = Math.ceil(messages.length / itemsPerPage);
+    const totalPagesNotificationList = Math.ceil(notificationList.length / itemsPerPage);
+
+    // Paginate function
+    const paginate = (array: any, pageNumber: any) => {
+        const startIndex = (pageNumber - 1) * itemsPerPage;
+        return array.slice(startIndex, startIndex + itemsPerPage);
     };
 
-    const _handleClosePopup = () => {
-        setOpenPopup(false);
+    // Handle page change
+    const handlePageChange = (event: any, value: any) => {
+        setCurrentPage(value);
     };
 
-    const _handleCloseNotification = () => {
-        setAnchorOpenNotification(null);
-    };
+    useEffect(() => {
+        const websocket = new WebSocket(websocketUrl);
 
-    const _handleClickNotification = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorOpenNotification(event.currentTarget);
-    };
+        websocket.onopen = () => {
+            console.log('WebSocket connection opened');
+        };
 
-    // Create a WebSocket connection instance
-    // const socket = io('ws://localhost:6969');
-    // const stompClient = Stomp.over(socket);
+        websocket.onmessage = (event) => {
+            console.log('Message received:', event.data);
+            var data: NotificationInterface = JSON.parse(event.data);
+            console.log(data);
+            setMessages(prevMessages => [...prevMessages, data]);
+        };
 
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         try {
-    //             const response = await fetch(`http://localhost:6969/api/v1/notification/get-all-notification?userid=1&target_userid=2`);
-    //             const getData = await response.json();
-    //             if (getData) {
-    //                 setData(getData.data);
-    //             } else {
-    //                 console.log(getData.data);
-    //             }
-    //         } catch (error) {
-    //             console.error("An error occurred during data fetching:", error);
-    //         }
-    //     };
-    //     fetchData();
+        websocket.onclose = () => {
+            console.log('WebSocket connection closed');
+        };
 
-    //     // Connect to WebSocket only once
-    //     stompClient.connect({}, () => {
-    //         console.log('Connected to WebSocket');
-    //         // Subscribe to notifications topic
-    //         stompClient.subscribe('/topic/public', (message: any) => {
-    //             const newNotification: NotificationInterface = JSON.parse(message.body);
-    //             // Update state with new notification
-    //             setData((prevData) => [newNotification, ...prevData]);
-    //         });
-    //     });
+        websocket.onerror = (error) => {
+            console.error('WebSocket error:', error);
+        };
 
-    //     // Cleanup function to disconnect from WebSocket
-    //     return () => {
-    //         stompClient.disconnect();
-    //     };
+        return () => {
+            websocket.close();
+        };
+    }, [websocketUrl]);
 
-    // }, [stompClient]);
 
-    const _handleMarkAllRead = () => {
-        const fetchData = async () => {
-            try {
-                const promises = data.map(async (noti) => {
-                    const isActive = noti.baseUserID && noti.baseUserID.status === "ACTIVE";
+    // ---------------UseEffect---------------//
 
-                    if (isActive) {
-                        const response = await fetch(`http://localhost:6969/api/v1/notification/un-read-notification?noti_id=${noti.notiID}`, {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                // 'Authorization': `Bearer ${tokenString}`,
-                            },
-                            // Uncomment the following line if you need to send data in the request body
-                            // body: JSON.stringify(params),
-                        });
-                        console.log("notiid" + noti.notiID);
-
-                        if (response.status === 200) {
-                            const updatedData = await response.json();
-                            // Update the state with the updated data
-                            setData((prevData) =>
-                                prevData.map((item) =>
-                                    item.notiID === noti.notiID ? updatedData : item
-                                )
-                            );
-                        } else {
-                            console.log("An error occurred:", await response.json());
-                        }
-                    }
-                });
-
-                await Promise.all(promises);
-            } catch (error) {
-                console.error("An error occurred during data fetching:", error);
+    /**
+     * Move to Top When scroll down
+     */
+    useEffect(() => {
+        const userStorage = Cookies.get('userAuth');
+        if (userStorage) {
+            const userParse: UserInterface = JSON.parse(userStorage);
+            setUserAuth(userParse);
+            __handleFetchNotification(userParse.userID);
+        }
+        const handleScroll = () => {
+            if (window.scrollY > 200) {
+                setShowScrollButton(true);
+            } else {
+                setShowScrollButton(false);
             }
         };
 
-        fetchData();
+        window.addEventListener('scroll', handleScroll);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
+
+    // ---------------FunctionHandler---------------//
+
+
+
+    /**
+    * Scrolls the window to the top smoothly.
+    */
+    const _handleScrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    const _handleMarkIsRead = async (clickedItem: NotificationInterface) => {
-        try {
-            const response = await fetch(`http://localhost:6969/api/v1/notification/un-read-notification?noti_id=${clickedItem.notiID}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
+    // Get language in local storage
+    const selectedLanguage = localStorage.getItem('language');
+    const codeLanguage = selectedLanguage?.toUpperCase();
 
+    // Using i18n
+    const { t, i18n } = useTranslation();
+    React.useEffect(() => {
+        if (selectedLanguage !== null) {
+            i18n.changeLanguage(selectedLanguage);
+        }
+    }, [selectedLanguage, i18n]);
+
+    const __handleFetchNotification = async (userId: any) => {
+        setIsLoading(true);
+        try {
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.notification + functionEndpoints.notification.getNotiByUserId}/${userId}`);
             if (response.status === 200) {
-                // Update the status of the clicked item locally
-                setData(prevData => prevData.map(item => {
-                    if (item.notiID === clickedItem.notiID) {
-                        return { ...item, status: true }; // Mark the clicked item as read
-                    }
-                    return item;
-                }));
-            } else {
-                console.log("An error occurred:", await response.json());
+                const sortedData = response.data.sort((a: NotificationInterface, b: NotificationInterface) => {
+                    return new Date(b.createDate).getTime() - new Date(a.createDate).getTime();
+                });
+
+                setIsLoading(false);
+                setNotificationList(sortedData);
+                console.log(response.data);
+            }
+            else {
+                toast.error(`${response.message}`, { autoClose: 4000 });
+                return;
             }
         } catch (error) {
-            console.error("An error occurred during data fetching:", error);
+            toast.error(`${error}`, { autoClose: 4000 });
+            console.log('error: ', error);
+
         }
-    };
+    }
+
+    const __handleMaskNotiRead = async (noti: NotificationInterface) => {
+        
+            try {
+                const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.notification + functionEndpoints.notification.updateReadStatus}/${noti.notificationID}`);
+                if (response.status === 200) {
+                    setNotificationList((prevNotifications) =>
+                        prevNotifications.map((item) =>
+                            item.notificationID === noti.notificationID
+                                ? { ...item, status: true }
+                                : item
+                        )
+                    );
+                }
+                else {
+                    toast.error(`${response.message}`, { autoClose: 4000 });
+                    return;
+                }
+            } catch (error) {
+                toast.error(`${error}`, { autoClose: 4000 });
+                console.log('error: ', error);
+
+            }
+        }
 
 
-    const newNotificationsCount = data.filter(item => !item.status).length;
+        return (
+            <div>
+                <LoadingComponent isLoading={isLoading}></LoadingComponent>
+                {/* <ToastContainer></ToastContainer> */}
+                <div  >
+                    <div style={{ width: '800px', margin: '0 auto' }} >
 
-    return (
-        <div>
-            <IconButton>
-                <Badge
-                    badgeContent={newNotificationsCount}
-                    color="error"
-                    onClick={_handleClickNotification}
-                >
-                    <NotificationsOutlinedIcon />
-                </Badge>
-                <Menu
-                    anchorEl={anchorOpenNotification}
-                    open={Boolean(anchorOpenNotification)}
-                    onClose={_handleCloseNotification}
-                    style={{ height: "70%", minWidth: "200px", borderRadius: "10px" }}
-                >
-                    {data.map((item) => (
-                        <div key={item.notiID} style={{ borderRadius: '8px', marginBottom: '8px', position: 'relative', backgroundColor: item.status ? 'rgba(162,222,82,0.1)' : 'rgba(234,49,62,0.1)' }} onClick={_handleMarkIsRead} >
-                            <div onClick={() => _handleMarkIsRead(item)} style={{ padding: '12px', cursor: 'pointer' }}>
-                                <div style={{ position: 'absolute', top: '12px', right: '12px', borderRadius: '4px', padding: '4px 8px', backgroundColor: item.status ? 'rgba(162,222,82,0.6)' : 'rgba(234,49,62,0.6)', color: '#fff' }}>
-                                    <span>{item.status ? 'Readed' : 'News'}</span>
-                                </div>
+                        <div style={{ width: '60%' }}>
+                            {messages.length > 0 && (
                                 <div>
-                                    <p style={{ fontSize: '14px', fontWeight: '500', marginBottom: '4px', color: '#333' }}>{item.baseUserID?.username}</p>
-                                    <p style={{ fontSize: '12px', fontWeight: '400', marginBottom: '2px', color: '#555' }}>{item.action === 'FOLLOW' ? `${item.action} You` : `${item.action} your post`}</p>
-                                    <p style={{ fontSize: '11px', fontWeight: '400', color: '#888' }}>{item.dateTime}</p>
+                                    <span className="text-gray-500 text-sm">New notifications</span>
+                                    <div className="space-y-4 p-4">
+                                        {paginate(messages, currentPage).map((notification: NotificationInterface, index: number) => (
+                                            <Card
+                                                key={index}
+                                                className="shadow-lg rounded-lg transition-shadow duration-300 hover:shadow-xl"
+                                                style={{ backgroundColor: !notification.status ? '#FAFAFA' : whiteColor }}
+                                                onClick={() => __handleMaskNotiRead(notification)}
+                                            >
+                                                <CardContent>
+                                                    <div className="flex items-center justify-between mb-4">
+                                                        <span className="font-semibold text-indigo-700 text-sm">
+                                                            {notification.type || 'SYSTEM'}
+                                                        </span>
+                                                        <span className="font-semibold text-indigo-700 text-sm" style={{ fontSize: 10, color: notification.status ? greenColor : primaryColor }}>
+                                                            {notification.status ? 'Read' : 'Not read'}
+                                                        </span>
+
+                                                    </div>
+                                                    <Typography variant="body2" className="text-gray-700 mb-4">
+                                                        {generateNotificationMessage(notification)}
+                                                    </Typography>
+                                                    <Typography variant="body2" className="text-gray-700 mb-4 pt-1">
+                                                        ID: {notification.targetID}
+                                                    </Typography>
+                                                    <Typography variant="caption" className="text-gray-500">
+                                                        Create at: {notification.createDate}
+                                                    </Typography>
+                                                </CardContent>
+                                            </Card>
+                                        ))}
+                                    </div>
+
                                 </div>
+                            )}
+                            <div className="mt-10">
+                                <span className="text-gray-500 text-sm">Old notifications</span>
+                                <div className="space-y-4 p-4">
+                                    {paginate(notificationList, currentPage).map((notification: NotificationInterface) => (
+                                        <Card
+                                            key={notification.notificationID}
+                                            className="shadow-lg rounded-lg transition-shadow duration-300 hover:shadow-xl"
+                                            style={{ backgroundColor: !notification.status ? '#FAFAFA' : whiteColor }}
+                                            onClick={() => __handleMaskNotiRead(notification)}
+                                        >
+                                            <CardContent>
+                                                <div className="flex items-center justify-between mb-4">
+                                                    <span className="font-semibold text-indigo-700 text-sm">
+                                                        {notification.type || 'SYSTEM'}
+                                                    </span>
+                                                    <span className="font-semibold text-indigo-700 text-sm" style={{ fontSize: 10, color: notification.status ? greenColor : primaryColor }}>
+                                                        {notification.status ? 'Read' : 'Not read'}
+                                                    </span>
+                                                </div>
+                                                <Typography variant="body2" className="text-gray-700 mb-4">
+                                                    {generateNotificationMessage(notification)}
+                                                </Typography>
+                                                <Typography variant="body2" className="text-gray-700 mb-4 pt-1" >
+                                                    ID: {notification.targetID}
+                                                </Typography>
+                                                <Typography variant="caption" className="text-gray-500">
+                                                    Created at: {notification.createDate}
+                                                </Typography>
+                                            </CardContent>
+                                        </Card>
+                                    ))}
+                                </div>
+                                <Pagination
+                                    count={totalPagesNotificationList}
+                                    page={currentPage}
+                                    onChange={handlePageChange}
+                                    className="mt-4"
+                                />
                             </div>
                         </div>
-                    ))}
-                    <Divider component="li" />
-                    <div style={{ padding: "8px", display: "flex", justifyContent: "flex-end", backgroundColor: "#fafbfd", borderTop: '1px solid #eee' }}>
-                        <Button onClick={_handleMarkAllRead} style={{ color: "#666", marginRight: '8px' }}>Mark all as read</Button>
-                        <Button onClick={_handleOpenPopup} style={{ color: "#666" }}>View All</Button>
+
+
+
+                        {showScrollButton && (
+                            <IconButton
+                                style={{
+                                    position: 'fixed',
+                                    bottom: '20px',
+                                    right: '20px',
+                                    zIndex: 100,
+                                    backgroundColor: primaryColor,
+                                    color: "white"
+                                }}
+                                onClick={_handleScrollToTop}
+                            >
+                                <ArrowUpward />
+                            </IconButton>
+                        )}
                     </div>
-                </Menu>
+                </div>
 
-                <Dialog open={openPopup} onClose={_handleClosePopup} PaperProps={{
-                    style: {
-                        backgroundColor: "white",
-                        boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
-                        borderRadius: "10px",
-                        width: "100%"
-                    },
-                }}>
-                    <DialogTitle>All Notifications</DialogTitle>
-                    <DialogContent>
-                        {data.map((item) => (
-                            <div key={item.notiID} style={{ borderRadius: '8px', marginBottom: '8px', position: 'relative', backgroundColor: item.status ? 'rgba(162,222,82,0.1)' : 'rgba(234,49,62,0.1)' }}>
-                                <div onClick={() => _handleMarkIsRead(item)} style={{ padding: '12px', cursor: 'pointer' }}>
-                                    <div style={{ position: 'absolute', top: '12px', right: '12px', borderRadius: '4px', padding: '4px 8px', backgroundColor: item.status ? 'rgba(162,222,82,0.6)' : 'rgba(234,49,62,0.6)', color: '#fff' }}>
-                                        <span>{item.status ? 'Readed' : 'News'}</span>
-                                    </div>
-                                    <div>
-                                        <p style={{ fontSize: '14px', fontWeight: '500', marginBottom: '4px', color: '#333' }}>{item.baseUserID?.username}</p>
-                                        <p style={{ fontSize: '12px', fontWeight: '400', marginBottom: '2px', color: '#555' }}>{item.action === 'FOLLOW' ? `${item.action} You` : `${item.action} your post`}</p>
-                                        <p style={{ fontSize: '11px', fontWeight: '400', color: '#888' }}>{item.dateTime}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={_handleClosePopup}>Close</Button>
-                    </DialogActions>
-                </Dialog>
-            </IconButton>
-        </div>
-    );
-};
 
-export default NotificationBrandComponent;
+                {/* Dialog */}
+            </div >
+
+        );
+    };
+
+    export default NotificationBrandComponent;
+

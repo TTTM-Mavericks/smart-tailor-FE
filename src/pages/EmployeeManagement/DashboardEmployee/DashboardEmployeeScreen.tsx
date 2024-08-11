@@ -1,23 +1,60 @@
-import * as React from 'react';
-import { Box, CssBaseline, useMediaQuery, useTheme, IconButton } from "@mui/material";
-import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
-import { ArrowUpward } from '@mui/icons-material';
-import theme from '../../../theme';
-import styles from "./DashboardEmployeeStyles.module.scss"
-import { tokens } from "../../../theme";
-import NotFound from '../GlobalComponent/Error404/Error404Component';
-import SideBarEmployeeComponent from '../GlobalComponent/SideBar/SideBarEmployeeComponent';
-import TopbarEmployeeComponent from '../GlobalComponent/TopBar/TopBarEmployeeComponent';
+import React, { useEffect, useState } from 'react';
+import Sidebar from '../GlobalComponent/SideBarComponent/SideBarComponent';;
+import Navbar from '../GlobalComponent/NavBarComponent/NavbarComponent';
 import EmployeeManageCustomer from '../ManageCustomer/ManageCustomerScreen';
+import EmployeeManageBrand from '../ManageBrand/EmployeeBrandManagement/EmployeeManageBrandScreen/ManageBrandScreen';
+import EmployeeManageReport from '../ManageReport/EmployeeReportManagement/EmployeeManageReportScreen/ManageReportScreen';
+import EmployeeManageOrder from '../ManageOrder/EmployeeOrderManagement/EmployeeManageOrderScreen/ManageOrderScreen';
+import EmployeeManageTransaction from '../ManageTransaction/EmployeeTransactionManagement/EmployeeManageTransactionScreen/ManageTransactionScreen';
+import ManageNotificationScreens from '../ManageNotification/ManageNotificationScreens';
+import EmployeeProfileSetup from '../EmployeeProfile/EmployeeProfileComponent';
 
 const DashboardEmployeeScreens = () => {
-    const themeColor = useTheme();
-    const colors = tokens(themeColor.palette.mode);
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [activeMenu, setActiveMenu] = useState('employee_manage_customer');
     const [showScrollButton, setShowScrollButton] = React.useState<boolean>(false);
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const [popperOpen, setPopperOpen] = useState<Record<string, boolean>>({});
+
+    const toggleMenu = () => {
+        setMenuOpen(!menuOpen);
+    };
+
+    useEffect(() => {
+        // Get the active tab from localStorage on component mount
+        const savedActiveMenu = localStorage.getItem('employeeActiveMenu');
+        if (savedActiveMenu) {
+            setActiveMenu(savedActiveMenu);
+        }
+    }, []);
+
+    const handleMenuClick = (menu: any) => {
+        setActiveMenu(menu);
+        // Save the active tab to localStorage
+        localStorage.setItem('employeeActiveMenu', menu);
+    };
+
+    // Effect to close popper on outside click
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (event.target instanceof Element) {
+                if (!event.target.closest('.popover')) {
+                    setPopperOpen({
+                        notification: false,
+                        user: false,
+                    });
+                }
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     React.useEffect(() => {
-        const _handleScroll = () => {
+        const handleScroll = () => {
             if (window.scrollY > 200) {
                 setShowScrollButton(true);
             } else {
@@ -25,10 +62,10 @@ const DashboardEmployeeScreens = () => {
             }
         };
 
-        window.addEventListener('scroll', _handleScroll);
+        window.addEventListener('scroll', handleScroll);
 
         return () => {
-            window.removeEventListener('scroll', _handleScroll);
+            window.removeEventListener('scroll', handleScroll);
         };
     }, []);
 
@@ -36,52 +73,45 @@ const DashboardEmployeeScreens = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    const checkDarkOrLightMode = localStorage.getItem("mui-mode")
+    const togglePopper = (key: any) => {
+        setPopperOpen((prev) => ({
+            notification: key === 'notification' ? !prev.notification : false,
+            user: key === 'user' ? !prev.user : false,
+        }));
+    };
 
-    console.log("checkDarkOrLightMode" + checkDarkOrLightMode);
-
-    if (isMobile) {
-        return (
-            <NotFound />
-        );
-    }
-
+    const renderComponent = () => {
+        switch (activeMenu) {
+            case 'employee_manage_brand':
+                return <EmployeeManageBrand />;
+            case 'employee_manage_report':
+                return <EmployeeManageReport />;
+            case 'employee_manage_order':
+                return <EmployeeManageOrder />;
+            case 'employee_manage_transaction':
+                return <EmployeeManageTransaction />;
+            case 'employee_manage_notification':
+                return <ManageNotificationScreens />;
+            case 'employee_profile':
+                return <EmployeeProfileSetup />;
+            default:
+                return (
+                    <EmployeeManageCustomer />
+                );
+        }
+    };
 
     return (
-        <CssVarsProvider theme={theme}>
-            <CssBaseline />
-            <div className={`${styles.dashboard}`}>
-                <SideBarEmployeeComponent />
-                <div className={`${styles.content}`}>
-                    <TopbarEmployeeComponent />
-                    <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="140px" gap="20px">
-                        <Box gridColumn="span 12" gridRow="span 5">
-                            <EmployeeManageCustomer />
-                        </Box>
-                        {/* <Box gridColumn="span 12" gridRow="span 5">
-                            <GeographyChartComponent />
-                        </Box> */}
-
-                    </Box>
-                    {showScrollButton && (
-                        <IconButton
-                            style={{
-                                position: 'fixed',
-                                bottom: '20px',
-                                right: '20px',
-                                zIndex: 100,
-                                backgroundColor: "#E96208",
-                                color: "white"
-                            }}
-                            onClick={_handleScrollToTop}
-                        >
-                            <ArrowUpward />
-                        </IconButton>
-                    )}
-                </div>
+        <div className="flex">
+            <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
+            <div className="flex flex-col w-full">
+                <Navbar toggleMenu={toggleMenu} menu={activeMenu} popperOpen={popperOpen} togglePopper={togglePopper} />
+                <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
+                    {renderComponent()}
+                </main>
             </div>
-        </CssVarsProvider >
+        </div>
     );
-}
+};
 
 export default DashboardEmployeeScreens;

@@ -1,23 +1,65 @@
 @import '../../index.module.scss';
 
-.container {
-    position: absolute;
+
+.canvas {
+    display: block;
+    margin: 0 auto;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.container1 {
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.tshirt {
+    width: 200px;
+    height: 200px;
+}
+
+.animatedLine {
+    animation: dash 2s linear infinite;
+}
+
+@keyframes dash {
+    to {
+        stroke-dashoffset: -20;
+    }
+}
+
+.text {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-top: 10px;
+    color: gray;
+}
+
+.container {
+    position: fixed; /* Changed to fixed to cover the entire viewport */
+    top: 0;
+    left: 0;
     width: 100%;
-    height: 100vh;
+    height: 100%;
+    display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000000;
     background-color: rgba($color: $grayColor, $alpha: 0.7);
+
 }
 
-.text{
+
+.text {
     color: black;
     font-size: 15px;
     font-weight: bold;
 }
 
-.ring{
+.ring {
     position: absolute;
     width: 100px;
     height: 100px;
@@ -29,10 +71,11 @@
 }
 
 @keyframes rotate1 {
-    from{
+    from {
         transform: rotateX(50deg) rotateZ(110deg);
     }
-    to{
+
+    to {
         transform: rotateX(50deg) rotateZ(470deg);
     }
 }
@@ -43,10 +86,11 @@
 }
 
 @keyframes rotate2 {
-    from{
+    from {
         transform: rotateX(20deg) rotateY(50deg) rotateZ(20deg);
     }
-    to{
+
+    to {
         transform: rotateX(20deg) rotateY(50deg) rotateZ(380deg);
     }
 }
@@ -57,10 +101,11 @@
 }
 
 @keyframes rotate3 {
-    from{
+    from {
         transform: rotateX(40deg) rotateY(130deg) rotateZ(450deg);
     }
-    to{
+
+    to {
         transform: rotateX(40deg) rotateY(130deg) rotateZ(90deg);
     }
 }
@@ -71,10 +116,11 @@
 }
 
 @keyframes rotate4 {
-    from{
-        transform: rotateX(70deg)  rotateZ(270deg);
+    from {
+        transform: rotateX(70deg) rotateZ(270deg);
     }
-    to{
-        transform: rotateX(70deg)  rotateZ(630deg);
+
+    to {
+        transform: rotateX(70deg) rotateZ(630deg);
     }
 }

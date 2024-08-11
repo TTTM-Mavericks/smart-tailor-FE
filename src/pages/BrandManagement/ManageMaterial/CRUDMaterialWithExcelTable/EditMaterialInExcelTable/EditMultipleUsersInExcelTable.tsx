@@ -1,15 +1,7 @@
 import React, { useState } from 'react';
 import { Button, TextField, Box, Typography, IconButton, Grid } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-
-interface ExcelData {
-    id: number,
-    category_name: string,
-    material_name: string,
-    price: number,
-    unit: string,
-    error: boolean
-}
+import { ExcelData } from '../../../../../models/BrandMaterialExcelModel';
 
 interface EditMultipleMaterialInExcelTableProps {
     open: boolean;
@@ -20,7 +12,7 @@ interface EditMultipleMaterialInExcelTableProps {
 }
 
 const EditMultipleMaterialInExcelTable: React.FC<EditMultipleMaterialInExcelTableProps> = ({ open, onClose, data, index, updateData }) => {
-    const [editedData, setEditedData] = useState(data);
+    const [editedData, setEditedData] = useState<any>(data);
 
     const _handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -48,18 +40,18 @@ const EditMultipleMaterialInExcelTable: React.FC<EditMultipleMaterialInExcelTabl
             <Box height={50} />
             <Grid container spacing={4}>
                 <Grid item xs={11}>
-                    <TextField name="category_name" label="Category Name" value={editedData?.category_name} onChange={_handleChange} fullWidth />
+                    <TextField name="Category_Name" label="Category Name" value={editedData?.Category_Name} fullWidth />
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField name="material_name" label="Material Name" value={editedData?.material_name} onChange={_handleChange} fullWidth />
+                    <TextField name="Material_Name" label="Material Name" value={editedData?.Material_Name} fullWidth />
 
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField name="price" label="Price" value={editedData?.price} onChange={_handleChange} fullWidth />
+                    <TextField name="Price" label="Price" value={editedData?.Price} type='number' onChange={_handleChange} fullWidth />
 
                 </Grid>
                 <Grid item xs={11}>
-                    <TextField name="unit" label="Unit" value={editedData?.unit} onChange={_handleChange} fullWidth />
+                    <TextField name="unit" label="Unit" value={editedData?.Unit} fullWidth />
 
                 </Grid>
             </Grid>

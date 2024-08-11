@@ -1,22 +1,67 @@
-import * as React from 'react';
-import TopbarComponent from '../GlobalComponent/TopBar/TopBarComponent';
-import SideBarComponent from '../GlobalComponent/SideBar/SideBarComponent';
-import { CssBaseline } from "@mui/material";
-import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
-import theme from '../../../theme';
-import styles from "./AdminProfileStyles.module.scss"
+import React, { useState } from 'react';
+import Sidebar from '../GlobalComponent/SidebarComponent/SidebarComponent';
+import { IconButton } from '@mui/material';
+import { ArrowUpward } from '@mui/icons-material';
 import ProfileSetup from './AdminProfileSettingComponent';
-export default function DashboardAdminProfileScreens() {
+
+const DashboardAdminProfileScreens = () => {
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [activeMenu, setActiveMenu] = useState('admin_profile');
+    const [showScrollButton, setShowScrollButton] = React.useState<boolean>(false);
+    const toggleMenu = () => {
+        setMenuOpen(!menuOpen);
+    };
+
+    const handleMenuClick = (menu: any) => {
+        setActiveMenu(menu);
+    };
+
+    React.useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 200) {
+                setShowScrollButton(true);
+            } else {
+                setShowScrollButton(false);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
+
+    const _handleScrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
     return (
-        <CssVarsProvider theme={theme}>
-            <CssBaseline />
-            <div className={`${styles.dashboard}`}>
-                <SideBarComponent />
-                <main className={`${styles.content}`}>
-                    <TopbarComponent />
+        <div className="flex">
+            <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
+            <div className="flex flex-col w-full">
+                {/* <Navbar toggleMenu={toggleMenu} /> */}
+                <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
                     <ProfileSetup />
                 </main>
+                {showScrollButton && (
+                    <IconButton
+                        style={{
+                            position: 'fixed',
+                            bottom: '20px',
+                            right: '20px',
+                            zIndex: 100,
+                            backgroundColor: "#E96208",
+                            color: "white"
+                        }}
+                        onClick={_handleScrollToTop}
+                    >
+                        <ArrowUpward />
+                    </IconButton>
+                )}
             </div>
-        </CssVarsProvider>
+        </div>
     );
-}
+};
+
+export default DashboardAdminProfileScreens;

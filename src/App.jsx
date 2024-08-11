@@ -1,37 +1,13 @@
-import React from 'react'; // Import React
 import Cookies from 'js-cookie'
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 import { jwtDecode } from 'jwt-decode';
 import CustomDesignScreen from './pages/CustomDesign/CustomDesignScreen';
-import AboutUsPage from './pages/AboutUs/AboutUsScreen';
 import HomeScreen from './pages/Home/HomeScreen';
-import ContactUsPage from './pages/ContactUs/ContactUsScreen';
 
-import {
-  DashboardAdminScreens,
-  DashboardManageUserScreen,
-  DashboardAdminProfileScreens,
-  DashboardRecentTransactionScreen,
-  DashboardManageInvoiceScreen,
-  DashboardFAQScreens,
-  DashboardPieChartScreens,
-  DashboardGeographyChartScreens,
-  DashboardLineChartScreens,
-  DashboardBarChartScreens,
-} from './pages/AdminManagement';
+import { DashboardAdminScreens } from './pages/AdminManagement';
 
-import {
-  DashboardEmployeeProfileScreens,
-  DashboardEmployeeScreens,
-  DashboardEmployeeManageBrandScreens,
-  DashboardManageReportScreen,
-  DashboardManageOrderScreen,
-  DashboardManageTransactionScreen,
-  DashboardEmployeeOrderDetailScreen,
-  DashboardEmployeeManageUserScreens,
-  DashboardManageNotification
-} from './pages/EmployeeManagement';
+import { DashboardEmployeeScreens, DashboardEmployeeOrderDetailScreen } from './pages/EmployeeManagement';
 
 import {
   ChangePasswordScreen,
@@ -43,12 +19,7 @@ import {
   VerifyEmailScreen,
 } from './pages/Authentication';
 
-import {
-  DashboardBrandManageNotification,
-  DashboardBrandProfileScreens,
-  DashboardBrandScreens,
-  DashboardManageMaterialScreen
-} from './pages/BrandManagement';
+import { BrandSignUpScreen, DashboardManageMaterialScreen, OrderRequestScreen, UploadBrandInforForm, WaitingProcessComponent } from './pages/BrandManagement';
 
 import Screen404 from './pages/Error/Screen404';
 import { ProductDetailScreens } from './pages/DetailProduct';
@@ -57,8 +28,24 @@ import { FilterProductScreen } from './pages/FilterProduct';
 import {
   OrderDetailScreen,
   OrderHistory,
-  OrderProductScreen
+  OrderProductScreen,
+  PickedOrderScreen,
+  RefundTransactionHistoryScreen
 } from './pages/Order';
+
+import { DashboardManagerMangeExpertTailoring } from './pages/ManagerManagement';
+import Brand from './pages/BrandManagement/DashboardBrand/BrandDashboardScreen';
+
+
+import CreateDesignComponent from './pages/CustomDesign/Components/CreateDesign/CreateDesignComponent';
+import DesignCollectionScreen from './pages/DesignCollection/DesignCollectionContainer/DesignCollectionScreen';
+import { DashboardAccountantScreens } from './pages/AccountantManagement';
+import ToogleComponent from './pages/AccountantManagement/GlobalComponent/Toogle/ToogleComponent';
+import ReportHistorySreen from './pages/Order/ReportHistory/ReportHistorySreen';
+import AboutUs from './pages/AboutUs/test';
+import NotificationComponent from './components/Notification/NotificationComponent';
+
+
 
 
 const tokenIsValid = (token) => {
@@ -113,12 +100,26 @@ const ConditionalTokenRefreshDialog = () => {
   return !shouldHide ? <TokenRefreshDialogComponent /> : null;
 };
 
+export const __getToken = () => {
+  const tokenStorage = Cookies.get('token');
+  if (!tokenStorage) {
+    return;
+  } else
+    return tokenStorage
+}
+
+export const __getUserLogined = () => {
+  const userAuth = localStorage.getItem('userAuth');
+  if (userAuth) {
+    return userParse = JSON.parse(userAuth);
+  } else return;
+}
 
 function App() {
   return (
     <div>
       <BrowserRouter>
-      <ConditionalTokenRefreshDialog />
+        <ConditionalTokenRefreshDialog />
         <Routes>
 
           {/* Init/Home route */}
@@ -132,54 +133,55 @@ function App() {
           <Route path='/auth/verify/:email' element={<VerifyEmailScreen></VerifyEmailScreen>} />
           <Route path='/auth/profilesetting' element={<ProfileSettings></ProfileSettings>} />
 
-
           {/* Design route */}
           {/* <Route path="/design" element={<PrivateRoute element={<CustomDesignScreen />} requiredRole="CUSTOMER" />} /> */}
-          <Route path='/design' element={<CustomDesignScreen></CustomDesignScreen>} />
-
+          <Route path='/design/:id' element={<CustomDesignScreen></CustomDesignScreen>} />
+          <Route path='/design_create' element={<CreateDesignComponent></CreateDesignComponent>} />
 
           {/* Admin dashboard route */}
           <Route path='/admin' element={<DashboardAdminScreens></DashboardAdminScreens>} />
-          <Route path='/admin_profile' element={<DashboardAdminProfileScreens></DashboardAdminProfileScreens>} />
-          <Route path='/about' element={<AboutUsPage></AboutUsPage>} />
-          <Route path='/contact' element={<ContactUsPage></ContactUsPage>} />
-          <Route path='/manager_user' element={<DashboardManageUserScreen></DashboardManageUserScreen>} />
-          <Route path='/manage_revenue' element={<DashboardRecentTransactionScreen></DashboardRecentTransactionScreen>} />
-          <Route path='/manage_invoice' element={<DashboardManageInvoiceScreen></DashboardManageInvoiceScreen>} />
-          <Route path='/admin_faq' element={<DashboardFAQScreens></DashboardFAQScreens>} />
-          <Route path='/pie_chart' element={<DashboardPieChartScreens></DashboardPieChartScreens>} />
-          <Route path='/geography_chart' element={<DashboardGeographyChartScreens></DashboardGeographyChartScreens>} />
-          <Route path='/line_chart' element={<DashboardLineChartScreens></DashboardLineChartScreens>} />
-          <Route path='/bar_chart' element={<DashboardBarChartScreens></DashboardBarChartScreens>} />
 
           {/* Employee dashboard route */}
           <Route path='/employee' element={<DashboardEmployeeScreens></DashboardEmployeeScreens>} />
-          <Route path='/manager_customer' element={<DashboardEmployeeManageUserScreens></DashboardEmployeeManageUserScreens>} />
-          <Route path='/employee_profile' element={<DashboardEmployeeProfileScreens></DashboardEmployeeProfileScreens>} />
-          <Route path='/manage_brand' element={<DashboardEmployeeManageBrandScreens></DashboardEmployeeManageBrandScreens>} />
-          <Route path='/manage_report' element={<DashboardManageReportScreen></DashboardManageReportScreen>} />
-          <Route path='/manager_order' element={<DashboardManageOrderScreen></DashboardManageOrderScreen>} />
-          <Route path='/manage_transaction' element={<DashboardManageTransactionScreen></DashboardManageTransactionScreen>} />
           <Route path="/row-details" element={<DashboardEmployeeOrderDetailScreen></DashboardEmployeeOrderDetailScreen>} />
-          <Route path="/manage_notification" element={<DashboardManageNotification></DashboardManageNotification>} />
 
           {/* Brand Dashboard Route */}
-          <Route path='/brand' element={<DashboardBrandScreens></DashboardBrandScreens>} />
-          <Route path="/brand_manage_notification" element={<DashboardBrandManageNotification></DashboardBrandManageNotification>} />
-          <Route path='/brand_profile' element={<DashboardBrandProfileScreens></DashboardBrandProfileScreens>} />
-          <Route path='/manage_material' element={<DashboardManageMaterialScreen></DashboardManageMaterialScreen>} />
+          <Route path='/brand' element={<DashboardManageMaterialScreen></DashboardManageMaterialScreen>} />
+          <Route path='/brand/signup' element={<BrandSignUpScreen></BrandSignUpScreen>} />
+          <Route path='/brand/updateProfile/:id' element={<UploadBrandInforForm></UploadBrandInforForm>} />
+          <Route path='/brand/manage_order_request/:id' element={<OrderRequestScreen></OrderRequestScreen>} />
+          <Route path='/brand/waiting_process_information' element={<WaitingProcessComponent></WaitingProcessComponent>} />
 
           {/* Detail Product Route */}
           <Route path='/detail_product/:id' element={<ProductDetailScreens></ProductDetailScreens>} />
           <Route path='/product' element={<FilterProductScreen></FilterProductScreen>} />
 
           {/* Order Detail Route */}
-          <Route path='/order_detail' element={<OrderDetailScreen></OrderDetailScreen>} />
+          <Route path='/order_detail/:id' element={<OrderDetailScreen></OrderDetailScreen>} />
           <Route path='/order_history' element={<OrderHistory></OrderHistory>} />
-          <Route path='/order' element={<OrderProductScreen></OrderProductScreen>} />
-          
+          <Route path='/design_detail/:id' element={<OrderProductScreen></OrderProductScreen>} />
+          <Route path='/report_history' element={<ReportHistorySreen></ReportHistorySreen>} />
+          <Route path='/refund_history' element={<RefundTransactionHistoryScreen></RefundTransactionHistoryScreen>} />
+
+
+
+          {/* Manager dashboard route */}
+          <Route path='/manager' element={<DashboardManagerMangeExpertTailoring />} />
 
           <Route path='*' element={<Screen404 />} />
+          <Route path='error404' element={<Screen404 />} />
+          <Route path='/pickedOrder' element={<PickedOrderScreen />} />
+
+          {/* Manage design */}
+          <Route path='/collection' element={<DesignCollectionScreen />} />
+
+          {/* Accountant dashboard route */}
+          <Route path='/accountant' element={<DashboardAccountantScreens></DashboardAccountantScreens>} />
+
+          {/* Test */}
+          <Route path='/test' element={<ToogleComponent></ToogleComponent>} />
+          <Route path='/bs' element={<AboutUs />} />
+          <Route path='/notification' element={<NotificationComponent></NotificationComponent>} />
         </Routes>
       </BrowserRouter>
     </div>

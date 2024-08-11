@@ -29,6 +29,7 @@ import {
 import { IoIosWarning } from "react-icons/io";
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import LoadingComponent from '../Loading/LoadingComponent';
+import { toast } from 'react-toastify';
 
 
 type Props = {
@@ -39,75 +40,10 @@ type Props = {
     model?: ReactElement;
     typeOfModel?: any;
     key?: any;
+    onCreateDesign?: () => void;
+    isFullStepActive?: boolean;
 }
 
-const ITEM_HEIGHT = 40;
-const ITEM_PADDING_TOP = 8;
-const CustomPaper = styled('div')(({ theme }) => ({
-    '& .MuiAutocomplete-listbox': {
-        backgroundColor: whiteColor,
-        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-        width: '100%',
-        border: `1px solid ${grayColor1}`,
-        fontSize: '12px',
-        '&::-webkit-scrollbar': {
-            width: '0.3em',
-            borderRadius: '5px',
-            backgroundColor: grayColor1
-        },
-        '&::-webkit-scrollbar-track': {
-            webkitBoxShadow: 'inset 0 0 6px rgba(0,0,0,0.1)',
-            borderRadius: '5px',
-            backGroundColor: grayColor1
-        },
-        '&::-webkit-scrollbar-thumb': {
-            backgroundColor: '#7b7b7b',
-            borderRadius: '5px'
-        },
-    },
-}));
-
-const CustomPopper = (props: any) => {
-    return <Popper {...props} placement="bottom-start" />;
-};
-
-const CustomTextField = styled(TextField)(({ theme }) => ({
-    '& .MuiInputBase-root': {
-        height: '35px',
-        width: '200px',
-        borderRadius: '8px',
-        outLine: 'none'
-    },
-    '& .MuiOutlinedInput-input': {
-        fontSize: '12px',
-    },
-    '& .MuiInputLabel-root': {
-        fontSize: '12px', // Adjust font size of the label
-    },
-}));
-
-const stylesInputField = {
-    input1: {
-        height: 50
-    },
-    input2: {
-        height: 200,
-        fontSize: "3em"
-    }
-};
-
-const names = [
-    'chỉ đỏ',
-    'Van Henry',
-    'April Tucker',
-    'Ralph Hubbard',
-    'Omar Alexander',
-    'Carlos Abbott',
-    'Miriam Wagner',
-    'Bradley Wilkerson',
-    'Virginia Andrews',
-    'Kelly Snyder',
-];
 
 const productData = [
     {
@@ -176,7 +112,7 @@ const productData = [
     },
 ]
 
-const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child, model, typeOfModel, key }) => {
+const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child, model, typeOfModel, key, onCreateDesign, isFullStepActive }) => {
     // TODO MUTIL LANGUAGE
     // ---------------UseState Variable---------------//
     const [selectedLanguage, setSelectedLanguage] = useState<string>(localStorage.getItem('language') || 'en');
@@ -241,13 +177,20 @@ const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child
     }
 
     const __handleSaveMaterialInformation = () => {
-        setIsOpenSaveMaterialDialog(false);
-        __handleClose();
+        if (isFullStepActive) {
+            setIsOpenSaveMaterialDialog(false);
+            if (onCreateDesign) {
+                onCreateDesign();
+            }
+        } else {
+            toast.error('Please enter full part', { autoClose: 4000 });
+        }
+        // __handleClose();
     }
 
 
     return (
-        <Dialog className={`${styles.dialog__container}`} fullWidth maxWidth={'sm'} open={isOpen}>
+        <Dialog className={`${styles.dialog__container}`} maxWidth={'md'} open={isOpen}>
             <DialogTitle >
                 <IoMdCloseCircleOutline
                     cursor={'pointer'}
@@ -260,7 +203,7 @@ const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child
             </DialogTitle>
             <DialogContent className={`${styles.dialog__content}`}>
                 <div className="mt-0" style={{ height: '100%' }}>
-                    <div className={styles.dialog__content__lableGroup}>
+                    {/* <div className={styles.dialog__content__lableGroup}>
                         <div >
                             <span className={styles.dialog__content__span__text}>For model</span>
                         </div>
@@ -270,10 +213,9 @@ const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child
                             <span style={{ color: greenColor }}>2.000.000</span>
                             <span> VNĐ</span>
                         </div>
-                    </div>
-                    <div className={`${styles.dialog__content__modelMaterialArea}`}>
+                    </div> */}
+                    {/* <div className={`${styles.dialog__content__modelMaterialArea}`}>
                         <main className={`${styles.dialog__content__modelMaterialArea__model}`}>
-                            {/* {model && model} */}
                             <img src={modelImg}></img>
                         </main>
                         <div className={`${styles.dialog__content__modelMaterialArea__material}`}>
@@ -343,12 +285,10 @@ const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child
                             </div>
 
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className={styles.dialog__content__lableGroup} style={{ width: '50%' }} >
-                        <div>
-                            <span className={styles.dialog__content__span__text}>For item mask</span>
-                        </div>
+
                         {/* <div className={styles.dialog__content__span}>
                             <span style={{ color: redColor }}>1.999.999</span>
                             <span> - </span>
@@ -365,7 +305,7 @@ const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child
 
 
             </DialogContent>
-            <DialogContent className={`${styles.dialog__content__totalPrice}`}>
+            {/* <DialogContent className={`${styles.dialog__content__totalPrice}`}>
                 <div className={`${styles.dialog__content__totalPrice__note} inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10`}>
                     <IoIosWarning size={50} color={yellowColor} mode={'contain'} />
                     <span>
@@ -407,12 +347,13 @@ const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child
                         </tr>
                     </tbody>
                 </table>
-            </DialogContent>
+            </DialogContent> */}
             <DialogActions>
                 <Button onClick={() => __handleOpenMaterialSavingDialog()} style={{ color: primaryColor, padding: '5px 20px 5px 20px' }}  >
                     Cancel
                 </Button>
-                <Button style={{ backgroundColor: redColor, color: whiteColor, padding: '5px 20px 5px 20px' }}>
+
+                <Button onClick={() => __handleSaveMaterialInformation()} style={{ backgroundColor: redColor, color: whiteColor, padding: '5px 20px 5px 20px' }}>
                     Order
                 </Button>
             </DialogActions>

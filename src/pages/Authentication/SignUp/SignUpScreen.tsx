@@ -140,7 +140,6 @@ export default function SignUpScreen() {
 
       const response = await api.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.signup}`, requestData);
       if (response.status === 200) {
-        localStorage.setItem('userRegister', JSON.stringify(requestData));
         console.log(response.data);
         navigate(`/auth/verify/${email}`);
         setIsloading(false);

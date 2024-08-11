@@ -1,4 +1,4 @@
-import { Card, ToggleButton, ToggleButtonGroup, Typography, useTheme } from "@mui/material";
+import { FormControl, InputLabel, Select, MenuItem, Box, useTheme } from '@mui/material';
 import { ResponsiveBar } from "@nivo/bar";
 import { tokens } from "../../../theme";
 import { mockBarData as barChartData } from "./DataTestBarChart";
@@ -9,6 +9,7 @@ const BarChart = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
+    const color = theme.palette
     const [option, setOption] = useState("month");
 
     const filteredData = option === "month" ? barChartData : [];
@@ -32,30 +33,32 @@ const BarChart = () => {
 
     return (
         <>
-            <div style={{ display: "flex", margin: "2%" }}>
-                <Typography variant="h5" >
-                    Bar Chart
-                </Typography>
-                <Card sx={{ backgroundColor: `${colors.primary[100]} !important`, width: "18%", color: `${colors.primary[100]}`, marginTop: "2%", marginLeft: "60%" }}>
-                    <ToggleButtonGroup
-                        color="primary"
+            <Box sx={{ display: 'flex', justifyContent: 'right', alignItems: 'right', margin: '2%' }}>
+                <FormControl variant="outlined" sx={{ minWidth: 200, backgroundColor: color.background.paper, borderRadius: 1 }}>
+                    <InputLabel sx={{ color: color.text.primary }}>Filter by Category</InputLabel>
+                    <Select
                         value={option}
-                        exclusive
                         onChange={_handleChange}
-                        aria-label="Platform"
+                        label="Filter by Category"
+                        sx={{
+                            '& .MuiOutlinedInput-notchedOutline': {
+                                borderColor: color.grey[300],
+                            },
+                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                                borderColor: color.primary.main,
+                            },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                borderColor: color.primary.main,
+                            },
+                        }}
                     >
-                        <ToggleButton value="month" sx={{ color: colors.primary[200], fontWeight: "bold" }}>
-                            {t(codeLanguage + '000041')}
-                        </ToggleButton>
-                        <ToggleButton value="year" sx={{ color: colors.primary[200], fontWeight: "bold" }}>
-                            {t(codeLanguage + '000042')}
-                        </ToggleButton>
-                        <ToggleButton value="week" sx={{ color: colors.primary[200], fontWeight: "bold" }}>
-                            {t(codeLanguage + '000043')}
-                        </ToggleButton>
-                    </ToggleButtonGroup>
-                </Card>
-            </div>
+                        <MenuItem value="month"> {t(`${codeLanguage}000041`)}</MenuItem>
+                        <MenuItem value="week">{t(`${codeLanguage}000042`)}</MenuItem>
+                        <MenuItem value="year">{t(`${codeLanguage}000043`)}</MenuItem>
+                    </Select>
+                </FormControl>
+            </Box>
+
             <ResponsiveBar
                 data={filteredData}
                 theme={{
@@ -93,7 +96,7 @@ const BarChart = () => {
                 }}
                 keys={["hot dog", "burger", "sandwich", "kebab", "fries", "donut"]}
                 indexBy="brand"
-                margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
+                margin={{ top: 50, right: 30, bottom: 50, left: 60 }}
                 padding={0.3}
                 valueScale={{ type: "linear" }}
                 indexScale={{ type: "band", round: true }}
@@ -120,7 +123,7 @@ const BarChart = () => {
                 ]}
                 borderColor={{
                     from: "color",
-                    modifiers: [["darker", "1.6"]],
+                    modifiers: [["darker", 1.6]],
                 }}
                 axisTop={null}
                 axisRight={null}
@@ -147,30 +150,6 @@ const BarChart = () => {
                     from: "color",
                     modifiers: [["darker", 1.6]],
                 }}
-                legends={[
-                    {
-                        dataFrom: "keys",
-                        anchor: "bottom-right",
-                        direction: "column",
-                        justify: false,
-                        translateX: 120,
-                        translateY: 0,
-                        itemsSpacing: 2,
-                        itemWidth: 100,
-                        itemHeight: 20,
-                        itemDirection: "left-to-right",
-                        itemOpacity: 0.85,
-                        symbolSize: 20,
-                        effects: [
-                            {
-                                on: "hover",
-                                style: {
-                                    itemOpacity: 1,
-                                },
-                            },
-                        ],
-                    },
-                ]}
                 role="application"
                 barAriaLabel={function (e) {
                     return e.id + ": " + e.formattedValue + " in country: " + e.indexValue;

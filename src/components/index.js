@@ -5,6 +5,8 @@ import CustomButton from './CustomButton/CustomButton'
 import Tab from './Tab/Tab'
 import TextEditor from './TextEditor/TextEditor'
 import ChooseMaterialDialogComponent from './ChooseMaterialDialog/ChooseMaterialDialogComponent'
+import PaymentOrderDialogComponent from './Dialog/PaymentDialog/PaymentOrderDialogComponent'
+import CustomerReportOrderDialogComponent from './Dialog/ReportDialog/CustomerReportOrderDialogComponent'
 
 export {
     AIPicker,
@@ -13,5 +15,7 @@ export {
     CustomButton,
     Tab,
     TextEditor,
-    ChooseMaterialDialogComponent
+    ChooseMaterialDialogComponent,
+    PaymentOrderDialogComponent,
+    CustomerReportOrderDialogComponent
 }

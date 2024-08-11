@@ -10,17 +10,15 @@ import EditIcon from '@mui/icons-material/Edit';
 import Swal from "sweetalert2";
 import EditMaterialPopUpScreens from "./EditMaterial/EditMaterialPopUpScreens";
 import AddEachMaterialWithHand from "../AddEachWithHand/AddEachMaterialWithHandScreens";
+import { AddExcelMultiple, AddMaterial, ExcelData } from "../../../../models/BrandMaterialExcelModel";
+import { Material } from "../../../../models/BrandMaterialExcelModel";
 import AddMultipleMaterialWithExcel from "../CRUDMaterialWithExcelTable/AddMultipleInExcelTable/AddMultipleMaterialComponent";
-
-interface Material {
-    id: number,
-    category_name: string,
-    material_name: string,
-    price: number,
-    unit: string
-}
-
-const brand_name = "LV"
+import { UpdateMaterial } from "../../../../models/BrandMaterialExcelModel";
+import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
+import { UserInterface } from "../../../../models/UserModel";
+import Cookies from "js-cookie";
+import { greenColor } from "../../../../root/ColorSystem";
+const brand_name = "LA LA LISA BRAND"
 
 // Make Style of popup
 const style = {
@@ -44,7 +42,7 @@ const ManageMaterialComponent: React.FC = () => {
     const [data, setData] = React.useState<Material[]>([]);
 
     // set formid to pass it to component edit user
-    const [formId, setFormId] = React.useState<Material | null>(null);
+    const [formId, setFormId] = React.useState<AddMaterial | null>(null);
 
     // Open Edit PopUp when clicking on the edit icon
     const [editopen, setEditOpen] = React.useState<boolean>(false);
@@ -83,6 +81,52 @@ const ManageMaterialComponent: React.FC = () => {
         setAddMultiple(false)
     }
 
+
+    let brandAuth: any = null;
+
+    const BRANDROLECHECK = Cookies.get('userAuth');
+
+    if (BRANDROLECHECK) {
+        try {
+            brandAuth = JSON.parse(BRANDROLECHECK);
+            const { userID, email, fullName, language, phoneNumber, roleName, imageUrl, userStatus } = brandAuth;
+            // Your code that uses the parsed data
+        } catch (error) {
+            console.error('Error parsing JSON:', error);
+            // Handle the error, perhaps by setting default values or showing an error message
+        }
+    } else {
+        console.error('userAuth cookie is not set');
+        // Handle the case when the cookie does not exist
+    }
+
+
+    let brandFromSignUp: any = null
+    // Get BrandID from session
+    const getBrandFromSingUp = sessionStorage.getItem('userRegister') as string | null;
+
+    if (getBrandFromSingUp) {
+        const BRANDFROMSIGNUPPARSE: UserInterface = JSON.parse(getBrandFromSingUp);
+        const brandID = BRANDFROMSIGNUPPARSE.userID;
+        const brandEmail = BRANDFROMSIGNUPPARSE.email;
+        brandFromSignUp = { brandID, brandEmail }
+        console.log(brandFromSignUp);
+
+        console.log('Brand ID:', brandID);
+        console.log('Brand Email:', brandEmail);
+    } else {
+        console.error('No user data found in session storage');
+    }
+    // Get ID When something null
+    const getID = () => {
+        if (!brandAuth || brandAuth.userID === null || brandAuth.userID === undefined || brandAuth.userID === '') {
+            return brandFromSignUp.brandID;
+        } else {
+            return brandAuth.userID;
+        }
+    };
+
+
     // Get language in local storage
     const selectedLanguage = localStorage.getItem('language');
     const codeLanguage = selectedLanguage?.toUpperCase();
@@ -96,7 +140,7 @@ const ManageMaterialComponent: React.FC = () => {
     }, [selectedLanguage, i18n]);
 
     React.useEffect(() => {
-        const apiUrl = 'https://66080c21a2a5dd477b13eae5.mockapi.io/CPSE_CHART';
+        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_material + functionEndpoints.material.getAllBrandMaterialByBrandID + `/${getID()}`}`;
         fetch(apiUrl)
             .then(response => {
                 if (!response.ok) {
@@ -105,8 +149,8 @@ const ManageMaterialComponent: React.FC = () => {
                 return response.json();
             })
             .then((responseData) => {
-                if (responseData && Array.isArray(responseData)) {
-                    setData(responseData);
+                if (responseData && Array.isArray(responseData.data)) {
+                    setData(responseData.data);
                     console.log("Data received:", responseData);
 
                 } else {
@@ -117,29 +161,51 @@ const ManageMaterialComponent: React.FC = () => {
     }, []);
 
     // Thêm người dùng mới vào danh sách
-    const _handleAddMaterial = (newMaterial: Material) => {
-        setData(prevData => [...prevData, newMaterial]);
+    const _handleAddMaterial = (newMaterial: AddMaterial) => {
+        setData((prevData: any) => [...prevData, newMaterial]);
     }
 
+    const _handleAddMultipleMaterial = (newMaterial: AddExcelMultiple[]) => {
+        setData((prevData: any) => [...prevData, ...newMaterial]);
+    }
+
+
     // Cập nhật người dùng trong danh sách
-    const _handleUpdateMaterial = (updatedMaterial: Material) => {
-        setData(prevData => prevData.map(material => material.id === updatedMaterial.id ? updatedMaterial : material));
+    const _handleUpdateMaterial = (updatedMaterial: UpdateMaterial) => {
+        setData(prevData => prevData.map((material: any) =>
+            material.categoryName === updatedMaterial.categoryName &&
+                material.materialName === updatedMaterial.materialName &&
+                material.hsCode === updatedMaterial.hsCode ? updatedMaterial : material
+        ));
     }
 
     // EDIT 
-    const _handleEditClick = (id: number,
-        category_name: string,
-        material_name: string,
-        price: number,
-        unit: string) => {
+    const _handleEditClick = (
+        categoryName: string,
+        materialName: string,
+        hsCode: number,
+        unit: string,
+        basePrice: number,
+        brandPrice: number,
+        brandName: string,
+    ) => {
         // Handle edit action
-        const materialDataToEdit: Material = {
-            id: id,
-            category_name: category_name,
-            material_name: material_name,
-            price: price,
-            unit: unit
+        const materialDataToEdit: UpdateMaterial = {
+            brandName: brandName,
+            categoryName: categoryName,
+            materialName: materialName,
+            hsCode: hsCode,
+            unit: unit,
+            basePrice: basePrice,
+            brandPrice: brandPrice
         }
+        console.log('Category Name:', categoryName);
+        console.log('Material Name:', materialName);
+        console.log('HS Code:', hsCode);
+        console.log('Unit:', unit);
+        console.log('Brand Price:', brandPrice);
+        console.log('Base Price:', basePrice);
+        console.log('Brand Name:', brandName);
         setFormId(materialDataToEdit);
         _handleEditOpen();
     };
@@ -148,7 +214,7 @@ const ManageMaterialComponent: React.FC = () => {
     const _handleDeleteClick = async (id: number) => {
         // Handle delete action
         try {
-            const response = await fetch(`https://66080c21a2a5dd477b13eae5.mockapi.io/CPSE_CHART/${id}`, {
+            const response = await fetch(`http://localhost:6969/api/v1/brand-material/get-all-brand-material-by-brand-name?brandName=LA LA LISA BRAND`, {
                 method: 'DELETE',
             });
             if (!response.ok) {
@@ -200,21 +266,27 @@ const ManageMaterialComponent: React.FC = () => {
     const columns: GridColDef[] = [
         // { field: "id", headerName: "ID", flex: 0.5 },
         {
-            field: "category_name",
+            field: "categoryName",
             headerName: "Category Name",
             flex: 1,
         },
         {
-            field: "material_name",
+            field: "materialName",
             headerName: "Material Name",
             flex: 1,
         },
         {
-            field: "price",
-            headerName: "Price",
+            field: "hsCode",
+            headerName: "HS Code",
+            flex: 1,
+        },
+        {
+            field: "basePrice",
+            headerName: "Base Price",
             type: "number",
             headerAlign: "left",
             align: "left",
+            flex: 1,
         },
         {
             field: "unit",
@@ -222,9 +294,11 @@ const ManageMaterialComponent: React.FC = () => {
             flex: 1,
         },
         {
-            field: "brand_name",
-            headerName: "Brand Name",
-            flex: 1,
+            field: "brandPrice",
+            headerName: "Brand Price",
+            type: "number",
+            headerAlign: "left",
+            align: "left",
         },
         {
             field: "actions",
@@ -233,23 +307,18 @@ const ManageMaterialComponent: React.FC = () => {
             sortable: false,
             renderCell: (params) => (
                 <Box>
-                    <IconButton onClick={() => _handleEditClick(params.row.id, params.row.category_name, params.row.material_name, params.row.price, params.row.unit)}>
-                        <EditIcon />
-                    </IconButton>
-                    <IconButton onClick={() => _hanldeConfirmDelete(params.row.id)}>
-                        <DeleteIcon htmlColor={colors.primary[300]} />
+                    <IconButton onClick={() => _handleEditClick(params.row.categoryName, params.row.materialName, params.row.hsCode, params.row.unit, params.row.brandPrice, params.row.basePrice, params.row.brandName)}>
+                        <EditIcon htmlColor="#E96208" />
                     </IconButton>
                 </Box>
             )
         }
     ];
 
-    const getRowId = (row: any) => {
-        return row.id;
-    };
+    const getRowId = (row: any) => `${row.id}-${row.materialName}`;
 
     return (
-        <Box m="20px">
+        <Box m="20px" sx={{ marginTop: "-6%" }}>
             <Box
                 m="40px 0 0 0"
                 height="75vh"
@@ -285,86 +354,67 @@ const ManageMaterialComponent: React.FC = () => {
                     }
                 }}
             >
-                <Button
-                    id="basic-button"
-                    aria-controls={open ? 'basic-menu' : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={open ? 'true' : undefined}
-                    onClick={_handleClick}
-                    endIcon={<Add />}
-                    variant="contained"
-                    color="primary"
-                    style={{ backgroundColor: `${colors.primary[300]} !important`, color: `${colors.primary[200]} !important`, marginLeft: "80%" }}
-                >
-                    {t(codeLanguage + '000048')}
-                </Button>
-                <Menu
-                    id="basic-menu"
-                    anchorEl={anchorEl}
-                    open={open}
-                    onClose={_handleClose}
-                    MenuListProps={{
-                        'aria-labelledby': 'basic-button',
+                <div className="container" style={{ display: "flex", marginTop: "-5%" }}>
+                    <h1 style={{ fontWeight: "bolder", fontSize: "20px", marginLeft: "7px" }}>
+                        Manage Material Table
+                    </h1>
+                    <Button
+                        id="basic-button"
+                        aria-controls={open ? 'basic-menu' : undefined}
+                        aria-haspopup="true"
+                        aria-expanded={open ? 'true' : undefined}
+                        onClick={_handleAddMultipleOpen}
+                        endIcon={<Add />}
+                        variant="contained"
+                        color="primary"
+                        style={{ backgroundColor: `${greenColor}`, color: `${colors.primary[200]} !important`, marginLeft: "65%" }}
+                    >
+                        {t(codeLanguage + '000048')}
+                    </Button>
+                    <Modal
+                        open={addMultiple}
+                        aria-labelledby="modal-modal-title"
+                        aria-describedby="modal-modal-description"
+                    >
+                        <Box sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            width: "70%",
+                            bgcolor: colors.primary[100],
+                            boxShadow: 24,
+                            p: 4,
+                            borderRadius: "20px"
+                        }}>
+                            <AddMultipleMaterialWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddMultipleMaterial} />
+                        </Box>
+                    </Modal>
+                </div>
+                <Box
+                    sx={{
+                        height: "100%",  // Adjust height as needed
+                        width: '100%',  // Adjust width as needed
+                        '& .MuiDataGrid-row:nth-of-type(odd)': {
+                            backgroundColor: '#D7E7FF !important',  // Change background color to blue for odd rows
+                        },
+                        '& .MuiDataGrid-row:nth-of-type(even)': {
+                            backgroundColor: '#FFFFFF !important',  // Change background color to red for even rows
+                        },
+                        '& .MuiDataGrid-columnHeaderTitle': {
+                            fontWeight: 'bolder',  // Make header text bolder
+                        }
                     }}
                 >
-                    <MenuItem >
-                        <div onClick={_handleAddOpen}>{t(codeLanguage + '000049')}</div>
-                        <Modal
-                            open={addOpenOrClose}
-                            aria-labelledby="modal-modal-title"
-                            aria-describedby="modal-modal-description"
-                        >
-                            <Box sx={{
-                                backgroundColor: colors.primary[100], position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: "40%",
-                                bgcolor: 'background.paper',
-                                border: '2px solid #000',
-                                boxShadow: 24,
-                                p: 4,
-                                borderRadius: "20px"
-                            }}>
-                                <AddEachMaterialWithHand closeCard={_handleAddClose} addNewMaterial={_handleAddMaterial} />
-                            </Box>
-                        </Modal>
-                    </MenuItem>
-
-                    <MenuItem>
-                        <div onClick={_handleAddMultipleOpen}>{t(codeLanguage + '000050')}</div>
-                        <Modal
-                            open={addMultiple}
-                            aria-labelledby="modal-modal-title"
-                            aria-describedby="modal-modal-description"
-                        >
-                            <Box sx={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: "70%",
-                                bgcolor: colors.primary[100],
-                                border: '2px solid #000',
-                                boxShadow: 24,
-                                p: 4,
-                                borderRadius: "20px"
-                            }}>
-                                <AddMultipleMaterialWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddMaterial} />
-                            </Box>
-                        </Modal>
-
-                    </MenuItem>
-                </Menu>
-
-                <DataGrid
-                    rows={data}
-                    columns={columns}
-                    slots={{ toolbar: GridToolbar }}
-                    // checkboxSelection
-                    disableRowSelectionOnClick
-                    getRowId={getRowId}
-                />
+                    <DataGrid
+                        rows={data}
+                        columns={columns}
+                        slots={{ toolbar: GridToolbar }}
+                        // checkboxSelection
+                        disableRowSelectionOnClick
+                        getRowId={getRowId}
+                    />
+                </Box>
                 <Modal
                     open={editopen}
                     aria-labelledby="modal-modal-title"

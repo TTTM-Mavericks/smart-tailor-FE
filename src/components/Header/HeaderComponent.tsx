@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { Dialog, Popover, Tab, Transition } from '@headlessui/react'
 import { Bars3Icon, MagnifyingGlassIcon, ShoppingBagIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { primaryColor } from '../../root/ColorSystem'
+import { grayColor, grayColor1, greenColor, primaryColor, redColor, secondaryColor, whiteColor } from '../../root/ColorSystem'
 import styles from './Header.module.scss';
 import { systemLogo } from '../../assets';
 import { useTranslation } from 'react-i18next';
@@ -14,22 +14,36 @@ import {
   IconButton,
   ListItemIcon,
   Menu,
-  Tooltip
+  Tooltip,
+  Badge,
+  Card,
+  CardContent,
+  Typography
 } from '@mui/material';
-import { Logout } from '@mui/icons-material';
+import { Logout, NotificationAdd, Notifications } from '@mui/icons-material';
 import HeaderLanguageSetting from '../LanguageSetting/LanguageSettingComponent';
 import { UserInterface } from '../../models/UserModel';
 import Cookies from 'js-cookie';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../api/ApiConfig';
 import { ToastContainer, toast } from 'react-toastify';
+import { NotificationInterface } from '../../models/NotificationModel';
+import { IoMdNotifications } from "react-icons/io";
+import { generateNotificationMessage } from '../../utils/ElementUtils';
 
 const navigation = {
   categories: [
 
     {
+      id: 'product',
+      name: 'Products',
+      href: '/product',
+      number: '000130',
+      type: 'page'
+    },
+    {
       id: 'design',
       name: 'Design',
-      href: '/design',
+      href: '/design_create',
       number: '000132',
       type: 'page'
     },
@@ -174,11 +188,83 @@ function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(' ')
 }
 
+export interface NotificationRealtimeInterface {
+  sender: string;
+  recipient: string;
+  message: string;
+  type: string;
+}
+
 export default function HeaderComponent() {
   const [open, setOpen] = useState<boolean>(false)
 
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [userLogined, setUserLogined] = useState<UserInterface>();
+  const [notificationList, setNotificationList] = useState<NotificationInterface[]>([]);
+  const [notiNumber, setNotiNumber] = useState<number>(0);
+  const [messages, setMessages] = useState<NotificationInterface[]>([]);
+
+  const userStorage = Cookies.get('userAuth');
+  if (!userStorage) return;
+  const userParse: UserInterface = JSON.parse(userStorage);
+  const websocketUrl = `ws://localhost:6969/websocket?userid=${userParse.userID}`;
+
+  // 1. First useEffect to fetch notifications and set notiNumber
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.notification + functionEndpoints.notification.getNotiByUserId}/${userParse.userID}`);
+        if (response.status === 200) {
+          const sortedData = response.data.sort((a: NotificationInterface, b: NotificationInterface) => {
+            return new Date(b.createDate).getTime() - new Date(a.createDate).getTime();
+          });
+          setNotificationList(sortedData);
+          console.log(response.data);
+          const filterStatusNoti = response.data.filter((noti: NotificationInterface) => noti.status === false);
+          setNotiNumber(filterStatusNoti.length);
+        } else {
+          toast.error(`${response.message}`, { autoClose: 4000 });
+        }
+      } catch (error) {
+        toast.error(`${error}`, { autoClose: 4000 });
+        console.log('error: ', error);
+      }
+    };
+
+    fetchNotifications();
+  }, [userParse.userID]);
+
+  // 2. Second useEffect to handle WebSocket connection after notiNumber is set
+  useEffect(() => {
+    const originalTitle = document.title;
+    const websocket = new WebSocket(websocketUrl);
+
+    websocket.onopen = () => {
+      console.log('WebSocket connection opened');
+    };
+
+    websocket.onmessage = (event) => {
+      console.log('Message received:', event.data);
+      const data: NotificationInterface = JSON.parse(event.data);
+      console.log(data);
+      setMessages(prevMessages => [...prevMessages, data]);
+      setNotiNumber(prevNotiNumber => prevNotiNumber + 1); // Ensure state is updated correctly
+      document.title = `New message | ${originalTitle}`;
+    };
+
+    websocket.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    websocket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+    return () => {
+      websocket.close();
+    };
+  }, [websocketUrl]);
+
 
   useEffect(() => {
     console.log('header: ', userLogined);
@@ -197,12 +283,23 @@ export default function HeaderComponent() {
   }, []);
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [anchorEl1, setAnchorEl1] = React.useState<null | HTMLElement>(null);
+
   const isOpen = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleClickOpenNotiMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl1(event.currentTarget);
+  };
+
+  const handleCloseNotiMenu = () => {
+    setAnchorEl1(null);
   };
 
   // Logout 
@@ -211,9 +308,10 @@ export default function HeaderComponent() {
       const authToken = Cookies.get('token');
       const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.signout}`, authToken);
       if (response.status === 200) {
-        localStorage.clear();
         Cookies.remove('token');
         Cookies.remove('refreshToken');
+        Cookies.remove('userAuth');
+
         window.location.href = '/auth/signin'
 
       } else {
@@ -251,8 +349,154 @@ export default function HeaderComponent() {
     setProposalOpen(!proposalOpen);
   };
 
+  const truncateMessage = (message: string, maxLength: number = 30): string => {
+    return message.length > maxLength ? `${message.slice(0, maxLength)}...` : message;
+  };
+
+
+  interface NotificationMenuProps {
+    anchorEl: HTMLElement | null;
+    handleClose: () => void;
+    notiNumber: number;
+    messages: NotificationInterface[];
+    notificationList: NotificationInterface[];
+  }
+
+  const NotificationMenu: React.FC<NotificationMenuProps> = ({
+    anchorEl,
+    handleClose,
+    notiNumber,
+    messages,
+    notificationList,
+  }) => {
+    const __handleMaskNotiRead = async (noti: NotificationInterface) => {
+
+      try {
+        const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.notification + functionEndpoints.notification.updateReadStatus}/${noti.notificationID}`);
+        if (response.status === 200) {
+          if (noti.type === 'ORDER') {
+            window.open(`/order_detail/${noti.targetID}`, '_blank');
+          }
+          if (noti.type === 'PAYMENT') {
+            window.open(`/order_history`, '_blank');
+          }
+          if (noti.type === 'REFUND') {
+            window.open(`/refund_history`, '_blank');
+          }
+          if (noti.type === 'REPORT') {
+            window.open(`/report_history`, '_blank');
+          }
+          console.log(response.data);
+
+          window.location.reload();
+        }
+        else {
+          toast.error(`${response.message}`, { autoClose: 4000 });
+          return;
+        }
+      } catch (error) {
+        toast.error(`${error}`, { autoClose: 4000 });
+        console.log('error: ', error);
+
+      }
+    }
+    return (
+      <div className={`${styles.notiMenu_content}`}>
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleClose}
+          PaperProps={{
+            style: {
+              width: '300px',
+              maxHeight: '50vh',
+              overflowY: 'auto',
+              padding: '2px',
+              scrollbarWidth: 'none', /* For Firefox */
+              '-ms-overflow-style': 'none', /* For Internet Explorer and Edge */
+            },
+          }}
+
+        >
+          <div className={`${styles.notiMenu_content} relative`}>
+            <p style={{ position: 'absolute', top: 0, right: 10 }}>
+              <a href='/notification' style={{ color: secondaryColor, fontSize: 11, textDecorationLine: 'underline' }}>View full</a>
+            </p>
+            {messages.length > 0 && (
+              <div>
+                <span className="text-gray-500 text-sm pl-4">New notifications</span>
+                <div className="space-y-4 p-4">
+                  {messages.map((notification, index) => (
+                    <Card
+                      key={index}
+                      className="shadow-lg rounded-lg transition-shadow duration-300 hover:shadow-xl"
+                      onClick={() => __handleMaskNotiRead(notification)}
+
+                    >
+                      <CardContent>
+                        <div className="flex items-center justify-between mb-4">
+                          <span className="font-semibold text-indigo-700 text-sm">
+                            {notification.type || 'SYSTEM'}
+                          </span>
+                        </div>
+                        <Typography variant="body2" className="text-gray-700 mb-4">
+                          {truncateMessage(generateNotificationMessage(notification))}
+                        </Typography>
+                        <Typography variant="body3" className="text-gray-700 mb-4 text-sm" style={{ fontSize: 12 }}>
+                          ID: {notification.targetID}
+                        </Typography>
+                        <Typography variant="caption" className="text-gray-500">
+                          Create at: {notification.createDate}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="mt-2">
+              <span className="text-gray-500 text-sm pl-4">Old notifications ({notificationList.length})</span>
+              <div className="space-y-4 p-4">
+                {notificationList.map((notification) => (
+                  <Card
+                    key={notification.notificationID}
+                    className="shadow-lg rounded-lg transition-shadow duration-300 hover:shadow-xl"
+                    style={{ backgroundColor: !notification.status ? '#FAFAFA' : whiteColor }}
+                    onClick={() => __handleMaskNotiRead(notification)}
+
+                  >
+                    <CardContent >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-semibold text-indigo-700 text-sm" style={{ fontSize: 12 }}>
+                          {notification.type || 'SYSTEM'}
+                        </span>
+                        <span className="font-semibold text-indigo-700 text-sm" style={{ fontSize: 10, color: notification.status ? greenColor : primaryColor }}>
+                          {notification.status ? 'Read' : 'Not read'}
+                        </span>
+                      </div>
+                      <Typography variant="body2" className="text-gray-700 mb-4" style={{ fontSize: 12 }}>
+                        {truncateMessage(generateNotificationMessage(notification))}
+                      </Typography>
+                      <Typography variant="body2" className="text-gray-500 mb-4 pt-2" style={{ fontSize: 12 }}>
+                        ID: {notification.targetID}
+                      </Typography>
+                      <Typography variant="caption" className="text-gray-500" style={{ fontSize: 12 }}>
+                        Created at: {notification.createDate}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </div>
+        </Menu >
+      </div >
+    );
+  };
+
+
   return (
-    <div className={`${styles.header__container} bg-white mb-200`}>
+    <div className={`${styles.header__container} bg-white`}>
       <ToastContainer></ToastContainer>
       {/* Mobile menu */}
       <Transition.Root show={open} as={Fragment}>
@@ -294,7 +538,7 @@ export default function HeaderComponent() {
 
                 {/* Links */}
                 <Tab.Group as="div" className="mt-2">
-                  <div className="border-b border-gray-200">
+                  <div className="">
                     <Tab.List className="-mb-px flex space-x-8 px-4">
                       {navigation.categories.map((category) => (
                         <Tab
@@ -408,7 +652,7 @@ export default function HeaderComponent() {
         </p>
 
         <nav aria-label="Top" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="border-b border-gray-200">
+          <div className="">
             <div className="flex h-16 items-center">
               <button
                 type="button"
@@ -422,99 +666,12 @@ export default function HeaderComponent() {
 
               {/* Logo */}
               <div className="ml-4 flex lg:ml-0">
-                <a href="#">
+                <a href="/">
                   <img className={`${styles.logo}`} src={systemLogo} alt="" />
                 </a>
               </div>
 
-              {/* Section 2 */}
-              <Popover.Group className="hidden lg:ml-8 lg:block lg:self-stretch">
-                <div className="flex h-full space-x-8">
-                  {navigation.categories_2.map((category) => (
-                    <Popover key={category.name} className="flex">
-                      {({ open }) => (
-                        <>
-                          <div className="relative flex">
-                            <Popover.Button
-                              onClick={toggleProposal}
-                              className={classNames(
-                                open ? 'text-indigo-600 border-red-500' : 'border-transparent text-gray-700 hover:text-gray-800',
-                                'relative z-10 -mb-px flex items-center pt-px text-sm font-medium transition-colors duration-200 ease-out focus:outline-none focus:border-red-500'
-                              )}
-                            >
-                              {t(codeLanguage + `${category.number}`)}
-                            </Popover.Button>
-                          </div>
 
-                          {category.type !== 'page' && (
-                            <Transition
-                              as={Fragment}
-                              enter="transition ease-out duration-200"
-                              enterFrom="opacity-0"
-                              enterTo="opacity-100"
-                              leave="transition ease-in duration-150"
-                              leaveFrom="opacity-100"
-                              leaveTo="opacity-0"
-                            >
-                              <Popover.Panel className="absolute inset-x-0 top-full text-sm text-gray-500">
-                                <div className="absolute inset-0 top-1/2 bg-white shadow" aria-hidden="true" />
-                                <div className="relative bg-white">
-                                  <div className="mx-auto max-w-7xl px-8">
-                                    <div className="grid grid-cols-2 gap-x-8 gap-y-10 py-16">
-                                      <div className="col-start-2 grid grid-cols-2 gap-x-8">
-                                        {category?.featured?.map((item) => (
-                                          <div key={item.name} className="group relative text-base sm:text-sm">
-                                            <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
-                                              <img
-                                                src={item.imageSrc}
-                                                alt={item.imageAlt}
-                                                className="object-cover object-center"
-                                              />
-                                            </div>
-                                            <a href={item.href} className="mt-6 block font-medium text-gray-900">
-                                              <span className="absolute inset-0 z-10" aria-hidden="true" />
-                                              {item.name}
-                                            </a>
-                                            <p aria-hidden="true" className="mt-1">
-                                              Shop now
-                                            </p>
-                                          </div>
-                                        ))}
-                                      </div>
-                                      <div className="row-start-1 grid grid-cols-3 gap-x-8 gap-y-10 text-sm">
-                                        {category?.sections?.map((section) => (
-                                          <div key={section.name}>
-                                            <p id={`${section.name}-heading`} className="font-medium text-gray-900">
-                                              {section.name}
-                                            </p>
-                                            <ul
-                                              role="list"
-                                              aria-labelledby={`${section.name}-heading`}
-                                              className="mt-6 space-y-6 sm:mt-4 sm:space-y-4"
-                                            >
-                                              {section.items.map((item) => (
-                                                <li key={item.name} className="flex">
-                                                  <a href={item.href} className="hover:text-gray-800">
-                                                    {item.name}
-                                                  </a>
-                                                </li>
-                                              ))}
-                                            </ul>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </Popover.Panel>
-                            </Transition>
-                          )}
-                        </>
-                      )}
-                    </Popover>
-                  ))}
-                </div>
-              </Popover.Group>
 
               {/* Flyout menus */}
               <Popover.Group className="hidden lg:ml-8 lg:block lg:self-stretch">
@@ -536,69 +693,7 @@ export default function HeaderComponent() {
                             </a>
                           </div>
 
-                          {/* {category.type !== 'page' && (
-                            <Transition
-                              as={Fragment}
-                              enter="transition ease-out duration-200"
-                              enterFrom="opacity-0"
-                              enterTo="opacity-100"
-                              leave="transition ease-in duration-150"
-                              leaveFrom="opacity-100"
-                              leaveTo="opacity-0"
-                            >
-                              <Popover.Panel className="absolute inset-x-0 top-full text-sm text-gray-500">
-                                <div className="absolute inset-0 top-1/2 bg-white shadow" aria-hidden="true" />
-                                <div className="relative bg-white">
-                                  <div className="mx-auto max-w-7xl px-8">
-                                    <div className="grid grid-cols-2 gap-x-8 gap-y-10 py-16">
-                                      <div className="col-start-2 grid grid-cols-2 gap-x-8">
-                                        {category?.featured?.map((item) => (
-                                          <div key={item.name} className="group relative text-base sm:text-sm">
-                                            <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
-                                              <img
-                                                src={item.imageSrc}
-                                                alt={item.imageAlt}
-                                                className="object-cover object-center"
-                                              />
-                                            </div>
-                                            <a href={item.href} className="mt-6 block font-medium text-gray-900">
-                                              <span className="absolute inset-0 z-10" aria-hidden="true" />
-                                              {item.name}
-                                            </a>
-                                            <p aria-hidden="true" className="mt-1">
-                                              Shop now
-                                            </p>
-                                          </div>
-                                        ))}
-                                      </div>
-                                      <div className="row-start-1 grid grid-cols-3 gap-x-8 gap-y-10 text-sm">
-                                        {category?.sections?.map((section) => (
-                                          <div key={section.name}>
-                                            <p id={`${section.name}-heading`} className="font-medium text-gray-900">
-                                              {section.name}
-                                            </p>
-                                            <ul
-                                              role="list"
-                                              aria-labelledby={`${section.name}-heading`}
-                                              className="mt-6 space-y-6 sm:mt-4 sm:space-y-4"
-                                            >
-                                              {section.items.map((item) => (
-                                                <li key={item.name} className="flex">
-                                                  <a href={item.href} className="hover:text-gray-800">
-                                                    {item.name}
-                                                  </a>
-                                                </li>
-                                              ))}
-                                            </ul>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </Popover.Panel>
-                            </Transition>
-                          )} */}
+
                         </>
                       )}
                     </Popover>
@@ -616,17 +711,31 @@ export default function HeaderComponent() {
                     </a>
                   </div>
 
-                  {/* Cart */}
-                  <div className="ml-4 flow-root lg:ml-6">
-                    <a href="#" className="group -m-2 flex items-center p-2">
-                      <ShoppingBagIcon
-                        className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
-                        aria-hidden="true"
-                      />
-                      <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">0</span>
-                      <span className="sr-only">items in cart, view bag</span>
+                  {/* Noti */}
+                  <div className="mr-2 flow-root lg:ml-6">
+                    <a onClick={handleClickOpenNotiMenu} className="group -m-2 flex items-center p-2 cursor-pointer">
+                      <Badge badgeContent={notiNumber} color={'primary'}
+                        sx={{
+                          '& .MuiBadge-dot': {
+                            backgroundColor: notiNumber > 0 ? 'red' : 'gray',
+                          },
+                        }}>
+                        <IoMdNotifications color={notiNumber > 0 ? primaryColor : 'gray'} size={25} />
+                      </Badge>
                     </a>
+                    <NotificationMenu
+                      anchorEl={anchorEl1}
+                      handleClose={handleCloseNotiMenu}
+                      notiNumber={notiNumber}
+                      messages={messages}
+                      notificationList={notificationList}
+                    />
                   </div>
+
+                  {/* Notification Menu */}
+
+
+
 
                   {/* EN VI */}
                   <div className="ml-4 flow-root lg:ml-6">
@@ -685,8 +794,8 @@ export default function HeaderComponent() {
                       anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                     >
                       <MenuItem>
-                        <a href={"/profile"} style={{ display: "flex", textDecoration: "none" }}>
-                          <Avatar /> <p style={{ color: "black", marginTop: "4px" }}>{t(codeLanguage + '000045')}</p>
+                        <a href={"/auth/profilesetting"} style={{ display: "flex", textDecoration: "none" }}>
+                          <Avatar src={userLogined?.imageUrl} /> <p style={{ color: "black", marginTop: "4px" }}>{t(codeLanguage + '000045')}</p>
                         </a>
                       </MenuItem>
                       <Divider />
@@ -742,7 +851,7 @@ export default function HeaderComponent() {
         </nav>
       </header>
 
-    </div>
+    </div >
   )
 }
 

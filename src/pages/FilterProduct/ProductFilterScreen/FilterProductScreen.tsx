@@ -6,10 +6,12 @@ import HeaderComponent from '../../../components/Header/HeaderComponent';
 import FooterComponent from '../../../components/Footer/FooterComponent';
 import Rating from '@mui/material/Rating';
 import { useNavigate } from 'react-router-dom';
-import { ArrowUpward } from '@mui/icons-material';
-import { IconButton } from "@mui/material";
+import { DesignInterface } from '../../../models/DesignModel';
+import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
+import axios from 'axios';
+import './FilterProductStyles.scss'
+import { FaArrowUp, FaComments, FaEdit, FaImage } from 'react-icons/fa';
 
-// Fake Data to test
 const sortOptions = [
     { name: 'Most Popular', href: '#', current: true },
     { name: 'Best Rating', href: '#', current: false },
@@ -20,8 +22,6 @@ const sortOptions = [
 
 const subCategories = [
     { name: 'T-shirts', href: '#' },
-    { name: 'Pants', href: '#' },
-    { name: 'Sweaters', href: '#' },
     { name: 'Jackets', href: '#' },
 ];
 
@@ -30,12 +30,8 @@ const filters = [
         id: 'color',
         name: 'Color',
         options: [
-            { value: 'white', label: 'White', checked: false },
+            { value: '#506027', label: '#506027', checked: false },
             { value: 'beige', label: 'Beige', checked: false },
-            { value: 'blue', label: 'Blue', checked: true },
-            { value: 'brown', label: 'Brown', checked: false },
-            { value: 'green', label: 'Green', checked: false },
-            { value: 'purple', label: 'Purple', checked: false },
         ],
     },
     {
@@ -43,10 +39,7 @@ const filters = [
         name: 'Category',
         options: [
             { value: 'new-arrivals', label: 'New Arrivals', checked: false },
-            { value: 'sale', label: 'Sale', checked: false },
-            { value: 'travel', label: 'Travel', checked: true },
-            { value: 'organization', label: 'Organization', checked: false },
-            { value: 'accessories', label: 'Accessories', checked: false },
+            { value: 'sale', label: 'Sale', checked: false }
         ],
     },
     {
@@ -54,319 +47,83 @@ const filters = [
         name: 'Size',
         options: [
             { value: '2l', label: '2L', checked: false },
-            { value: '6l', label: '6L', checked: false },
-            { value: '12l', label: '12L', checked: false },
-            { value: '18l', label: '18L', checked: false },
-            { value: '20l', label: '20L', checked: false },
             { value: '40l', label: '40L', checked: true },
         ],
     },
 ];
 
-const products = [
-    {
-        id: 1,
-        name: 'Basic Tee',
-        price: '$35',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
-        imageAlt: 'A plain white t-shirt',
-        category: 'totes',
-        color: 'white',
-        popularity: 4.5,
-        rating: 4.7,
-        dateAdded: '2023-05-14',
-    },
-    {
-        id: 2,
-        name: 'Basic Sweatshirt',
-        price: '$65',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
-        imageAlt: 'A plain grey sweatshirt',
-        category: 'sale',
-        color: 'white',
-        popularity: 4.5,
-        rating: 4.7,
-        dateAdded: '2023-05-13',
-    },
-    {
-        id: 3,
-        name: 'Basic Pants',
-        price: '$50',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-02.jpg',
-        imageAlt: 'A pair of plain black pants',
-        category: 'totes',
-        color: 'white',
-        popularity: 2.5,
-        rating: 3.7,
-        dateAdded: '2023-05-12',
-    },
-    {
-        id: 4,
-        name: 'Basic Tee',
-        price: '$35',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
-        imageAlt: 'A plain white t-shirt',
-        category: 'sale',
-        color: 'white',
-        popularity: 2.5,
-        rating: 3,
-        dateAdded: '2023-05-10',
-    },
-    {
-        id: 5,
-        name: 'Basic Sweatshirt',
-        price: '$65',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
-        imageAlt: 'A plain grey sweatshirt',
-        category: 'totes',
-        color: 'white',
-        popularity: 4.5,
-        rating: 3,
-        dateAdded: '2023-05-20',
-    },
-    {
-        id: 6,
-        name: 'Basic Pants',
-        price: '$50',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-02.jpg',
-        imageAlt: 'A pair of plain black pants',
-        category: 'totes',
-        color: 'white',
-        popularity: 4.5,
-        rating: 5,
-        dateAdded: '2023-05-02',
-    },
-    {
-        id: 7,
-        name: 'Basic Tee',
-        price: '$35',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
-        imageAlt: 'A plain white t-shirt',
-        category: 'new-arrivals',
-        color: 'white',
-        popularity: 4.5,
-        rating: 5,
-        dateAdded: '2023-05-10',
-    },
-    {
-        id: 8,
-        name: 'Basic Sweatshirt',
-        price: '$65',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
-        imageAlt: 'A plain grey sweatshirt',
-        category: 'totes',
-        color: 'new-arrivals',
-        popularity: 4.5,
-        rating: 4,
-        dateAdded: '2023-05-22',
-    },
-    {
-        id: 9,
-        name: 'Basic Pants',
-        price: '$50',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-02.jpg',
-        imageAlt: 'A pair of plain black pants',
-        category: 'new-arrivals',
-        color: 'beige',
-        popularity: 4.5,
-        rating: 4,
-        dateAdded: '2023-05-21',
-    },
-    {
-        id: 10,
-        name: 'Basic Tee',
-        price: '$35',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
-        imageAlt: 'A plain white t-shirt',
-        category: 'new-arrivals',
-        color: 'white',
-        popularity: 4.5,
-        rating: 5,
-        dateAdded: '2023-05-10',
-    },
-    {
-        id: 11,
-        name: 'Basic Sweatshirt',
-        price: '$65',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
-        imageAlt: 'A plain grey sweatshirt',
-        category: 'totes',
-        color: 'new-arrivals',
-        popularity: 4.5,
-        rating: 4,
-        dateAdded: '2023-05-22',
-    },
-    {
-        id: 12,
-        name: 'Basic Pants',
-        price: '$50',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-02.jpg',
-        imageAlt: 'A pair of plain black pants',
-        category: 'new-arrivals',
-        color: 'beige',
-        popularity: 4.5,
-        rating: 4,
-        dateAdded: '2023-05-21',
-    },
-    {
-        id: 13,
-        name: 'Basic Tee',
-        price: '$35',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
-        imageAlt: 'A plain white t-shirt',
-        category: 'totes',
-        color: 'white',
-        popularity: 4.5,
-        rating: 4.7,
-        dateAdded: '2023-05-14',
-    },
-    {
-        id: 14,
-        name: 'Basic Sweatshirt',
-        price: '$65',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
-        imageAlt: 'A plain grey sweatshirt',
-        category: 'sale',
-        color: 'white',
-        popularity: 4.5,
-        rating: 4.7,
-        dateAdded: '2023-05-13',
-    },
-    {
-        id: 15,
-        name: 'Basic Pants',
-        price: '$50',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-02.jpg',
-        imageAlt: 'A pair of plain black pants',
-        category: 'totes',
-        color: 'white',
-        popularity: 2.5,
-        rating: 3.7,
-        dateAdded: '2023-05-12',
-    },
-    {
-        id: 16,
-        name: 'Basic Tee',
-        price: '$35',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
-        imageAlt: 'A plain white t-shirt',
-        category: 'sale',
-        color: 'white',
-        popularity: 2.5,
-        rating: 3,
-        dateAdded: '2023-05-10',
-    },
-    {
-        id: 17,
-        name: 'Basic Tee',
-        price: '$35',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
-        imageAlt: 'A plain white t-shirt',
-        category: 'totes',
-        color: 'white',
-        popularity: 4.5,
-        rating: 4.7,
-        dateAdded: '2023-05-14',
-    },
-    {
-        id: 18,
-        name: 'Basic Sweatshirt',
-        price: '$65',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
-        imageAlt: 'A plain grey sweatshirt',
-        category: 'sale',
-        color: 'white',
-        popularity: 4.5,
-        rating: 4.7,
-        dateAdded: '2023-05-13',
-    },
-    {
-        id: 19,
-        name: 'Basic Pants',
-        price: '$50',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-02.jpg',
-        imageAlt: 'A pair of plain black pants',
-        category: 'totes',
-        color: 'white',
-        popularity: 2.5,
-        rating: 3.7,
-        dateAdded: '2023-05-12',
-    },
-    {
-        id: 20,
-        name: 'Basic Tee',
-        price: '$35',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg',
-        imageAlt: 'A plain white t-shirt',
-        category: 'sale',
-        color: 'white',
-        popularity: 2.5,
-        rating: 3,
-        dateAdded: '2023-05-10',
-    },
-];
-
-// End Fake data to test
-
-/**
- * Combines an array of CSS class names into a single string.
- * @param {...string[]} classes - Array of CSS class names to combine.
- * @returns {string} - A string containing all the non-falsy class names separated by a space.
- */
 function classNames(...classes: string[]): string {
-    // Filter out falsy values from classes array
-    return classes.filter(Boolean)
-        // Join remaining classes with a space separator
-        .join(' ');
+    return classes.filter(Boolean).join(' ');
 }
 
 export default function FilterProductScreen() {
-    // ---------------UseState Variable---------------//
     const navigate = useNavigate();
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
     const [selectedSubCategory, setSelectedSubCategory] = useState<any>([]);
     const [selectedColors, setSelectedColors] = useState<any>([]);
     const [selectedSortOption, setSelectedSortOption] = useState('Most Popular');
-    const [showScrollButton, setShowScrollButton] = useState<boolean>(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const [productsPerPage] = useState(8);
+    const [productsPerPage, setProductsPerPage] = useState(8);
+    const [productData, setProductData] = useState<any>([]);
+    const [totalPages, setTotalPages] = useState(1);
+    const [goToPage, setGoToPage] = useState(currentPage.toString());
 
+    useEffect(() => {
+        setGoToPage(currentPage.toString());
+    }, [currentPage]);
 
+    useEffect(() => {
+        const apiUrl = `${baseURL}${versionEndpoints.v1}/${featuresEndpoints.design}${functionEndpoints.design.getAllDesign}`;
+        axios.get(apiUrl)
+            .then(response => {
+                if (response.status !== 200) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.data;
+            })
+            .then((responseData) => {
+                if (responseData && Array.isArray(responseData.data)) {
+                    setProductData(responseData.data);
+                    console.log("Data received:", responseData);
+                } else {
+                    console.error('Invalid data format:', responseData);
+                }
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    }, []);
 
-
-    // ---------------FunctionHandler---------------//
-
-    /**
-     * Handles the change event for a checkbox, updating the state based on whether the value is currently selected.
-     * @param {Function} setState - The state setter function for the selected values.
-     * @param {any} value - The value of the checkbox that was changed.
-     */
     const _handleCheckboxChange = (setState: any, value: any) => {
         setState((prevSelected: any) =>
             prevSelected.includes(value) ? prevSelected.filter((item: any) => item !== value) : [...prevSelected, value]
         );
     };
 
-    /**
-     * Filters the products based on selected subcategories and colors.
-     * @param {Array} selectedSubCategory - Array of selected subcategories to filter the products by.
-     * @param {Array} selectedColors - Array of selected colors to filter the products by.
-     */
+
 
     const filteredProducts = useMemo(() => {
-        return products.filter(
-            (product) =>
-                (selectedSubCategory.length === 0 || selectedSubCategory.includes(product.category)) &&
+        return productData.filter(
+            (product: any) =>
+                (selectedSubCategory.length === 0 || selectedSubCategory.includes(product.expertTailoring.expertTailoringName)) &&
                 (selectedColors.length === 0 || selectedColors.includes(product.color))
         );
-    }, [selectedSubCategory, selectedColors]);
+    }, [selectedSubCategory, selectedColors, productData]);
 
+    function getBasePricesForDesign(data: any, designID: any) {
+        const design = data.find((item: any) => item.designID === designID);
+        if (!design) return [];
+        return design.partOfDesign.map((part: any) => part.material.basePrice);
+    }
 
-    /**
-     * Sorts the filtered products based on the selected sorting option.
-     * @param {string} selectedSortOption - The selected sorting criteria (e.g., 'Most Popular', 'Best Rating', 'Newest', 'Price: Low to High', 'Price: High to Low').
-     * @returns {Array} sortedProducts - The products sorted according to the selected sorting criteria.
-     */
+    function sumBasePrices(prices: any) {
+        return prices.reduce((sum: any, price: any) => sum + (typeof price === 'number' ? price : 0), 0);
+    }
+
+    const getAllPrice = (product: any) => {
+        const basePrices = getBasePricesForDesign(productData, product.designID);
+        const totalBasePrice = sumBasePrices(basePrices);
+        return totalBasePrice;
+    };
+
     const sortedProducts = useMemo(() => {
         switch (selectedSortOption) {
             case 'Most Popular':
@@ -374,71 +131,78 @@ export default function FilterProductScreen() {
             case 'Best Rating':
                 return [...filteredProducts].sort((a, b) => b.rating - a.rating);
             case 'Newest':
-                return [...filteredProducts].sort((a, b) => new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime());
+                return [...filteredProducts].sort((a, b) => new Date(b.expertTailoring.createDate).getTime() - new Date(a.expertTailoring.createDate).getTime());
             case 'Price: Low to High':
-                return [...filteredProducts].sort((a, b) => parseFloat(a.price.replace('$', '')) - parseFloat(b.price.replace('$', '')));
+                return [...filteredProducts].sort((a, b) => {
+                    const aPrice = getAllPrice(a);
+                    const bPrice = getAllPrice(b);
+                    return aPrice - bPrice;
+                });
             case 'Price: High to Low':
-                return [...filteredProducts].sort((a, b) => parseFloat(b.price.replace('$', '')) - parseFloat(a.price.replace('$', '')));
+                return [...filteredProducts].sort((a, b) => {
+                    const aPrice = getAllPrice(a);
+                    const bPrice = getAllPrice(b);
+                    return bPrice - aPrice;
+                });
             default:
                 return filteredProducts;
         }
-    }, [filteredProducts, selectedSortOption]);
+    }, [filteredProducts, selectedSortOption, productData]);
 
-
-
-    /**
-     * Scrolls the window to the top smoothly.
-     */
-    const _handleScrollToTop = () => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    };
-
-    // ---------------UseEffect---------------//
-
-    /**
-     * Move to Top When scroll down
-     */
     useEffect(() => {
-        const handleScroll = () => {
-            if (window.scrollY > 200) {
-                setShowScrollButton(true);
-            } else {
-                setShowScrollButton(false);
-            }
-        };
-
-        window.addEventListener('scroll', handleScroll);
-
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-        };
-    }, []);
-
-
-    /**
-    * Call again the Number when sorting
-    */
-    useEffect(() => {
-        // Calculate the new total number of pages after filtering
-        const newTotalPages = Math.ceil(sortedProducts.length / productsPerPage);
-
-        // If the current page exceeds the new total number of pages, update the current page
-        if (currentPage > newTotalPages) {
-            setCurrentPage(newTotalPages);
-        }
+        setTotalPages(Math.ceil(sortedProducts.length / productsPerPage));
     }, [sortedProducts, productsPerPage]);
 
-    // ---------------Usable Variable---------------//
+    useEffect(() => {
+        if (currentPage > totalPages) {
+            setCurrentPage(totalPages);
+        }
+    }, [totalPages, currentPage]);
+
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
     const currentProducts = sortedProducts.slice(indexOfFirstProduct, indexOfLastProduct);
-    const paginate = (pageNumber: any) => setCurrentPage(pageNumber);
 
+    const paginate = (pageNumber: any) => {
+        const newPage = Math.max(1, Math.min(pageNumber, totalPages));
+        setCurrentPage(newPage);
+    };
+
+    const [isOpen, setIsOpen] = useState(false);
+
+    const toggleMenu = () => setIsOpen(!isOpen);
+
+    const handleScrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const handleEdit = () => {
+        console.log('Edit functionality triggered');
+        // Implement edit functionality
+    };
+
+    const handleImageUpload = () => {
+        console.log('Image upload functionality triggered');
+        // Implement image upload functionality
+    };
+
+    const handleComments = () => {
+        console.log('Comments functionality triggered');
+        // Implement comments functionality
+    };
+
+    const handleStartDesign = () => {
+        navigate('/design_create'); // Replace '/home' with the actual path to your home page
+    };
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [filteredProducts]);
 
     return (
-        <div className="bg-white" style={{ marginTop: "5%" }}>
+        <div className="bg-white" style={{ marginTop: "0" }}>
             <HeaderComponent />
-            <div>
+            <div style={{ marginTop: "-3%" }}>
                 <Transition.Root show={mobileFiltersOpen} as={Fragment}>
                     <Dialog as="div" className="relative z-40 lg:hidden" onClose={setMobileFiltersOpen}>
                         <Transition.Child
@@ -671,99 +435,136 @@ export default function FilterProductScreen() {
                                 <div className="border-b border-gray-200 pb-6 text-sm font-medium text-gray-900">
                                     Showing <span className="font-semibold">{filteredProducts.length}</span> results
                                 </div>
-                                <div className="grid grid-cols-1 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8 mt-6">
-                                    {currentProducts.map((product) => (
-                                        <div
-                                            key={product.id}
-                                            className="transition-transform duration-300 ease-in-out transform hover:scale-105"
-                                        >
-                                            <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-w-7 xl:aspect-h-8">
-                                                <img
-                                                    src={product.imageSrc}
-                                                    alt={product.imageAlt}
-                                                    className="h-full w-full object-cover object-center group-hover:opacity-75 transition-opacity duration-300"
-                                                />
+                                <div className="grid grid-cols-1 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 mt-6">
+                                    {currentProducts.map((product: any) => {
+                                        const basePrices = getBasePricesForDesign(productData, product.designID);
+                                        const totalBasePrice = sumBasePrices(basePrices);
+
+                                        return (
+                                            <div key={product.designID} className="product-card">
+                                                <div className="image-container">
+                                                    <img
+                                                        src={product.imageUrl}
+                                                        alt={product.imageAlt}
+                                                        className="product-image"
+                                                    />
+                                                    <button className="start-design-btn" onClick={handleStartDesign}>Start Design</button>
+                                                </div>
+
+                                                <div className="product-info" style={{ height: "150px" }}>
+                                                    <p className="price" style={{ color: "#FF5800", fontFamily: "monospace" }}>{totalBasePrice} VND</p>
+                                                    <p className="size">{product.titleDesign}</p>
+                                                    <p className="color">Color: {product.color}</p>
+                                                    <p className="color">Size: {product.size}</p>
+                                                </div>
+
+                                                <div className="hover-details">
+                                                    <p className="price" style={{ color: "#FF5800", fontFamily: "monospace" }}>{totalBasePrice} VND</p>
+                                                    <br></br>
+                                                    <p className="color">Size: {product.size}</p>
+                                                    <p className="color">Color: {product.color}</p>
+                                                    <p>97% polyester & 3% Spandex</p>
+                                                </div>
                                             </div>
-                                            <h3 className="mt-4 text-sm text-gray-700 group-hover:text-gray-900 transition-colors duration-300">
-                                                {product.name}
-                                            </h3>
-                                            <p className="mt-1 text-lg font-medium text-gray-900">{product.color}</p>
-                                            <div className="flex items-center mt-2">
-                                                <Rating name="half-rating" value={product.rating} readOnly />
-                                                <span className="ml-2 text-sm text-gray-600">({product.rating})</span>
-                                            </div>
-                                            <p className="mt-1 text-lg font-medium text-gray-900">{product.price}</p>
-                                            <div className="flex space-x-4 mt-4">
-                                                <button
-                                                    className="flex-1 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-600"
-                                                    onClick={() => navigate(`/detail_product/${product.id}`)}
-                                                    style={{ backgroundColor: "#ACC8E5" }}
-                                                >
-                                                    Detail
-                                                </button>
-                                                <button
-                                                    onClick={() => navigate('/design')}
-                                                    className="flex-1 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors duration-300"
-                                                    style={{ backgroundColor: "#E96208" }}>
-                                                    Design
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
 
                                 {/* Pagination */}
-                                <div className="max-w-full md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl mx-auto bg-white p-6 rounded-lg shadow-sm" style={{ marginTop: "5%" }}>
-                                    <div className="flex justify-center">
-                                        <nav className="flex space-x-2" aria-label="Pagination">
-                                            <a
-                                                href="#"
-                                                className={`relative inline-flex items-center px-4 py-2 text-sm ${currentPage === 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-gradient-to-r from-violet-300 to-indigo-300'} border border-fuchsia-100 hover:border-violet-100 text-white font-semibold leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10`}
-                                                onClick={() => {
-                                                    if (currentPage > 1) paginate(currentPage - 1);
-                                                }}
+                                <div className="flex flex-wrap items-center justify-center space-x-2 mt-8">
+                                    <select
+                                        className="border border-gray-300 rounded-md px-3 py-2 bg-white text-gray-700 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                                        value={productsPerPage}
+                                        onChange={(e) => {
+                                            setProductsPerPage(Number(e.target.value));
+                                            paginate(1);
+                                        }}
+                                    >
+                                        <option value="10">10 per page</option>
+                                        <option value="20">20 per page</option>
+                                        <option value="50">50 per page</option>
+                                    </select>
+
+                                    <div className="flex items-center space-x-1 mt-4 sm:mt-0">
+                                        <button
+                                            className={`px-3 py-2 rounded-md ${currentPage === 1
+                                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                : 'bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500'
+                                                }`}
+                                            onClick={() => { if (currentPage > 1) paginate(currentPage - 1); }}
+                                            disabled={currentPage === 1}
+                                        >
+                                            &laquo;
+                                        </button>
+
+                                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+                                            <button
+                                                key={number}
+                                                onClick={() => paginate(number)}
+                                                className={`px-3 py-2 rounded-md ${currentPage === number
+                                                    ? 'bg-orange-500 text-white'
+                                                    : 'bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500'
+                                                    }`}
                                             >
-                                                Previous
-                                            </a>
-                                            {Array.from(Array(Math.ceil(sortedProducts.length / productsPerPage)).keys()).map((number) => (
-                                                <a
-                                                    href="#"
-                                                    key={number + 1}
-                                                    onClick={() => paginate(number + 1)}
-                                                    className={`relative inline-flex items-center px-4 py-2 text-sm font-medium ${currentPage === number + 1 ? 'text-white bg-indigo-600 border-indigo-600' : 'text-gray-700 bg-white border border-fuchsia-100 hover:bg-fuchsia-200 cursor-pointer'} rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10`}
-                                                >
-                                                    {number + 1}
-                                                </a>
-                                            ))}
-                                            <a
-                                                href="#"
-                                                onClick={() => {
-                                                    if (currentPage < Math.ceil(sortedProducts.length / productsPerPage)) paginate(currentPage + 1);
-                                                }}
-                                                className={`relative inline-flex items-center px-4 py-2 text-sm ${currentPage === Math.ceil(sortedProducts.length / productsPerPage) ? 'bg-gray-300 cursor-not-allowed' : 'bg-gradient-to-r from-violet-300 to-indigo-300'} border border-fuchsia-100 hover:border-violet-100 text-white font-semibold leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10`}
-                                            >
-                                                Next
-                                            </a>
-                                        </nav>
+                                                {number}
+                                            </button>
+                                        ))}
+
+                                        <button
+                                            className={`px-3 py-2 rounded-md ${currentPage === Math.ceil(sortedProducts.length / productsPerPage)
+                                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                : 'bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500'
+                                                }`}
+                                            onClick={() => {
+                                                if (currentPage < Math.ceil(sortedProducts.length / productsPerPage)) paginate(currentPage + 1);
+                                            }}
+                                            disabled={currentPage === Math.ceil(sortedProducts.length / productsPerPage)}
+                                        >
+                                            &raquo;
+                                        </button>
+                                    </div>
+
+                                    <div className="flex items-center space-x-2 mt-4 sm:mt-0">
+                                        <span className="text-gray-600">Go to</span>
+                                        <input
+                                            type="text"
+                                            className="border border-gray-300 rounded-md w-16 px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                            value={goToPage}
+                                            onChange={(e: any) => setGoToPage(e.target.value)}
+                                            onKeyPress={(e: any) => {
+                                                if (e.key === 'Enter') {
+                                                    const page = Math.max(1, Math.min(parseInt(goToPage), totalPages));
+                                                    if (!isNaN(page)) {
+                                                        paginate(page);
+                                                    }
+                                                }
+                                            }}
+                                        />
                                     </div>
                                 </div>
                             </div>
+                            <div className="fixed bottom-4 right-4 z-50">
+                                {isOpen && (
+                                    <div className="flex flex-col-reverse mb-2 space-y-2 space-y-reverse">
+                                        <button onClick={handleScrollToTop} className="p-3 bg-white rounded-full shadow-lg">
+                                            <FaArrowUp />
+                                        </button>
+                                        <button onClick={handleEdit} className="p-3 bg-white rounded-full shadow-lg">
+                                            <FaEdit />
+                                        </button>
+                                        <button onClick={handleImageUpload} className="p-3 bg-white rounded-full shadow-lg">
+                                            <FaImage />
+                                        </button>
+                                    </div>
+                                )}
+                                <button
+                                    onClick={toggleMenu}
+                                    className="p-4 text-white bg-orange-500 rounded-full shadow-lg"
+                                >
+                                    <FaComments />
+                                </button>
+                            </div>
                         </div>
-                        {showScrollButton && (
-                            <IconButton
-                                style={{
-                                    position: 'fixed',
-                                    bottom: '20px',
-                                    right: '20px',
-                                    zIndex: 100,
-                                    backgroundColor: "#E96208",
-                                    color: "white"
-                                }}
-                                onClick={_handleScrollToTop}
-                            >
-                                <ArrowUpward />
-                            </IconButton>
-                        )}
                     </section>
                 </main>
             </div>
