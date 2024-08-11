@@ -22,6 +22,7 @@ import { __handlegetRatingStyle, __handlegetStatusBackgroundBoolean } from '../.
 import '../../../index.css'
 import Select from 'react-select';
 import { DesignInterface } from '../../../models/DesignModel';
+import { __getToken } from '../../../App';
 
 interface AccountantOrderInterface {
     orderID: string;
@@ -277,7 +278,7 @@ const BrandManageTransactionComponent: React.FC = () => {
     const __handleFetchOrderData = async (userID: any) => {
         setIsLoading(true)
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getBrandTransactions}/${userID}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getBrandTransactions}/${userID}`, null, __getToken());
             if (response.status === 200) {
                 console.log(response.data);
                 // setOrderDetailList(response.data);

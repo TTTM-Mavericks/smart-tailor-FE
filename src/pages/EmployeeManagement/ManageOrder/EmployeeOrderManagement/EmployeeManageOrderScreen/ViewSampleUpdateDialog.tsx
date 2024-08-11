@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Dialog, Tabs, Tab } from '@mui/material';
-import { FaTimes, FaClipboardCheck, FaUser, FaBuilding, FaCalendar, FaCalendarCheck, FaGlasses } from 'react-icons/fa';
+import { FaTimes, FaClipboardCheck, FaUser, FaBuilding, FaCalendar, FaCalendarCheck } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import api, { versionEndpoints, featuresEndpoints, functionEndpoints } from '../../../../../api/ApiConfig';
 import { toast } from 'react-toastify';
-import { SampleModelInterface, StageInterface } from '../../../../../models/OrderModel';
+import { SampleModelInterface } from '../../../../../models/OrderModel';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
+import { __getToken } from '../../../../../App';
 
 type Props = {
     isOpen: boolean;
@@ -14,14 +15,26 @@ type Props = {
     brandID?: any;
 };
 
-const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID, brandID }) => {
+const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID }) => {
     const [sampleProductData, setSampleProductData] = useState<SampleModelInterface[]>([]);
     const [activeTab, setActiveTab] = useState(0);
+    const [groupedData, setGroupedData] = useState<{ [key: string]: SampleModelInterface[] }>({});
 
     useEffect(() => {
         if (!isOpen) return;
         __handleFetchOrderData();
     }, [isOpen]);
+
+    useEffect(() => {
+        // Group the data by stage whenever sampleProductData changes
+        const grouped = sampleProductData.reduce((acc: any, item) => {
+            const stage = item.stage || 'Unknown';
+            if (!acc[stage]) acc[stage] = [];
+            acc[stage].push(item);
+            return acc;
+        }, {});
+        setGroupedData(grouped);
+    }, [sampleProductData]);
 
     const __handleFetchOrderData = async () => {
         try {
@@ -36,7 +49,7 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID, bra
             toast.error(`${error}`, { autoClose: 4000 });
             console.log(error);
         }
-    }
+    };
 
     const __handleSchangeStatusOfSampleProduct = async (childID: any, itemSample: SampleModelInterface) => {
         console.log('itemSample', itemSample);
@@ -49,11 +62,11 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID, bra
                 imageUrl: itemSample.imageUrl || '',
                 video: itemSample.video || '',
                 status: true,
-            }
+            };
 
             console.log('bodyRequest: ', bodyRequest);
 
-            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.SampleProduct + functionEndpoints.SampleProduct.updateSampleProductStatus}/${itemSample.sampleModelID}`, bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.SampleProduct + functionEndpoints.SampleProduct.updateSampleProductStatus}/${itemSample.sampleModelID}`, bodyRequest, __getToken());
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
                 console.log(response.message);
@@ -67,16 +80,16 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID, bra
             console.log(error);
             toast.error(`${error}`, { autoClose: 4000 });
         }
-    }
+    };
 
     const __handelUpdateOrderState = async (orderParentID: any, itemData: SampleModelInterface) => {
         try {
             const bodyRequest = {
                 orderID: orderParentID,
                 status: itemData.stage
-            }
+            };
             console.log('bodyRequest 2: ', bodyRequest);
-            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest, __getToken());
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
                 toast.success(`${response.message}`, { autoClose: 4000 });
@@ -88,7 +101,7 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID, bra
             console.log('error: ', error);
             toast.error(`${error}`, { autoClose: 4000 });
         }
-    }
+    };
 
     return (
         <Dialog open={isOpen} maxWidth="lg" fullWidth>
@@ -106,13 +119,6 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID, bra
                     className="relative bg-white w-full max-w-4xl rounded-xl shadow-2xl p-8 max-h-[90vh] overflow-y-auto"
                     onClick={(e: any) => e.stopPropagation()}
                 >
-                    {/* <button
-                        onClick={onClose}
-                        className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition duration-150"
-                        aria-label="Close modal"
-                    >
-                        <FaTimes size={24} />
-                    </button> */}
                     <IoMdCloseCircleOutline
                         cursor="pointer"
                         size={20}
@@ -125,12 +131,12 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID, bra
                     <div className="flex justify-between items-center mb-6 bg-indigo-50 p-4 rounded-lg">
                         <div className="flex items-center">
                             <FaClipboardCheck className="text-indigo-500 mr-2" size={20} />
-                            <span className=" text-sm font-semibold text-gray-700">Order ID:</span>
+                            <span className="text-sm font-semibold text-gray-700">Order ID:</span>
                             <p className="text-sm font-bold text-indigo-700 ml-2">{orderID}</p>
                         </div>
                     </div>
 
-                    {sampleProductData && sampleProductData.length > 0 ? (
+                    {Object.keys(groupedData).length > 0 ? (
                         <>
                             <Tabs
                                 value={activeTab}
@@ -139,14 +145,16 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID, bra
                                 scrollButtons="auto"
                                 className="mb-6"
                             >
-                                {sampleProductData.map((item, index) => (
-                                    <Tab key={item.sampleModelID} label={`Sample ${index + 1}`} />
+                                {Object.keys(groupedData).map((stage, index) => (
+                                    <Tab key={stage} label={stage} />
                                 ))}
                             </Tabs>
 
-                            {sampleProductData.map((item, index) => (
-                                <TabPanel key={item.sampleModelID} value={activeTab} index={index}>
-                                    <SampleCard item={item} onAccept={(item) => __handleSchangeStatusOfSampleProduct(item.orderID, item)} onReject={onClose} />
+                            {Object.entries(groupedData).map(([stage, items], index) => (
+                                <TabPanel key={stage} value={activeTab} index={index}>
+                                    {items.map((item) => (
+                                        <SampleCard key={item.sampleModelID} item={item} onAccept={() => __handleSchangeStatusOfSampleProduct(item.orderID, item)} onReject={onClose} />
+                                    ))}
                                 </TabPanel>
                             ))}
                         </>
@@ -169,7 +177,7 @@ const TabPanel: React.FC<{ children: React.ReactNode; value: number; index: numb
 
 const SampleCard: React.FC<{ item: SampleModelInterface; onAccept: (item: SampleModelInterface) => void; onReject?: () => void }> = ({ item, onAccept, onReject }) => {
     return (
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-10">
             <h3 className="text-sm font-semibold text-indigo-700 mb-4">Sample Model ID: {item.sampleModelID}</h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -191,7 +199,7 @@ const SampleCard: React.FC<{ item: SampleModelInterface; onAccept: (item: Sample
 
             <div className="mb-6">
                 <h4 className="text-lg font-semibold text-gray-700 mb-2">Description</h4>
-                <p className="text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-200 shadow-inner">
+                <p className="text-gray-600">
                     {item.description}
                 </p>
             </div>
@@ -223,19 +231,21 @@ const SampleCard: React.FC<{ item: SampleModelInterface; onAccept: (item: Sample
             </div>
 
             {!item.status && (
-
-                <div className="flex justify-end space-x-4 mt-6">
-                    <button
-                        onClick={onReject}
-                        className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-150 focus:outline-none focus:ring-2 focus:ring-red-400"
-                    >
-                        Reject
-                    </button>
+                <div className="flex justify-center items-center space-x-4 mt-6">
                     <button
                         onClick={() => onAccept(item)}
-                        className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-150 focus:outline-none focus:ring-2 focus:ring-green-400"
+                        className="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-lg flex items-center justify-center space-x-2"
                     >
-                        Accept
+                        <FaClipboardCheck />
+                        <span>Accept</span>
+                    </button>
+
+                    <button
+                        onClick={onReject}
+                        className="bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-lg flex items-center justify-center space-x-2"
+                    >
+                        <FaTimes />
+                        <span>Reject</span>
                     </button>
                 </div>
             )}

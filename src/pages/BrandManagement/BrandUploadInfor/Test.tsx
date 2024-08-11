@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { SampleModelInterface } from '../../../models/OrderModel';
 import { toast } from 'react-toastify';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
+import { __getToken } from '../../../App';
 
 
 type Props = {
@@ -46,7 +47,7 @@ const ViewSampleBrandUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID
                 status: 'START_PRODUCING'
             }
             console.log('bodyRequest: ', bodyRequest);
-            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest, __getToken());
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
                 toast.success(`${response.message}`, { autoClose: 4000 });

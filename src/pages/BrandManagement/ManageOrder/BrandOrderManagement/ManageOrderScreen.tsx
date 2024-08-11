@@ -24,6 +24,7 @@ import { EstimatedStageInterface } from '../../../Order/OrderDetail/OrderDetailS
 import Select from 'react-select';
 import { DataGrid, GridColDef, GridRenderCellParams, GridToolbar } from '@mui/x-data-grid';
 import { tokens } from '../../../../theme';
+import { __getToken } from '../../../../App';
 
 /**
  * 
@@ -240,7 +241,7 @@ const BrandOrderFields: React.FC<{
     const __handleLoadProgressStep = async (subOrderId: any) => {
         setIsLoading(true);
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderStageById}/${subOrderId}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderStageById}/${subOrderId}`, null, __getToken());
             if (response.status === 200) {
                 setIsLoading(false);
                 const sortedData = sortStages(response.data);
@@ -260,7 +261,7 @@ const BrandOrderFields: React.FC<{
 
     const __handleFetchTimeLine = async (parentId: any) => {
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderTimeLineByParentId}/${parentId}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderTimeLineByParentId}/${parentId}`, null, __getToken());
             if (response.status === 200) {
                 setIsLoading(false);
                 setTimeLine(response.data);
@@ -315,7 +316,7 @@ const BrandOrderFields: React.FC<{
                 status: step
             }
             console.log('bodyRequest: ', bodyRequest);
-            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest, __getToken());
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
                 setIsLoading(false);
@@ -357,7 +358,7 @@ const BrandOrderFields: React.FC<{
         setIsDialogOpen(true);
 
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderStageById}/${orderID}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderStageById}/${orderID}`, null, __getToken());
             if (response.status === 200) {
                 setIsLoading(false);
                 const sortedData = sortStages(response.data);
@@ -396,7 +397,7 @@ const BrandOrderFields: React.FC<{
                 status: 'CANCEL'
             }
             console.log('bodyRequest: ', bodyRequest);
-            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest, __getToken());
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
                 toast.success(`${response.message}`, { autoClose: 4000 });
@@ -477,7 +478,7 @@ const BrandOrderFields: React.FC<{
                 <DesignDetails design={designDetails} />
             )}
             <div className="mt-6 flex justify-end">
-                {order.orderStatus === 'CHECKING_SAMPLE_DATA' && (
+                {/* {order.orderStatus === 'CHECKING_SAMPLE_DATA' && (
                     <>
                         <button
                             onClick={() => __handleOpenInputSampleProductDialog(order.orderID)}
@@ -493,7 +494,7 @@ const BrandOrderFields: React.FC<{
                             <BrandUpdateSampleProductDialog stageID={stageIdStart} isOpen={isDialogOpen} orderID={order.orderID} brandID={userAuth?.userID} onClose={__handleCloseInputSampleProductDialog}></BrandUpdateSampleProductDialog>
                         )}
                     </>
-                )}
+                )} */}
 
                 {order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCEL' && (
 
@@ -630,7 +631,7 @@ const BrandOrderFields: React.FC<{
                                     {progressSteps?.map((step, index) => {
                                         // const isCompleted = index < step.indexOf(order.orderStatus) + 1;
                                         // const isCurrent = index === progressSteps.indexOf(step.status) + 1;
-                                        const isClickable = index >= 1 && index <= 99;
+                                        const isClickable = !step.status;
                                         return (
                                             <p key={index} className={`text-center `}>
                                                 <button
@@ -937,7 +938,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
                 status: 'CANCEL'
             }
             console.log('bodyRequest: ', bodyRequest);
-            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest, __getToken());
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
                 toast.success(`${response.message}`, { autoClose: 4000 });
@@ -960,7 +961,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
         setIsDialogOpen(true);
 
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderStageById}/${orderID}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderStageById}/${orderID}`, null, __getToken());
             if (response.status === 200) {
                 setIsLoading(false);
                 const sortedData = sortStages(response.data);
@@ -986,7 +987,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
     const __handleLoadProgressStep = async (subOrderId: any) => {
         setIsLoading(true);
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderStageById}/${subOrderId}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderStageById}/${subOrderId}`, null, __getToken());
             if (response.status === 200) {
                 setIsLoading(false);
                 const sortedData = sortStages(response.data);
@@ -1005,7 +1006,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
     }
     const __handleFetchTimeLine = async (parentId: any) => {
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderTimeLineByParentId}/${parentId}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderTimeLineByParentId}/${parentId}`, null, __getToken());
             if (response.status === 200) {
                 setIsLoading(false);
                 setTimeLine(response.data);
@@ -1235,7 +1236,11 @@ const BrandManageOrder: React.FC = () => {
         const userParse: UserInterface = JSON.parse(userStorage)
         const apiUrl = `${baseURL}${versionEndpoints.v1}${featuresEndpoints.order}${functionEndpoints.order.getOrderByBrandId}/${userParse.userID}`;
         console.log(apiUrl);
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`,  // Add the Bearer token here
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');
@@ -1400,13 +1405,13 @@ const BrandManageOrder: React.FC = () => {
                                             className={`px-4 py-2 ${!isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'}`}
                                             onClick={() => setIsTableView(false)}
                                         >
-                                            Card
+                                            Card mode
                                         </button>
                                         <button
                                             className={`px-4 py-2 ${isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'}`}
                                             onClick={() => setIsTableView(true)}
                                         >
-                                            Table
+                                            List mode
                                         </button>
                                     </div>
                                 </div>

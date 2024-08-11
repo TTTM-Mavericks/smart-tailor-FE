@@ -208,7 +208,7 @@ const DesignCollectionScreen = () => {
                             <a href="/auth/profilesetting" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
                                 Account Settings
                             </a>
-                            <a href="#" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
+                            <a href="/notification" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
                                 Notifications
                             </a>
                             <a href="/order_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">

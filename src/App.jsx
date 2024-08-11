@@ -43,7 +43,8 @@ import { DashboardAccountantScreens } from './pages/AccountantManagement';
 import ToogleComponent from './pages/AccountantManagement/GlobalComponent/Toogle/ToogleComponent';
 import ReportHistorySreen from './pages/Order/ReportHistory/ReportHistorySreen';
 import AboutUs from './pages/AboutUs/test';
-import { NotificationComponent } from './components/Notification/NotificationComponent';
+import NotificationComponent from './components/Notification/NotificationComponent';
+
 
 
 
@@ -99,6 +100,20 @@ const ConditionalTokenRefreshDialog = () => {
   return !shouldHide ? <TokenRefreshDialogComponent /> : null;
 };
 
+export const __getToken = () => {
+  const tokenStorage = Cookies.get('token');
+  if (!tokenStorage) {
+    return;
+  } else
+    return tokenStorage
+}
+
+export const __getUserLogined = () => {
+  const userAuth = localStorage.getItem('userAuth');
+  if (userAuth) {
+    return userParse = JSON.parse(userAuth);
+  } else return;
+}
 
 function App() {
   return (

@@ -5,6 +5,7 @@ import style from './BrandUploadProgcessSampleProductStyle.module.scss';
 import { primaryColor, secondaryColor } from '../../../../../root/ColorSystem';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { toast } from 'react-toastify';
+import { __getToken } from '../../../../../App';
 
 type Props = {
     isOpen: boolean;
@@ -122,7 +123,7 @@ const BrandUploadProgcessSampleProduct: React.FC<Props> = ({ isOpen, onClose, or
                 status: step
             }
             console.log('bodyRequest: ', bodyRequest);
-            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest, __getToken());
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
                 toast.success(`${response.message}`, { autoClose: 4000 });

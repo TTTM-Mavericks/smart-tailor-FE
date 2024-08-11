@@ -10,6 +10,7 @@ import { greenColor, redColor, secondaryColor } from '../../../root/ColorSystem'
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import Cookies from 'js-cookie';
 import { UserInterface } from '../../../models/UserModel';
+import { __getToken } from '../../../App';
 
 const getStatusColor = (status: string) => {
     switch (status) {
@@ -85,7 +86,7 @@ const OrderReport: React.FC<{
             >
                 View Details
             </button>
-            
+
         </div>
     </div>
 );
@@ -155,7 +156,7 @@ const ReportModal: React.FC<{ report: Report; onClose: () => void; onMarkResolve
                     <div className="flex items-center">
                         <FaClipboardCheck className="text-indigo-500 mr-2" size={20} />
                         <span className=" text-sm font-semibold text-gray-700">Order ID:</span>
-                    <p className="text-sm font-bold text-indigo-700 ml-2">{report.reportID}</p>
+                        <p className="text-sm font-bold text-indigo-700 ml-2">{report.reportID}</p>
                     </div>
                 </div>
 
@@ -252,13 +253,18 @@ const ReportHistoryComponent: React.FC = () => {
         { value: 'Order Status', label: 'Order Status' }
     ];
     useEffect(() => {
-
         const userStorage = Cookies.get('userAuth');
         if (!userStorage) return;
         const userParse: UserInterface = JSON.parse(userStorage);
-
+        console.log('token: ', __getToken());
         const apiUrl = `${baseURL}${versionEndpoints.v1}${featuresEndpoints.report}${functionEndpoints.report.getReportByUserID}/${userParse.userID}`;
-        axios.get(apiUrl)
+        axios.get(apiUrl,
+            {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`,
+                }
+            }
+        )
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');
