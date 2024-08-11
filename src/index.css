@@ -2,13 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: light;
-  color: rgba(255, 255, 255, 0.87);
+  color: rgba(0, 0, 0, 0.87);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -33,4 +34,46 @@
 body {
   margin: 0;
   place-items: center;
+}
+
+.rating-red {
+  color: red;
+  animation: glitter 5s infinite;
+  font-weight: bold;
+}
+
+.rating-orange {
+  color: orange;
+  animation: glitter 5s infinite;
+  font-weight: bold;
+
+}
+
+.rating-yellow {
+  color: rgb(172, 39, 141);
+  animation: glitter 5s infinite;
+  font-weight: bold;
+
+}
+
+.rating-green {
+  color: green;
+  animation: glitter 5s infinite;
+  font-weight: bold;
+
+}
+
+.rating-default {
+  color: black;
+  font-weight: bold;
+
+}
+
+@keyframes glitter {
+  0% { text-shadow: 0 0 5px #fff; }
+  20% { text-shadow: 0 0 10px #f3e9ab; }
+  40% { text-shadow: 0 0 15px #ffdf00; }
+  60% { text-shadow: 0 0 20px #fff; }
+  80% { text-shadow: 0 0 25px #ffdf00; }
+  100% { text-shadow: 0 0 30px #fff; }
 }

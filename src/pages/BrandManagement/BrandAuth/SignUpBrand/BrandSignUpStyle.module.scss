@@ -1,0 +1,101 @@
+@import '../../../../index.module.scss';
+
+.signup__container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    // background: linear-gradient(155deg, rgba(233, 116, 35, 0.7) 0%, rgba(233, 116, 35, 0.7) 38.500080333246004%, rgba(235, 235, 235, 0.7) 74.85924410434251%, rgba(248, 248, 248, 0.7) 100%);
+    display: flex;
+}
+
+@keyframes moveUpDown {
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+.signup__backGround {
+    width: 60%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: moveUpDown 2s ease-in-out infinite;
+
+    img {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.signup__box {
+    width: 40%;
+    margin: 0 auto;
+    height: 100%;
+    // width: 30vw;
+    // background: linear-gradient(155deg, rgba(233, 116, 35, 0.7) 0%, rgba(233, 116, 35, 0.7) 38.500080333246004%, rgba(235, 235, 235, 0.7) 74.85924410434251%, rgba(248, 248, 248, 0.7) 100%);
+    // border-radius: 20px;
+}
+
+.signup__input:focus {
+    outline: auto;
+    outline-color: $primaryColor;
+
+}
+
+.language__button {
+    display: flex;
+    width: 100%;
+}
+
+.language__button span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-left: 10px;
+}
+
+.language__button :hover {
+    background-color: rgb(237, 237, 237);
+}
+
+.icon_language {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    float: right;
+    align-items: flex-end;
+}
+
+.signup__btn {
+    background-color: $primaryColor;
+}
+
+.signup__btn:hover {
+    scale: 1.02;
+    transition: 0.3s;
+}
+
+.signupGoogle__btn {
+    background-color: $secondaryColor;
+}
+
+.signupGoogle__btn:hover {
+    scale: 1.02;
+    transition: 0.3s;
+}
+
+.error__txt {
+    color: $errorColor;
+    font-size: 12px;
+}

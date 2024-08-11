@@ -1,0 +1,12 @@
+@import '../../../../index.module.scss';
+
+.verticalStepper__container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &__typography {
+
+        font-size: 12px;
+        font-weight: bold;
+    }
+}
