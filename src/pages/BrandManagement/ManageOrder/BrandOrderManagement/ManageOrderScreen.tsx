@@ -264,7 +264,7 @@ const BrandOrderFields: React.FC<{
             const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderTimeLineByParentId}/${parentId}`, null, __getToken());
             if (response.status === 200) {
                 setIsLoading(false);
-                // setTimeLine(response.data);
+                setTimeLine(response.data);
             }
             else {
                 console.log('detail error: ', response.message);
