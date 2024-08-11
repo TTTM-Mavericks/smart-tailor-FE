@@ -500,7 +500,7 @@ const BrandOrderFields: React.FC<{
 
                     <button
                         onClick={() => __handleOpenReportDialog()}
-                        className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4"
+                        className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4 mb-2"
                         style={{
                             borderRadius: 4,
                             backgroundColor: redColor
@@ -533,7 +533,7 @@ const BrandOrderFields: React.FC<{
                 {order.orderStatus !== 'CANCEL' && order.orderStatus !== 'COMPLETED' && (
                     <button
                         onClick={() => __handleOpenUpdateProcessDialog(order)}
-                        className="bg-green-500 text-sm text-white px-4 py-2  hover:bg-green-600 transition duration-300"
+                        className="bg-green-500 text-sm text-white px-4 py-2  hover:bg-green-600 transition duration-300 mb-2"
                         style={{
                             borderRadius: 4,
                             backgroundColor: greenColor

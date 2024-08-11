@@ -342,7 +342,7 @@ const EmployeeOrderFields: React.FC<{
 
                     <button
                         onClick={() => __handleOpenReportDialog()}
-                        className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4"
+                        className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4 mb-2"
                         style={{
                             borderRadius: 4,
                             backgroundColor: redColor
