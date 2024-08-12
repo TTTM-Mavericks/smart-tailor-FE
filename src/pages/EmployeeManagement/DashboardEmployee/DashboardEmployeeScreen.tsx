@@ -8,6 +8,7 @@ import EmployeeManageOrder from '../ManageOrder/EmployeeOrderManagement/Employee
 import EmployeeManageTransaction from '../ManageTransaction/EmployeeTransactionManagement/EmployeeManageTransactionScreen/ManageTransactionScreen';
 import ManageNotificationScreens from '../ManageNotification/ManageNotificationScreens';
 import EmployeeProfileSetup from '../EmployeeProfile/EmployeeProfileComponent';
+import NotificationEmployeeComponent from '../GlobalComponent/Notification/NotificationEmployeeComponent';
 
 const DashboardEmployeeScreens = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -91,7 +92,7 @@ const DashboardEmployeeScreens = () => {
             case 'employee_manage_transaction':
                 return <EmployeeManageTransaction />;
             case 'employee_manage_notification':
-                return <ManageNotificationScreens />;
+                return <NotificationEmployeeComponent />;
             case 'employee_profile':
                 return <EmployeeProfileSetup />;
             default:

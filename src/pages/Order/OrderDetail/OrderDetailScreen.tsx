@@ -27,7 +27,8 @@ import { Report } from '../../../models/EmployeeManageReportModel';
 import { ghtkLogo } from '../../../assets';
 import { height } from '@mui/system';
 import CustomerUpgradeDialog from '../../../components/Dialog/UpgradeDialog/CustomerUpgradeDialog';
-import { __getToken } from '../../../App';
+import { __getToken, __getUserLogined } from '../../../App';
+import { __handleSendNotification } from '../../../utils/NotificationUtils';
 
 
 export interface EstimatedStageInterface {
@@ -342,6 +343,19 @@ const OrderDetailScreen: React.FC = () => {
                 console.log('detail order: ', response.data);
                 setIsLoading(false);
                 toast.success(`${response.message}`, { autoClose: 4000 });
+
+                const user: UserInterface = __getUserLogined();
+                const bodyRequest = {
+                    senderID: user.userID,
+                    recipientID: orderDetail?.employeeID,
+                    action: "CANCEL",
+                    type: "ORDER",
+                    targetID: orderDetail?.orderID,
+                    message: ""
+                }
+                console.log(bodyRequest);
+                __handleSendNotification(bodyRequest);
+
                 setTimeout(() => {
                     window.location.reload();
                 }, 2000);
@@ -865,6 +879,7 @@ const OrderDetailScreen: React.FC = () => {
                 orderID={orderDetail?.orderID}
                 onClose={__handleCloseReportDialog}
                 isOpen={isOpenReportOrderDialog}
+                order={orderDetail}
             ></CustomerReportOrderDialogComponent>
 
             <CustomerReportOrderDialogComponent

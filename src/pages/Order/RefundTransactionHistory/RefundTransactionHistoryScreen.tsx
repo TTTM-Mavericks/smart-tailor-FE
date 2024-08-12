@@ -301,6 +301,9 @@ const RefundTransactionHistoryScreen: React.FC = () => {
                             <a href="/refund_history" className="px-4 py-3 font-semibold text-orange-900 bg-white border border-orange-100 rounded-lg hover:bg-orange-50">
                                 Refund Transaction
                             </a>
+                            <a href="/transaction_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
+                                Trandsactions
+                            </a>
                             <a href="/collection" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
                                 Collection
                             </a>

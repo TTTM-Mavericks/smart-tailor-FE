@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Chip, CircularProgress, IconButton } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
 import { greenColor, primaryColor, redColor, secondaryColor, whiteColor } from '../../../root/ColorSystem';
-import style from './BrandManageTransactionComponentStyle.module.scss'
+import style from './AllTransactionHistoryComponentStyle.module.scss'
 import { OrderDetailInterface, PaymentInterface } from '../../../models/OrderModel';
 import { fontWeight, Stack } from '@mui/system';
 import { FaAngleDown } from "react-icons/fa";
@@ -16,13 +16,14 @@ import Cookies from 'js-cookie';
 import { UserInterface } from '../../../models/UserModel';
 import { __handleAddCommasToNumber } from '../../../utils/NumbericUtils';
 import { Listbox, Transition } from '@headlessui/react';
-import PaymentInformationDialogComponent from '../../Order/Components/Dialog/PaymentInformationDialog/PaymentInformationDialogComponent';
+import PaymentInformationDialogComponent from '../Components/Dialog/PaymentInformationDialog/PaymentInformationDialogComponent';
 import PaymentFromAccountantToBranđialog from '../../../components/Dialog/PaymentDialog/PaymentFromAccountantToBranđialog';
 import { __handlegetRatingStyle, __handlegetStatusBackgroundBoolean } from '../../../utils/ElementUtils';
 import '../../../index.css'
 import Select from 'react-select';
 import { DesignInterface } from '../../../models/DesignModel';
 import { __getToken } from '../../../App';
+import HeaderComponent from '../../../components/Header/HeaderComponent';
 
 interface AccountantOrderInterface {
     orderID: string;
@@ -184,7 +185,7 @@ interface Transaction {
 
 // TODO MUTIL LANGUAGE
 
-const BrandManageTransactionComponent: React.FC = () => {
+const AllTransactionHistoryComponent: React.FC = () => {
     // ---------------UseState---------------//
     const [showScrollButton, setShowScrollButton] = useState<boolean>(false);
     const [isOpenPaymentInforDialog, setIsOpenPaymentInformationDialog] = useState<boolean>(false);
@@ -385,58 +386,6 @@ const BrandManageTransactionComponent: React.FC = () => {
     }, [selectedLanguage, i18n]);
 
 
-    const __handleOpenPaymentDialog = (paymentId: any) => {
-        setIsOpenPaymentDialog({ [paymentId]: true })
-    }
-
-    const __handleClosePaymentDialog = (paymentId: any) => {
-        setIsOpenPaymentDialog({ [paymentId]: false })
-    }
-
-
-    const renderDropdown = (selected: string, setSelected: React.Dispatch<React.SetStateAction<string>>) => (
-        <Listbox value={selected} onChange={setSelected} >
-            <div className="relative" style={{ zIndex: 30 }}>
-                <Listbox.Button className={`${style.button} flex items-center`}>
-                    {selected}
-                    <FaAngleDown className="ml-2 w-4 h-4" aria-hidden="true" />
-                </Listbox.Button>
-                <Transition
-                    as={React.Fragment}
-                    leave="transition ease-in duration-100"
-                    leaveFrom="opacity-100"
-                    leaveTo="opacity-0"
-                >
-                    <Listbox.Options className="absolute mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                        {options.map((option, idx) => (
-                            <Listbox.Option
-                                key={idx}
-                                className={({ active }) =>
-                                    `cursor-pointer select-none relative py-2 pl-10 pr-4 ${active ? 'text-amber-900 bg-amber-100' : 'text-gray-900'}`
-                                }
-                                style={{ zIndex: 30 }}
-                                value={option}
-                            >
-                                {({ selected, active }) => (
-                                    <>
-                                        <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
-                                            {option}
-                                        </span>
-                                        {selected ? (
-                                            <span className={`absolute inset-y-0 left-0 flex items-center pl-3 ${active ? 'text-amber-600' : 'text-amber-600'}`}>
-                                                {/* <CheckIcon className="w-5 h-5" aria-hidden="true" /> */}
-                                            </span>
-                                        ) : null}
-                                    </>
-                                )}
-                            </Listbox.Option>
-                        ))}
-                    </Listbox.Options>
-                </Transition>
-            </div>
-        </Listbox>
-    );
-
     const __handleOpenPaymentForBrandialog = (orderId: any) => {
         setSelectedTransaction(orderId);
         setIsOpenPaymentForBrandDialog(true);
@@ -475,10 +424,46 @@ const BrandManageTransactionComponent: React.FC = () => {
 
     return (
         <div>
+            <HeaderComponent />
             <LoadingComponent isLoading={isLoading}></LoadingComponent>
             {/* <ToastContainer></ToastContainer> */}
-            <div className={`${style.orderHistory__container}`} style={{marginTop: -50}}>
+            <div className={`${style.orderHistory__container}`}>
+                <aside className={`${style.orderHistory__container__menuBar}`}>
+                    <div className="sticky top-20 p-4 text-sm border-r border-gray-200 h-full mt-10">
+                        <nav className="flex flex-col gap-3">
+                            <a href="/auth/profilesetting" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
+                                Account Settings
+                            </a>
+                            <a href="/notification" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
+                                Notifications
+                            </a>
+                            <a href="/order_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
+                                Order History
+                            </a>
+                            <a href="/report_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
+                                Report History
+                            </a>
+                            <a href="/refund_history" className="px-4 py-3 font-semibold text-orange-900 bg-white border border-orange-100 rounded-lg hover:bg-orange-50">
+                                Refund Transaction
+                            </a>
+                            <a href="/transaction_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
+                                Trandsactions
+                            </a>
+                            <a href="/collection" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
+                                Collection
+                            </a>
+                        </nav>
+                    </div>
+                </aside>
                 <div style={{ width: '100%' }} className="max-w-6xl mx-auto p-4 md:p-6 min-h-screen">
+                    <div className={`${style.gradientBackground}`}>
+                        <p className={style.textStyle}>Refund history</p>
+                    </div>
+                    <div className={` inline-flex items-center rounded-md bg-yellow-50 px-2 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10 mt-10`}>
+                        <span>
+                            {t(codeLanguage + '000199')}
+                        </span>
+                    </div>
                     <div className="mb-6">
                         <label htmlFor="filterSelect" className="block mb-2 text-lg font-semibold text-gray-700">Select Filters</label>
                         <Select
@@ -493,6 +478,36 @@ const BrandManageTransactionComponent: React.FC = () => {
                             }}
                         />
                     </div>
+
+                    {selectedFilters.includes('Order ID') && (
+                        <div className="filter-item">
+                            <label htmlFor="orderIdFilter" className="block mb-2 text-sm font-medium text-gray-700">Order ID</label>
+                            <input
+                                type="text"
+                                id="orderIdFilter"
+                                name="orderID"
+                                value={filters.orderID}
+                                onChange={handleFilterChange}
+                                placeholder="Enter Order ID"
+                                className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
+                            />
+                        </div>
+                    )}
+
+                    {selectedFilters.includes('Payment ID') && (
+                        <div className="filter-item">
+                            <label htmlFor="orderIdFilter" className="block mb-2 text-sm font-medium text-gray-700">Payment ID</label>
+                            <input
+                                type="text"
+                                id="paymentIDFilter"
+                                name="paymentID"
+                                value={filters.paymentID}
+                                onChange={handleFilterChange}
+                                placeholder="Enter Order ID"
+                                className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
+                            />
+                        </div>
+                    )}
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
                         {selectedFilters.includes('Date') && (
@@ -509,35 +524,6 @@ const BrandManageTransactionComponent: React.FC = () => {
                             </div>
                         )}
 
-                        {selectedFilters.includes('Order ID') && (
-                            <div className="filter-item">
-                                <label htmlFor="orderIdFilter" className="block mb-2 text-sm font-medium text-gray-700">Order ID</label>
-                                <input
-                                    type="text"
-                                    id="orderIdFilter"
-                                    name="orderID"
-                                    value={filters.orderID}
-                                    onChange={handleFilterChange}
-                                    placeholder="Enter Order ID"
-                                    className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
-                                />
-                            </div>
-                        )}
-
-                        {selectedFilters.includes('Payment ID') && (
-                            <div className="filter-item">
-                                <label htmlFor="orderIdFilter" className="block mb-2 text-sm font-medium text-gray-700">Payment ID</label>
-                                <input
-                                    type="text"
-                                    id="paymentIDFilter"
-                                    name="paymentID"
-                                    value={filters.paymentID}
-                                    onChange={handleFilterChange}
-                                    placeholder="Enter Order ID"
-                                    className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
-                                />
-                            </div>
-                        )}
 
                         {selectedFilters.includes('Order Status') && (
                             <div className="filter-item">
@@ -550,8 +536,8 @@ const BrandManageTransactionComponent: React.FC = () => {
                                     className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
                                 >
                                     <option value="">All Order Statuses</option>
-                                    <option value={'true'}>Paid</option>
-                                    <option value={'false'}>Pending</option>
+                                    <option value={'true'}>PAID</option>
+                                    <option value={'false'}>PENDING</option>
                                 </select>
                             </div>
                         )}
@@ -561,7 +547,7 @@ const BrandManageTransactionComponent: React.FC = () => {
 
                     {fulldataTransactionResposne?.filter(applyFilters).map((transaction) => (
                         // {fulldataTransactionResposne?.map((orderDetail) => (
-                        <div className="bg-white rounded-xl shadow-md p-4 md:p-6 mb-4 md:mb-8 transform transition-all hover:shadow-lg">
+                        <div key={transaction.paymentID} className="bg-white rounded-xl shadow-md p-4 md:p-6 mb-4 md:mb-8 transform transition-all hover:shadow-lg">
                             <div className="flex flex-wrap md:flex-nowrap mb-4 md:mb-6">
                                 <div className="w-full md:w-1/2 mb-4 md:mb-0">
                                     <h2 className="text-sm md:text-1xl font-bold text-gray-800 pb-2">OrderID {transaction.orderID} </h2>
@@ -701,4 +687,4 @@ const BrandManageTransactionComponent: React.FC = () => {
     );
 };
 
-export default BrandManageTransactionComponent;
+export default AllTransactionHistoryComponent;

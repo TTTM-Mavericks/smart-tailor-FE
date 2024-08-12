@@ -19,6 +19,9 @@ import { DesignInterface, ExpertTailoringSizeInterface } from '../../../models/D
 import { toast, ToastContainer } from 'react-toastify';
 import LoadingComponent from '../../../components/Loading/LoadingComponent';
 import { __handleAddCommasToNumber, __handleRoundToThreeDecimalPlaces } from '../../../utils/NumbericUtils';
+import { __handleSendNotification } from '../../../utils/NotificationUtils';
+import { __getUserLogined } from '../../../App';
+import { UserInterface } from '../../../models/UserModel';
 
 
 interface SizeQuantity {
@@ -267,11 +270,25 @@ const OrderProductScreen = () => {
             if (response.status === 200) {
                 // await __handleCreateOrder();
                 toast.success(`${response.message}`, { autoClose: 4000 });
+
+
+                const user: UserInterface = __getUserLogined();
+                console.log(response.data.employeeID);
+                const bodyRequest = {
+                    senderID: user.userID,
+                    recipientID: response.data.employeeID,
+                    action: "CREATE",
+                    type: "ORDER",
+                    targetID: response.data.orderID,
+                    message: ""
+                }
+                console.log(bodyRequest);
+                __handleSendNotification(bodyRequest);
+
                 setTimeout(() => {
                     navigate(`/order_detail/${response.data.orderID}`);
                 }, 1000);
 
-                
             }
             else {
                 setIsLoadingPage(false);
@@ -473,7 +490,7 @@ const OrderProductScreen = () => {
         <div className={`${style.orderProduct__container}`}>
             <HeaderComponent></HeaderComponent>
             <LoadingComponent isLoading={isLoadingPage}></LoadingComponent>
-
+            <ToastContainer></ToastContainer>
             <div>
                 <div className="py-0 md:px-6 2xl:px-20 2xl:container 2xl:mx-auto">
                     <div className="mt-2 flex flex-col xl:flex-row jusitfy-center items-stretch w-full xl:space-x-8 space-y-4 md:space-y-6 xl:space-y-0">
@@ -814,8 +831,6 @@ const OrderProductScreen = () => {
             {/* DIALOG */}
             <OrderPolicyDialogComponent onClose={__handleCloseOrderPolicyDilog} isOpen={isOpenOrderPolicyDialog} onOrderProduct={__handlePostSizeAndQuatity}></OrderPolicyDialogComponent>
             <ChangeAddressDialogComponent onSelectedAddressData={(address) => __handleGetSelectedAdress(address)} isOpen={isChangeAddressDialogOpen} onClose={() => __handleOpenChangeAddressDialog(false)}></ChangeAddressDialogComponent>
-            <ToastContainer></ToastContainer>
-
         </div >
     );
 };
