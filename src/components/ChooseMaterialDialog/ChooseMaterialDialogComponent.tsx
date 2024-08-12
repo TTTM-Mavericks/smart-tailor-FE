@@ -348,15 +348,18 @@ const ChooseMaterialDialogComponent: React.FC<Props> = ({ isOpen, onClose, child
                     </tbody>
                 </table>
             </DialogContent> */}
-            <DialogActions>
-                <Button onClick={() => __handleOpenMaterialSavingDialog()} style={{ color: primaryColor, padding: '5px 20px 5px 20px' }}  >
-                    Cancel
-                </Button>
+            {isFullStepActive && (
 
-                <Button onClick={() => __handleSaveMaterialInformation()} style={{ backgroundColor: redColor, color: whiteColor, padding: '5px 20px 5px 20px' }}>
-                    Order
-                </Button>
-            </DialogActions>
+                <DialogActions>
+                    <Button onClick={() => __handleOpenMaterialSavingDialog()} style={{ color: primaryColor, padding: '5px 20px 5px 20px' }}  >
+                        Cancel
+                    </Button>
+
+                    <Button onClick={() => __handleSaveMaterialInformation()} style={{ backgroundColor: redColor, color: whiteColor, padding: '5px 20px 5px 20px' }}>
+                        Order
+                    </Button>
+                </DialogActions>
+            )}
 
             <div>
                 <div style={{ width: '100%', marginTop: 0, overflow: 'hidden' }}>

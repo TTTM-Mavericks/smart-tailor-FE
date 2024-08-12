@@ -71,6 +71,13 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID }) =
                 console.log('detail order: ', response.data);
                 console.log(response.message);
                 await __handelUpdateOrderState(childID, itemSample);
+                // setGroupedData((prevGroupedData) => {
+                //     const updatedGroup = prevGroupedData[childID].map((sample) =>
+                //         sample.sampleModelID === itemSample.sampleModelID ? { ...sample, status: true } : sample
+                //     );
+                //     return { ...prevGroupedData, [childID]: updatedGroup };
+                // });
+
             }
             else {
                 console.log('detail error: ', response.message);

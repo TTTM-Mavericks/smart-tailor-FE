@@ -102,7 +102,7 @@ function CustomDesignScreen() {
 
   // ---------------UseState Variable---------------//
   const [selectedPartOfCloth, setSelectedPartOfCloth] = useState<PartOfDesignInterface>();
-  const [partOfClothData, setPartOfClothData] = useState<PartOfDesignInterface[]>();
+  const [partOfClothData, setPartOfClothData] = useState<PartOfDesignInterface[]>([]);
   const [selectedStamp, setSelectedStamp] = useState<ItemMaskInterface[]>();
   const [selectedItem, setSelectedItem] = useState<string>('LOGO_PART');
   const [file, setFile] = useState('');
@@ -813,7 +813,7 @@ function CustomDesignScreen() {
 
         }
       } else {
-        toast.error(`${response.message}`, { autoClose: 4000 });
+        toast.error(`${'Please enter material into part of cloth'}`, { autoClose: 4000 });
         setIsLoadingPage(false);
       }
     } catch (error) {

@@ -32,7 +32,7 @@ const RefundTransactionHistoryScreen: React.FC = () => {
     const [currentPaymentData, setCurrentPaymentData] = useState<PaymentInterface | PaymentOrderInterface>();
     // const [isExtendTransaction, setIsExtendTransaction] = useState<{ orderID: string, isExtend: boolean } | null>(null);
     const [isExtendTransaction, setIsExtendTransaction] = useState<{ [key: string]: boolean }>({});
-    const [orderDetailList, setOrderDetailList] = useState<OrderDetailInterface[]>();
+    const [orderDetailList, setOrderDetailList] = useState<OrderDetailInterface[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [userAuth, setUserAuth] = useState<UserInterface>();
     const [isOpenPaymentDialog, setIsOpenPaymentDialog] = useState<{ [key: string]: boolean }>({});
@@ -120,7 +120,7 @@ const RefundTransactionHistoryScreen: React.FC = () => {
             const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderByUserId}/${userID}`, null, __getToken());
             if (response.status === 200) {
                 console.log(response.data);
-                const dataResp = response.data.filter((item: any) => 
+                const dataResp = response.data.filter((item: any) =>
                     item.paymentList.length !== 0 &&
                     item.paymentList.some((payment: any) => payment.paymentType === 'ORDER_REFUND')
                 );
@@ -301,6 +301,9 @@ const RefundTransactionHistoryScreen: React.FC = () => {
                             <a href="/refund_history" className="px-4 py-3 font-semibold text-orange-900 bg-white border border-orange-100 rounded-lg hover:bg-orange-50">
                                 Refund Transaction
                             </a>
+                            <a href="/transaction_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
+                                Trandsactions
+                            </a>
                             <a href="/collection" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
                                 Collection
                             </a>
@@ -385,7 +388,7 @@ const RefundTransactionHistoryScreen: React.FC = () => {
                         )}
                     </div>
 
-                    {orderDetailList?.filter(applyFilters).map((orderDetail) => (
+                    {orderDetailList?.length > 0 ? orderDetailList?.filter(applyFilters).map((orderDetail) => (
                         <div className="bg-white rounded-xl shadow-md p-4 md:p-6 mb-4 md:mb-8 transform transition-all hover:shadow-lg">
                             <div className="flex flex-col md:flex-row items-start md:items-center mb-4 md:mb-6" >
                                 <div className="mb-4 md:mb-0 w-max">
@@ -516,7 +519,11 @@ const RefundTransactionHistoryScreen: React.FC = () => {
                             }
 
                         </div>
-                    ))}
+                    )) : (
+                        <div>
+                            <span className="text-gray-500 text-sm text-center justify-center content-center">Do not have any refund transaction</span>
+                        </div>
+                    )}
 
                     {showScrollButton && (
                         <IconButton
