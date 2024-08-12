@@ -11,10 +11,11 @@ import { ToastContainer, toast } from 'react-toastify';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import { __handleAddCommasToNumber } from '../../../../utils/NumbericUtils';
 import { GrFormNext } from "react-icons/gr";
+import { MdOutlineNavigateNext, MdOutlineNavigateBefore } from "react-icons/md";
 
 
 type materialDetailProps = {
-    partOfDesigndata?: PartOfDesignInterface[];
+    partOfDesigndata: PartOfDesignInterface[];
     primaryKey?: any,
     onGetMaterial: (item: PartOfDesignInterface[]) => void;
     expertID?: any,
@@ -106,7 +107,7 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
     const [selectedMaterials, setSelectedMaterials] = useState<ItemMaskMaterial[]>([]);
     const [materialItem, setMaterialItem] = useState<string>('');
     const [inputValueMaterialItem, setInputValueMaterialItem] = useState<string>('');
-    const [data, setData] = useState<PartOfDesignInterface[]>();
+    const [data, setData] = useState<PartOfDesignInterface[]>([]);
     const [printTypeMaterial, setPrintTypeMaterial] = useState<{ itemId: string, partName: string, type: string, material: string }[]>([]);
     const [selectedItemMask, setSelectedItemMask] = useState<{ partOfDesignId: any, itemMask: ItemMaskInterface }>();
     const [selectedPartOfDesign, setSelectedPartOfDesign] = useState<PartOfDesignInterface | undefined>();
@@ -204,7 +205,6 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
     }, [inputValueMaterialItem, materialItem, selectedItemMask, selectedPartOfDesign]);
 
     useEffect(() => {
-        console.log('11111111111111', data);
         if (data) {
             onGetMaterial(data);
         }
@@ -288,7 +288,6 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
     }, [allMaterialCategory]);
 
     useEffect(() => {
-        console.log('embroiderMaterial: ', embroiderMaterial);
 
     }, [embroiderMaterial])
 
@@ -304,7 +303,6 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
         try {
             const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.getListMaterialByCategoryAndExpert}?expertTailoringID=${expertID}&categoryID=${categoryID}`);
             if (response.status === 200) {
-                console.log('material-----------------: ', response.data);
                 return response.data;
             } else {
             }
@@ -321,7 +319,6 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
             const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.getAllCategory}`);
             if (response.status === 200) {
                 setAllMaterialCategory(response.data);
-                console.log('material list alll: ', response.data);
             } else {
                 toast.error(`${response.message}`, { autoClose: 4000 });
             }
@@ -339,7 +336,6 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
         value: any,
         part: PartOfDesignInterface | undefined
     ) => {
-        console.log('check: ', item, value, part);
         setData((prevData) => {
             if (!prevData) return prevData;
 
@@ -396,28 +392,28 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
      * Handle apply all material 
      */
     const __handleApplyAllMaterialForItemMask = () => {
-        try {
-            setData((prevData) => {
-                if (!prevData) return prevData;
-                return prevData.map((partItem: PartOfDesignInterface) => {
-                    return {
-                        ...partItem,
-                        itemMasks: partItem.itemMasks?.map((itemMask: ItemMaskInterface) => {
-                            return {
-                                ...itemMask,
-                                printType: printTypeMaterial.find((item) => item.itemId === itemMask.itemMaskID)?.type || selectedItemMask?.itemMask.printType,
-                                itemMaterial: {
-                                    itemMaterialID: inputValueMaterialItem,
-                                },
-                            };
-                        }),
-                    };
-                });
-            });
-            toast.success(`Apply all successfully`, { autoClose: 3000 });
-        } catch (error) {
-            toast.error(`Error: ${error}`, { autoClose: 3000 });
-        }
+        if (!selectedItemMask || !selectedPartOfDesign) return;
+
+        // Find the print type material for the current item mask
+        const selectedPrintTypeMaterial = printTypeMaterial.find(
+            item => item.itemId === selectedItemMask.itemMask.itemMaskID
+        );
+
+        if (!selectedPrintTypeMaterial) return;
+
+        // Create a new array where every item mask of the part gets the selected print type and material
+        const updatedPrintTypeMaterial = itemMaskData?.map(itemMask => ({
+            itemId: itemMask.itemMaskID,
+            partName: selectedPartOfDesign.partOfDesignName,
+            type: selectedPrintTypeMaterial.type,
+            material: selectedPrintTypeMaterial.material,
+        })) || [];
+
+        // Update the print type material state with this new array
+        setPrintTypeMaterial(updatedPrintTypeMaterial);
+
+        toast.success(`Apply all successfully`, { autoClose: 3000 });
+
 
     }
 
@@ -480,9 +476,46 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
         }
     };
 
+    const __handleNext = () => {
+        const newStep = activeStep + 1;
+        if (newStep < data.length) {
+            __handleStepClick(newStep, data[newStep]);
+        }
+    };
+
+    const __handleBack = () => {
+        const newStep = activeStep - 1;
+        if (newStep >= 0) {
+            __handleStepClick(newStep, data[newStep]);
+        }
+    };
+
+    const __handleApplyAllMaterialForPartOfDesign = () => {
+        if (!selectedPartOfDesign) return;
+
+        // Find the selected fabric for the current part
+        const selectedFabric = fabric.find(fabricItem => fabricItem.partId === selectedPartOfDesign.partOfDesignID)?.fabric;
+
+        if (!selectedFabric) return;
+
+        // Create a new array where every part of the design gets the selected fabric
+        const updatedFabric = data.map(part => ({
+            partId: part.partOfDesignID,
+            fabric: selectedFabric,
+        }));
+
+        // Update the fabric state with this new array
+        setFabric(updatedFabric);
+        toast.success('Apply successfully', { autoClose: 1000 })
+    };
+
+
+
+
 
     return (
         <div style={{ width: '100%', position: 'relative' }}>
+
             <div className={style.materialDetail__partOfClothStep}>
                 <Stepper alternativeLabel activeStep={activeStep} orientation="horizontal">
                     {data?.map((part, index) => (
@@ -496,11 +529,7 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                         </Step>
                     ))}
                 </Stepper>
-                {/* {!isFullStepActive && (
-                    <button onClick={__handleStepButtonClick} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'absolute', right: 0 }} >
-                        <GrFormNext size={20}></GrFormNext>
-                    </button>
-                )} */}
+
             </div>
             <div style={{ paddingLeft: 20 }}>
                 <span style={{ fontSize: 12, fontWeight: '500' }}>ITEM MASKS</span>
@@ -508,14 +537,14 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
             <form className={`${style.materialDetail__container}`} style={primaryKey === 'DIALOG' ? { display: 'flex' } : {}} >
                 <div className={`${style.materialDetail__container__itemMaskArea} items-center justify-center `} style={primaryKey === 'DIALOG' ? { paddingRight: '10px', height: 350, overflow: 'auto', marginTop: 20 } : {}}>
                     {data?.map((part: PartOfDesignInterface, key) => (
-                        <div >
+                        <div className='' >
                             {selectedPartOfDesign?.partOfDesignID === part.partOfDesignID ? part?.itemMasks?.map((item, optionIdx) => (
                                 <Disclosure
                                     key={optionIdx}
                                     style={{ border: item.itemMaskID === selectedItemMask?.itemMask.itemMaskID && selectedItemMask?.partOfDesignId === selectedPartOfDesign?.partOfDesignID ? `1.5px solid ${primaryColor}` : 'none', borderRadius: 4 }}
                                     onClick={() => __handleSetlectedItemMask(item, part)}
                                     as="div"
-                                    className={`py-1 border-t border-gray-200 px-4 ${style.materialDetail__content}`}>
+                                    className={`py-1 border-t border-gray-200 px-4 mb-2 ${style.materialDetail__content}`}>
                                     {({ open }) => (
                                         <>
                                             <h3 className="-mx-2 flow-root">
@@ -621,7 +650,7 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                     {selectedPartOfDesign ? (
                         <div style={{ paddingLeft: 20 }}>
                             <span style={{ fontSize: 12, fontWeight: '500' }}>{selectedPartOfDesign.partOfDesignName}</span>
-                            <a onClick={() => __handleApplyAllMaterialForItemMask()} style={{ fontSize: 11, fontWeight: '500', color: secondaryColor, cursor: 'pointer', float: 'right' }}>Apply all items</a>
+                            <a onClick={() => __handleApplyAllMaterialForPartOfDesign()} style={{ fontSize: 11, fontWeight: '500', color: secondaryColor, cursor: 'pointer', float: 'right' }}>Apply all items</a>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 0, marginTop: 10 }}>
                                 <div style={{ width: 100, fontSize: 14, }} >
                                     <label
@@ -741,6 +770,34 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                     }
                 </div>
             </form>
+            <div className="flex mt-4" style={{ position: 'absolute', bottom: 10, width: '100%' }}>
+                <div className="w-1/2 flex justify-start">
+                    <button
+                        disabled={activeStep === 0}
+                        onClick={__handleBack}
+                        className="text-white flex items-center justify-center p-1"
+                        style={{ fontSize: 15, backgroundColor: '#1976D2', borderRadius: 2 }}
+                    >
+                        <MdOutlineNavigateBefore size={20} color={whiteColor} />
+                        <span className='pr-1'>Back</span>
+                    </button>
+                </div>
+
+                <div className="w-1/2 flex justify-end">
+                    {!isFullStepActive && (
+                        <button
+                            disabled={activeStep === data.length - 1}
+                            onClick={__handleNext}
+                            className="text-white flex items-center justify-center p-1"
+                            style={{ fontSize: 15, backgroundColor: '#1976D2', borderRadius: 2 }}
+                        >
+                            <span className='pl-1'>Next</span>
+                            <MdOutlineNavigateNext size={20} color={whiteColor} />
+                        </button>
+                    )}
+                </div>
+            </div>
+
 
         </div >
     );

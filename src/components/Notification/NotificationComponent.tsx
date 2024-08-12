@@ -166,14 +166,14 @@ const NotificationComponent: React.FC = () => {
             const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.notification + functionEndpoints.notification.updateReadStatus}/${noti.notificationID}`);
             if (response.status === 200) {
                 // Update the status of the notification in the local state
-                setNotificationList((prevNotifications) => 
+                setNotificationList((prevNotifications) =>
                     prevNotifications.map((item) =>
                         item.notificationID === noti.notificationID
                             ? { ...item, status: true }
                             : item
                     )
                 );
-    
+
                 // Open the appropriate URL based on notification type
                 if (noti.type === 'ORDER') {
                     window.open(`/order_detail/${noti.targetID}`, '_blank');
@@ -184,7 +184,7 @@ const NotificationComponent: React.FC = () => {
                 } else if (noti.type === 'REPORT') {
                     window.open(`/report_history`, '_blank');
                 }
-                
+
                 console.log(response.data);
             } else {
                 toast.error(`${response.message}`, { autoClose: 4000 });
@@ -194,7 +194,7 @@ const NotificationComponent: React.FC = () => {
             console.log('error: ', error);
         }
     };
-    
+
 
 
     return (
@@ -236,7 +236,7 @@ const NotificationComponent: React.FC = () => {
                     </div>
 
                     <div style={{ width: '60%' }} className="mx-auto mt-10">
-                        {messages.length > 0 && (
+                        {messages.length > 0 ? (
                             <div>
                                 <span className="text-gray-500 text-sm">New notifications</span>
                                 <div className="space-y-4 p-4">
@@ -272,46 +272,58 @@ const NotificationComponent: React.FC = () => {
                                 </div>
 
                             </div>
-                        )}
-                        <div className="mt-10">
-                            <span className="text-gray-500 text-sm">Old notifications</span>
-                            <div className="space-y-4 p-4">
-                                {paginate(notificationList, currentPage).map((notification: NotificationInterface) => (
-                                    <Card
-                                        key={notification.notificationID}
-                                        className="shadow-lg rounded-lg transition-shadow duration-300 hover:shadow-xl"
-                                        style={{ backgroundColor: !notification.status ? '#FAFAFA' : whiteColor }}
-                                        onClick={() => __handleMaskNotiRead(notification)}
-                                    >
-                                        <CardContent>
-                                            <div className="flex items-center justify-between mb-4">
-                                                <span className="font-semibold text-indigo-700 text-sm">
-                                                    {notification.type || 'SYSTEM'}
-                                                </span>
-                                                <span className="font-semibold text-indigo-700 text-sm" style={{ fontSize: 10, color: notification.status ? greenColor : primaryColor }}>
-                                                    {notification.status ? 'Read' : 'Not read'}
-                                                </span>
-                                            </div>
-                                            <Typography variant="body2" className="text-gray-700 mb-4">
-                                                {generateNotificationMessage(notification)}
-                                            </Typography>
-                                            <Typography variant="body2" className="text-gray-700 mb-4 pt-1" >
-                                                ID: {notification.targetID}
-                                            </Typography>
-                                            <Typography variant="caption" className="text-gray-500">
-                                                Created at: {notification.createDate}
-                                            </Typography>
-                                        </CardContent>
-                                    </Card>
-                                ))}
+                        ) : (
+                            <div>
+                                <span className="text-gray-500 text-sm text-center justify-center content-center">Do not have any notification</span>
                             </div>
-                            <Pagination
-                                count={totalPagesNotificationList}
-                                page={currentPage}
-                                onChange={handlePageChange}
-                                className="mt-4"
-                            />
-                        </div>
+                        )}
+
+                        {notificationList.length > 0 ? (
+                            <div className="mt-10">
+                                <span className="text-gray-500 text-sm">Old notifications</span>
+                                <div className="space-y-4 p-4">
+                                    {paginate(notificationList, currentPage).map((notification: NotificationInterface) => (
+                                        <Card
+                                            key={notification.notificationID}
+                                            className="shadow-lg rounded-lg transition-shadow duration-300 hover:shadow-xl"
+                                            style={{ backgroundColor: !notification.status ? '#FAFAFA' : whiteColor }}
+                                            onClick={() => __handleMaskNotiRead(notification)}
+                                        >
+                                            <CardContent>
+                                                <div className="flex items-center justify-between mb-4">
+                                                    <span className="font-semibold text-indigo-700 text-sm">
+                                                        {notification.type || 'SYSTEM'}
+                                                    </span>
+                                                    <span className="font-semibold text-indigo-700 text-sm" style={{ fontSize: 10, color: notification.status ? greenColor : primaryColor }}>
+                                                        {notification.status ? 'Read' : 'Not read'}
+                                                    </span>
+                                                </div>
+                                                <Typography variant="body2" className="text-gray-700 mb-4">
+                                                    {generateNotificationMessage(notification)}
+                                                </Typography>
+                                                <Typography variant="body2" className="text-gray-700 mb-4 pt-1" >
+                                                    ID: {notification.targetID}
+                                                </Typography>
+                                                <Typography variant="caption" className="text-gray-500">
+                                                    Created at: {notification.createDate}
+                                                </Typography>
+                                            </CardContent>
+                                        </Card>
+                                    ))}
+                                </div>
+                                <Pagination
+                                    count={totalPagesNotificationList}
+                                    page={currentPage}
+                                    onChange={handlePageChange}
+                                    className="mt-4"
+                                />
+                            </div>
+                        ) : (
+                            <div>
+                                {/* <span className="text-gray-500 text-sm text-center justify-center content-center">Do not have any notification</span> */}
+                            </div>
+                        )}
+
                     </div>
 
 
@@ -332,12 +344,12 @@ const NotificationComponent: React.FC = () => {
                         </IconButton>
                     )}
                 </div>
-            </div>
+            </div >
 
 
             {/* Dialog */}
 
-            <FooterComponent />
+            < FooterComponent />
         </div >
 
     );

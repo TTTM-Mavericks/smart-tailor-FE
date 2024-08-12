@@ -38,7 +38,7 @@ const DesignCollectionScreen = () => {
     const [activeTab, setActiveTab] = useState('All');
     const [userAuth, setUserAuth] = useState<UserInterface>();
     const [isLoading, setIsloading] = useState<boolean>(false);
-    const [designList, setDesignList] = useState<DesignInterface[]>();
+    const [designList, setDesignList] = useState<DesignInterface[]>([]);
     const [isScrolled, setIsScrolled] = useState(false);
     const [isEnd, setIsEnd] = useState(false)
 
@@ -107,6 +107,8 @@ const DesignCollectionScreen = () => {
                 setIsloading(false);
             } else {
                 toast.error(`${response.message}`, { autoClose: 4000 })
+                setIsloading(false);
+
             }
         } catch (error) {
             console.error('Error checking verification status:', error);
@@ -199,7 +201,6 @@ const DesignCollectionScreen = () => {
     return (
         <div>
             <HeaderComponent></HeaderComponent>
-            <ToastContainer></ToastContainer>
             <LoadingComponent isLoading={isLoading}></LoadingComponent>
             <div className={`${styles.designCollection__container}`}>
                 <aside className={`${styles.designCollection__container__menuBer}`}>
