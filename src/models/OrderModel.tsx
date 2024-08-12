@@ -77,6 +77,7 @@ export interface OrderDetailInterface {
     brand?: BrandInterface,
     orderImageList: any,
     employeeID?: any,
+    rating?: number
 }
 
 export interface OrderRequestDetailInterface {

@@ -464,7 +464,7 @@ const AllTransactionHistoryComponent: React.FC = () => {
                             {t(codeLanguage + '000199')}
                         </span>
                     </div>
-                    <div className="mb-6">
+                    <div className="mb-6 mt-5">
                         <label htmlFor="filterSelect" className="block mb-2 text-lg font-semibold text-gray-700">Select Filters</label>
                         <Select
                             isMulti
