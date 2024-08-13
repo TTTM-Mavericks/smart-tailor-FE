@@ -36,12 +36,15 @@ import { __getToken } from '../../../../App';
 const getStatusColor = (status: string) => {
     switch (status) {
         case 'NOT_VERIFY': return 'text-gray-600';
-        case 'PENDING': return 'text-yellow-600';
+        case 'PENDING': return 'text-blue-600';
         case 'DEPOSIT': return 'text-blue-600';
         case 'PROCESSING': return 'text-orange-600';
         case 'CANCEL': return 'text-red-600';
         case 'COMPLETED': return 'text-green-600';
         case 'DELIVERED': return 'text-indigo-600';
+        case 'START_PRODUCING': return 'text-pink-600';
+        case 'CHECKING_SAMPLE_DATA': return 'text-orange-600';
+
         default: return 'text-gray-600';
     }
 };
@@ -425,6 +428,7 @@ const BrandOrderFields: React.FC<{
     return (
         <div className="bg-white mb-8 shadow-lg rounded-lg p-6 transition duration-300 ease-in-out transform hover:shadow-xl">
             <LoadingComponent isLoading={isLoading}></LoadingComponent>
+
             <h3 className="text-sm font-semibold mb-3 text-indigo-700">Type order: {order.orderType}</h3>
             <div className="flex justify-between">
                 <div className="w-1/2">
@@ -456,7 +460,9 @@ const BrandOrderFields: React.FC<{
                                     </p>
                                 ))}
                             </div>
-                            <p className="text-gray-700 mt-4 text-sm">Price: {__handleAddCommasToNumber(order.totalPrice)} VND</p>
+                            {order.totalPrice && (
+                                <p className="text-gray-700 mt-4 text-sm">Price: {__handleAddCommasToNumber(order.totalPrice)} VND</p>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -1228,6 +1234,13 @@ const BrandManageOrder: React.FC = () => {
         { value: 'Order ID', label: 'Order ID' },
         { value: 'Order Status', label: 'Order Status' }
     ];
+
+    const [pendingCount, setPendingCount] = useState<number>(0);
+    const [canceledCount, setCanceledCount] = useState<number>(0);
+    const [completedCount, setCompletedCount] = useState<number>(0);
+    const [checkingSampleDataCount, setCheckingSampleDataCount] = useState<number>(0);
+
+
     useEffect(() => {
         setIsLoading(true);
         const userStorage = Cookies.get('userAuth');
@@ -1249,12 +1262,20 @@ const BrandManageOrder: React.FC = () => {
                 }
                 return response.data;
             })
-            .then((responseData) => {
+            .then((responseData: any) => {
                 if (responseData && Array.isArray(responseData.data)) {
                     const subOrders = responseData.data.filter((order: any) => order.orderType === FILTERED_ORDER_TYPE);
-                    setOrder(subOrders);
+                    const filteredPendingOrders = subOrders.filter((order: any) => order.orderStatus === 'PENDING');
+                    const filteredCanceledOrders = subOrders.filter((order: any) => order.orderStatus === 'START_PRODUCING');
+                    const filteredCompletedOrders = subOrders.filter((order: any) => order.orderStatus === 'COMPLETED');
+                    const filteredCheckingSampleDataOrders = subOrders.filter((order: any) => order.orderStatus === 'CHECKING_SAMPLE_DATA');
                     setFilteredOrders(subOrders);
-                    console.log("Data received:", subOrders);
+                    setOrder(subOrders);
+                    setPendingCount(filteredPendingOrders.length);
+                    setCanceledCount(filteredCanceledOrders.length);
+                    setCompletedCount(filteredCompletedOrders.length);
+                    setCheckingSampleDataCount(filteredCheckingSampleDataOrders.length);
+
                 } else {
                     console.error('Invalid data format:', responseData);
                 }
@@ -1379,6 +1400,61 @@ const BrandManageOrder: React.FC = () => {
 
     return (
         <div className='-mt-8'>
+            <div className="mt-12">
+                <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
+                    <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+                        <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-blue-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                                <path d="M19.14 12.936c.046-.306.071-.618.071-.936s-.025-.63-.071-.936l2.037-1.582a.646.646 0 00.154-.809l-1.928-3.338a.646.646 0 00-.785-.293l-2.4.964a7.826 7.826 0 00-1.617-.936l-.364-2.558A.645.645 0 0013.629 3h-3.258a.645.645 0 00-.635.538l-.364 2.558a7.82 7.82 0 00-1.617.936l-2.4-.964a.646.646 0 00-.785.293L2.642 9.673a.646.646 0 00.154.809l2.037 1.582a7.43 7.43 0 000 1.872l-2.037 1.582a.646.646 0 00-.154.809l1.928 3.338c.169.293.537.42.785.293l2.4-.964c.506.375 1.05.689 1.617.936l.364 2.558a.645.645 0 00.635.538h3.258a.645.645 0 00.635-.538l.364-2.558a7.82 7.82 0 001.617-.936l2.4.964c.248.127.616 0 .785-.293l1.928-3.338a.646.646 0 00-.154-.809l-2.037-1.582zM12 15.3A3.3 3.3 0 1112 8.7a3.3 3.3 0 010 6.6z" />
+                            </svg>
+                        </div>
+                        <div className="p-4 text-right">
+                            <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600" style={{ color: secondaryColor, fontWeight: 'bold' }}>PENDING</p>
+                            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{pendingCount}</h4>
+                        </div>
+
+                    </div>
+                    <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+                        <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-pink-600 to-pink-400 text-white shadow-pink-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15V7l6 5-6 5z" />
+                            </svg>
+
+                        </div>
+                        <div className="p-4 text-right">
+                            <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600" style={{ color: redColor, fontWeight: 'bold' }}>START</p>
+                            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{canceledCount}</h4>
+                        </div>
+
+                    </div>
+                    <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+                        <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-green-600 to-green-400 text-white shadow-green-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.59 14.59l-4.24-4.24 1.41-1.41L10.41 14l7.42-7.42 1.41 1.41-8.83 8.83z" />
+                            </svg>
+
+                        </div>
+                        <div className="p-4 text-right">
+                            <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600" style={{ color: greenColor, fontWeight: 'bold' }}>COMPLETED</p>
+                            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{completedCount}</h4>
+                        </div>
+
+                    </div>
+                    <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+                        <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-orange-600 to-orange-400 text-white shadow-orange-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                                <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-.75 5.5c0-.414.336-.75.75-.75s.75.336.75.75v6c0 .414-.336.75-.75.75h-.008c-.414 0-.742-.336-.742-.75V7.5zm.75 11c-.552 0-1-.448-1-1s.448-1 1-1 1 .448 1 1-.448 1-1 1z" />
+                            </svg>
+
+                        </div>
+                        <div className="p-4 text-right">
+                            <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600" style={{ color: primaryColor, fontWeight: 'bold' }}>CHECKING</p>
+                            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{checkingSampleDataCount}</h4>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
             {isLoading ? (
                 <div className="flex justify-center items-center h-screen">
                     <LoadingComponent isLoading={isLoading} />
@@ -1388,7 +1464,7 @@ const BrandManageOrder: React.FC = () => {
                     <div style={{ width: "100%" }}>
                         <div className="flex flex-col">
                             <div className="mb-6">
-                                <div className="flex mt-5">
+                                <div className="flex mt-0">
                                     <div className="w-7/10" style={{ width: "80%" }}>
                                         <Select
                                             isMulti
@@ -1404,16 +1480,16 @@ const BrandManageOrder: React.FC = () => {
                                     </div>
                                     <div className="flex border border-gray-300 rounded-md overflow-hidden" style={{ marginLeft: "auto" }}>
                                         <button
-                                            className={`px-4 py-2 ${!isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'}`}
+                                            className={`px-2 py-1 ${!isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700 '} text-sm`}
                                             onClick={() => setIsTableView(false)}
                                         >
-                                            Card mode
+                                            List mode
                                         </button>
                                         <button
-                                            className={`px-4 py-2 ${isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'}`}
+                                            className={`px-2 py-1 ${isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'} text-sm`}
                                             onClick={() => setIsTableView(true)}
                                         >
-                                            List mode
+                                            Table mode
                                         </button>
                                     </div>
                                 </div>
