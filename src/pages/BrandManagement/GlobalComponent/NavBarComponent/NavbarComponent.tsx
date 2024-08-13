@@ -70,7 +70,6 @@ const Navbar: React.FC<NavbarProps> = ({ toggleMenu, menu, popperOpen, togglePop
                                 </li>
                             </ol>
                         </nav>
-                        <h6 className="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-gray-900">home</h6>
                     </div>
 
                     <div className="flex items-center">
