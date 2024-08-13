@@ -13,7 +13,7 @@ import LoadingComponent from '../Loading/LoadingComponent';
 import { UserInterface } from '../../models/UserModel';
 import { NotificationInterface } from '../../models/NotificationModel';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../api/ApiConfig';
-import { __getUserLogined } from '../../App';
+import { __getToken, __getUserLogined } from '../../App';
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { generateNotificationMessage } from '../../utils/ElementUtils';
 
@@ -140,7 +140,7 @@ const NotificationComponent: React.FC = () => {
     const __handleFetchNotification = async (userId: any) => {
         setIsLoading(true);
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.notification + functionEndpoints.notification.getNotiByUserId}/${userId}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.notification + functionEndpoints.notification.getNotiByUserId}/${userId}`, null, __getToken());
             if (response.status === 200) {
                 const sortedData = response.data.sort((a: NotificationInterface, b: NotificationInterface) => {
                     return new Date(b.createDate).getTime() - new Date(a.createDate).getTime();
@@ -253,19 +253,20 @@ const NotificationComponent: React.FC = () => {
                                             <CardContent>
                                                 <div className="flex items-center justify-between mb-4">
                                                     <span className="font-semibold text-indigo-700 text-sm">
-                                                        {notification.type || 'SYSTEM'}
+                                                        {notification.type || 'SYSTEM'}: {notification.targetID}
+
                                                     </span>
                                                     <span className="font-semibold text-indigo-700 text-sm" style={{ fontSize: 10, color: notification.status ? greenColor : primaryColor }}>
                                                         {notification.status ? 'Read' : 'Not read'}
                                                     </span>
 
                                                 </div>
-                                                <Typography variant="body2" className="text-gray-700 mb-4">
+                                                <Typography variant="body2" className="inline-flex items-center text-green-600 bg-green-100 px-2 py-1 rounded-full">
                                                     {generateNotificationMessage(notification)}
                                                 </Typography>
-                                                <Typography variant="body2" className="text-gray-700 mb-4 pt-1">
+                                                {/* <Typography variant="body2" className="text-gray-700 mb-4 pt-1">
                                                     ID: {notification.targetID}
-                                                </Typography>
+                                                </Typography> */}
                                                 <Typography variant="caption" className="text-gray-500">
                                                     Create at: {notification.createDate}
                                                 </Typography>
@@ -277,7 +278,7 @@ const NotificationComponent: React.FC = () => {
                             </div>
                         ) : (
                             <div>
-                                <span className="text-gray-500 text-sm text-center justify-center content-center">Do not have any notification</span>
+                                {/* <span className="text-gray-500 text-sm text-center justify-center content-center">Do not have any notification</span> */}
                             </div>
                         )}
 
@@ -295,18 +296,19 @@ const NotificationComponent: React.FC = () => {
                                             <CardContent>
                                                 <div className="flex items-center justify-between mb-4">
                                                     <span className="font-semibold text-indigo-700 text-sm">
-                                                        {notification.type || 'SYSTEM'}
+                                                        {notification.type || 'SYSTEM'}: {notification.targetID}
+
                                                     </span>
                                                     <span className="font-semibold text-indigo-700 text-sm" style={{ fontSize: 10, color: notification.status ? greenColor : primaryColor }}>
                                                         {notification.status ? 'Read' : 'Not read'}
                                                     </span>
                                                 </div>
-                                                <Typography variant="body2" className="text-gray-700 mb-4">
+                                                <Typography variant="body2" className="inline-flex items-center text-green-600 bg-green-100 px-2 py-1 rounded-full">
                                                     {generateNotificationMessage(notification)}
                                                 </Typography>
-                                                <Typography variant="body2" className="text-gray-700 mb-4 pt-1" >
+                                                {/* <Typography variant="body2" className="text-gray-700 mb-4 pt-1" >
                                                     ID: {notification.targetID}
-                                                </Typography>
+                                                </Typography> */}
                                                 <Typography variant="caption" className="text-gray-500">
                                                     Created at: {notification.createDate}
                                                 </Typography>
@@ -323,7 +325,7 @@ const NotificationComponent: React.FC = () => {
                             </div>
                         ) : (
                             <div>
-                                {/* <span className="text-gray-500 text-sm text-center justify-center content-center">Do not have any notification</span> */}
+                                <span className="text-gray-500 text-sm text-center justify-center content-center">Do not have any notification</span>
                             </div>
                         )}
 

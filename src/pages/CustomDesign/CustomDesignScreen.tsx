@@ -34,6 +34,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Cloud, UploadCloud } from 'react-feather';
 import { __handleDownloadElementAsPng, __handleGetElementAsBase64 } from '../../utils/CanvasUtils';
 import { useSnapshot } from 'valtio';
+import { __getToken } from '../../App';
 
 
 interface ItemMask {
@@ -795,7 +796,7 @@ function CustomDesignScreen() {
       setIsLoadingPage(true);
     }
     try {
-      const response = await api.put(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.updateDesign}/${id}`, mainDesign);
+      const response = await api.put(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.updateDesign}/${id}`, mainDesign, __getToken());
       if (response.status === 200) {
         // toast.success(`${response.message}`, { autoClose: 4000 });
 

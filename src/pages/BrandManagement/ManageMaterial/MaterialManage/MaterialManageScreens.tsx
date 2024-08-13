@@ -18,6 +18,7 @@ import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } 
 import { UserInterface } from "../../../../models/UserModel";
 import Cookies from "js-cookie";
 import { greenColor } from "../../../../root/ColorSystem";
+import { __getToken } from "../../../../App";
 const brand_name = "LA LA LISA BRAND"
 
 // Make Style of popup
@@ -141,7 +142,11 @@ const ManageMaterialComponent: React.FC = () => {
 
     React.useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_material + functionEndpoints.material.getAllBrandMaterialByBrandID + `/${getID()}`}`;
-        fetch(apiUrl)
+        fetch(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`,  // Add the Bearer token here
+            }
+        })
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');

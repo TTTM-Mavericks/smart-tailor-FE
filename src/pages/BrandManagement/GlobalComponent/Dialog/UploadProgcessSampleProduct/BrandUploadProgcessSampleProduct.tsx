@@ -5,24 +5,31 @@ import style from './BrandUploadProgcessSampleProductStyle.module.scss';
 import { primaryColor, secondaryColor } from '../../../../../root/ColorSystem';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { toast } from 'react-toastify';
-import { __getToken } from '../../../../../App';
+import { __getToken, __getUserLogined } from '../../../../../App';
+import { OrderDetailInterface } from '../../../../../models/OrderModel';
+import { UserInterface } from '../../../../../models/UserModel';
+import { __handleSendNotification } from '../../../../../utils/NotificationUtils';
+import { BrandOrder } from '../../../../../models/BrandManageOrderModel';
+import LoadingComponent from '../../../../../components/Loading/LoadingComponent';
 
 type Props = {
     isOpen: boolean;
-    onClose?: () => void;
+    onClose: () => void;
     orderID?: string;
     brandID?: any;
     onSubmit?: () => void;
     step?: string,
     stageID?: any,
+    orderDetail?: OrderDetailInterface | BrandOrder
 };
 
-const BrandUploadProgcessSampleProduct: React.FC<Props> = ({ isOpen, onClose, orderID, brandID, onSubmit, step, stageID }) => {
+const BrandUploadProgcessSampleProduct: React.FC<Props> = ({ orderDetail, isOpen, onClose, orderID, brandID, onSubmit, step, stageID }) => {
     const [description, setDescription] = useState<string>('');
     const [images, setImages] = useState<File[]>([]);
     const [videos, setVideos] = useState<File[]>([]);
     const [imageError, setImageError] = useState<string>('');
     const [videoError, setVideoError] = useState<string>('');
+    const [isLoading, setIsloading] = useState<boolean>(false);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setImageError('');
@@ -67,7 +74,7 @@ const BrandUploadProgcessSampleProduct: React.FC<Props> = ({ isOpen, onClose, or
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
+        setIsloading(false);
         const imagePromises = images.map(file => fileToBase64(file));
         const videoPromises = videos.map(file => fileToBase64(file));
 
@@ -99,6 +106,24 @@ const BrandUploadProgcessSampleProduct: React.FC<Props> = ({ isOpen, onClose, or
                     console.log('detail order: ', response.data);
                     toast.success(`${response.message}`, { autoClose: 4000 });
                     console.log(response.message);
+
+                    const user: UserInterface = __getUserLogined();
+                    const bodyRequest = {
+                        senderID: user.userID,
+                        recipientID: orderDetail?.employeeID,
+                        action: "UPDATE",
+                        type: "SAMPLE PRODUCT",
+                        targetID: orderID,
+                        message: `Brand ${brandID} added a sample product of Order`
+                    }
+                    console.log(bodyRequest);
+                    __handleSendNotification(bodyRequest);
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 2000)
+                    onClose();
+
+
 
                 }
                 else {
@@ -143,6 +168,7 @@ const BrandUploadProgcessSampleProduct: React.FC<Props> = ({ isOpen, onClose, or
 
     return (
         <Dialog open={isOpen} onClose={onClose} aria-labelledby="dialog-title" maxWidth="md" fullWidth>
+            <LoadingComponent isLoading={isLoading}></LoadingComponent>
             <DialogTitle id="dialog-title">
                 Update Sample Product
                 <IoMdCloseCircleOutline

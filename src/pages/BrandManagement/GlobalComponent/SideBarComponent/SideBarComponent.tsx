@@ -5,6 +5,7 @@ import Cookies from 'js-cookie';
 import { UserInterface } from '../../../../models/UserModel';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import { toast } from 'react-toastify';
+import { __getToken } from '../../../../App';
 
 interface SidebarProps {
     menuOpen: boolean;
@@ -29,7 +30,7 @@ const Sidebar: React.FC<SidebarProps> = ({ menuOpen, toggleMenu, activeMenu, han
     useEffect(() => {
         const fetchNotifications = async () => {
             try {
-                const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.notification + functionEndpoints.notification.getNotiByUserId}/${userParse.userID}`);
+                const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.notification + functionEndpoints.notification.getNotiByUserId}/${userParse.userID}`, null, __getToken());
                 if (response.status === 200) {
                     const sortedData = response.data.sort((a: NotificationInterface, b: NotificationInterface) => {
                         return new Date(b.createDate).getTime() - new Date(a.createDate).getTime();
