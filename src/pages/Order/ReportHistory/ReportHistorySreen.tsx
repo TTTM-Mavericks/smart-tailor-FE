@@ -57,7 +57,6 @@ const ReportHistorySreen: React.FC = () => {
         if (userStorage) {
             const userParse: UserInterface = JSON.parse(userStorage);
             setUserAuth(userParse)
-            __handleFetchOrderData(userParse.userID);
         }
         const handleScroll = () => {
             if (window.scrollY > 200) {
@@ -75,26 +74,6 @@ const ReportHistorySreen: React.FC = () => {
     }, []);
 
     // ---------------FunctionHandler---------------//
-
-    const __handleFetchOrderData = async (userID: any) => {
-        setIsLoading(true)
-        try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderByUserId}/${userID}`);
-            if (response.status === 200) {
-                console.log(response.data);
-                setOrderDetailList(response.data);
-                setIsLoading(false)
-            } else {
-                toast.error(`${response.message}`, { autoClose: 4000 });
-                console.log(response.message);
-            }
-            console.log(response);
-        } catch (error) {
-            toast.error(`${error}`, { autoClose: 4000 });
-            console.log(error);
-
-        }
-    }
 
     /**
      * Close order policy dialog
@@ -245,7 +224,7 @@ const ReportHistorySreen: React.FC = () => {
                             <a href="/auth/profilesetting" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
                                 Account Settings
                             </a>
-                            <a href="#" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
+                            <a href="/notification" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
                                 Notifications
                             </a>
                             <a href="/order_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
@@ -256,6 +235,9 @@ const ReportHistorySreen: React.FC = () => {
                             </a>
                             <a href="/refund_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
                                 Refund History
+                            </a>
+                            <a href="/transaction_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
+                                Trandsactions
                             </a>
                             <a href="/collection" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
                                 Collection

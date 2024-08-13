@@ -25,6 +25,7 @@ import { width } from '@mui/system';
 import { DataGrid, GridColDef, GridRenderCellParams, GridToolbar } from '@mui/x-data-grid';
 import { tokens } from '../../../../../theme';
 import { __handleGetDateTimeColor, __isNearCurrentDate } from '../../../../../utils/DateUtils';
+import { __getToken } from '../../../../../App';
 
 
 /**
@@ -230,7 +231,7 @@ const EmployeeOrderFields: React.FC<{
                 status: 'DELIVERED'
             }
             console.log('bodyRequest: ', bodyRequest);
-            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest, __getToken());
             if (response.status === 200) {
                 toast.success(`${response.message}`, { autoClose: 4000 });
                 setTimeout(() => {
@@ -263,7 +264,7 @@ const EmployeeOrderFields: React.FC<{
                 status: 'CANCEL'
             }
             console.log('bodyRequest: ', bodyRequest);
-            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest, __getToken());
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
                 toast.success(`${response.message}`, { autoClose: 4000 });
@@ -280,6 +281,32 @@ const EmployeeOrderFields: React.FC<{
             toast.error(`${error}`, { autoClose: 4000 });
         }
     };
+
+    const __handleRejectOrder = async (orderDetail: any) => {
+        setIsLoading(true)
+        try {
+            const bodyRequest = {
+                orderID: orderDetail?.orderID,
+                status: 'CANCEL'
+            }
+            console.log('bodyRequest: ', bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest, __getToken());
+            if (response.status === 200) {
+                console.log('detail order: ', response.data);
+                toast.success(`${response.message}`, { autoClose: 4000 });
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            }
+            else {
+                console.log('detail error: ', response.message);
+                toast.error(`${response.message}`, { autoClose: 4000 });
+            }
+        } catch (error) {
+            console.log('error: ', error);
+            toast.error(`${error}`, { autoClose: 4000 });
+        }
+    }
 
     return (
         <div className="bg-white mb-8 shadow-lg rounded-lg transition duration-300 ease-in-out transform hover:shadow-xl">
@@ -338,7 +365,7 @@ const EmployeeOrderFields: React.FC<{
             )}
             <div className="mt-6 flex justify-end">
 
-                {order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCEL' && (
+                {order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCEL' && order.orderStatus !== 'NOT_VERIFY' && (
 
                     <button
                         onClick={() => __handleOpenReportDialog()}
@@ -351,6 +378,8 @@ const EmployeeOrderFields: React.FC<{
                         Cancel
                     </button>
                 )}
+
+
 
                 <CustomerReportOrderDialogComponent
                     isCancelOrder={true}
@@ -382,19 +411,34 @@ const EmployeeOrderFields: React.FC<{
                 >
                     View details
                 </button>
-                {order.orderStatus !== 'COMPLETED' && (
 
+                {order.orderStatus === 'NOT_VERIFY' && (
                     <button
-                        onClick={() => onUpdatedOrderPending(order.orderID)}
-                        className="mb-2 bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 mr-4"
+                        onClick={() => __handleRejectOrder(order.orderID)}
+                        className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4"
                         style={{
                             borderRadius: 4,
-                            backgroundColor: primaryColor
+                            backgroundColor: redColor
+                        }}
+                    >
+                        Reject order
+                    </button>
+                )}
+
+                {order.orderStatus === 'NOT_VERIFY' && (
+                    <button
+                        onClick={() => onUpdatedOrderPending(order.orderID)}
+                        className="bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 mr-4"
+                        style={{
+                            borderRadius: 4,
+                            backgroundColor: greenColor
                         }}
                     >
                         Verify order
                     </button>
                 )}
+
+
 
                 {order.orderStatus === 'COMPLETED' && (
 
@@ -490,7 +534,7 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
 
     const __handleFetchOrderDetails = async (orderId: string) => {
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getAllSubOrder}/${orderId}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getAllSubOrder}/${orderId}`, null, __getToken());
             if (response.status === 200) {
                 setOrderChild(prevState => ({
                     ...prevState,
@@ -518,7 +562,7 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
                 status: 'CANCEL'
             }
             console.log('bodyRequest: ', bodyRequest);
-            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest, __getToken());
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
                 toast.success(`${response.message}`, { autoClose: 4000 });
@@ -826,7 +870,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
         setIsLoading(true);
         try {
             const bodyRequest = { orderID, status: 'DELIVERED' };
-            const response = await axios.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest, __getToken());
             if (response.status === 200) {
                 toast.success(`${response.data.message}`, { autoClose: 4000 });
                 onUpdatedOrderPending(orderID);
@@ -848,7 +892,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
         setIsLoading(true);
         try {
             const bodyRequest = { orderID, status: 'CANCEL' };
-            const response = await axios.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest, __getToken());
             if (response.status === 200) {
                 toast.success(`${response.data.message}`, { autoClose: 4000 });
                 onUpdatedOrderPending(orderID);
@@ -1100,7 +1144,11 @@ const EmployeeManageOrder: React.FC = () => {
     useEffect(() => {
         const apiUrl = `${baseURL}${versionEndpoints.v1}${featuresEndpoints.order}${functionEndpoints.order.getAllOrder}`;
         setIsLoading(true);
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`,  // Add the Bearer token here
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');
@@ -1131,12 +1179,13 @@ const EmployeeManageOrder: React.FC = () => {
             setIsLoading(true);
             console.log("order id" + orderID);
 
-            const response = await axios.put(
+            const response = await api.put(
                 `${baseURL}${versionEndpoints.v1}${featuresEndpoints.order}${functionEndpoints.order.changeOrderStatus}`,
                 {
                     orderID: orderID,
                     status: "PENDING"
-                }
+                },
+                __getToken()
             );
 
             if (response.status === 200) {
@@ -1296,13 +1345,13 @@ const EmployeeManageOrder: React.FC = () => {
                                             className={`px-4 py-2 ${!isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'}`}
                                             onClick={() => setIsTableView(false)}
                                         >
-                                            Card
+                                            Card mode
                                         </button>
                                         <button
                                             className={`px-4 py-2 ${isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'}`}
                                             onClick={() => setIsTableView(true)}
                                         >
-                                            Table
+                                            List mode
                                         </button>
                                     </div>
                                 </div>

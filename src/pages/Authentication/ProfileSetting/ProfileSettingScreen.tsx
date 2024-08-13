@@ -363,7 +363,7 @@ const ProfileSettings: React.FC = () => {
                             <a href="/auth/profilesetting" className="px-4 py-3 font-semibold text-orange-900 bg-white border border-orange-100 rounded-lg hover:bg-orange-50">
                                 Account Settings
                             </a>
-                            <a href="#" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
+                            <a href="/notification" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
                                 Notifications
                             </a>
                             <a href="/order_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
@@ -374,6 +374,9 @@ const ProfileSettings: React.FC = () => {
                             </a>
                             <a href="/refund_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
                                 Refund History
+                            </a>
+                            <a href="/transaction_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
+                                Trandsactions
                             </a>
                             <a href="/collection" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
                                 Collection
@@ -414,15 +417,17 @@ const ProfileSettings: React.FC = () => {
                             <div className="flex flex-col gap-3">
                                 <button
                                     type="button"
-                                    className="py-3 px-6 text-base font-medium text-white bg-orange-700 rounded-lg hover:bg-orange-800"
+                                    className="py-1.5 px-2 font-medium text-white bg-orange-700 rounded-lg hover:bg-orange-800"
                                     onClick={() => fileInputRef.current?.click()}
+                                    style={{fontSize: 12}}
                                 >
                                     Change picture
                                 </button>
                                 <button
                                     type="button"
-                                    className="py-3 px-6 text-base font-medium text-orange-700 bg-white rounded-lg border border-orange-200 hover:bg-orange-100 hover:text-white-900"
+                                    className="py-1.5 px-6 font-medium text-orange-700 bg-white rounded-lg border border-orange-200 hover:bg-orange-100 hover:text-white-900"
                                     onClick={_handleDeletePicture}
+                                    style={{fontSize: 12}}
                                 >
                                     Delete picture
                                 </button>

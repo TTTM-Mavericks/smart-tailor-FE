@@ -5,6 +5,7 @@ import styles from './PaymentInformationDialogStyle.module.scss';
 import { primaryColor, redColor, whiteColor, greenColor, yellowColor } from '../../../../../root/ColorSystem';
 import { PaymentInterface } from '../../../../../models/OrderModel';
 import { PaymentOrderInterface } from '../../../../../models/PaymentModel';
+import { __handleAddCommasToNumber } from '../../../../../utils/NumbericUtils';
 
 type OrderPolicyDialogProps = {
     isOpen: boolean;
@@ -37,7 +38,10 @@ const PaymentInformationDialogComponent: React.FC<OrderPolicyDialogProps> = ({ i
     return (
         <Dialog open={isOpen} onClose={onClose} fullWidth maxWidth="sm">
             <DialogTitle>
-                Payment Information
+                <p className='flex items-center'>
+                    <span>Payment Information</span>
+
+                </p>
                 <IoMdCloseCircleOutline
                     cursor={'pointer'}
                     size={20}
@@ -48,7 +52,7 @@ const PaymentInformationDialogComponent: React.FC<OrderPolicyDialogProps> = ({ i
             </DialogTitle>
             <DialogContent className={styles.orderPolicyDialog__content}>
                 {paymentData ? (
-                    <div style={{padding: 2}} >
+                    <div style={{ padding: 2 }} >
                         <Grid container spacing={2}>
                             <Grid item xs={12}>
                                 <Typography variant="h6" gutterBottom>
@@ -83,10 +87,10 @@ const PaymentInformationDialogComponent: React.FC<OrderPolicyDialogProps> = ({ i
                                 <Divider />
                             </Grid>
                             <Grid item xs={6}>
-                                <Typography variant="body2" style={{ fontSize: 14 }}><strong>Amount:</strong> ${paymentData.paymentAmount.toFixed(2)}</Typography>
+                                <Typography variant="body2" style={{ fontSize: 14 }}><strong>Amount:</strong> {__handleAddCommasToNumber(paymentData.paymentAmount)} VND</Typography>
                             </Grid>
                             <Grid item xs={6}>
-                                <Typography variant="body2" style={{ fontSize: 14 }}><strong>Method:</strong> {paymentData.paymentMethod}</Typography>
+                                <Typography variant="body2" style={{ fontSize: 14 }}><strong>Method:</strong> {paymentData.paymentMethod || ' Banking'}</Typography>
                             </Grid>
                             <Grid item xs={6}>
                                 <Typography variant="body2" style={{ fontSize: 14 }}>
@@ -122,7 +126,7 @@ const PaymentInformationDialogComponent: React.FC<OrderPolicyDialogProps> = ({ i
                 )}
             </DialogContent>
             <DialogActions>
-                <Button
+                {/* <Button
                     variant="contained"
                     color="primary"
                     onClick={__handleButtonClick}
@@ -130,7 +134,7 @@ const PaymentInformationDialogComponent: React.FC<OrderPolicyDialogProps> = ({ i
                     style={{ marginRight: 10 }}
                 >
                     Confirm
-                </Button>
+                </Button> */}
             </DialogActions>
         </Dialog>
     );

@@ -26,6 +26,9 @@ import Cookies from 'js-cookie';
 import { Report } from '../../../models/EmployeeManageReportModel';
 import { ghtkLogo } from '../../../assets';
 import { height } from '@mui/system';
+import CustomerUpgradeDialog from '../../../components/Dialog/UpgradeDialog/CustomerUpgradeDialog';
+import { __getToken, __getUserLogined } from '../../../App';
+import { __handleSendNotification } from '../../../utils/NotificationUtils';
 
 
 export interface EstimatedStageInterface {
@@ -89,6 +92,7 @@ const OrderDetailScreen: React.FC = () => {
     const [reportReason, setReportReason] = useState<Report[]>([]);
     const [referencePrice, setReferencePrice] = useState<OrderPriceDetailInterface>();
     const [isOpenSystemShippingPriceDialog, setIsOpenSystemShippingPriceDialog] = useState<boolean>(false);
+    const [token, setToken] = useState<string>();
 
 
 
@@ -160,10 +164,17 @@ const OrderDetailScreen: React.FC = () => {
      * Move to Top When scroll down
      */
     useEffect(() => {
+        __handleGetOrderDetail();
+
         const userStorage = Cookies.get('userAuth');
         if (userStorage) {
             const userParse: UserInterface = JSON.parse(userStorage);
             setUserAuth(userParse);
+        }
+        const tokenStorage = Cookies.get('token');
+        if (tokenStorage) {
+            console.log('tokenStorage: ', tokenStorage);
+            setToken(tokenStorage);
         }
 
 
@@ -186,7 +197,6 @@ const OrderDetailScreen: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        __handleGetOrderDetail();
 
     }, [])
 
@@ -197,7 +207,7 @@ const OrderDetailScreen: React.FC = () => {
 
     const __handleReferencePrice = async (parentId: any) => {
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.designDetail + functionEndpoints.designDetail.getTotalPriceByParentOrderId}/${parentId}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.designDetail + functionEndpoints.designDetail.getTotalPriceByParentOrderId}/${parentId}`, null, __getToken());
             if (response.status === 200) {
                 setReferencePrice(response.data)
             }
@@ -215,7 +225,7 @@ const OrderDetailScreen: React.FC = () => {
 
     const __handleFetchTimeLine = async (parentId: any) => {
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderTimeLineByParentId}/${parentId}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderTimeLineByParentId}/${parentId}`, null, __getToken());
             if (response.status === 200) {
                 setIsLoading(false);
                 setTimeLine(response.data);
@@ -233,7 +243,7 @@ const OrderDetailScreen: React.FC = () => {
 
     const __handleLoadProgressStep = async (subOrderId: any) => {
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderStageById}/${subOrderId}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderStageById}/${subOrderId}`, null, __getToken());
             if (response.status === 200) {
                 setIsLoading(false);
                 const sortedData = sortStages(response.data);
@@ -265,7 +275,7 @@ const OrderDetailScreen: React.FC = () => {
     const __handleGetOrderDetail = async () => {
         setIsLoading(true);
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderDetailById}/${id}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderDetailById}/${id}`, null, __getToken());
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
                 setOrderDetail(response.data);
@@ -274,7 +284,6 @@ const OrderDetailScreen: React.FC = () => {
                 await __handleLoadProgressStep(response.data.orderID);
                 await __handleFetchTimeLine(response.data.orderID);
                 await __handleReferencePrice(response.data.orderID);
-
             }
             else {
                 console.log('detail order: ', response.message);
@@ -329,11 +338,24 @@ const OrderDetailScreen: React.FC = () => {
                 status: 'CANCEL'
             }
             console.log('bodyRequest: ', bodyRequest);
-            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest);
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest, __getToken());
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
                 setIsLoading(false);
                 toast.success(`${response.message}`, { autoClose: 4000 });
+
+                const user: UserInterface = __getUserLogined();
+                const bodyRequest = {
+                    senderID: user.userID,
+                    recipientID: orderDetail?.employeeID,
+                    action: "CANCEL",
+                    type: "ORDER",
+                    targetID: orderDetail?.orderID,
+                    message: ""
+                }
+                console.log(bodyRequest);
+                __handleSendNotification(bodyRequest);
+
                 setTimeout(() => {
                     window.location.reload();
                 }, 2000);
@@ -402,7 +424,7 @@ const OrderDetailScreen: React.FC = () => {
             }
             console.log('bodyRequest: ', bodyRequest);
 
-            const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.ratingOrder}`, bodyRequest);
+            const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.ratingOrder}`, bodyRequest, __getToken());
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
                 toast.success(`${response.message}`, { autoClose: 4000 });
@@ -462,7 +484,7 @@ const OrderDetailScreen: React.FC = () => {
         setIsOpenReasonCancelDialog(true)
         setIsLoading(true);
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.report + functionEndpoints.report.getReportByOrderID}/${orderDetail?.orderID}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.report + functionEndpoints.report.getReportByOrderID}/${orderDetail?.orderID}`, null, __getToken());
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
                 setReportReason(response.data);
@@ -598,7 +620,7 @@ const OrderDetailScreen: React.FC = () => {
 
                     </div> */}
 
-                    {timeline && progressSteps && orderDetail?.orderStatus !== 'CANCEL' && (
+                    {timeline && progressSteps && (orderDetail?.orderStatus !== 'CANCEL' && orderDetail?.orderStatus !== 'NOT_VERIFY') && (
 
 
 
@@ -609,19 +631,19 @@ const OrderDetailScreen: React.FC = () => {
                         </p> */}
                             <div className="flex justify-between text-sm mb-2">
                                 <p className='flex'>
-                                    <span>ET: </span>
+                                    <span>Start: </span>
                                     <span className={`text-indigo-600 ml-1`}>
                                         {timeline?.estimatedDateFinishFirstStage}
                                     </span>
                                 </p>
                                 <p className='flex'>
-                                    <span>ET: </span>
+                                    <span>Stage: 1-2: </span>
                                     <span className={`text-indigo-600 ml-1`}>
                                         {timeline?.estimatedDateFinishSecondStage}
                                     </span >
                                 </p>
                                 <p className='flex'>
-                                    <span>ET: </span>
+                                    <span>Completed: </span>
                                     <span className={`text-indigo-600 ml-1`}>
                                         {timeline?.estimatedDateFinishCompleteStage}
                                     </span>
@@ -675,17 +697,21 @@ const OrderDetailScreen: React.FC = () => {
                                         <p className="text-gray-600 text-sm">Deposit</p>
                                         <p className="text-gray-600 text-sm">{referencePrice?.customerPriceDeposit ? __handleAddCommasToNumber(referencePrice?.customerPriceDeposit) : 'Loading'} VND</p>
                                     </div>
-                                    <div className="flex justify-between border-b pb-2">
+                                    {referencePrice?.customerPriceFirstStage !== '-1' && (
+                                        <div className="flex justify-between border-b pb-2">
                                         <p className="text-gray-600 text-sm">Stage 1</p>
                                         <p className="text-gray-600 text-sm">{referencePrice?.customerPriceFirstStage ? __handleAddCommasToNumber(referencePrice?.customerPriceFirstStage) : 'Loading'} VND</p>
                                     </div>
+                                    )}
+                                    {referencePrice?.customerSecondStage !== '-1' && (
                                     <div className="flex justify-between border-b pb-2">
                                         <p className="text-gray-600 text-sm">Stage 2</p>
                                         <p className="text-gray-600 text-sm">{referencePrice?.customerSecondStage ? __handleAddCommasToNumber(referencePrice?.customerSecondStage) : 'Loading'} VND</p>
 
                                     </div>
+                                    )}
                                     <div className="flex justify-between border-b pb-2">
-                                        <p className="text-gray-600 text-sm">Shipping</p>
+                                        <p className="text-gray-600 text-sm">Shipping (Pay later)</p>
                                         {referencePrice?.customerShippingFee !== '-1' ? (
                                             <div className="text-gray-600 text-sm flex items-center justify-center">
                                                 <img src={ghtkLogo} style={{ width: 100, height: 15, marginRight: 20 }}></img>
@@ -696,7 +722,7 @@ const OrderDetailScreen: React.FC = () => {
                                         ) : (
                                             <div className="text-gray-600 text-sm flex items-center justify-center">
                                                 <p className={`mr-2 flex items-center justify-center rounded-md bg-yellow-50 px-2 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10`}>
-                                                    Over weight delivery service. Pay later
+                                                    Over weight delivery service
                                                 </p>
                                                 <span onClick={() => setIsOpenSystemShippingPriceDialog(true)} style={{ cursor: 'pointer', textDecorationLine: 'underline', color: secondaryColor }}>View</span>
                                             </div>
@@ -711,19 +737,19 @@ const OrderDetailScreen: React.FC = () => {
 
                                     </div>
                                 </div>
-                                {orderDetail?.paymentList && orderDetail?.paymentList?.length <= 0 && (
+                                {orderDetail?.paymentList && orderDetail?.paymentList.length === 0 &&
+                                    (orderDetail?.orderStatus !== 'DELIVERED' && orderDetail?.orderStatus !== 'COMPLETED') && (
+                                        <div className="flex justify-end mt-4">
+                                            <button
+                                                onClick={() => __handleOpenConfirmCalcelDialog()}
+                                                className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200 mr-4"
+                                                style={{ backgroundColor: redColor }}
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    )}
 
-                                    <div className="flex justify-end mt-4">
-                                        <button
-                                            onClick={() => __handleOpenConfirmCalcelDialog()}
-                                            className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200 mr-4"
-                                            style={{ backgroundColor: redColor }}
-                                        >
-                                            Cancel
-                                        </button>
-
-                                    </div>
-                                )}
                             </div>
 
 
@@ -741,6 +767,9 @@ const OrderDetailScreen: React.FC = () => {
                                                 <p className="text-gray-600 text-sm">Stage 1 price</p>
                                             )}
                                             {payment && payment[0].paymentType === 'STAGE_2' && (
+                                                <p className="text-gray-600 text-sm">Stage 2 price</p>
+                                            )}
+                                            {payment && payment[0].paymentType === 'COMPLETED_ORDER' && (
                                                 <p className="text-gray-600 text-sm">Stage 2 price</p>
                                             )}
                                             <p className="text-gray-600 text-sm">{payment?.map((item) => {
@@ -857,6 +886,7 @@ const OrderDetailScreen: React.FC = () => {
                 orderID={orderDetail?.orderID}
                 onClose={__handleCloseReportDialog}
                 isOpen={isOpenReportOrderDialog}
+                order={orderDetail}
             ></CustomerReportOrderDialogComponent>
 
             <CustomerReportOrderDialogComponent
@@ -868,7 +898,7 @@ const OrderDetailScreen: React.FC = () => {
             ></CustomerReportOrderDialogComponent>
 
             {
-                orderDetail?.orderStatus === 'DELIVERED' && (
+                orderDetail?.orderStatus === 'DELIVERED' || (orderDetail?.rating && orderDetail?.rating > 0) && (
 
                     <Dialog open={isOpenRatingDialog} onClose={() => setIsOpenRatingDialog(false)}>
                         <DialogTitle>
@@ -990,7 +1020,6 @@ const OrderDetailScreen: React.FC = () => {
 
 
             </Dialog>
-
 
 
             <FooterComponent />

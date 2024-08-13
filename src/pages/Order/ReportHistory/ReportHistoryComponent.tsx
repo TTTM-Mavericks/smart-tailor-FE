@@ -10,6 +10,7 @@ import { greenColor, redColor, secondaryColor } from '../../../root/ColorSystem'
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import Cookies from 'js-cookie';
 import { UserInterface } from '../../../models/UserModel';
+import { __getToken } from '../../../App';
 
 const getStatusColor = (status: string) => {
     switch (status) {
@@ -85,7 +86,7 @@ const OrderReport: React.FC<{
             >
                 View Details
             </button>
-            
+
         </div>
     </div>
 );
@@ -155,7 +156,7 @@ const ReportModal: React.FC<{ report: Report; onClose: () => void; onMarkResolve
                     <div className="flex items-center">
                         <FaClipboardCheck className="text-indigo-500 mr-2" size={20} />
                         <span className=" text-sm font-semibold text-gray-700">Order ID:</span>
-                    <p className="text-sm font-bold text-indigo-700 ml-2">{report.reportID}</p>
+                        <p className="text-sm font-bold text-indigo-700 ml-2">{report.reportID}</p>
                     </div>
                 </div>
 
@@ -252,13 +253,18 @@ const ReportHistoryComponent: React.FC = () => {
         { value: 'Order Status', label: 'Order Status' }
     ];
     useEffect(() => {
-
         const userStorage = Cookies.get('userAuth');
         if (!userStorage) return;
         const userParse: UserInterface = JSON.parse(userStorage);
-
+        console.log('token: ', __getToken());
         const apiUrl = `${baseURL}${versionEndpoints.v1}${featuresEndpoints.report}${functionEndpoints.report.getReportByUserID}/${userParse.userID}`;
-        axios.get(apiUrl)
+        axios.get(apiUrl,
+            {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`,
+                }
+            }
+        )
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');
@@ -451,83 +457,90 @@ const ReportHistoryComponent: React.FC = () => {
             </div>
 
             <div>
-                {filteredReports.slice(indexOfFirstReport, indexOfLastReport).map(report => (
-                    <OrderReport
-                        key={report.reportID}
-                        report={report}
-                        onViewDetails={handleViewDetails}
-                        onMarkResolved={handleMarkResolved}
-                    />
-                ))}
+                {filteredReports.length > 0 ? filteredReports.slice(indexOfFirstReport, indexOfLastReport).map(report => (
+                    <>
+                        <OrderReport
+                            key={report.reportID}
+                            report={report}
+                            onViewDetails={handleViewDetails}
+                            onMarkResolved={handleMarkResolved}
+                        />
+                        <div className="mt-8 flex flex-wrap items-center justify-center space-x-4">
+                            <select
+                                value={itemsPerPage}
+                                onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                                className="border rounded-md px-3 py-2 text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:border-orange-500"
+                            >
+                                <option value={5}>5/page</option>
+                                <option value={10}>10/page</option>
+                                <option value={20}>20/page</option>
+                                <option value={50}>50/page</option>
+                            </select>
+
+                            <button
+                                onClick={() => paginate(currentPage - 1)}
+                                disabled={currentPage === 1}
+                                className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                            >
+                                &lt;
+                            </button>
+
+                            {renderPageNumbers().map((number, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => typeof number === 'number' && paginate(number)}
+                                    className={`px-3 py-2 rounded-md ${number === currentPage
+                                        ? 'bg-orange-500 text-white'
+                                        : 'text-gray-700 hover:bg-gray-100'
+                                        } ${number === '...' ? 'cursor-default' : ''}`}
+                                >
+                                    {number}
+                                </button>
+                            ))}
+
+                            <button
+                                onClick={() => paginate(currentPage + 1)}
+                                disabled={currentPage === totalPages}
+                                className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                            >
+                                &gt;
+                            </button>
+
+                            <div className="flex items-center space-x-2 mt-4 sm:mt-0">
+                                <span className="text-gray-600">Go to</span>
+                                <input
+                                    type="text"
+                                    className="border border-gray-300 rounded-md w-16 px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                    value={goToPage}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoToPage(e.target.value)}
+                                    onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                                        if (e.key === 'Enter') {
+                                            const page = Math.max(1, Math.min(parseInt(goToPage), totalPages));
+                                            if (!isNaN(page)) {
+                                                paginate(page);
+                                            }
+                                        }
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </>
+                )) : (
+                    <div>
+                        <span className="text-gray-500 text-sm text-center justify-center content-center">Do not have any report</span>
+                    </div>
+                )}
             </div>
 
-            <div className="mt-8 flex flex-wrap items-center justify-center space-x-4">
-                <select
-                    value={itemsPerPage}
-                    onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-                    className="border rounded-md px-3 py-2 text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:border-orange-500"
-                >
-                    <option value={5}>5/page</option>
-                    <option value={10}>10/page</option>
-                    <option value={20}>20/page</option>
-                    <option value={50}>50/page</option>
-                </select>
-
-                <button
-                    onClick={() => paginate(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
-                >
-                    &lt;
-                </button>
-
-                {renderPageNumbers().map((number, index) => (
-                    <button
-                        key={index}
-                        onClick={() => typeof number === 'number' && paginate(number)}
-                        className={`px-3 py-2 rounded-md ${number === currentPage
-                            ? 'bg-orange-500 text-white'
-                            : 'text-gray-700 hover:bg-gray-100'
-                            } ${number === '...' ? 'cursor-default' : ''}`}
-                    >
-                        {number}
-                    </button>
-                ))}
-
-                <button
-                    onClick={() => paginate(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
-                >
-                    &gt;
-                </button>
-
-                <div className="flex items-center space-x-2 mt-4 sm:mt-0">
-                    <span className="text-gray-600">Go to</span>
-                    <input
-                        type="text"
-                        className="border border-gray-300 rounded-md w-16 px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                        value={goToPage}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoToPage(e.target.value)}
-                        onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                            if (e.key === 'Enter') {
-                                const page = Math.max(1, Math.min(parseInt(goToPage), totalPages));
-                                if (!isNaN(page)) {
-                                    paginate(page);
-                                }
-                            }
-                        }}
-                    />
-                </div>
-            </div>
+            
 
             {isModalOpen && selectedReport && (
-                <ReportModal
-                    report={selectedReport}
-                    onClose={handleCloseModal}
-                    onMarkResolved={handleMarkResolved}
-                />
-            )}
+                    <ReportModal
+                        report={selectedReport}
+                        onClose={handleCloseModal}
+                        onMarkResolved={handleMarkResolved}
+                    />
+                )}
         </div>
     );
 };

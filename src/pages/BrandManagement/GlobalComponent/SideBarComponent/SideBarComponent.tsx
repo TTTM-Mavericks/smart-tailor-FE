@@ -1,5 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { NotificationInterface } from '../../../../models/NotificationModel';
+import Cookies from 'js-cookie';
+import { UserInterface } from '../../../../models/UserModel';
+import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
+import { toast } from 'react-toastify';
+import { __getToken } from '../../../../App';
 
 interface SidebarProps {
     menuOpen: boolean;
@@ -8,7 +14,77 @@ interface SidebarProps {
     handleMenuClick: (menu: string) => void;
 }
 
+
+
 const Sidebar: React.FC<SidebarProps> = ({ menuOpen, toggleMenu, activeMenu, handleMenuClick }) => {
+    const [notificationList, setNotificationList] = useState<NotificationInterface[]>([]);
+    const [notiNumber, setNotiNumber] = useState<number>(0);
+    const [messages, setMessages] = useState<NotificationInterface[]>([]);
+
+    const userStorage = Cookies.get('userAuth');
+    if (!userStorage) return;
+    const userParse: UserInterface = JSON.parse(userStorage);
+    const websocketUrl = `ws://localhost:6969/websocket?userid=${userParse.userID}`;
+
+    // 1. First useEffect to fetch notifications and set notiNumber
+    useEffect(() => {
+        const fetchNotifications = async () => {
+            try {
+                const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.notification + functionEndpoints.notification.getNotiByUserId}/${userParse.userID}`, null, __getToken());
+                if (response.status === 200) {
+                    const sortedData = response.data.sort((a: NotificationInterface, b: NotificationInterface) => {
+                        return new Date(b.createDate).getTime() - new Date(a.createDate).getTime();
+                    });
+                    setNotificationList(sortedData);
+                    console.log(response.data);
+                    const filterStatusNoti = response.data.filter((noti: NotificationInterface) => noti.status === false);
+                    setNotiNumber(filterStatusNoti.length);
+                } else {
+
+                }
+            } catch (error) {
+                toast.error(`${error}`, { autoClose: 4000 });
+                console.log('error: ', error);
+            }
+        };
+
+        fetchNotifications();
+    }, [userParse.userID]);
+
+    // 2. Second useEffect to handle WebSocket connection after notiNumber is set
+    useEffect(() => {
+        const originalTitle = document.title;
+        const websocket = new WebSocket(websocketUrl);
+
+        websocket.onopen = () => {
+            console.log('WebSocket connection opened');
+        };
+
+        websocket.onmessage = (event) => {
+            console.log('Message received:', event.data);
+            const data: NotificationInterface = JSON.parse(event.data);
+            console.log(data);
+            setMessages(prevMessages => [...prevMessages, data]);
+            setNotiNumber(prevNotiNumber => prevNotiNumber + 1); // Ensure state is updated correctly
+            document.title = `New message | ${originalTitle}`;
+        };
+
+        websocket.onclose = () => {
+            console.log('WebSocket connection closed');
+        };
+
+        websocket.onerror = (error) => {
+            console.error('WebSocket error:', error);
+        };
+
+        return () => {
+            websocket.close();
+        };
+    }, [websocketUrl]);
+
+    
+
+
     return (
         <aside className={`bg-gradient-to-br from-gray-800 to-gray-900 ${menuOpen ? 'translate-x-0' : '-translate-x-80'} fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0`}>
             <div className="relative border-b border-white/20">
@@ -30,7 +106,7 @@ const Sidebar: React.FC<SidebarProps> = ({ menuOpen, toggleMenu, activeMenu, han
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
                                 <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"></path>
                             </svg>
-                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">Manage Notification</p>
+                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">Manage Notification ({notiNumber})</p>
                         </div>
                     </li>
                     <li>

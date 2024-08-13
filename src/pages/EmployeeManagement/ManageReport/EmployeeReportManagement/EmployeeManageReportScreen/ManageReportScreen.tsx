@@ -15,6 +15,7 @@ import { toast } from 'react-toastify';
 import { UserInterface } from '../../../../../models/UserModel';
 import Cookies from 'js-cookie';
 import { ArrowDropDown, MarkChatRead, Visibility } from '@mui/icons-material';
+import { __getToken } from '../../../../../App';
 
 const getStatusColor = (status: string) => {
     switch (status) {
@@ -470,7 +471,11 @@ const EmployeeManageReport: React.FC = () => {
     ];
     useEffect(() => {
         const apiUrl = `${baseURL}${versionEndpoints.v1}${featuresEndpoints.report}${functionEndpoints.report.getAllReport}`;
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`,  // Add the Bearer token here
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');

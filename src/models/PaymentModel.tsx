@@ -37,5 +37,6 @@ export interface PaymentOrderInterface {
     paymentType: string;
     orderID: string;
     payOSResponse: PayOSResponseInterface;
-    paymentURl?: string
+    paymentURl?: string,
+    createDate?: string
 }

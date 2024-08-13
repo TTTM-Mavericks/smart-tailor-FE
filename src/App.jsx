@@ -43,7 +43,9 @@ import { DashboardAccountantScreens } from './pages/AccountantManagement';
 import ToogleComponent from './pages/AccountantManagement/GlobalComponent/Toogle/ToogleComponent';
 import ReportHistorySreen from './pages/Order/ReportHistory/ReportHistorySreen';
 import AboutUs from './pages/AboutUs/test';
-import { NotificationComponent } from './components/Notification/NotificationComponent';
+import NotificationComponent from './components/Notification/NotificationComponent';
+import AllTransactionHistoryComponent from './pages/Order/AllTransactionHistory/AllTransactionHistoryComponent';
+
 
 
 
@@ -99,6 +101,20 @@ const ConditionalTokenRefreshDialog = () => {
   return !shouldHide ? <TokenRefreshDialogComponent /> : null;
 };
 
+export const __getToken = () => {
+  const tokenStorage = Cookies.get('token');
+  if (!tokenStorage) {
+    return;
+  } else
+    return tokenStorage
+}
+
+export const __getUserLogined = () => {
+  const userAuth = localStorage.getItem('userAuth');
+  if (userAuth) {
+    return JSON.parse(userAuth);
+  } else return;
+}
 
 function App() {
   return (
@@ -147,6 +163,8 @@ function App() {
           <Route path='/design_detail/:id' element={<OrderProductScreen></OrderProductScreen>} />
           <Route path='/report_history' element={<ReportHistorySreen></ReportHistorySreen>} />
           <Route path='/refund_history' element={<RefundTransactionHistoryScreen></RefundTransactionHistoryScreen>} />
+          <Route path='/transaction_history' element={<AllTransactionHistoryComponent></AllTransactionHistoryComponent>} />
+
 
 
 

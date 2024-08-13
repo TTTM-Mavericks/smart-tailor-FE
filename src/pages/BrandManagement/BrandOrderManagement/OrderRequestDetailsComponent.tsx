@@ -12,6 +12,7 @@ import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../
 import { toast } from 'react-toastify';
 import { UserInterface } from '../../../models/UserModel';
 import { useNavigate } from 'react-router-dom';
+import { __getToken } from '../../../App';
 
 interface OrderDetailsProps {
     order: OrderInterface;
@@ -302,7 +303,7 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
                 detailList: sizeQuantities.map((item) => (item.designDetailId))
             }
             console.log('bodyRequest: ', bodyRequest);
-            const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.brandPickOrder}`, bodyRequest);
+            const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.brandPickOrder}`, bodyRequest, __getToken());
             if (response.status === 200) {
                 console.log(response.data);
                 toast.success(`${response.message}`, { autoClose: 4000 });
@@ -420,7 +421,7 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
                                             justifyContent: 'center',
                                             alignContent: 'center',
                                             backgroundColor: whiteColor,
-                                            fontSize: 20
+                                            fontSize: 14
                                         }}
                                     >
                                         Remain: {formattedTime}
@@ -435,14 +436,14 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
                                         Accept
                                     </button>
                                 </div>
-                                <div style={{ marginTop: 0 }}>
+                                {/* <div style={{ marginTop: 0 }}>
                                     <button
                                         type="submit"
                                         className={`${style.orderRequest__button__deny} px-5 py-2.5 text-sm font-medium`}
                                     >
                                         Deny
                                     </button>
-                                </div>
+                                </div> */}
                             </Grid>
 
                         </Grid>

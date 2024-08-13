@@ -38,6 +38,8 @@ export const featuresEndpoints = {
   systemPropertise: '/system-property',
   brandPropertise: '/brand-property',
   SampleProduct: '/sample-product-data',
+  notification: '/notification',
+  payment: '/payment'
 
 }
 export const functionEndpoints = {
@@ -196,6 +198,14 @@ export const functionEndpoints = {
     getSamplePriductByParentOrderID: '/get-sample-product-data-by-parent-order-id',
     updateSampleProductStatus: '/update-sample-product-data',
     getsampleProductDataByParentOrderId: '/get-sample-product-data-by-parent-order-id'
+  },
+  notification: {
+    getNotiByUserId: '/get-all-notification-user-id',
+    updateReadStatus: '/update-notification-status',
+    sendNoti: '/send-notification'
+  },
+  payment: {
+    getPaymentByUserID: '/get-payment-by-user-id'
   }
 }
 
@@ -227,7 +237,7 @@ const api = {
     }
   },
 
-  put: async (url: string, data: any, accessToken?: string) => {
+  put: async (url: string, data?: any, accessToken?: string) => {
     try {
       const response = await axiosInstance.put(url, data, getRequestConfig(accessToken));
       return response.data;

@@ -34,6 +34,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Cloud, UploadCloud } from 'react-feather';
 import { __handleDownloadElementAsPng, __handleGetElementAsBase64 } from '../../utils/CanvasUtils';
 import { useSnapshot } from 'valtio';
+import { __getToken } from '../../App';
 
 
 interface ItemMask {
@@ -102,7 +103,7 @@ function CustomDesignScreen() {
 
   // ---------------UseState Variable---------------//
   const [selectedPartOfCloth, setSelectedPartOfCloth] = useState<PartOfDesignInterface>();
-  const [partOfClothData, setPartOfClothData] = useState<PartOfDesignInterface[]>();
+  const [partOfClothData, setPartOfClothData] = useState<PartOfDesignInterface[]>([]);
   const [selectedStamp, setSelectedStamp] = useState<ItemMaskInterface[]>();
   const [selectedItem, setSelectedItem] = useState<string>('LOGO_PART');
   const [file, setFile] = useState('');
@@ -166,10 +167,10 @@ function CustomDesignScreen() {
     setUpdatePartData(updatePart);
     setPartOfClothData(updatePart);
     const result = updatePart?.find((item: PartOfDesignInterface) => item.partOfDesignID === selectedPartOfCloth?.partOfDesignID);
-    // if (result) {
-    //   console.log('selectedPartOfCloth change: ', result.itemMasks);
-    //   setSelectedStamp(result.itemMasks)
-    // }
+    if (result) {
+      console.log('selectedPartOfCloth change: ', result.itemMasks);
+      setSelectedStamp(result.itemMasks)
+    }
     state.modelData = updatePart
 
   }, []);
@@ -254,7 +255,7 @@ function CustomDesignScreen() {
   useEffect(() => {
 
     setPartOfClothData(partOfClothData);
-    // state.modelData = partOfClothData;
+    state.modelData = partOfClothData;
 
   }, [partOfClothData])
 
@@ -288,9 +289,9 @@ function CustomDesignScreen() {
   }, [selectedStamp, selectedPartOfCloth]);
 
 
-  useEffect(() => {
-    setSelectedStamp(selectedStamp);
-  }, [selectedStamp])
+  // useEffect(() => {
+  //   setSelectedStamp(selectedStamp);
+  // }, [selectedStamp]);
 
   useEffect(() => {
     __handleGetAllSystemImageStamps()
@@ -402,11 +403,12 @@ function CustomDesignScreen() {
         const sortedParts = response.data.partOfDesign.sort((a: PartOfDesignInterface, b: PartOfDesignInterface) => order.indexOf(a.partOfDesignName) - order.indexOf(b.partOfDesignName));
         console.log(sortedParts);
         setSelectedPartOfCloth(response.data.partOfDesign[0]);
+        // setPartOfClothData(response.data.partOfDesign)
         setTypeOfModelID(response.data.expertTailoring.expertTailoringID);
         setColorModel(response.data.color);
         setTitleDesign(response.data.titleDesign);
         state.color = response.data.color;
-        // state.modelData = response.data.partOfDesign
+        state.modelData = response.data.partOfDesign
         setIsLoadingPage(false);
 
       }
@@ -794,7 +796,7 @@ function CustomDesignScreen() {
       setIsLoadingPage(true);
     }
     try {
-      const response = await api.put(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.updateDesign}/${id}`, mainDesign);
+      const response = await api.put(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.updateDesign}/${id}`, mainDesign, __getToken());
       if (response.status === 200) {
         // toast.success(`${response.message}`, { autoClose: 4000 });
 
@@ -812,7 +814,7 @@ function CustomDesignScreen() {
 
         }
       } else {
-        toast.error(`${response.message}`, { autoClose: 4000 });
+        toast.error(`${'Please enter material into part of cloth'}`, { autoClose: 4000 });
         setIsLoadingPage(false);
       }
     } catch (error) {

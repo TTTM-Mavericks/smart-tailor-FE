@@ -8,6 +8,7 @@ import EmployeeManageOrder from '../ManageOrder/EmployeeOrderManagement/Employee
 import EmployeeManageTransaction from '../ManageTransaction/EmployeeTransactionManagement/EmployeeManageTransactionScreen/ManageTransactionScreen';
 import ManageNotificationScreens from '../ManageNotification/ManageNotificationScreens';
 import EmployeeProfileSetup from '../EmployeeProfile/EmployeeProfileComponent';
+import NotificationEmployeeComponent from '../GlobalComponent/Notification/NotificationEmployeeComponent';
 
 const DashboardEmployeeScreens = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -91,7 +92,7 @@ const DashboardEmployeeScreens = () => {
             case 'employee_manage_transaction':
                 return <EmployeeManageTransaction />;
             case 'employee_manage_notification':
-                return <ManageNotificationScreens />;
+                return <NotificationEmployeeComponent />;
             case 'employee_profile':
                 return <EmployeeProfileSetup />;
             default:
@@ -104,7 +105,7 @@ const DashboardEmployeeScreens = () => {
     return (
         <div className="flex">
             <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
-            <div className="flex flex-col w-full">
+            <div  className="flex flex-col w-full">
                 <Navbar toggleMenu={toggleMenu} menu={activeMenu} popperOpen={popperOpen} togglePopper={togglePopper} />
                 <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
                     {renderComponent()}
