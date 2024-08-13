@@ -39,7 +39,7 @@ export const featuresEndpoints = {
   brandPropertise: '/brand-property',
   SampleProduct: '/sample-product-data',
   notification: '/notification',
-  payment: '/payment'
+  payment: '/payment',
 
 }
 export const functionEndpoints = {
@@ -65,7 +65,7 @@ export const functionEndpoints = {
   designDetail: {
     addNewDesignDetail: '/add-new-design-detail',
     getAllInforOrderDetail: '/get-all-design-detail-by-order-id',
-    getTotalPriceByParentOrderId:'/calculate-total-price-by-parent-order-id'
+    getTotalPriceByParentOrderId: '/calculate-total-price-by-parent-order-id'
   },
   brand: {
     addExcel: '/add-new-brand-material-by-excel-file',
@@ -188,7 +188,9 @@ export const functionEndpoints = {
 
   },
   systemPropertise: {
-    getAllSystemPropertise: '/get-all-system-properties'
+    getAllSystemPropertise: '/get-all-system-properties',
+    updateSystemPropertise: '/update-system-property',
+    addSystemPropertise: '/add-new-system-property'
   },
   brandPropertise: {
     addNewBrandPropertise: '/add-new-brand-property'
