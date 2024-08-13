@@ -21,7 +21,7 @@ type CancelOrderPolicyDialogProps = {
     isOpen: boolean;
     onClose: () => void;
     onClick?: () => void;
-    paymentData?: PaymentOrderInterface[];
+    paymentData?: any;
 }
 
 interface PaymentFormData {

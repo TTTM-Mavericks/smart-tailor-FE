@@ -566,10 +566,6 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [userAuth, setUserAuth] = useState<UserInterface>();
     const [isOpenPaymentDialog, setIsOpenPaymentDialog] = useState<{ [key: string]: boolean }>({});
-    const [selectedOwner, setSelectedOwner] = React.useState('Owner');
-    const [selectedCategory, setSelectedCategory] = React.useState('Category');
-    const [selectedDate, setSelectedDate] = React.useState('Modify date');
-    const [selectedRelevance, setSelectedRelevance] = React.useState('Liên quan nhất');
     const [activeTab, setActiveTab] = useState('All');
     const [orderChild, setOrderChild] = useState<{ [orderId: string]: OrderDetailInterface[] | SubOrder[] }>({});
     const [selectedOrder, setSelectedOrder] = useState<any>();

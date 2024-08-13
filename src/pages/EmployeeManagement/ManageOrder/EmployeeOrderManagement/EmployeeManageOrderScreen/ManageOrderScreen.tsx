@@ -365,7 +365,7 @@ const EmployeeOrderFields: React.FC<{
             {showDesignDetails && (
                 <DesignDetails design={designDetails} />
             )}
-            <div className="mt-6 flex justify-end">
+            <div className="mt-6 flex justify-end mb-2">
 
                 {order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCEL' && order.orderStatus !== 'NOT_VERIFY' && (
 
@@ -417,7 +417,7 @@ const EmployeeOrderFields: React.FC<{
                 {order.orderStatus === 'NOT_VERIFY' && (
                     <button
                         onClick={() => __handleRejectOrder(order.orderID)}
-                        className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4"
+                        className="mb-2 bg-indigo-500 text-sm text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"
                         style={{
                             borderRadius: 4,
                             backgroundColor: redColor
