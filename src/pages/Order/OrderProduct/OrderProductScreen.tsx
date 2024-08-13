@@ -19,6 +19,9 @@ import { DesignInterface, ExpertTailoringSizeInterface } from '../../../models/D
 import { toast, ToastContainer } from 'react-toastify';
 import LoadingComponent from '../../../components/Loading/LoadingComponent';
 import { __handleAddCommasToNumber, __handleRoundToThreeDecimalPlaces } from '../../../utils/NumbericUtils';
+import { __handleSendNotification } from '../../../utils/NotificationUtils';
+import { __getToken, __getUserLogined } from '../../../App';
+import { UserInterface } from '../../../models/UserModel';
 
 
 interface SizeQuantity {
@@ -52,12 +55,11 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
         fontSize: '12px',
     },
     '& .MuiInputLabel-root': {
-        fontSize: '12px', // Adjust font size of the label
-        marginTop: '-10px'
+        fontSize: '10px', // Adjust font size of the label
+        paddingTop: '0px'
     },
     '& .MuiInputLabel-root.Mui-focused': {
         color: primaryColor, // Label color when focused
-        marginTop: '0px'
     },
     '& .MuiOutlinedInput-root': {
         '& fieldset': {
@@ -264,13 +266,29 @@ const OrderProductScreen = () => {
                 buyerName: selectedAddress.fullName,
             }
             console.log('bodyRequest: ', bodyRequest);
-            const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.designDetail + functionEndpoints.designDetail.addNewDesignDetail}`, bodyRequest);
+            const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.designDetail + functionEndpoints.designDetail.addNewDesignDetail}`, bodyRequest, __getToken());
             if (response.status === 200) {
                 // await __handleCreateOrder();
                 toast.success(`${response.message}`, { autoClose: 4000 });
+
+
+                const user: UserInterface = __getUserLogined();
+                console.log(response.data.employeeID);
+                const bodyRequest = {
+                    senderID: user.userID,
+                    recipientID: response.data.employeeID,
+                    action: "CREATE",
+                    type: "ORDER",
+                    targetID: response.data.orderID,
+                    message: ""
+                }
+                console.log(bodyRequest);
+                __handleSendNotification(bodyRequest);
+
                 setTimeout(() => {
                     navigate(`/order_detail/${response.data.orderID}`);
                 }, 1000);
+
             }
             else {
                 setIsLoadingPage(false);
@@ -472,7 +490,7 @@ const OrderProductScreen = () => {
         <div className={`${style.orderProduct__container}`}>
             <HeaderComponent></HeaderComponent>
             <LoadingComponent isLoading={isLoadingPage}></LoadingComponent>
-
+            <ToastContainer></ToastContainer>
             <div>
                 <div className="py-0 md:px-6 2xl:px-20 2xl:container 2xl:mx-auto">
                     <div className="mt-2 flex flex-col xl:flex-row jusitfy-center items-stretch w-full xl:space-x-8 space-y-4 md:space-y-6 xl:space-y-0">
@@ -546,7 +564,7 @@ const OrderProductScreen = () => {
                                                                                         __handleSizeChange(index, newValue.sizeID, newValue.sizeName);
                                                                                     }
                                                                                 }}
-                                                                                renderInput={(params) => <CustomTextField {...params} label="Size" variant="outlined" />}
+                                                                                renderInput={(params) => <CustomTextField {...params} placeholder='Size' variant="outlined" />}
                                                                             />
                                                                         </Grid>
                                                                         <Grid className={`${style.orderProduct__container__detail__sizeDetail__quantity}`} item>
@@ -556,8 +574,9 @@ const OrderProductScreen = () => {
                                                                                 label="Quantity"
                                                                                 value={sq.quantity}
                                                                                 onChange={(e) => __handleQuantityChange(index, Number(e.target.value))}
-                                                                                inputProps={{ min: 1 }}
+                                                                                inputProps={{ min: 1, max: 5000 }}
                                                                                 style={{ marginLeft: 20, marginRight: 10 }}
+
                                                                             />
                                                                             <FaMinusCircle size={25} color={primaryColor} onClick={() => __handleRemoveSizeQuantity(index)} style={{ display: sizeQuantities.length === 1 ? 'none' : 'flex', cursor: 'pointer' }}>
                                                                             </FaMinusCircle>
@@ -609,7 +628,7 @@ const OrderProductScreen = () => {
                                                                                 </Grid>
                                                                                 <Grid item>
                                                                                     <CustomTextFieldSizeCustom
-                                                                                        label="Ring 1 (cm)"
+                                                                                        label="Shoulder (cm)"
                                                                                         variant="outlined"
                                                                                         type="number"
                                                                                         value={sq.ring1 || 1}
@@ -620,7 +639,7 @@ const OrderProductScreen = () => {
                                                                                 </Grid>
                                                                                 <Grid item>
                                                                                     <CustomTextFieldSizeCustom
-                                                                                        label="Ring 2 (cm)"
+                                                                                        label="Bust (cm)"
                                                                                         variant="outlined"
                                                                                         type="number"
                                                                                         value={sq.ring2 || 1}
@@ -631,7 +650,7 @@ const OrderProductScreen = () => {
                                                                                 </Grid>
                                                                                 <Grid item>
                                                                                     <CustomTextFieldSizeCustom
-                                                                                        label="Ring 3 (cm)"
+                                                                                        label="Waist (cm)"
                                                                                         variant="outlined"
                                                                                         type="number"
                                                                                         value={sq.ring3 || 1}
@@ -643,8 +662,14 @@ const OrderProductScreen = () => {
                                                                             </div>
 
                                                                             <DialogActions>
-                                                                                <Button onClick={__handleClose}>Disagree</Button>
-                                                                                <button autoFocus onClick={__handleClose} style={{ width: '150px', backgroundColor: primaryColor }} >
+                                                                                <button
+                                                                                    className="text-white flex items-center justify-center px-2 py-1"
+                                                                                    style={{ fontSize: 15, color: redColor, borderRadius: 4 }}
+                                                                                    onClick={__handleClose}>Close</button>
+                                                                                <button autoFocus onClick={__handleClose}
+                                                                                    className="text-white flex items-center justify-center px-2 py-1"
+                                                                                    style={{ fontSize: 15, backgroundColor: primaryColor, borderRadius: 4 }}
+                                                                                >
                                                                                     Accept
                                                                                 </button>
                                                                             </DialogActions>
@@ -708,7 +733,7 @@ const OrderProductScreen = () => {
                         {/* Order summary */}
                         <div className="bg-gray-50 light:bg-gray-800 w-full xl:w-2/5 flex justify-between items-center md:items-start px-4 py-6 md:p-6 xl:p-8 flex-col">
                             <div className="flex flex-col w-full bg-gray-50 light:bg-gray-800 space-y-6 mb-10">
-                                <h3 className="text-xl light:text-white font-semibold leading-5 text-gray-800">Summary</h3>
+                                <h3 className="text-xl light:text-white font-semibold leading-5 text-gray-800">Material price summary</h3>
                                 <div className="flex justify-center items-center w-full space-y-4 flex-col border-gray-200 border-b pb-4">
                                     <div className="flex justify-between w-full">
                                         <p className="text-sm light:text-white leading-4 text-gray-800">Min price</p>
@@ -720,24 +745,21 @@ const OrderProductScreen = () => {
                                     </div>
                                     <div className="flex justify-between items-center w-full">
                                         <p className="text-sm light:text-white leading-4 text-gray-800">Discount <span className="bg-gray-200 p-1 text-xs font-medium light:bg-white light:text-gray-800 leading-3 text-gray-800">Quantity (0%) </span></p>
-                                        <p className="text-sm light:text-gray-300 leading-4 text-gray-600">-{((materialPrice?.min + materialPrice?.max) / 2 * 0 / 100) == 0 ? __handleAddCommasToNumber((materialPrice?.min + materialPrice?.max) / 2 * 0 / 100) : '0'} VND</p>
+                                        <p className="text-sm light:text-gray-300 leading-4 text-gray-600">0 VND</p>
                                     </div>
-                                    <div className="flex justify-between items-center w-full">
-                                        <p className="text-sm light:text-white leading-4 text-gray-800">Shipping</p>
-                                        <p className="text-sm light:text-gray-300 leading-4 text-gray-600">Self-payment</p>
-                                    </div>
+
                                 </div>
                                 <div className="flex justify-between items-center w-full">
-                                    <p className="text-base light:text-white font-semibold leading-4 text-gray-800">Total</p>
+                                    <p className="text-base light:text-white font-semibold leading-4 text-gray-800">Total material / design</p>
                                     <div>
                                         <span> ~ </span>
-                                        <span style={{ color: redColor, fontWeight: 400 }} className="text-gray-600">{__handleAddCommasToNumber(__handleCalculateTotalMax(materialPrice?.min, materialPrice?.max, 2))} VND</span>
+                                        <span style={{ color: redColor, fontWeight: 400 }} className="text-gray-600">{__handleAddCommasToNumber(__handleCalculateTotalMax(materialPrice?.min, materialPrice?.max, 0))} VND</span>
                                     </div>
 
                                 </div>
                             </div>
 
-                            <h3 className="text-md light:text-white font-semibold leading-5 text-gray-800">Customer</h3>
+                            <h3 className="text-xl light:text-white font-semibold leading-5 text-gray-800">Customer</h3>
                             <div className="flex flex-col md:flex-row xl:flex-col justify-start items-stretch h-full w-full md:space-x-6 lg:space-x-8 xl:space-x-0">
                                 <div className="flex flex-col justify-start items-start flex-shrink-0" >
                                     {/* <div className=" justify-center w-full md:justify-start items-center space-x-4 py-8 border-b border-gray-200">
@@ -809,8 +831,6 @@ const OrderProductScreen = () => {
             {/* DIALOG */}
             <OrderPolicyDialogComponent onClose={__handleCloseOrderPolicyDilog} isOpen={isOpenOrderPolicyDialog} onOrderProduct={__handlePostSizeAndQuatity}></OrderPolicyDialogComponent>
             <ChangeAddressDialogComponent onSelectedAddressData={(address) => __handleGetSelectedAdress(address)} isOpen={isChangeAddressDialogOpen} onClose={() => __handleOpenChangeAddressDialog(false)}></ChangeAddressDialogComponent>
-            <ToastContainer></ToastContainer>
-
         </div >
     );
 };

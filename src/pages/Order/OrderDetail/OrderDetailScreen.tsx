@@ -27,7 +27,8 @@ import { Report } from '../../../models/EmployeeManageReportModel';
 import { ghtkLogo } from '../../../assets';
 import { height } from '@mui/system';
 import CustomerUpgradeDialog from '../../../components/Dialog/UpgradeDialog/CustomerUpgradeDialog';
-import { __getToken } from '../../../App';
+import { __getToken, __getUserLogined } from '../../../App';
+import { __handleSendNotification } from '../../../utils/NotificationUtils';
 
 
 export interface EstimatedStageInterface {
@@ -342,6 +343,19 @@ const OrderDetailScreen: React.FC = () => {
                 console.log('detail order: ', response.data);
                 setIsLoading(false);
                 toast.success(`${response.message}`, { autoClose: 4000 });
+
+                const user: UserInterface = __getUserLogined();
+                const bodyRequest = {
+                    senderID: user.userID,
+                    recipientID: orderDetail?.employeeID,
+                    action: "CANCEL",
+                    type: "ORDER",
+                    targetID: orderDetail?.orderID,
+                    message: ""
+                }
+                console.log(bodyRequest);
+                __handleSendNotification(bodyRequest);
+
                 setTimeout(() => {
                     window.location.reload();
                 }, 2000);
@@ -606,7 +620,7 @@ const OrderDetailScreen: React.FC = () => {
 
                     </div> */}
 
-                    {timeline && progressSteps && orderDetail?.orderStatus !== 'CANCEL' && (
+                    {timeline && progressSteps && (orderDetail?.orderStatus !== 'CANCEL' && orderDetail?.orderStatus !== 'NOT_VERIFY') && (
 
 
 
@@ -683,15 +697,19 @@ const OrderDetailScreen: React.FC = () => {
                                         <p className="text-gray-600 text-sm">Deposit</p>
                                         <p className="text-gray-600 text-sm">{referencePrice?.customerPriceDeposit ? __handleAddCommasToNumber(referencePrice?.customerPriceDeposit) : 'Loading'} VND</p>
                                     </div>
-                                    <div className="flex justify-between border-b pb-2">
+                                    {referencePrice?.customerPriceFirstStage !== '-1' && (
+                                        <div className="flex justify-between border-b pb-2">
                                         <p className="text-gray-600 text-sm">Stage 1</p>
                                         <p className="text-gray-600 text-sm">{referencePrice?.customerPriceFirstStage ? __handleAddCommasToNumber(referencePrice?.customerPriceFirstStage) : 'Loading'} VND</p>
                                     </div>
+                                    )}
+                                    {referencePrice?.customerSecondStage !== '-1' && (
                                     <div className="flex justify-between border-b pb-2">
                                         <p className="text-gray-600 text-sm">Stage 2</p>
                                         <p className="text-gray-600 text-sm">{referencePrice?.customerSecondStage ? __handleAddCommasToNumber(referencePrice?.customerSecondStage) : 'Loading'} VND</p>
 
                                     </div>
+                                    )}
                                     <div className="flex justify-between border-b pb-2">
                                         <p className="text-gray-600 text-sm">Shipping (Pay later)</p>
                                         {referencePrice?.customerShippingFee !== '-1' ? (
@@ -719,19 +737,19 @@ const OrderDetailScreen: React.FC = () => {
 
                                     </div>
                                 </div>
-                                {orderDetail?.paymentList && orderDetail?.paymentList?.length <= 0 && (
+                                {orderDetail?.paymentList && orderDetail?.paymentList.length === 0 &&
+                                    (orderDetail?.orderStatus !== 'DELIVERED' && orderDetail?.orderStatus !== 'COMPLETED') && (
+                                        <div className="flex justify-end mt-4">
+                                            <button
+                                                onClick={() => __handleOpenConfirmCalcelDialog()}
+                                                className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200 mr-4"
+                                                style={{ backgroundColor: redColor }}
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    )}
 
-                                    <div className="flex justify-end mt-4">
-                                        <button
-                                            onClick={() => __handleOpenConfirmCalcelDialog()}
-                                            className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200 mr-4"
-                                            style={{ backgroundColor: redColor }}
-                                        >
-                                            Cancel
-                                        </button>
-
-                                    </div>
-                                )}
                             </div>
 
 
@@ -749,6 +767,9 @@ const OrderDetailScreen: React.FC = () => {
                                                 <p className="text-gray-600 text-sm">Stage 1 price</p>
                                             )}
                                             {payment && payment[0].paymentType === 'STAGE_2' && (
+                                                <p className="text-gray-600 text-sm">Stage 2 price</p>
+                                            )}
+                                            {payment && payment[0].paymentType === 'COMPLETED_ORDER' && (
                                                 <p className="text-gray-600 text-sm">Stage 2 price</p>
                                             )}
                                             <p className="text-gray-600 text-sm">{payment?.map((item) => {
@@ -865,6 +886,7 @@ const OrderDetailScreen: React.FC = () => {
                 orderID={orderDetail?.orderID}
                 onClose={__handleCloseReportDialog}
                 isOpen={isOpenReportOrderDialog}
+                order={orderDetail}
             ></CustomerReportOrderDialogComponent>
 
             <CustomerReportOrderDialogComponent
@@ -876,7 +898,7 @@ const OrderDetailScreen: React.FC = () => {
             ></CustomerReportOrderDialogComponent>
 
             {
-                orderDetail?.orderStatus === 'DELIVERED' && (
+                orderDetail?.orderStatus === 'DELIVERED' || (orderDetail?.rating && orderDetail?.rating > 0) && (
 
                     <Dialog open={isOpenRatingDialog} onClose={() => setIsOpenRatingDialog(false)}>
                         <DialogTitle>

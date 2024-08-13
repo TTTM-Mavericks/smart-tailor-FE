@@ -29,6 +29,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { NotificationInterface } from '../../models/NotificationModel';
 import { IoMdNotifications } from "react-icons/io";
 import { generateNotificationMessage } from '../../utils/ElementUtils';
+import { __getToken } from '../../App';
 
 const navigation = {
   categories: [
@@ -213,7 +214,7 @@ export default function HeaderComponent() {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.notification + functionEndpoints.notification.getNotiByUserId}/${userParse.userID}`);
+        const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.notification + functionEndpoints.notification.getNotiByUserId}/${userParse.userID}`, null , __getToken());
         if (response.status === 200) {
           const sortedData = response.data.sort((a: NotificationInterface, b: NotificationInterface) => {
             return new Date(b.createDate).getTime() - new Date(a.createDate).getTime();

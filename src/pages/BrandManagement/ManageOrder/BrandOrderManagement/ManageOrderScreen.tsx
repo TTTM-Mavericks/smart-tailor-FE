@@ -617,6 +617,7 @@ const BrandOrderFields: React.FC<{
                                                         orderID={selectedStep?.orderID}
                                                         isOpen={true}
                                                         onClose={__handleCloseUpLoadProcessSampleProductDialog}
+                                                        orderDetail={order}
                                                     >
                                                     </BrandUploadProgcessSampleProduct>
                                                 )}
@@ -652,6 +653,7 @@ const BrandOrderFields: React.FC<{
                                                         orderID={selectedStep?.orderID}
                                                         isOpen={true}
                                                         onClose={__handleCloseUpLoadProcessSampleProductDialog}
+                                                        orderDetail={order}
                                                     >
                                                     </BrandUploadProgcessSampleProduct>
                                                 )}

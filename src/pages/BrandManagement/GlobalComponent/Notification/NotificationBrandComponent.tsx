@@ -13,6 +13,7 @@ import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../
 import LoadingComponent from '../../../../components/Loading/LoadingComponent';
 import { greenColor, primaryColor, whiteColor } from '../../../../root/ColorSystem';
 import { generateNotificationMessage } from '../../../../utils/ElementUtils';
+import { __getToken } from '../../../../App';
 
 
 export interface NotificationRealtimeInterface {
@@ -138,7 +139,7 @@ const NotificationBrandComponent: React.FC = () => {
     const __handleFetchNotification = async (userId: any) => {
         setIsLoading(true);
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.notification + functionEndpoints.notification.getNotiByUserId}/${userId}`);
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.notification + functionEndpoints.notification.getNotiByUserId}/${userId}`, null, __getToken());
             if (response.status === 200) {
                 const sortedData = response.data.sort((a: NotificationInterface, b: NotificationInterface) => {
                     return new Date(b.createDate).getTime() - new Date(a.createDate).getTime();
@@ -160,142 +161,159 @@ const NotificationBrandComponent: React.FC = () => {
     }
 
     const __handleMaskNotiRead = async (noti: NotificationInterface) => {
-        
-            try {
-                const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.notification + functionEndpoints.notification.updateReadStatus}/${noti.notificationID}`);
-                if (response.status === 200) {
-                    setNotificationList((prevNotifications) =>
-                        prevNotifications.map((item) =>
-                            item.notificationID === noti.notificationID
-                                ? { ...item, status: true }
-                                : item
-                        )
-                    );
-                }
-                else {
-                    toast.error(`${response.message}`, { autoClose: 4000 });
-                    return;
-                }
-            } catch (error) {
-                toast.error(`${error}`, { autoClose: 4000 });
-                console.log('error: ', error);
 
+        try {
+            const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.notification + functionEndpoints.notification.updateReadStatus}/${noti.notificationID}`);
+            if (response.status === 200) {
+                setNotificationList((prevNotifications) =>
+                    prevNotifications.map((item) =>
+                        item.notificationID === noti.notificationID
+                            ? { ...item, status: true }
+                            : item
+                    )
+                );
+
+                if(noti.type === 'REQUEST ACCEPT'){
+                    window.open(`/brand/manage_order_request/${noti.targetID}`, '_blank')
+                }
             }
+            else {
+                toast.error(`${response.message}`, { autoClose: 4000 });
+                return;
+            }
+        } catch (error) {
+            toast.error(`${error}`, { autoClose: 4000 });
+            console.log('error: ', error);
+
         }
+    }
 
 
-        return (
-            <div>
-                <LoadingComponent isLoading={isLoading}></LoadingComponent>
-                {/* <ToastContainer></ToastContainer> */}
-                <div  >
-                    <div style={{ width: '800px', margin: '0 auto' }} >
+    return (
+        <div style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }} >
+            <LoadingComponent isLoading={isLoading}></LoadingComponent>
+            {/* <ToastContainer></ToastContainer> */}
+            <div >
 
-                        <div style={{ width: '60%' }}>
-                            {messages.length > 0 && (
-                                <div>
-                                    <span className="text-gray-500 text-sm">New notifications</span>
-                                    <div className="space-y-4 p-4">
-                                        {paginate(messages, currentPage).map((notification: NotificationInterface, index: number) => (
-                                            <Card
-                                                key={index}
-                                                className="shadow-lg rounded-lg transition-shadow duration-300 hover:shadow-xl"
-                                                style={{ backgroundColor: !notification.status ? '#FAFAFA' : whiteColor }}
-                                                onClick={() => __handleMaskNotiRead(notification)}
-                                            >
-                                                <CardContent>
-                                                    <div className="flex items-center justify-between mb-4">
-                                                        <span className="font-semibold text-indigo-700 text-sm">
-                                                            {notification.type || 'SYSTEM'}
-                                                        </span>
-                                                        <span className="font-semibold text-indigo-700 text-sm" style={{ fontSize: 10, color: notification.status ? greenColor : primaryColor }}>
-                                                            {notification.status ? 'Read' : 'Not read'}
-                                                        </span>
+                <div style={{ width: '100%' }}>
+                    {messages.length > 0 ? (
+                        <div>
+                            <span className="text-gray-500 text-sm">New notifications</span>
+                            <div className="space-y-4 p-4">
+                                {paginate(messages, currentPage).map((notification: NotificationInterface, index: number) => (
+                                    <Card
+                                        key={index}
+                                        className="shadow-lg rounded-lg transition-shadow duration-300 hover:shadow-xl"
+                                        style={{ backgroundColor: !notification.status ? '#FAFAFA' : whiteColor }}
+                                        onClick={() => __handleMaskNotiRead(notification)}
+                                    >
+                                        <CardContent>
+                                            <div className="flex items-center justify-between mb-4">
+                                                <span className="font-semibold text-indigo-700 text-sm">
+                                                    {notification.type || 'SYSTEM'}: {notification.targetID}
+                                                </span>
+                                                <span className="font-semibold text-indigo-700 text-sm" style={{ fontSize: 10, color: notification.status ? greenColor : primaryColor }}>
+                                                    {notification.status ? 'Read' : 'Not read'}
+                                                </span>
 
-                                                    </div>
-                                                    <Typography variant="body2" className="text-gray-700 mb-4">
-                                                        {generateNotificationMessage(notification)}
-                                                    </Typography>
-                                                    <Typography variant="body2" className="text-gray-700 mb-4 pt-1">
-                                                        ID: {notification.targetID}
-                                                    </Typography>
-                                                    <Typography variant="caption" className="text-gray-500">
-                                                        Create at: {notification.createDate}
-                                                    </Typography>
-                                                </CardContent>
-                                            </Card>
-                                        ))}
-                                    </div>
-
-                                </div>
-                            )}
-                            <div className="mt-10">
-                                <span className="text-gray-500 text-sm">Old notifications</span>
-                                <div className="space-y-4 p-4">
-                                    {paginate(notificationList, currentPage).map((notification: NotificationInterface) => (
-                                        <Card
-                                            key={notification.notificationID}
-                                            className="shadow-lg rounded-lg transition-shadow duration-300 hover:shadow-xl"
-                                            style={{ backgroundColor: !notification.status ? '#FAFAFA' : whiteColor }}
-                                            onClick={() => __handleMaskNotiRead(notification)}
-                                        >
-                                            <CardContent>
-                                                <div className="flex items-center justify-between mb-4">
-                                                    <span className="font-semibold text-indigo-700 text-sm">
-                                                        {notification.type || 'SYSTEM'}
-                                                    </span>
-                                                    <span className="font-semibold text-indigo-700 text-sm" style={{ fontSize: 10, color: notification.status ? greenColor : primaryColor }}>
-                                                        {notification.status ? 'Read' : 'Not read'}
-                                                    </span>
-                                                </div>
-                                                <Typography variant="body2" className="text-gray-700 mb-4">
-                                                    {generateNotificationMessage(notification)}
-                                                </Typography>
-                                                <Typography variant="body2" className="text-gray-700 mb-4 pt-1" >
+                                            </div>
+                                            <Typography variant="body2" className="inline-flex items-center text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                                                {generateNotificationMessage(notification)}
+                                            </Typography>
+                                            {/* <Typography variant="body2" className="text-gray-700 mb-4 pt-1" >
                                                     ID: {notification.targetID}
-                                                </Typography>
-                                                <Typography variant="caption" className="text-gray-500">
-                                                    Created at: {notification.createDate}
-                                                </Typography>
-                                            </CardContent>
-                                        </Card>
-                                    ))}
-                                </div>
-                                <Pagination
-                                    count={totalPagesNotificationList}
-                                    page={currentPage}
-                                    onChange={handlePageChange}
-                                    className="mt-4"
-                                />
+                                                </Typography> */}
+                                            <Typography variant="body2" className="text-gray-700 mb-4 pt-1" >
+                                                Message: {notification.message}
+                                            </Typography>
+                                            <Typography variant="caption" className="text-gray-500">
+                                                Created at: {notification.createDate}
+                                            </Typography>
+                                        </CardContent>
+                                    </Card>
+                                ))}
                             </div>
+
                         </div>
+                    ) : (
+                        <></>
+                    )}
+                    {notificationList.length > 0 ? (
+                        <div className="mt-10">
+                            <span className="text-gray-500 text-sm">Old notifications</span>
+                            <div className="space-y-4 p-4">
+                                {paginate(notificationList, currentPage).map((notification: NotificationInterface) => (
+                                    <Card
+                                        key={notification.notificationID}
+                                        className="shadow-lg rounded-lg transition-shadow duration-300 hover:shadow-xl"
+                                        style={{ backgroundColor: !notification.status ? '#FAFAFA' : whiteColor }}
+                                        onClick={() => __handleMaskNotiRead(notification)}
+                                    >
+                                        <CardContent>
+                                            <div className="flex items-center justify-between mb-4">
+                                                <span className="font-semibold text-indigo-700 text-sm">
+                                                    {notification.type || 'SYSTEM'}: {notification.targetID}
+                                                </span>
+                                                <span className="font-semibold text-indigo-700 text-sm" style={{ fontSize: 10, color: notification.status ? greenColor : primaryColor }}>
+                                                    {notification.status ? 'Read' : 'Not read'}
+                                                </span>
+                                            </div>
+                                            <Typography variant="body2" className="inline-flex items-center text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                                                {generateNotificationMessage(notification)}
+                                            </Typography>
+                                            {/* <Typography variant="body2" className="text-gray-700 mb-4 pt-1" >
+                                                    ID: {notification.targetID}
+                                                </Typography> */}
+                                            <Typography variant="body2" className="text-gray-700 mb-4 pt-1" >
+                                                Message: {notification.message}
+                                            </Typography>
+                                            <Typography variant="caption" className="text-gray-500">
+                                                Created at: {notification.createDate}
+                                            </Typography>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </div>
+                            <Pagination
+                                count={totalPagesNotificationList}
+                                page={currentPage}
+                                onChange={handlePageChange}
+                                className="mt-4"
+                            />
+                        </div>
+                    ) : (
+                        <div>
+                            {/* <span className="text-gray-500 text-sm text-center justify-center content-center">Do not have any notification</span> */}
+                        </div>
+                    )}
 
-
-
-                        {showScrollButton && (
-                            <IconButton
-                                style={{
-                                    position: 'fixed',
-                                    bottom: '20px',
-                                    right: '20px',
-                                    zIndex: 100,
-                                    backgroundColor: primaryColor,
-                                    color: "white"
-                                }}
-                                onClick={_handleScrollToTop}
-                            >
-                                <ArrowUpward />
-                            </IconButton>
-                        )}
-                    </div>
                 </div>
 
 
-                {/* Dialog */}
-            </div >
 
-        );
-    };
+                {showScrollButton && (
+                    <IconButton
+                        style={{
+                            position: 'fixed',
+                            bottom: '20px',
+                            right: '20px',
+                            zIndex: 100,
+                            backgroundColor: primaryColor,
+                            color: "white"
+                        }}
+                        onClick={_handleScrollToTop}
+                    >
+                        <ArrowUpward />
+                    </IconButton>
+                )}
+            </div>
 
-    export default NotificationBrandComponent;
+
+            {/* Dialog */}
+        </div >
+
+    );
+};
+
+export default NotificationBrandComponent;
 

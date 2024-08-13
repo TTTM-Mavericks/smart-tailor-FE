@@ -38,7 +38,7 @@ const DesignCollectionScreen = () => {
     const [activeTab, setActiveTab] = useState('All');
     const [userAuth, setUserAuth] = useState<UserInterface>();
     const [isLoading, setIsloading] = useState<boolean>(false);
-    const [designList, setDesignList] = useState<DesignInterface[]>();
+    const [designList, setDesignList] = useState<DesignInterface[]>([]);
     const [isScrolled, setIsScrolled] = useState(false);
     const [isEnd, setIsEnd] = useState(false)
 
@@ -107,6 +107,8 @@ const DesignCollectionScreen = () => {
                 setIsloading(false);
             } else {
                 toast.error(`${response.message}`, { autoClose: 4000 })
+                setIsloading(false);
+
             }
         } catch (error) {
             console.error('Error checking verification status:', error);
@@ -199,7 +201,6 @@ const DesignCollectionScreen = () => {
     return (
         <div>
             <HeaderComponent></HeaderComponent>
-            <ToastContainer></ToastContainer>
             <LoadingComponent isLoading={isLoading}></LoadingComponent>
             <div className={`${styles.designCollection__container}`}>
                 <aside className={`${styles.designCollection__container__menuBer}`}>
@@ -219,6 +220,9 @@ const DesignCollectionScreen = () => {
                             </a>
                             <a href="/refund_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
                                 Refund History
+                            </a>
+                            <a href="/transaction_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
+                                Trandsactions
                             </a>
                             <a href="/collection" className="px-4 py-3 font-semibold text-orange-900 bg-white border border-orange-100 rounded-lg hover:bg-orange-50">
                                 Collection

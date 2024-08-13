@@ -34,6 +34,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Cloud, UploadCloud } from 'react-feather';
 import { __handleDownloadElementAsPng, __handleGetElementAsBase64 } from '../../utils/CanvasUtils';
 import { useSnapshot } from 'valtio';
+import { __getToken } from '../../App';
 
 
 interface ItemMask {
@@ -102,7 +103,7 @@ function CustomDesignScreen() {
 
   // ---------------UseState Variable---------------//
   const [selectedPartOfCloth, setSelectedPartOfCloth] = useState<PartOfDesignInterface>();
-  const [partOfClothData, setPartOfClothData] = useState<PartOfDesignInterface[]>();
+  const [partOfClothData, setPartOfClothData] = useState<PartOfDesignInterface[]>([]);
   const [selectedStamp, setSelectedStamp] = useState<ItemMaskInterface[]>();
   const [selectedItem, setSelectedItem] = useState<string>('LOGO_PART');
   const [file, setFile] = useState('');
@@ -795,7 +796,7 @@ function CustomDesignScreen() {
       setIsLoadingPage(true);
     }
     try {
-      const response = await api.put(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.updateDesign}/${id}`, mainDesign);
+      const response = await api.put(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.updateDesign}/${id}`, mainDesign, __getToken());
       if (response.status === 200) {
         // toast.success(`${response.message}`, { autoClose: 4000 });
 
@@ -813,7 +814,7 @@ function CustomDesignScreen() {
 
         }
       } else {
-        toast.error(`${response.message}`, { autoClose: 4000 });
+        toast.error(`${'Please enter material into part of cloth'}`, { autoClose: 4000 });
         setIsLoadingPage(false);
       }
     } catch (error) {

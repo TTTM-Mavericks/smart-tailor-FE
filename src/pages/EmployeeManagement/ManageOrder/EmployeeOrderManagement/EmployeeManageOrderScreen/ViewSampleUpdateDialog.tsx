@@ -6,7 +6,9 @@ import api, { versionEndpoints, featuresEndpoints, functionEndpoints } from '../
 import { toast } from 'react-toastify';
 import { SampleModelInterface } from '../../../../../models/OrderModel';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
-import { __getToken } from '../../../../../App';
+import { __getToken, __getUserLogined } from '../../../../../App';
+import { UserInterface } from '../../../../../models/UserModel';
+import { __handleSendNotification } from '../../../../../utils/NotificationUtils';
 
 type Props = {
     isOpen: boolean;
@@ -71,6 +73,13 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID }) =
                 console.log('detail order: ', response.data);
                 console.log(response.message);
                 await __handelUpdateOrderState(childID, itemSample);
+                // setGroupedData((prevGroupedData) => {
+                //     const updatedGroup = prevGroupedData[childID].map((sample) =>
+                //         sample.sampleModelID === itemSample.sampleModelID ? { ...sample, status: true } : sample
+                //     );
+                //     return { ...prevGroupedData, [childID]: updatedGroup };
+                // });
+
             }
             else {
                 console.log('detail error: ', response.message);
@@ -93,6 +102,22 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID }) =
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
                 toast.success(`${response.message}`, { autoClose: 4000 });
+                const user: UserInterface = __getUserLogined();
+                const bodyRequest = {
+                    senderID: user.userID,
+                    recipientID: itemData.brandID,
+                    action: "UPDATE",
+                    type: "ORDER",
+                    targetID: itemData.orderID,
+                    message: `Accept the sample and change status to ${itemData.stage}`
+                }
+                console.log(bodyRequest);
+                __handleSendNotification(bodyRequest);
+                setTimeout(() => {
+                    window.location.reload()
+                }, 2000)
+
+
             } else {
                 console.log('detail error: ', response.message);
                 toast.error(`${response.message}`, { autoClose: 4000 });

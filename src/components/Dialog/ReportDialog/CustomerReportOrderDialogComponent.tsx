@@ -10,16 +10,18 @@ import { toast } from 'react-toastify';
 import { use } from 'i18next';
 import Cookies from 'js-cookie';
 import { UserInterface } from '../../../models/UserModel';
-import { __getToken } from '../../../App';
+import { __getToken, __getUserLogined } from '../../../App';
+import { __handleSendNotification } from '../../../utils/NotificationUtils';
 
 type Props = {
     isOpen: boolean;
     onClose: () => void;
     onClickReportAndCancel?: () => Promise<void>;
     orderID?: any;
-    isCancelOrder?: boolean
+    isCancelOrder?: boolean,
+    order?: OrderDetailInterface
 }
-const CustomerReportOrderDialogComponent: React.FC<Props> = ({ isOpen, onClose, onClickReportAndCancel, orderID, isCancelOrder }) => {
+const CustomerReportOrderDialogComponent: React.FC<Props> = ({order, isOpen, onClose, onClickReportAndCancel, orderID, isCancelOrder }) => {
 
     //TODO MUTIL LANGUAGE
 
@@ -110,6 +112,19 @@ const CustomerReportOrderDialogComponent: React.FC<Props> = ({ isOpen, onClose, 
                 if (isCancelOrder && onClickReportAndCancel) {
                     await onClickReportAndCancel()
                 }
+
+                const user: UserInterface = __getUserLogined();
+                const bodyRequest = {
+                    senderID: user.userID,
+                    recipientID: order?.employeeID,
+                    action: "CREATE",
+                    type: "REPORT",
+                    targetID: order?.orderID,
+                    message: ""
+                }
+                console.log(bodyRequest);
+                __handleSendNotification(bodyRequest);
+
                 setTimeout(() => {
                     window.location.reload();
                 }, 3000);

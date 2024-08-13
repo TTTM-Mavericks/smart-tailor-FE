@@ -38,7 +38,8 @@ export const featuresEndpoints = {
   systemPropertise: '/system-property',
   brandPropertise: '/brand-property',
   SampleProduct: '/sample-product-data',
-  notification: '/notification'
+  notification: '/notification',
+  payment: '/payment'
 
 }
 export const functionEndpoints = {
@@ -200,7 +201,11 @@ export const functionEndpoints = {
   },
   notification: {
     getNotiByUserId: '/get-all-notification-user-id',
-    updateReadStatus: '/update-notification-status'
+    updateReadStatus: '/update-notification-status',
+    sendNoti: '/send-notification'
+  },
+  payment: {
+    getPaymentByUserID: '/get-payment-by-user-id'
   }
 }
 

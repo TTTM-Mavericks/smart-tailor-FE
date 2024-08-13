@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import SettingDesignLoadingComponent from '../../../../components/Loading/SettingDesignLoadingComponent';
 import LoadingComponent from '../../../../components/Loading/LoadingComponent';
 import { whiteColor } from '../../../../root/ColorSystem';
+import { __getToken } from '../../../../App';
 
 interface ItemMask {
     itemMaskName: string;
@@ -200,7 +201,7 @@ const CreateDesignComponent = () => {
         if (!mainDesign) return;
         setIsLoadingPage(true);
         try {
-            const response = await api.post(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.addNewDesign}`, mainDesign);
+            const response = await api.post(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.addNewDesign}`, mainDesign, __getToken());
             if (response.status === 200) {
                 setTimeout(() => {
                     setIsLoadingPage(false);
