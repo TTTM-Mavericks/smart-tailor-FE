@@ -430,7 +430,7 @@ const EmployeeOrderFields: React.FC<{
                 {order.orderStatus === 'NOT_VERIFY' && (
                     <button
                         onClick={() => onUpdatedOrderPending(order.orderID)}
-                        className="bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 mr-4"
+                        className="bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 mr-4 mb-2"
                         style={{
                             borderRadius: 4,
                             backgroundColor: greenColor
