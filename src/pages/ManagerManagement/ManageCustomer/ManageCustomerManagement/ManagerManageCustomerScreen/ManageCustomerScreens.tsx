@@ -12,6 +12,7 @@ import axios from "axios";
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { ExpertTailoring } from "../../../../../models/ManagerExpertTailoringModel";
 import { ExpertTailoringEdit } from "../../../../../models/ManagerExpertTailoringModel";
+import { Customer } from "../../../../../models/CustomerModel";
 
 // Make Style of popup
 const style = {
@@ -30,7 +31,7 @@ const style = {
 const ManageCustomer: React.FC = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [data, setData] = React.useState<ExpertTailoring[]>([]);
+    const [data, setData] = React.useState<Customer[]>([]);
 
     // set formid to pass it to component edit Material
     const [formId, setFormId] = React.useState<ExpertTailoringEdit | null>(null);
@@ -39,38 +40,6 @@ const ManageCustomer: React.FC = () => {
     const [editopen, setEditOpen] = React.useState<boolean>(false);
     const _handleEditOpen = () => setEditOpen(true);
     const _handleEditClose = () => setEditOpen(false);
-
-    // open or close the add modal
-    const [anchorEl, setAnchorEl] = React.useState(null);
-    const open = Boolean(anchorEl);
-    const _handleClick = (event: any) => {
-        setAnchorEl(event.currentTarget);
-    };
-    const _handleClose = () => {
-        setAnchorEl(null);
-    };
-
-    // close open pop up
-    const [addOpenOrClose, setAddOpenOrClose] = React.useState<boolean>(false)
-
-    const _handleAddOpen = () => {
-        setAddOpenOrClose(true);
-    }
-
-    const _handleAddClose = () => {
-        setAddOpenOrClose(false)
-    }
-
-    // close open pop up
-    const [addMultiple, setAddMultiple] = React.useState<boolean>(false)
-
-    const _handleAddMultipleOpen = () => {
-        setAddMultiple(true);
-    }
-
-    const _handleAddMultipleClose = () => {
-        setAddMultiple(false)
-    }
 
     // Get language in local storage
     const selectedLanguage = localStorage.getItem('language');
@@ -85,7 +54,7 @@ const ManageCustomer: React.FC = () => {
     }, [selectedLanguage, i18n]);
 
     React.useEffect(() => {
-        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.getAllExpertTailoring}`;
+        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.user + functionEndpoints.user.getAllCustomer}`;
 
         axios.get(apiUrl)
             .then(response => {
@@ -105,10 +74,6 @@ const ManageCustomer: React.FC = () => {
             .catch(error => console.error('Error fetching data:', error));
     }, []);
 
-    // Thêm người dùng mới vào danh sách
-    const _handleAddExpertTailoring = (addNewExpertTailoring: ExpertTailoring) => {
-        setData(prevData => [...prevData, addNewExpertTailoring]);
-    }
 
     // Cập nhật người dùng trong danh sách
     const _handleUpdateMaterial = (updatedExpertTailoring: ExpertTailoringEdit) => {
@@ -197,20 +162,66 @@ const ManageCustomer: React.FC = () => {
 
     const columns: GridColDef[] = [
         {
-            field: "expertTailoringName",
-            headerName: "ExpertTailoring Name",
-            flex: 1,
+            field: "userID",
+            headerName: "User ID",
+            width: 150
         },
         {
-            field: "sizeImageUrl",
-            headerName: "Size Image Url",
-            flex: 1,
+            field: "email",
+            headerName: "Email",
+            width: 230
         },
         {
-            field: "status",
-            headerName: "Status",
+            field: "fullName",
+            headerName: "Full Name",
             headerAlign: "left",
             align: "left",
+            width: 150
+        },
+        {
+            field: "phoneNumber",
+            headerName: "Phone Number",
+            headerAlign: "left",
+            align: "left",
+            width: 140
+        },
+        {
+            field: "createDate",
+            headerName: "Create Date",
+            headerAlign: "left",
+            align: "left",
+            width: 200
+        },
+        {
+            field: "userStatus",
+            headerName: "User Status",
+            headerAlign: "left",
+            align: "left",
+            renderCell: (params) => (
+                <Box
+                    sx={{
+                        backgroundColor: params.value === true ? '#ffebee' : '#e8f5e9',
+                        color: params.value === true ? '#f44336' : '#4caf50',
+                        borderRadius: '16px',
+                        padding: '1px 5px',
+                        fontSize: '0.75rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        height: "50%",
+                        marginTop: "10%"
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                        }}
+                    />
+                    {params.value === true ? 'INACTIVE' : 'ACTIVE'}
+                </Box>
+            )
         },
         {
             field: "actions",
@@ -219,10 +230,10 @@ const ManageCustomer: React.FC = () => {
             sortable: false,
             renderCell: (params) => (
                 <Box>
-                    <IconButton onClick={() => _handleEditClick(params.row.expertTailoringID, params.row.expertTailoringName, params.row.sizeImageUrl)}>
+                    {/* <IconButton onClick={() => _handleEditClick(params.row.userID, params.row.email, params.row.fullName)}>
                         <EditIcon />
-                    </IconButton>
-                    <IconButton onClick={() => _hanldeConfirmDelete(params.row.expertTailoringID)}>
+                    </IconButton> */}
+                    <IconButton onClick={() => _hanldeConfirmDelete(params.row.userID)}>
                         <DeleteIcon htmlColor={colors.primary[300]} />
                     </IconButton>
                 </Box>
@@ -230,10 +241,13 @@ const ManageCustomer: React.FC = () => {
         }
     ];
 
-    const getRowId = (row: any) => `${row.expertTailoringID}-${row.expertTailoringName}-${row.sizeImageUrl}`;
+    const getRowId = (row: any) => `${row.userID}-${row.email}-${row.fullName}`;
 
     return (
         <Box m="20px">
+            <h1 style={{ fontWeight: "bolder", fontSize: "20px", marginLeft: "10px", marginTop: "-4%", marginBottom: "-3%" }}>
+                Manage Customer Table
+            </h1>
             <Box
                 m="40px 0 0 0"
                 height="75vh"

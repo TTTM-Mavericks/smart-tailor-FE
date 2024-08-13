@@ -6,7 +6,7 @@ import { Report, ReportImageList, ReportTable } from '../../../../../models/Empl
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import axios from 'axios';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
-import { greenColor, redColor, secondaryColor } from '../../../../../root/ColorSystem';
+import { cancelColor, cancelColorText, completeColor, completeColorText, deliveredColor, deliveredColorText, deposisColor, deposisColorText, greenColor, pendingColor, pendingColorText, processingColor, processingColorText, redColor, secondaryColor, whiteColor } from '../../../../../root/ColorSystem';
 import Select from 'react-select';
 import { Box, IconButton, Tooltip, useTheme } from '@mui/material';
 import { tokens } from '../../../../../theme';
@@ -293,17 +293,59 @@ const ReportTables: React.FC<ReportTableProps> = ({ reports, onViewDetails, onUp
     const columns: GridColDef[] = [
         { field: 'reportID', headerName: 'Report ID', width: 150 },
         { field: 'buyerName', headerName: 'Customer', width: 150, renderCell: (params) => params.row.orderResponse.buyerName },
-        { field: 'address', headerName: 'Address', width: 200, renderCell: (params) => params.row.orderResponse.address },
+        { field: 'address', headerName: 'Address', width: 140, renderCell: (params) => params.row.orderResponse.address },
+        { field: 'province', headerName: 'Province', width: 140, renderCell: (params) => params.row.orderResponse.province },
         { field: 'phone', headerName: 'Phone', width: 120, renderCell: (params) => params.row.orderResponse.phone },
-        { field: 'expectedStartDate', headerName: 'Date', width: 150, renderCell: (params) => params.row.orderResponse.expectedStartDate },
+        { field: 'expectedStartDate', headerName: 'Date', width: 200, renderCell: (params) => params.row.orderResponse.expectedStartDate },
         {
             field: 'orderStatus',
             headerName: 'Order Status',
-            width: 150,
-            renderCell: (params: GridRenderCellParams) => (
-                <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(params.row.orderResponse.orderStatus)}`}>
-                    {params.row.orderResponse.orderStatus}
-                </span>
+            width: 100,
+            renderCell: (params) => (
+                <Box
+                    sx={{
+                        backgroundColor:
+                            params.value === "PENDING"
+                                ? pendingColor
+                                : params.value === "DELIVERED"
+                                    ? deliveredColor
+                                    : params.value === "DEPOSIT"
+                                        ? deposisColor
+                                        : params.value === "PROCESSING"
+                                            ? processingColor
+                                            : params.value === "COMPLETED"
+                                                ? completeColor
+                                                : cancelColor,
+                        color: params.value === "PENDING"
+                            ? pendingColorText
+                            : params.value === "DELIVERED"
+                                ? deliveredColorText
+                                : params.value === "DEPOSIT"
+                                    ? deposisColorText
+                                    : params.value === "PROCESSING"
+                                        ? processingColorText
+                                        : params.value === "COMPLETED"
+                                            ? completeColorText
+                                            : cancelColorText,
+                        borderRadius: '16px',
+                        padding: '1px 5px',
+                        fontSize: '0.75rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        height: "50%",
+                        marginTop: "10%"
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                        }}
+                    />
+                    {params.row.orderResponse.orderStatus === null ? "NULL" : params.row.orderResponse.orderStatus}
+                </Box>
             )
         },
         {

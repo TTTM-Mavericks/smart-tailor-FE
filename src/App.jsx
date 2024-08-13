@@ -45,6 +45,7 @@ import ReportHistorySreen from './pages/Order/ReportHistory/ReportHistorySreen';
 import AboutUs from './pages/AboutUs/test';
 import NotificationComponent from './components/Notification/NotificationComponent';
 import AllTransactionHistoryComponent from './pages/Order/AllTransactionHistory/AllTransactionHistoryComponent';
+import ManageInvoiceScreen from './pages/AdminManagement/ManageInvoice/ManageInvoiceScreens';
 
 
 
@@ -185,6 +186,7 @@ function App() {
           <Route path='/test' element={<ToogleComponent></ToogleComponent>} />
           <Route path='/bs' element={<AboutUs />} />
           <Route path='/notification' element={<NotificationComponent></NotificationComponent>} />
+          <Route path='/invoice' element={<ManageInvoiceScreen></ManageInvoiceScreen>} />
         </Routes>
       </BrowserRouter>
     </div>

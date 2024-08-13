@@ -5,6 +5,7 @@ import { IconButton } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
 import AccountantDashboards from '../AccountantDashboard/AccountantDashboardScreen';
 import AccountantManagePaymentForBrandComponent from '../AccountantManagePaymentForBrand/AccountantManagePaymentForBrandComponent';
+import AccountantDashboard from '../AccountantDashboard/AccountantDashboardScreen';
 import AccountantManageRefundPaymentForBrandComponent from '../AccountantManageRefundPayment/AccountantManageRefundPaymentForBrandComponent';
 
 // Define the type for popperOpen
@@ -88,6 +89,10 @@ const DashboardAccountantScreens: React.FC = () => {
             case 'accountant_manage_brand_payment':
                 return (
                     <AccountantManagePaymentForBrandComponent />
+                );
+            case 'accountant_dash':
+                return (
+                    <AccountantDashboard />
                 );
             case 'accountant_manage_refund_payment':
                 return (

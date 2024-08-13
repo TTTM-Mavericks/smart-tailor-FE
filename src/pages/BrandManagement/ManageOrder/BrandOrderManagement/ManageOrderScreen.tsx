@@ -9,7 +9,7 @@ import { Box, Dialog, DialogContent, DialogTitle, IconButton, Tooltip, useTheme 
 import { IoMdCloseCircleOutline } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { greenColor, primaryColor, redColor, secondaryColor, yellowColor } from '../../../../root/ColorSystem';
+import { cancelColor, cancelColorText, completeColor, completeColorText, deliveredColor, deliveredColorText, deposisColor, deposisColorText, greenColor, pendingColor, pendingColorText, primaryColor, processingColor, processingColorText, redColor, secondaryColor, whiteColor, yellowColor } from '../../../../root/ColorSystem';
 import PartOfDesignInformationDialogComponent from '../../BrandOrderManagement/PartOfDesignInformationDialogComponent';
 import LoadingComponent from '../../../../components/Loading/LoadingComponent';
 import Cookies from 'js-cookie';
@@ -426,7 +426,7 @@ const BrandOrderFields: React.FC<{
     }, []);
 
     return (
-        <div className="bg-white mb-8 shadow-lg rounded-lg p-6 transition duration-300 ease-in-out transform hover:shadow-xl">
+        <div className="bg-white mb-8 shadow-lg rounded-lg transition duration-300 ease-in-out transform hover:shadow-xl">
             <LoadingComponent isLoading={isLoading}></LoadingComponent>
 
             <h3 className="text-sm font-semibold mb-3 text-indigo-700">Type order: {order.orderType}</h3>
@@ -466,9 +466,10 @@ const BrandOrderFields: React.FC<{
                         </div>
                     </div>
                 </div>
-                <div className="w-1/2 mt-10 pl-28">
-                    <p className="text-gray-600 mb-2 text-sm">Customer: {order.buyerName}</p>
-                    <p className="text-gray-600 mb-2 text-sm">Date: {order.createDate}</p>
+                <div className="w-1/2 mt-10">
+                    {/* <p className="text-gray-600 mb-2 text-sm">Title Design: {order.titleDesign}</p> */}
+                    <p className="text-gray-600 mb-2 text-sm">Create Date: {order.createDate}</p>
+                    <p className="text-gray-600 mb-2 text-sm">Expected Start Date: {order.expectedStartDate}</p>
                     <p className="text-gray-600 mb-2 text-sm">
                         Address: {order.address}, {order.ward}, {order.district}, {order.province}
                     </p>
@@ -506,7 +507,7 @@ const BrandOrderFields: React.FC<{
 
                     <button
                         onClick={() => __handleOpenReportDialog()}
-                        className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4"
+                        className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4 mb-2"
                         style={{
                             borderRadius: 4,
                             backgroundColor: redColor
@@ -527,7 +528,7 @@ const BrandOrderFields: React.FC<{
 
                 <button
                     onClick={() => onViewDetails(order, designDetails)}
-                    className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4"
+                    className="bg-indigo-500 text-sm text-white px-4 py-2 mb-2 hover:bg-indigo-600 transition duration-300 mr-4"
                     style={{
                         borderRadius: 4,
                         backgroundColor: secondaryColor
@@ -539,7 +540,7 @@ const BrandOrderFields: React.FC<{
                 {order.orderStatus !== 'CANCEL' && order.orderStatus !== 'COMPLETED' && (
                     <button
                         onClick={() => __handleOpenUpdateProcessDialog(order)}
-                        className="bg-green-500 text-sm text-white px-4 py-2  hover:bg-green-600 transition duration-300"
+                        className="bg-green-500 text-sm text-white px-4 py-2  hover:bg-green-600 transition duration-300 mb-2"
                         style={{
                             borderRadius: 4,
                             backgroundColor: greenColor
@@ -1051,18 +1052,59 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
 
     const columns: GridColDef[] = [
         { field: 'orderID', headerName: 'Order ID', width: 150 },
-        { field: 'buyerName', headerName: 'Customer', width: 150 },
-        { field: 'address', headerName: 'Address', width: 150 },
-        { field: 'phone', headerName: 'phone', width: 150 },
-        { field: 'expectedStartDate', headerName: 'Date', width: 200 },
+        { field: 'quantity', headerName: 'Quantity', width: 100 },
+        { field: 'totalPrice', headerName: 'Total Price', width: 140 },
+        { field: 'createDate', headerName: 'Create Date', width: 200 },
+        { field: 'expectedStartDate', headerName: 'Expected Start Date', width: 200 },
         {
             field: 'orderStatus',
             headerName: 'Status',
-            width: 150,
-            renderCell: (params: GridRenderCellParams) => (
-                <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(params.value)}`}>
+            width: 100,
+            renderCell: (params) => (
+                <Box
+                    sx={{
+                        backgroundColor:
+                            params.value === "PENDING"
+                                ? pendingColor
+                                : params.value === "DELIVERED"
+                                    ? deliveredColor
+                                    : params.value === "DEPOSIT"
+                                        ? deposisColor
+                                        : params.value === "PROCESSING"
+                                            ? processingColor
+                                            : params.value === "COMPLETED"
+                                                ? completeColor
+                                                : cancelColor,
+                        color: params.value === "PENDING"
+                            ? pendingColorText
+                            : params.value === "DELIVERED"
+                                ? deliveredColorText
+                                : params.value === "DEPOSIT"
+                                    ? deposisColorText
+                                    : params.value === "PROCESSING"
+                                        ? processingColorText
+                                        : params.value === "COMPLETED"
+                                            ? completeColorText
+                                            : cancelColorText,
+                        borderRadius: '16px',
+                        padding: '1px 5px',
+                        fontSize: '0.75rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        height: "50%",
+                        marginTop: "10%"
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                        }}
+                    />
                     {params.value}
-                </span>
+                </Box>
             )
         },
         {

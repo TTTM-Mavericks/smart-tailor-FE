@@ -310,7 +310,6 @@ const ManageMaterials: React.FC = () => {
                             width: '6px',
                             height: '6px',
                             borderRadius: '50%',
-                            backgroundColor: params.value === 'Active' ? '#f44336' : '#4caf50',
                         }}
                     />
                     {params.row.status ? 'ACTIVE' : 'INACTIVE'}
