@@ -17,6 +17,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import Swal from 'sweetalert2';
 import { margin } from '@mui/system';
 import { greenColor, redColor } from '../../../../root/ColorSystem';
+import { __getToken } from '../../../../App';
 
 interface AddMaterialWithMultipleExcelFormProps {
     closeMultipleCard: () => void;
@@ -134,7 +135,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                         const workbook = XLSX.read(data, { type: 'array' });
                         const sheetName = workbook.SheetNames[0];
                         const sheet = workbook.Sheets[sheetName];
-                        const jsonData = XLSX.utils.sheet_to_json<ExcelData>(sheet, { range: 1 });
+                        const jsonData = XLSX.utils.sheet_to_json<ExcelData>(sheet, { range: 2 });
 
                         // Update error property for duplicate entries
                         const updatedData = jsonData.map(item => {
@@ -157,7 +158,6 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                 }
             };
             reader.readAsArrayBuffer(file);
-
         }
     };
 
@@ -242,7 +242,16 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
         }));
 
         try {
-            const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.addNewMaterialByExcelFile}`, formData);
+            const response = await axios.post(
+                `${baseURL + versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.addNewMaterialByExcelFile}`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${__getToken()}`
+                    }
+                }
+            );
+
             if (response.status === 200) {
                 const { successCount, failureCount, message } = response.data;
 
@@ -282,7 +291,11 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
             url: url,
             method: 'GET',
             responseType: 'blob', // Important to handle binary data
+            headers: {
+                Authorization: `Bearer ${__getToken()}`
+            }
         })
+
             .then(response => {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 const a = document.createElement('a');
@@ -336,7 +349,7 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
      */
     const _handleDownloadErrorData = async () => {
         const workBook = new ExcelJS.Workbook();
-        const worksheet = workBook.addWorksheet('Category and Material');
+        const worksheet = workBook.addWorksheet('CATEGORY AND MATERIAL ERROR');
 
         // Define the columns and headers
         worksheet.columns = [
@@ -347,12 +360,18 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
             { header: 'Base_Price', key: 'Base_Price', width: 20 }
         ];
 
+
         // Insert a custom header row above the defined columns
         worksheet.insertRow(1, ['CATEGORY AND MATERIAL ERRORS']);
+        worksheet.insertRow(2, [`Explanation:
+• Category_Name: Only values from the predefined list of categories in the Smart Tailor application are allowed.
+• Base_Price: Only positive integer values are allowed, and the currency unit is VND.
+• HS_Code: Only positive integer values are allowed.`]);
 
         // Merge cells for the custom header row
         worksheet.mergeCells('A1:E1');
-        worksheet.autoFilter = 'A2:E2';  // Apply filter to the actual header row
+        worksheet.mergeCells('A2:E2');
+        worksheet.autoFilter = 'A3:E3';  // Apply filter to the actual header row
 
         // Set styles for the custom header row
         const customHeaderRow = worksheet.getRow(1);
@@ -367,8 +386,15 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
             };
         });
 
+
+        const customHeaderRow2 = worksheet.getRow(2);
+        customHeaderRow2.height = 80;
+        customHeaderRow2.eachCell(cell => {
+            cell.alignment = { wrapText: true, vertical: 'top' };  // Enable text wrapping for row 2
+        });
+
         // Set styles for column header row
-        worksheet.getRow(2).eachCell(cell => {
+        worksheet.getRow(3).eachCell(cell => {
             cell.font = { bold: true };
             cell.alignment = { vertical: 'middle', horizontal: 'center' };
             cell.fill = {
@@ -403,13 +429,13 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
 
         // Add only error rows to the worksheet
         excelData.forEach((rowData, rowIndex) => {
-            if (errorRows.has(rowIndex + 4)) {  // Check if this row is in the errorRows set
+            if (errorRows.has(rowIndex + 5)) {  // Check if this row is in the errorRows set
                 const row = worksheet.addRow(rowData);
 
                 // Apply error formatting to cells with errors
                 worksheet.columns.forEach((column, colIndex) => {
                     const cell = row.getCell(colIndex + 1);
-                    const errorKey = `${rowIndex + 4}-${column.key}`;  // Adjust rowIndex to match error messages
+                    const errorKey = `${rowIndex + 5}-${column.key}`;  // Adjust rowIndex to match error messages
 
                     // Handle null values
                     if (cell.value === null) {

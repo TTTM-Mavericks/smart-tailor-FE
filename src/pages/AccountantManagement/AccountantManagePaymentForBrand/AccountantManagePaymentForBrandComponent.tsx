@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Button, Chip, CircularProgress, IconButton, useTheme } from '@mui/material';
+import { Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, useTheme } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
 import { cancelColor, cancelColorText, completeColor, completeColorText, deliveredColor, deliveredColorText, deposisColor, deposisColorText, greenColor, pendingColor, pendingColorText, primaryColor, processingColor, processingColorText, redColor, secondaryColor, whiteColor } from '../../../root/ColorSystem';
 import style from './AccountantManagePaymentForBrandComponentStyle.module.scss'
 import { OrderDetailInterface, PaymentInterface } from '../../../models/OrderModel';
-import { fontWeight, Stack } from '@mui/system';
+import { display, fontWeight, Stack } from '@mui/system';
 import { FaAngleDown, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaUser } from "react-icons/fa";
 import { FaAngleUp } from "react-icons/fa";
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
@@ -28,6 +28,43 @@ import { IoMdCloseCircleOutline } from 'react-icons/io';
 import { DataGrid, GridColDef, GridToolbar } from '@mui/x-data-grid';
 import { tokens } from '../../../theme';
 import { __getToken } from '../../../App';
+import jsPDF from "jspdf";
+import autoTable from 'jspdf-autotable';
+import { styled } from '@mui/system';
+
+const InvoiceHeader = styled(Box)(({ theme }) => ({
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: theme.spacing(4),
+}));
+
+const Logo = styled(Typography)(({ theme }) => ({
+    fontWeight: 'bold',
+    fontSize: '2rem',
+}));
+
+const InvoiceDetails = styled(Box)(({ theme }) => ({
+    marginBottom: theme.spacing(4),
+}));
+
+const ThankYou = styled(Typography)(({ theme }) => ({
+    marginTop: theme.spacing(4),
+    marginBottom: theme.spacing(2),
+}));
+
+const PaymentInfo = styled(Box)(({ theme }) => ({
+    marginTop: theme.spacing(4),
+}));
+
+const ScrollFreeDialogContent = styled(DialogContent)({
+    '&::-webkit-scrollbar': {
+        display: 'none',
+    },
+    '-ms-overflow-style': 'none',
+    'scrollbar-width': 'none',
+});
+
 
 interface AccountantOrderInterface {
     orderID: string;
@@ -211,6 +248,203 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
 
     const safelyGetProperty = (obj: any, path: string) => {
         return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+    };
+
+    const _handleOpenPDF = (selectedOrder: any) => {
+        console.log("bebe");
+
+        if (!selectedOrder) return;
+
+        const doc = new jsPDF();
+
+        // set background color
+        doc.setFillColor(244, 245, 239); // White color
+        doc.rect(0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height, 'F');
+
+        const imgData = "http://localhost:3000/src/assets/system/smart-tailor_logo.png";
+        const imgWidth = 40;
+        const imgHeight = 40;
+        doc.addImage(imgData, 'PNG', 15, 10, imgWidth, imgHeight);
+
+        doc.setFontSize(35);
+        doc.setFont('Playfair Display', 'bold');
+
+        doc.text("INVOICE", 140, 30).getFont()
+
+        const textOffset = 10;
+        const tableStartY = Math.max(imgHeight + textOffset, 50);
+
+        autoTable(doc, {
+            startY: tableStartY,
+            body: [
+                [
+                    {
+                        content: `Invoice No. ${selectedOrder.orderID}` + `\n${selectedOrder.orderType}`,
+                        styles: {
+                            halign: 'left',
+                            valign: "middle",
+                            fontSize: 10
+                        }
+                    },
+                    {
+                        content: `SMART TAILOR, Inc` + `\nLot E2a-7, Street D1, High-Tech Park` + `\nLong Thanh My Ward City` + `\nThu Duc` + `\nHo Chi Minh City.` + `\nViet Nam`,
+                        styles: {
+                            halign: 'right',
+                            valign: "middle",
+                            fontSize: 10
+                        }
+                    }
+                ]
+            ], theme: 'plain',
+        })
+
+        autoTable(doc, {
+            body: [
+                [
+                    {
+                        content: `___________________________________________________________________________________________`,
+                        styles: {
+                            halign: 'left',
+                            overflow: 'linebreak'
+                        }
+                    }
+                ]
+            ], theme: 'plain'
+        })
+
+        autoTable(doc, {
+            head: [['Design ID', 'Quantity', 'Size', 'Create Date']],
+            body: selectedOrder.detailList?.map((item: any) => [
+                item.designDetailId,
+                item.quantity,
+                item.size?.sizeName,
+                item.size?.createDate
+            ]),
+            theme: "plain"
+        });
+
+        autoTable(doc, {
+            head: [[{ content: "                          ", styles: { halign: 'right' } }, { content: "                         ", styles: { halign: 'center' } }, { content: "Sum", styles: { halign: 'center' } }, { content: `${__handleAddCommasToNumber(selectedOrder.totalPrice)} VND`, styles: { halign: 'center' } }]],
+            body: [
+                [
+                    {
+                        content: '                           ',
+                        styles: {
+                            halign: 'right',
+                            fontStyle: 'bold'
+                        },
+                    },
+                    {
+                        content: '              ',
+                        styles: {
+                            halign: 'center',
+                            fontStyle: 'bold',
+                        },
+                    },
+                    {
+                        content: "Tax (0%)",
+                        styles: {
+                            fontStyle: 'bold',
+                            halign: "center"
+                        }
+                    },
+                    {
+                        content: "0 VND",
+                        styles: {
+                            fontStyle: 'bold',
+                            halign: "center"
+                        }
+                    }
+                ],
+            ],
+            theme: 'plain'
+        });
+
+        autoTable(doc, {
+            body: [
+                [
+                    {
+                        content: `                                                                                                               __________________________________`,
+                        styles: {
+                            halign: 'left',
+                            overflow: 'linebreak'
+                        }
+                    }
+                ]
+            ], theme: 'plain'
+        })
+
+        autoTable(doc, {
+            head: [[{ content: "                          ", styles: { halign: 'right' } }, { content: "                         ", styles: { halign: 'center' } }, { content: "TOTAL", styles: { halign: 'center' } }, { content: `${__handleAddCommasToNumber(selectedOrder.totalPrice)} VND`, styles: { halign: 'center' } }]],
+            theme: 'plain'
+        });
+
+        autoTable(doc, {
+            body: [
+                [
+                    {
+                        content: `                                                                                                               __________________________________`,
+                        styles: {
+                            halign: 'left',
+                            overflow: 'linebreak'
+                        }
+                    }
+                ]
+            ], theme: 'plain'
+        })
+
+        autoTable(doc, {
+            body: [
+                [
+                    {
+                        content: "Thank You!",
+                        styles: {
+                            halign: 'left',
+                            fontSize: 20
+                        }
+                    }
+                ]
+            ],
+            theme: "plain"
+        })
+
+        autoTable(doc, {
+            body: [
+                [
+                    {
+                        content: `SMART TAILOR, Inc` + `\nLot E2a - 7, Street D1, High - Tech Park` + `\nLong Thanh My Ward City` + `\nThu Duc` + `\nHo Chi Minh City.` + `\nViet Nam`,
+                        styles: {
+                            halign: 'left',
+                            valign: "middle",
+                            fontSize: 10
+                        }
+                    },
+                    {
+                        content: `${selectedOrder.quantity} ` + `\n${selectedOrder.quantity} `,
+                        styles: {
+                            halign: 'right',
+                            valign: "bottom",
+                            fontSize: 12
+                        }
+                    }
+                ]
+            ], theme: 'plain',
+        })
+
+        doc.save('invoice.pdf')
+    };
+
+    const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
+    const [selectedTransactions, setSelectedTransactions] = useState(null);
+
+    const handleViewTransaction = (transaction: any) => {
+        setSelectedTransactions(transaction);
+        setIsTransactionModalOpen(true);
+    };
+
+    const handleCloseTransactionModal = () => {
+        setIsTransactionModalOpen(false);
+        setSelectedTransactions(null);
     };
 
     return (
@@ -412,7 +646,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
                                         <p
                                             className={`px-5 text-sm font-medium`}
                                         >
-
+                                            <p className='mb-40' onClick={() => handleViewTransaction(subOrder)}>View transaction</p>
                                             <button
                                                 type="submit"
                                                 className="px-5 py-2 text-sm font-medium text-white"
@@ -431,6 +665,13 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
                                     </div>
                                 </div>
                             </div>
+                            {isTransactionModalOpen && selectedTransactions && (
+                                <TransactionModals
+                                    transaction={selectedTransactions}
+                                    onClose={handleCloseTransactionModal}
+                                    onDownloadPDF={() => _handleOpenPDF(selectedTransactions)}
+                                />
+                            )}
                             {selectedOrder === subOrder.orderID && (
                                 <PaymentFromAccountantToBranđialog
                                     onClose={__handleClosePaymentForBrandDialog}
@@ -459,7 +700,14 @@ const Tables: React.FC<TablesProps> = ({ table, onViewDetails }) => {
         { field: 'orderID', headerName: 'Order ID', width: 130, flex: 1 },
         { field: 'orderType', headerName: 'Type', width: 130, flex: 1 },
         { field: 'buyerName', headerName: 'Buyer Name', width: 150 },
-        { field: 'totalPrice', headerName: 'Total Price', width: 130 },
+        {
+            field: 'totalPrice', headerName: 'Total Price', width: 130,
+            renderCell: (params) => (
+                <span>
+                    {params.value.toLocaleString()}
+                </span>
+            ),
+        },
         { field: 'expectedStartDate', headerName: 'Expected Start Date', width: 180 },
         {
             field: 'orderStatus', headerName: 'Order Status', width: 100,
@@ -556,6 +804,160 @@ const Tables: React.FC<TablesProps> = ({ table, onViewDetails }) => {
         </Box>
     );
 }
+
+
+interface TransactionModalsProps {
+    transaction: any;
+    onClose: () => void;
+    onDownloadPDF: () => void;
+}
+
+const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onClose, onDownloadPDF }) => {
+    return (
+        <Dialog open={true} onClose={onClose} maxWidth="md" fullWidth>
+            <ScrollFreeDialogContent>
+                <DialogContent>
+                    <InvoiceHeader>
+                        <Logo>SMART TAILOR</Logo>
+                        <Typography variant="h4">INVOICE</Typography>
+                    </InvoiceHeader>
+
+                    <Grid container spacing={2}>
+                        <Grid item xs={6}>
+                            <InvoiceDetails>
+                                <Typography variant="body2" style={{ display: "flex" }}>Brand: <p
+                                    style={{ fontWeight: "500", marginTop: "-4px" }}
+                                    className="text-sm text-black flex content-center items-center"
+                                >
+                                    <img
+                                        src={transaction.brand?.user.imageUrl}
+                                        style={{
+                                            width: 30,
+                                            height: 30,
+                                            borderRadius: 90,
+                                            marginLeft: 5,
+                                            marginRight: 5,
+                                        }}
+                                    />
+                                    <p
+                                        className={`${__handlegetRatingStyle(
+                                            transaction.brand?.rating
+                                        )} text-sm text-gray-500`}
+                                    >
+                                        {" "}
+                                        {transaction.brand?.brandName}
+                                    </p>
+                                </p></Typography>
+                                <Typography variant="body2"><p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                    Brand Rating:{" "}
+                                    <span className="text-sm text-gray-500 pb-2">
+                                        {transaction.brand?.rating}
+                                    </span>{" "}
+                                    <span className="text-yellow-400 text-sm">★</span>
+                                </p></Typography>
+                                <Typography variant="body2">{transaction.customerAddress}</Typography>
+                            </InvoiceDetails>
+                        </Grid>
+                        <Grid item xs={6}>
+                            <Typography variant="body1" align="right">Invoice No. {transaction.orderID}</Typography>
+
+                            <Typography variant="body1" align="right">{transaction.createDate}</Typography>
+                        </Grid>
+                    </Grid>
+
+                    <Box sx={{ width: '100%', overflow: 'hidden', boxShadow: 3, borderRadius: 2 }}>
+                        <TableContainer component={Paper} elevation={0}>
+                            <Table sx={{ minWidth: 650 }}>
+                                <TableHead>
+                                    <TableRow sx={{ backgroundColor: '#2196f3' }}>
+                                        <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Design ID</TableCell>
+                                        <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Quantity</TableCell>
+                                        <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Size</TableCell>
+                                        <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Create Date</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {transaction.detailList?.map((item: any) => (
+                                        <TableRow
+                                            key={item.id}
+                                            sx={{ '&:nth-of-type(odd)': { backgroundColor: '#f5f5f5' } }}
+                                        >
+                                            <TableCell align="left">{item.designDetailId}</TableCell>
+                                            <TableCell align="left">{item.quantity}</TableCell>
+                                            <TableCell align="left">{item.size?.sizeName}</TableCell>
+                                            <TableCell align="left">{item.size?.createDate}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+
+                        <Box sx={{ padding: 2, backgroundColor: '#f0f0f0' }}>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12}>
+                                    <Typography variant="h6" align="right" sx={{ fontWeight: 'bold' }}>
+                                        <p className="text-sm text-gray-600">
+                                            Total: <span className="text-gray-800 font-semibold ml-1">
+                                                {new Intl.NumberFormat('en-US', {
+                                                    style: 'currency',
+                                                    currency: 'VND'
+                                                }).format(transaction.totalPrice)}
+                                            </span>
+                                        </p>
+                                    </Typography>
+                                </Grid>
+                            </Grid>
+                        </Box>
+                    </Box>
+
+                    {/* <ThankYou variant="h6" align="center">
+                        Thank you!
+                    </ThankYou> */}
+
+                    <PaymentInfo>
+                        <h2 className="text-lg font-semibold text-gray-800">PAYMENT INFORMATION</h2>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <div className="flex items-center text-sm">
+                                    <span className="text-gray-600">Brand:</span>
+                                    <div className="flex items-center ml-2">
+                                        <img
+                                            src={transaction.brand?.user.imageUrl}
+                                            className="w-8 h-8 rounded-full mr-2"
+                                            alt="Brand logo"
+                                        />
+                                        <span className={`${__handlegetRatingStyle(transaction.brand?.rating)} text-gray-700`}>
+                                            {transaction.brand?.brandName}
+                                        </span>
+                                    </div>
+                                </div>
+                                <p className="text-sm text-gray-600">Province: <span className="text-gray-800">{transaction.province}</span></p>
+                                <p className="text-sm text-gray-600">Phone Number: <span className="text-gray-800">{transaction.phone}</span></p>
+                            </div>
+
+                            <div className="space-y-2">
+                                <p className="text-sm text-gray-600">Buyer: <span className="text-gray-800">{transaction.buyerName}</span></p>
+                                <p className="text-sm text-gray-600">Date: <span className="text-gray-800">{transaction.createDate}</span></p>
+                                <p className="text-sm text-gray-600">
+                                    Total: <span className="text-gray-800 font-semibold ml-1">
+                                        {new Intl.NumberFormat('en-US', {
+                                            style: 'currency',
+                                            currency: 'VND'
+                                        }).format(transaction.totalPrice)}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </PaymentInfo>
+                </DialogContent>
+            </ScrollFreeDialogContent>
+            <DialogActions>
+                <Button onClick={onDownloadPDF} variant="contained" color="primary">Download PDF</Button>
+                <Button onClick={onClose} variant="outlined">Close</Button>
+            </DialogActions>
+        </Dialog >
+    );
+};
 
 const AccountantManagePaymentForBrandComponent: React.FC = () => {
     // ---------------UseState---------------//
@@ -919,11 +1321,209 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
+
+    const _handleOpenPDF = (selectedOrder: any) => {
+        console.log("bebe");
+
+        if (!selectedOrder) return;
+
+        const doc = new jsPDF();
+
+        // set background color
+        doc.setFillColor(244, 245, 239); // White color
+        doc.rect(0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height, 'F');
+
+        const imgData = "http://localhost:3000/src/assets/system/smart-tailor_logo.png";
+        const imgWidth = 40;
+        const imgHeight = 40;
+        doc.addImage(imgData, 'PNG', 15, 10, imgWidth, imgHeight);
+
+        doc.setFontSize(35);
+        doc.setFont('Playfair Display', 'bold');
+
+        doc.text("INVOICE", 140, 30).getFont()
+
+        const textOffset = 10;
+        const tableStartY = Math.max(imgHeight + textOffset, 50);
+
+        autoTable(doc, {
+            startY: tableStartY,
+            body: [
+                [
+                    {
+                        content: `Invoice No. ${selectedOrder.orderID}` + `\n${selectedOrder.orderType}`,
+                        styles: {
+                            halign: 'left',
+                            valign: "middle",
+                            fontSize: 10
+                        }
+                    },
+                    {
+                        content: `SMART TAILOR, Inc` + `\nLot E2a-7, Street D1, High-Tech Park` + `\nLong Thanh My Ward City` + `\nThu Duc` + `\nHo Chi Minh City.` + `\nViet Nam`,
+                        styles: {
+                            halign: 'right',
+                            valign: "middle",
+                            fontSize: 10
+                        }
+                    }
+                ]
+            ], theme: 'plain',
+        })
+
+        autoTable(doc, {
+            body: [
+                [
+                    {
+                        content: `___________________________________________________________________________________________`,
+                        styles: {
+                            halign: 'left',
+                            overflow: 'linebreak'
+                        }
+                    }
+                ]
+            ], theme: 'plain'
+        })
+
+        autoTable(doc, {
+            head: [['Design ID', 'Quantity', 'Size', 'Create Date']],
+            body: selectedOrder.detailList?.map((item: any) => [
+                item.designDetailId,
+                item.quantity,
+                item.size?.sizeName,
+                item.size?.createDate
+            ]),
+            theme: "plain"
+        });
+
+        autoTable(doc, {
+            head: [[{ content: "                          ", styles: { halign: 'right' } }, { content: "                         ", styles: { halign: 'center' } }, { content: "Sum", styles: { halign: 'center' } }, { content: `${__handleAddCommasToNumber(selectedOrder.totalPrice)} VND`, styles: { halign: 'center' } }]],
+            body: [
+                [
+                    {
+                        content: '                           ',
+                        styles: {
+                            halign: 'right',
+                            fontStyle: 'bold'
+                        },
+                    },
+                    {
+                        content: '              ',
+                        styles: {
+                            halign: 'center',
+                            fontStyle: 'bold',
+                        },
+                    },
+                    {
+                        content: "Tax (0%)",
+                        styles: {
+                            fontStyle: 'bold',
+                            halign: "center"
+                        }
+                    },
+                    {
+                        content: "0 VND",
+                        styles: {
+                            fontStyle: 'bold',
+                            halign: "center"
+                        }
+                    }
+                ],
+            ],
+            theme: 'plain'
+        });
+
+        autoTable(doc, {
+            body: [
+                [
+                    {
+                        content: `                                                                                                               __________________________________`,
+                        styles: {
+                            halign: 'left',
+                            overflow: 'linebreak'
+                        }
+                    }
+                ]
+            ], theme: 'plain'
+        })
+
+        autoTable(doc, {
+            head: [[{ content: "                          ", styles: { halign: 'right' } }, { content: "                         ", styles: { halign: 'center' } }, { content: "TOTAL", styles: { halign: 'center' } }, { content: `${__handleAddCommasToNumber(selectedOrder.totalPrice)} VND`, styles: { halign: 'center' } }]],
+            theme: 'plain'
+        });
+
+        autoTable(doc, {
+            body: [
+                [
+                    {
+                        content: `                                                                                                               __________________________________`,
+                        styles: {
+                            halign: 'left',
+                            overflow: 'linebreak'
+                        }
+                    }
+                ]
+            ], theme: 'plain'
+        })
+
+        autoTable(doc, {
+            body: [
+                [
+                    {
+                        content: "Thank You!",
+                        styles: {
+                            halign: 'left',
+                            fontSize: 20
+                        }
+                    }
+                ]
+            ],
+            theme: "plain"
+        })
+
+        autoTable(doc, {
+            body: [
+                [
+                    {
+                        content: `SMART TAILOR, Inc` + `\nLot E2a - 7, Street D1, High - Tech Park` + `\nLong Thanh My Ward City` + `\nThu Duc` + `\nHo Chi Minh City.` + `\nViet Nam`,
+                        styles: {
+                            halign: 'left',
+                            valign: "middle",
+                            fontSize: 10
+                        }
+                    },
+                    {
+                        content: `${selectedOrder.quantity} ` + `\n${selectedOrder.quantity} `,
+                        styles: {
+                            halign: 'right',
+                            valign: "bottom",
+                            fontSize: 12
+                        }
+                    }
+                ]
+            ], theme: 'plain',
+        })
+
+        doc.save('invoice.pdf')
+    };
+
+    const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
+    const [selectedTransactions, setSelectedTransactions] = useState(null);
+
+    const handleViewTransaction = (transaction: any) => {
+        setSelectedTransactions(transaction);
+        setIsTransactionModalOpen(true);
+    };
+
+    const handleCloseTransactionModal = () => {
+        setIsTransactionModalOpen(false);
+        setSelectedTransactions(null);
+    };
+
     return (
         <div>
             <LoadingComponent isLoading={isLoading}></LoadingComponent>
             {/* <ToastContainer></ToastContainer> */}
-            <div className={`${style.orderHistory__container}`}>
+            <div className={`${style.orderHistory__container} `}>
                 <div style={{ width: '100%' }} className="max-w-6xl mx-auto md:p-6 min-h-screen">
                     <div className="mb-6">
                         <div className="mt-0">
@@ -1130,7 +1730,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                                         orderDetail?.orderStatus === "Delivered"
                                                                         ? "at " + orderDetail?.expectedProductCompletionDate
                                                                         : ""
-                                                                    }`}
+                                                                    } `}
                                                                 variant="filled"
                                                                 style={{
                                                                     backgroundColor:
@@ -1181,7 +1781,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                     </div>
                                     <button
                                         onClick={() => __handleExtendTranscation(orderDetail?.orderID)}
-                                        className={`${style.orderHistory__transactionLable}`}
+                                        className={`${style.orderHistory__transactionLable} `}
                                     >
                                         <p className="text-sm md:text-sm font-bold text-gray-800 pr-5">Transactions</p>
                                         {isExtendTransaction[orderDetail?.orderID || '1'] ? (
@@ -1248,7 +1848,8 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                             <p
                                                                 className={`${__handlegetRatingStyle(
                                                                     order.brand?.rating
-                                                                )} text-sm text-gray-500`}
+                                                                )
+                                                                    } text - sm text - gray - 500`}
                                                             >
                                                                 {" "}
                                                                 {order.brand?.brandName}
@@ -1285,7 +1886,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                     </p>
                                                     <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
                                                         Expected start at:{" "}
-                                                        <span className={`${__handleGetDateTimeColor(order.expectedStartDate)} text-sm pb-2`}>
+                                                        <span className={`${__handleGetDateTimeColor(order.expectedStartDate)} text - sm pb - 2`}>
                                                             {order.expectedStartDate}
                                                         </span>
                                                     </p>
@@ -1333,13 +1934,13 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
 
                                                 </div>
                                                 <div
-                                                    className={`${style.orderHistory__viewInvoice__buttonPayment}items-center justify-center`}
+                                                    className={`${style.orderHistory__viewInvoice__buttonPayment} items - center justify - center`}
                                                     style={{ textAlign: "center" }}
                                                 >
                                                     <p
-                                                        className={`${style.orderHistory__viewInvoice__button} px-5 text-sm font-medium`}
+                                                        className={`${style.orderHistory__viewInvoice__button} px - 5 text - sm font - medium`}
                                                     >
-                                                        <p className='mb-40'>View transaction</p>
+                                                        <p className='mb-40' onClick={() => handleViewTransaction(order)}>View transaction</p>
                                                         <button
                                                             type="submit"
                                                             className="px-5 py-2 text-sm font-medium text-white"
@@ -1355,8 +1956,16 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                             <span className="font-medium text-white">Payment</span>
                                                         </button>
                                                     </p>
-
                                                 </div>
+
+                                                {isTransactionModalOpen && selectedTransactions && (
+                                                    <TransactionModals
+                                                        transaction={selectedTransactions}
+                                                        onClose={handleCloseTransactionModal}
+                                                        onDownloadPDF={() => _handleOpenPDF(selectedTransactions)}
+                                                    />
+                                                )}
+
                                                 {selectedOrder === order.orderID && (
                                                     <PaymentFromAccountantToBranđialog
                                                         onClose={__handleClosePaymentForBrandialog}

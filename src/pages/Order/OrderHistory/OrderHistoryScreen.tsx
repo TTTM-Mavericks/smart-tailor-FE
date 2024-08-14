@@ -265,6 +265,19 @@ const OrderHistory: React.FC = () => {
         </Listbox>
     );
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const [productsPerPage, setProductsPerPage] = useState(10);
+    const [goToPage, setGoToPage] = useState(currentPage.toString());
+    const indexOfLastProduct = currentPage * productsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    const currentProducts = orderDetailList.slice(indexOfFirstProduct, indexOfLastProduct);
+    const totalPages = Math.ceil(orderDetailList.length / productsPerPage);
+    const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+    useEffect(() => {
+        setGoToPage(currentPage.toString());
+    }, [currentPage]);
+
     return (
         <div>
             <HeaderComponent />
@@ -375,7 +388,7 @@ const OrderHistory: React.FC = () => {
                         )}
                     </div>
 
-                    {orderDetailList?.length > 0 ? orderDetailList?.filter(applyFilters).map((orderDetail) => (
+                    {currentProducts?.length > 0 ? currentProducts?.filter(applyFilters).map((orderDetail) => (
                         <div className="bg-white rounded-xl shadow-md p-4 md:p-6 mb-4 md:mb-8 transform transition-all hover:shadow-lg">
                             <div className="flex flex-col md:flex-row items-start md:items-center mb-4 md:mb-6" >
                                 <div className="mb-4 md:mb-0 w-max">
@@ -510,6 +523,78 @@ const OrderHistory: React.FC = () => {
                             <span className="text-gray-500 text-sm text-center justify-center content-center">Do not have any order</span>
                         </div>
                     )}
+
+                    <div className="flex flex-wrap items-center justify-center space-x-2 mt-8">
+                        <select
+                            className="border border-gray-300 rounded-md px-3 py-2 bg-white text-gray-700 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                            value={productsPerPage}
+                            onChange={(e) => {
+                                setProductsPerPage(Number(e.target.value));
+                                paginate(1);
+                            }}
+                        >
+                            <option value="10">10 per page</option>
+                            <option value="20">20 per page</option>
+                            <option value="50">50 per page</option>
+                        </select>
+
+                        <div className="flex items-center space-x-1 mt-4 sm:mt-0">
+                            <button
+                                className={`px-3 py-2 rounded-md ${currentPage === 1
+                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                    : 'bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500'
+                                    }`}
+                                onClick={() => { if (currentPage > 1) paginate(currentPage - 1); }}
+                                disabled={currentPage === 1}
+                            >
+                                &laquo;
+                            </button>
+
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+                                <button
+                                    key={number}
+                                    onClick={() => paginate(number)}
+                                    className={`px-3 py-2 rounded-md ${currentPage === number
+                                        ? 'bg-orange-500 text-white'
+                                        : 'bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500'
+                                        }`}
+                                >
+                                    {number}
+                                </button>
+                            ))}
+
+                            <button
+                                className={`px-3 py-2 rounded-md ${currentPage === totalPages
+                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                    : 'bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500'
+                                    }`}
+                                onClick={() => {
+                                    if (currentPage < totalPages) paginate(currentPage + 1);
+                                }}
+                                disabled={currentPage === totalPages}
+                            >
+                                &raquo;
+                            </button>
+                        </div>
+
+                        <div className="flex items-center space-x-2 mt-4 sm:mt-0">
+                            <span className="text-gray-600">Go to</span>
+                            <input
+                                type="text"
+                                className="border border-gray-300 rounded-md w-16 px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                value={goToPage}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoToPage(e.target.value)}
+                                onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                                    if (e.key === 'Enter') {
+                                        const page = Math.max(1, Math.min(parseInt(goToPage), totalPages));
+                                        if (!isNaN(page)) {
+                                            paginate(page);
+                                        }
+                                    }
+                                }}
+                            />
+                        </div>
+                    </div>
 
                     {showScrollButton && (
                         <IconButton
