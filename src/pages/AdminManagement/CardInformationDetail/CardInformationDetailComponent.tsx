@@ -1,119 +1,92 @@
 import { useState, useEffect } from "react";
 import { useTheme } from "@mui/material";
 import { tokens } from "../../../theme";
-import { useTranslation } from 'react-i18next';
+import { baseURL, functionEndpoints, versionEndpoints } from "../../../api/ApiConfig";
+import axios from "axios";
+import { __getToken } from "../../../App";
 
 const CardInformationDetailComponent = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
-    const [emailData, setEmailData] = useState({
-        emailsSent: "",
-        increase: ""
-    });
+    const [orderStatusDetails, setOrderStatusDetails] = useState([]);
+    const [loading, setLoading] = useState<any>(true);
+    const [error, setError] = useState<any>(null);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchOrderStatusDetails = async () => {
             try {
-
-                const data = {
-                    emailsSent: "123456789",
-                    increase: "-25%"
-                };
-
-                setEmailData(data);
+                const response = await axios.get(
+                    `${baseURL + versionEndpoints.v1 + '/order' + functionEndpoints.chart.orderStatusDetail}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${__getToken()}`,
+                        }
+                    }
+                );
+                setOrderStatusDetails(response.data.data.orderStatusDetailList || []);
             } catch (error) {
-                console.error("Error fetching data: ", error);
+                console.error('Error fetching order status details:', error);
+                setError('Failed to load order status details');
+            } finally {
+                setLoading(false);
             }
         };
 
-        fetchData();
+        fetchOrderStatusDetails();
     }, []);
 
-    // Get language in local storage
-    const selectedLanguage = localStorage.getItem('language');
-    const codeLanguage = selectedLanguage?.toUpperCase();
+    if (loading) return <div className="p-4">Loading...</div>;
+    if (error) return <div className="p-4 text-red-500">{error}</div>;
 
-    // Using i18n
-    const { t, i18n } = useTranslation();
-    useEffect(() => {
-        if (selectedLanguage !== null) {
-            i18n.changeLanguage(selectedLanguage);
+    const getCardColor = (status: any) => {
+        switch (status) {
+            case "Total Parent Order": return "blue";
+            case "Total Cancel Order": return "red";
+            case "Total Pre Order": return "yellow";
+            case "Total Processing Order": return "green";
+            case "Total Fully Completed Order": return "purple";
+            default: return "gray";
         }
-    }, [selectedLanguage, i18n]);
+    };
 
+    const getCardIcon = (status: any) => {
+        switch (status) {
+            case "Total Parent Order": return "M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 15 12 15s-3.5-1.57-3.5-3.5S10.07 8 12 8zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 17.82 9.64 17 12 17s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V21z";
+            case "Total Cancel Order": return "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z";
+            case "Total Pre Order": return "M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z";
+            case "Total Processing Order": return "M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z";
+            case "Total Fully Completed Order": return "M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z";
+            default: return "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z";
+        }
+    };
 
     return (
-        <div className="mt-12">
-            <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
-                <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
-                    <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-blue-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-6 h-6 text-white">
-                            <path d="M12 7.5a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5z"></path>
-                            <path fill-rule="evenodd" d="M1.5 4.875C1.5 3.839 2.34 3 3.375 3h17.25c1.035 0 1.875.84 1.875 1.875v9.75c0 1.036-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 011.5 14.625v-9.75zM8.25 9.75a3.75 3.75 0 117.5 0 3.75 3.75 0 01-7.5 0zM18.75 9a.75.75 0 00-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 00.75-.75V9.75a.75.75 0 00-.75-.75h-.008zM4.5 9.75A.75.75 0 015.25 9h.008a.75.75 0 01.75.75v.008a.75.75 0 01-.75.75H5.25a.75.75 0 01-.75-.75V9.75z" clip-rule="evenodd"></path>
-                            <path d="M2.25 18a.75.75 0 000 1.5c5.4 0 10.63.722 15.6 2.075 1.19.324 2.4-.558 2.4-1.82V18.75a.75.75 0 00-.75-.75H2.25z"></path>
-                        </svg>
-                    </div>
-                    <div className="p-4 text-right">
-                        <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Today's Money</p>
-                        <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">$53k</h4>
-                    </div>
-                    <div className="border-t border-blue-gray-50 p-4">
-                        <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
-                            <strong className="text-green-500">+55%</strong>&nbsp;than last week
-                        </p>
-                    </div>
-                </div>
-                <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
-                    <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-pink-600 to-pink-400 text-white shadow-pink-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-6 h-6 text-white">
-                            <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd"></path>
-                        </svg>
-                    </div>
-                    <div className="p-4 text-right">
-                        <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Today's Users</p>
-                        <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">2,300</h4>
-                    </div>
-                    <div className="border-t border-blue-gray-50 p-4">
-                        <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
-                            <strong className="text-green-500">+3%</strong>&nbsp;than last month
-                        </p>
-                    </div>
-                </div>
-                <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
-                    <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-green-600 to-green-400 text-white shadow-green-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-6 h-6 text-white">
-                            <path d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z"></path>
-                        </svg>
-                    </div>
-                    <div className="p-4 text-right">
-                        <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">New Clients</p>
-                        <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">3,462</h4>
-                    </div>
-                    <div className="border-t border-blue-gray-50 p-4">
-                        <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
-                            <strong className="text-red-500">-2%</strong>&nbsp;than yesterday
-                        </p>
-                    </div>
-                </div>
-                <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
-                    <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-orange-600 to-orange-400 text-white shadow-orange-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-6 h-6 text-white">
-                            <path d="M18.375 2.25c-1.035 0-1.875.84-1.875 1.875v15.75c0 1.035.84 1.875 1.875 1.875h.75c1.035 0 1.875-.84 1.875-1.875V4.125c0-1.036-.84-1.875-1.875-1.875h-.75zM9.75 8.625c0-1.036.84-1.875 1.875-1.875h.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-.75a1.875 1.875 0 01-1.875-1.875V8.625zM3 13.125c0-1.036.84-1.875 1.875-1.875h.75c1.036 0 1.875.84 1.875 1.875v6.75c0 1.035-.84 1.875-1.875 1.875h-.75A1.875 1.875 0 013 19.875v-6.75z"></path>
-                        </svg>
-                    </div>
-                    <div className="p-4 text-right">
-                        <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Sales</p>
-                        <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">$103,430</h4>
-                    </div>
-                    <div className="border-t border-blue-gray-50 p-4">
-                        <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
-                            <strong className="text-green-500">+5%</strong>&nbsp;than yesterday
-                        </p>
-                    </div>
-                </div>
+        <div>
+            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                {orderStatusDetails.slice(0, 4).map((item: any, index: any) => {
+                    const cardColor = getCardColor(item.first);
+                    const cardIcon = getCardIcon(item.first);
+                    return (
+                        <div key={index} className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+                            <div className={`bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-${cardColor}-600 to-${cardColor}-400 text-white shadow-${cardColor}-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center`}>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-6 h-6 text-white">
+                                    <path d={cardIcon}></path>
+                                </svg>
+                            </div>
+                            <div className="p-4 text-right">
+                                <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">{item.first}</p>
+                                <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{item.second} Orders</h4>
+                            </div>
+                            <div className="border-t border-blue-gray-50 p-4">
+                                <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
+                                    <strong className="text-green-500">+55%</strong>&nbsp;than last week
+                                </p>
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
-
         </div>
     );
 };

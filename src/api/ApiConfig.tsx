@@ -208,6 +208,13 @@ export const functionEndpoints = {
   },
   payment: {
     getPaymentByUserID: '/get-payment-by-user-id'
+  },
+  chart: {
+    orderStatusDetail: '/get-order-status-detail',
+    calculateOrderGrowthPercentageMonth: '/calculate-order-growth-percentage-for-current-and-previous-month',
+    calculateUserGrowthPercentageMonth: '/calculate-user-growth-percentage-for-current-and-previous-month',
+    calculateCustomerGrowthPercentageMonth: '/calculate-new-customer-growth-percentage-for-current-and-previous-week',
+    calculatePaymentGrowthPercentageMonth: '/calculate-payment-growth-percentage-for-current-and-previous-week'
   }
 }
 

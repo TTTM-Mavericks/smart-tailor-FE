@@ -20,3 +20,4 @@ export const mockPieData = [
         value: 584,
     },
 ];
+
