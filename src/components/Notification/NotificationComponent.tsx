@@ -303,15 +303,15 @@ const NotificationComponent: React.FC = () => {
                                                         {notification.status ? 'Read' : 'Not read'}
                                                     </span>
                                                 </div>
-                                                <Typography variant="body2" className="inline-flex items-center text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                                                <p className="text-sm inline-flex items-center text-green-600 bg-green-100 px-2 py-1 rounded-full">
                                                     {generateNotificationMessage(notification)}
-                                                </Typography>
-                                                {/* <Typography variant="body2" className="text-gray-700 mb-4 pt-1" >
-                                                    ID: {notification.targetID}
-                                                </Typography> */}
-                                                <Typography variant="caption" className="text-gray-500">
+                                                </p>
+                                                <p className=" text-sm text-gray-500" style={{fontSize: 12}}>
+                                                    Message: {notification.message}
+                                                </p>
+                                                <p className=" text-sm text-gray-500" style={{fontSize: 12}}>
                                                     Created at: {notification.createDate}
-                                                </Typography>
+                                                </p>
                                             </CardContent>
                                         </Card>
                                     ))}

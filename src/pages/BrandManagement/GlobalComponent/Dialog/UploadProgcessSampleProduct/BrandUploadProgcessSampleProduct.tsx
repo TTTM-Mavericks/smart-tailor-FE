@@ -113,8 +113,8 @@ const BrandUploadProgcessSampleProduct: React.FC<Props> = ({ orderDetail, isOpen
                         recipientID: orderDetail?.employeeID,
                         action: "UPDATE",
                         type: "SAMPLE PRODUCT",
-                        targetID: orderID,
-                        message: `Brand ${brandID} added a sample product of Order`
+                        targetID: orderDetail?.parentOrderID,
+                        message: `Brand ${brandID} added a sample product - Sub order: ${orderID}`
                     }
                     console.log(bodyRequest);
                     __handleSendNotification(bodyRequest);

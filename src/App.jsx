@@ -111,7 +111,7 @@ export const __getToken = () => {
 }
 
 export const __getUserLogined = () => {
-  const userAuth = localStorage.getItem('userAuth');
+  const userAuth = Cookies.get('userAuth');
   if (userAuth) {
     return JSON.parse(userAuth);
   } else return;

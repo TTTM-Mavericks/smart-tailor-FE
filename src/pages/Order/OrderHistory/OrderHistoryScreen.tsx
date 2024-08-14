@@ -113,7 +113,10 @@ const OrderHistory: React.FC = () => {
             const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderByUserId}/${userID}`, null, __getToken());
             if (response.status === 200) {
                 console.log(response.data);
-                setOrderDetailList(response.data);
+                const dataResp = response.data.filter((item: OrderDetailInterface) =>
+                    item.orderType !== 'PARENT_ORDER'                     
+                );
+                setOrderDetailList(dataResp);
                 setIsLoading(false)
             } else {
                 toast.error(`${response.message}`, { autoClose: 4000 });

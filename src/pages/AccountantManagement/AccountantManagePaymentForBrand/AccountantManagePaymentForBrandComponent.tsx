@@ -229,7 +229,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
                 onClick={e => e.stopPropagation()}
             >
                 <IoMdCloseCircleOutline
-                    size={28}
+                    size={20}
                     className="absolute top-4 right-4 cursor-pointer text-red-500 hover:text-red-500 transition-colors"
                     onClick={onClose}
                 />
@@ -406,13 +406,13 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
 
                                     </div>
                                     <div
-                                        className={`${style.orderHistory__viewInvoice__buttonPayment}items-center justify-center`}
-                                        style={{ textAlign: "center" }}
+                                        className={`${style.orderHistory__viewInvoice__buttonPayment}items-center justify-center mt-0`}
+                                        style={{ textAlign: "center", position: 'absolute', bottom: 0, right: 10 }}
                                     >
                                         <p
-                                            className={`${style.orderHistory__viewInvoice__button} px-5 text-sm font-medium`}
+                                            className={`px-5 text-sm font-medium`}
                                         >
-                                            <p className='mb-40'>View transaction</p>
+
                                             <button
                                                 type="submit"
                                                 className="px-5 py-2 text-sm font-medium text-white"
@@ -425,10 +425,9 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
                                                 }}
                                                 onClick={() => __handleOpenPaymentForBrandDialog(subOrder.orderID)}
                                             >
-                                                <span className="font-medium text-white">Payment</span>
+                                                <span className="font-medium text-white">Payment hehe</span>
                                             </button>
                                         </p>
-
                                     </div>
                                 </div>
                             </div>
@@ -439,6 +438,8 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
                                     paymentData={subOrder.paymentList}
                                 ></PaymentFromAccountantToBranđialog>
                             )}
+                            <p className='pb-5 text-sm underline text-blue-500 mr-auto'>View transaction</p>
+
                         </motion.div>
                     ))}
                 </div>

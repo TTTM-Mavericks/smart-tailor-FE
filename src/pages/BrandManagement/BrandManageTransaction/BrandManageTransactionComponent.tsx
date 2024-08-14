@@ -612,7 +612,7 @@ const BrandManageTransactionComponent: React.FC = () => {
                             </div>
                         )}
 
-                        {selectedFilters.includes('Order Status') && (
+                        {selectedFilters.includes('Payment Status') && (
                             <div className="filter-item">
                                 <label htmlFor="statusFilter" className="block mb-2 text-sm font-medium text-gray-700">Order Status</label>
                                 <select
@@ -637,7 +637,8 @@ const BrandManageTransactionComponent: React.FC = () => {
                         <div className="bg-white rounded-xl shadow-md p-4 md:p-6 mb-4 md:mb-8 transform transition-all hover:shadow-lg">
                             <div className="flex flex-wrap md:flex-nowrap mb-4 md:mb-6">
                                 <div className="w-full md:w-1/2 mb-4 md:mb-0">
-                                    <h2 className="text-sm md:text-1xl font-bold text-gray-800 pb-2">OrderID {transaction.orderID} </h2>
+                                    <h2 className="text-sm md:text-1xl font-bold text-gray-800 pb-2">Order ID {transaction.orderID} </h2>
+                                    
                                     <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">
                                         Payment ID: <span className="text-sm text-gray-500 pb-2">{transaction?.paymentID}</span>
                                     </p>

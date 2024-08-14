@@ -280,7 +280,7 @@ const OrderProductScreen = () => {
                     action: "CREATE",
                     type: "ORDER",
                     targetID: response.data.orderID,
-                    message: ""
+                    message: `Customer ${user.userID} created an order, let's check it.`
                 }
                 console.log(bodyRequest);
                 __handleSendNotification(bodyRequest);

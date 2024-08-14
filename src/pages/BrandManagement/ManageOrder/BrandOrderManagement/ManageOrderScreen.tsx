@@ -264,7 +264,7 @@ const BrandOrderFields: React.FC<{
 
     const __handleFetchTimeLine = async (parentId: any) => {
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderTimeLineByParentId}/${parentId}`, null, __getToken());
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderTimeLineBySubOrderId}/${parentId}`, null, __getToken());
             if (response.status === 200) {
                 setIsLoading(false);
                 setTimeLine(response.data);
@@ -284,7 +284,7 @@ const BrandOrderFields: React.FC<{
     const __handleOpenUpdateProcessDialog = (orderDetail: BrandOrder) => {
         setOpenOrderDetail(orderDetail);
         __handleLoadProgressStep(orderDetail.orderID);
-        __handleFetchTimeLine(orderDetail.parentOrderID);
+        __handleFetchTimeLine(orderDetail.orderID);
     };
 
     const __handleCloseUpdateProcessDialog = () => {
@@ -403,9 +403,11 @@ const BrandOrderFields: React.FC<{
             const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest, __getToken());
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
-                toast.success(`${response.message}`, { autoClose: 4000 });
+                toast.success(`${response.message}`, { autoClose: 1000 });
                 setTimeout(() => {
                     window.location.reload();
+                    setIsLoading(false)
+
                 }, 2000);
             }
             else {
@@ -576,30 +578,40 @@ const BrandOrderFields: React.FC<{
                             <div className="pt-4 mb-20">
 
                                 <div className="flex justify-between text-sm mb-0 ml-0">
-                                    <p className='flex'>
-                                        <span>ET: </span>
-                                        <span className={`text-indigo-600 ml-1`}>
-                                            dd-mm-yyy 00:00:00
-                                        </span>
-                                    </p>
-                                    <p className='flex'>
-                                        <span>ET: </span>
-                                        <span className={`text-indigo-600 ml-1`}>
-                                            {timeline?.estimatedDateFinishFirstStage}
-                                        </span>
-                                    </p>
-                                    <p className='flex'>
-                                        <span>ET: </span>
-                                        <span className={`text-indigo-600 ml-1`}>
-                                            {timeline?.estimatedDateFinishSecondStage}
-                                        </span >
-                                    </p>
-                                    <p className='flex'>
-                                        <span>ET: </span>
-                                        <span className={`text-indigo-600 ml-1`}>
-                                            {timeline?.estimatedDateFinishCompleteStage}
-                                        </span>
-                                    </p>
+                                    {timeline?.estimatedDateStartDepositStage && (
+                                        <p className='flex'>
+                                            <span>ET: </span>
+                                            <span className={`text-indigo-600 ml-1`}>
+                                                {timeline?.estimatedDateStartDepositStage}
+                                            </span>
+                                        </p>
+                                    )}
+                                    {timeline?.estimatedDateFinishFirstStage && (
+                                        <p className='flex'>
+                                            <span>ET: </span>
+                                            <span className={`text-indigo-600 ml-1`}>
+                                                {timeline?.estimatedDateFinishFirstStage}
+                                            </span>
+                                        </p>
+                                    )}
+                                    {timeline?.estimatedDateFinishSecondStage && (
+
+                                        <p className='flex'>
+                                            <span>ET: </span>
+                                            <span className={`text-indigo-600 ml-1`}>
+                                                {timeline?.estimatedDateFinishSecondStage}
+                                            </span >
+                                        </p>
+                                    )}
+                                    {timeline?.estimatedDateFinishCompleteStage && (
+
+                                        <p className='flex'>
+                                            <span>ET: </span>
+                                            <span className={`text-indigo-600 ml-1`}>
+                                                {timeline?.estimatedDateFinishCompleteStage}
+                                            </span>
+                                        </p>
+                                    )}
 
 
                                 </div>
@@ -1015,7 +1027,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
     }
     const __handleFetchTimeLine = async (parentId: any) => {
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderTimeLineByParentId}/${parentId}`, null, __getToken());
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderTimeLineBySubOrderId}/${parentId}`, null, __getToken());
             if (response.status === 200) {
                 setIsLoading(false);
                 setTimeLine(response.data);
@@ -1034,7 +1046,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
     const __handleOpenUpdateProcessDialog = (orderDetail: BrandOrderTable) => {
         setOpenOrderDetail(orderDetail);
         __handleLoadProgressStep(orderDetail.orderID);
-        __handleFetchTimeLine(orderDetail.parentOrderID);
+        __handleFetchTimeLine(orderDetail.orderID);
     };
 
     const getStatusColor = (status: string) => {

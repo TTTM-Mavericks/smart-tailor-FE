@@ -33,8 +33,8 @@ const ProductCard: React.FC<Props> = ({ object, onClick, style, className }) => 
                 </Typography>
             </div>
             <div className={styles.card__actions}>
-                <Button size="small">Share</Button>
-                <Button size="small">Learn More</Button>
+                {/* <Button size="small">Share</Button>
+                <Button size="small">Learn More</Button> */}
             </div>
         </div>
     );

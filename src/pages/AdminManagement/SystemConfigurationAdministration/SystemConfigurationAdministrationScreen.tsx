@@ -12,6 +12,7 @@ const AdminConfiguration = () => {
     const [properties, setProperties] = useState<SystemPropertyInterface[]>([]);
     const [selectedPropertyDetail, setSelectedPropertyDetail] = useState<string | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+    const [isDialogAddOpen, setIsDialogAddOpen] = useState<boolean>(false);
     const [errors, setErrors] = useState<string[]>([]);
     const [newProperty, setNewProperty] = useState<SystemPropertyInterface>({
         propertyID: '',
@@ -100,7 +101,7 @@ const AdminConfiguration = () => {
                     propertyValue: '',
                     propertyStatus: true,
                 }); // Reset the new property state
-                setIsDialogOpen(false); // Close the dialog
+                setIsDialogAddOpen(false); // Close the dialog
             }
         } catch (error: any) {
             console.error('Error adding property', error);
@@ -115,6 +116,7 @@ const AdminConfiguration = () => {
 
     const handleCloseDialog = () => {
         setIsDialogOpen(false);
+        setIsDialogAddOpen(false)
         setSelectedPropertyDetail(null);
     };
 
@@ -171,7 +173,7 @@ const AdminConfiguration = () => {
                             Save Configuration
                         </button>
                         <button
-                            onClick={() => setIsDialogOpen(true)}
+                            onClick={() => setIsDialogAddOpen(true)}
                             className="mt-6 ml-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center"
                         >
                             <FaPlus className="mr-2" /> Add Property
@@ -181,6 +183,13 @@ const AdminConfiguration = () => {
             </div>
 
             <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
+                <DialogTitle><span style={{ fontSize: 16 }}>Property Detail</span></DialogTitle>
+                <DialogContent>
+                    <p style={{ fontSize: 13 }}>{selectedPropertyDetail}</p>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isDialogAddOpen} onClose={handleCloseDialog}>
                 <DialogTitle>Add New Property</DialogTitle>
                 <IoMdCloseCircleOutline
                     cursor={'pointer'}

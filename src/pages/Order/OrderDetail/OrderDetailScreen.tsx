@@ -38,6 +38,7 @@ export interface EstimatedStageInterface {
     estimatedDateFinishSecondStage: string;
     estimatedQuantityFinishCompleteStage: number;
     estimatedDateFinishCompleteStage: string;
+    estimatedDateStartDepositStage: string
 }
 
 interface BrandDetailPriceResponseInterface {
@@ -287,8 +288,6 @@ const OrderDetailScreen: React.FC = () => {
             }
             else {
                 console.log('detail order: ', response.message);
-
-                navigate('/error404');
             }
         } catch (error) {
             console.log('error: ', error);
@@ -351,7 +350,7 @@ const OrderDetailScreen: React.FC = () => {
                     action: "CANCEL",
                     type: "ORDER",
                     targetID: orderDetail?.orderID,
-                    message: ""
+                    message: `Some reason make customer ${user.userID} want to cancel this order`
                 }
                 console.log(bodyRequest);
                 __handleSendNotification(bodyRequest);
@@ -898,7 +897,7 @@ const OrderDetailScreen: React.FC = () => {
             ></CustomerReportOrderDialogComponent>
 
             {
-                orderDetail?.orderStatus === 'DELIVERED' || (orderDetail?.rating && orderDetail?.rating > 0) && (
+                orderDetail?.orderStatus === 'DELIVERED' && !orderDetail?.rating && (
 
                     <Dialog open={isOpenRatingDialog} onClose={() => setIsOpenRatingDialog(false)}>
                         <DialogTitle>

@@ -13,6 +13,7 @@ import { toast } from 'react-toastify';
 import { UserInterface } from '../../../models/UserModel';
 import { useNavigate } from 'react-router-dom';
 import { __getToken } from '../../../App';
+import LoadingComponent from '../../../components/Loading/LoadingComponent';
 
 interface OrderDetailsProps {
     order: OrderInterface;
@@ -296,6 +297,7 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
      * Handle brand accept order request from customer
      */
     const __handleAcceptOrderRequest = async () => {
+        setIsLoadingPage(true);
         try {
             const bodyRequest = {
                 brandID: brand?.userID,
@@ -307,17 +309,23 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
             if (response.status === 200) {
                 console.log(response.data);
                 toast.success(`${response.message}`, { autoClose: 4000 });
+                
                 setTimeout(() => {
                     navigate('/brand');
+                    setIsLoadingPage(false);
                 }, 3000);
             } else {
                 toast.error(`${response.message}`, { autoClose: 4000 });
                 console.log(response.message);
+                setIsLoadingPage(false);
+
             }
             console.log(response);
         } catch (error) {
             toast.error(`${error}`, { autoClose: 4000 });
             console.log(error);
+            setIsLoadingPage(false);
+
 
         }
     }
@@ -336,8 +344,8 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
 
     return (
         <div className="container mx-auto p-6 bg-white rounded-lg shadow-lg">
+            <LoadingComponent isLoading={isLoadingPage}></LoadingComponent>
             <Typography variant="h4" style={{ fontSize: 20, fontWeight: 'bold' }}>Order Details</Typography>
-
             {/* Order Information */}
             {design ? (
                 <>

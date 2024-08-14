@@ -29,161 +29,9 @@ import { ToastContainer, toast } from 'react-toastify';
 import { NotificationInterface } from '../../models/NotificationModel';
 import { IoMdNotifications } from "react-icons/io";
 import { generateNotificationMessage } from '../../utils/ElementUtils';
-import { __getToken } from '../../App';
+import { __getToken, __getUserLogined } from '../../App';
 
-const navigation = {
-  categories: [
 
-    {
-      id: 'product',
-      name: 'Products',
-      href: '/product',
-      number: '000130',
-      type: 'page'
-    },
-    {
-      id: 'design',
-      name: 'Design',
-      href: '/design_create',
-      number: '000132',
-      type: 'page'
-    },
-    {
-      id: 'about',
-      name: 'About us',
-      number: '000133',
-      href: '/about',
-      type: 'page'
-    },
-    {
-      id: 'report',
-      name: 'Report',
-      href: '/report',
-      number: '000134',
-      type: 'page'
-    },
-  ],
-  categories_2: [
-    {
-      id: 'products',
-      name: 'Products',
-      type: 'menu',
-      number: '000130',
-      featured: [
-        {
-          name: 'New Arrivals',
-          href: '/product',
-          imageSrc: 'https://tailwindui.com/img/ecommerce-images/mega-menu-category-01.jpg',
-          imageAlt: 'Models sitting back to back, wearing Basic Tee in black and bone.',
-        },
-        {
-          name: 'Basic Tees',
-          href: '/product',
-          imageSrc: 'https://tailwindui.com/img/ecommerce-images/mega-menu-category-02.jpg',
-          imageAlt: 'Close up of Basic Tee fall bundle with off-white, ochre, olive, and black tees.',
-        },
-      ],
-      sections: [
-        {
-          id: 'clothing',
-          name: 'Clothing',
-          items: [
-            { name: 'Tops', href: '#' },
-            { name: 'Dresses', href: '#' },
-            { name: 'Pants', href: '#' },
-            { name: 'Denim', href: '#' },
-            { name: 'Sweaters', href: '#' },
-            { name: 'T-Shirts', href: '#' },
-            { name: 'Jackets', href: '#' },
-            { name: 'Activewear', href: '#' },
-            { name: 'Browse All', href: '#' },
-          ],
-        },
-        {
-          id: 'accessories',
-          name: 'Accessories',
-          items: [
-            { name: 'Watches', href: '#' },
-            { name: 'Wallets', href: '#' },
-            { name: 'Bags', href: '#' },
-            { name: 'Sunglasses', href: '#' },
-            { name: 'Hats', href: '#' },
-            { name: 'Belts', href: '#' },
-          ],
-        },
-        {
-          id: 'brands',
-          name: 'Brands',
-          items: [
-            { name: 'Full Nelson', href: '#' },
-            { name: 'My Way', href: '#' },
-            { name: 'Re-Arranged', href: '#' },
-            { name: 'Counterfeit', href: '#' },
-            { name: 'Significant Other', href: '#' },
-          ],
-        },
-      ],
-    },
-    {
-      id: 'sewingcompany',
-      name: 'Sewing company',
-      type: 'menu',
-      number: '000131',
-      featured: [
-        {
-          name: 'New Arrivals',
-          href: '#',
-          imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-04-detail-product-shot-01.jpg',
-          imageAlt: 'Drawstring top with elastic loop closure and textured interior padding.',
-        },
-        {
-          name: 'Artwork Tees',
-          href: '#',
-          imageSrc: 'https://tailwindui.com/img/ecommerce-images/category-page-02-image-card-06.jpg',
-          imageAlt:
-            'Three shirts in gray, white, and blue arranged on table with same line drawing of hands and shapes overlapping on front of shirt.',
-        },
-      ],
-      sections: [
-        {
-          id: 'clothing',
-          name: 'Clothing',
-          items: [
-            { name: 'Tops', href: '#' },
-            { name: 'Pants', href: '#' },
-            { name: 'Sweaters', href: '#' },
-            { name: 'T-Shirts', href: '#' },
-            { name: 'Jackets', href: '#' },
-            { name: 'Activewear', href: '#' },
-            { name: 'Browse All', href: '#' },
-          ],
-        },
-        {
-          id: 'accessories',
-          name: 'Accessories',
-          items: [
-            { name: 'Watches', href: '#' },
-            { name: 'Wallets', href: '#' },
-            { name: 'Bags', href: '#' },
-            { name: 'Sunglasses', href: '#' },
-            { name: 'Hats', href: '#' },
-            { name: 'Belts', href: '#' },
-          ],
-        },
-        {
-          id: 'brands',
-          name: 'Brands',
-          items: [
-            { name: 'Re-Arranged', href: '#' },
-            { name: 'Counterfeit', href: '#' },
-            { name: 'Full Nelson', href: '#' },
-            { name: 'My Way', href: '#' },
-          ],
-        },
-      ],
-    },
-  ]
-}
 
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(' ')
@@ -204,17 +52,176 @@ export default function HeaderComponent() {
   const [notificationList, setNotificationList] = useState<NotificationInterface[]>([]);
   const [notiNumber, setNotiNumber] = useState<number>(0);
   const [messages, setMessages] = useState<NotificationInterface[]>([]);
+  const [websocketUrl, setWebsocketUrl] = useState<string>();
 
-  const userStorage = Cookies.get('userAuth');
-  if (!userStorage) return;
-  const userParse: UserInterface = JSON.parse(userStorage);
-  const websocketUrl = `ws://localhost:6969/websocket?userid=${userParse.userID}`;
+  const navigation = {
+    categories: [
+
+      {
+        id: 'product',
+        name: 'Products',
+        href: '/product',
+        number: '000130',
+        type: 'page'
+      },
+      {
+        id: 'design',
+        name: 'Design',
+        href: `${__getUserLogined()?.userID ? '/design_create' : '/auth/signin'}`,
+        number: '000132',
+        type: 'page'
+      },
+      {
+        id: 'about',
+        name: 'About us',
+        number: '000133',
+        href: '/about',
+        type: 'page'
+      },
+      {
+        id: 'report',
+        name: 'Report',
+        href: '/report',
+        number: '000134',
+        type: 'page'
+      },
+    ],
+    categories_2: [
+      {
+        id: 'products',
+        name: 'Products',
+        type: 'menu',
+        number: '000130',
+        featured: [
+          {
+            name: 'New Arrivals',
+            href: '/product',
+            imageSrc: 'https://tailwindui.com/img/ecommerce-images/mega-menu-category-01.jpg',
+            imageAlt: 'Models sitting back to back, wearing Basic Tee in black and bone.',
+          },
+          {
+            name: 'Basic Tees',
+            href: '/product',
+            imageSrc: 'https://tailwindui.com/img/ecommerce-images/mega-menu-category-02.jpg',
+            imageAlt: 'Close up of Basic Tee fall bundle with off-white, ochre, olive, and black tees.',
+          },
+        ],
+        sections: [
+          {
+            id: 'clothing',
+            name: 'Clothing',
+            items: [
+              { name: 'Tops', href: '#' },
+              { name: 'Dresses', href: '#' },
+              { name: 'Pants', href: '#' },
+              { name: 'Denim', href: '#' },
+              { name: 'Sweaters', href: '#' },
+              { name: 'T-Shirts', href: '#' },
+              { name: 'Jackets', href: '#' },
+              { name: 'Activewear', href: '#' },
+              { name: 'Browse All', href: '#' },
+            ],
+          },
+          {
+            id: 'accessories',
+            name: 'Accessories',
+            items: [
+              { name: 'Watches', href: '#' },
+              { name: 'Wallets', href: '#' },
+              { name: 'Bags', href: '#' },
+              { name: 'Sunglasses', href: '#' },
+              { name: 'Hats', href: '#' },
+              { name: 'Belts', href: '#' },
+            ],
+          },
+          {
+            id: 'brands',
+            name: 'Brands',
+            items: [
+              { name: 'Full Nelson', href: '#' },
+              { name: 'My Way', href: '#' },
+              { name: 'Re-Arranged', href: '#' },
+              { name: 'Counterfeit', href: '#' },
+              { name: 'Significant Other', href: '#' },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'sewingcompany',
+        name: 'Sewing company',
+        type: 'menu',
+        number: '000131',
+        featured: [
+          {
+            name: 'New Arrivals',
+            href: '#',
+            imageSrc: 'https://tailwindui.com/img/ecommerce-images/product-page-04-detail-product-shot-01.jpg',
+            imageAlt: 'Drawstring top with elastic loop closure and textured interior padding.',
+          },
+          {
+            name: 'Artwork Tees',
+            href: '#',
+            imageSrc: 'https://tailwindui.com/img/ecommerce-images/category-page-02-image-card-06.jpg',
+            imageAlt:
+              'Three shirts in gray, white, and blue arranged on table with same line drawing of hands and shapes overlapping on front of shirt.',
+          },
+        ],
+        sections: [
+          {
+            id: 'clothing',
+            name: 'Clothing',
+            items: [
+              { name: 'Tops', href: '#' },
+              { name: 'Pants', href: '#' },
+              { name: 'Sweaters', href: '#' },
+              { name: 'T-Shirts', href: '#' },
+              { name: 'Jackets', href: '#' },
+              { name: 'Activewear', href: '#' },
+              { name: 'Browse All', href: '#' },
+            ],
+          },
+          {
+            id: 'accessories',
+            name: 'Accessories',
+            items: [
+              { name: 'Watches', href: '#' },
+              { name: 'Wallets', href: '#' },
+              { name: 'Bags', href: '#' },
+              { name: 'Sunglasses', href: '#' },
+              { name: 'Hats', href: '#' },
+              { name: 'Belts', href: '#' },
+            ],
+          },
+          {
+            id: 'brands',
+            name: 'Brands',
+            items: [
+              { name: 'Re-Arranged', href: '#' },
+              { name: 'Counterfeit', href: '#' },
+              { name: 'Full Nelson', href: '#' },
+              { name: 'My Way', href: '#' },
+            ],
+          },
+        ],
+      },
+    ]
+  }
+
+  // const userStorage: any = Cookies.get('userAuth');
+  // if (userStorage) return;
+  // const userParse: UserInterface = JSON.parse(userStorage);
+  // const websocketUrl = `ws://localhost:6969/websocket?userid=${userParse.userID}`;
 
   // 1. First useEffect to fetch notifications and set notiNumber
   useEffect(() => {
+    const user = __getUserLogined();
+    console.log('user: ', user);
+    if (!user) return;
     const fetchNotifications = async () => {
+      console.log('ahsd jkashd jash dashdaskjdh jashd kj');
       try {
-        const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.notification + functionEndpoints.notification.getNotiByUserId}/${userParse.userID}`, null , __getToken());
+        const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.notification + functionEndpoints.notification.getNotiByUserId}/${__getUserLogined().userID}`, null, __getToken());
         if (response.status === 200) {
           const sortedData = response.data.sort((a: NotificationInterface, b: NotificationInterface) => {
             return new Date(b.createDate).getTime() - new Date(a.createDate).getTime();
@@ -233,10 +240,11 @@ export default function HeaderComponent() {
     };
 
     fetchNotifications();
-  }, [userParse.userID]);
+  }, []);
 
   // 2. Second useEffect to handle WebSocket connection after notiNumber is set
   useEffect(() => {
+    if (!websocketUrl) return;
     const originalTitle = document.title;
     const websocket = new WebSocket(websocketUrl);
 
@@ -270,9 +278,11 @@ export default function HeaderComponent() {
   useEffect(() => {
     console.log('header: ', userLogined);
     const checkLoginStatus = () => {
-      const userSession = localStorage.getItem('userAuth');
+      const userSession = Cookies.get('userAuth');
       if (userSession) {
-        const userParse = JSON.parse(userSession);
+        const userParse: UserInterface = JSON.parse(userSession);
+        setWebsocketUrl(`ws://localhost:6969/websocket?userid=${userParse.userID}`);
+
         setUserLogined(userParse)
         setIsLoggedIn(true);
       } else {
@@ -435,20 +445,20 @@ export default function HeaderComponent() {
 
                     >
                       <CardContent>
-                        <div className="flex items-center justify-between mb-4">
+                        <div style={{fontSize: 12}}  className="flex items-center justify-between mb-4">
                           <span className="font-semibold text-indigo-700 text-sm">
                             {notification.type || 'SYSTEM'}
                           </span>
                         </div>
-                        <Typography variant="body2" className="text-gray-700 mb-4">
+                        <p className="text-gray-700 mb-4">
                           {truncateMessage(generateNotificationMessage(notification))}
-                        </Typography>
-                        <Typography variant="body3" className="text-gray-700 mb-4 text-sm" style={{ fontSize: 12 }}>
+                        </p>
+                        <p style={{fontSize: 12}}  className="text-gray-700 mb-4 text-sm">
                           ID: {notification.targetID}
-                        </Typography>
-                        <Typography variant="caption" className="text-gray-500">
+                        </p>
+                        <p style={{fontSize: 11}} className="text-gray-500">
                           Create at: {notification.createDate}
-                        </Typography>
+                        </p>
                       </CardContent>
                     </Card>
                   ))}
@@ -478,12 +488,12 @@ export default function HeaderComponent() {
                       <Typography variant="body2" className="text-gray-700 mb-4" style={{ fontSize: 12 }}>
                         {truncateMessage(generateNotificationMessage(notification))}
                       </Typography>
-                      <Typography variant="body2" className="text-gray-500 mb-4 pt-2" style={{ fontSize: 12 }}>
-                        ID: {notification.targetID}
-                      </Typography>
-                      <Typography variant="caption" className="text-gray-500" style={{ fontSize: 12 }}>
-                        Created at: {notification.createDate}
-                      </Typography>
+                      <p style={{fontSize: 12}}  className="text-gray-700 mb-4 text-sm">
+                          ID: {notification.targetID}
+                        </p>
+                        <p style={{fontSize: 11}} className="text-gray-500">
+                          Create at: {notification.createDate}
+                        </p>
                     </CardContent>
                   </Card>
                 ))}

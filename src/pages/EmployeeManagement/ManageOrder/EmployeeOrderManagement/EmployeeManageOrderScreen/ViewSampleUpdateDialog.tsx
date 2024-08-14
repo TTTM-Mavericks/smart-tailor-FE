@@ -114,7 +114,6 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID }) =
                 console.log(bodyRequest);
                 __handleSendNotification(bodyRequest);
                 setTimeout(() => {
-                    window.location.reload()
                 }, 2000)
 
 

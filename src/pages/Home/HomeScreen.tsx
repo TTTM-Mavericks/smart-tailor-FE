@@ -458,14 +458,14 @@ const HomeScreen = () => {
                     initial={{ opacity: 0, y: 50 }}
                     animate={isTestimonialsVisible ? { opacity: 1, y: 0, transition: { duration: 0.5 } } : {}}
                 >
-                    <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-                        <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl text-center animate-slideIn">
+                    {/* <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8"> */}
+                        {/* <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl text-center animate-slideIn">
                             {t(codeLanguage + '000179')}
                         </p>
                         <p className="mt-6 text-lg leading-8 text-gray-600 text-center">
                             {t(codeLanguage + '000180')}
-                        </p>
-                        <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-8">
+                        </p> */}
+                        {/* <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-8"> */}
                             {/* {designData.slice(0, 8).map((product: any) => {
                                 const basePrices = getBasePricesForDesign(designData, product.designID);
                                 const totalBasePrice = sumBasePrices(basePrices);
@@ -511,11 +511,11 @@ const HomeScreen = () => {
                                     </div>
                                 );
                             })} */}
-                            {designData.slice(0, 8).map((product, index) => (
+                            {/* {designData.slice(0, 8).map((product, index) => (
                                 <ProductCard key={product.designID} product={product} isFeatured={index === 1} />
-                            ))}
-                        </div>
-                    </div>
+                            ))} */}
+                        {/* </div> */}
+                    {/* </div> */}
                 </motion.div>
             </div>
 
