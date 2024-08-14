@@ -6,42 +6,49 @@ import { useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
 import axios from "axios";
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from "../../../api/ApiConfig";
+import { __getToken } from "../../../App";
 
 const PieChart = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [option, setOption] = useState("month");
-    const color = theme.palette
+    const color = theme.palette;
 
-    const [data, setData] = useState([])
+    const [orderStatusDetails, setOrderStatusDetails] = useState([]);
+    const [loading, setLoading] = useState<any>(true);
+    const [error, setError] = useState<any>(null);
 
     useEffect(() => {
-        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.getAllExpertTailoring}`;
+        const fetchOrderStatusDetails = async () => {
+            try {
+                const response = await axios.get(
+                    `${baseURL + versionEndpoints.v1 + '/order' + functionEndpoints.chart.orderStatusDetail}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${__getToken()}`,
+                        }
+                    }
+                );
+                setOrderStatusDetails(response.data.data.orderStatusDetailList || []);
+            } catch (error) {
+                console.error('Error fetching order status details:', error);
+                setError('Failed to load order status details');
+            } finally {
+                setLoading(false);
+            }
+        };
 
-        axios.get(apiUrl)
-            .then(response => {
-                if (response.status !== 200) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.data;
-            })
-            .then((responseData) => {
-                if (responseData && Array.isArray(responseData.data)) {
-                    setData(responseData.data);
-                    console.log("Data received:", responseData);
-                } else {
-                    console.error('Invalid data format:', responseData);
-                }
-            })
-            .catch(error => console.error('Error fetching data:', error));
+        fetchOrderStatusDetails();
     }, []);
 
-    const filteredData = option === "month" ? pieChartData : [];
-    console.log("filter data" + filteredData + option);
+    const pieChartData = orderStatusDetails.map((item: any) => ({
+        id: item.first,
+        value: parseInt(item.second, 10),
+    }));
 
     const _handleChange = (e: any) => {
-        setOption(e.target.value)
-    }
+        setOption(e.target.value);
+    };
 
     // Get language in local storage
     const selectedLanguage = localStorage.getItem('language');
@@ -54,6 +61,10 @@ const PieChart = () => {
             i18n.changeLanguage(selectedLanguage);
         }
     }, [selectedLanguage, i18n]);
+
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>{error}</div>;
+
     return (
         <>
             <Box sx={{ display: 'flex', justifyContent: 'right', alignItems: 'right', margin: '2%' }}>
@@ -82,7 +93,7 @@ const PieChart = () => {
                 </FormControl>
             </Box>
             <ResponsivePie
-                data={filteredData}
+                data={pieChartData}
                 theme={{
                     axis: {
                         domain: {
@@ -163,7 +174,7 @@ const PieChart = () => {
                         justify: false,
                         translateX: 0,
                         translateY: 56,
-                        itemsSpacing: 0,
+                        itemsSpacing: 90,
                         itemWidth: 100,
                         itemHeight: 18,
                         itemTextColor: colors.primary[200],

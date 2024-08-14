@@ -297,8 +297,8 @@ const ManageMaterials: React.FC = () => {
             renderCell: (params) => (
                 <Box
                     sx={{
-                        backgroundColor: params.value === 'Active' ? '#ffebee' : '#e8f5e9',
-                        color: params.value === 'Active' ? '#f44336' : '#4caf50',
+                        backgroundColor: params.value === false ? '#ffebee' : '#e8f5e9',
+                        color: params.value === false ? '#f44336' : '#4caf50',
                         borderRadius: '16px',
                         padding: '1px 5px',
                         fontSize: '0.75rem',

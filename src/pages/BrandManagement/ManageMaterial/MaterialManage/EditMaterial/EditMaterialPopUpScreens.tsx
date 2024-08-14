@@ -11,6 +11,7 @@ import { UserInterface } from "../../../../../models/UserModel";
 import { CancelOutlined } from "@mui/icons-material";
 import { primaryColor, redColor } from "../../../../../root/ColorSystem";
 import { borderColor, width } from "@mui/system";
+import { __getToken } from "../../../../../App";
 
 interface EditMaterialPopUpScreenFormProps {
     fid: {
@@ -105,29 +106,36 @@ const EditMaterialPopUpScreens: React.FC<EditMaterialPopUpScreenFormProps> = ({ 
         }
     }, [selectedLanguage, i18n]);
 
-    const _handleSubmit = () => {
-
-        axios.put(`${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_material + functionEndpoints.brand.updateBrandMaterial}`, {
-            ...formData, brandID: getID()
-        })
-
-            .then((response) => {
-                console.log('Response:', response);
-                // updateMaterial({ ...formData, brandID: getID() });
-                Swal.fire(
-                    `Edit Success!`,
-                    `The Brand Price Updated Success`,
-                    'success'
-                );
-            })
-            .catch((error: any) => {
-                console.error('Update Error:', error);
-                Swal.fire(
-                    `Edit Fail!`,
-                    `The Brand Price Updated Fail`,
-                    'error'
-                );
-            });
+    const _handleSubmit = async () => {
+        try {
+            const response = await axios.put(
+                `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_material + functionEndpoints.brand.updateBrandMaterial}`,
+                {
+                    ...formData,
+                    brandID: getID()
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${__getToken()}`,
+                    }
+                }
+            );
+            console.log('Response:', response);
+            Swal.fire(
+                `Edit Success!`,
+                `The Brand Price Updated Success`,
+                'success'
+            );
+            editClose()
+        } catch (error) {
+            console.error('Update Error:', error);
+            Swal.fire(
+                `Edit Fail!`,
+                `The Brand Price Update Failed`,
+                'error'
+            );
+            editClose()
+        }
     };
 
     return (
