@@ -1053,7 +1053,14 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
     const columns: GridColDef[] = [
         { field: 'orderID', headerName: 'Order ID', width: 150 },
         { field: 'quantity', headerName: 'Quantity', width: 100 },
-        { field: 'totalPrice', headerName: 'Total Price', width: 140 },
+        {
+            field: 'totalPrice', headerName: 'Total Price', width: 140,
+            renderCell: (params) => (
+                <span>
+                    {params.value.toLocaleString()}
+                </span>
+            ),
+        },
         { field: 'createDate', headerName: 'Create Date', width: 200 },
         { field: 'expectedStartDate', headerName: 'Expected Start Date', width: 200 },
         {

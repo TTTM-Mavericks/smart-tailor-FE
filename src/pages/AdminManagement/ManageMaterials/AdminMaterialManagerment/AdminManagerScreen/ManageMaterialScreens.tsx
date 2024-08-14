@@ -274,6 +274,11 @@ const ManageMaterials: React.FC = () => {
             headerName: "Base Price",
             headerAlign: "left",
             align: "left",
+            renderCell: (params) => (
+                <span>
+                    {params.value.toLocaleString()}
+                </span>
+            ),
         },
         {
             field: "unit",

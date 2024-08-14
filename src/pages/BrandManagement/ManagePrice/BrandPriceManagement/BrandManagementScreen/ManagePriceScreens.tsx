@@ -205,26 +205,51 @@ const ManagePrice: React.FC = () => {
         {
             field: "laborQuantityMinQuantity",
             headerName: "Min Quantity",
+            renderCell: (params) => (
+                <span>
+                    {params.value.toLocaleString()}
+                </span>
+            ),
             flex: 1,
         },
         {
             field: "laborQuantityMaxQuantity",
             headerName: "Max Quantity",
+            renderCell: (params) => (
+                <span>
+                    {params.value.toLocaleString()}
+                </span>
+            ),
             flex: 1,
         },
         {
             field: "laborQuantityMinPrice",
             headerName: "Min Price",
+            renderCell: (params) => (
+                <span>
+                    {params.value.toLocaleString()}
+                </span>
+            ),
             flex: 1,
         },
         {
             field: "laborQuantityMaxPrice",
             headerName: "Max Price",
+            renderCell: (params) => (
+                <span>
+                    {params.value.toLocaleString()}
+                </span>
+            ),
             flex: 1,
         },
         {
             field: "laborCostPerQuantity",
             headerName: "Brand Price",
+            renderCell: (params) => (
+                <span>
+                    {params.value.toLocaleString()}
+                </span>
+            ),
             flex: 1,
         },
         {

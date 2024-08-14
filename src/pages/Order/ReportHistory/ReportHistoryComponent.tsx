@@ -229,7 +229,6 @@ const ReportModal: React.FC<{ report: Report; onClose: () => void; onMarkResolve
 const ReportHistoryComponent: React.FC = () => {
     const [reports, setReports] = useState<Report[]>([]);
     const [filteredReports, setFilteredReports] = useState<Report[]>([]);
-    const [currentPage, setCurrentPage] = useState(1);
     const [reportsPerPage] = useState(6);
     // const [filters, setFilters] = useState({
     //     date: '',
@@ -237,10 +236,11 @@ const ReportHistoryComponent: React.FC = () => {
     //     name: '',
     //     orderStatus: '',
     // });
+
+
     const [selectedReport, setSelectedReport] = useState<Report | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [itemsPerPage, setItemsPerPage] = useState(20);
-    const [goToPage, setGoToPage] = useState('1');
     const [filters, setFilters] = useState({
         orderID: '',
         createDate: '',
@@ -314,21 +314,15 @@ const ReportHistoryComponent: React.FC = () => {
         );
     };
 
-    const indexOfLastReport = currentPage * reportsPerPage;
-    const indexOfFirstReport = indexOfLastReport - reportsPerPage;
-    const currentReports = filteredReports.slice(indexOfFirstReport, indexOfLastReport);
-
-    const paginate = (pageNumber: number) => {
-        setCurrentPage(pageNumber);
-        setGoToPage(pageNumber.toString());
-    };
+    // const indexOfLastReport = currentPage * reportsPerPage;
+    // const indexOfFirstReport = indexOfLastReport - reportsPerPage;
+    // const currentReports = filteredReports.slice(indexOfFirstReport, indexOfLastReport);
 
     const handleItemsPerPageChange = (newItemsPerPage: number) => {
         setItemsPerPage(newItemsPerPage);
         setCurrentPage(1);
     };
 
-    const totalPages = Math.ceil(filteredReports.length / itemsPerPage);
 
     const renderPageNumbers = () => {
         const pageNumbers = [];
@@ -381,6 +375,19 @@ const ReportHistoryComponent: React.FC = () => {
         ));
         handleCloseModal();
     };
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const [productsPerPage, setProductsPerPage] = useState(10);
+    const [goToPage, setGoToPage] = useState(currentPage.toString());
+    const indexOfLastProduct = currentPage * productsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    const currentProducts = reports.slice(indexOfFirstProduct, indexOfLastProduct);
+    const totalPages = Math.ceil(reports.length / productsPerPage);
+    const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+    useEffect(() => {
+        setGoToPage(currentPage.toString());
+    }, [currentPage]);
 
     return (
         <div className='-mt-8'>
@@ -457,7 +464,7 @@ const ReportHistoryComponent: React.FC = () => {
             </div>
 
             <div>
-                {filteredReports.length > 0 ? filteredReports.slice(indexOfFirstReport, indexOfLastReport).map(report => (
+                {filteredReports.length > 0 ? currentProducts?.filter(applyFilters).map(report => (
                     <>
                         <OrderReport
                             key={report.reportID}
@@ -465,65 +472,6 @@ const ReportHistoryComponent: React.FC = () => {
                             onViewDetails={handleViewDetails}
                             onMarkResolved={handleMarkResolved}
                         />
-                        <div className="mt-8 flex flex-wrap items-center justify-center space-x-4">
-                            <select
-                                value={itemsPerPage}
-                                onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-                                className="border rounded-md px-3 py-2 text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:border-orange-500"
-                            >
-                                <option value={5}>5/page</option>
-                                <option value={10}>10/page</option>
-                                <option value={20}>20/page</option>
-                                <option value={50}>50/page</option>
-                            </select>
-
-                            <button
-                                onClick={() => paginate(currentPage - 1)}
-                                disabled={currentPage === 1}
-                                className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
-                            >
-                                &lt;
-                            </button>
-
-                            {renderPageNumbers().map((number, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => typeof number === 'number' && paginate(number)}
-                                    className={`px-3 py-2 rounded-md ${number === currentPage
-                                        ? 'bg-orange-500 text-white'
-                                        : 'text-gray-700 hover:bg-gray-100'
-                                        } ${number === '...' ? 'cursor-default' : ''}`}
-                                >
-                                    {number}
-                                </button>
-                            ))}
-
-                            <button
-                                onClick={() => paginate(currentPage + 1)}
-                                disabled={currentPage === totalPages}
-                                className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
-                            >
-                                &gt;
-                            </button>
-
-                            <div className="flex items-center space-x-2 mt-4 sm:mt-0">
-                                <span className="text-gray-600">Go to</span>
-                                <input
-                                    type="text"
-                                    className="border border-gray-300 rounded-md w-16 px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                    value={goToPage}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoToPage(e.target.value)}
-                                    onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                                        if (e.key === 'Enter') {
-                                            const page = Math.max(1, Math.min(parseInt(goToPage), totalPages));
-                                            if (!isNaN(page)) {
-                                                paginate(page);
-                                            }
-                                        }
-                                    }}
-                                />
-                            </div>
-                        </div>
                     </>
                 )) : (
                     <div>
@@ -532,15 +480,85 @@ const ReportHistoryComponent: React.FC = () => {
                 )}
             </div>
 
-            
 
-            {isModalOpen && selectedReport && (
-                    <ReportModal
-                        report={selectedReport}
-                        onClose={handleCloseModal}
-                        onMarkResolved={handleMarkResolved}
+            <div className="flex flex-wrap items-center justify-center space-x-2 mt-8">
+                <select
+                    className="border border-gray-300 rounded-md px-3 py-2 bg-white text-gray-700 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                    value={productsPerPage}
+                    onChange={(e) => {
+                        setProductsPerPage(Number(e.target.value));
+                        paginate(1);
+                    }}
+                >
+                    <option value="10">10 per page</option>
+                    <option value="20">20 per page</option>
+                    <option value="50">50 per page</option>
+                </select>
+
+                <div className="flex items-center space-x-1 mt-4 sm:mt-0">
+                    <button
+                        className={`px-3 py-2 rounded-md ${currentPage === 1
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : 'bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500'
+                            }`}
+                        onClick={() => { if (currentPage > 1) paginate(currentPage - 1); }}
+                        disabled={currentPage === 1}
+                    >
+                        &laquo;
+                    </button>
+
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+                        <button
+                            key={number}
+                            onClick={() => paginate(number)}
+                            className={`px-3 py-2 rounded-md ${currentPage === number
+                                ? 'bg-orange-500 text-white'
+                                : 'bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500'
+                                }`}
+                        >
+                            {number}
+                        </button>
+                    ))}
+
+                    <button
+                        className={`px-3 py-2 rounded-md ${currentPage === totalPages
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : 'bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500'
+                            }`}
+                        onClick={() => {
+                            if (currentPage < totalPages) paginate(currentPage + 1);
+                        }}
+                        disabled={currentPage === totalPages}
+                    >
+                        &raquo;
+                    </button>
+                </div>
+
+                <div className="flex items-center space-x-2 mt-4 sm:mt-0">
+                    <span className="text-gray-600">Go to</span>
+                    <input
+                        type="text"
+                        className="border border-gray-300 rounded-md w-16 px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        value={goToPage}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoToPage(e.target.value)}
+                        onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                            if (e.key === 'Enter') {
+                                const page = Math.max(1, Math.min(parseInt(goToPage), totalPages));
+                                if (!isNaN(page)) {
+                                    paginate(page);
+                                }
+                            }
+                        }}
                     />
-                )}
+                </div>
+            </div>
+            {isModalOpen && selectedReport && (
+                <ReportModal
+                    report={selectedReport}
+                    onClose={handleCloseModal}
+                    onMarkResolved={handleMarkResolved}
+                />
+            )}
         </div>
     );
 };
