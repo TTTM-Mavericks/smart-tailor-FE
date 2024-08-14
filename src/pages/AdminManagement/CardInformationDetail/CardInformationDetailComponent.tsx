@@ -1,47 +1,35 @@
 import { useState, useEffect } from "react";
 import { useTheme } from "@mui/material";
 import { tokens } from "../../../theme";
-import { useTranslation } from 'react-i18next';
+import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from "../../../api/ApiConfig";
+import axios from "axios";
 
 const CardInformationDetailComponent = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
-    const [emailData, setEmailData] = useState({
-        emailsSent: "",
-        increase: ""
-    });
+    const [data, setData] = useState([])
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
+        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.getAllExpertTailoring}`;
 
-                const data = {
-                    emailsSent: "123456789",
-                    increase: "-25%"
-                };
-
-                setEmailData(data);
-            } catch (error) {
-                console.error("Error fetching data: ", error);
-            }
-        };
-
-        fetchData();
+        axios.get(apiUrl)
+            .then(response => {
+                if (response.status !== 200) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.data;
+            })
+            .then((responseData) => {
+                if (responseData && Array.isArray(responseData.data)) {
+                    setData(responseData.data);
+                    console.log("Data received:", responseData);
+                } else {
+                    console.error('Invalid data format:', responseData);
+                }
+            })
+            .catch(error => console.error('Error fetching data:', error));
     }, []);
-
-    // Get language in local storage
-    const selectedLanguage = localStorage.getItem('language');
-    const codeLanguage = selectedLanguage?.toUpperCase();
-
-    // Using i18n
-    const { t, i18n } = useTranslation();
-    useEffect(() => {
-        if (selectedLanguage !== null) {
-            i18n.changeLanguage(selectedLanguage);
-        }
-    }, [selectedLanguage, i18n]);
-
 
     return (
         <div className="mt-12">
@@ -56,12 +44,7 @@ const CardInformationDetailComponent = () => {
                     </div>
                     <div className="p-4 text-right">
                         <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Today's Money</p>
-                        <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">$53k</h4>
-                    </div>
-                    <div className="border-t border-blue-gray-50 p-4">
-                        <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
-                            <strong className="text-green-500">+55%</strong>&nbsp;than last week
-                        </p>
+                        <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">53k</h4>
                     </div>
                 </div>
                 <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
@@ -74,11 +57,6 @@ const CardInformationDetailComponent = () => {
                         <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Today's Users</p>
                         <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">2,300</h4>
                     </div>
-                    <div className="border-t border-blue-gray-50 p-4">
-                        <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
-                            <strong className="text-green-500">+3%</strong>&nbsp;than last month
-                        </p>
-                    </div>
                 </div>
                 <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
                     <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-green-600 to-green-400 text-white shadow-green-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
@@ -90,11 +68,6 @@ const CardInformationDetailComponent = () => {
                         <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">New Clients</p>
                         <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">3,462</h4>
                     </div>
-                    <div className="border-t border-blue-gray-50 p-4">
-                        <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
-                            <strong className="text-red-500">-2%</strong>&nbsp;than yesterday
-                        </p>
-                    </div>
                 </div>
                 <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
                     <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-orange-600 to-orange-400 text-white shadow-orange-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
@@ -104,12 +77,7 @@ const CardInformationDetailComponent = () => {
                     </div>
                     <div className="p-4 text-right">
                         <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Sales</p>
-                        <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">$103,430</h4>
-                    </div>
-                    <div className="border-t border-blue-gray-50 p-4">
-                        <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
-                            <strong className="text-green-500">+5%</strong>&nbsp;than yesterday
-                        </p>
+                        <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">103,430</h4>
                     </div>
                 </div>
             </div>

@@ -4,12 +4,37 @@ import { FormControl, InputLabel, Select, MenuItem, Box, useTheme } from '@mui/m
 import { mockPieData as pieChartData } from "./PieDataTest";
 import { useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
+import axios from "axios";
+import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from "../../../api/ApiConfig";
 
 const PieChart = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [option, setOption] = useState("month");
     const color = theme.palette
+
+    const [data, setData] = useState([])
+
+    useEffect(() => {
+        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.getAllExpertTailoring}`;
+
+        axios.get(apiUrl)
+            .then(response => {
+                if (response.status !== 200) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.data;
+            })
+            .then((responseData) => {
+                if (responseData && Array.isArray(responseData.data)) {
+                    setData(responseData.data);
+                    console.log("Data received:", responseData);
+                } else {
+                    console.error('Invalid data format:', responseData);
+                }
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    }, []);
 
     const filteredData = option === "month" ? pieChartData : [];
     console.log("filter data" + filteredData + option);
