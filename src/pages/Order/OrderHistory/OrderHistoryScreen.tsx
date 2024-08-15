@@ -114,7 +114,7 @@ const OrderHistory: React.FC = () => {
             if (response.status === 200) {
                 console.log(response.data);
                 const dataResp = response.data.filter((item: OrderDetailInterface) =>
-                    item.orderType !== 'PARENT_ORDER'                     
+                    item.orderType === 'PARENT_ORDER'                     
                 );
                 setOrderDetailList(dataResp);
                 setIsLoading(false)

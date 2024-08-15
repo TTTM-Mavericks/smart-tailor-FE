@@ -553,18 +553,21 @@ const BrandManageTransactionComponent: React.FC = () => {
                         </div>
                     </div>
                     <div className="mb-6">
-                        <label htmlFor="filterSelect" className="block mb-2 text-lg font-semibold text-gray-700">Select Filters</label>
-                        <Select
-                            isMulti
-                            name="filters"
-                            options={filterOptions}
-                            className="basic-multi-select"
-                            classNamePrefix="select"
-                            value={filterOptions.filter(option => selectedFilters.includes(option.value))}
-                            onChange={(selectedOptions: any) => {
-                                setSelectedFilters(selectedOptions.map((option: any) => option.value));
-                            }}
-                        />
+                        <label htmlFor="filterSelect" className="block mb-2 text-sm font-semibold text-gray-700">Select filters</label>
+
+                        <div style={{ width: "60%" }}>
+                            <Select
+                                isMulti
+                                name="filters"
+                                options={filterOptions}
+                                className="basic-multi-select"
+                                classNamePrefix="select"
+                                value={filterOptions.filter(option => selectedFilters.includes(option.value))}
+                                onChange={(selectedOptions: any) => {
+                                    setSelectedFilters(selectedOptions.map((option: any) => option.value));
+                                }}
+                            />
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
@@ -638,7 +641,7 @@ const BrandManageTransactionComponent: React.FC = () => {
                             <div className="flex flex-wrap md:flex-nowrap mb-4 md:mb-6">
                                 <div className="w-full md:w-1/2 mb-4 md:mb-0">
                                     <h2 className="text-sm md:text-1xl font-bold text-gray-800 pb-2">Order ID {transaction.orderID} </h2>
-                                    
+
                                     <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">
                                         Payment ID: <span className="text-sm text-gray-500 pb-2">{transaction?.paymentID}</span>
                                     </p>

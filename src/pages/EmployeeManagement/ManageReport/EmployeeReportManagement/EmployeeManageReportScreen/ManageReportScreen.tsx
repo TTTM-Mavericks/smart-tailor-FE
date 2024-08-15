@@ -606,7 +606,7 @@ const EmployeeManageReport: React.FC = () => {
                 <div className="flex flex-col">
                     <div className="mb-6">
                         <div className="flex mt-5">
-                            <div className="w-7/10" style={{ width: "80%" }}>
+                            <div className="w-7/10" style={{ width: "60%" }}>
                                 <Select
                                     isMulti
                                     name="filters"

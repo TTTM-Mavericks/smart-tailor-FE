@@ -477,80 +477,66 @@ const BrandOrderFields: React.FC<{
                     </p>
                 </div>
             </div>
-            <div className="mt-4 flex items-center" onClick={() => setShowDesignDetails(!showDesignDetails)}>
-                <ArrowDropDown
-                    className="cursor-pointer mr-2"
-                />
-                <span style={{ fontWeight: "bold", fontSize: 14 }}>Show Design Details</span>
-            </div>
-            {showDesignDetails && (
-                <DesignDetails design={designDetails} />
-            )}
-            <div className="mt-6 flex justify-end">
-                {/* {order.orderStatus === 'CHECKING_SAMPLE_DATA' && (
-                    <>
+
+            <div className=''>
+                <div className="pb-5 flex items-center" onClick={() => setShowDesignDetails(!showDesignDetails)}>
+                    <span style={{ fontWeight: "bold", fontSize: 14, marginLeft: 10 }}>Show Design Details</span>
+                    <ArrowDropDown
+                        className="cursor-pointer mr-2"
+                    />
+                </div>
+                {showDesignDetails && (
+                    <DesignDetails design={designDetails} />
+                )}
+                <div className="-mt-16 flex justify-end" style={{ position: 'absolute', bottom: 0, right: 10 }}>
+
+                    {order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCEL' && (
+
                         <button
-                            onClick={() => __handleOpenInputSampleProductDialog(order.orderID)}
-                            className="text-sm bg-indigo-500 text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4"
+                            onClick={() => __handleOpenReportDialog()}
+                            className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4 mb-2"
                             style={{
                                 borderRadius: 4,
-                                backgroundColor: yellowColor
+                                backgroundColor: redColor
                             }}
                         >
-                            Update sampleData
+                            Cancel
                         </button>
-                        {selectedOrderID === order.orderID && (
-                            <BrandUpdateSampleProductDialog stageID={stageIdStart} isOpen={isDialogOpen} orderID={order.orderID} brandID={userAuth?.userID} onClose={__handleCloseInputSampleProductDialog}></BrandUpdateSampleProductDialog>
-                        )}
-                    </>
-                )} */}
+                    )}
 
-                {order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCEL' && (
+
+                    <CustomerReportOrderDialogComponent
+                        isCancelOrder={true}
+                        orderID={order?.orderID}
+                        onClose={() => setIsOpenReportOrderCanceledDialog(false)}
+                        isOpen={isOpenReportOrderCanceledDialog}
+                        onClickReportAndCancel={() => _handleCancelOrder(order)}
+                    ></CustomerReportOrderDialogComponent>
 
                     <button
-                        onClick={() => __handleOpenReportDialog()}
-                        className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4 mb-2"
+                        onClick={() => onViewDetails(order, designDetails)}
+                        className="bg-indigo-500 text-sm text-white px-4 py-2 mb-2 hover:bg-indigo-600 transition duration-300 mr-4"
                         style={{
                             borderRadius: 4,
-                            backgroundColor: redColor
+                            backgroundColor: secondaryColor
                         }}
                     >
-                        Cancel
+                        View Details
                     </button>
-                )}
 
-
-                <CustomerReportOrderDialogComponent
-                    isCancelOrder={true}
-                    orderID={order?.orderID}
-                    onClose={() => setIsOpenReportOrderCanceledDialog(false)}
-                    isOpen={isOpenReportOrderCanceledDialog}
-                    onClickReportAndCancel={() => _handleCancelOrder(order)}
-                ></CustomerReportOrderDialogComponent>
-
-                <button
-                    onClick={() => onViewDetails(order, designDetails)}
-                    className="bg-indigo-500 text-sm text-white px-4 py-2 mb-2 hover:bg-indigo-600 transition duration-300 mr-4"
-                    style={{
-                        borderRadius: 4,
-                        backgroundColor: secondaryColor
-                    }}
-                >
-                    View Details
-                </button>
-
-                {order.orderStatus !== 'CANCEL' && order.orderStatus !== 'COMPLETED' && (
-                    <button
-                        onClick={() => __handleOpenUpdateProcessDialog(order)}
-                        className="bg-green-500 text-sm text-white px-4 py-2  hover:bg-green-600 transition duration-300 mb-2"
-                        style={{
-                            borderRadius: 4,
-                            backgroundColor: greenColor
-                        }}
-                    >
-                        Update process
-                    </button>
-                )}
+                    {order.orderStatus !== 'CANCEL' && order.orderStatus !== 'COMPLETED' && (
+                        <button
+                            onClick={() => __handleOpenUpdateProcessDialog(order)}
+                            className="bg-green-500 text-sm text-white px-4 py-2  hover:bg-green-600 transition duration-300 mb-2"
+                            style={{
+                                borderRadius: 4,
+                                backgroundColor: greenColor
+                            }}
+                        >
+                            Update process
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* Progress Bar */}
@@ -628,7 +614,7 @@ const BrandOrderFields: React.FC<{
                                                         color: !step.status ? '#CBCBCB' : secondaryColor
                                                     }}
                                                 >
-                                                    {step.currentQuantity} / {order.quantity}
+                                                    {step.currentQuantity} / {order.quantity} products
                                                 </p>
                                                 {selectedStep?.orderID === order.orderID && selectedStep.step === step.stage && (
                                                     <BrandUploadProgcessSampleProduct
@@ -1066,7 +1052,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
         { field: 'orderID', headerName: 'Order ID', width: 150 },
         { field: 'quantity', headerName: 'Quantity', width: 100 },
         {
-            field: 'totalPrice', headerName: 'Total Price', width: 140,
+            field: 'totalPrice', headerName: 'Total Price (VND)', width: 140,
             renderCell: (params) => (
                 <span>
                     {params.value.toLocaleString()}
@@ -1460,7 +1446,7 @@ const BrandManageOrder: React.FC = () => {
     };
 
     return (
-        <div className='-mt-8'>
+        <div className='-mt-8' style={{width: '95%', margin: '0 auto'}}>
             <div className="mt-12">
                 <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
                     <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
@@ -1524,9 +1510,9 @@ const BrandManageOrder: React.FC = () => {
                 <>
                     <div style={{ width: "100%" }}>
                         <div className="flex flex-col">
-                            <div className="mb-6">
+                            <div className="mb-2">
                                 <div className="flex mt-0">
-                                    <div className="w-7/10" style={{ width: "80%" }}>
+                                    <div className="w-5/10" style={{ width: "60%" }}>
                                         <Select
                                             isMulti
                                             name="filters"

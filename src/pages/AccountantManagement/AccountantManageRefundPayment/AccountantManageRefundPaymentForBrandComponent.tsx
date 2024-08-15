@@ -328,7 +328,7 @@ const Tables: React.FC<TablesProps> = ({ table, onViewDetails }) => {
         { field: 'orderID', headerName: 'Order ID', width: 130 },
         { field: 'orderType', headerName: 'Type', width: 130 },
         { field: 'buyerName', headerName: 'Buyer Name', width: 150 },
-        { field: 'totalPrice', headerName: 'Total Price', width: 130 },
+        { field: 'totalPrice', headerName: 'Total Price (VND)', width: 130 },
         { field: 'expectedStartDate', headerName: 'Expected Start Date', width: 180 },
         { field: 'orderStatus', headerName: 'Order Status', width: 130 },
         {
@@ -795,7 +795,7 @@ const AccountantManageRefundPaymentForBrandComponent: React.FC = () => {
                             </div>
                         </div>
                         <div className="flex mt-0">
-                            <div className="w-7/10" style={{ width: "80%" }}>
+                            <div className="w-7/10" style={{ width: "60%" }}>
                                 <Select
                                     isMulti
                                     name="filters"
@@ -931,7 +931,7 @@ const AccountantManageRefundPaymentForBrandComponent: React.FC = () => {
                                                         }}
                                                     >
                                                         <p style={{ fontWeight: "500" }} className="text-sm text-black">
-                                                            Status:{" "}
+                                                            Order status:{" "}
                                                         </p>
                                                         <Stack direction="row" spacing={1} padding={1}>
                                                             <Chip
@@ -966,7 +966,7 @@ const AccountantManageRefundPaymentForBrandComponent: React.FC = () => {
                                                             alignItems: "center",
                                                         }}
                                                     >
-                                                        <p style={{ fontWeight: "500" }} className="text-sm text-black">
+                                                        {/* <p style={{ fontWeight: "500" }} className="text-sm text-black">
                                                             Payment status:{" "}
                                                         </p>
                                                         <Stack direction="row" spacing={5} padding={1}>
@@ -982,7 +982,7 @@ const AccountantManageRefundPaymentForBrandComponent: React.FC = () => {
                                                                         : false
                                                                 )}
                                                             />
-                                                        </Stack>
+                                                        </Stack> */}
                                                     </div>
                                                 </div>
                                             </div>

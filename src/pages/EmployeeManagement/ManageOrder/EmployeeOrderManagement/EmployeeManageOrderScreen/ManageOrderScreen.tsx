@@ -748,7 +748,7 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
                                     </span>
                                 </p>
                                 <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">
-                                    Rating: <span className="text-sm text-gray-500 pb-2">{order.brand?.rating}</span>
+                                    Rating: <span className="text-sm text-gray-500 pb-2">{order.brand?.rating?.toFixed(2)}</span>
                                 </p>
 
                                 <p style={{ fontWeight: '500' }} className="text-sm text-black pb-0">
@@ -1398,7 +1398,7 @@ const EmployeeManageOrder: React.FC = () => {
 
                             <div className="mb-0">
                                 <div className="flex mt-0">
-                                    <div className="w-7/10" style={{ width: "80%" }}>
+                                    <div className="w-7/10" style={{ width: "60%" }}>
                                         <Select
                                             isMulti
                                             name="filters"
