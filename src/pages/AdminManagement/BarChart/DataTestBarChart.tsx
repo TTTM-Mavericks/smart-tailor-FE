@@ -1,51 +1,36 @@
 export const mockBarData = [
     {
         brandName: "AD",
-        "hot dog": 137,
-        burger: 96,
-        kebab: 72,
-        donut: 140,
+        values: 137,
+
     },
     {
         brandName: "AE",
-        "hot dog": 55,
-        burger: 28,
-        kebab: 58,
-        donut: 29,
+        values: 55,
+
     },
     {
         brandName: "AF",
-        "hot dog": 109,
-        burger: 23,
-        kebab: 34,
-        donut: 152,
+        values: 109,
+
     },
     {
         brandName: "AG",
-        "hot dog": 133,
-        burger: 52,
-        kebab: 43,
-        donut: 83,
+        values: 133,
+
     },
     {
         brandName: "AI",
-        "hot dog": 81,
-        burger: 80,
-        kebab: 112,
-        donut: 35,
+        values: 81,
+
     },
     {
         brandName: "AL",
-        "hot dog": 66,
-        burger: 111,
-        kebab: 167,
-        donut: 18,
+        values: 66,
+
     },
     {
         brandName: "AM",
-        "hot dog": 80,
-        burger: 47,
-        kebab: 158,
-        donut: 49,
+        values: 80,
     },
 ];

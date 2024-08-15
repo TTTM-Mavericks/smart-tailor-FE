@@ -15,8 +15,6 @@ const PieChart = () => {
     const color = theme.palette;
 
     const [orderStatusDetails, setOrderStatusDetails] = useState([]);
-    const [loading, setLoading] = useState<any>(true);
-    const [error, setError] = useState<any>(null);
 
     useEffect(() => {
         const fetchOrderStatusDetails = async () => {
@@ -32,9 +30,9 @@ const PieChart = () => {
                 setOrderStatusDetails(response.data.data.orderStatusDetailList || []);
             } catch (error) {
                 console.error('Error fetching order status details:', error);
-                setError('Failed to load order status details');
             } finally {
-                setLoading(false);
+                console.error('Error fetching order status details');
+
             }
         };
 
@@ -62,12 +60,9 @@ const PieChart = () => {
         }
     }, [selectedLanguage, i18n]);
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>{error}</div>;
-
     return (
         <>
-            <Box sx={{ display: 'flex', justifyContent: 'right', alignItems: 'right', margin: '2%' }}>
+            {/* <Box sx={{ display: 'flex', justifyContent: 'right', alignItems: 'right', margin: '2%' }}>
                 <FormControl variant="outlined" sx={{ minWidth: 200, backgroundColor: color.background.paper, borderRadius: 1 }}>
                     <InputLabel sx={{ color: color.text.primary }}>Filter by Category</InputLabel>
                     <Select
@@ -91,7 +86,7 @@ const PieChart = () => {
                         <MenuItem value="year">{t(`${codeLanguage}000043`)}</MenuItem>
                     </Select>
                 </FormControl>
-            </Box>
+            </Box> */}
             <ResponsivePie
                 data={pieChartData}
                 theme={{

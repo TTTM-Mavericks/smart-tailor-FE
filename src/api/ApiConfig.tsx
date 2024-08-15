@@ -214,7 +214,9 @@ export const functionEndpoints = {
     calculateOrderGrowthPercentageMonth: '/calculate-order-growth-percentage-for-current-and-previous-month',
     calculateUserGrowthPercentageMonth: '/calculate-user-growth-percentage-for-current-and-previous-month',
     calculateCustomerGrowthPercentageMonth: '/calculate-new-customer-growth-percentage-for-current-and-previous-week',
-    calculatePaymentGrowthPercentageMonth: '/calculate-payment-growth-percentage-for-current-and-previous-week'
+    calculatePaymentGrowthPercentageMonth: '/calculate-payment-growth-percentage-for-current-and-previous-week',
+    getTotalForEachMonth: '/get-total-payment-of-each-month',
+    getTotalForEachBrand: '/get-order-detail-of-each-brand'
   }
 }
 
