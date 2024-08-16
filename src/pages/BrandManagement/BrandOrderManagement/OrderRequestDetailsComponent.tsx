@@ -315,7 +315,7 @@ const OrderRequestDetailsComponent: React.FC<OrderDetailsProps> = ({ order, desi
                     setIsLoadingPage(false);
                 }, 3000);
             } else {
-                toast.error(`${response.message}`, { autoClose: 4000 });
+                toast.warning(`${response.message}`, { autoClose: 4000 });
                 console.log(response.message);
                 setIsLoadingPage(false);
 

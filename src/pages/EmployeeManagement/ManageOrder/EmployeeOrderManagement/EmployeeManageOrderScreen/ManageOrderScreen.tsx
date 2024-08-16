@@ -223,12 +223,12 @@ const EmployeeOrderFields: React.FC<{
         setSelectedOrderID(null);
     };
 
-    const __handleUpdateOrderDelivery = async (orderId: any) => {
+    const __handleUpdateOrderDelivery = async (orderId: any, type: string) => {
         setIsLoading(true)
         try {
             const bodyRequest = {
                 orderID: orderId,
-                status: 'DELIVERED'
+                status: type
             }
             console.log('bodyRequest: ', bodyRequest);
             const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest, __getToken());
@@ -356,105 +356,122 @@ const EmployeeOrderFields: React.FC<{
                     </p>
                 </div>
             </div>
-            <div className="mt-4 flex items-center" onClick={() => setShowDesignDetails(!showDesignDetails)}>
-                <ArrowDropDown
-                    className="cursor-pointer mr-2"
-                />
-                <span style={{ fontSize: 14, fontWeight: "bold" }}>Show Design Details</span>
-            </div>
-            {showDesignDetails && (
-                <DesignDetails design={designDetails} />
-            )}
-            <div className="mt-6 flex justify-end mb-2">
 
-                {order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCEL' && order.orderStatus !== 'NOT_VERIFY' && (
-
-                    <button
-                        onClick={() => __handleOpenReportDialog()}
-                        className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4 mb-2"
-                        style={{
-                            borderRadius: 4,
-                            backgroundColor: redColor
-                        }}
-                    >
-                        Cancel
-                    </button>
+            <div style={{ position: 'relative' }}>
+                <div className="mt-0 flex items-center pb-10" onClick={() => setShowDesignDetails(!showDesignDetails)}>
+                    <span style={{ fontSize: 14, fontWeight: "bold", marginLeft: 20 }}>Show Design Details</span>
+                    <ArrowDropDown
+                        className="cursor-pointer mr-2"
+                    />
+                </div>
+                {showDesignDetails && (
+                    <DesignDetails design={designDetails} />
                 )}
+                <div className="mt-6 flex justify-end mb-2" style={{ position: 'absolute', bottom: 5, right: 10 }}>
+
+                    {order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCEL' && order.orderStatus !== 'NOT_VERIFY' && (
+
+                        <button
+                            onClick={() => __handleOpenReportDialog()}
+                            className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4 mb-2"
+                            style={{
+                                borderRadius: 4,
+                                backgroundColor: redColor
+                            }}
+                        >
+                            Cancel
+                        </button>
+                    )}
 
 
 
-                <CustomerReportOrderDialogComponent
-                    isCancelOrder={true}
-                    orderID={order?.orderID}
-                    onClose={() => setIsOpenReportOrderCanceledDialog(false)}
-                    isOpen={isOpenReportOrderCanceledDialog}
-                    onClickReportAndCancel={() => _handleCancelOrder(order)}
-                ></CustomerReportOrderDialogComponent>
+                    <CustomerReportOrderDialogComponent
+                        isCancelOrder={true}
+                        orderID={order?.orderID}
+                        onClose={() => setIsOpenReportOrderCanceledDialog(false)}
+                        isOpen={isOpenReportOrderCanceledDialog}
+                        onClickReportAndCancel={() => _handleCancelOrder(order)}
+                    ></CustomerReportOrderDialogComponent>
 
-                <button
-                    onClick={() => __handleOpenInputSampleProductDialog(order.orderID)}
-                    className="mb-2 bg-indigo-500 text-sm text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"
-                    style={{
-                        borderRadius: 4,
-                        backgroundColor: yellowColor
-                    }}
-                >
-                    View sample data
-                </button>
-                <ViewSampleUpdateDialog isOpen={isDialogOpen} orderID={order.orderID} brandID={userAuth?.userID} onClose={__handleCloseInputSampleProductDialog}></ViewSampleUpdateDialog>
-
-                <button
-                    onClick={() => onViewDetails(order, designDetails)}
-                    className="mb-2 bg-indigo-500 text-sm text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"
-                    style={{
-                        borderRadius: 4,
-                        backgroundColor: secondaryColor
-                    }}
-                >
-                    View details
-                </button>
-
-                {order.orderStatus === 'NOT_VERIFY' && (
                     <button
-                        onClick={() => __handleRejectOrder(order.orderID)}
+                        onClick={() => __handleOpenInputSampleProductDialog(order.orderID)}
                         className="mb-2 bg-indigo-500 text-sm text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"
                         style={{
                             borderRadius: 4,
-                            backgroundColor: redColor
+                            backgroundColor: yellowColor
                         }}
                     >
-                        Reject order
+                        View sample data
                     </button>
-                )}
+                    <ViewSampleUpdateDialog isOpen={isDialogOpen} orderID={order.orderID} brandID={userAuth?.userID} onClose={__handleCloseInputSampleProductDialog}></ViewSampleUpdateDialog>
 
-                {order.orderStatus === 'NOT_VERIFY' && (
                     <button
-                        onClick={() => onUpdatedOrderPending(order.orderID)}
-                        className="bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 mr-4 mb-2"
+                        onClick={() => onViewDetails(order, designDetails)}
+                        className="mb-2 bg-indigo-500 text-sm text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"
                         style={{
                             borderRadius: 4,
-                            backgroundColor: greenColor
+                            backgroundColor: secondaryColor
                         }}
                     >
-                        Verify order
+                        View details
                     </button>
-                )}
+
+                    {order.orderStatus === 'NOT_VERIFY' && (
+                        <button
+                            onClick={() => __handleRejectOrder(order.orderID)}
+                            className="mb-2 bg-indigo-500 text-sm text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"
+                            style={{
+                                borderRadius: 4,
+                                backgroundColor: redColor
+                            }}
+                        >
+                            Reject order
+                        </button>
+                    )}
+
+                    {order.orderStatus === 'NOT_VERIFY' && (
+                        <button
+                            onClick={() => onUpdatedOrderPending(order.orderID)}
+                            className="bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 mr-4 mb-2"
+                            style={{
+                                borderRadius: 4,
+                                backgroundColor: greenColor
+                            }}
+                        >
+                            Verify order
+                        </button>
+                    )}
 
 
 
-                {order.orderStatus === 'COMPLETED' && (
+                    {order.orderStatus === 'FINAL_CHECKING' && (
+
+                        <button
+                            onClick={() => __handleUpdateOrderDelivery(order.orderID, 'DELIVERED')}
+                            className="mb-2 bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 mr-4"
+                            style={{
+                                borderRadius: 4,
+                                backgroundColor: greenColor
+                            }}
+                        >
+                            Delivery
+                        </button>
+                    )}
+
+                    {order.orderStatus === 'COMPLETED' && (
 
                     <button
-                        onClick={() => __handleUpdateOrderDelivery(order.orderID)}
+                        onClick={() => __handleUpdateOrderDelivery(order.orderID, 'FINAL_CHECKING')}
                         className="mb-2 bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 mr-4"
                         style={{
                             borderRadius: 4,
-                            backgroundColor: greenColor
+                            backgroundColor: redColor
                         }}
                     >
-                        Delivery
+                        Final check
                     </button>
-                )}
+)}
+                </div>
             </div>
         </div>
     );
