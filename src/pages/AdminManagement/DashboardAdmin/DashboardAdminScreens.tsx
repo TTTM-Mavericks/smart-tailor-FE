@@ -126,7 +126,7 @@ const DashboardAdminScreens = () => {
                         <CardInformationDetailComponent />
                         {/* <GeographyChartComponent /> */}
                         <PieChartComponent />
-                        <BarChartComponent />
+                        {/* <BarChartComponent /> */}
                     </>
                 );
         }

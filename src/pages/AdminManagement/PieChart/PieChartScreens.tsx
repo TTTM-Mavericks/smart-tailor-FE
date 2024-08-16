@@ -1,6 +1,6 @@
 import { ResponsivePie } from "@nivo/pie";
 import { tokens } from "../../../theme";
-import { FormControl, InputLabel, Select, MenuItem, Box, useTheme } from '@mui/material';
+import { FormControl, InputLabel, Select, MenuItem, Box, useTheme, Typography } from '@mui/material';
 import { mockPieData as pieChartData } from "./PieDataTest";
 import { useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
@@ -14,20 +14,20 @@ const PieChart = () => {
     const [option, setOption] = useState("month");
     const color = theme.palette;
 
-    const [orderStatusDetails, setOrderStatusDetails] = useState([]);
+    const [totalUserDetails, setTotalUserDetail] = useState([]);
 
     useEffect(() => {
-        const fetchOrderStatusDetails = async () => {
+        const fetchTotalUserDetail = async () => {
             try {
                 const response = await axios.get(
-                    `${baseURL + versionEndpoints.v1 + '/order' + functionEndpoints.chart.orderStatusDetail}`,
+                    `${baseURL + versionEndpoints.v1 + '/user' + functionEndpoints.chart.calculateTotalOfUser}`,
                     {
                         headers: {
                             Authorization: `Bearer ${__getToken()}`,
                         }
                     }
                 );
-                setOrderStatusDetails(response.data.data.orderStatusDetailList || []);
+                setTotalUserDetail(response.data.data || []);
             } catch (error) {
                 console.error('Error fetching order status details:', error);
             } finally {
@@ -35,14 +35,14 @@ const PieChart = () => {
 
             }
         };
-
-        fetchOrderStatusDetails();
+        fetchTotalUserDetail();
     }, []);
 
-    const pieChartData = orderStatusDetails.map((item: any) => ({
+    const pieChartData = totalUserDetails.map((item: any) => ({
         id: item.first,
         value: parseInt(item.second, 10),
     }));
+
 
     const _handleChange = (e: any) => {
         setOption(e.target.value);
@@ -62,31 +62,9 @@ const PieChart = () => {
 
     return (
         <>
-            {/* <Box sx={{ display: 'flex', justifyContent: 'right', alignItems: 'right', margin: '2%' }}>
-                <FormControl variant="outlined" sx={{ minWidth: 200, backgroundColor: color.background.paper, borderRadius: 1 }}>
-                    <InputLabel sx={{ color: color.text.primary }}>Filter by Category</InputLabel>
-                    <Select
-                        value={option}
-                        onChange={_handleChange}
-                        label="Filter by Category"
-                        sx={{
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                borderColor: color.grey[300],
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                borderColor: color.primary.main,
-                            },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                borderColor: color.primary.main,
-                            },
-                        }}
-                    >
-                        <MenuItem value="month"> {t(`${codeLanguage}000041`)}</MenuItem>
-                        <MenuItem value="week">{t(`${codeLanguage}000042`)}</MenuItem>
-                        <MenuItem value="year">{t(`${codeLanguage}000043`)}</MenuItem>
-                    </Select>
-                </FormControl>
-            </Box> */}
+            <Typography style={{ marginTop: "2%", marginLeft: "2%" }}>
+                <h1>Total User Appear In Smart Tailor</h1>
+            </Typography>
             <ResponsivePie
                 data={pieChartData}
                 theme={{
