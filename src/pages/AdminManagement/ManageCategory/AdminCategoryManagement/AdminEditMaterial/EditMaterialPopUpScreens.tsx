@@ -8,6 +8,7 @@ import { Category } from "../../../../../models/AdminCategoryExcelModel";
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { CancelOutlined } from "@mui/icons-material";
 import { primaryColor, redColor } from "../../../../../root/ColorSystem";
+import { __getToken } from "../../../../../App";
 
 interface EditCategoryPopUpScreenFormProps {
     fid: {
@@ -49,6 +50,10 @@ const EditMCategoryPopUpScreens: React.FC<EditCategoryPopUpScreenFormProps> = ({
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.updateCategory}`;
             const response = await axios.put(apiUrl, {
                 ...formData
+            }, {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`
+                }
             });
 
             console.log("formData" + formData);

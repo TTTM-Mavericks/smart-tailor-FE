@@ -8,6 +8,7 @@ import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from 
 import { LaborQuantity } from "../../../../../models/LaborQuantityModel";
 import { CancelOutlined } from "@mui/icons-material";
 import { primaryColor, redColor } from "../../../../../root/ColorSystem";
+import { __getToken } from "../../../../../App";
 
 interface EditPricePopUpScreenFormProps {
     fid: {
@@ -61,6 +62,10 @@ const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, e
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_labor_quantity + functionEndpoints.brandLaborQuantity.updateBrandLaborQuantity + `/${userID}`}`;
             const response = await axios.put(apiUrl, {
                 ...formData
+            }, {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`
+                }
             });
 
             if (!response.data) {

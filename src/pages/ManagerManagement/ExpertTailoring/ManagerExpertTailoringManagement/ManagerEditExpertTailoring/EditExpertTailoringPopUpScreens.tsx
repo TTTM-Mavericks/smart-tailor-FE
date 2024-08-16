@@ -9,6 +9,7 @@ import { ExpertTailoringEdit } from "../../../../../models/ManagerExpertTailorin
 import { ToastContainer, toast } from "react-toastify";
 import { primaryColor, redColor } from "../../../../../root/ColorSystem";
 import { CancelOutlined } from "@mui/icons-material";
+import { __getToken } from "../../../../../App";
 
 interface EditExpertTailoringPopUpScreenFormProps {
     fid: {
@@ -62,7 +63,11 @@ const EditExpertTailoringPopUpScreens: React.FC<EditExpertTailoringPopUpScreenFo
      */
     React.useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.getAllCategory}`;
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');
@@ -183,11 +188,11 @@ const EditExpertTailoringPopUpScreens: React.FC<EditExpertTailoringPopUpScreenFo
             const response = await axios.put(
                 `${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.updateExpertTailoring + `/${fid.expertTailoringID}`}`,
                 addNewExpertTailorings,
-                // {
-                //     headers: {
-                //         'Authorization': `Bearer ${token}`
-                //     }
-                // }
+                {
+                    headers: {
+                        Authorization: `Bearer ${__getToken()}`
+                    }
+                }
 
             );
             console.log("res:" + response);

@@ -13,6 +13,7 @@ import axios from "axios";
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { AddSize, Sizes } from "../../../../../models/AdminManageSizeModel";
 import { greenColor } from "../../../../../root/ColorSystem";
+import { __getToken } from "../../../../../App";
 // Make Style of popup
 const style = {
     position: 'absolute',
@@ -68,7 +69,11 @@ const ManageSizes: React.FC = () => {
     React.useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.size + functionEndpoints.size.getAllSize}`;
 
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');
@@ -109,7 +114,11 @@ const ManageSizes: React.FC = () => {
     const _handleDeleteClick = async (sizeName: string) => {
         try {
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.size + functionEndpoints.size.updateSize}`;
-            const response = await axios.delete(apiUrl + `/${sizeName}`);
+            const response = await axios.delete((apiUrl + `/${sizeName}`), {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`
+                }
+            });
 
             if (!response.data) {
                 throw new Error('Error deleting size');

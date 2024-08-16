@@ -7,6 +7,7 @@ import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from 
 import { EditLaborQuantity } from '../../../../models/LaborQuantityModel';
 import { AddCircleOutline, CancelOutlined, RemoveCircleOutline } from '@mui/icons-material';
 import { primaryColor } from '../../../../root/ColorSystem';
+import { __getToken } from '../../../../App';
 
 interface AddLaborQuantityWithHandsFormProps {
     closeCard: () => void;
@@ -39,7 +40,11 @@ const AddPriceManual: React.FC<AddLaborQuantityWithHandsFormProps> = ({ closeCar
     const handleSubmit = async () => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.labor_quantity + functionEndpoints.laborQantity.addNewLaborQuantity}`;
         try {
-            const response = await axios.post(apiUrl, { laborQuantityRequests: prices });
+            const response = await axios.post(apiUrl, { laborQuantityRequests: prices }, {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`
+                }
+            });
             if (response.data.status === 200) {
                 closeCard();
                 Swal.fire(

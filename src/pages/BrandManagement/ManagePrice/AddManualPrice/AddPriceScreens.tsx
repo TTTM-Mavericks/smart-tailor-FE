@@ -16,6 +16,7 @@ import { Category } from '../../../../models/AdminCategoryExcelModel';
 import { LaborQuantity } from '../../../../models/LaborQuantityModel';
 import { BrandLaborQuantity } from '../../../../models/BrandLaborQuantityModel';
 import { CancelOutlined } from '@mui/icons-material';
+import { __getToken } from '../../../../App';
 
 interface AddPriceWithHandsFormProps {
     closeCard: () => void;
@@ -80,8 +81,8 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
 
             const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.addNewCategory + `?categoryName=${formData.categoryName}`}`, {
                 headers: {
-                    'Content-Type': 'application/json',
-                },
+                    Authorization: `Bearer ${__getToken()}`
+                }
             });
 
             console.log('Response:', response.data);
@@ -115,9 +116,13 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
     const [prices, setPrices] = useState<LaborQuantity[]>([]);
 
     useEffect(() => {
-        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.labor_quantity + functionEndpoints.laborQantity.getAllLaborQuantity}`;
+        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_labor_quantity + functionEndpoints.laborQantity.getAllLaborQuantityByBrandID + `/${userID}`}`;
 
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');

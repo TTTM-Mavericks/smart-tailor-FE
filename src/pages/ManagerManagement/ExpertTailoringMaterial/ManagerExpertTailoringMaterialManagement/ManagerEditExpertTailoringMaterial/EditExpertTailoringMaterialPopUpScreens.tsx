@@ -7,6 +7,7 @@ import axios from 'axios';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { ExpertTailoringEdit } from "../../../../../models/ManagerExpertTailoringModel";
 import { ToastContainer, toast } from "react-toastify";
+import { __getToken } from "../../../../../App";
 
 interface EditExpertTailoringMaterialPopUpScreenFormProps {
     fid: {
@@ -60,7 +61,11 @@ const EditExpertTailoringPopUpScreens: React.FC<EditExpertTailoringMaterialPopUp
      */
     React.useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.getAllCategory}`;
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');
@@ -179,14 +184,12 @@ const EditExpertTailoringPopUpScreens: React.FC<EditExpertTailoringMaterialPopUp
         try {
             // const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0YW1tdHNlMTYxMDg3QGZwdC5lZHUudm4iLCJpYXQiOjE3MTgyODUyMTMsImV4cCI6MTcxODM3MTYxM30.UUpy2s9SwYGF_TyIru6VASQ-ZzGTOqx7mkWkcSR2__0'; // Replace with the actual bearer token
             const response = await axios.put(
-                `${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.updateExpertTailoringMaterial + `/${fid.expertTailoringID}`}`,
-                addNewExpertTailorings,
-                // {
-                //     headers: {
-                //         'Authorization': `Bearer ${token}`
-                //     }
-                // }
-
+                `${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.updateExpertTailoring + `/${fid.expertTailoringID}`}`,
+                addNewExpertTailorings, {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`
+                }
+            }
             );
             console.log("res:" + response);
 
