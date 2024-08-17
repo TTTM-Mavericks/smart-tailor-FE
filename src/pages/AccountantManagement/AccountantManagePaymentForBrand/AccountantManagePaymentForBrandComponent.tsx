@@ -1933,13 +1933,13 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
 
                                                 </div>
                                                 <div
-                                                    className={`${style.orderHistory__viewInvoice__buttonPayment} items - center justify - center`}
+                                                    className={`${style.orderHistory__viewInvoice__buttonPayment} items-center justify-center`}
                                                     style={{ textAlign: "center" }}
                                                 >
                                                     <p
-                                                        className={`${style.orderHistory__viewInvoice__button} px - 5 text - sm font - medium`}
+                                                        className={` px-5 text-sm font-medium`}
                                                     >
-                                                        <p className='mb-40' onClick={() => handleViewTransaction(order)}>View transaction</p>
+                                                        <p className='mb-32 cursor-pointer' onClick={() => handleViewTransaction(order)}>View transaction</p>
                                                         <button
                                                             type="submit"
                                                             className="px-5 py-2 text-sm font-medium text-white"

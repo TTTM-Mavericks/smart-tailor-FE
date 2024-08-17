@@ -29,6 +29,8 @@ import { height } from '@mui/system';
 import CustomerUpgradeDialog from '../../../components/Dialog/UpgradeDialog/CustomerUpgradeDialog';
 import { __getToken, __getUserLogined } from '../../../App';
 import { __handleSendNotification } from '../../../utils/NotificationUtils';
+import MaterialDetailTableComponent from '../Components/Table/MaterialDetailTableComponent';
+import ViewFinalCheckingProductsDialogComponent from '../Components/Dialog/ViewFinalCheckingProductsDialog/ViewFinalCheckingProductsDialogComponent';
 
 
 export interface EstimatedStageInterface {
@@ -95,6 +97,10 @@ const OrderDetailScreen: React.FC = () => {
     const [isOpenSystemShippingPriceDialog, setIsOpenSystemShippingPriceDialog] = useState<boolean>(false);
     const [token, setToken] = useState<string>();
     const [isOpenSuspendedDialog, setIsOpenSuspendedDialog] = useState<boolean>(false);
+    const [isOpenFinalProductsDialog, setIsOpenFinalProductsDialog] = useState<boolean>(false);
+    const [isOpenMaterialDetailDialog, setIsOpenMaterialDetailDialog] = useState<boolean>(false);
+
+
 
 
 
@@ -543,6 +549,10 @@ const OrderDetailScreen: React.FC = () => {
                                 <span className='font-semibold text-gray-600'>Expert tailoring: </span>
                                 <span style={{ fontWeight: "normal" }}>{orderDetail?.designResponse.expertTailoring?.expertTailoringName}</span>
                             </p>
+                            <p className="text-sm text-gray-600 mb-1 mt-3 w-full">
+                                <span className='font-semibold text-gray-600'>Material details: </span>
+                                <span style={{ fontWeight: "500", color: secondaryColor, cursor: 'pointer' }} onClick={() => setIsOpenMaterialDetailDialog(true)}>View</span>
+                            </p>
 
                             <p className="text-sm text-gray-600 mb-1 mt-3 w-full">
                                 <span className='font-semibold text-gray-600'>Quantity: </span>
@@ -573,8 +583,8 @@ const OrderDetailScreen: React.FC = () => {
                                 </p>
                             )}
 
-                            <div className="flex flex-col md:flex-row md:space-x-10 mt-4">
-                                <div className="md:w-1/2 flex items-center">
+                            <div className="flex mt-4">
+                                <div className="w-52 flex items-center">
                                     <div className={style.orderDetail__orderStatus__tag} style={orderDetail?.orderStatus === 'CANCEL' ? { backgroundColor: redColor } : (orderDetail?.orderStatus === 'COMPLETED' || orderDetail?.orderStatus === 'DELIVERED') ? { backgroundColor: greenColor } : {}}>{orderDetail?.orderStatus}</div>
                                     {orderDetail?.orderStatus === 'CANCEL' && (
                                         <div className="ml-5">
@@ -587,6 +597,14 @@ const OrderDetailScreen: React.FC = () => {
                                         </div>
                                     )}
                                 </div>
+                                {orderDetail?.orderStatus === 'FINAL_CHECKING' && (
+                                    <div className="-ml-2" style={{ width: 200 }}>
+                                        <a onClick={() => setIsOpenFinalProductsDialog(true)} className="text-sm text-indigo-600 hover:text-indigo-800 transition duration-200 cursor-pointer">View products</a>
+                                    </div>
+                                )}
+                                {isOpenFinalProductsDialog && (
+                                    <ViewFinalCheckingProductsDialogComponent order={orderDetail} onClose={() => setIsOpenFinalProductsDialog(false)} ></ViewFinalCheckingProductsDialogComponent>
+                                )}
                             </div>
                         </div>
 
@@ -678,15 +696,15 @@ const OrderDetailScreen: React.FC = () => {
                                 {progressSteps?.map((step, index) => {
                                     const isCurrentStep = step.status;
                                     return (
-                                        <>
+                                        <div key={index}>
                                             <p onClick={() => __handleOpenViewHistory(step.stageId)} key={index} className={`text-center ${isCurrentStep ? 'text-indigo-600' : 'text-gray-400'} cursor-pointer`}>
                                                 {step.currentQuantity} / {orderDetail?.quantity} products
                                             </p>
                                             {selectedStage === step.stageId && (
-                                                <ViewProgessOfProductDialog stageId={step.stageId} orderID={orderDetail?.orderID} isOpen={isOpenViewHistory} onClose={() => setIsOpenViewHistory(false)} ></ViewProgessOfProductDialog>
+                                                <ViewProgessOfProductDialog key={index} stageId={step.stageId} orderID={orderDetail?.orderID} isOpen={isOpenViewHistory} onClose={() => setIsOpenViewHistory(false)} ></ViewProgessOfProductDialog>
                                             )}
 
-                                        </>
+                                        </div>
                                     );
                                 })}
                             </div>
@@ -1079,6 +1097,26 @@ const OrderDetailScreen: React.FC = () => {
 
 
                 </DialogActions>
+
+            </Dialog>
+
+            <Dialog open={isOpenMaterialDetailDialog} aria-labelledby="popup-dialog-title" maxWidth="lg" fullWidth onClose={() => setIsOpenMaterialDetailDialog(false)}>
+                <DialogTitle id="popup-dialog-title">
+                    Material detail
+                    <IoMdCloseCircleOutline
+                        cursor="pointer"
+                        size={20}
+                        color={redColor}
+                        onClick={() => setIsOpenMaterialDetailDialog(false)}
+                        style={{ position: 'absolute', right: 20, top: 20 }}
+                    />
+                </DialogTitle>
+                <DialogContent >
+                    <div>
+                        <MaterialDetailTableComponent materialDetailData={orderDetail?.designResponse.materialDetail}></MaterialDetailTableComponent>
+                    </div>
+                </DialogContent>
+
 
             </Dialog>
 

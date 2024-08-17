@@ -16,6 +16,7 @@ import { UserInterface } from '../../../../../models/UserModel';
 import Cookies from 'js-cookie';
 import { ArrowDropDown, MarkChatRead, Visibility } from '@mui/icons-material';
 import { __getToken } from '../../../../../App';
+import LoadingComponent from '../../../../../components/Loading/LoadingComponent';
 
 const getStatusColor = (status: string) => {
     switch (status) {
@@ -469,7 +470,11 @@ const EmployeeManageReport: React.FC = () => {
         { value: 'Report ID', label: 'Report ID' },
         { value: 'Order Status', label: 'Order Status' },
     ];
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+
+
     useEffect(() => {
+        setIsLoading(true);
         const apiUrl = `${baseURL}${versionEndpoints.v1}${featuresEndpoints.report}${functionEndpoints.report.getAllReport}`;
         axios.get(apiUrl, {
             headers: {
@@ -487,8 +492,12 @@ const EmployeeManageReport: React.FC = () => {
                     setReports(responseData.data);
                     setFilteredReports(responseData.data); // Set filteredReports here
                     console.log("Data received:", responseData);
+                    setIsLoading(false);
+
                 } else {
                     console.error('Invalid data format:', responseData);
+                    setIsLoading(false);
+
                 }
             })
             .catch(error => console.error('Error fetching data:', error));
@@ -602,6 +611,7 @@ const EmployeeManageReport: React.FC = () => {
 
     return (
         <div className='-mt-8'>
+            <LoadingComponent isLoading={isLoading}></LoadingComponent>
             <div style={{ width: "100%" }}>
                 <div className="flex flex-col">
                     <div className="mb-6">
@@ -706,85 +716,92 @@ const EmployeeManageReport: React.FC = () => {
 
                 </div>
             </div>
+            {filteredReports.length > 0 ? (
 
-            <div>
-                {isTableView ? (
-                    <ReportTables
-                        reports={filteredReports}
-                        onViewDetails={handleViewDetails}
-                        onUpdatedOrderPending={handleMarkResolved}
-                    />
-                ) :
-                    (<div>
-                        {filteredReports.slice(indexOfFirstReport, indexOfLastReport).map(report => (
-                            <OrderReport
-                                key={report.reportID}
-                                report={report}
-                                onViewDetails={handleViewDetails}
-                                onMarkResolved={handleMarkResolved}
-                            />
-                        ))}
-                        <div className="mt-8 flex flex-wrap items-center justify-center space-x-4">
-                            <select
-                                value={itemsPerPage}
-                                onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-                                className="border rounded-md px-3 py-2 text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:border-orange-500"
-                            >
-                                <option value={5}>5/page</option>
-                                <option value={10}>10/page</option>
-                                <option value={20}>20/page</option>
-                                <option value={50}>50/page</option>
-                            </select>
 
-                            <button
-                                onClick={() => paginate(currentPage - 1)}
-                                disabled={currentPage === 1}
-                                className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
-                            >
-                                &lt;
-                            </button>
-
-                            {renderPageNumbers().map((number, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => typeof number === 'number' && paginate(number)}
-                                    className={`px-3 py-2 rounded-md ${number === currentPage
-                                        ? 'bg-orange-500 text-white'
-                                        : 'text-gray-700 hover:bg-gray-100'
-                                        } ${number === '...' ? 'cursor-default' : ''}`}
-                                >
-                                    {number}
-                                </button>
-                            ))}
-
-                            <button
-                                onClick={() => paginate(currentPage + 1)}
-                                disabled={currentPage === totalPages}
-                                className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
-                            >
-                                &gt;
-                            </button>
-
-                            <div className="flex items-center space-x-2 mt-4 sm:mt-0">
-                                <span className="text-gray-600">Go to</span>
-                                <input
-                                    type="text"
-                                    className="border border-gray-300 rounded-md w-16 px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                    value={goToPage}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoToPage(e.target.value)}
-                                    onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                                        if (e.key === 'Enter') {
-                                            const page = Math.max(1, Math.min(parseInt(goToPage), totalPages));
-                                            if (!isNaN(page)) {
-                                                paginate(page);
-                                            }
-                                        }
-                                    }}
+                <div>
+                    {isTableView ? (
+                        <ReportTables
+                            reports={filteredReports}
+                            onViewDetails={handleViewDetails}
+                            onUpdatedOrderPending={handleMarkResolved}
+                        />
+                    ) :
+                        (<div>
+                            {filteredReports.slice(indexOfFirstReport, indexOfLastReport).map(report => (
+                                <OrderReport
+                                    key={report.reportID}
+                                    report={report}
+                                    onViewDetails={handleViewDetails}
+                                    onMarkResolved={handleMarkResolved}
                                 />
+                            ))}
+                            <div className="mt-8 flex flex-wrap items-center justify-center space-x-4">
+                                <select
+                                    value={itemsPerPage}
+                                    onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                                    className="border rounded-md px-3 py-2 text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:border-orange-500"
+                                >
+                                    <option value={5}>5/page</option>
+                                    <option value={10}>10/page</option>
+                                    <option value={20}>20/page</option>
+                                    <option value={50}>50/page</option>
+                                </select>
+
+                                <button
+                                    onClick={() => paginate(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                    className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                                >
+                                    &lt;
+                                </button>
+
+                                {renderPageNumbers().map((number, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => typeof number === 'number' && paginate(number)}
+                                        className={`px-3 py-2 rounded-md ${number === currentPage
+                                            ? 'bg-orange-500 text-white'
+                                            : 'text-gray-700 hover:bg-gray-100'
+                                            } ${number === '...' ? 'cursor-default' : ''}`}
+                                    >
+                                        {number}
+                                    </button>
+                                ))}
+
+                                <button
+                                    onClick={() => paginate(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                    className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                                >
+                                    &gt;
+                                </button>
+
+                                <div className="flex items-center space-x-2 mt-4 sm:mt-0">
+                                    <span className="text-gray-600">Go to</span>
+                                    <input
+                                        type="text"
+                                        className="border border-gray-300 rounded-md w-16 px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                        value={goToPage}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoToPage(e.target.value)}
+                                        onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                                            if (e.key === 'Enter') {
+                                                const page = Math.max(1, Math.min(parseInt(goToPage), totalPages));
+                                                if (!isNaN(page)) {
+                                                    paginate(page);
+                                                }
+                                            }
+                                        }}
+                                    />
+                                </div>
                             </div>
-                        </div>
-                    </div>)}
-            </div>
+                        </div>)}
+                </div>
+            ) : (
+                <div>
+                    <span className="text-gray-600">Do not have any report.</span>
+                </div>
+            )}
             {isModalOpen && selectedReport && (
                 <ReportModal
                     report={selectedReport}

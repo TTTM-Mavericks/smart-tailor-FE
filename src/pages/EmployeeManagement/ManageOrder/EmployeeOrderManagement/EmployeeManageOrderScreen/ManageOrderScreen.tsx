@@ -26,6 +26,7 @@ import { DataGrid, GridColDef, GridRenderCellParams, GridToolbar } from '@mui/x-
 import { tokens } from '../../../../../theme';
 import { __handleGetDateTimeColor, __isNearCurrentDate } from '../../../../../utils/DateUtils';
 import { __getToken } from '../../../../../App';
+import FinalCheckingProductsDialogComponent from '../../../../../components/Dialog/FinalCheckingProductsDialog/FinalCheckingProductsDialogComponent';
 
 
 /**
@@ -186,7 +187,7 @@ const EmployeeOrderFields: React.FC<{
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedOrderID, setSelectedOrderID] = useState<string | null>(null);
     const [isOpenReportOrderCanceledDialog, setIsOpenReportOrderCanceledDialog] = useState<boolean>(false);
-
+    const [isOpenFinalCheckingOrderDialog, setIsOpenFinalCheckingOrderDialog] = useState<boolean>(false);
 
 
     useEffect(() => {
@@ -342,7 +343,7 @@ const EmployeeOrderFields: React.FC<{
                                     </p>
                                 ))}
                             </div>
-                            {order.totalPrice && (
+                            {order.totalPrice > 0 && (
                                 <p className="text-gray-700 mt-4 text-sm">Price: {__handleAddCommasToNumber(order.totalPrice)} VND</p>
                             )}
                         </div>
@@ -358,7 +359,7 @@ const EmployeeOrderFields: React.FC<{
             </div>
 
             <div style={{ position: 'relative' }}>
-                <div className="mt-0 flex items-center pb-10" onClick={() => setShowDesignDetails(!showDesignDetails)}>
+                <div className="mt-0 flex items-center pb-5" onClick={() => setShowDesignDetails(!showDesignDetails)}>
                     <span style={{ fontSize: 14, fontWeight: "bold", marginLeft: 20 }}>Show Design Details</span>
                     <ArrowDropDown
                         className="cursor-pointer mr-2"
@@ -367,7 +368,7 @@ const EmployeeOrderFields: React.FC<{
                 {showDesignDetails && (
                     <DesignDetails design={designDetails} />
                 )}
-                <div className="mt-6 flex justify-end mb-2" style={{ position: 'absolute', bottom: 5, right: 10 }}>
+                <div className="mt-6 flex justify-end mb-2" style={{ position: 'absolute', bottom: 0, right: 10 }}>
 
                     {order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCEL' && order.orderStatus !== 'NOT_VERIFY' && (
 
@@ -445,32 +446,46 @@ const EmployeeOrderFields: React.FC<{
 
 
                     {order.orderStatus === 'FINAL_CHECKING' && (
+                        <>
+                            <button
+                                onClick={() => setIsOpenFinalCheckingOrderDialog(true)}
+                                className="mb-2 bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 mr-4"
+                                style={{
+                                    borderRadius: 4,
+                                    backgroundColor: primaryColor
+                                }}
+                            >
+                                Upload final products
+                            </button>
 
-                        <button
-                            onClick={() => __handleUpdateOrderDelivery(order.orderID, 'DELIVERED')}
-                            className="mb-2 bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 mr-4"
-                            style={{
-                                borderRadius: 4,
-                                backgroundColor: greenColor
-                            }}
-                        >
-                            Delivery
-                        </button>
+                            <FinalCheckingProductsDialogComponent onClose={() => setIsOpenFinalCheckingOrderDialog(false)} isOpen={isOpenFinalCheckingOrderDialog} order={order} orderID={order.orderID}></FinalCheckingProductsDialogComponent>
+
+                            <button
+                                onClick={() => __handleUpdateOrderDelivery(order.orderID, 'DELIVERED')}
+                                className="mb-2 bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 mr-4"
+                                style={{
+                                    borderRadius: 4,
+                                    backgroundColor: greenColor
+                                }}
+                            >
+                                Delivery
+                            </button>
+                        </>
                     )}
 
                     {order.orderStatus === 'COMPLETED' && (
 
-                    <button
-                        onClick={() => __handleUpdateOrderDelivery(order.orderID, 'FINAL_CHECKING')}
-                        className="mb-2 bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 mr-4"
-                        style={{
-                            borderRadius: 4,
-                            backgroundColor: redColor
-                        }}
-                    >
-                        Final check
-                    </button>
-)}
+                        <button
+                            onClick={() => __handleUpdateOrderDelivery(order.orderID, 'FINAL_CHECKING')}
+                            className="mb-2 bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 mr-4"
+                            style={{
+                                borderRadius: 4,
+                                backgroundColor: redColor
+                            }}
+                        >
+                            Final check
+                        </button>
+                    )}
                 </div>
             </div>
         </div>
