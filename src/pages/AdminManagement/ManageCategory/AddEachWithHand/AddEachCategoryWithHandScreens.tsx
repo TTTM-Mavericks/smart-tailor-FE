@@ -16,6 +16,7 @@ import { AddCategory } from '../../../../models/AdminCategoryExcelModel';
 import { borderRadius, display, height } from '@mui/system';
 import { AddCircleOutline, CancelOutlined, RemoveCircleOutline } from '@mui/icons-material';
 import { primaryColor } from '../../../../root/ColorSystem';
+import { __getToken } from '../../../../App';
 
 interface AddMaterialWithHandsFormProps {
     closeCard: () => void;
@@ -67,7 +68,11 @@ const AddEachCategoryWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
 
         try {
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.addNewCategory}`;
-            const response = await axios.post(apiUrl, { categoryNames: formData.map(cat => cat.categoryNames) }); // Extract categoryNames
+            const response = await axios.post(apiUrl, { categoryNames: formData.map(cat => cat.categoryNames) }, {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`
+                }
+            }); // Extract categoryNames
 
             console.log('Response:', response.data);
 

@@ -18,6 +18,7 @@ import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from 
 import { toast, ToastContainer } from 'react-toastify';
 import { AddExpertTailoringMaterial } from '../../../../models/ManagerExpertTaloringMaterialModel';
 import { CancelOutlined } from '@mui/icons-material';
+import { __getToken } from '../../../../App';
 
 interface AddExpertTailoringWithHandsFormProps {
     closeCard: () => void;
@@ -49,7 +50,11 @@ const AddEachExpertTailoringWithHand: React.FC<AddExpertTailoringWithHandsFormPr
 
     useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.getAllCategory}`;
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');
@@ -70,7 +75,11 @@ const AddEachExpertTailoringWithHand: React.FC<AddExpertTailoringWithHandsFormPr
 
     useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.getAllMaterial}`;
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');
@@ -91,7 +100,11 @@ const AddEachExpertTailoringWithHand: React.FC<AddExpertTailoringWithHandsFormPr
 
     useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.expertTailoring + functionEndpoints.expertTailoring.getAllExpertTailoring}`;
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');
@@ -124,7 +137,11 @@ const AddEachExpertTailoringWithHand: React.FC<AddExpertTailoringWithHandsFormPr
         try {
             const response = await axios.post(
                 `${baseURL + versionEndpoints.v1 + featuresEndpoints.expertTailoringMaterial + functionEndpoints.expertTailoringMaterial.addNewExpertTailoringMaterial}`,
-                formData,
+                formData, {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`
+                }
+            }
             );
             console.log("API response:", response);
             if (response.status === 200) {

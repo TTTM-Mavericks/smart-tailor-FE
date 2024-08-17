@@ -7,6 +7,7 @@ import { AddSize } from '../../../../models/AdminManageSizeModel';
 import { AddCircleOutline, CancelOutlined, RemoveCircleOutline } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
 import { primaryColor } from '../../../../root/ColorSystem';
+import { __getToken } from '../../../../App';
 
 interface AddSizeManualProps {
     closeCard: () => void;
@@ -68,7 +69,11 @@ const AddSizeManual: React.FC<AddSizeManualProps> = ({ closeCard, addNewSizes })
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.size + functionEndpoints.size.addNewSize}`;
 
         try {
-            const response = await axios.post(apiUrl, { sizeRequestList: sizes });
+            const response = await axios.post(apiUrl, { sizeRequestList: sizes }, {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`
+                }
+            });
 
             if (response.data.status === 200) {
                 closeCard();

@@ -14,6 +14,7 @@ import { ExpertTailoring } from "../../../../../models/ManagerExpertTailoringMod
 import { ExpertTailoringEdit } from "../../../../../models/ManagerExpertTailoringModel";
 import { useNavigate } from "react-router-dom";
 import { Employee } from "../../../../../models/EmployeeModel";
+import { __getToken } from "../../../../../App";
 
 // Make Style of popup
 const style = {
@@ -63,7 +64,11 @@ const ManageEmployee: React.FC = () => {
     React.useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.user + functionEndpoints.user.getAllEmployee}`;
 
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');
@@ -112,7 +117,11 @@ const ManageEmployee: React.FC = () => {
         try {
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.user + functionEndpoints.user.getAllEmployee}`;
 
-            const response = await axios.put(apiUrl + `/${expertTailoringID}`)
+            const response = await axios.put((apiUrl + `/${expertTailoringID}`), {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`
+                }
+            })
 
             if (!response.data) {
                 throw new Error('Error deleting material');
