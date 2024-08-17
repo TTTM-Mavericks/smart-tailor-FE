@@ -8,6 +8,7 @@ import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from 
 import { Sizes } from "../../../../../models/AdminManageSizeModel";
 import { CancelOutlined } from "@mui/icons-material";
 import { primaryColor, redColor } from "../../../../../root/ColorSystem";
+import { __getToken } from "../../../../../App";
 
 interface EditSizePopUpScreenFormProps {
     fid: {
@@ -52,6 +53,10 @@ const EditSizePopUpScreens: React.FC<EditSizePopUpScreenFormProps> = ({ fid, edi
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.size + functionEndpoints.size.updateSize + `/${sizeID}`}`;
             const response = await axios.put(apiUrl, {
                 ...formData
+            }, {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`
+                }
             });
 
             console.log("formData" + formData);

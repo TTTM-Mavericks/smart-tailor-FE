@@ -13,7 +13,7 @@ type PopperOpenState = Record<string, boolean>;
 
 const DashboardAccountantScreens: React.FC = () => {
     const [menuOpen, setMenuOpen] = useState(false);
-    const [activeMenu, setActiveMenu] = useState('accountant_dashboard');
+    const [activeMenu, setActiveMenu] = useState('accountant_dash');
     const [showScrollButton, setShowScrollButton] = useState(false);
     const [popperOpen, setPopperOpen] = useState<PopperOpenState>({ // Initialize with type
         notification: false,

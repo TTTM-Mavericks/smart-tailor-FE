@@ -16,6 +16,7 @@ import { EditLaborQuantity, LaborQuantity } from "../../../../../models/LaborQua
 import EditPricePopUpScreens from "../AdminEditPrice/EditPricePopUpScreens";
 import { margin } from "@mui/system";
 import { greenColor } from "../../../../../root/ColorSystem";
+import { __getToken } from "../../../../../App";
 
 // Make Style of popup
 const style = {
@@ -92,7 +93,11 @@ const AdminManagePrice: React.FC = () => {
     React.useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.labor_quantity + functionEndpoints.laborQantity.getAllLaborQuantity}`;
 
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');

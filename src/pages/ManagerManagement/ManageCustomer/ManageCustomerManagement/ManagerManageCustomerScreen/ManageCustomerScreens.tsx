@@ -13,6 +13,7 @@ import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from 
 import { ExpertTailoring } from "../../../../../models/ManagerExpertTailoringModel";
 import { ExpertTailoringEdit } from "../../../../../models/ManagerExpertTailoringModel";
 import { Customer } from "../../../../../models/CustomerModel";
+import { __getToken } from "../../../../../App";
 
 // Make Style of popup
 const style = {
@@ -101,7 +102,11 @@ const ManageCustomer: React.FC = () => {
         try {
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.updateStatusExpertTailoring}`;
 
-            const response = await axios.put(apiUrl + `/${expertTailoringID}`)
+            const response = await axios.put((apiUrl + `/${expertTailoringID}`), {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`
+                }
+            })
 
             if (!response.data) {
                 throw new Error('Error deleting material');

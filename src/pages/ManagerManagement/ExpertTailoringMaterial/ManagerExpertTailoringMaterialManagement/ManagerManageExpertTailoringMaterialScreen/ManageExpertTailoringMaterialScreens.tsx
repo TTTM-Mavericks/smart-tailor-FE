@@ -17,6 +17,7 @@ import { AddExpertTailoring, ExpertTailoring } from "../../../../../models/Manag
 import { ExpertTailoringEdit } from "../../../../../models/ManagerExpertTailoringModel";
 import { AddExpertTailoringMaterial, ExpertTailoringMaterial } from "../../../../../models/ManagerExpertTaloringMaterialModel";
 import { greenColor } from "../../../../../root/ColorSystem";
+import { __getToken } from "../../../../../App";
 
 // Make Style of popup
 const style = {
@@ -92,7 +93,11 @@ const ManageExpertTailoringMaterial: React.FC = () => {
     React.useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.expertTailoringMaterial + functionEndpoints.expertTailoringMaterial.getAllExpertTailoringMaterial}`;
 
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');
@@ -141,7 +146,11 @@ const ManageExpertTailoringMaterial: React.FC = () => {
         try {
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.expertTailoringMaterial + functionEndpoints.expertTailoringMaterial.updateStatusExpertTailoringMaterial}`;
 
-            const response = await axios.put(apiUrl + `?expertTailoringID=${expertTailoringID}&materialID=${materialID}`)
+            const response = await axios.put((apiUrl + `?expertTailoringID=${expertTailoringID}&materialID=${materialID}`), {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`
+                }
+            })
 
             if (!response.data) {
                 throw new Error('Error deleting material');

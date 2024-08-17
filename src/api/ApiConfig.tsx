@@ -214,9 +214,22 @@ export const functionEndpoints = {
   chart: {
     orderStatusDetail: '/get-order-status-detail',
     calculateOrderGrowthPercentageMonth: '/calculate-order-growth-percentage-for-current-and-previous-month',
+    getTotalForEachMonth: '/get-total-payment-of-each-month',
+    getTotalForEachBrand: '/get-order-detail-of-each-brand',
+    calculatePaymentGrowthPercentageMonth: '/calculate-payment-growth-percentage-for-current-and-previous-week',
     calculateUserGrowthPercentageMonth: '/calculate-user-growth-percentage-for-current-and-previous-month',
     calculateCustomerGrowthPercentageMonth: '/calculate-new-customer-growth-percentage-for-current-and-previous-week',
-    calculatePaymentGrowthPercentageMonth: '/calculate-payment-growth-percentage-for-current-and-previous-week'
+    calculateNewUserGrowthPercentageByRoleName: '/calculate-new-user-growth-percentage-for-current-and-previous-day-by-role-name',
+    calculateCustomerGrowthPercentageWeek: '/calculate-new-customer-growth-percentage-for-current-and-previous-week',
+    calculateUserGrowthPercentageWeek: '/calculate-user-growth-percentage-for-current-and-previous-week',
+    calculateTotalOfUser: '/calculate-total-of-user',
+    calculatePaymentGrowthPercentageWeek: '/calculate-payment-growth-percentage-for-current-and-previous-week',
+    calculateIncomeGrowthPercentageWeek: '/calculate-income-growth-percentage-for-current-and-previous-week',
+    calculateRefundGrowthPercentageMonth: '/calculate-refund-growth-percentage-for-current-and-previous-month',
+    getTotalPaymentForEachMonth: "/get-total-payment-of-each-month",
+    getTotalRefundForEachMonth: '/get-total-refund-of-each-month',
+    getTotalIncomeForEachMonth: '/get-total-income-of-each-month',
+
   }
 }
 

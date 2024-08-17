@@ -17,6 +17,7 @@ import { AddExpertTailoring, ExpertTailoring } from "../../../../../models/Manag
 import { ExpertTailoringEdit } from "../../../../../models/ManagerExpertTailoringModel";
 import { AddSizeExpertTailoring, SizeExpertTailoring, SizeExpertTailoringEdit } from "../../../../../models/ManagerSizeExpertTailoringModel";
 import { greenColor } from "../../../../../root/ColorSystem";
+import { __getToken } from "../../../../../App";
 
 // Make Style of popup
 const style = {
@@ -92,7 +93,11 @@ const ManageSizeExpertTailoring: React.FC = () => {
     React.useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.sizeExpertTailoring + functionEndpoints.sizeExpertTailoring.getAllSizeExpertTailoring}`;
 
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');

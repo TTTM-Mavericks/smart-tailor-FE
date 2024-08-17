@@ -20,6 +20,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import { CancelOutlined } from '@mui/icons-material';
 import { primaryColor } from '../../../../root/ColorSystem';
 import { width } from '@mui/system';
+import { __getToken } from '../../../../App';
 
 interface AddExpertTailoringWithHandsFormProps {
     closeCard: () => void;
@@ -75,7 +76,11 @@ const AddEachExpertTailoringWithHand: React.FC<AddExpertTailoringWithHandsFormPr
      */
     useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.getAllCategory}`;
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');
@@ -195,11 +200,11 @@ const AddEachExpertTailoringWithHand: React.FC<AddExpertTailoringWithHandsFormPr
             const response = await axios.post(
                 `${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.addNewExpertTailoring}`,
                 addNewExpertTailorings,
-                // {
-                //     headers: {
-                //         'Authorization': `Bearer ${token}`
-                //     }
-                // }
+                {
+                    headers: {
+                        Authorization: `Bearer ${__getToken()}`
+                    }
+                }
 
             );
             console.log("res:" + response);

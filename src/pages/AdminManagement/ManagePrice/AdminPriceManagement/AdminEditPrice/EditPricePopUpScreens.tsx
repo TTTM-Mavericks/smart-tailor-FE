@@ -9,6 +9,7 @@ import { LaborQuantity } from "../../../../../models/LaborQuantityModel";
 import { CancelOutlined } from "@mui/icons-material";
 import { primaryColor, redColor } from "../../../../../root/ColorSystem";
 import { borderColor } from "@mui/system";
+import { __getToken } from "../../../../../App";
 
 interface EditPricePopUpScreenFormProps {
     fid: {
@@ -53,7 +54,11 @@ const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, e
     const _handleSubmit = async () => {
         try {
             const apiUrl = `${baseURL}${versionEndpoints.v1}${featuresEndpoints.labor_quantity}${functionEndpoints.laborQantity.updateLaborQuantity}/${laborQuantityID}`;
-            const response = await axios.put(apiUrl, formData);
+            const response = await axios.put(apiUrl, formData, {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`
+                }
+            });
 
             if (!response.data) {
                 throw new Error('Error updating material');

@@ -16,6 +16,7 @@ import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from 
 import { AddExpertTailoring, ExpertTailoring } from "../../../../../models/ManagerExpertTailoringModel";
 import { ExpertTailoringEdit } from "../../../../../models/ManagerExpertTailoringModel";
 import { greenColor } from "../../../../../root/ColorSystem";
+import { __getToken } from "../../../../../App";
 
 // Make Style of popup
 const style = {
@@ -91,7 +92,11 @@ const ManageExpertTailoring: React.FC = () => {
     React.useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.getAllExpertTailoring}`;
 
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');
@@ -140,7 +145,11 @@ const ManageExpertTailoring: React.FC = () => {
         try {
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.updateStatusExpertTailoring}`;
 
-            const response = await axios.put(apiUrl + `/${expertTailoringID}`)
+            const response = await axios.put((apiUrl + `/${expertTailoringID}`, {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`
+                }
+            }))
 
             if (!response.data) {
                 throw new Error('Error deleting material');
