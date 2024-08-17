@@ -33,6 +33,7 @@ import MaterialDetailTableComponent from '../Components/Table/MaterialDetailTabl
 import ViewFinalCheckingProductsDialogComponent from '../Components/Dialog/ViewFinalCheckingProductsDialog/ViewFinalCheckingProductsDialogComponent';
 
 
+
 export interface EstimatedStageInterface {
     estimatedQuantityFinishFirstStage: number;
     estimatedDateFinishFirstStage: string;
