@@ -59,26 +59,39 @@ const Shirt = ({ isDefault }) => {
 
     useEffect(() => {
         const loadDecals = async () => {
-            deCalData.forEach(decalGroup => {
-                decalGroup.items.forEach(async (item) => {
-                    try {
-                        const texture = await loadTexture(item.imageUrl);
-                        setDecalData(prev => prev.map(group =>
-                            group.key === decalGroup.key
-                                ? { ...group, items: group.items.map(i => i.itemMaskID === item.itemMaskID ? { ...i, texture } : i) }
-                                : group
-                        ));
-                    } catch (error) {
-                        console.error(`Failed to load texture for item ${item.itemMaskID}`, error);
-                    }
-                });
-            });
+            let updated = false; // Flag to track if state should be updated
+
+            const updatedDecalData = await Promise.all(
+                deCalData.map(async decalGroup => {
+                    const updatedItems = await Promise.all(decalGroup.items.map(async item => {
+                        if (!item.texture) {  // Only load texture if it doesn't exist
+                            try {
+                                const texture = await loadTexture(item.imageUrl);
+                                updated = true;
+                                return { ...item, texture };
+                            } catch (error) {
+                                console.error(`Failed to load texture for item ${item.itemMaskID}`, error);
+                                return item; // Return item as is if loading fails
+                            }
+                        }
+                        return item; // Return unchanged item if texture exists
+                    }));
+                    return { ...decalGroup, items: updatedItems };
+                })
+            );
+
+            // Update state only if changes occurred
+            if (updated) {
+                setDecalData(updatedDecalData);
+            }
         };
 
         if (deCalData.length > 0) {
             loadDecals();
         }
     }, [deCalData]);
+
+
 
     useFrame((state, delta) => easing.dampC(materials.lambert1.color, snap.color, 0.25, delta))
 

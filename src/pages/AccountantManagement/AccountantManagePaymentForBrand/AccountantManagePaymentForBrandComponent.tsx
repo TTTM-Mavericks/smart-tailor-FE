@@ -251,7 +251,6 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
     };
 
     const _handleOpenPDF = (selectedOrder: any) => {
-        console.log("bebe");
 
         if (!selectedOrder) return;
 
@@ -463,7 +462,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
                 onClick={e => e.stopPropagation()}
             >
                 <IoMdCloseCircleOutline
-                    size={28}
+                    size={20}
                     className="absolute top-4 right-4 cursor-pointer text-red-500 hover:text-red-500 transition-colors"
                     onClick={onClose}
                 />
@@ -565,7 +564,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
                                         <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
                                             Rating:{" "}
                                             <span className="text-sm text-gray-500 pb-2">
-                                                {subOrder.brand?.rating}
+                                            {subOrder.brand?.rating?.toFixed(2)}
                                             </span>{" "}
                                             <span className="text-yellow-400 text-sm">★</span>
                                         </p>
@@ -640,13 +639,13 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
 
                                     </div>
                                     <div
-                                        className={`${style.orderHistory__viewInvoice__buttonPayment}items-center justify-center`}
-                                        style={{ textAlign: "center" }}
+                                        className={`${style.orderHistory__viewInvoice__buttonPayment}items-center justify-center mt-0`}
+                                        style={{ textAlign: "center", position: 'absolute', bottom: 0, right: 10 }}
                                     >
                                         <p
-                                            className={`${style.orderHistory__viewInvoice__button} px-5 text-sm font-medium`}
+                                            className={`px-5 text-sm font-medium`}
                                         >
-                                            <p className='mb-40' onClick={() => handleViewTransaction(subOrder)}>View transaction</p>
+                                            {/* <p className='mb-40' onClick={() => handleViewTransaction(subOrder)}>View transaction</p> */}
                                             <button
                                                 type="submit"
                                                 className="px-5 py-2 text-sm font-medium text-white"
@@ -662,7 +661,6 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
                                                 <span className="font-medium text-white">Payment</span>
                                             </button>
                                         </p>
-
                                     </div>
                                 </div>
                             </div>
@@ -680,6 +678,8 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
                                     paymentData={subOrder.paymentList}
                                 ></PaymentFromAccountantToBranđialog>
                             )}
+                            <p className='pb-5 text-sm underline text-blue-500 mr-auto cursor-pointer' onClick={() => handleViewTransaction(subOrder)}>View transaction</p>
+
                         </motion.div>
                     ))}
                 </div>
@@ -700,7 +700,7 @@ const Tables: React.FC<TablesProps> = ({ table, onViewDetails }) => {
         { field: 'orderType', headerName: 'Type', width: 130, flex: 1 },
         { field: 'buyerName', headerName: 'Buyer Name', width: 150 },
         {
-            field: 'totalPrice', headerName: 'Total Price', width: 130,
+            field: 'totalPrice', headerName: 'Total Price (VND)', width: 130,
             renderCell: (params) => (
                 <span>
                     {params.value.toLocaleString()}
@@ -1264,7 +1264,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
     const columns: GridColDef[] = [
         { field: 'orderID', headerName: 'Order ID', width: 130 },
         { field: 'buyerName', headerName: 'Buyer Name', width: 150 },
-        { field: 'totalPrice', headerName: 'Total Price', width: 130, valueFormatter: (params: any) => `${__handleAddCommasToNumber(params.value)} VND` },
+        { field: 'totalPrice', headerName: 'Total Price (VND)', width: 130, valueFormatter: (params: any) => `${__handleAddCommasToNumber(params.value)} VND` },
         { field: 'expectedStartDate', headerName: 'Expected Start Date', width: 180 },
         {
             field: 'orderStatus', headerName: 'Order Status', width: 130,
@@ -1584,7 +1584,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                         </div>
 
                         <div className="flex mt-0">
-                            <div className="w-7/10" style={{ width: "80%" }}>
+                            <div className="w-7/10" style={{ width: "60%" }}>
                                 <Select
                                     isMulti
                                     name="filters"
@@ -1858,7 +1858,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                     <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
                                                         Rating:{" "}
                                                         <span className="text-sm text-gray-500 pb-2">
-                                                            {order.brand?.rating}
+                                                        {order.brand?.rating?.toFixed(2)}
                                                         </span>{" "}
                                                         <span className="text-yellow-400 text-sm">★</span>
                                                     </p>
@@ -1933,13 +1933,13 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
 
                                                 </div>
                                                 <div
-                                                    className={`${style.orderHistory__viewInvoice__buttonPayment} items - center justify - center`}
+                                                    className={`${style.orderHistory__viewInvoice__buttonPayment} items-center justify-center`}
                                                     style={{ textAlign: "center" }}
                                                 >
                                                     <p
-                                                        className={`${style.orderHistory__viewInvoice__button} px - 5 text - sm font - medium`}
+                                                        className={` px-5 text-sm font-medium`}
                                                     >
-                                                        <p className='mb-40' onClick={() => handleViewTransaction(order)}>View transaction</p>
+                                                        <p className='mb-32 cursor-pointer' onClick={() => handleViewTransaction(order)}>View transaction</p>
                                                         <button
                                                             type="submit"
                                                             className="px-5 py-2 text-sm font-medium text-white"

@@ -26,7 +26,7 @@ const AccountantDashboard: React.FC = () => {
         const fetchOrderGrowthPercentage = async () => {
             try {
                 const response = await axios.get(
-                    `${baseURL + versionEndpoints.v1 + '/payment' + functionEndpoints.chart.getTotalPaymentForEachMonth}`,
+                    `${baseURL + versionEndpoints.v1 + '/payment' + functionEndpoints.chart.getTotalIncomeForEachMonth}`,
                     {
                         headers: {
                             Authorization: `Bearer ${__getToken()}`,
@@ -53,7 +53,7 @@ const AccountantDashboard: React.FC = () => {
         const fetchOrderGrowthPercentage = async () => {
             try {
                 const response = await axios.get(
-                    `${baseURL + versionEndpoints.v1 + '/payment' + functionEndpoints.chart.getTotalPaymentForEachMonth}`,
+                    `${baseURL + versionEndpoints.v1 + '/payment' + functionEndpoints.chart.getTotalRefundForEachMonth}`,
                     {
                         headers: {
                             Authorization: `Bearer ${__getToken()}`,
@@ -127,10 +127,6 @@ const AccountantDashboard: React.FC = () => {
         fetchGrowthPercentage('/payment' + functionEndpoints.chart.calculateRefundGrowthPercentageMonth, setRefundGrowthPercentage);
         // fetchGrowthPercentage('/user' + functionEndpoints.chart.calculateNewUserGrowthPercentageByRoleName + '/employee', setNewEmployeeGrowthPercentage);
     }, []);
-
-    console.log("incomeGrowthPercentage" + JSON.stringify(paymentGrowthPercentage));
-    console.log("refundGrowthPercentage" + JSON.stringify(incomeGrowthPercentage));
-    console.log("paymentGrowthPercentagenew" + JSON.stringify(refundGrowthPercentage));
     // console.log("newEmployeeGrowthPercentage" + JSON.stringify(newEmployeeGrowthPercentage));
 
     return (
@@ -147,7 +143,7 @@ const AccountantDashboard: React.FC = () => {
                         </div>
                         <div className="p-4 text-right">
                             <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Payment Growth</p>
-                            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{paymentGrowthPercentage.previousData}{paymentGrowthPercentage.currentData}</h4>
+                            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{paymentGrowthPercentage.currentData}</h4>
                         </div>
                         <div className="border-t border-blue-gray-50 p-4">
                             <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
@@ -166,7 +162,7 @@ const AccountantDashboard: React.FC = () => {
                         </div>
                         <div className="p-4 text-right">
                             <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Income Growth</p>
-                            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{incomeGrowthPercentage.previousData}{incomeGrowthPercentage.currentData}</h4>
+                            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{incomeGrowthPercentage.currentData}</h4>
                         </div>
                         <div className="border-t border-blue-gray-50 p-4">
                             <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
@@ -185,7 +181,7 @@ const AccountantDashboard: React.FC = () => {
                         </div>
                         <div className="p-4 text-right">
                             <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Refund Growth</p>
-                            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{refundGrowthPercentage.previousData} {refundGrowthPercentage.currentData}</h4>
+                            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{refundGrowthPercentage.currentData}</h4>
                         </div>
                         <div className="border-t border-blue-gray-50 p-4">
                             <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">

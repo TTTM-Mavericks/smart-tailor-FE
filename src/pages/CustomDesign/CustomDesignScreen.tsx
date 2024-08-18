@@ -168,7 +168,7 @@ function CustomDesignScreen() {
     setPartOfClothData(updatePart);
     const result = updatePart?.find((item: PartOfDesignInterface) => item.partOfDesignID === selectedPartOfCloth?.partOfDesignID);
     if (result) {
-      console.log('selectedPartOfCloth change: ', result.itemMasks);
+      console.log('-----------------------------------------');
       setSelectedStamp(result.itemMasks)
     }
     state.modelData = updatePart
@@ -427,8 +427,16 @@ function CustomDesignScreen() {
     setPartOfClothData(partOfClothData);
   }
 
-  const __handleRemoveStamp = (itemId: string) => {
-    setSelectedStamp((prev) => prev?.filter((stamp: ItemMaskInterface) => stamp.itemMaskID !== itemId));
+  const __handleRemoveStamp = async (itemId: string) => {
+
+    const result = partOfClothData?.find((item: PartOfDesignInterface) => item.partOfDesignName === selectedPartOfCloth?.partOfDesignName);
+    if (result) {
+      console.log('selectedPartOfCloth change: ', result.itemMasks);
+      const itemMasks = result.itemMasks?.filter((stamp: ItemMaskInterface) => stamp.itemMaskID !== itemId)
+      if (itemMasks) setSelectedStamp(itemMasks)
+    }
+
+    // await setSelectedStamp((prev) => prev?.filter((stamp: ItemMaskInterface) => stamp.itemMaskID !== itemId));
   };
 
   const __handleSaveStateToUndoStack = () => {
@@ -652,6 +660,10 @@ function CustomDesignScreen() {
       result.zIndex = 1;
 
       // setSelectedPartOfCloth(selectedPartOfCloth);
+      // const result = partOfClothData?.find((item: PartOfDesignInterface) => item.partOfDesignName === selectedPartOfCloth?.partOfDesignName);
+      // if (result) {
+       
+      // }
 
       setSelectedStamp((prevSelectedStamp = []) => {
         const existingItemIndex = prevSelectedStamp.findIndex(

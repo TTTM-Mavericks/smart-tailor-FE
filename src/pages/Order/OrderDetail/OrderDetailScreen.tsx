@@ -29,6 +29,9 @@ import { height } from '@mui/system';
 import CustomerUpgradeDialog from '../../../components/Dialog/UpgradeDialog/CustomerUpgradeDialog';
 import { __getToken, __getUserLogined } from '../../../App';
 import { __handleSendNotification } from '../../../utils/NotificationUtils';
+import MaterialDetailTableComponent from '../Components/Table/MaterialDetailTableComponent';
+import ViewFinalCheckingProductsDialogComponent from '../Components/Dialog/ViewFinalCheckingProductsDialog/ViewFinalCheckingProductsDialogComponent';
+
 
 
 export interface EstimatedStageInterface {
@@ -38,6 +41,7 @@ export interface EstimatedStageInterface {
     estimatedDateFinishSecondStage: string;
     estimatedQuantityFinishCompleteStage: number;
     estimatedDateFinishCompleteStage: string;
+    estimatedDateStartDepositStage: string
 }
 
 interface BrandDetailPriceResponseInterface {
@@ -93,6 +97,11 @@ const OrderDetailScreen: React.FC = () => {
     const [referencePrice, setReferencePrice] = useState<OrderPriceDetailInterface>();
     const [isOpenSystemShippingPriceDialog, setIsOpenSystemShippingPriceDialog] = useState<boolean>(false);
     const [token, setToken] = useState<string>();
+    const [isOpenSuspendedDialog, setIsOpenSuspendedDialog] = useState<boolean>(false);
+    const [isOpenFinalProductsDialog, setIsOpenFinalProductsDialog] = useState<boolean>(false);
+    const [isOpenMaterialDetailDialog, setIsOpenMaterialDetailDialog] = useState<boolean>(false);
+
+
 
 
 
@@ -154,9 +163,14 @@ const OrderDetailScreen: React.FC = () => {
     };
     // ---------------UseEffect---------------//
 
+
     useEffect(() => {
         if (orderDetail?.orderStatus === 'DELIVERED') {
             setIsOpenRatingDialog(true);
+        }
+
+        if (orderDetail?.orderStatus === 'SUSPENDED') {
+            setIsOpenSuspendedDialog(true);
         }
     }, [orderDetail])
 
@@ -213,11 +227,9 @@ const OrderDetailScreen: React.FC = () => {
             }
             else {
                 console.log('detail error: ', response.message);
-                toast.error(`${response.message}`, { autoClose: 4000 });
             }
         } catch (error) {
             console.log('error: ', error);
-            toast.error(`${error}`, { autoClose: 4000 });
         }
     }
 
@@ -232,11 +244,11 @@ const OrderDetailScreen: React.FC = () => {
             }
             else {
                 console.log('detail error: ', response.message);
-                toast.error(`${response.message}`, { autoClose: 4000 });
+                // toast.error(`${response.message}`, { autoClose: 4000 });
             }
         } catch (error) {
             console.log('error: ', error);
-            toast.error(`${error}`, { autoClose: 4000 });
+            // toast.error(`${error}`, { autoClose: 4000 });
         }
 
     }
@@ -251,11 +263,11 @@ const OrderDetailScreen: React.FC = () => {
             }
             else {
                 console.log('detail error: ', response.message);
-                toast.error(`${response.message}`, { autoClose: 4000 });
+                // toast.error(`${response.message}`, { autoClose: 4000 });
             }
         } catch (error) {
             console.log('error: ', error);
-            toast.error(`${error}`, { autoClose: 4000 });
+            // toast.error(`${error}`, { autoClose: 4000 });
         }
 
     }
@@ -287,8 +299,6 @@ const OrderDetailScreen: React.FC = () => {
             }
             else {
                 console.log('detail order: ', response.message);
-
-                navigate('/error404');
             }
         } catch (error) {
             console.log('error: ', error);
@@ -351,7 +361,7 @@ const OrderDetailScreen: React.FC = () => {
                     action: "CANCEL",
                     type: "ORDER",
                     targetID: orderDetail?.orderID,
-                    message: ""
+                    message: `Some reason make customer ${user.userID} want to cancel this order`
                 }
                 console.log(bodyRequest);
                 __handleSendNotification(bodyRequest);
@@ -540,6 +550,10 @@ const OrderDetailScreen: React.FC = () => {
                                 <span className='font-semibold text-gray-600'>Expert tailoring: </span>
                                 <span style={{ fontWeight: "normal" }}>{orderDetail?.designResponse.expertTailoring?.expertTailoringName}</span>
                             </p>
+                            <p className="text-sm text-gray-600 mb-1 mt-3 w-full">
+                                <span className='font-semibold text-gray-600'>Material details: </span>
+                                <span style={{ fontWeight: "500", color: secondaryColor, cursor: 'pointer' }} onClick={() => setIsOpenMaterialDetailDialog(true)}>View</span>
+                            </p>
 
                             <p className="text-sm text-gray-600 mb-1 mt-3 w-full">
                                 <span className='font-semibold text-gray-600'>Quantity: </span>
@@ -570,15 +584,28 @@ const OrderDetailScreen: React.FC = () => {
                                 </p>
                             )}
 
-                            <div className="flex flex-col md:flex-row md:space-x-10 mt-4">
-                                <div className="md:w-1/2 flex items-center">
+                            <div className="flex mt-4">
+                                <div className="w-52 flex items-center">
                                     <div className={style.orderDetail__orderStatus__tag} style={orderDetail?.orderStatus === 'CANCEL' ? { backgroundColor: redColor } : (orderDetail?.orderStatus === 'COMPLETED' || orderDetail?.orderStatus === 'DELIVERED') ? { backgroundColor: greenColor } : {}}>{orderDetail?.orderStatus}</div>
                                     {orderDetail?.orderStatus === 'CANCEL' && (
-                                        <div className="ml-10">
+                                        <div className="ml-5">
                                             <a onClick={() => __handleGetCancelReasonDetail()} className="text-sm text-indigo-600 hover:text-indigo-800 transition duration-200 cursor-pointer">View reasons</a>
                                         </div>
                                     )}
+                                    {orderDetail?.orderStatus === 'SUSPENDED' && (
+                                        <div className="ml-2">
+                                            <a onClick={() => setIsOpenSuspendedDialog(true)} className="text-sm text-indigo-600 hover:text-indigo-800 transition duration-200 cursor-pointer">View reasons</a>
+                                        </div>
+                                    )}
                                 </div>
+                                {orderDetail?.orderStatus === 'FINAL_CHECKING' && (
+                                    <div className="-ml-2" style={{ width: 200 }}>
+                                        <a onClick={() => setIsOpenFinalProductsDialog(true)} className="text-sm text-indigo-600 hover:text-indigo-800 transition duration-200 cursor-pointer">View products</a>
+                                    </div>
+                                )}
+                                {isOpenFinalProductsDialog && (
+                                    <ViewFinalCheckingProductsDialogComponent order={orderDetail} onClose={() => setIsOpenFinalProductsDialog(false)} ></ViewFinalCheckingProductsDialogComponent>
+                                )}
                             </div>
                         </div>
 
@@ -670,15 +697,15 @@ const OrderDetailScreen: React.FC = () => {
                                 {progressSteps?.map((step, index) => {
                                     const isCurrentStep = step.status;
                                     return (
-                                        <>
+                                        <div key={index}>
                                             <p onClick={() => __handleOpenViewHistory(step.stageId)} key={index} className={`text-center ${isCurrentStep ? 'text-indigo-600' : 'text-gray-400'} cursor-pointer`}>
                                                 {step.currentQuantity} / {orderDetail?.quantity} products
                                             </p>
                                             {selectedStage === step.stageId && (
-                                                <ViewProgessOfProductDialog stageId={step.stageId} orderID={orderDetail?.orderID} isOpen={isOpenViewHistory} onClose={() => setIsOpenViewHistory(false)} ></ViewProgessOfProductDialog>
+                                                <ViewProgessOfProductDialog key={index} stageId={step.stageId} orderID={orderDetail?.orderID} isOpen={isOpenViewHistory} onClose={() => setIsOpenViewHistory(false)} ></ViewProgessOfProductDialog>
                                             )}
 
-                                        </>
+                                        </div>
                                     );
                                 })}
                             </div>
@@ -693,22 +720,25 @@ const OrderDetailScreen: React.FC = () => {
                         <div className="mt-0 border-t pt-4 flex">
                             <div className={`w-full md:w-2/5 mt-6 md:mt-0 ${orderDetail?.paymentList && orderDetail?.paymentList?.length <= 0 && 'ml-auto'}`}>
                                 <div className="flex flex-col space-y-4">
-                                    <div className="flex justify-between border-b pb-2">
-                                        <p className="text-gray-600 text-sm">Deposit</p>
-                                        <p className="text-gray-600 text-sm">{referencePrice?.customerPriceDeposit ? __handleAddCommasToNumber(referencePrice?.customerPriceDeposit) : 'Loading'} VND</p>
-                                    </div>
+                                    {referencePrice?.customerPriceDeposit !== '-1' && (
+                                        <div className="flex justify-between border-b pb-2">
+                                            <p className="text-gray-600 text-sm">Deposit</p>
+                                            <p className="text-gray-600 text-sm">{referencePrice?.customerPriceDeposit ? __handleAddCommasToNumber(referencePrice?.customerPriceDeposit) : 'Loading'} VND</p>
+                                        </div>
+                                    )}
+
                                     {referencePrice?.customerPriceFirstStage !== '-1' && (
                                         <div className="flex justify-between border-b pb-2">
-                                        <p className="text-gray-600 text-sm">Stage 1</p>
-                                        <p className="text-gray-600 text-sm">{referencePrice?.customerPriceFirstStage ? __handleAddCommasToNumber(referencePrice?.customerPriceFirstStage) : 'Loading'} VND</p>
-                                    </div>
+                                            <p className="text-gray-600 text-sm">Stage 1</p>
+                                            <p className="text-gray-600 text-sm">{referencePrice?.customerPriceFirstStage ? __handleAddCommasToNumber(referencePrice?.customerPriceFirstStage) : 'Loading'} VND</p>
+                                        </div>
                                     )}
                                     {referencePrice?.customerSecondStage !== '-1' && (
-                                    <div className="flex justify-between border-b pb-2">
-                                        <p className="text-gray-600 text-sm">Stage 2</p>
-                                        <p className="text-gray-600 text-sm">{referencePrice?.customerSecondStage ? __handleAddCommasToNumber(referencePrice?.customerSecondStage) : 'Loading'} VND</p>
+                                        <div className="flex justify-between border-b pb-2">
+                                            <p className="text-gray-600 text-sm">Stage 2</p>
+                                            <p className="text-gray-600 text-sm">{referencePrice?.customerSecondStage ? __handleAddCommasToNumber(referencePrice?.customerSecondStage) : 'Loading'} VND</p>
 
-                                    </div>
+                                        </div>
                                     )}
                                     <div className="flex justify-between border-b pb-2">
                                         <p className="text-gray-600 text-sm">Shipping (Pay later)</p>
@@ -898,7 +928,7 @@ const OrderDetailScreen: React.FC = () => {
             ></CustomerReportOrderDialogComponent>
 
             {
-                orderDetail?.orderStatus === 'DELIVERED' || (orderDetail?.rating && orderDetail?.rating > 0) && (
+                orderDetail?.orderStatus === 'DELIVERED' && !orderDetail?.rating && (
 
                     <Dialog open={isOpenRatingDialog} onClose={() => setIsOpenRatingDialog(false)}>
                         <DialogTitle>
@@ -1016,7 +1046,77 @@ const OrderDetailScreen: React.FC = () => {
                     </button>
                 </DialogActions>
 
+            </Dialog>
 
+
+            <Dialog open={isOpenSuspendedDialog} aria-labelledby="popup-dialog-title" maxWidth="xs" fullWidth onClose={() => setIsOpenSuspendedDialog(false)}>
+                <DialogTitle id="popup-dialog-title">
+                    Suspended status
+                    <IoMdCloseCircleOutline
+                        cursor="pointer"
+                        size={20}
+                        color={redColor}
+                        onClick={() => setIsOpenSuspendedDialog(false)}
+                        style={{ position: 'absolute', right: 20, top: 20 }}
+                    />
+                </DialogTitle>
+                <DialogContent >
+                    <div className='mt-0 text-sm'>
+                        Sorry! Some stage of processing be delayed, Do you still want to extend time to success this order?
+                    </div>
+                    <div className='mt-2 text-sm'>
+                        If you do not want to extend, We will refund this order in the next time.
+                    </div>
+                </DialogContent>
+                <DialogActions>
+
+                    <button
+                        type="submit"
+                        className="px-5 py-2.5 text-sm font-medium text-white"
+                        onClick={_handleCancelOrder}
+                        style={{
+                            borderRadius: 4,
+                            color: whiteColor,
+                            backgroundColor: redColor,
+                        }}
+                    >
+                        Cancel Order
+                    </button>
+
+                    <button
+                        type="submit"
+                        className="px-5 py-2.5 text-sm font-medium text-white"
+                        onClick={() => setIsOpenSuspendedDialog(false)}
+                        style={{
+                            borderRadius: 4,
+                            color: whiteColor,
+                            backgroundColor: greenColor,
+                        }}
+                    >
+                        Extend time
+                    </button>
+
+
+                </DialogActions>
+
+            </Dialog>
+
+            <Dialog open={isOpenMaterialDetailDialog} aria-labelledby="popup-dialog-title" maxWidth="lg" fullWidth onClose={() => setIsOpenMaterialDetailDialog(false)}>
+                <DialogTitle id="popup-dialog-title">
+                    Material detail
+                    <IoMdCloseCircleOutline
+                        cursor="pointer"
+                        size={20}
+                        color={redColor}
+                        onClick={() => setIsOpenMaterialDetailDialog(false)}
+                        style={{ position: 'absolute', right: 20, top: 20 }}
+                    />
+                </DialogTitle>
+                <DialogContent >
+                    <div>
+                        <MaterialDetailTableComponent materialDetailData={orderDetail?.designResponse.materialDetail}></MaterialDetailTableComponent>
+                    </div>
+                </DialogContent>
 
 
             </Dialog>

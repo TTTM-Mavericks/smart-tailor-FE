@@ -470,7 +470,7 @@ const AllTransactionHistoryComponent: React.FC = () => {
                 </aside>
                 <div style={{ width: '100%' }} className="max-w-6xl mx-auto p-4 md:p-6 min-h-screen">
                     <div className={`${style.gradientBackground}`}>
-                        <p className={style.textStyle}>Refund history</p>
+                        <p className={style.textStyle}>Trasactions history</p>
                     </div>
                     <div className={` inline-flex items-center rounded-md bg-yellow-50 px-2 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10 mt-10`}>
                         <span>

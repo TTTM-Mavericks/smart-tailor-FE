@@ -66,7 +66,7 @@ const tokenIsValid = (token) => {
 const isAuthenticated = (requiredRole) => {
   const token = Cookies.get('token');
   console.log('token: ', token);
-  const userAuth = localStorage.getItem('userAuth');
+  const userAuth = Cookies.get('userAuth');
   if (userAuth) {
     const userParse = JSON.parse(userAuth);
     return userParse.roleName === requiredRole
@@ -111,7 +111,7 @@ export const __getToken = () => {
 }
 
 export const __getUserLogined = () => {
-  const userAuth = localStorage.getItem('userAuth');
+  const userAuth = Cookies.get('userAuth');
   if (userAuth) {
     return JSON.parse(userAuth);
   } else return;
@@ -141,17 +141,17 @@ function App() {
           <Route path='/design_create' element={<CreateDesignComponent></CreateDesignComponent>} />
 
           {/* Admin dashboard route */}
-          <Route path='/admin' element={<DashboardAdminScreens></DashboardAdminScreens>} />
+          <Route path='/admin' element={<PrivateRoute element={<DashboardAdminScreens></DashboardAdminScreens>} requiredRole="ADMIN" />} />
 
           {/* Employee dashboard route */}
-          <Route path='/employee' element={<DashboardEmployeeScreens></DashboardEmployeeScreens>} />
+          <Route path='/employee' element={<PrivateRoute element={<DashboardEmployeeScreens></DashboardEmployeeScreens>} requiredRole="EMPLOYEE" />} />
           <Route path="/row-details" element={<DashboardEmployeeOrderDetailScreen></DashboardEmployeeOrderDetailScreen>} />
 
           {/* Brand Dashboard Route */}
-          <Route path='/brand' element={<DashboardManageMaterialScreen></DashboardManageMaterialScreen>} />
+          <Route path='/brand' element={<PrivateRoute element={<DashboardManageMaterialScreen></DashboardManageMaterialScreen>} requiredRole="BRAND" />} />
           <Route path='/brand/signup' element={<BrandSignUpScreen></BrandSignUpScreen>} />
           <Route path='/brand/updateProfile/:id' element={<UploadBrandInforForm></UploadBrandInforForm>} />
-          <Route path='/brand/manage_order_request/:id' element={<OrderRequestScreen></OrderRequestScreen>} />
+          <Route path='/brand/manage_order_request/:id' element={<PrivateRoute element={<OrderRequestScreen></OrderRequestScreen>} requiredRole="BRAND" />} />
           <Route path='/brand/waiting_process_information' element={<WaitingProcessComponent></WaitingProcessComponent>} />
 
           {/* Detail Product Route */}

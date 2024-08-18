@@ -90,7 +90,7 @@ const CardInformationDetailComponent = () => {
                     </div>
                     <div className="p-4 text-right">
                         <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Brand Growth</p>
-                        <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{newBrandGrowthPercentage.previousData}{newBrandGrowthPercentage.currentData}</h4>
+                        <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{newBrandGrowthPercentage.currentData}</h4>
                     </div>
                     <div className="border-t border-blue-gray-50 p-4">
                         <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
@@ -109,7 +109,7 @@ const CardInformationDetailComponent = () => {
                     </div>
                     <div className="p-4 text-right">
                         <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">User Growth</p>
-                        <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{userGrowthPercentage.previousData}{userGrowthPercentage.currentData}</h4>
+                        <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{userGrowthPercentage.currentData}</h4>
                     </div>
                     <div className="border-t border-blue-gray-50 p-4">
                         <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
@@ -128,7 +128,7 @@ const CardInformationDetailComponent = () => {
                     </div>
                     <div className="p-4 text-right">
                         <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Customer Growth</p>
-                        <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{customerGrowthPercentage.previousData} {customerGrowthPercentage.currentData}</h4>
+                        <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{customerGrowthPercentage.currentData}</h4>
                     </div>
                     <div className="border-t border-blue-gray-50 p-4">
                         <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
@@ -147,7 +147,7 @@ const CardInformationDetailComponent = () => {
                     </div>
                     <div className="p-4 text-right">
                         <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Employee Growth</p>
-                        <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{newEmployeeGrowthPercentage.previousData}{newEmployeeGrowthPercentage.currentData}</h4>
+                        <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{newEmployeeGrowthPercentage.currentData}</h4>
                     </div>
                     <div className="border-t border-blue-gray-50 p-4">
                         <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
