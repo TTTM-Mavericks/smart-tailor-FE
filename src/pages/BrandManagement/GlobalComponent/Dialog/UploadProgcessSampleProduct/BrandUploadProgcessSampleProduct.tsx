@@ -73,8 +73,7 @@ const BrandUploadProgcessSampleProduct: React.FC<Props> = ({ orderDetail, isOpen
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsloading(false);
+        setIsloading(true);
         const imagePromises = images.map(file => fileToBase64(file));
         const videoPromises = videos.map(file => fileToBase64(file));
 

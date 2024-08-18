@@ -21,7 +21,7 @@ import PaymentFromAccountantToBranđialog from '../../../components/Dialog/Payme
 import { __handlegetRatingStyle, __handlegetStatusBackgroundBoolean } from '../../../utils/ElementUtils';
 import '../../../index.css'
 import Select from 'react-select';
-import { DesignInterface } from '../../../models/DesignModel';
+import { DesignDetailInterface, DesignInterface } from '../../../models/DesignModel';
 import { __handleGetDateTimeColor } from '../../../utils/DateUtils';
 import { color, motion } from 'framer-motion';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
@@ -31,6 +31,8 @@ import { __getToken } from '../../../App';
 import jsPDF from "jspdf";
 import autoTable from 'jspdf-autotable';
 import { styled } from '@mui/system';
+import { bankImg } from '../../../assets';
+import QRCode from 'react-qr-code';
 
 const InvoiceHeader = styled(Box)(({ theme }) => ({
     display: 'flex',
@@ -129,6 +131,7 @@ interface SubOrder {
     productionCompletionDate: string;
     detailList: Detail[];
     paymentList: Payment[];
+    designResponse: DesignDetailInterface
 }
 
 interface Brand {
@@ -227,9 +230,10 @@ interface Transaction {
 interface TransactionModalProps {
     transaction: any;
     onClose: () => void;
+    orderDetail?: OrderDetailInterface | AccountantOrderInterface
 }
 
-const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClose }) => {
+const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClose, orderDetail }) => {
     const [isTransactionsExpanded, setIsTransactionsExpanded] = useState(true);
     const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
     const [isOpenPaymentForBrandDialog, setIsOpenPaymentForBrandDialog] = useState<boolean>(false);
@@ -564,7 +568,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
                                         <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
                                             Rating:{" "}
                                             <span className="text-sm text-gray-500 pb-2">
-                                            {subOrder.brand?.rating?.toFixed(2)}
+                                                {subOrder.brand?.rating?.toFixed(2)}
                                             </span>{" "}
                                             <span className="text-yellow-400 text-sm">★</span>
                                         </p>
@@ -669,6 +673,8 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
                                     transaction={selectedTransactions}
                                     onClose={handleCloseTransactionModal}
                                     onDownloadPDF={() => _handleOpenPDF(selectedTransactions)}
+                                    parentOrderDetai={orderDetail}
+
                                 />
                             )}
                             {selectedOrder === subOrder.orderID && (
@@ -809,9 +815,19 @@ interface TransactionModalsProps {
     transaction: any;
     onClose: () => void;
     onDownloadPDF: () => void;
+    parentOrderDetai?: OrderDetailInterface | AccountantOrderInterface
 }
 
-const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onClose, onDownloadPDF }) => {
+const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onClose, onDownloadPDF, parentOrderDetai }) => {
+    useEffect(() => {
+        console.log('transaction.designResponse.materialDetail: ', transaction.designResponse);
+    }, [transaction]);
+
+    const __handleMoveToPayOSPaymentDetail = () => {
+        if (transaction) {
+            window.open(transaction.paymentList[0]?.payOSResponse.data.checkoutUrl, '_blank');
+        }
+    }
     return (
         <Dialog open={true} onClose={onClose} maxWidth="md" fullWidth>
             <ScrollFreeDialogContent>
@@ -854,21 +870,78 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                                     </span>{" "}
                                     <span className="text-yellow-400 text-sm">★</span>
                                 </p></Typography>
-                                <Typography variant="body2">{transaction.customerAddress}</Typography>
+                                <Typography variant="body2">{transaction.address}</Typography>
                             </InvoiceDetails>
                         </Grid>
                         <Grid item xs={6}>
                             <Typography variant="body1" align="right">Invoice No. {transaction.orderID}</Typography>
 
-                            <Typography variant="body1" align="right">{transaction.createDate}</Typography>
+                            <Typography variant="body1" align="right">{transaction.expectedStartDate}</Typography>
                         </Grid>
                     </Grid>
 
-                    <Box sx={{ width: '100%', overflow: 'hidden', boxShadow: 3, borderRadius: 2 }}>
+
+
+                    <Typography variant="body2" align="left">Material detail</Typography>
+
+                    <Box sx={{ width: '100%', overflow: 'hidden', boxShadow: 3, borderRadius: 2, marginTop: 2, marginBottom: 2 }}>
                         <TableContainer component={Paper} elevation={0}>
                             <Table sx={{ minWidth: 650 }}>
                                 <TableHead>
-                                    <TableRow sx={{ backgroundColor: '#2196f3' }}>
+                                    <TableRow sx={{ backgroundColor: primaryColor }}>
+                                        <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>HS code</TableCell>
+                                        <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Name</TableCell>
+                                        <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Category</TableCell>
+                                        <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Unit</TableCell>
+                                        <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Quantity</TableCell>
+                                        <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Min price (VND)</TableCell>
+                                        <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Max price (VND)</TableCell>
+
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {parentOrderDetai && parentOrderDetai?.designResponse?.materialDetail?.map((item: any) => (
+                                        <TableRow
+                                            key={item.materialResponse?.materialID}
+                                            sx={{ '&:nth-of-type(odd)': { backgroundColor: '#f5f5f5' } }}
+                                        >
+                                            <TableCell align="left">{item.materialResponse?.hsCode}</TableCell>
+                                            <TableCell align="left">{item.materialResponse?.materialName}</TableCell>
+                                            <TableCell align="left">{item.materialResponse?.categoryName}</TableCell>
+                                            <TableCell align="left">{item.materialResponse?.unit}</TableCell>
+                                            <TableCell align="left">{item.quantity}</TableCell>
+                                            <TableCell align="left">{__handleAddCommasToNumber(item.minPrice)}</TableCell>
+                                            <TableCell align="left">{__handleAddCommasToNumber(item.maxPrice)}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+
+                        {/* <Box sx={{ padding: 2, backgroundColor: '#f0f0f0' }}>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12}>
+                                    <Typography variant="h6" align="right" sx={{ fontWeight: 'bold' }}>
+                                        <p className="text-sm text-gray-600">
+                                            Total: <span className="text-gray-800 font-semibold ml-1">
+                                                {new Intl.NumberFormat('en-US', {
+                                                    style: 'currency',
+                                                    currency: 'VND'
+                                                }).format(transaction.totalPrice)}
+                                            </span>
+                                        </p>
+                                    </Typography>
+                                </Grid>
+                            </Grid>
+                        </Box> */}
+                    </Box>
+
+                    <Typography variant="body2" align="left">Design detail</Typography>
+                    <Box sx={{ width: '100%', overflow: 'hidden', boxShadow: 3, borderRadius: 2, marginTop: 2, marginBottom: 3 }}>
+                        <TableContainer component={Paper} elevation={0}>
+                            <Table sx={{ minWidth: 650 }}>
+                                <TableHead sx={{ height: 10 }}>
+                                    <TableRow sx={{ backgroundColor: primaryColor, height: 10 }}>
                                         <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Design ID</TableCell>
                                         <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Quantity</TableCell>
                                         <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Size</TableCell>
@@ -909,42 +982,62 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                         </Box>
                     </Box>
 
+
                     {/* <ThankYou variant="h6" align="center">
                         Thank you!
                     </ThankYou> */}
 
                     <PaymentInfo>
-                        <h2 className="text-lg font-semibold text-gray-800">PAYMENT INFORMATION</h2>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <div className="flex items-center text-sm">
-                                    <span className="text-gray-600">Brand:</span>
-                                    <div className="flex items-center ml-2">
-                                        <img
-                                            src={transaction.brand?.user.imageUrl}
-                                            className="w-8 h-8 rounded-full mr-2"
-                                            alt="Brand logo"
-                                        />
-                                        <span className={`${__handlegetRatingStyle(transaction.brand?.rating)} text-gray-700`}>
-                                            {transaction.brand?.brandName}
-                                        </span>
+                        <h2 className="text-lg font-semibold text-gray-800 mb-5">PAYMENT INFORMATION</h2>
+                        <div className="flex h-full items-center">
+                            <div className="space-y-4 h-full" style={{ width: 450 }}>
+                                <div className="flex w-3/4 items-center space-x-2">
+                                    <img style={{ borderRadius: 90 }} src={bankImg} alt="Bank Logo" className="w-8 h-8" />
+                                    <div>
+                                        <div className="text-sm font-medium">{transaction.paymentList[0]?.paymentRecipientBankCode}</div>
                                     </div>
                                 </div>
-                                <p className="text-sm text-gray-600">Province: <span className="text-gray-800">{transaction.province}</span></p>
-                                <p className="text-sm text-gray-600">Phone Number: <span className="text-gray-800">{transaction.phone}</span></p>
-                            </div>
 
-                            <div className="space-y-2">
-                                <p className="text-sm text-gray-600">Buyer: <span className="text-gray-800">{transaction.buyerName}</span></p>
-                                <p className="text-sm text-gray-600">Date: <span className="text-gray-800">{transaction.createDate}</span></p>
-                                <p className="text-sm text-gray-600">
-                                    Total: <span className="text-gray-800 font-semibold ml-1">
-                                        {new Intl.NumberFormat('en-US', {
-                                            style: 'currency',
-                                            currency: 'VND'
-                                        }).format(transaction.totalPrice)}
-                                    </span>
-                                </p>
+                                <div className="mt-4">
+                                    <div className="flex justify-between items-center border-b py-2">
+                                        <span style={{ fontSize: 13 }} className="font-semibold">Account Holder:</span>
+                                        <div className="flex items-center justify-end">
+                                            <span style={{ fontSize: 14 }} className="text-right">{transaction.paymentList[0]?.paymentRecipientName || 'N/A'}</span>
+                                            <button className="ml-2 bg-gray-100 text-sm font-medium py-1 px-2 rounded">Copy</button>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between items-center border-b py-2">
+                                        <span style={{ fontSize: 13 }} className="font-semibold">Account Number:</span>
+                                        <div className="flex items-center justify-end">
+                                            <span style={{ fontSize: 14 }} className="text-right">{transaction.paymentList[0]?.paymentRecipientBankNumber || 'N/A'}</span>
+                                            <button className="ml-2 bg-gray-100 text-sm font-medium py-1 px-2 rounded">Copy</button>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between items-center border-b py-2">
+                                        <span style={{ fontSize: 13 }} className="font-semibold">Amount:</span>
+                                        <div className="flex items-center justify-end">
+                                            <span style={{ fontSize: 14 }} className="text-right">{__handleAddCommasToNumber(transaction.paymentList[0]?.paymentAmount)} VND</span>
+                                            <button className="ml-2 bg-gray-100 text-sm font-medium py-1 px-2 rounded">Copy</button>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between items-center py-2">
+                                        <span style={{ fontSize: 13 }} className="font-semibold">Description:</span>
+                                        <div className="flex items-center justify-end">
+                                            <span style={{ fontSize: 14 }} className="text-right">{transaction.paymentList[0]?.paymentType || 'N/A'}</span>
+                                            <button className="ml-2 bg-gray-100 text-sm font-medium py-1 px-2 rounded">Copy</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="relative flex justify-center items-center mr-auto" style={{width: 200, height : 200, marginLeft: 100}}>
+                                <QRCode value={transaction.paymentList[0]?.payOSResponse.data.checkoutUrl || ''} />
+                                <div
+                                    className="absolute flex items-center justify-center w-20 h-20 rounded-full transform transition-transform duration-300 hover:scale-110 cursor-pointer"
+                                    style={{ backgroundColor: primaryColor, color: whiteColor, fontWeight: 500, opacity: 0.9 }}
+                                    onClick={() => __handleMoveToPayOSPaymentDetail()}
+                                >
+                                    <p>Click</p>
+                                </div>
                             </div>
                         </div>
                     </PaymentInfo>
@@ -1679,6 +1772,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                 <TransactionModal
                                     transaction={selectedTransaction}
                                     onClose={handleCloseModal}
+                                    orderDetail={selectedTransaction}
                                 />
                             )}
                         </div>
@@ -1858,7 +1952,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                     <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
                                                         Rating:{" "}
                                                         <span className="text-sm text-gray-500 pb-2">
-                                                        {order.brand?.rating?.toFixed(2)}
+                                                            {order.brand?.rating?.toFixed(2)}
                                                         </span>{" "}
                                                         <span className="text-yellow-400 text-sm">★</span>
                                                     </p>
@@ -1962,6 +2056,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                         transaction={selectedTransactions}
                                                         onClose={handleCloseTransactionModal}
                                                         onDownloadPDF={() => _handleOpenPDF(selectedTransactions)}
+                                                        parentOrderDetai={orderDetail}
                                                     />
                                                 )}
 

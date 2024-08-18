@@ -317,7 +317,7 @@ export default function HeaderComponent() {
   const __handleLogout = async () => {
     try {
       const authToken = Cookies.get('token');
-      const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.signout}`,null, __getToken());
+      const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.signout}`);
       if (response.status === 200) {
         Cookies.remove('token');
         Cookies.remove('refreshToken');
