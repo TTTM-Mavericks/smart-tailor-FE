@@ -415,8 +415,6 @@ const EmployeeOrderFields: React.FC<{
                         </button>
                     )}
 
-
-
                     <CustomerReportOrderDialogComponent
                         isCancelOrder={true}
                         orderID={order?.orderID}
@@ -473,8 +471,6 @@ const EmployeeOrderFields: React.FC<{
                             Verify order
                         </button>
                     )}
-
-
 
                     {order.orderStatus === 'FINAL_CHECKING' && (
                         <>
@@ -545,9 +541,6 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
     const [isOpenReportOrderDialog, setIsOpenReportOrderDialog] = useState<boolean>(false);
     const [isOpenReportOrderCanceledDialog, setIsOpenReportOrderCanceledDialog] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
-
-
-
 
     useEffect(() => {
         __handleFetchOrderDetails(order.orderID);
