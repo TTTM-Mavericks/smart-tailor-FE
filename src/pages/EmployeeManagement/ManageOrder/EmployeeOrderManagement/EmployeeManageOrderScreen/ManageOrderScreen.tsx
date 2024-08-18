@@ -18,7 +18,7 @@ import { IoMdCloseCircleOutline } from 'react-icons/io';
 import { __handlegetRatingStyle, __handlegetStatusBackgroundBoolean } from '../../../../../utils/ElementUtils';
 import style from './EmployeeManageOrderStyle.module.scss'
 import { OrderDetailInterface } from '../../../../../models/OrderModel';
-import { Box, CircularProgress, IconButton, Tooltip, useTheme } from '@mui/material';
+import { Box, CircularProgress, Dialog, DialogContent, DialogTitle, IconButton, Tooltip, useTheme } from '@mui/material';
 import { CustomerReportOrderDialogComponent } from '../../../../../components';
 import Select from 'react-select';
 import { width } from '@mui/system';
@@ -27,6 +27,8 @@ import { tokens } from '../../../../../theme';
 import { __handleGetDateTimeColor, __isNearCurrentDate } from '../../../../../utils/DateUtils';
 import { __getToken } from '../../../../../App';
 import FinalCheckingProductsDialogComponent from '../../../../../components/Dialog/FinalCheckingProductsDialog/FinalCheckingProductsDialogComponent';
+import MaterialDetailTableComponent from '../../../../Order/Components/Table/MaterialDetailTableComponent';
+
 
 
 /**
@@ -188,6 +190,8 @@ const EmployeeOrderFields: React.FC<{
     const [selectedOrderID, setSelectedOrderID] = useState<string | null>(null);
     const [isOpenReportOrderCanceledDialog, setIsOpenReportOrderCanceledDialog] = useState<boolean>(false);
     const [isOpenFinalCheckingOrderDialog, setIsOpenFinalCheckingOrderDialog] = useState<boolean>(false);
+    const [selectedOrderMaterial, setSelectedOrderMaterial] = useState<any>();
+
 
 
     useEffect(() => {
@@ -355,6 +359,33 @@ const EmployeeOrderFields: React.FC<{
                     <p className="text-gray-600 mb-2 text-sm">
                         Address: {order.address}, {order.ward}, {order.district}, {order.province}
                     </p>
+                    <p style={{ fontWeight: "500", color: secondaryColor, cursor: 'pointer' }} onClick={() => setSelectedOrderMaterial(order.orderID)}>
+                        View material
+                    </p>
+
+                    {selectedOrderMaterial === order.orderID && (
+
+                        <Dialog open={true} aria-labelledby="popup-dialog-title" maxWidth="lg" fullWidth onClose={() => setSelectedOrderMaterial(null)}>
+                            <DialogTitle id="popup-dialog-title">
+                                Material detail
+                                <IoMdCloseCircleOutline
+                                    cursor="pointer"
+                                    size={20}
+                                    color={redColor}
+                                    onClick={() => setSelectedOrderMaterial(null)}
+                                    style={{ position: 'absolute', right: 20, top: 20 }}
+                                />
+                            </DialogTitle>
+                            <DialogContent >
+                                <div>
+                                    <MaterialDetailTableComponent materialDetailData={designDetails?.materialDetail}></MaterialDetailTableComponent>
+                                </div>
+                            </DialogContent>
+
+
+                        </Dialog>
+                    )}
+
                 </div>
             </div>
 

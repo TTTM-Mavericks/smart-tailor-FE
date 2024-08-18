@@ -25,6 +25,7 @@ import Select from 'react-select';
 import { DataGrid, GridColDef, GridRenderCellParams, GridToolbar } from '@mui/x-data-grid';
 import { tokens } from '../../../../theme';
 import { __getToken } from '../../../../App';
+import MaterialDetailTableComponent from '../../../Order/Components/Table/MaterialDetailTableComponent';
 
 /**
  * 
@@ -216,6 +217,8 @@ const BrandOrderFields: React.FC<{
     const [stageIdStart, setStageIdStart] = useState<string>();
     const [isOpenReportOrderCanceledDialog, setIsOpenReportOrderCanceledDialog] = useState<boolean>(false);
     const [timeline, setTimeLine] = useState<EstimatedStageInterface>();
+    const [selectedOrderMaterial, setSelectedOrderMaterial] = useState<any>();
+
 
 
     const customSortOrder = [
@@ -472,9 +475,31 @@ const BrandOrderFields: React.FC<{
                     {/* <p className="text-gray-600 mb-2 text-sm">Title Design: {order.titleDesign}</p> */}
                     <p className="text-gray-600 mb-2 text-sm">Create Date: {order.createDate}</p>
                     <p className="text-gray-600 mb-2 text-sm">Expected Start Date: {order.expectedStartDate}</p>
-                    <p className="text-gray-600 mb-2 text-sm">
-                        Address: {order.address}, {order.ward}, {order.district}, {order.province}
+                    <p style={{ fontWeight: "500", color: secondaryColor, cursor: 'pointer' }} onClick={() => setSelectedOrderMaterial(order.orderID)}>
+                        View material
                     </p>
+                    {selectedOrderMaterial === order.orderID && (
+
+                        <Dialog open={true} aria-labelledby="popup-dialog-title" maxWidth="lg" fullWidth onClose={() => setSelectedOrderMaterial(null)}>
+                            <DialogTitle id="popup-dialog-title">
+                                Material detail
+                                <IoMdCloseCircleOutline
+                                    cursor="pointer"
+                                    size={20}
+                                    color={redColor}
+                                    onClick={() => setSelectedOrderMaterial(null)}
+                                    style={{ position: 'absolute', right: 20, top: 20 }}
+                                />
+                            </DialogTitle>
+                            <DialogContent >
+                                <div>
+                                    <MaterialDetailTableComponent materialDetailData={designDetails?.materialDetail}></MaterialDetailTableComponent>
+                                </div>
+                            </DialogContent>
+
+
+                        </Dialog>
+                    )}
                 </div>
             </div>
 
@@ -1446,7 +1471,7 @@ const BrandManageOrder: React.FC = () => {
     };
 
     return (
-        <div className='-mt-8' style={{width: '95%', margin: '0 auto'}}>
+        <div className='-mt-8' style={{ width: '95%', margin: '0 auto' }}>
             <div className="mt-12">
                 <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
                     <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
