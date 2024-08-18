@@ -117,25 +117,26 @@ const BrandUploadProgcessSampleProduct: React.FC<Props> = ({ orderDetail, isOpen
                     }
                     console.log(bodyRequest);
                     __handleSendNotification(bodyRequest);
-                    setTimeout(() => {
-                        window.location.reload()
-                    }, 2000)
+                    setIsloading(false)
+                    // setTimeout(() => {
+                    //     window.location.reload()
+                    // }, 2000)
                     onClose();
-
-
-
                 }
                 else {
                     console.log('detail error: ', response.message);
+                    setIsloading(false)
                     toast.error(`${response.message}`, { autoClose: 4000 });
                 }
             } catch (error) {
+                setIsloading(false)
                 console.log(error);
                 toast.error(`${error}`, { autoClose: 4000 });
             }
 
             // Perform your API call with the base64 data if needed
         } catch (error) {
+            setIsloading(false)
             console.error('Error converting files to base64:', error);
         }
     };
