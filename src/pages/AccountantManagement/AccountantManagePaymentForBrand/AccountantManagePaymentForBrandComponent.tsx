@@ -21,7 +21,7 @@ import PaymentFromAccountantToBranđialog from '../../../components/Dialog/Payme
 import { __handlegetRatingStyle, __handlegetStatusBackgroundBoolean } from '../../../utils/ElementUtils';
 import '../../../index.css'
 import Select from 'react-select';
-import { DesignDetailInterface, DesignInterface } from '../../../models/DesignModel';
+import { DesignDetailInterface, DesignInterface, MaterialDetailInterface } from '../../../models/DesignModel';
 import { __handleGetDateTimeColor } from '../../../utils/DateUtils';
 import { color, motion } from 'framer-motion';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
@@ -282,7 +282,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
             body: [
                 [
                     {
-                        content: `Invoice No. ${selectedOrder.orderID}` + `\n${selectedOrder.orderType}`,
+                        content: `Invoice No. ${selectedOrder.paymentList[0].paymentID}` + `\n${selectedOrder.orderType}`,
                         styles: {
                             halign: 'left',
                             valign: "middle",
@@ -818,9 +818,32 @@ interface TransactionModalsProps {
     parentOrderDetai?: OrderDetailInterface | AccountantOrderInterface
 }
 
+interface MaterialReportInterface {
+    basePrice: number;
+    brandID: string;
+    brandPrice: number;
+    categoryName: string;
+    createDate: string; // Consider using Date type if you plan to manipulate dates
+    hsCode: string;
+    lastModifiedDate: string | null; // If this can be null, keep it as a nullable string
+    materialID: string;
+    materialName: string;
+    unit: string;
+}
+
+interface TransactionSubOrderInterface {
+    brandLaborQuantity: number;
+    orderCustomResponse: OrderDetailInterface;
+    brandMaterialResponseList: MaterialReportInterface[]
+}
+
 const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onClose, onDownloadPDF, parentOrderDetai }) => {
+
+    const [transactionSubOrder, setTransactionSubOrder] = useState<TransactionSubOrderInterface>();
+
     useEffect(() => {
         console.log('transaction.designResponse.materialDetail: ', transaction.designResponse);
+        __handleFetchInvoiceData();
     }, [transaction]);
 
     const __handleMoveToPayOSPaymentDetail = () => {
@@ -828,6 +851,40 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
             window.open(transaction.paymentList[0]?.payOSResponse.data.checkoutUrl, '_blank');
         }
     }
+
+    const __handleFetchInvoiceData = async () => {
+        try {
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getSubOrderInvoiceBySubOrderId}/${transaction.orderID}`);
+            if (response.status === 200) {
+
+                console.log(response.data);
+                setTransactionSubOrder(response.data)
+            }
+        } catch (error) {
+            console.error(`Error fetching details for order ${transaction.orderID}:`, error);
+        }
+    }
+
+    const __handleGetQuantityMaterial = (materialID: any) => {
+        const result = parentOrderDetai?.designResponse?.materialDetail?.find((item) => item.materialResponse?.materialID === materialID)
+        if (result) return result;
+    }
+
+    const __handleGetTotalMaterialPrice = () => {
+        if (!transactionSubOrder) return 0; // Return 0 if no transactionSubOrder exists
+        let sum: number = 0;
+
+        transactionSubOrder?.brandMaterialResponseList?.forEach((material) => {
+            transactionSubOrder.orderCustomResponse?.designResponse?.materialDetail?.forEach((item) => {
+                if (material.materialID === item.materialResponse?.materialID && item.quantity) {
+                    sum += material.brandPrice * item.quantity;
+                }
+            });
+        });
+
+        return sum;
+    };
+
     return (
         <Dialog open={true} onClose={onClose} maxWidth="md" fullWidth>
             <ScrollFreeDialogContent>
@@ -874,7 +931,7 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                             </InvoiceDetails>
                         </Grid>
                         <Grid item xs={6}>
-                            <Typography variant="body1" align="right">Invoice No. {transaction.orderID}</Typography>
+                            <Typography variant="body1" align="right">Invoice No. {transaction.paymentList[0].paymentID}</Typography>
 
                             <Typography variant="body1" align="right">{transaction.expectedStartDate}</Typography>
                         </Grid>
@@ -894,31 +951,37 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                                         <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Category</TableCell>
                                         <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Unit</TableCell>
                                         <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Quantity</TableCell>
-                                        <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Min price (VND)</TableCell>
-                                        <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Max price (VND)</TableCell>
-
+                                        <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Price (VND)</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {parentOrderDetai && parentOrderDetai?.designResponse?.materialDetail?.map((item: any) => (
+                                    {transactionSubOrder ? transactionSubOrder?.brandMaterialResponseList?.map((item) => (
                                         <TableRow
-                                            key={item.materialResponse?.materialID}
+                                            key={item.materialID}
                                             sx={{ '&:nth-of-type(odd)': { backgroundColor: '#f5f5f5' } }}
                                         >
-                                            <TableCell align="left">{item.materialResponse?.hsCode}</TableCell>
-                                            <TableCell align="left">{item.materialResponse?.materialName}</TableCell>
-                                            <TableCell align="left">{item.materialResponse?.categoryName}</TableCell>
-                                            <TableCell align="left">{item.materialResponse?.unit}</TableCell>
-                                            <TableCell align="left">{item.quantity}</TableCell>
-                                            <TableCell align="left">{__handleAddCommasToNumber(item.minPrice)}</TableCell>
-                                            <TableCell align="left">{__handleAddCommasToNumber(item.maxPrice)}</TableCell>
+                                            <TableCell align="left">{item.hsCode}</TableCell>
+                                            <TableCell align="left">{item.materialName}</TableCell>
+                                            <TableCell align="left">{item.categoryName}</TableCell>
+                                            <TableCell align="left">{item.unit}</TableCell>
+                                            <TableCell align="left">{__handleGetQuantityMaterial(item.materialID)?.quantity}</TableCell>
+                                            <TableCell align="left">{__handleAddCommasToNumber(item.brandPrice)}</TableCell>
                                         </TableRow>
-                                    ))}
+                                    )) : (
+                                        <div>
+                                            <TableRow
+
+                                                sx={{ '&:nth-of-type(odd)': { backgroundColor: '#f5f5f5' } }}
+                                            >
+                                                Data Loading
+                                            </TableRow>
+                                        </div>
+                                    )}
                                 </TableBody>
                             </Table>
                         </TableContainer>
 
-                        {/* <Box sx={{ padding: 2, backgroundColor: '#f0f0f0' }}>
+                        <Box sx={{ padding: 2, backgroundColor: '#f0f0f0' }}>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
                                     <Typography variant="h6" align="right" sx={{ fontWeight: 'bold' }}>
@@ -927,13 +990,13 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                                                 {new Intl.NumberFormat('en-US', {
                                                     style: 'currency',
                                                     currency: 'VND'
-                                                }).format(transaction.totalPrice)}
+                                                }).format(__handleGetTotalMaterialPrice())}
                                             </span>
                                         </p>
                                     </Typography>
                                 </Grid>
                             </Grid>
-                        </Box> */}
+                        </Box>
                     </Box>
 
                     <Typography variant="body2" align="left">Design detail</Typography>
@@ -982,12 +1045,37 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                         </Box>
                     </Box>
 
+                    {transactionSubOrder && (
+                        <div className="space-y-4 h-full ml-auto" style={{ width: 450 }}>
+                            <div className="mt-4">
+                                <div className="flex justify-between items-center border-b py-2">
+                                    <span style={{ fontSize: 13 }} className="font-semibold">Design price:</span>
+                                    <div className="flex items-center justify-end">
+                                        <span style={{ fontSize: 14 }} className="text-right">{__handleAddCommasToNumber(__handleGetTotalMaterialPrice() * transactionSubOrder?.orderCustomResponse?.quantity)} VND</span>
+                                    </div>
+                                </div>
+                                <div className="flex justify-between items-center border-b py-2">
+                                    <span style={{ fontSize: 13 }} className="font-semibold">Labor price:</span>
+                                    <div className="flex items-center justify-end">
+                                        <span style={{ fontSize: 14 }} className="text-right">{__handleAddCommasToNumber(transactionSubOrder?.brandLaborQuantity)} VND</span>
+                                    </div>
+                                </div>
+                                <div className="flex justify-between items-center py-2">
+                                    <span style={{ fontSize: 15 }} className="font-semibold">Total price:</span>
+                                    <div className="flex items-center justify-end">
+                                        <span style={{ fontSize: 14 }} className="text-right">{__handleAddCommasToNumber(transaction.paymentList[0]?.paymentAmount)} VND</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
 
                     {/* <ThankYou variant="h6" align="center">
                         Thank you!
                     </ThankYou> */}
 
-                    <PaymentInfo>
+                    {/* <PaymentInfo>
                         <h2 className="text-lg font-semibold text-gray-800 mb-5">PAYMENT INFORMATION</h2>
                         <div className="flex h-full items-center">
                             <div className="space-y-4 h-full" style={{ width: 450 }}>
@@ -1029,7 +1117,7 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                                     </div>
                                 </div>
                             </div>
-                            <div className="relative flex justify-center items-center mr-auto" style={{width: 200, height : 200, marginLeft: 100}}>
+                            <div className="relative flex justify-center items-center mr-auto" style={{ width: 200, height: 200, marginLeft: 100 }}>
                                 <QRCode value={transaction.paymentList[0]?.payOSResponse.data.checkoutUrl || ''} />
                                 <div
                                     className="absolute flex items-center justify-center w-20 h-20 rounded-full transform transition-transform duration-300 hover:scale-110 cursor-pointer"
@@ -1040,7 +1128,7 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                                 </div>
                             </div>
                         </div>
-                    </PaymentInfo>
+                    </PaymentInfo> */}
                 </DialogContent>
             </ScrollFreeDialogContent>
             <DialogActions>
@@ -1443,7 +1531,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
             body: [
                 [
                     {
-                        content: `Invoice No. ${selectedOrder.orderID}` + `\n${selectedOrder.orderType}`,
+                        content: `Invoice No. ${selectedOrder.paymentList[0].paymentID}` + `\n${selectedOrder.orderType}`,
                         styles: {
                             halign: 'left',
                             valign: "middle",
@@ -1971,6 +2059,12 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                     </p>
                                                 </div>
                                                 <div>
+                                                <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                        PaymentID:{" "}
+                                                        <span className="text-sm text-gray-500 pb-2">
+                                                            {order?.paymentList && order?.paymentList?.length > 0 ? order?.paymentList[0]?.paymentID : 'NaN'}
+                                                        </span>
+                                                    </p>
                                                     <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
                                                         Total price:{" "}
                                                         <span className="text-sm text-gray-500 pb-2">

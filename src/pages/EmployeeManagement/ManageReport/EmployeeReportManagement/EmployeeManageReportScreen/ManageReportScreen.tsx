@@ -297,7 +297,7 @@ const ReportTables: React.FC<ReportTableProps> = ({ reports, onViewDetails, onUp
         { field: 'address', headerName: 'Address', width: 140, renderCell: (params) => params.row.orderResponse.address },
         { field: 'province', headerName: 'Province', width: 140, renderCell: (params) => params.row.orderResponse.province },
         { field: 'phone', headerName: 'Phone', width: 120, renderCell: (params) => params.row.orderResponse.phone },
-        { field: 'expectedStartDate', headerName: 'Date', width: 200, renderCell: (params) => params.row.orderResponse.expectedStartDate },
+        { field: 'expectedStartDate', headerName: 'Date', width: 200, renderCell: (params) => params.row.createDate },
         {
             field: 'orderStatus',
             headerName: 'Order Status',
