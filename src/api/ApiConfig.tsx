@@ -148,6 +148,7 @@ export const functionEndpoints = {
     ratingOrder: '/rating-order',
     getBrandTransactions: '/get-full-of-order-by-brand-id',
     getOrderTimeLineBySubOrderId: '/order-time-line-by-sub-order-id',
+    getSubOrderInvoiceBySubOrderId: '/get-sub-order-invoice-by-sub-order-id'
 
   },
   sizeExpertTailoring: {

@@ -80,6 +80,8 @@ export interface MaterialDetailInterface {
   minPrice?: number;
   maxPrice?: number;
   quantity?: number;
+  basePrice?: number,
+  brandPrice?: number,
 }
 
 export interface DesignDetailInterface {
