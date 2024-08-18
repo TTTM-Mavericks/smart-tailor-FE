@@ -222,7 +222,7 @@ const ProfileSettings: React.FC = () => {
             }
 
             const response = await axios.put(
-                `${baseURL + versionEndpoints.v1 + featuresEndpoints.customer + functionEndpoints.customer.updateProfile}`,
+                `${baseURL + versionEndpoints.v1 + featuresEndpoints.customer + functionEndpoints.customer.updateProfile + `/${userID}`}`,
                 updatedProfileData,
                 {
                     headers: {
@@ -419,7 +419,7 @@ const ProfileSettings: React.FC = () => {
                                     type="button"
                                     className="py-1.5 px-2 font-medium text-white bg-orange-700 rounded-lg hover:bg-orange-800"
                                     onClick={() => fileInputRef.current?.click()}
-                                    style={{fontSize: 12}}
+                                    style={{ fontSize: 12 }}
                                 >
                                     Change picture
                                 </button>
@@ -427,7 +427,7 @@ const ProfileSettings: React.FC = () => {
                                     type="button"
                                     className="py-1.5 px-6 font-medium text-orange-700 bg-white rounded-lg border border-orange-200 hover:bg-orange-100 hover:text-white-900"
                                     onClick={_handleDeletePicture}
-                                    style={{fontSize: 12}}
+                                    style={{ fontSize: 12 }}
                                 >
                                     Delete picture
                                 </button>
