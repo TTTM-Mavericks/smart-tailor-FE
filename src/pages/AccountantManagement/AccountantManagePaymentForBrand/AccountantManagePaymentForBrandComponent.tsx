@@ -979,7 +979,7 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                                 </Grid>
                             </Grid>
                         </Box>
-                    </Box>
+                    </Box >
                     <Typography variant="body2" align="left">Design detail</Typography>
                     <Box sx={{ width: '100%', overflow: 'hidden', boxShadow: 3, borderRadius: 2, marginTop: 2, marginBottom: 3 }}>
                         <TableContainer component={Paper} elevation={0}>
@@ -1110,7 +1110,7 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                         </div>
                     </PaymentInfo> */}
                 </DialogContent>
-            </ScrollFreeDialogContent>
+            </ScrollFreeDialogContent >
             <DialogActions>
                 <Button onClick={onDownloadPDF} variant="contained" color="primary">Download PDF</Button>
                 <Button onClick={onClose} variant="outlined">Close</Button>
