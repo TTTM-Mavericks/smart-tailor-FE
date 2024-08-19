@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BellAlertIcon } from '@heroicons/react/20/solid';
 import NotificationBrandComponent from '../Notification/NotificationBrandComponent';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import { toast } from 'react-toastify';
+import { UserInterface } from '../../../../models/UserModel';
 
 interface NavbarProps {
     toggleMenu: () => void;
@@ -48,6 +49,22 @@ const Navbar: React.FC<NavbarProps> = ({ toggleMenu, menu, popperOpen, togglePop
         window.location.href = '/customer';
     }
 
+    const [userLogined, setUserLogined] = useState<UserInterface>();
+
+    useEffect(() => {
+        console.log('header: ', userLogined);
+        const checkLoginStatus = () => {
+            const userSession = Cookies.get('userAuth');
+            if (userSession) {
+                const userParse: UserInterface = JSON.parse(userSession);
+                setUserLogined(userParse)
+            } else {
+                console.error("Can not");
+            }
+        };
+
+        checkLoginStatus();
+    }, []);
     return (
         <div className="p-4 xl:ml-80">
             <nav className="block w-full max-w-full bg-transparent text-white shadow-none rounded-xl transition-all px-0 py-1">
@@ -112,9 +129,9 @@ const Navbar: React.FC<NavbarProps> = ({ toggleMenu, menu, popperOpen, togglePop
                             onClick={() => togglePopper('user')}
                         >
                             <span className="flex items-center">
-                                <span className="text-gray-900 font-semibold mr-2">Brand</span>
+                                <span className="text-gray-900 font-semibold mr-2">{userLogined?.fullName}</span>
                                 <img
-                                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQI3yTTdH4icgz_2KDXa5eYcYPak8--DVwPeQ&s"
+                                    src={userLogined?.imageUrl}
                                     className="h-10 w-10 rounded-full border-2 border-[#f84525]"
                                     alt="profile"
                                 />
@@ -141,7 +158,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleMenu, menu, popperOpen, togglePop
                     <div
                         className="popover absolute right-0 mt-2 w-48 p-6 rounded-md shadow-md shadow-black/5 bg-white z-50"
                     >
-                        <h3 className="text-lg font-semibold mb-4">Admin Account</h3>
+                        <h3 className="text-lg font-semibold mb-4">{userLogined?.fullName}</h3>
                         <ul>
                             <li className="py-1" onClick={_handleProfile} style={{ cursor: "pointer" }}>Profile</li>
                             <li className="py-1">Settings</li>

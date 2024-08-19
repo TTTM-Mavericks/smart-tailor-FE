@@ -3,6 +3,7 @@ import axios from 'axios';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import { UserInterface } from '../../../models/UserModel';
 import Cookies from 'js-cookie';
+import { __handlegetRatingStyle } from '../../../utils/ElementUtils';
 
 const BrandProfileSetup = () => {
     const [brandInfo, setBrandInfo] = useState<any>(null);
@@ -54,33 +55,61 @@ const BrandProfileSetup = () => {
     }
 
     return (
-        <div className="bg-gray-100 min-h-screen p-8">
-            <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
+        <div className=" min-h-screen p-8">
+            <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden transform transition duration-500">
                 <div className="md:flex">
                     <div className="md:flex-shrink-0">
-                        <img className="h-48 w-full object-cover md:w-48" src={brandInfo.user.imageUrl} alt={brandInfo.brandName} />
+                        <img
+                            className="h-48 w-full object-cover md:w-48 rounded-t-xl md:rounded-none md:rounded-l-xl"
+                            src={brandInfo.user.imageUrl}
+                            alt={brandInfo.brandName}
+                        />
                     </div>
                     <div className="p-8">
-                        <div className="uppercase tracking-wide text-sm text-indigo-500 font-semibold">{brandInfo.brandName}</div>
-                        <p className="mt-2 text-gray-500">{brandInfo.user.fullName}</p>
+                        <div className="flex items-center space-x-2">
+                            <p
+                                className={`${__handlegetRatingStyle(brandInfo.rating)} text-xl font-bold text-gray-900`}
+                            >
+                                {brandInfo.brandName}
+                            </p>
+                        </div>
+                        <p className="mt-2 text-gray-700 text-lg">{brandInfo.user.fullName}</p>
                         <p className="mt-2 text-gray-500">{brandInfo.user.email}</p>
                         <p className="mt-2 text-gray-500">{brandInfo.user.phoneNumber}</p>
                     </div>
                 </div>
 
-                <div className="px-8 py-6 border-t border-gray-200">
+                <div className="px-8 py-6 border-t border-gray-200 bg-gray-50">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <h3 className="text-lg font-semibold text-gray-900">Brand Details</h3>
-                            <p className="mt-2 text-gray-600">Status: <span className="font-medium">{brandInfo.brandStatus}</span></p>
-                            <p className="mt-2 text-gray-600">Rating: <span className="font-medium">{brandInfo.rating.toFixed(1)} ({brandInfo.numberOfRatings} ratings)</span></p>
-                            <p className="mt-2 text-gray-600">Created: <span className="font-medium">{new Date(brandInfo.createDate).toLocaleDateString()}</span></p>
+                            <p className="mt-2 text-gray-600">
+                                Status: <span className="font-medium">{brandInfo.brandStatus}</span>
+                            </p>
+                            <p className="mt-2 text-gray-600">
+                                Rating:{" "}
+                                <span className="font-medium">
+                                    {brandInfo.rating.toFixed(1)} ({brandInfo.numberOfRatings} ratings)
+                                </span>
+                            </p>
+                            <p className="mt-2 text-gray-600">
+                                Created:{" "}
+                                <span className="font-medium">
+                                    {new Date(brandInfo.createDate).toLocaleDateString()}
+                                </span>
+                            </p>
                         </div>
                         <div>
                             <h3 className="text-lg font-semibold text-gray-900">Bank Information</h3>
-                            <p className="mt-2 text-gray-600">Bank: <span className="font-medium">{brandInfo.bankName}</span></p>
-                            <p className="mt-2 text-gray-600">Account: <span className="font-medium">{brandInfo.accountNumber}</span></p>
-                            <p className="mt-2 text-gray-600">Name: <span className="font-medium">{brandInfo.accountName}</span></p>
+                            <p className="mt-2 text-gray-600">
+                                Bank: <span className="font-medium">{brandInfo.bankName}</span>
+                            </p>
+                            <p className="mt-2 text-gray-600">
+                                Account: <span className="font-medium">{brandInfo.accountNumber}</span>
+                            </p>
+                            <p className="mt-2 text-gray-600">
+                                Name: <span className="font-medium">{brandInfo.accountName}</span>
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -88,17 +117,24 @@ const BrandProfileSetup = () => {
                 <div className="px-8 py-6 bg-gray-50">
                     <h3 className="text-lg font-semibold text-gray-900">Address</h3>
                     <p className="mt-2 text-gray-600">{brandInfo.address}</p>
-                    <p className="mt-1 text-gray-600">{brandInfo.ward}, {brandInfo.district}, {brandInfo.province}</p>
+                    <p className="mt-1 text-gray-600">
+                        {brandInfo.ward}, {brandInfo.district}, {brandInfo.province}
+                    </p>
                 </div>
 
                 {brandInfo.qr_Payment && (
                     <div className="px-8 py-6 border-t border-gray-200">
                         <h3 className="text-lg font-semibold text-gray-900">QR Payment</h3>
-                        <img src={brandInfo.qr_Payment} alt="QR Payment" className="mt-4 max-w-xs mx-auto" />
+                        <img
+                            src={brandInfo.qr_Payment}
+                            alt="QR Payment"
+                            className="mt-4 max-w-xs mx-auto rounded-lg shadow-md"
+                        />
                     </div>
                 )}
             </div>
         </div>
+
     );
 };
 

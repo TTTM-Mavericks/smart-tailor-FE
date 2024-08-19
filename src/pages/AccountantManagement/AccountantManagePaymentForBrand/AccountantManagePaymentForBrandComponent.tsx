@@ -1,12 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, useTheme } from '@mui/material';
+import {
+    Box,
+    Button,
+    Chip,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    Grid,
+    IconButton,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Typography,
+    useTheme,
+} from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
 import { cancelColor, cancelColorText, completeColor, completeColorText, deliveredColor, deliveredColorText, deposisColor, deposisColorText, greenColor, pendingColor, pendingColorText, primaryColor, processingColor, processingColorText, redColor, secondaryColor, whiteColor } from '../../../root/ColorSystem';
 import style from './AccountantManagePaymentForBrandComponentStyle.module.scss'
 import { OrderDetailInterface, PaymentInterface } from '../../../models/OrderModel';
-import { display, fontWeight, Stack } from '@mui/system';
-import { FaAngleDown, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaUser } from "react-icons/fa";
+import { Stack } from '@mui/system';
+import { FaAngleDown } from "react-icons/fa";
 import { FaAngleUp } from "react-icons/fa";
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import { toast } from 'react-toastify';
@@ -21,18 +39,16 @@ import PaymentFromAccountantToBranđialog from '../../../components/Dialog/Payme
 import { __handlegetRatingStyle, __handlegetStatusBackgroundBoolean } from '../../../utils/ElementUtils';
 import '../../../index.css'
 import Select from 'react-select';
-import { DesignDetailInterface, DesignInterface, MaterialDetailInterface } from '../../../models/DesignModel';
+import { DesignDetailInterface, DesignInterface } from '../../../models/DesignModel';
 import { __handleGetDateTimeColor } from '../../../utils/DateUtils';
-import { color, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
-import { DataGrid, GridColDef, GridToolbar } from '@mui/x-data-grid';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { tokens } from '../../../theme';
 import { __getToken } from '../../../App';
 import jsPDF from "jspdf";
 import autoTable from 'jspdf-autotable';
 import { styled } from '@mui/system';
-import { bankImg } from '../../../assets';
-import QRCode from 'react-qr-code';
 
 const InvoiceHeader = styled(Box)(({ theme }) => ({
     display: 'flex',
@@ -48,15 +64,6 @@ const Logo = styled(Typography)(({ theme }) => ({
 
 const InvoiceDetails = styled(Box)(({ theme }) => ({
     marginBottom: theme.spacing(4),
-}));
-
-const ThankYou = styled(Typography)(({ theme }) => ({
-    marginTop: theme.spacing(4),
-    marginBottom: theme.spacing(2),
-}));
-
-const PaymentInfo = styled(Box)(({ theme }) => ({
-    marginTop: theme.spacing(4),
 }));
 
 const ScrollFreeDialogContent = styled(DialogContent)({
@@ -253,9 +260,46 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
     const safelyGetProperty = (obj: any, path: string) => {
         return path.split('.').reduce((acc, part) => acc && acc[part], obj);
     };
+
+    const __handleGetQuantityMaterial = (materialID: any) => {
+        const result = transaction?.designResponse?.materialDetail?.find((item: any) => item.materialResponse?.materialID === materialID)
+        if (result) return result;
+    }
+
+
     // Download PDF Function
-    const _handleOpenPDF = (selectedOrder: any) => {
-        if (!selectedOrder) return;
+    const _handleOpenPDF = (pdfData: PDFData) => {
+        const { transaction, transactionSubOrder, totalMaterialPrice } = pdfData;
+
+        const __handleGetTotalMaterialPrice = () => {
+            if (!transactionSubOrder) {
+                console.log("No transactionSubOrder available");
+                return 0; // Return 0 if no transactionSubOrder exists
+            }
+
+            let sum: number = 0;
+
+            console.log("Transaction:", transactionSubOrder);
+
+            transactionSubOrder?.brandMaterialResponseList?.forEach((material: any) => {
+                console.log("Processing material:", material);
+
+                transactionSubOrder.orderCustomResponse?.designResponse?.materialDetail?.forEach((item: any) => {
+                    console.log("Checking item:", item);
+
+                    if (material.materialID === item.materialResponse?.materialID && item.quantity) {
+                        const materialPrice = material.brandPrice * item.quantity;
+                        console.log(`Adding price: ${material.brandPrice} * ${item.quantity} = ${materialPrice}`);
+                        sum += materialPrice;
+                    }
+                });
+            });
+
+            console.log("Total Material Price:", sum);
+            return sum;
+        };
+
+        if (!transaction) return;
         const doc = new jsPDF();
 
         // set background color
@@ -280,7 +324,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
             body: [
                 [
                     {
-                        content: `Invoice No. ${selectedOrder.paymentList[0].paymentID}` + `\n${selectedOrder.orderType}`,
+                        content: `Invoice No. ${transaction.paymentList[0].paymentID}` + `\n${transaction.orderType}`,
                         styles: {
                             halign: 'left',
                             valign: "middle",
@@ -316,19 +360,34 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
         // Add Material detail
         doc.setFontSize(12);
         autoTable(doc, {
-            head: [['HS code', 'Name', 'Category', 'Unit', 'Quantity', 'Min price (VND)', 'Max price (VND)']],
-            body: orderDetail?.designResponse?.materialDetail?.map((item: any) => [
-                item.materialResponse?.hsCode,
-                item.materialResponse?.materialName,
-                item.materialResponse?.categoryName,
-                item.materialResponse?.unit,
-                item.quantity,
-                __handleAddCommasToNumber(item.minPrice),
-                __handleAddCommasToNumber(item.maxPrice)
-            ]) || [],
+            head: [['HS code', 'Name', 'Category', 'Unit', 'Quantity', 'Brand Price (VND)']],
+
+            body: transactionSubOrder?.brandMaterialResponseList?.map((item: MaterialReportInterface) => {
+                return [
+                    item.hsCode,
+                    item.materialName,
+                    item.categoryName,
+                    item.unit,
+                    __handleGetQuantityMaterial(item.materialID)?.quantity || 'N/A',
+                    __handleAddCommasToNumber(item.brandPrice)
+                ];
+            }) || [],
             theme: 'striped',
             headStyles: { fillColor: primaryColor, textColor: whiteColor },
         });
+
+        // autoTable(doc, {
+        //     head: [['Design Total', 'Brand Labor', 'Total']],
+        //     body: transactionSubOrder ? [
+        //         [
+        //             __handleAddCommasToNumber(__handleGetTotalMaterialPrice() * transactionSubOrder?.orderCustomResponse?.quantity),
+        //             __handleAddCommasToNumber(transactionSubOrder?.brandLaborQuantity),
+        //             __handleAddCommasToNumber(transaction.paymentList[0]?.paymentAmount)
+        //         ]
+        //     ] : [],
+        //     theme: 'striped',
+        //     headStyles: { fillColor: primaryColor, textColor: whiteColor },
+        // });
 
         autoTable(doc, {
             body: [
@@ -347,7 +406,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
         // Original Design detail table
         autoTable(doc, {
             head: [['Design ID', 'Quantity', 'Size', 'Create Date']],
-            body: selectedOrder.detailList?.map((item: any) => [
+            body: transaction.detailList?.map((item: any) => [
                 item.designDetailId,
                 item.quantity,
                 item.size?.sizeName,
@@ -372,7 +431,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
         })
 
         autoTable(doc, {
-            head: [[{ content: "                          ", styles: { halign: 'right' } }, { content: "                         ", styles: { halign: 'center' } }, { content: "TOTAL", styles: { halign: 'center' } }, { content: `${__handleAddCommasToNumber(selectedOrder.totalPrice)} VND`, styles: { halign: 'center' } }]],
+            head: [[{ content: "                          ", styles: { halign: 'right' } }, { content: "                         ", styles: { halign: 'center' } }, { content: "TOTAL", styles: { halign: 'center' } }, { content: `${__handleAddCommasToNumber(transaction.totalPrice)} VND`, styles: { halign: 'center' } }]],
             theme: 'plain'
         });
 
@@ -420,7 +479,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
             ], theme: 'plain',
         })
 
-        doc.save('invoice.pdf')
+        doc.save('Transaction_Invoice.pdf')
     };
 
     const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
@@ -658,9 +717,8 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
                                 <TransactionModals
                                     transaction={selectedTransactions}
                                     onClose={handleCloseTransactionModal}
-                                    onDownloadPDF={() => _handleOpenPDF(selectedTransactions)}
+                                    onDownloadPDF={(pdfData) => _handleOpenPDF(pdfData)}
                                     parentOrderDetai={orderDetail}
-
                                 />
                             )}
                             {selectedOrder === subOrder.orderID && (
@@ -800,8 +858,14 @@ const Tables: React.FC<TablesProps> = ({ table, onViewDetails }) => {
 interface TransactionModalsProps {
     transaction: any;
     onClose: () => void;
-    onDownloadPDF: () => void;
+    onDownloadPDF: (data: PDFData) => void;
     parentOrderDetai?: OrderDetailInterface | AccountantOrderInterface
+}
+
+interface PDFData {
+    transaction: any;
+    transactionSubOrder: TransactionSubOrderInterface | undefined;
+    totalMaterialPrice: number;
 }
 
 interface MaterialReportInterface {
@@ -855,6 +919,15 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
         const result = parentOrderDetai?.designResponse?.materialDetail?.find((item) => item.materialResponse?.materialID === materialID)
         if (result) return result;
     }
+
+    const handleDownloadPDF = () => {
+        const pdfData: PDFData = {
+            transaction,
+            transactionSubOrder,
+            totalMaterialPrice: __handleGetTotalMaterialPrice()
+        };
+        onDownloadPDF(pdfData);
+    };
 
     const __handleGetTotalMaterialPrice = () => {
         if (!transactionSubOrder) return 0; // Return 0 if no transactionSubOrder exists
@@ -1112,7 +1185,7 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                 </DialogContent>
             </ScrollFreeDialogContent >
             <DialogActions>
-                <Button onClick={onDownloadPDF} variant="contained" color="primary">Download PDF</Button>
+                <Button onClick={handleDownloadPDF} variant="contained" color="primary">Download PDF</Button>
                 <Button onClick={onClose} variant="outlined">Close</Button>
             </DialogActions>
         </Dialog >
@@ -1448,6 +1521,19 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
         },
     ];
 
+    const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
+    const [selectedTransactions, setSelectedTransactions] = useState<any>(null);
+
+    const handleViewTransaction = (transaction: any) => {
+        setSelectedTransactions(transaction);
+        setIsTransactionModalOpen(true);
+    };
+
+    const handleCloseTransactionModal = () => {
+        setIsTransactionModalOpen(false);
+        setSelectedTransactions(null);
+    };
+
     const [selectedTransaction, setSelectedTransaction] = useState<AccountantOrderInterface | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -1464,10 +1550,48 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
-    console.log(JSON.stringify(fulldataOrderResposne) + "bebebe123123");
+    console.log("tottal full " + JSON.stringify(fulldataOrderResposne));
 
-    const _handleOpenPDF = (selectedOrder: any) => {
-        if (!selectedOrder) return;
+
+    const __handleGetQuantityMaterial = (materialID: string) => {
+        const designResponse = fulldataOrderResposne?.find((item: any) => {
+            return item?.designResponse?.materialDetail?.some((material: any) => material.materialResponse?.materialID === materialID);
+        });
+        const materialDetail = designResponse?.designResponse?.materialDetail?.find((material: any) => material.materialResponse?.materialID === materialID);
+        return materialDetail;
+    };
+
+    // Download PDF Function
+    const _handleOpenPDF = (pdfData: PDFData) => {
+        const { transaction, transactionSubOrder, totalMaterialPrice } = pdfData;
+        const __handleGetTotalMaterialPrice = () => {
+            if (!transactionSubOrder) {
+                console.log("No transactionSubOrder available");
+                return 0; // Return 0 if no transactionSubOrder exists
+            }
+
+            let sum: number = 0;
+
+            console.log("Transaction:", transactionSubOrder);
+
+            transactionSubOrder?.brandMaterialResponseList?.forEach((material: any) => {
+                console.log("Processing material:", material);
+
+                transactionSubOrder.orderCustomResponse?.designResponse?.materialDetail?.forEach((item: any) => {
+                    console.log("Checking item:", item);
+
+                    if (material.materialID === item.materialResponse?.materialID && item.quantity) {
+                        const materialPrice = material.brandPrice * item.quantity;
+                        console.log(`Adding price: ${material.brandPrice} * ${item.quantity} = ${materialPrice}`);
+                        sum += materialPrice;
+                    }
+                });
+            });
+
+            console.log("Total Material Price:", sum);
+            return sum;
+        };
+        if (!transaction) return;
         const doc = new jsPDF();
 
         // set background color
@@ -1492,7 +1616,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
             body: [
                 [
                     {
-                        content: `Invoice No. ${selectedOrder.paymentList[0].paymentID}` + `\n${selectedOrder.orderType}`,
+                        content: `Invoice No. ${transaction.paymentList[0].paymentID}` + `\n${transaction.orderType}`,
                         styles: {
                             halign: 'left',
                             valign: "middle",
@@ -1528,19 +1652,33 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
         // Add Material detail
         doc.setFontSize(12);
         autoTable(doc, {
-            head: [['HS code', 'Name', 'Category', 'Unit', 'Quantity', 'Min price (VND)', 'Max price (VND)']],
-            body: fulldataOrderResposne?.[0]?.designResponse?.materialDetail?.map((item) => [
-                item.materialResponse?.hsCode ?? '',
-                item.materialResponse?.materialName ?? '',
-                item.materialResponse?.categoryName ?? '',
-                item.materialResponse?.unit ?? '',
-                item.quantity ?? '',
-                __handleAddCommasToNumber(item.minPrice ?? 0),
-                __handleAddCommasToNumber(item.maxPrice ?? 0)
-            ]) ?? [],
+            head: [['HS code', 'Name', 'Category', 'Unit', 'Quantity', 'Brand Price (VND)']],
+            body: transactionSubOrder?.brandMaterialResponseList?.map((item: MaterialReportInterface) => {
+                return [
+                    item.hsCode,
+                    item.materialName,
+                    item.categoryName,
+                    item.unit,
+                    __handleGetQuantityMaterial(item.materialID)?.quantity || 'N/A',
+                    __handleAddCommasToNumber(item.brandPrice)
+                ];
+            }) || [],
             theme: 'striped',
             headStyles: { fillColor: primaryColor, textColor: whiteColor },
         });
+
+        // autoTable(doc, {
+        //     head: [['Design Total', 'Brand Labor', 'Total']],
+        //     body: transactionSubOrder ? [
+        //         [
+        //             __handleAddCommasToNumber(__handleGetTotalMaterialPrice() * transactionSubOrder?.orderCustomResponse?.quantity),
+        //             __handleAddCommasToNumber(transactionSubOrder?.brandLaborQuantity),
+        //             __handleAddCommasToNumber(transaction.paymentList[0]?.paymentAmount)
+        //         ]
+        //     ] : [],
+        //     theme: 'striped',
+        //     headStyles: { fillColor: primaryColor, textColor: whiteColor },
+        // });
 
         autoTable(doc, {
             body: [
@@ -1559,7 +1697,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
         // Original Design detail table
         autoTable(doc, {
             head: [['Design ID', 'Quantity', 'Size', 'Create Date']],
-            body: selectedOrder.detailList?.map((item: any) => [
+            body: transaction.detailList?.map((item: any) => [
                 item.designDetailId,
                 item.quantity,
                 item.size?.sizeName,
@@ -1584,7 +1722,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
         })
 
         autoTable(doc, {
-            head: [[{ content: "                          ", styles: { halign: 'right' } }, { content: "                         ", styles: { halign: 'center' } }, { content: "TOTAL", styles: { halign: 'center' } }, { content: `${__handleAddCommasToNumber(selectedOrder.totalPrice)} VND`, styles: { halign: 'center' } }]],
+            head: [[{ content: "                          ", styles: { halign: 'right' } }, { content: "                         ", styles: { halign: 'center' } }, { content: "TOTAL", styles: { halign: 'center' } }, { content: `${__handleAddCommasToNumber(transaction.totalPrice)} VND`, styles: { halign: 'center' } }]],
             theme: 'plain'
         });
 
@@ -1632,20 +1770,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
             ], theme: 'plain',
         })
 
-        doc.save('invoice.pdf')
-    };
-
-    const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
-    const [selectedTransactions, setSelectedTransactions] = useState(null);
-
-    const handleViewTransaction = (transaction: any) => {
-        setSelectedTransactions(transaction);
-        setIsTransactionModalOpen(true);
-    };
-
-    const handleCloseTransactionModal = () => {
-        setIsTransactionModalOpen(false);
-        setSelectedTransactions(null);
+        doc.save('Transaction_Invoice.pdf')
     };
 
     return (
@@ -2098,7 +2223,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                     <TransactionModals
                                                         transaction={selectedTransactions}
                                                         onClose={handleCloseTransactionModal}
-                                                        onDownloadPDF={() => _handleOpenPDF(selectedTransactions)}
+                                                        onDownloadPDF={(pdfData) => _handleOpenPDF(pdfData)}
                                                         parentOrderDetai={orderDetail}
                                                     />
                                                 )}
