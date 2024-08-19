@@ -1,12 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, useTheme } from '@mui/material';
+import {
+    Box,
+    Button,
+    Chip,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    Grid,
+    IconButton,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Typography,
+    useTheme,
+} from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
 import { cancelColor, cancelColorText, completeColor, completeColorText, deliveredColor, deliveredColorText, deposisColor, deposisColorText, greenColor, pendingColor, pendingColorText, primaryColor, processingColor, processingColorText, redColor, secondaryColor, whiteColor } from '../../../root/ColorSystem';
 import style from './AccountantManagePaymentForBrandComponentStyle.module.scss'
 import { OrderDetailInterface, PaymentInterface } from '../../../models/OrderModel';
-import { display, fontWeight, Stack } from '@mui/system';
-import { FaAngleDown, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaUser } from "react-icons/fa";
+import { Stack } from '@mui/system';
+import { FaAngleDown } from "react-icons/fa";
 import { FaAngleUp } from "react-icons/fa";
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import { toast } from 'react-toastify';
@@ -21,18 +39,16 @@ import PaymentFromAccountantToBranđialog from '../../../components/Dialog/Payme
 import { __handlegetRatingStyle, __handlegetStatusBackgroundBoolean } from '../../../utils/ElementUtils';
 import '../../../index.css'
 import Select from 'react-select';
-import { DesignDetailInterface, DesignInterface, MaterialDetailInterface } from '../../../models/DesignModel';
+import { DesignDetailInterface, DesignInterface } from '../../../models/DesignModel';
 import { __handleGetDateTimeColor } from '../../../utils/DateUtils';
-import { color, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
-import { DataGrid, GridColDef, GridToolbar } from '@mui/x-data-grid';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { tokens } from '../../../theme';
 import { __getToken } from '../../../App';
 import jsPDF from "jspdf";
 import autoTable from 'jspdf-autotable';
 import { styled } from '@mui/system';
-import { bankImg } from '../../../assets';
-import QRCode from 'react-qr-code';
 
 const InvoiceHeader = styled(Box)(({ theme }) => ({
     display: 'flex',
@@ -48,15 +64,6 @@ const Logo = styled(Typography)(({ theme }) => ({
 
 const InvoiceDetails = styled(Box)(({ theme }) => ({
     marginBottom: theme.spacing(4),
-}));
-
-const ThankYou = styled(Typography)(({ theme }) => ({
-    marginTop: theme.spacing(4),
-    marginBottom: theme.spacing(2),
-}));
-
-const PaymentInfo = styled(Box)(({ theme }) => ({
-    marginTop: theme.spacing(4),
 }));
 
 const ScrollFreeDialogContent = styled(DialogContent)({
@@ -254,17 +261,52 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
         return path.split('.').reduce((acc, part) => acc && acc[part], obj);
     };
 
-    const _handleOpenPDF = (selectedOrder: any) => {
+    const __handleGetQuantityMaterial = (materialID: any) => {
+        const result = transaction?.designResponse?.materialDetail?.find((item: any) => item.materialResponse?.materialID === materialID)
+        if (result) return result;
+    }
 
-        if (!selectedOrder) return;
 
+    // Download PDF Function
+    const _handleOpenPDF = (pdfData: PDFData) => {
+        const { transaction, transactionSubOrder, totalMaterialPrice } = pdfData;
+
+        const __handleGetTotalMaterialPrice = () => {
+            if (!transactionSubOrder) {
+                console.log("No transactionSubOrder available");
+                return 0; // Return 0 if no transactionSubOrder exists
+            }
+
+            let sum: number = 0;
+
+            console.log("Transaction:", transactionSubOrder);
+
+            transactionSubOrder?.brandMaterialResponseList?.forEach((material: any) => {
+                console.log("Processing material:", material);
+
+                transactionSubOrder.orderCustomResponse?.designResponse?.materialDetail?.forEach((item: any) => {
+                    console.log("Checking item:", item);
+
+                    if (material.materialID === item.materialResponse?.materialID && item.quantity) {
+                        const materialPrice = material.brandPrice * item.quantity;
+                        console.log(`Adding price: ${material.brandPrice} * ${item.quantity} = ${materialPrice}`);
+                        sum += materialPrice;
+                    }
+                });
+            });
+
+            console.log("Total Material Price:", sum);
+            return sum;
+        };
+
+        if (!transaction) return;
         const doc = new jsPDF();
 
         // set background color
         doc.setFillColor(244, 245, 239); // White color
         doc.rect(0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height, 'F');
 
-        const imgData = "http://localhost:3000/src/assets/system/smart-tailor_logo.png";
+        const imgData = "https://res.cloudinary.com/dby2saqmn/image/upload/v1723989709/ncoktpbtvzzhjqktopjz.png";
         const imgWidth = 40;
         const imgHeight = 40;
         doc.addImage(imgData, 'PNG', 15, 10, imgWidth, imgHeight);
@@ -282,7 +324,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
             body: [
                 [
                     {
-                        content: `Invoice No. ${selectedOrder.paymentList[0].paymentID}` + `\n${selectedOrder.orderType}`,
+                        content: `Invoice No. ${transaction.paymentList[0].paymentID}` + `\n${transaction.orderType}`,
                         styles: {
                             halign: 'left',
                             valign: "middle",
@@ -315,59 +357,70 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
             ], theme: 'plain'
         })
 
+        // Add Material detail
+        doc.setFontSize(12);
+        autoTable(doc, {
+            head: [['HS code', 'Name', 'Category', 'Unit', 'Quantity', 'Brand Price (VND)']],
+
+            body: transactionSubOrder?.brandMaterialResponseList?.map((item: MaterialReportInterface) => {
+                return [
+                    item.hsCode,
+                    item.materialName,
+                    item.categoryName,
+                    item.unit,
+                    __handleGetQuantityMaterial(item.materialID)?.quantity || 'N/A',
+                    __handleAddCommasToNumber(item.brandPrice)
+                ];
+            }) || [],
+            theme: 'striped',
+            headStyles: { fillColor: primaryColor, textColor: whiteColor },
+        });
+
+        // autoTable(doc, {
+        //     head: [['Design Total', 'Brand Labor', 'Total']],
+        //     body: transactionSubOrder ? [
+        //         [
+        //             __handleAddCommasToNumber(__handleGetTotalMaterialPrice() * transactionSubOrder?.orderCustomResponse?.quantity),
+        //             __handleAddCommasToNumber(transactionSubOrder?.brandLaborQuantity),
+        //             __handleAddCommasToNumber(transaction.paymentList[0]?.paymentAmount)
+        //         ]
+        //     ] : [],
+        //     theme: 'striped',
+        //     headStyles: { fillColor: primaryColor, textColor: whiteColor },
+        // });
+
+        autoTable(doc, {
+            body: [
+                [
+                    {
+                        content: `___________________________________________________________________________________________`,
+                        styles: {
+                            halign: 'left',
+                            overflow: 'linebreak'
+                        }
+                    }
+                ]
+            ], theme: 'plain'
+        })
+
+        // Original Design detail table
         autoTable(doc, {
             head: [['Design ID', 'Quantity', 'Size', 'Create Date']],
-            body: selectedOrder.detailList?.map((item: any) => [
+            body: transaction.detailList?.map((item: any) => [
                 item.designDetailId,
                 item.quantity,
                 item.size?.sizeName,
                 item.size?.createDate
             ]),
-            theme: "plain"
-        });
-
-        autoTable(doc, {
-            head: [[{ content: "                          ", styles: { halign: 'right' } }, { content: "                         ", styles: { halign: 'center' } }, { content: "Sum", styles: { halign: 'center' } }, { content: `${__handleAddCommasToNumber(selectedOrder.totalPrice)} VND`, styles: { halign: 'center' } }]],
-            body: [
-                [
-                    {
-                        content: '                           ',
-                        styles: {
-                            halign: 'right',
-                            fontStyle: 'bold'
-                        },
-                    },
-                    {
-                        content: '              ',
-                        styles: {
-                            halign: 'center',
-                            fontStyle: 'bold',
-                        },
-                    },
-                    {
-                        content: "Tax (0%)",
-                        styles: {
-                            fontStyle: 'bold',
-                            halign: "center"
-                        }
-                    },
-                    {
-                        content: "0 VND",
-                        styles: {
-                            fontStyle: 'bold',
-                            halign: "center"
-                        }
-                    }
-                ],
-            ],
-            theme: 'plain'
+            theme: 'striped',
+            headStyles: { fillColor: primaryColor, textColor: whiteColor },
         });
 
         autoTable(doc, {
             body: [
                 [
                     {
-                        content: `                                                                                                               __________________________________`,
+                        content: `___________________________________________________________________________________________`,
                         styles: {
                             halign: 'left',
                             overflow: 'linebreak'
@@ -378,7 +431,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
         })
 
         autoTable(doc, {
-            head: [[{ content: "                          ", styles: { halign: 'right' } }, { content: "                         ", styles: { halign: 'center' } }, { content: "TOTAL", styles: { halign: 'center' } }, { content: `${__handleAddCommasToNumber(selectedOrder.totalPrice)} VND`, styles: { halign: 'center' } }]],
+            head: [[{ content: "                          ", styles: { halign: 'right' } }, { content: "                         ", styles: { halign: 'center' } }, { content: "TOTAL", styles: { halign: 'center' } }, { content: `${__handleAddCommasToNumber(transaction.totalPrice)} VND`, styles: { halign: 'center' } }]],
             theme: 'plain'
         });
 
@@ -402,7 +455,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
                     {
                         content: "Thank You!",
                         styles: {
-                            halign: 'left',
+                            halign: 'center',
                             fontSize: 20
                         }
                     }
@@ -415,26 +468,18 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
             body: [
                 [
                     {
-                        content: `SMART TAILOR, Inc` + `\nLot E2a - 7, Street D1, High - Tech Park` + `\nLong Thanh My Ward City` + `\nThu Duc` + `\nHo Chi Minh City.` + `\nViet Nam`,
+                        content: ` Lot E2a - 7, Street D1, High - Tech Park` + ` Long Thanh My Ward City` + ` Thu Duc` + ` Ho Chi Minh City` + ` Viet Nam`,
                         styles: {
                             halign: 'left',
                             valign: "middle",
                             fontSize: 10
-                        }
-                    },
-                    {
-                        content: `${selectedOrder.quantity} ` + `\n${selectedOrder.quantity} `,
-                        styles: {
-                            halign: 'right',
-                            valign: "bottom",
-                            fontSize: 12
                         }
                     }
                 ]
             ], theme: 'plain',
         })
 
-        doc.save('invoice.pdf')
+        doc.save('Transaction_Invoice.pdf')
     };
 
     const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
@@ -672,9 +717,8 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
                                 <TransactionModals
                                     transaction={selectedTransactions}
                                     onClose={handleCloseTransactionModal}
-                                    onDownloadPDF={() => _handleOpenPDF(selectedTransactions)}
+                                    onDownloadPDF={(pdfData) => _handleOpenPDF(pdfData)}
                                     parentOrderDetai={orderDetail}
-
                                 />
                             )}
                             {selectedOrder === subOrder.orderID && (
@@ -814,8 +858,14 @@ const Tables: React.FC<TablesProps> = ({ table, onViewDetails }) => {
 interface TransactionModalsProps {
     transaction: any;
     onClose: () => void;
-    onDownloadPDF: () => void;
+    onDownloadPDF: (data: PDFData) => void;
     parentOrderDetai?: OrderDetailInterface | AccountantOrderInterface
+}
+
+interface PDFData {
+    transaction: any;
+    transactionSubOrder: TransactionSubOrderInterface | undefined;
+    totalMaterialPrice: number;
 }
 
 interface MaterialReportInterface {
@@ -869,6 +919,15 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
         const result = parentOrderDetai?.designResponse?.materialDetail?.find((item) => item.materialResponse?.materialID === materialID)
         if (result) return result;
     }
+
+    const handleDownloadPDF = () => {
+        const pdfData: PDFData = {
+            transaction,
+            transactionSubOrder,
+            totalMaterialPrice: __handleGetTotalMaterialPrice()
+        };
+        onDownloadPDF(pdfData);
+    };
 
     const __handleGetTotalMaterialPrice = () => {
         if (!transactionSubOrder) return 0; // Return 0 if no transactionSubOrder exists
@@ -936,11 +995,7 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                             <Typography variant="body1" align="right">{transaction.expectedStartDate}</Typography>
                         </Grid>
                     </Grid>
-
-
-
                     <Typography variant="body2" align="left">Material detail</Typography>
-
                     <Box sx={{ width: '100%', overflow: 'hidden', boxShadow: 3, borderRadius: 2, marginTop: 2, marginBottom: 2 }}>
                         <TableContainer component={Paper} elevation={0}>
                             <Table sx={{ minWidth: 650 }}>
@@ -997,8 +1052,7 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                                 </Grid>
                             </Grid>
                         </Box>
-                    </Box>
-
+                    </Box >
                     <Typography variant="body2" align="left">Design detail</Typography>
                     <Box sx={{ width: '100%', overflow: 'hidden', boxShadow: 3, borderRadius: 2, marginTop: 2, marginBottom: 3 }}>
                         <TableContainer component={Paper} elevation={0}>
@@ -1026,7 +1080,6 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                                 </TableBody>
                             </Table>
                         </TableContainer>
-
                         <Box sx={{ padding: 2, backgroundColor: '#f0f0f0' }}>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
@@ -1130,9 +1183,9 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                         </div>
                     </PaymentInfo> */}
                 </DialogContent>
-            </ScrollFreeDialogContent>
+            </ScrollFreeDialogContent >
             <DialogActions>
-                <Button onClick={onDownloadPDF} variant="contained" color="primary">Download PDF</Button>
+                <Button onClick={handleDownloadPDF} variant="contained" color="primary">Download PDF</Button>
                 <Button onClick={onClose} variant="outlined">Close</Button>
             </DialogActions>
         </Dialog >
@@ -1170,6 +1223,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
     const [completedCount, setCompletedCount] = useState<number>(0);
     const [checkingSampleDataCount, setCheckingSampleDataCount] = useState<number>(0);
 
+
     // ---------------UseEffect---------------//
     useEffect(() => {
 
@@ -1177,11 +1231,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
     }, [orderChild]);
     const [fulldataOrderResposne, setFulldataOrderResposne] = useState<AccountantOrderInterface[]>([]);
 
-
-
     // ---------------UseEffect---------------//
-
-
     useEffect(() => {
 
         __handleFetchOrderData();
@@ -1319,16 +1369,6 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                 </div>
             );
         }
-        //  else {
-        //     return (
-        //         <div className="flex items-center text-gray-500">
-        //             <svg className="w-6 h-6 mr-2" viewBox="0 0 20 20" fill="currentColor">
-        //                 <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-        //             </svg>
-        //             <span className="font-medium">Order status unknown</span>
-        //         </div>
-        //     );
-        // }
     };
 
     /**
@@ -1358,7 +1398,6 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
     const __handleClosePaymentDialog = (paymentId: any) => {
         setIsOpenPaymentDialog({ [paymentId]: false })
     }
-
 
     const renderDropdown = (selected: string, setSelected: React.Dispatch<React.SetStateAction<string>>) => (
         <Listbox value={selected} onChange={setSelected} >
@@ -1439,9 +1478,6 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
     };
 
     const [isTableView, setIsTableView] = useState(false)
-
-
-
     const columns: GridColDef[] = [
         { field: 'orderID', headerName: 'Order ID', width: 130 },
         { field: 'buyerName', headerName: 'Buyer Name', width: 150 },
@@ -1485,6 +1521,19 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
         },
     ];
 
+    const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
+    const [selectedTransactions, setSelectedTransactions] = useState<any>(null);
+
+    const handleViewTransaction = (transaction: any) => {
+        setSelectedTransactions(transaction);
+        setIsTransactionModalOpen(true);
+    };
+
+    const handleCloseTransactionModal = () => {
+        setIsTransactionModalOpen(false);
+        setSelectedTransactions(null);
+    };
+
     const [selectedTransaction, setSelectedTransaction] = useState<AccountantOrderInterface | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -1501,19 +1550,55 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
+    console.log("tottal full " + JSON.stringify(fulldataOrderResposne));
 
-    const _handleOpenPDF = (selectedOrder: any) => {
-        console.log("bebe");
 
-        if (!selectedOrder) return;
+    const __handleGetQuantityMaterial = (materialID: string) => {
+        const designResponse = fulldataOrderResposne?.find((item: any) => {
+            return item?.designResponse?.materialDetail?.some((material: any) => material.materialResponse?.materialID === materialID);
+        });
+        const materialDetail = designResponse?.designResponse?.materialDetail?.find((material: any) => material.materialResponse?.materialID === materialID);
+        return materialDetail;
+    };
 
+    // Download PDF Function
+    const _handleOpenPDF = (pdfData: PDFData) => {
+        const { transaction, transactionSubOrder, totalMaterialPrice } = pdfData;
+        const __handleGetTotalMaterialPrice = () => {
+            if (!transactionSubOrder) {
+                console.log("No transactionSubOrder available");
+                return 0; // Return 0 if no transactionSubOrder exists
+            }
+
+            let sum: number = 0;
+
+            console.log("Transaction:", transactionSubOrder);
+
+            transactionSubOrder?.brandMaterialResponseList?.forEach((material: any) => {
+                console.log("Processing material:", material);
+
+                transactionSubOrder.orderCustomResponse?.designResponse?.materialDetail?.forEach((item: any) => {
+                    console.log("Checking item:", item);
+
+                    if (material.materialID === item.materialResponse?.materialID && item.quantity) {
+                        const materialPrice = material.brandPrice * item.quantity;
+                        console.log(`Adding price: ${material.brandPrice} * ${item.quantity} = ${materialPrice}`);
+                        sum += materialPrice;
+                    }
+                });
+            });
+
+            console.log("Total Material Price:", sum);
+            return sum;
+        };
+        if (!transaction) return;
         const doc = new jsPDF();
 
         // set background color
         doc.setFillColor(244, 245, 239); // White color
         doc.rect(0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height, 'F');
 
-        const imgData = "http://localhost:3000/src/assets/system/smart-tailor_logo.png";
+        const imgData = "https://res.cloudinary.com/dby2saqmn/image/upload/v1723989709/ncoktpbtvzzhjqktopjz.png";
         const imgWidth = 40;
         const imgHeight = 40;
         doc.addImage(imgData, 'PNG', 15, 10, imgWidth, imgHeight);
@@ -1531,7 +1616,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
             body: [
                 [
                     {
-                        content: `Invoice No. ${selectedOrder.paymentList[0].paymentID}` + `\n${selectedOrder.orderType}`,
+                        content: `Invoice No. ${transaction.paymentList[0].paymentID}` + `\n${transaction.orderType}`,
                         styles: {
                             halign: 'left',
                             valign: "middle",
@@ -1564,59 +1649,69 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
             ], theme: 'plain'
         })
 
+        // Add Material detail
+        doc.setFontSize(12);
+        autoTable(doc, {
+            head: [['HS code', 'Name', 'Category', 'Unit', 'Quantity', 'Brand Price (VND)']],
+            body: transactionSubOrder?.brandMaterialResponseList?.map((item: MaterialReportInterface) => {
+                return [
+                    item.hsCode,
+                    item.materialName,
+                    item.categoryName,
+                    item.unit,
+                    __handleGetQuantityMaterial(item.materialID)?.quantity || 'N/A',
+                    __handleAddCommasToNumber(item.brandPrice)
+                ];
+            }) || [],
+            theme: 'striped',
+            headStyles: { fillColor: primaryColor, textColor: whiteColor },
+        });
+
+        // autoTable(doc, {
+        //     head: [['Design Total', 'Brand Labor', 'Total']],
+        //     body: transactionSubOrder ? [
+        //         [
+        //             __handleAddCommasToNumber(__handleGetTotalMaterialPrice() * transactionSubOrder?.orderCustomResponse?.quantity),
+        //             __handleAddCommasToNumber(transactionSubOrder?.brandLaborQuantity),
+        //             __handleAddCommasToNumber(transaction.paymentList[0]?.paymentAmount)
+        //         ]
+        //     ] : [],
+        //     theme: 'striped',
+        //     headStyles: { fillColor: primaryColor, textColor: whiteColor },
+        // });
+
+        autoTable(doc, {
+            body: [
+                [
+                    {
+                        content: `___________________________________________________________________________________________`,
+                        styles: {
+                            halign: 'left',
+                            overflow: 'linebreak'
+                        }
+                    }
+                ]
+            ], theme: 'plain'
+        })
+
+        // Original Design detail table
         autoTable(doc, {
             head: [['Design ID', 'Quantity', 'Size', 'Create Date']],
-            body: selectedOrder.detailList?.map((item: any) => [
+            body: transaction.detailList?.map((item: any) => [
                 item.designDetailId,
                 item.quantity,
                 item.size?.sizeName,
                 item.size?.createDate
             ]),
-            theme: "plain"
-        });
-
-        autoTable(doc, {
-            head: [[{ content: "                          ", styles: { halign: 'right' } }, { content: "                         ", styles: { halign: 'center' } }, { content: "Sum", styles: { halign: 'center' } }, { content: `${__handleAddCommasToNumber(selectedOrder.totalPrice)} VND`, styles: { halign: 'center' } }]],
-            body: [
-                [
-                    {
-                        content: '                           ',
-                        styles: {
-                            halign: 'right',
-                            fontStyle: 'bold'
-                        },
-                    },
-                    {
-                        content: '              ',
-                        styles: {
-                            halign: 'center',
-                            fontStyle: 'bold',
-                        },
-                    },
-                    {
-                        content: "Tax (0%)",
-                        styles: {
-                            fontStyle: 'bold',
-                            halign: "center"
-                        }
-                    },
-                    {
-                        content: "0 VND",
-                        styles: {
-                            fontStyle: 'bold',
-                            halign: "center"
-                        }
-                    }
-                ],
-            ],
-            theme: 'plain'
+            theme: 'striped',
+            headStyles: { fillColor: primaryColor, textColor: whiteColor },
         });
 
         autoTable(doc, {
             body: [
                 [
                     {
-                        content: `                                                                                                               __________________________________`,
+                        content: `___________________________________________________________________________________________`,
                         styles: {
                             halign: 'left',
                             overflow: 'linebreak'
@@ -1627,7 +1722,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
         })
 
         autoTable(doc, {
-            head: [[{ content: "                          ", styles: { halign: 'right' } }, { content: "                         ", styles: { halign: 'center' } }, { content: "TOTAL", styles: { halign: 'center' } }, { content: `${__handleAddCommasToNumber(selectedOrder.totalPrice)} VND`, styles: { halign: 'center' } }]],
+            head: [[{ content: "                          ", styles: { halign: 'right' } }, { content: "                         ", styles: { halign: 'center' } }, { content: "TOTAL", styles: { halign: 'center' } }, { content: `${__handleAddCommasToNumber(transaction.totalPrice)} VND`, styles: { halign: 'center' } }]],
             theme: 'plain'
         });
 
@@ -1651,7 +1746,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                     {
                         content: "Thank You!",
                         styles: {
-                            halign: 'left',
+                            halign: 'center',
                             fontSize: 20
                         }
                     }
@@ -1664,39 +1759,18 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
             body: [
                 [
                     {
-                        content: `SMART TAILOR, Inc` + `\nLot E2a - 7, Street D1, High - Tech Park` + `\nLong Thanh My Ward City` + `\nThu Duc` + `\nHo Chi Minh City.` + `\nViet Nam`,
+                        content: ` Lot E2a - 7, Street D1, High - Tech Park` + ` Long Thanh My Ward City` + ` Thu Duc` + ` Ho Chi Minh City` + ` Viet Nam`,
                         styles: {
                             halign: 'left',
                             valign: "middle",
                             fontSize: 10
-                        }
-                    },
-                    {
-                        content: `${selectedOrder.quantity} ` + `\n${selectedOrder.quantity} `,
-                        styles: {
-                            halign: 'right',
-                            valign: "bottom",
-                            fontSize: 12
                         }
                     }
                 ]
             ], theme: 'plain',
         })
 
-        doc.save('invoice.pdf')
-    };
-
-    const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
-    const [selectedTransactions, setSelectedTransactions] = useState(null);
-
-    const handleViewTransaction = (transaction: any) => {
-        setSelectedTransactions(transaction);
-        setIsTransactionModalOpen(true);
-    };
-
-    const handleCloseTransactionModal = () => {
-        setIsTransactionModalOpen(false);
-        setSelectedTransactions(null);
+        doc.save('Transaction_Invoice.pdf')
     };
 
     return (
@@ -2059,7 +2133,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                     </p>
                                                 </div>
                                                 <div>
-                                                <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
                                                         PaymentID:{" "}
                                                         <span className="text-sm text-gray-500 pb-2">
                                                             {order?.paymentList && order?.paymentList?.length > 0 ? order?.paymentList[0]?.paymentID : 'NaN'}
@@ -2149,7 +2223,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                     <TransactionModals
                                                         transaction={selectedTransactions}
                                                         onClose={handleCloseTransactionModal}
-                                                        onDownloadPDF={() => _handleOpenPDF(selectedTransactions)}
+                                                        onDownloadPDF={(pdfData) => _handleOpenPDF(pdfData)}
                                                         parentOrderDetai={orderDetail}
                                                     />
                                                 )}
