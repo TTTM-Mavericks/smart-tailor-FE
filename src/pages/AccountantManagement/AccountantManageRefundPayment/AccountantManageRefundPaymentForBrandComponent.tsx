@@ -381,7 +381,7 @@ const AccountantManageRefundPaymentForBrandComponent: React.FC = () => {
     // ---------------UseState---------------//
     const [showScrollButton, setShowScrollButton] = useState<boolean>(false);
     const [isOpenPaymentInforDialog, setIsOpenPaymentInformationDialog] = useState<boolean>(false);
-    const [currentPaymentData, setCurrentPaymentData] = useState<PaymentInterface | PaymentOrderInterface>();
+    const [currentPaymentData, setCurrentPaymentData] = useState<{ payment: PaymentInterface | PaymentOrderInterface, order: AccountantOrderInterface } | undefined>();
     const [isExtendTransaction, setIsExtendTransaction] = useState<{ [orderId: string]: boolean }>({});
     // const [orderDetailList, setOrderDetailList] = useState<OrderDetailInterface[]>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -542,8 +542,8 @@ const AccountantManageRefundPaymentForBrandComponent: React.FC = () => {
      * Open invoice information dialog
      * @param payment 
      */
-    const __handleViewInvoiceClick = (payment: PaymentInterface | PaymentOrderInterface) => {
-        setCurrentPaymentData(payment);
+    const __handleViewInvoiceClick = (payment: PaymentInterface | PaymentOrderInterface, order: AccountantOrderInterface) => {
+        setCurrentPaymentData({ payment, order });
         setIsOpenPaymentInformationDialog(true);
     };
 
@@ -1039,7 +1039,7 @@ const AccountantManageRefundPaymentForBrandComponent: React.FC = () => {
 
                                                             <p
                                                                 className={`${style.orderHistory__viewInvoice__button} ml-2 md:ml-4 px-3 py-2 md:px-4 md:py-2`}
-                                                                onClick={() => __handleViewInvoiceClick(payment)}
+                                                                onClick={() => __handleViewInvoiceClick(payment, orderDetail)}
                                                             >
                                                                 View transaction
                                                             </p>

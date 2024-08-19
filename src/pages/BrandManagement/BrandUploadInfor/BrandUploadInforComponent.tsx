@@ -30,7 +30,49 @@ const UploadBrandInforForm = () => {
 
     const [businessType, setBusinessType] = useState('individual');
     const [taxCodeData, setTaxCodeData] = useState<any>(null);
+    const [avatarFile, setAvatarFile] = useState<File | null>(null);
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
+    const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setAvatarFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setAvatarPreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const uploadAvatarToCloudinary = async (file: File): Promise<string> => {
+        const cloudName = 'dby2saqmn';
+        const presetKey = 'whear-app';
+        const folderName = 'avatars';
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', presetKey);
+        formData.append('folder', folderName);
+
+        try {
+            const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+                method: 'POST',
+                body: formData,
+            });
+
+            const responseData = await response.json();
+
+            if (responseData.secure_url) {
+                return responseData.secure_url;
+            } else {
+                throw new Error('Error uploading avatar to Cloudinary');
+            }
+        } catch (error) {
+            console.error('Error uploading avatar to Cloudinary:', error);
+            throw error;
+        }
+    };
     const [formErrors, setFormErrors] = useState({
         brandName: '',
         accountNumber: '',
@@ -400,6 +442,8 @@ const UploadBrandInforForm = () => {
 
         try {
             const response = await axios.get(`https://api.vietqr.io/v2/business/${formData.taxCode}`);
+            console.log("fmmmm" + formData.taxCode);
+
             if (response.data.code === "00" && response.data.desc === "Success - Thành công") {
                 setTaxCodeError('');
                 setTaxCodeValidated(true);
@@ -457,7 +501,7 @@ const UploadBrandInforForm = () => {
 
 
         let uploadedImages: BrandImages[] = [];
-
+        let avatarUrl = '';
         if (files && files.length > 0) {
             try {
                 uploadedImages = await _handleUploadToCloudinary(files);
@@ -468,6 +512,21 @@ const UploadBrandInforForm = () => {
                     icon: 'error',
                     title: 'Image Upload Failed',
                     text: 'There was an error uploading your images. Please try again.',
+                });
+                setIsLoading(false);
+                return;
+            }
+        }
+
+        if (avatarFile) {
+            try {
+                avatarUrl = await uploadAvatarToCloudinary(avatarFile);
+            } catch (error) {
+                console.error('Error uploading avatar:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Avatar Upload Failed',
+                    text: 'There was an error uploading your avatar. Please try again.',
                 });
                 setIsLoading(false);
                 return;
@@ -648,7 +707,35 @@ const UploadBrandInforForm = () => {
                 </div>
                 <h2 className="text-2xl font-bold mb-6">Upload information</h2>
 
-
+                <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Avatar
+                    </label>
+                    <div className="flex items-center space-x-4">
+                        {avatarPreview && (
+                            <div className="w-20 h-20 rounded-full overflow-hidden">
+                                <img
+                                    src={avatarPreview}
+                                    alt="Avatar preview"
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                        )}
+                        <input
+                            type="file"
+                            onChange={handleAvatarChange}
+                            accept="image/*"
+                            className="hidden"
+                            id="avatar-upload"
+                        />
+                        <label
+                            htmlFor="avatar-upload"
+                            className="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                            {avatarFile ? 'Change Avatar' : 'Upload Avatar'}
+                        </label>
+                    </div>
+                </div>
                 {/* Form Input POST */}
                 <form className="space-y-4" onSubmit={_handleSubmit}>
                     <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4">
