@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import { NotificationInterface } from '../../../../models/NotificationModel';
 import Cookies from 'js-cookie';
 import { UserInterface } from '../../../../models/UserModel';
-import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
+import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import { toast } from 'react-toastify';
 import { __getToken } from '../../../../App';
+import axios from 'axios';
 
 interface SidebarProps {
     menuOpen: boolean;
@@ -82,8 +83,60 @@ const Sidebar: React.FC<SidebarProps> = ({ menuOpen, toggleMenu, activeMenu, han
         };
     }, [websocketUrl]);
 
-    
+    // Manage Order CHECKING_SAMPLE_DATA
+    const apiUrl = `${baseURL}${versionEndpoints.v1}${featuresEndpoints.order}${functionEndpoints.order.getAllOrder}`;
+    async function getCheckingSampleDataOrdersCount() {
+        try {
+            const response = await axios.get(apiUrl);
+            console.log('API response:', response.data);
+            const count = response.data.data.filter((order: any) => order.orderStatus === 'CHECKING_SAMPLE_DATA').length;
+            console.log('CHECKING_SAMPLE_DATA count:', count);
+            return count;
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+            return 0;
+        }
+    }
 
+
+    const [checkingSampleDataCount, setCheckingSampleDataCount] = useState(0);
+
+    useEffect(() => {
+        async function fetchOrderCount() {
+            const count = await getCheckingSampleDataOrdersCount();
+            setCheckingSampleDataCount(count);
+        }
+        fetchOrderCount();
+    }, []);
+
+
+    // Manage Transaction with paymentType  fined and paymentstatus = pending
+    const apiUrls = `${baseURL}${versionEndpoints.v1}${featuresEndpoints.payment}${functionEndpoints.payment.getPaymentByUserID}/${userParse.userID}`;
+    async function getPendingFinedTransactionsCount(userID: string) {
+        try {
+            const apiUrl = `${baseURL}${versionEndpoints.v1}${featuresEndpoints.payment}${functionEndpoints.payment.getPaymentByUserID}/${userID}`;
+            const response = await axios.get(apiUrl);
+            console.log('API response:', response.data);
+            const count = response.data.data.filter(
+                (payment: any) => payment.paymentType === 'FINED' && payment.paymentStatus === 'PENDING'
+            ).length;
+            console.log('Pending fined transactions count:', count);
+            return count;
+        } catch (error) {
+            console.error('Error fetching transactions:', error);
+            return 0;
+        }
+    }
+
+    const [pendingFinedCount, setPendingFinedCount] = useState(0);
+
+    useEffect(() => {
+        async function fetchTransactionCount() {
+            const count = await getPendingFinedTransactionsCount(userParse.userID);
+            setPendingFinedCount(count);
+        }
+        fetchTransactionCount();
+    }, [userParse.userID]);
 
     return (
         <aside className={`bg-gradient-to-br from-gray-800 to-gray-900 ${menuOpen ? 'translate-x-0' : '-translate-x-80'} fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0`}>
@@ -126,19 +179,47 @@ const Sidebar: React.FC<SidebarProps> = ({ menuOpen, toggleMenu, activeMenu, han
                         </div>
                     </li>
                     <li>
-                        <div onClick={() => handleMenuClick('manage_order')} className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'manage_order' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}>
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                        <div
+                            onClick={() => handleMenuClick('manage_order')}
+                            className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'manage_order'
+                                ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]'
+                                : 'text-white hover:bg-white/10 active:bg-white/30'
+                                } w-full flex items-center gap-4 px-4 capitalize`}
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                                aria-hidden="true"
+                                className="w-5 h-5 text-inherit"
+                            >
                                 <path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"></path>
                             </svg>
-                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">Manage Order</p>
+                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">
+                                Manage Order ({checkingSampleDataCount})
+                            </p>
                         </div>
                     </li>
                     <li>
-                        <div onClick={() => handleMenuClick('manage_brand_trandsactions')} className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'manage_brand_trandsactions' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}>
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                        <div
+                            onClick={() => handleMenuClick('manage_brand_trandsactions')}
+                            className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'manage_brand_trandsactions'
+                                ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]'
+                                : 'text-white hover:bg-white/10 active:bg-white/30'
+                                } w-full flex items-center gap-4 px-4 capitalize`}
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                                aria-hidden="true"
+                                className="w-5 h-5 text-inherit"
+                            >
                                 <path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"></path>
                             </svg>
-                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">Manage Transactions</p>
+                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">
+                                Manage Transactions ({pendingFinedCount})
+                            </p>
                         </div>
                     </li>
                     <li>
