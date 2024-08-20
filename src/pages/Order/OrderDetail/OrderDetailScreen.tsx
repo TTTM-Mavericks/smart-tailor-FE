@@ -537,7 +537,7 @@ const OrderDetailScreen: React.FC = () => {
                                 alt={orderDetail?.designResponse.imageUrl}
                                 className="w-40 h-52 object-cover rounded-md shadow-md mb-4 md:mb-0"
                             />
-                            <button onClick={() => navigate(`/design/${orderDetail?.designResponse.designID}`)} className="text-indigo-600 hover:text-indigo-800 transition duration-200 mt-2">Edit design</button>
+                            {/* <button onClick={() => navigate(`/design/${orderDetail?.designResponse.designID}`)} className="text-indigo-600 hover:text-indigo-800 transition duration-200 mt-2">Edit design</button> */}
                         </div>
 
 
@@ -659,16 +659,26 @@ const OrderDetailScreen: React.FC = () => {
                             <div className="flex justify-between text-sm mb-2">
                                 <p className='flex'>
                                     <span>Start: </span>
-                                    <span className={`text-indigo-600 ml-1`}>
-                                        {timeline?.estimatedDateFinishFirstStage}
-                                    </span>
+                                    {timeline?.estimatedDateFinishFirstStage ? (
+
+                                        <span className={`text-indigo-600 ml-1`}>
+                                            {timeline?.estimatedDateFinishFirstStage}
+                                        </span>
+                                    ) : (
+                                        <span className={`text-indigo-600 ml-1`}>
+                                            {orderDetail?.expectedStartDate}
+                                        </span>
+                                    )}
                                 </p>
-                                <p className='flex'>
-                                    <span>Stage: 1-2: </span>
-                                    <span className={`text-indigo-600 ml-1`}>
-                                        {timeline?.estimatedDateFinishSecondStage}
-                                    </span >
-                                </p>
+                                {timeline?.estimatedDateFinishSecondStage && (
+
+                                    <p className='flex'>
+                                        <span>Stage: 1-2: </span>
+                                        <span className={`text-indigo-600 ml-1`}>
+                                            {timeline?.estimatedDateFinishSecondStage}
+                                        </span >
+                                    </p>
+                                )}
                                 <p className='flex'>
                                     <span>Completed: </span>
                                     <span className={`text-indigo-600 ml-1`}>
@@ -698,9 +708,12 @@ const OrderDetailScreen: React.FC = () => {
                                     const isCurrentStep = step.status;
                                     return (
                                         <div key={index}>
-                                            <p onClick={() => __handleOpenViewHistory(step.stageId)} key={index} className={`text-center ${isCurrentStep ? 'text-indigo-600' : 'text-gray-400'} cursor-pointer`}>
-                                                {step.currentQuantity} / {orderDetail?.quantity} products
-                                            </p>
+                                            {step.currentQuantity > 0 && (
+
+                                                <p onClick={() => __handleOpenViewHistory(step.stageId)} key={index} className={`text-center ${isCurrentStep ? 'text-indigo-600' : 'text-gray-400'} cursor-pointer`}>
+                                                    {step.currentQuantity} / {orderDetail?.quantity} products
+                                                </p>
+                                            )}
                                             {selectedStage === step.stageId && (
                                                 <ViewProgessOfProductDialog key={index} stageId={step.stageId} orderID={orderDetail?.orderID} isOpen={isOpenViewHistory} onClose={() => setIsOpenViewHistory(false)} ></ViewProgessOfProductDialog>
                                             )}
@@ -714,7 +727,7 @@ const OrderDetailScreen: React.FC = () => {
 
                     )}
 
-                    {orderDetail?.orderStatus !== 'NOT_VERIFY' && orderDetail?.orderStatus !== 'CANCEL' && (
+                    {orderDetail?.orderStatus !== 'CANCEL' && (
 
 
                         <div className="mt-0 border-t pt-4 flex">
@@ -803,7 +816,7 @@ const OrderDetailScreen: React.FC = () => {
                                                 <p className="text-gray-600 text-sm">Stage 2 price</p>
                                             )}
                                             <p className="text-gray-600 text-sm">{payment?.map((item) => {
-                                                if (true) return __handleAddCommasToNumber(item.payOSResponse.data.amount)
+                                                if (true) return __handleAddCommasToNumber(item?.payOSData?.amount)
                                             })} VND</p>
                                         </div>
                                         <div className="flex justify-between border-b pb-2">
@@ -813,7 +826,7 @@ const OrderDetailScreen: React.FC = () => {
                                         <div className="flex justify-between font-semibold text-gray-900">
                                             <p className="text-gray-600 text-sm">Total</p>
                                             <p className="text-gray-600 text-sm">{payment?.map((item) => {
-                                                if (true) return __handleAddCommasToNumber(item.payOSResponse.data.amount)
+                                                if (true) return __handleAddCommasToNumber(item?.payOSData?.amount)
                                             })} VND</p>
                                         </div>
                                     </div>

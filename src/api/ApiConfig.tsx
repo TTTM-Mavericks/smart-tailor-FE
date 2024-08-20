@@ -60,7 +60,8 @@ export const functionEndpoints = {
     getDesignByID: '/get-design-by-id',
     getAllDesign: '/get-all-design',
     updateDesign: '/update-design',
-    getAllDesignByUserID: '/get-all-design-by-user-id'
+    getAllDesignByUserID: '/get-all-design-by-user-id',
+    createClonseDesignByOldDesignId: '/create-clone-design-from-base-design'
   },
   designDetail: {
     addNewDesignDetail: '/add-new-design-detail',

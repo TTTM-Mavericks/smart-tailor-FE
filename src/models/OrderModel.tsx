@@ -19,6 +19,7 @@ export interface PaymentInterface {
     paymentType: string;
     createDate: string; // LocalDateTime
     lastModifiedDate: string; // LocalDateTime
+    
 }
 
 export interface OrderInterface {
