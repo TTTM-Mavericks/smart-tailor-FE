@@ -662,7 +662,7 @@ function CustomDesignScreen() {
       // setSelectedPartOfCloth(selectedPartOfCloth);
       // const result = partOfClothData?.find((item: PartOfDesignInterface) => item.partOfDesignName === selectedPartOfCloth?.partOfDesignName);
       // if (result) {
-       
+
       // }
 
       setSelectedStamp((prevSelectedStamp = []) => {
@@ -898,8 +898,8 @@ function CustomDesignScreen() {
       {/* Header */}
       <div className={styles.customDesign__container__header}>
         <div className={styles.customDesign__container__header__logo}>
-          <img src={systemLogo}></img>
-          <div >
+          <img src={systemLogo} onClick={() => window.location.href = '/'}></img>
+          <div onClick={() => window.location.href = '/'} >
             <h3>{t(codeLanguage + '000001')}</h3>
           </div>
           <UploadCloud size={20} style={{ marginTop: 5, marginLeft: 15 }} color={isSaved ? greenColor : blackColor}> </UploadCloud>

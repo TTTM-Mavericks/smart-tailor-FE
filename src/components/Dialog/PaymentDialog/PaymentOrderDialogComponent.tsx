@@ -58,7 +58,7 @@ const PaymentOrderDialogComponent: React.FC<CancelOrderPolicyDialogProps> = ({ i
     // ---------------FunctionHandler---------------//
     const __handleMoveToPayOSPaymentDetail = () => {
         if (paymentInfor) {
-            window.location.href = paymentInfor?.payOSResponse.data.checkoutUrl;
+            window.open(paymentInfor?.payOSData?.checkoutUrl, '_blank');
         }
     }
 
@@ -94,7 +94,7 @@ const PaymentOrderDialogComponent: React.FC<CancelOrderPolicyDialogProps> = ({ i
                 {selectedTab === 'QR Code' ? (
                     <div className="flex justify-center items-center w-96 h-full px-32" style={{ width: 450 }}>
                         <div className="relative flex justify-center items-center w-80 h-80 transform transition-transform duration-300 hover:scale-110">
-                            <QRCode value={paymentInfor?.payOSResponse.data.qrCode || ''} />
+                            <QRCode value={paymentInfor?.payOSData?.qrCode || ''} />
                             <div
                                 className="absolute flex items-center justify-center w-20 h-20 rounded-full transform transition-transform duration-300 hover:scale-110 cursor-pointer"
                                 style={{ backgroundColor: primaryColor, color: whiteColor, fontWeight: 500, opacity: 0.9 }}

@@ -292,13 +292,13 @@ const ReportHistorySreen: React.FC = () => {
             </div>
 
             {/* Dialog */}
-            {currentPaymentData && (
+            {/* {currentPaymentData && (
                 <PaymentInformationDialogComponent
                     data={currentPaymentData}
                     onClose={__handleClosePaymentInformationDialog}
                     isOpen={isOpenPaymentInforDialog}
                 />
-            )}
+            )} */}
             <FooterComponent />
         </div>
 

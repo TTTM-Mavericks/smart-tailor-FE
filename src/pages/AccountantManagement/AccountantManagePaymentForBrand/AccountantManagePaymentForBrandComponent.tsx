@@ -887,13 +887,33 @@ interface TransactionSubOrderInterface {
     brandMaterialResponseList: MaterialReportInterface[]
 }
 
+interface BrandDetailPriceResponseInterface {
+    brandID: string;
+    subOrderID: string;
+    brandPriceDeposit: string;
+    brandPriceFirstStage: string;
+    brandPriceSecondStage: string;
+}
+
+interface OrderPriceDetailInterface {
+    totalPriceOfParentOrder: string;
+    customerPriceDeposit: string;
+    customerPriceFirstStage: string;
+    customerSecondStage: string;
+    customerShippingFee: string | number | undefined;
+    brandDetailPriceResponseList: BrandDetailPriceResponseInterface[];
+}
+
 const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onClose, onDownloadPDF, parentOrderDetai }) => {
 
     const [transactionSubOrder, setTransactionSubOrder] = useState<TransactionSubOrderInterface>();
+    const [referencePrice, setReferencePrice] = useState<OrderPriceDetailInterface>();
+
 
     useEffect(() => {
         console.log('transaction.designResponse.materialDetail: ', transaction.designResponse);
         __handleFetchInvoiceData();
+        __handleReferencePrice(parentOrderDetai?.orderID)
     }, [transaction]);
 
     const __handleMoveToPayOSPaymentDetail = () => {
@@ -943,6 +963,26 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
 
         return sum;
     };
+
+    const __handleReferencePrice = async (parentId: any) => {
+        try {
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.designDetail + functionEndpoints.designDetail.getTotalPriceByParentOrderId}/${parentId}`, null, __getToken());
+            if (response.status === 200) {
+                setReferencePrice(response.data);
+                console.log('response.data: ', response.data);
+            }
+            else {
+                console.log('detail error: ', response.message);
+            }
+        } catch (error) {
+            console.log('error: ', error);
+        }
+    }
+
+    const __handleGetStageBrandPrice = (subOrderID: any) => {
+        const result = referencePrice?.brandDetailPriceResponseList.find((item) => item.subOrderID === subOrderID);
+        if (result) return result;
+    }
 
     return (
         <Dialog open={true} onClose={onClose} maxWidth="md" fullWidth>
@@ -1099,8 +1139,43 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                     </Box>
 
                     {transactionSubOrder && (
-                        <div className="space-y-4 h-full ml-auto" style={{ width: 450 }}>
-                            <div className="mt-4">
+                        <div className="space-y-4 h-full flex items-center justify-center content-center" >
+                            <div className="w-1/3 mr-auto mt-4">
+                                <div className="flex justify-between items-center border-b py-2">
+                                    <span style={{ fontSize: 13 }} className="font-semibold">Deposit</span>
+                                    <div className="flex items-center justify-end">
+                                        {__handleGetStageBrandPrice(transactionSubOrder.orderCustomResponse.orderID)?.brandPriceDeposit ? (
+                                            <span style={{ fontSize: 14 }} className="text-right">{__handleAddCommasToNumber(__handleGetStageBrandPrice(transactionSubOrder.orderCustomResponse.orderID)?.brandPriceDeposit)} VND</span>
+                                        ) : (
+                                            <span style={{ fontSize: 14 }} className="text-right">Loading</span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-between items-center border-b py-2">
+                                    <span style={{ fontSize: 13 }} className="font-semibold">Stage 1</span>
+                                    <div className="flex items-center justify-end">
+                                        {__handleGetStageBrandPrice(transactionSubOrder.orderCustomResponse.orderID)?.brandPriceFirstStage ? (
+                                            <span style={{ fontSize: 14 }} className="text-right">{__handleAddCommasToNumber(__handleGetStageBrandPrice(transactionSubOrder.orderCustomResponse.orderID)?.brandPriceFirstStage)} VND</span>
+                                        ) : (
+                                            <span style={{ fontSize: 14 }} className="text-right">Loading</span>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="flex justify-between items-center py-2">
+                                    <span style={{ fontSize: 13 }} className="font-semibold">Stage 2</span>
+                                    <div className="flex items-center justify-end">
+                                        {__handleGetStageBrandPrice(transactionSubOrder.orderCustomResponse.orderID)?.brandPriceSecondStage ? (
+                                            <span style={{ fontSize: 14 }} className="text-right">{__handleAddCommasToNumber(__handleGetStageBrandPrice(transactionSubOrder.orderCustomResponse.orderID)?.brandPriceSecondStage)} VND</span>
+                                        ) : (
+                                            <span style={{ fontSize: 14 }} className="text-right">Loading</span>
+                                        )}
+                                    </div>
+
+                                </div>
+                            </div>
+                            
+                            <div className="w-1/2">
                                 <div className="flex justify-between items-center border-b py-2">
                                     <span style={{ fontSize: 13 }} className="font-semibold">Design price:</span>
                                     <div className="flex items-center justify-end">
@@ -1114,7 +1189,7 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                                     </div>
                                 </div>
                                 <div className="flex justify-between items-center py-2">
-                                    <span style={{ fontSize: 15 }} className="font-semibold">Total price:</span>
+                                    <span style={{ fontSize: 13 }} className="font-semibold">Total price:</span>
                                     <div className="flex items-center justify-end">
                                         <span style={{ fontSize: 14 }} className="text-right">{__handleAddCommasToNumber(transaction.paymentList[0]?.paymentAmount)} VND</span>
                                     </div>
@@ -1196,7 +1271,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
     // ---------------UseState---------------//
     const [showScrollButton, setShowScrollButton] = useState<boolean>(false);
     const [isOpenPaymentInforDialog, setIsOpenPaymentInformationDialog] = useState<boolean>(false);
-    const [currentPaymentData, setCurrentPaymentData] = useState<PaymentInterface | PaymentOrderInterface>();
+    const [currentPaymentData, setCurrentPaymentData] = useState<PaymentOrderInterface>();
     const [isExtendTransaction, setIsExtendTransaction] = useState<{ [orderId: string]: boolean }>({});
     // const [orderDetailList, setOrderDetailList] = useState<OrderDetailInterface[]>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -1338,10 +1413,10 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
      * Open invoice information dialog
      * @param payment 
      */
-    const __handleViewInvoiceClick = (payment: PaymentInterface | PaymentOrderInterface) => {
-        setCurrentPaymentData(payment);
-        setIsOpenPaymentInformationDialog(true);
-    };
+    // const __handleViewInvoiceClick = (payment: PaymentInterface | PaymentOrderInterface) => {
+    //     setCurrentPaymentData(payment);
+    //     setIsOpenPaymentInformationDialog(true);
+    // };
 
     /**
      * 
@@ -2261,7 +2336,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                 </div>
             </div>
             {/* Dialog */}
-            {
+            {/* {
                 currentPaymentData && (
                     <PaymentInformationDialogComponent
                         data={currentPaymentData}
@@ -2269,7 +2344,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                         isOpen={isOpenPaymentInforDialog}
                     />
                 )
-            }
+            } */}
         </div >
     );
 };

@@ -759,7 +759,7 @@ const AllTransactionHistoryComponent: React.FC = () => {
                 </div>
             </div>
             {/* Dialog */}
-            {
+            {/* {
                 currentPaymentData && (
                     <PaymentInformationDialogComponent
                         data={currentPaymentData}
@@ -767,7 +767,7 @@ const AllTransactionHistoryComponent: React.FC = () => {
                         isOpen={isOpenPaymentInforDialog}
                     />
                 )
-            }
+            } */}
         </div >
     );
 };
