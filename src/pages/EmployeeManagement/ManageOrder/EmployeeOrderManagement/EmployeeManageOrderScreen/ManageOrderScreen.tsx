@@ -47,6 +47,10 @@ const getStatusColor = (status: string) => {
         case 'CANCEL': return 'text-red-600';
         case 'COMPLETED': return 'text-green-600';
         case 'DELIVERED': return 'text-indigo-600';
+        case 'RECEIVED': return 'text-green-400';
+        case 'REFUND_REQUEST': return 'text-red-600';
+
+
         default: return 'text-gray-600';
     }
 };
