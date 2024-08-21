@@ -24,7 +24,8 @@ export interface PayOSResponseInterface {
     orderCode?: any;
     payOSID?: any;
     qrCode?: any;
-    status?: string
+    status?: string;
+    createDate?: string;
 
 }
 

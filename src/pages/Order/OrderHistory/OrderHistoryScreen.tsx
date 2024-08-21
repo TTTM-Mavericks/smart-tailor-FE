@@ -483,7 +483,7 @@ const OrderHistory: React.FC = () => {
                                                         Amount: <span>{__handleAddCommasToNumber(payment.payOSData?.amount)} VND</span>
                                                     </p>
                                                     <p className="text-sm text-gray-500 pb-2">
-                                                        {/* Created at: <span>{payment.payOSData?.}</span> */}
+                                                        Created at: <span>{payment.payOSData?.createDate}</span>
                                                     </p>
 
                                                     <p

@@ -21,9 +21,7 @@ import shirtSleeve from './clothes/shirt-sleeve.png'
 import mbBankLogo from './system/mbbank_logo.png'
 import bankImg from './system/bank_img.png'
 import ghtkLogo from './system/GHTK_logo.png'
-
-
-
+import clothTag from './system/cloth_tag.png'
 
 
 export {
@@ -49,5 +47,6 @@ export {
     shirtSleeve,
     mbBankLogo,
     bankImg,
-    ghtkLogo
+    ghtkLogo,
+    clothTag
 };
