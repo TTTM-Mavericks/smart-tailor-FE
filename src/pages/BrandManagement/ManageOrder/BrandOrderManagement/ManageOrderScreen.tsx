@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaChevronLeft, FaChevronRight, FaTimes, FaCheck } from 'react-icons/fa';
+import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaChevronLeft, FaChevronRight, FaTimes, FaCheck, FaFileAlt, FaBox, FaDollarSign, FaCalendarAlt } from 'react-icons/fa';
 import { ArrowDropDown, Cancel, Update, UpdateOutlined, Verified, ViewAgendaOutlined, Visibility } from '@mui/icons-material';
 import axios from 'axios';
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
@@ -454,27 +454,48 @@ const BrandOrderFields: React.FC<{
                             )}
                         </div>
                         <div className="ml-4 mt-10">
-                            <p className="text-sm text-gray-600 mb-2">Order ID: {order.orderID}</p>
                             <p className="text-sm text-gray-600 mb-2">
-                                Order Status: <span className={` mb-2 ${getStatusColor(order.orderStatus)} font-bold`}>{order.orderStatus}</span>
+                                <FaFileAlt className="inline-block mr-1" />
+                                <span style={{ fontWeight: "bolder" }}>Order ID:</span> {order.orderID}
+                            </p>
+                            <p className="text-sm text-gray-600 mb-2">
+                                <FaBox className="inline-block mr-1" />
+                                <span style={{ fontWeight: "bolder" }}>Order Status: </span>
+                                <span className={`mb-2 ${getStatusColor(order.orderStatus)} font-bold`}>{order.orderStatus}</span>
                             </p>
                             <div className="mt-4">
                                 {order.detailList.map((detail, index) => (
-                                    <p key={index} className="text-sm text-gray-600">
-                                        Size {detail.size.sizeName}: Quantity {detail.quantity}
-                                    </p>
+                                    <>
+                                        <p key={index} className="text-sm text-gray-600">
+                                            <FaBox className="inline-block mr-1" />
+                                            <span style={{ fontWeight: "bolder" }}> Size: </span>{detail.size.sizeName}
+                                        </p>
+                                        <p key={index} className="text-sm text-gray-600">
+                                            <FaBox className="inline-block mr-1" />
+                                            <span style={{ fontWeight: "bolder" }}> Quantity: </span>{detail.quantity}
+                                        </p>
+                                    </>
                                 ))}
                             </div>
                             {order.totalPrice && (
-                                <p className="text-gray-700 mt-4 text-sm">Price: {__handleAddCommasToNumber(order.totalPrice)} VND</p>
+                                <p className="text-gray-700 mt-4 text-sm">
+                                    <FaDollarSign className="inline-block mr-1" />
+                                    <span style={{ fontWeight: "bolder" }}>Price:</span> {__handleAddCommasToNumber(order.totalPrice)} VND
+                                </p>
                             )}
                         </div>
                     </div>
                 </div>
                 <div className="w-1/2 mt-10">
                     {/* <p className="text-gray-600 mb-2 text-sm">Title Design: {order.titleDesign}</p> */}
-                    <p className="text-gray-600 mb-2 text-sm">Create Date: {order.createDate}</p>
-                    <p className="text-gray-600 mb-2 text-sm">Expected Start Date: {order.expectedStartDate}</p>
+                    <p className="text-gray-600 mb-2 text-sm">
+                        <FaCalendarAlt className="inline-block mr-1" />
+                        <span style={{ fontWeight: "bolder" }}>Create Date:</span> {order.createDate}
+                    </p>
+                    <p className="text-gray-600 mb-2 text-sm">
+                        <FaCalendarAlt className="inline-block mr-1" />
+                        <span style={{ fontWeight: "bolder" }}>Expected Start Date:</span> {order.expectedStartDate}
+                    </p>
                     <p style={{ fontWeight: "500", color: secondaryColor, cursor: 'pointer' }} onClick={() => setSelectedOrderMaterial(order.orderID)}>
                         View material
                     </p>

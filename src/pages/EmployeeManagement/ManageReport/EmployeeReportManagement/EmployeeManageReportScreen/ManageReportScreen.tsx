@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './ManageReportStyles.module.scss'
 import { motion } from 'framer-motion';
-import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaTimes, FaChevronLeft, FaChevronRight, FaFileAlt, FaCalendarAlt, FaMapMarkerAlt, FaEye, FaCheck } from 'react-icons/fa';
 import { Report, ReportImageList, ReportTable } from '../../../../../models/EmployeeManageReportModel';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import axios from 'axios';
@@ -48,62 +48,97 @@ const OrderReport: React.FC<{
     onMarkResolved: (reportID: string) => void;
 }> = ({ report, onViewDetails, onMarkResolved }) => (
     <div className="bg-white mb-8 shadow-lg rounded-lg p-6 transition duration-300 ease-in-out transform hover:shadow-xl">
-        <h3 className="font-semibold mb-3 text-indigo-700 text-sm">Report ID: {report.reportID}</h3>
+        <h3 className="font-semibold mb-3 text-indigo-700 text-sm">
+            <FaFileAlt className="inline-block mr-2" />
+            Report ID: {report.reportID}
+        </h3>
         <div className="flex justify-between">
             <div className="w-1/2">
-                <p className="text-gray-600 mb-2 text-sm">Type Of Report: {report.typeOfReport}</p>
-                <p className="text-gray-600 mb-2 text-sm">Created by: {report.userResponse?.fullName} ({report.userResponse?.userID})</p>
-                <p className="text-gray-600 mb-2 text-sm">Date: {report.createDate}</p>
-                <p className="text-gray-700 mt-2 text-sm">Content: {report.content}</p>
+                <p className="text-gray-600 mb-2 text-sm">
+                    <span style={{ fontWeight: "bolder" }}>
+                        <FaClipboardCheck className="inline-block mr-2" />
+                        Type Of Report:
+                    </span> {report.typeOfReport}
+                </p>
+                <p className="text-gray-600 mb-2 text-sm">
+                    <span style={{ fontWeight: "bolder" }}>
+                        <FaUser className="inline-block mr-2" />
+                        Created by:
+                    </span> {report.userResponse?.fullName} ({report.userResponse?.userID})
+                </p>
+                <p className="text-gray-600 mb-2 text-sm">
+                    <span style={{ fontWeight: "bolder" }}>
+                        <FaCalendarAlt className="inline-block mr-2" />
+                        Date:
+                    </span> {report.createDate}
+                </p>
+                <p className="text-gray-700 mt-2 text-sm">
+                    <span style={{ fontWeight: "bolder" }}>
+                        <FaFileAlt className="inline-block mr-2" />
+                        Content:
+                    </span> {report.content}
+                </p>
                 <p className="text-gray-600 mt-2 text-sm">
-                    Status Report:{' '}
-                    <span
-                        className={`ml-2 font-semibold px-2 py-1 rounded-full ${report.reportStatus ? 'bg-green-200 text-green-800' : 'bg-yellow-200 text-yellow-800'
-                            }`}
-                    >
+                    <span style={{ fontWeight: "bolder" }}>
+                        <FaClipboardCheck className="inline-block mr-2" />
+                        Status Report:
+                    </span>
+                    <span className={`ml-2 font-semibold px-2 py-1 rounded-full ${report.reportStatus ? 'bg-green-200 text-green-800' : 'bg-yellow-200 text-yellow-800'}`}>
                         {report.reportStatus ? 'Read' : 'Unread'}
                     </span>
                 </p>
                 <div className="mt-4">
                     {report.orderResponse.detailList.map((detail, index) => (
                         <p key={index} className="text-gray-600 text-sm">
-                            Size {detail.size.sizeName}: Quantity {detail.quantity}
+                            <span style={{ fontWeight: "bolder" }}>
+                                Size
+                            </span> {detail.size.sizeName}: <span style={{ fontWeight: "bolder" }}>Quantity: </span> {detail.quantity}
                         </p>
                     ))}
                 </div>
             </div>
             <div className="w-1/2">
-                <p className="text-gray-600 mb-2 text-sm">Order ID: {report.orderResponse.orderID}</p>
-                {/* <p className="text-gray-600 mb-2 text-sm">
-                    Order Status: <span className={`mb-2 ${getStatusColor(report.orderResponse.orderStatus)} font-bold`}>{report.orderResponse.orderStatus}</span>
-                </p> */}
-                <p className="text-gray-600 mb-2 text-sm">Total Quantity: {report.orderResponse.quantity}</p>
                 <p className="text-gray-600 mb-2 text-sm">
-                    Address: {report.orderResponse.address}, {report.orderResponse.ward}, {report.orderResponse.district},{' '}
-                    {report.orderResponse.province}
+                    <span style={{ fontWeight: "bolder" }}>
+                        <FaClipboardCheck className="inline-block mr-2" />
+                        Order ID:
+                    </span> {report.orderResponse.orderID}
                 </p>
-
+                <p className="text-gray-600 mb-2 text-sm">
+                    <span style={{ fontWeight: "bolder" }}>
+                        <FaClipboardCheck className="inline-block mr-2" />
+                        Total Quantity:
+                    </span> {report.orderResponse.quantity}
+                </p>
+                <p className="text-gray-600 mb-2 text-sm">
+                    <span style={{ fontWeight: "bolder" }}>
+                        <FaMapMarkerAlt className="inline-block mr-2" />
+                        Address:
+                    </span> {report.orderResponse.address}, {report.orderResponse.ward}, {report.orderResponse.district}, {report.orderResponse.province}
+                </p>
             </div>
         </div>
         <div className="mt-6 flex justify-end">
             <button
                 onClick={() => onViewDetails(report)}
-                className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4"
+                className="bg-indigo-500 text-sm text-white px-4 py-2 hover:bg-indigo-600 transition duration-300 mr-4 flex items-center"
                 style={{
                     borderRadius: 4,
                     backgroundColor: secondaryColor
                 }}
             >
+                <FaEye className="mr-2" />
                 View Details
             </button>
             <button
                 onClick={() => onMarkResolved(report.reportID)}
-                className="bg-green-500 text-white text-sm px-4 py-2 rounded-full hover:bg-green-600 transition duration-300"
+                className="bg-green-500 text-white text-sm px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 flex items-center"
                 style={{
                     borderRadius: 4,
                     backgroundColor: greenColor
                 }}
             >
+                <FaCheck className="mr-2" />
                 Mark as Resolved
             </button>
         </div>
