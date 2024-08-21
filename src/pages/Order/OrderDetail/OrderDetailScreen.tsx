@@ -32,6 +32,7 @@ import { __handleSendNotification } from '../../../utils/NotificationUtils';
 import MaterialDetailTableComponent from '../Components/Table/MaterialDetailTableComponent';
 import ViewFinalCheckingProductsDialogComponent from '../Components/Dialog/ViewFinalCheckingProductsDialog/ViewFinalCheckingProductsDialogComponent';
 import RefunctionRequestDialogComponent from '../../../components/Dialog/RefunctionRequestDialog/RefunctionRequestDialogComponent';
+import PartOfClothAndPriceDetailTableComponent from '../Components/Table/PartOfClothAndPriceDetailComponent';
 
 
 
@@ -60,6 +61,7 @@ interface OrderPriceDetailInterface {
     customerSecondStage: string;
     customerShippingFee: string | number | undefined;
     brandDetailPriceResponseList: BrandDetailPriceResponseInterface[];
+    customerCommissionFee: string;
 }
 
 
@@ -102,7 +104,7 @@ const OrderDetailScreen: React.FC = () => {
     const [isOpenFinalProductsDialog, setIsOpenFinalProductsDialog] = useState<boolean>(false);
     const [isOpenMaterialDetailDialog, setIsOpenMaterialDetailDialog] = useState<boolean>(false);
     const [isOpenRefundRequestDialog, setIsOpenRefundRequestDialog] = useState<boolean>(false);
-
+    const [totalPrices, setTotalPrices] = useState<{ min: number, max: number }>({ min: 0, max: 0 });
 
 
 
@@ -164,6 +166,31 @@ const OrderDetailScreen: React.FC = () => {
         progressDate: 'March 24, 2021'
     };
     // ---------------UseEffect---------------//
+
+    useEffect(() => {
+
+        if (orderDetail?.designMaterialDetailResponseList) {
+            const calculateTotalPrices = () => {
+                let totalMin = 0;
+                let totalMax = 0;
+
+                orderDetail?.designMaterialDetailResponseList?.forEach(item => {
+                    // Ensure minPriceMaterial and maxPriceMaterial are defined and parsed as numbers
+                    if (item.minPriceMaterial) {
+                        totalMin += parseFloat(item.minPriceMaterial);
+                    }
+                    if (item.maxPriceMaterial) {
+                        totalMax += parseFloat(item.maxPriceMaterial);
+                    }
+                });
+
+                return { min: totalMin, max: totalMax };
+            };
+
+            setTotalPrices(calculateTotalPrices());
+        }
+
+    }, [orderDetail])
 
 
     useEffect(() => {
@@ -729,12 +756,20 @@ const OrderDetailScreen: React.FC = () => {
 
                     )}
 
-                    {orderDetail?.orderStatus !== 'CANCEL' && (
 
 
+                    {orderDetail?.orderStatus !== 'CANCEL' && orderDetail?.orderStatus !== 'NOT_VERIFY' && orderDetail?.orderStatus !== 'PENDING' && (
                         <div className="mt-0 border-t pt-4 flex">
                             <div className={`w-full md:w-2/5 mt-6 md:mt-0 ${orderDetail?.paymentList && orderDetail?.paymentList?.length <= 0 && 'ml-auto'}`}>
                                 <div className="flex flex-col space-y-4">
+                                    {referencePrice?.customerCommissionFee !== '-1' && (
+                                        <div className="flex justify-between border-b pb-2">
+                                            <p className="text-gray-600 text-sm">Commission fee</p>
+                                            <p className="text-gray-600 text-sm">{referencePrice?.customerCommissionFee ? __handleAddCommasToNumber(referencePrice?.customerCommissionFee) : 'Loading'} VND</p>
+
+                                        </div>
+                                    )}
+
                                     {referencePrice?.customerPriceDeposit !== '-1' && (
                                         <div className="flex justify-between border-b pb-2">
                                             <p className="text-gray-600 text-sm">Deposit</p>
@@ -755,6 +790,7 @@ const OrderDetailScreen: React.FC = () => {
 
                                         </div>
                                     )}
+
                                     <div className="flex justify-between border-b pb-2">
                                         <p className="text-gray-600 text-sm">Shipping (Pay later)</p>
                                         {referencePrice?.customerShippingFee !== '-1' ? (
@@ -799,7 +835,7 @@ const OrderDetailScreen: React.FC = () => {
 
 
 
-                            {orderDetail?.paymentList && orderDetail?.paymentList?.length > 0 && orderDetail.orderStatus !== 'CANCEL' && (
+                            {orderDetail?.paymentList && orderDetail?.paymentList?.length > 0 && orderDetail.orderStatus !== 'CANCEL' && orderDetail.orderStatus !== 'REFUND_REQUEST' && (
 
                                 <div className="w-full md:w-2/5 mt-6 md:mt-0 ml-auto">
                                     <div className="flex flex-col space-y-4">
@@ -825,6 +861,7 @@ const OrderDetailScreen: React.FC = () => {
                                             <p className="text-gray-600 text-sm">Discount</p>
                                             <p className="text-gray-600 text-sm">0</p>
                                         </div>
+
                                         <div className="flex justify-between font-semibold text-gray-900">
                                             <p className="text-gray-600 text-sm">Total</p>
                                             <p className="text-gray-600 text-sm">{payment?.map((item) => {
@@ -907,6 +944,48 @@ const OrderDetailScreen: React.FC = () => {
 
                         </div>
                     )}
+
+                    {['NOT_VERIFY', 'PENDING'].includes(orderDetail?.orderStatus || '') && (
+                        <div className="mt-0 border-t pt-4 flex">
+                            <div className={`w-full md:w-2/5 mt-6 md:mt-0`}>
+                                <div className="flex flex-col space-y-4">
+                                    <div className="flex justify-between border-b pb-2">
+                                        <p className="text-gray-600 text-sm">Min price</p>
+                                        <p className="text-gray-600 text-sm">
+                                            {totalPrices.min !== undefined
+                                                ? __handleAddCommasToNumber(totalPrices.min * (orderDetail?.quantity ?? 0))
+                                                : 'Loading'} VND
+                                        </p>
+                                    </div>
+                                    <div className="flex justify-between border-b pb-2">
+                                        <p className="text-gray-600 text-sm">Max price</p>
+                                        <p className="text-gray-600 text-sm">
+                                            {totalPrices.max !== undefined
+                                                ? __handleAddCommasToNumber(totalPrices.max * (orderDetail?.quantity ?? 0))
+                                                : 'Loading'} VND
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* {orderDetail?.orderStatus === 'PENDING' && (
+                        <div className="mt-0 border-t pt-4 flex">
+                            <div className={`w-full md:w-2/5 mt-6 md:mt-0`}>
+                                <div className="flex flex-col space-y-4">
+                                    <div className="flex justify-between border-b pb-2">
+                                        <p className="text-gray-600 text-sm">Min price</p>
+                                        <p className="text-gray-600 text-sm">{totalPrices.min ? __handleAddCommasToNumber(totalPrices.min * orderDetail.quantity) : 'Loading'} VND</p>
+                                    </div>
+                                    <div className="flex justify-between border-b pb-2">
+                                        <p className="text-gray-600 text-sm">Max price</p>
+                                        <p className="text-gray-600 text-sm">{totalPrices.max ? __handleAddCommasToNumber(totalPrices.max * orderDetail.quantity) : 'Loading'} VND</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )} */}
 
 
 
@@ -1156,8 +1235,11 @@ const OrderDetailScreen: React.FC = () => {
                     />
                 </DialogTitle>
                 <DialogContent >
-                    <div>
+                    <div className='mb-5'>
                         <MaterialDetailTableComponent materialDetailData={orderDetail?.designResponse.materialDetail}></MaterialDetailTableComponent>
+                    </div>
+                    <div>
+                        <PartOfClothAndPriceDetailTableComponent designMaterialDetailData={orderDetail?.designMaterialDetailResponseList}></PartOfClothAndPriceDetailTableComponent>
                     </div>
                 </DialogContent>
 
@@ -1167,7 +1249,7 @@ const OrderDetailScreen: React.FC = () => {
             <RefunctionRequestDialogComponent
                 isOpen={isOpenRefundRequestDialog}
                 onClickReportAndCancel={() => _handleCancelOrder('REFUND_REQUEST')}
-                onClose={()=>setIsOpenRefundRequestDialog(false)}
+                onClose={() => setIsOpenRefundRequestDialog(false)}
                 order={orderDetail}
                 orderID={orderDetail?.orderID}
             />

@@ -10,7 +10,7 @@ import { FaAngleDown, FaCalendar, FaCalendarAlt, FaCalendarDay, FaClipboardCheck
 import { FaAngleUp } from "react-icons/fa";
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import { toast } from 'react-toastify';
-import { PaymentOrderInterface } from '../../../models/PaymentModel';
+import { PaymentOrderInterface, PayOSResponseInterface } from '../../../models/PaymentModel';
 import LoadingComponent from '../../../components/Loading/LoadingComponent';
 import Cookies from 'js-cookie';
 import { UserInterface } from '../../../models/UserModel';
@@ -149,6 +149,7 @@ interface Payment {
     paymentURl: string | null;
     payOSResponse: PayOSResponse | null;
     createDate: string;
+    payOSData?: PayOSResponseInterface
 }
 
 interface PayOSResponse {
@@ -542,7 +543,7 @@ const AccountantManageRefundPaymentForBrandComponent: React.FC = () => {
      * Open invoice information dialog
      * @param payment 
      */
-    const __handleViewInvoiceClick = (payment: PaymentInterface | PaymentOrderInterface, order: AccountantOrderInterface) => {
+    const __handleViewInvoiceClick = (payment: any, order: AccountantOrderInterface) => {
         setCurrentPaymentData({ payment, order });
         setIsOpenPaymentInformationDialog(true);
     };
@@ -552,7 +553,7 @@ const AccountantManageRefundPaymentForBrandComponent: React.FC = () => {
      * @param item 
      * @returns 
      */
-    const renderStatusIcon = (item: PaymentInterface | PaymentOrderInterface) => {
+    const renderStatusIcon = (item: any) => {
         if (item.paymentStatus === true) {
             return (
                 <div className="flex items-center text-green-600" style={{ backgroundColor: `rgba($color: ${greenColor}, $alpha: 0.7)` }}>
@@ -1011,7 +1012,7 @@ const AccountantManageRefundPaymentForBrandComponent: React.FC = () => {
                                         )}
                                     </div>
                                     {isExtendTransaction[orderDetail?.orderID || '1'] &&
-                                        orderDetail?.paymentList?.map((payment: any, itemIndex) => {
+                                        orderDetail?.paymentList?.map((payment, itemIndex) => {
                                             if (payment.paymentType === 'ORDER_REFUND') {
                                                 return (
                                                     <div
@@ -1030,17 +1031,15 @@ const AccountantManageRefundPaymentForBrandComponent: React.FC = () => {
                                                             className="ml-0 md:ml-6 mt-4 md:mt-0 flex-grow"
                                                             style={{ position: 'relative' }}
                                                         >
-                                                            <div>
-                                                                <p className="text-sm text-black-500 pb-2" style={{ fontWeight: "bolder" }}>
-                                                                    ID: <span>{payment.paymentID}</span>
-                                                                </p>
-                                                                <p className="text-sm text-black-500 pb-2" style={{ fontWeight: "bolder" }}>
-                                                                    Amount: <span>{__handleAddCommasToNumber(payment.payOSResponse?.data?.amount)} VND</span>
-                                                                </p>
-                                                                <p className="text-sm text-black-500 pb-2" style={{ fontWeight: "bolder" }}>
-                                                                    Created at: <span>{payment.payOSResponse?.data?.createdAt}</span>
-                                                                </p>
-                                                            </div>
+                                                            <p className="text-sm text-gray-500 pb-2">
+                                                                ID: <span>{payment.paymentID}</span>
+                                                            </p>
+                                                            <p className="text-sm text-gray-500 pb-2">
+                                                                Amount: <span>{__handleAddCommasToNumber(payment.payOSData?.amount)} VND</span>
+                                                            </p>
+                                                            <p className="text-sm text-gray-500 pb-2">
+                                                                Created at: <span>{payment.payOSData?.createDate}</span>
+                                                            </p>
 
                                                             <p
                                                                 className={`${style.orderHistory__viewInvoice__button} ml-2 md:ml-4 px-3 py-2 md:px-4 md:py-2`}

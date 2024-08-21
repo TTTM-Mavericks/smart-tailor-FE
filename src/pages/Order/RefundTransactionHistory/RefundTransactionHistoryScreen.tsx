@@ -491,10 +491,10 @@ const RefundTransactionHistoryScreen: React.FC = () => {
                                                         ID: <span>{payment.paymentID}</span>
                                                     </p>
                                                     <p className="text-sm text-gray-500 pb-2">
-                                                        Amount: <span>{__handleAddCommasToNumber(payment.payOSResponse?.data?.amount)} VND</span>
+                                                        Amount: <span>{__handleAddCommasToNumber(payment?.payOSData?.amount)} VND</span>
                                                     </p>
                                                     <p className="text-sm text-gray-500 pb-2">
-                                                        Created at: <span>{payment.payOSResponse?.data?.createdAt}</span>
+                                                        Created at: <span>{payment?.payOSData?.createDate}</span>
                                                     </p>
 
                                                     <p

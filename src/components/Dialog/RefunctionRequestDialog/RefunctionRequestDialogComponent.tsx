@@ -12,6 +12,7 @@ import Cookies from 'js-cookie';
 import { UserInterface } from '../../../models/UserModel';
 import { __getToken, __getUserLogined } from '../../../App';
 import { __handleSendNotification } from '../../../utils/NotificationUtils';
+import { clothTag } from '../../../assets';
 
 type Props = {
     isOpen: boolean;
@@ -20,7 +21,7 @@ type Props = {
     orderID?: any;
     order?: OrderDetailInterface
 }
-const RefunctionRequestDialogComponent: React.FC<Props> = ({order, isOpen, onClose, onClickReportAndCancel, orderID }) => {
+const RefunctionRequestDialogComponent: React.FC<Props> = ({ order, isOpen, onClose, onClickReportAndCancel, orderID }) => {
 
     //TODO MUTIL LANGUAGE
 
@@ -108,7 +109,7 @@ const RefunctionRequestDialogComponent: React.FC<Props> = ({order, isOpen, onClo
             if (response.status === 200) {
                 setIsLoadingPage(false);
                 toast.success(`${response.message}`, { autoClose: 4000 });
-                if ( onClickReportAndCancel) {
+                if (onClickReportAndCancel) {
                     await onClickReportAndCancel()
                 }
 
@@ -156,42 +157,94 @@ const RefunctionRequestDialogComponent: React.FC<Props> = ({order, isOpen, onClo
                     />
                 </DialogTitle>
                 <DialogContent className={`${styles.orderPolicyDialog__content}  bg-gray-100 flex flex-col items-center `}>
+
+
+
                     <div className="w-full max-w-3xl bg-white p-6 shadow-md rounded-md mt-6">
-                        <h2 className="text-md font-semibold mb-4 ">Order {order?.orderID}</h2>
+                        <h2 className="text-md font-semibold ">Order {order?.orderID}</h2>
+
+                        <div className='flex items-center justify-center -mt-16'>
+                            <div
+                                className="w-1/2"
+                                style={{
+                                    width: 150,  // Swap width and height since it will be rotated
+                                    height: 300,
+                                    transform: 'rotate(270deg)', // Rotate 90 degrees
+                                    margin: '0 auto',
+                                    marginLeft: 100
+                                }}
+                            >
+                                <img
+                                    src={clothTag}
+                                    style={{
+                                        width: '100%',
+                                        height: '100%'
+                                    }}
+                                    alt=""
+                                />
+                                <p
+                                    style={{
+                                        position: 'absolute',
+                                        top: '50%',
+                                        left: '50%',
+                                        transform: 'translate(-50%, -50%) rotate(90deg)',
+                                        fontSize: 10,
+                                        fontWeight: 'bold',
+                                        textAlign: 'center',
+                                        width: '200px'
+                                    }}
+                                >
+                                    [SMT]-{order?.orderID}-#######
+                                </p>
+                            </div>
+                            <div className="p-4 w-1/2">
+                                <span className="block mb-2" style={{fontSize: 11}}>* Each product or batch of products comes with a cloth tag.</span>
+                                <span className="block mb-2" style={{fontSize: 11}}>* Please take a picture of the product along with the cloth tag.</span>
+                                <span className="block mb-2" style={{fontSize: 11}}>* The cloth tag must be clearly visible in the photo.</span>
+                                <span className="block mb-2" style={{fontSize: 11}}>* Please take pictures of the products or batches of products that do not meet the requirements or need to be returned.</span>
+                                <span className="block mb-2" style={{fontSize: 11}}>*We will not address cases where the cloth tag is not photographed, the photo is unclear, or the defect on the product is not accurately shown.</span>
+                            </div>
+
+                        </div>
+
+
+
+
+
                         <form onSubmit={__handleSubmit}>
-                            
-                                <div className="mb-4">
-                                    <label className="block text-gray-700 font-semibold mb-2">
-                                        Upload Images
-                                    </label>
-                                    <input
-                                        type="file"
-                                        multiple
-                                        accept="image/*"
-                                        onChange={__handleImageChange}
-                                        className="w-full p-2 border border-gray-300 rounded-md"
-                                    />
-                                    <span style={{ fontSize: 13, color: errorColor }}>{errorImg}</span>
-                                    <div className="mt-2 flex flex-wrap gap-4">
-                                        {images.map((image, index) => (
-                                            <div key={index} className="relative">
-                                                <img
-                                                    src={URL.createObjectURL(image)}
-                                                    alt={`Upload Preview ${index + 1}`}
-                                                    className="w-32 h-36 object-cover rounded-md"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={() => __handleRemoveImage(index)}
-                                                    className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full hover:bg-red-700 transition-colors"
-                                                >
-                                                    <IoMdTrash size={16} />
-                                                </button>
-                                            </div>
-                                        ))}
-                                    </div>
+
+                            <div className="mb-4">
+                                <label className="block text-gray-700 font-semibold mb-2">
+                                    Upload Images
+                                </label>
+                                <input
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={__handleImageChange}
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                />
+                                <span style={{ fontSize: 13, color: errorColor }}>{errorImg}</span>
+                                <div className="mt-2 flex flex-wrap gap-4">
+                                    {images.map((image, index) => (
+                                        <div key={index} className="relative">
+                                            <img
+                                                src={URL.createObjectURL(image)}
+                                                alt={`Upload Preview ${index + 1}`}
+                                                className="w-32 h-36 object-cover rounded-md"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => __handleRemoveImage(index)}
+                                                className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full hover:bg-red-700 transition-colors"
+                                            >
+                                                <IoMdTrash size={16} />
+                                            </button>
+                                        </div>
+                                    ))}
                                 </div>
-                            
+                            </div>
+
                             <div className="mb-4">
                                 <label htmlFor="comment" className="block text-gray-700 font-semibold mb-2">
                                     Reasons
