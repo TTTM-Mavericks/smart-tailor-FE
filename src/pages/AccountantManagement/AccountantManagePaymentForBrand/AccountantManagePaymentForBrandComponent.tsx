@@ -24,7 +24,7 @@ import { cancelColor, cancelColorText, completeColor, completeColorText, deliver
 import style from './AccountantManagePaymentForBrandComponentStyle.module.scss'
 import { OrderDetailInterface, PaymentInterface } from '../../../models/OrderModel';
 import { Stack } from '@mui/system';
-import { FaAngleDown } from "react-icons/fa";
+import { FaAngleDown, FaBuilding, FaClock, FaCreditCard, FaDollarSign, FaHashtag } from "react-icons/fa";
 import { FaAngleUp } from "react-icons/fa";
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import { toast } from 'react-toastify';
@@ -49,6 +49,7 @@ import { __getToken } from '../../../App';
 import jsPDF from "jspdf";
 import autoTable from 'jspdf-autotable';
 import { styled } from '@mui/system';
+import { FaFileAlt, FaTag, FaCalendarAlt } from 'react-icons/fa'
 
 const InvoiceHeader = styled(Box)(({ theme }) => ({
     display: 'flex',
@@ -2026,28 +2027,28 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                 <div className="bg-white rounded-xl shadow-md p-4 md:p-6 mb-4 md:mb-8 transform transition-all hover:shadow-lg">
                                     <div className="flex flex-col md:flex-row items-start md:items-center mb-4 md:mb-6" >
                                         <div className="mb-4 md:mb-0 w-max">
-
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <div>
-                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                        Order ID:{" "}
-                                                        <span className="text-sm text-gray-500 pb-2">
-                                                            {orderDetail?.orderID}
-                                                        </span>
-                                                    </p>
-                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                        Design ID:{" "}
-                                                        <span className="text-sm text-gray-500 pb-2">
-                                                            {orderDetail.designResponse?.designID}
-                                                        </span>
-                                                    </p>
-                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                        Create date:{" "}
-                                                        <span className="text-sm text-gray-500 pb-2">
-                                                            {orderDetail?.expectedStartDate}
-                                                        </span>
-                                                    </p>
-                                                </div>
+                                            <div>
+                                                <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                    <FaFileAlt className="inline-block mr-1" />
+                                                    Order ID:{" "}
+                                                    <span className="text-sm text-gray-500 pb-2">
+                                                        {orderDetail?.orderID}
+                                                    </span>
+                                                </p>
+                                                <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                    <FaTag className="inline-block mr-1" />
+                                                    Design ID:{" "}
+                                                    <span className="text-sm text-gray-500 pb-2">
+                                                        {orderDetail.designResponse?.designID}
+                                                    </span>
+                                                </p>
+                                                <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                    <FaCalendarAlt className="inline-block mr-1" />
+                                                    Create date:{" "}
+                                                    <span className="text-sm text-gray-500 pb-2">
+                                                        {orderDetail?.expectedStartDate}
+                                                    </span>
+                                                </p>
                                                 <div className='ml-32' style={{ marginTop: -10 }}>
                                                     <div
                                                         style={{
@@ -2057,7 +2058,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                         }}
                                                     >
                                                         <p style={{ fontWeight: "500" }} className="text-sm text-black">
-                                                            Status:{" "}
+                                                            <span className="text-sm text-gray-500 pb-2">Status:</span>{" "}
                                                         </p>
                                                         <Stack direction="row" spacing={1} padding={1}>
                                                             <Chip
@@ -2093,7 +2094,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                         }}
                                                     >
                                                         <p style={{ fontWeight: "500" }} className="text-sm text-black">
-                                                            Payment status:{" "}
+                                                            <span className="text-sm text-gray-500 pb-2">Payment status:</span>{" "}
                                                         </p>
                                                         <Stack direction="row" spacing={5} padding={1}>
                                                             <Chip
@@ -2133,193 +2134,196 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                             </div>
                                         )}
                                     </div>
-                                    {isExtendTransaction[orderDetail?.orderID || '1'] && orderChild[orderDetail.orderID]?.map((order, itemIndex) => (
-                                        <div
-                                            key={itemIndex}
-                                            className="flex flex-col md:flex-row items-start md:items-center mt-10 mb-4 md:mb-6 border-b pb-4 md:pb-6"
-                                        >
-                                            <div className="flex-shrink-0"></div>
+                                    {
+                                        isExtendTransaction[orderDetail?.orderID || '1'] && orderChild[orderDetail.orderID]?.map((order, itemIndex) => (
                                             <div
-                                                className="ml-0 md:ml-6 mt-4 md:mt-0 flex-grow grid grid-cols-1 md:grid-cols-2 gap-4"
-                                                style={{ position: "relative" }}
+                                                key={itemIndex}
+                                                className="flex flex-col md:flex-row items-start md:items-center mt-10 mb-4 md:mb-6 border-b pb-4 md:pb-6"
                                             >
-                                                <div>
-                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                        Sub ID:{" "}
-                                                        <span className="text-sm text-gray-500 pb-2">
-                                                            {order.orderID}
-                                                        </span>
-                                                    </p>
-                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                        Type:{" "}
-                                                        <span className="text-sm text-blue-700 pb-2">
-                                                            {order.orderType}
-                                                        </span>
-                                                    </p>
-                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                        Brand ID:{" "}
-                                                        <span className="text-sm text-gray-500 pb-2">
-                                                            {order.brand?.brandID}
-                                                        </span>
-                                                    </p>
-                                                    <p
-                                                        style={{ fontWeight: "500" }}
-                                                        className="text-sm text-black flex content-center items-center"
-                                                    >
-                                                        Brand:
+                                                <div className="flex-shrink-0"></div>
+                                                <div
+                                                    className="ml-0 md:ml-6 mt-4 md:mt-0 flex-grow grid grid-cols-1 md:grid-cols-2 gap-4"
+                                                    style={{ position: "relative" }}
+                                                >
+                                                    <div>
+                                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                            <FaHashtag className="inline-block mr-1" />
+                                                            Sub ID:{" "}
+                                                            <span className="text-sm text-gray-500 pb-2">
+                                                                {order.orderID}
+                                                            </span>
+                                                        </p>
+                                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                            <FaTag className="inline-block mr-1" />
+                                                            Type:{" "}
+                                                            <span className="text-sm text-blue-700 pb-2">
+                                                                {order.orderType}
+                                                            </span>
+                                                        </p>
+                                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                            <FaBuilding className="inline-block mr-1" />
+                                                            Brand ID:{" "}
+                                                            <span className="text-sm text-gray-500 pb-2">
+                                                                {order.brand?.brandID}
+                                                            </span>
+                                                        </p>
                                                         <p
                                                             style={{ fontWeight: "500" }}
                                                             className="text-sm text-black flex content-center items-center"
                                                         >
-                                                            <img
-                                                                src={order.brand?.user.imageUrl}
-                                                                style={{
-                                                                    width: 30,
-                                                                    height: 30,
-                                                                    borderRadius: 90,
-                                                                    marginLeft: 5,
-                                                                    marginRight: 5,
-                                                                }}
-                                                            />
+                                                            <span className="text-sm text-gray-500 pb-2">Brand:</span>
                                                             <p
-                                                                className={`${__handlegetRatingStyle(
-                                                                    order.brand?.rating
-                                                                )
-                                                                    } text - sm text - gray - 500`}
+                                                                style={{ fontWeight: "500" }}
+                                                                className="text-sm text-black flex content-center items-center"
                                                             >
-                                                                {" "}
-                                                                {order.brand?.brandName}
+                                                                <img
+                                                                    src={order.brand?.user.imageUrl}
+                                                                    style={{
+                                                                        width: 30,
+                                                                        height: 30,
+                                                                        borderRadius: 90,
+                                                                        marginLeft: 5,
+                                                                        marginRight: 5,
+                                                                    }}
+                                                                />
+                                                                <p
+                                                                    className={`${__handlegetRatingStyle(
+                                                                        order.brand?.rating
+                                                                    )
+                                                                        } text - sm text - gray - 500`}
+                                                                >
+                                                                    {" "}
+                                                                    {order.brand?.brandName}
+                                                                </p>
                                                             </p>
                                                         </p>
-                                                    </p>
-                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                        Rating:{" "}
-                                                        <span className="text-sm text-gray-500 pb-2">
-                                                            {order.brand?.rating?.toFixed(1)}
-                                                        </span>{" "}
-                                                        <span className="text-yellow-400 text-sm">★</span>
-                                                    </p>
-                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-4">
-                                                        Details:
-                                                        {order.detailList?.map((detail) => (
-                                                            <div className="grid grid-cols-4 gap-1 pt-0">
-                                                                <p className="text-sm text-gray-500 pb-2">
-                                                                    Size: {detail.size?.sizeName}
-                                                                </p>
-                                                                <p className="text-sm text-gray-500 pb-2">
-                                                                    Quantity: {detail.quantity}
-                                                                </p>
-                                                            </div>
-                                                        ))}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                        PaymentID:{" "}
-                                                        <span className="text-sm text-gray-500 pb-2">
-                                                            {order?.paymentList && order?.paymentList?.length > 0 ? order?.paymentList[0]?.paymentID : 'NaN'}
-                                                        </span>
-                                                    </p>
-                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                        Total price:{" "}
-                                                        <span className="text-sm text-gray-500 pb-2">
-                                                            {__handleAddCommasToNumber(order.totalPrice)} VND
-                                                        </span>
-                                                    </p>
-                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                        Expected start at:{" "}
-                                                        <span className={`${__handleGetDateTimeColor(order.expectedStartDate)} text - sm pb - 2`}>
-                                                            {order.expectedStartDate}
-                                                        </span>
-                                                    </p>
-                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                        Status:
-                                                        <button
-                                                            className="py-1 px-3 rounded-full ml-2"
-                                                            style={{
-                                                                backgroundColor:
-                                                                    orderDetail?.orderStatus === "PENDING"
-                                                                        ? secondaryColor
-                                                                        : orderDetail?.orderStatus === "DELIVERED"
-                                                                            ? greenColor
-                                                                            : orderDetail?.orderStatus === "DEPOSIT"
-                                                                                ? secondaryColor
-                                                                                : orderDetail?.orderStatus === "PROCESSING"
+                                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                            <span className="text-sm text-gray-500 pb-2">Rating:</span>{" "}
+                                                            <span className="text-sm text-gray-500 pb-2">
+                                                                {order.brand?.rating?.toFixed(1)}
+                                                            </span>{" "}
+                                                            <span className="text-yellow-400 text-sm">★</span>
+                                                        </p>
+                                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-4">
+                                                            Details:
+                                                            {order.detailList?.map((detail) => (
+                                                                <div className="grid grid-cols-4 gap-1 pt-0">
+                                                                    <span style={{ fontWeight: "bolder" }}> Size: </span>{detail?.size?.sizeName}: <span style={{ fontWeight: "bolder" }}>Quantity: </span> {detail.quantity}
+                                                                </div>
+                                                            ))}
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                            <FaCreditCard className="inline-block mr-1" />
+                                                            Payment ID:{" "}
+                                                            <span className="text-sm text-gray-500 pb-2">
+                                                                {order?.paymentList && order?.paymentList?.length > 0 ? order?.paymentList[0]?.paymentID : 'NaN'}
+                                                            </span>
+                                                        </p>
+                                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                            <FaDollarSign className="inline-block mr-1" />
+                                                            Total price:{" "}
+                                                            <span className="text-sm text-gray-500 pb-2">
+                                                                {__handleAddCommasToNumber(order.totalPrice)} VND
+                                                            </span>
+                                                        </p>
+                                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                            <FaClock className="inline-block mr-1" />
+                                                            Expected start at:{" "}
+                                                            <span className={`${__handleGetDateTimeColor(order.expectedStartDate)} text-sm pb-2`}>
+                                                                {order.expectedStartDate}
+                                                            </span>
+                                                        </p>
+                                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                            <span className="text-sm text-gray-500 pb-2">Status:</span>
+                                                            <button
+                                                                className="py-1 px-3 rounded-full ml-2"
+                                                                style={{
+                                                                    backgroundColor:
+                                                                        orderDetail?.orderStatus === "PENDING"
+                                                                            ? secondaryColor
+                                                                            : orderDetail?.orderStatus === "DELIVERED"
+                                                                                ? greenColor
+                                                                                : orderDetail?.orderStatus === "DEPOSIT"
                                                                                     ? secondaryColor
-                                                                                    : redColor,
-                                                                opacity: 1,
-                                                                color: whiteColor,
-                                                                fontSize: 11,
-                                                            }}
-                                                        >
-                                                            {orderDetail?.orderStatus}
-                                                        </button>
-                                                    </p>
-                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                        Payment status:
-                                                        <button
-                                                            className="py-1 px-3 rounded-full ml-2"
-                                                            style={__handlegetStatusBackgroundBoolean(
-                                                                order?.paymentList &&
+                                                                                    : orderDetail?.orderStatus === "PROCESSING"
+                                                                                        ? secondaryColor
+                                                                                        : redColor,
+                                                                    opacity: 1,
+                                                                    color: whiteColor,
+                                                                    fontSize: 11,
+                                                                }}
+                                                            >
+                                                                {orderDetail?.orderStatus}
+                                                            </button>
+                                                        </p>
+                                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                            <span className="text-sm text-gray-500 pb-2">Payment status:</span>
+                                                            <button
+                                                                className="py-1 px-3 rounded-full ml-2"
+                                                                style={__handlegetStatusBackgroundBoolean(
+                                                                    order?.paymentList &&
+                                                                        order?.paymentList[0].paymentStatus
+                                                                        ? true
+                                                                        : false
+                                                                )}
+                                                            >
+                                                                {`${order?.paymentList &&
                                                                     order?.paymentList[0].paymentStatus
-                                                                    ? true
-                                                                    : false
-                                                            )}
-                                                        >
-                                                            {`${order?.paymentList &&
-                                                                order?.paymentList[0].paymentStatus
-                                                                ? "PAID"
-                                                                : "PENDING"
-                                                                } `}
-                                                        </button>
-                                                    </p>
+                                                                    ? "PAID"
+                                                                    : "PENDING"
+                                                                    } `}
+                                                            </button>
+                                                        </p>
 
-                                                </div>
-                                                <div
-                                                    className={`${style.orderHistory__viewInvoice__buttonPayment} items-center justify-center`}
-                                                    style={{ textAlign: "center" }}
-                                                >
-                                                    <p
-                                                        className={` px-5 text-sm font-medium`}
+                                                    </div>
+                                                    <div
+                                                        className={`${style.orderHistory__viewInvoice__buttonPayment} items-center justify-center`}
+                                                        style={{ textAlign: "center" }}
                                                     >
-                                                        <p className='mb-32 cursor-pointer' onClick={() => handleViewTransaction(order)}>View transaction</p>
-                                                        <button
-                                                            type="submit"
-                                                            className="px-5 py-2 text-sm font-medium text-white"
-                                                            style={{
-                                                                borderRadius: 4,
-                                                                color: whiteColor,
-                                                                marginBottom: 10,
-                                                                backgroundColor: primaryColor,
-                                                                textDecoration: "none",
-                                                            }}
-                                                            onClick={() => __handleOpenPaymentForBrandialog(order.orderID)}
+                                                        <p
+                                                            className={` px-5 text-sm font-medium`}
                                                         >
-                                                            <span className="font-medium text-white">Payment</span>
-                                                        </button>
-                                                    </p>
+                                                            <p className='mb-32 cursor-pointer' onClick={() => handleViewTransaction(order)}>View transaction</p>
+                                                            <button
+                                                                type="submit"
+                                                                className="px-5 py-2 text-sm font-medium text-white"
+                                                                style={{
+                                                                    borderRadius: 4,
+                                                                    color: whiteColor,
+                                                                    marginBottom: 10,
+                                                                    backgroundColor: primaryColor,
+                                                                    textDecoration: "none",
+                                                                }}
+                                                                onClick={() => __handleOpenPaymentForBrandialog(order.orderID)}
+                                                            >
+                                                                <span className="font-medium text-white">Payment</span>
+                                                            </button>
+                                                        </p>
+                                                    </div>
+
+                                                    {isTransactionModalOpen && selectedTransactions && (
+                                                        <TransactionModals
+                                                            transaction={selectedTransactions}
+                                                            onClose={handleCloseTransactionModal}
+                                                            onDownloadPDF={(pdfData) => _handleOpenPDF(pdfData)}
+                                                            parentOrderDetai={orderDetail}
+                                                        />
+                                                    )}
+
+                                                    {selectedOrder === order.orderID && (
+                                                        <PaymentFromAccountantToBranđialog
+                                                            onClose={__handleClosePaymentForBrandialog}
+                                                            isOpen={true}
+                                                            paymentData={order.paymentList}
+                                                        ></PaymentFromAccountantToBranđialog>
+                                                    )}
                                                 </div>
-
-                                                {isTransactionModalOpen && selectedTransactions && (
-                                                    <TransactionModals
-                                                        transaction={selectedTransactions}
-                                                        onClose={handleCloseTransactionModal}
-                                                        onDownloadPDF={(pdfData) => _handleOpenPDF(pdfData)}
-                                                        parentOrderDetai={orderDetail}
-                                                    />
-                                                )}
-
-                                                {selectedOrder === order.orderID && (
-                                                    <PaymentFromAccountantToBranđialog
-                                                        onClose={__handleClosePaymentForBrandialog}
-                                                        isOpen={true}
-                                                        paymentData={order.paymentList}
-                                                    ></PaymentFromAccountantToBranđialog>
-                                                )}
                                             </div>
-                                        </div>
 
-                                    ))}
+                                        ))
+                                    }
                                 </div>
                             ))}
                         </div>

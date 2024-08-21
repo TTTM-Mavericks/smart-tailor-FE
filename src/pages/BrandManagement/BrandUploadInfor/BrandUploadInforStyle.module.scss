@@ -1,0 +1,56 @@
+@import '../../../index.module.scss';
+
+.orderPolicyDialog__content {
+    &::-webkit-scrollbar {
+        width: 3px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: $grayColor1;
+        border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #7b7b7b;
+        border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: #7b7b7b;
+        /* Color when hovering over the scrollbar thumb */
+    }
+
+    &__section {
+        margin-bottom: 20px;
+
+        strong {
+            font-size: 14px;
+        }
+
+        p {
+            font-size: 13px;
+            padding-left: 10px;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin-top: 10px;
+
+
+            p {
+                list-style-type: disc;
+                margin-bottom: 5px;
+                font-size: 13px;
+
+            }
+        }
+
+        li {
+            margin-bottom: 5px;
+            font-size: 13px;
+            padding-left: 10px;
+
+        }
+    }
+
+}

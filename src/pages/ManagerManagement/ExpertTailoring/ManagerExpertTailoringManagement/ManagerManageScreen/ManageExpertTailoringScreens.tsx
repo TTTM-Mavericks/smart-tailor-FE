@@ -214,8 +214,13 @@ const ManageExpertTailoring: React.FC = () => {
             flex: 1,
         },
         {
+            field: "modelImageUrl",
+            headerName: "Model Image Url",
+            flex: 1,
+        },
+        {
             field: "sizeImageUrl",
-            headerName: "Size Image Urls",
+            headerName: "Size Image Url",
             flex: 1,
         },
         {

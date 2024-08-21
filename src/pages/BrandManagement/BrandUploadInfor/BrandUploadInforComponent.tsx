@@ -11,7 +11,11 @@ import { UserInterface } from '../../../models/UserModel';
 import { toast } from 'react-toastify';
 import LoadingComponent from '../../../components/Loading/LoadingComponent';
 import ViewSampleBrandUpdateDialog from './Test';
-
+import { AnyObject } from 'three/examples/jsm/nodes/core/constants';
+import { Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, Typography } from '@mui/material';
+import { primaryColor, redColor, whiteColor } from '../../../root/ColorSystem';
+import { IoMdCloseCircleOutline } from 'react-icons/io';
+import styles from './BrandUploadInforStyle.module.scss'
 const UploadBrandInforForm = () => {
     const { id } = useParams<{ id: string }>();
     // ---------------UseState Variables---------------//
@@ -32,6 +36,21 @@ const UploadBrandInforForm = () => {
     const [taxCodeData, setTaxCodeData] = useState<any>(null);
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [policyAgreed, setPolicyAgreed] = useState(false);
+
+    const handleDialogOpen = () => {
+        setIsDialogOpen(true);
+    };
+
+    const handleDialogClose = () => {
+        setIsDialogOpen(false);
+    };
+
+    const handlePolicyAgreeChange = (e: any) => {
+        setPolicyAgreed(e.target.checked);
+    };
 
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -485,92 +504,103 @@ const UploadBrandInforForm = () => {
         }
     };
 
-    const _handleSubmit = async (e: React.FormEvent) => {
+    const _handleSubmit = async (e: any) => {
+        e.preventDefault();
+        handleDialogOpen();
+    }
+
+    const handleFinalSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-
-        if (!validateForm() || !taxCodeValidated) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Validation Error',
-                text: 'Please correct the errors in the form and validate the tax code',
-            });
-            setIsLoading(false);
-            return;
-        }
-
-
-        let uploadedImages: BrandImages[] = [];
-        let avatarUrl = '';
-        if (files && files.length > 0) {
-            try {
-                uploadedImages = await _handleUploadToCloudinary(files);
-                console.log("Uploaded images:", uploadedImages);
-            } catch (error) {
-                console.error('Error uploading images:', error);
+        if (policyAgreed) {
+            if (!validateForm() || !taxCodeValidated) {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Image Upload Failed',
-                    text: 'There was an error uploading your images. Please try again.',
+                    title: 'Validation Error',
+                    text: 'Please correct the errors in the form and validate the tax code',
                 });
+                handleDialogClose();
                 setIsLoading(false);
                 return;
             }
-        }
 
-        if (avatarFile) {
+
+            let uploadedImages: BrandImages[] = [];
+            let avatarUrl = '';
+            if (files && files.length > 0) {
+                try {
+                    uploadedImages = await _handleUploadToCloudinary(files);
+                    console.log("Uploaded images:", uploadedImages);
+                } catch (error) {
+                    console.error('Error uploading images:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Image Upload Failed',
+                        text: 'There was an error uploading your images. Please try again.',
+                    });
+                    setIsLoading(false);
+                    return;
+                }
+            }
+
+            if (avatarFile) {
+                try {
+                    avatarUrl = await uploadAvatarToCloudinary(avatarFile);
+                } catch (error) {
+                    console.error('Error uploading avatar:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Avatar Upload Failed',
+                        text: 'There was an error uploading your avatar. Please try again.',
+                    });
+                    setIsLoading(false);
+                    return;
+                }
+            }
+
+            const updatedFormData = {
+                ...formData,
+                brandImages: uploadedImages
+            };
+
+            console.log("Submitting form data:", updatedFormData);
             try {
-                avatarUrl = await uploadAvatarToCloudinary(avatarFile);
+                const response = await axios.post(
+                    `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.uploadBrandInfor + '/' + getID()}`,
+                    updatedFormData
+                );
+
+                console.log('Profile uploaded successfully:', response.data);
+
+                if (response.status === 200) {
+                    setIsLoading(false);
+                }
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Upload Brand Information Success!',
+                    text: 'Brand profile uploaded successfully',
+                });
+                handleDialogClose();
+                setActiveStep(2);
+                window.location.href = `/brand/waiting_process_information`;
+
             } catch (error) {
-                console.error('Error uploading avatar:', error);
+                setIsLoading(false);
+                handleDialogClose();
+                console.error('Error uploading profile', error);
                 Swal.fire({
                     icon: 'error',
-                    title: 'Avatar Upload Failed',
-                    text: 'There was an error uploading your avatar. Please try again.',
+                    title: 'Upload Brand Information Failed!',
+                    text: 'There was an error uploading your brand profile. Please try again.',
                 });
-                setIsLoading(false);
-                return;
+                setActiveStep(1);
             }
+            handleDialogClose();
+        } else {
+            alert('You must agree to the policy before submitting.');
         }
-
-        const updatedFormData = {
-            ...formData,
-            brandImages: uploadedImages
-        };
-
-        console.log("Submitting form data:", updatedFormData);
-
-        try {
-            const response = await axios.post(
-                `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.uploadBrandInfor + '/' + getID()}`,
-                updatedFormData
-            );
-
-            console.log('Profile uploaded successfully:', response.data);
-
-            if (response.status === 200) {
-                setIsLoading(false);
-            }
-
-            Swal.fire({
-                icon: 'success',
-                title: 'Upload Brand Information Success!',
-                text: 'Brand profile uploaded successfully',
-            });
-            setActiveStep(2);
-            window.location.href = `/brand/waiting_process_information`;
-
-        } catch (error) {
-            setIsLoading(false);
-            console.error('Error uploading profile', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Upload Brand Information Failed!',
-                text: 'There was an error uploading your brand profile. Please try again.',
-            });
-            setActiveStep(1);
-        }
-    }
+    };
 
     // ---------------Fetch Account Name on Account Number Change---------------//
     useEffect(() => {
@@ -599,12 +629,12 @@ const UploadBrandInforForm = () => {
             <div className="lg:w-2/6 w-full bg-gradient-to-r from-emerald-500 to-emerald-900 p-10 text-white flex flex-col justify-between">
                 <div>
                     <button className="text-white mb-4 flex items-center space-x-2">
-                        {/* <span className="text-lg">&#x2190;</span> */}
-                        <span>Become Brand</span>
+                        <span>Become a Brand Partner</span>
                     </button>
-                    <h1 className="text-4xl font-bold mb-2">222,222 VND</h1>
-                    <p>We will bill you 222,222 VND monthly, unless you cancel.</p>
+                    <h1 className="text-2xl font-bold mb-2">Exclusive Benefits</h1>
+                    <p>Join us as a brand partner and unlock a suite of premium features tailored</p>
                 </div>
+
                 {/* QR PAYMENT */}
                 <div className="flex justify-center items-start mt-10">
                     <img
@@ -614,6 +644,7 @@ const UploadBrandInforForm = () => {
                     />
                 </div>
                 {/* END QR PAYMENT */}
+
                 <div className="mt-10">
                     <div className="flex items-center mb-6">
                         <div className="w-7 h-5 bg-black rounded-full flex items-center justify-center mr-4">
@@ -623,14 +654,6 @@ const UploadBrandInforForm = () => {
                             <h2 className="text-lg font-semibold">Smart Tailor pro</h2>
                             <p className="text-sm">Up to more functionality and more create design.</p>
                         </div>
-                    </div>
-                    <div>
-                        <label className="block mb-2">Add promo code</label>
-                        <input type="text" className="w-full p-2 text-black rounded focus:outline-none focus:ring-2 focus:ring-purple-500" />
-                    </div>
-                    <div className="mt-6 space-y-2">
-                        <p className="flex justify-between"><span>Subtotal</span> <span>222,222 VND</span></p>
-                        <p className="flex justify-between"><span>Total due today</span> <span>222,000 VND</span></p>
                     </div>
                 </div>
             </div>
@@ -705,39 +728,11 @@ const UploadBrandInforForm = () => {
                         {selectedOption === 'yearly' && renderCheckmark()}
                     </div>
                 </div>
-                <h2 className="text-2xl font-bold mb-6">Upload information</h2>
-
-                <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Avatar
-                    </label>
-                    <div className="flex items-center space-x-4">
-                        {avatarPreview && (
-                            <div className="w-20 h-20 rounded-full overflow-hidden">
-                                <img
-                                    src={avatarPreview}
-                                    alt="Avatar preview"
-                                    className="w-full h-full object-cover"
-                                />
-                            </div>
-                        )}
-                        <input
-                            type="file"
-                            onChange={handleAvatarChange}
-                            accept="image/*"
-                            className="hidden"
-                            id="avatar-upload"
-                        />
-                        <label
-                            htmlFor="avatar-upload"
-                            className="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        >
-                            {avatarFile ? 'Change Avatar' : 'Upload Avatar'}
-                        </label>
-                    </div>
-                </div>
                 {/* Form Input POST */}
                 <form className="space-y-4" onSubmit={_handleSubmit}>
+                    {/* Avatar Upload Section */}
+
+
                     <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4">
                         <input type="text"
                             name="email"
@@ -780,7 +775,6 @@ const UploadBrandInforForm = () => {
                             {formErrors.accountNumber && <p className="text-red-500 text-sm mt-1">{formErrors.accountNumber}</p>}
                         </div>
                     </div>
-                    {/* <input type="text" className="w-full p-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Card number" /> */}
                     <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4">
                         <input type="text"
                             name="accountName"
@@ -850,7 +844,6 @@ const UploadBrandInforForm = () => {
                             </div>
                         )}
                     </div>
-
                     {/* <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4">
                         <select
                             className="appearance-none mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -861,7 +854,6 @@ const UploadBrandInforForm = () => {
                             ))}
                         </select>
                     </div> */}
-
                     <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4">
                         <select
                             name="businessType"
@@ -902,54 +894,162 @@ const UploadBrandInforForm = () => {
                         <div className="mt-4 p-4 bg-gray-100 rounded-lg">
                             <h3 className="font-bold mb-2">Tax Code Information:</h3>
                             <p><strong>Name:</strong> {taxCodeData.name}</p>
-                            {/* <p><strong>International Name:</strong> {taxCodeData.internationalName}</p> */}
+                            <p><strong>International Name:</strong> {taxCodeData.internationalName}</p>
                             <p><strong>Address:</strong> {taxCodeData.address}</p>
                         </div>
                     )}
 
-                    {/* Image Array */}
-                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4 mb-4">
-                        {previewUrls.map((url, index) => (
-                            <div key={url} className="relative aspect-square rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-                                <img src={url} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
-                                <button
-                                    onClick={() => {
-                                        const newFiles = files.filter((_, i) => i !== index);
-                                        const newPreviewUrls = previewUrls.filter((_, i) => i !== index);
-                                        setFiles(newFiles);
-                                        setPreviewUrls(newPreviewUrls);
-                                    }}
-                                    className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 transition-colors"
-                                    aria-label="Remove image"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
+                    <div className="flex items-center space-x-4">
+                        {avatarPreview && (
+                            <div className="w-20 h-20 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out">
+                                <img
+                                    src={avatarPreview}
+                                    alt="Avatar preview"
+                                    className="w-full h-full object-cover"
+                                />
                             </div>
-                        ))}
-                        <div
-                            onClick={() => fileInputRef.current?.click()}
-                            className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors"
+                        )}
+                        <input
+                            type="file"
+                            onChange={handleAvatarChange}
+                            accept="image/*"
+                            className="hidden"
+                            id="avatar-upload"
+                        />
+                        <label
+                            for="avatar-upload"
+                            className="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         >
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                className="hidden"
-                                onChange={_handleChanges}
-                                accept="image/*"
-                                multiple
-                            />
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                            </svg>
-                            <span className="text-sm text-gray-500">Add Image</span>
+                            {avatarFile ? 'Change Avatar' : 'Upload Avatar'}
+                        </label>
+                        <div className="w-2/3 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
+                            {previewUrls.map((url, index) => (
+                                <div key={url} className="relative aspect-square rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+                                    <img src={url} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
+                                    <button
+                                        onClick={() => {
+                                            const newFiles = files.filter((_, i) => i !== index);
+                                            const newPreviewUrls = previewUrls.filter((_, i) => i !== index);
+                                            setFiles(newFiles);
+                                            setPreviewUrls(newPreviewUrls);
+                                        }}
+                                        className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 transition-colors"
+                                        aria-label="Remove image"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            ))}
+                            <div
+                                onClick={() => fileInputRef.current?.click()}
+                                className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors"
+                            >
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    className="hidden"
+                                    onChange={_handleChanges}
+                                    accept="image/*"
+                                    multiple
+                                />
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                </svg>
+                                <span className="text-sm text-gray-500">Add Image</span>
+                            </div>
                         </div>
                     </div>
                     <button type="submit" className="w-full p-4 text-white rounded bg-orange-600 hover:bg-orange-700 text-white font-bold transition-colors duration-300">Upload Information</button>
                 </form>
-            </div>
-        </div>
+            </div >
+            {isDialogOpen && (
+                <Dialog open={isDialogOpen}>
+                    <DialogTitle>
+                        Upload Information Policy
+                        <IoMdCloseCircleOutline
+                            cursor={'pointer'}
+                            size={20}
+                            color={redColor}
+                            onClick={handleDialogClose}
+                            style={{ position: 'absolute', right: 20, top: 20 }}
+                        />
+                    </DialogTitle>
+                    <DialogContent className={styles.orderPolicyDialog__content}>
+                        <Typography variant="body1" className={styles.orderPolicyDialog__content__section}>
+                            <strong>General Regulations</strong><br />
+                            <li>This brand information upload policy applies to all brand data submitted through our platform.</li>
+                            <li>By uploading brand information, users agree to the terms and conditions outlined in this policy.</li>
+                        </Typography>
+                        <Typography variant="body1" className={styles.orderPolicyDialog__content__section}>
+                            <strong>Accepted Formats</strong><br />
+                            <li>Brand information can be uploaded in the following formats: CSV, XLSX, or JSON.</li>
+                            <li>Ensure that the file format complies with the specified format guidelines to avoid upload errors.</li>
+                        </Typography>
+                        <Typography variant="body1" className={styles.orderPolicyDialog__content__section}>
+                            <strong>Data Requirements</strong><br />
+                            <li>Brand data must include the following fields: Brand Name, Brand Description, and Brand Logo URL.</li>
+                            <li>Ensure that all data is accurate and up-to-date before uploading.</li>
+                            <li>Prohibited content includes but is not limited to: offensive language, false information, and unauthorized trademarks.</li>
+                        </Typography>
+                        <Typography variant="body1" className={styles.orderPolicyDialog__content__section}>
+                            <strong>Upload Process</strong><br />
+                            <li>Step 1: Select the file containing the brand information from your device.</li>
+                            <li>Step 2: Ensure the file meets the format and data requirements specified above.</li>
+                            <li>Step 3: Click the 'Upload' button to submit the brand information.</li>
+                            <li>Step 4: The system will validate the data. If errors are detected, you will be prompted to correct them before finalizing the upload.</li>
+                        </Typography>
+                        <Typography variant="body1" className={styles.orderPolicyDialog__content__section}>
+                            <strong>Errors and Corrections</strong><br />
+                            <li>If the uploaded file contains errors, you will receive an error report outlining the issues.</li>
+                            <li>Correct the errors as indicated in the report and re-upload the file.</li>
+                        </Typography>
+                        <Typography variant="body1" className={styles.orderPolicyDialog__content__section}>
+                            <strong>Data Handling and Privacy</strong><br />
+                            <li>Uploaded brand information will be stored securely and used only for the intended purpose.</li>
+                            <li>Personal data or sensitive information should not be included in the brand information upload.</li>
+                        </Typography>
+                        <Typography variant="body1" className={styles.orderPolicyDialog__content__section}>
+                            <strong>Support and Contact</strong><br />
+                            <li>For questions or support regarding the brand information upload process, please contact our support team via email: smarttailor@gmail.com or phone: 0123-456-789.</li>
+                        </Typography>
+                        <Typography variant="body1" className={styles.orderPolicyDialog__content__section}>
+                            <strong>Policy Changes</strong><br />
+                            <li>We reserve the right to update this brand information upload policy at any time.</li>
+                            <li>Any changes will be communicated via our website and may be sent to users through email notifications.</li>
+                        </Typography>
+                    </DialogContent>
+                    <FormControlLabel
+                        control={<Checkbox color={'error'} checked={policyAgreed} onChange={handlePolicyAgreeChange} />}
+                        label={(<span style={{ fontSize: 14 }}>I agree to the upload information policy</span>)}
+                        className='px-5 py-5'
+                        style={{ fontSize: '1px', fontWeight: 500 }}
+                        sx={{ fontSize: 12 }}
+                    />
+                    <DialogActions>
+                        <button
+                            type="submit"
+                            className="px-5 py-2.5 text-sm font-medium text-white"
+                            style={
+                                {
+                                    border: `1px solid ${primaryColor}`,
+                                    borderRadius: 4,
+                                    color: policyAgreed ? whiteColor : primaryColor,
+                                    marginBottom: 10,
+                                    marginRight: 10,
+                                    backgroundColor: policyAgreed ? primaryColor : whiteColor
+                                }
+                            }
+                            onClick={handleFinalSubmit}
+                            disabled={!policyAgreed}
+                        >
+                            Confirm
+                        </button>
+                    </DialogActions>
+                </Dialog>
+            )}
+        </div >
     );
 };
 

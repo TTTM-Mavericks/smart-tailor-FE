@@ -6,7 +6,7 @@ import { greenColor, primaryColor, redColor, secondaryColor, whiteColor } from '
 import style from './AccountantManageRefundPaymentForBrandComponentStyle.module.scss'
 import { OrderDetailInterface, PaymentInterface } from '../../../models/OrderModel';
 import { fontWeight, Stack } from '@mui/system';
-import { FaAngleDown, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaUser } from "react-icons/fa";
+import { FaAngleDown, FaCalendar, FaCalendarAlt, FaCalendarDay, FaClipboardCheck, FaCreditCard, FaDraftingCompass, FaExclamationCircle, FaMoneyBillWave, FaReceipt, FaUser } from "react-icons/fa";
 import { FaAngleUp } from "react-icons/fa";
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import { toast } from 'react-toastify';
@@ -904,18 +904,21 @@ const AccountantManageRefundPaymentForBrandComponent: React.FC = () => {
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
                                                     <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                        <FaReceipt className="inline-block mr-1" />
                                                         Order ID:{" "}
                                                         <span className="text-sm text-gray-500 pb-2">
                                                             {orderDetail?.orderID}
                                                         </span>
                                                     </p>
                                                     <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                        <FaDraftingCompass className="inline-block mr-1" />
                                                         Design ID:{" "}
                                                         <span className="text-sm text-gray-500 pb-2">
                                                             {orderDetail.designResponse?.designID}
                                                         </span>
                                                     </p>
                                                     <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                        <FaCalendarAlt className="inline-block mr-1" />
                                                         Create date:{" "}
                                                         <span className="text-sm text-gray-500 pb-2">
                                                             {orderDetail?.expectedStartDate}
@@ -931,7 +934,7 @@ const AccountantManageRefundPaymentForBrandComponent: React.FC = () => {
                                                         }}
                                                     >
                                                         <p style={{ fontWeight: "500" }} className="text-sm text-black">
-                                                            Order status:{" "}
+                                                            <span className="text-sm text-gray-500 pb-2">Order status:</span>{" "}
                                                         </p>
                                                         <Stack direction="row" spacing={1} padding={1}>
                                                             <Chip
@@ -1027,15 +1030,20 @@ const AccountantManageRefundPaymentForBrandComponent: React.FC = () => {
                                                             className="ml-0 md:ml-6 mt-4 md:mt-0 flex-grow"
                                                             style={{ position: 'relative' }}
                                                         >
-                                                            <p className="text-sm text-gray-500 pb-2">
-                                                                ID: <span>{payment.paymentID}</span>
-                                                            </p>
-                                                            <p className="text-sm text-gray-500 pb-2">
-                                                                Amount: <span>{__handleAddCommasToNumber(payment.payOSResponse?.data?.amount)} VND</span>
-                                                            </p>
-                                                            <p className="text-sm text-gray-500 pb-2">
-                                                                Created at: <span>{payment.payOSResponse?.data?.createdAt}</span>
-                                                            </p>
+                                                            <div>
+                                                                <p className="text-sm text-gray-500 pb-2">
+                                                                    <FaCreditCard className="inline-block mr-1" />
+                                                                    ID: <span>{payment.paymentID}</span>
+                                                                </p>
+                                                                <p className="text-sm text-gray-500 pb-2">
+                                                                    <FaMoneyBillWave className="inline-block mr-1" />
+                                                                    Amount: <span>{__handleAddCommasToNumber(payment.payOSResponse?.data?.amount)} VND</span>
+                                                                </p>
+                                                                <p className="text-sm text-gray-500 pb-2">
+                                                                    <FaCalendarDay className="inline-block mr-1" />
+                                                                    Created at: <span>{payment.payOSResponse?.data?.createdAt}</span>
+                                                                </p>
+                                                            </div>
 
                                                             <p
                                                                 className={`${style.orderHistory__viewInvoice__button} ml-2 md:ml-4 px-3 py-2 md:px-4 md:py-2`}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa';
+import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaChevronLeft, FaChevronRight, FaTimes, FaImage, FaFileAlt, FaBox, FaCalendarAlt, FaMapMarkerAlt, FaEye } from 'react-icons/fa';
 import { ArrowDropDown, BrandingWatermark, Cancel, Verified, ViewAgenda, ViewAgendaOutlined, Visibility } from '@mui/icons-material';
 import axios from 'axios';
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
@@ -336,39 +336,57 @@ const EmployeeOrderFields: React.FC<{
                                     />
                                 </div>
                             ) : (
-                                <p style={{ fontSize: "13px" }}>No image available</p>
+                                <p style={{ fontSize: "13px" }}>
+                                    <FaImage className="inline-block mr-1" />
+                                    No image available
+                                </p>
                             )}
                         </div>
                         <div className="ml-4 mt-10">
-                            <p className="text-gray-600 mb-2 text-sm">Order ID: {order.orderID}</p>
                             <p className="text-gray-600 mb-2 text-sm">
-                                Order Status: <span className={`mb-2 ${getStatusColor(order.orderStatus)} font-bold`}>{order.orderStatus}</span>
+                                <FaFileAlt className="inline-block mr-1" />
+                                <span style={{ fontWeight: "bolder" }}>Order ID:</span> {order.orderID}
+                            </p>
+                            <p className="text-gray-600 mb-2 text-sm">
+                                <FaBox className="inline-block mr-1" />
+                                <span style={{ fontWeight: "bolder" }}>Order Status:</span> <span className={`mb-2 ${getStatusColor(order.orderStatus)} font-bold`}>{order.orderStatus}</span>
                             </p>
                             <div className="mt-4">
                                 {order.detailList.map((detail, index) => (
                                     <p key={index} className="text-gray-600 text-sm">
-                                        Size {detail.size.sizeName}: Quantity {detail.quantity}
+                                        {/* <FaBox className="inline-block mr-1" /> */}
+                                        <span style={{ fontWeight: "bolder" }}> Size: </span>{detail.size.sizeName}: <span style={{ fontWeight: "bolder" }}>Quantity: </span> {detail.quantity}
                                     </p>
                                 ))}
                             </div>
                             {order.totalPrice > 0 && (
-                                <p className="text-gray-700 mt-4 text-sm">Price: {__handleAddCommasToNumber(order.totalPrice)} VND</p>
+                                <p className="text-gray-700 mt-4 text-sm">
+                                    {/* <FaBox className="inline-block mr-1" /> */}
+                                    Price: {__handleAddCommasToNumber(order.totalPrice)} VND
+                                </p>
                             )}
                         </div>
                     </div>
                 </div>
                 <div className="w-1/2 mt-10">
-                    <p className="text-gray-600 mb-2 text-sm">Customer: {order.buyerName}</p>
-                    <p className="text-gray-600 mb-2 text-sm">Date: {order.createDate}</p>
                     <p className="text-gray-600 mb-2 text-sm">
-                        Address: {order.address}, {order.ward}, {order.district}, {order.province}
+                        <FaUser className="inline-block mr-1" />
+                        <span style={{ fontWeight: "bolder" }}>Customer: </span>{order.buyerName}
+                    </p>
+                    <p className="text-gray-600 mb-2 text-sm">
+                        <FaCalendarAlt className="inline-block mr-1" />
+                        <span style={{ fontWeight: "bolder" }}>Date: </span>{order.createDate}
+                    </p>
+                    <p className="text-gray-600 mb-2 text-sm">
+                        <FaMapMarkerAlt className="inline-block mr-1" />
+                        <span style={{ fontWeight: "bolder" }}>Address:</span> {order.address}, {order.ward}, {order.district}, {order.province}
                     </p>
                     <p style={{ fontWeight: "500", color: secondaryColor, cursor: 'pointer' }} onClick={() => setSelectedOrderMaterial(order.orderID)}>
+                        {/* <FaEye className="inline-block mr-1" /> */}
                         View material
                     </p>
 
                     {selectedOrderMaterial === order.orderID && (
-
                         <Dialog open={true} aria-labelledby="popup-dialog-title" maxWidth="lg" fullWidth onClose={() => setSelectedOrderMaterial(null)}>
                             <DialogTitle id="popup-dialog-title">
                                 Material detail
@@ -380,16 +398,13 @@ const EmployeeOrderFields: React.FC<{
                                     style={{ position: 'absolute', right: 20, top: 20 }}
                                 />
                             </DialogTitle>
-                            <DialogContent >
+                            <DialogContent>
                                 <div>
                                     <MaterialDetailTableComponent materialDetailData={designDetails?.materialDetail}></MaterialDetailTableComponent>
                                 </div>
                             </DialogContent>
-
-
                         </Dialog>
                     )}
-
                 </div>
             </div>
 
