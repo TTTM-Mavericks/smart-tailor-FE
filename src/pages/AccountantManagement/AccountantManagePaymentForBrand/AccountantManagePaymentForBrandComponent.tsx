@@ -613,7 +613,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
                                         <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
                                             Rating:{" "}
                                             <span className="text-sm text-gray-500 pb-2">
-                                                {subOrder.brand?.rating?.toFixed(2)}
+                                                {subOrder.brand?.rating?.toFixed(1)}
                                             </span>{" "}
                                             <span className="text-yellow-400 text-sm">★</span>
                                         </p>
@@ -1022,7 +1022,7 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                                 <Typography variant="body2"><p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
                                     Brand Rating:{" "}
                                     <span className="text-sm text-gray-500 pb-2">
-                                        {transaction.brand?.rating}
+                                        {transaction.brand?.rating.toFixed(1)}
                                     </span>{" "}
                                     <span className="text-yellow-400 text-sm">★</span>
                                 </p></Typography>
@@ -1152,29 +1152,35 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                                     </div>
                                 </div>
 
-                                <div className="flex justify-between items-center border-b py-2">
-                                    <span style={{ fontSize: 13 }} className="font-semibold">Stage 1</span>
-                                    <div className="flex items-center justify-end">
-                                        {__handleGetStageBrandPrice(transactionSubOrder.orderCustomResponse.orderID)?.brandPriceFirstStage ? (
-                                            <span style={{ fontSize: 14 }} className="text-right">{__handleAddCommasToNumber(__handleGetStageBrandPrice(transactionSubOrder.orderCustomResponse.orderID)?.brandPriceFirstStage)} VND</span>
-                                        ) : (
-                                            <span style={{ fontSize: 14 }} className="text-right">Loading</span>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="flex justify-between items-center py-2">
-                                    <span style={{ fontSize: 13 }} className="font-semibold">Stage 2</span>
-                                    <div className="flex items-center justify-end">
-                                        {__handleGetStageBrandPrice(transactionSubOrder.orderCustomResponse.orderID)?.brandPriceSecondStage ? (
-                                            <span style={{ fontSize: 14 }} className="text-right">{__handleAddCommasToNumber(__handleGetStageBrandPrice(transactionSubOrder.orderCustomResponse.orderID)?.brandPriceSecondStage)} VND</span>
-                                        ) : (
-                                            <span style={{ fontSize: 14 }} className="text-right">Loading</span>
-                                        )}
-                                    </div>
+                                {__handleGetStageBrandPrice(transactionSubOrder.orderCustomResponse.orderID)?.brandPriceFirstStage !== '-1' && (
+                                    <div className="flex justify-between items-center border-b py-2">
 
-                                </div>
+                                        <span style={{ fontSize: 13 }} className="font-semibold">Stage 1</span>
+                                        <div className="flex items-center justify-end">
+                                            {__handleGetStageBrandPrice(transactionSubOrder.orderCustomResponse.orderID)?.brandPriceFirstStage ? (
+                                                <span style={{ fontSize: 14 }} className="text-right">{__handleAddCommasToNumber(__handleGetStageBrandPrice(transactionSubOrder.orderCustomResponse.orderID)?.brandPriceFirstStage)} VND</span>
+                                            ) : (
+                                                <span style={{ fontSize: 14 }} className="text-right">Loading</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                                {__handleGetStageBrandPrice(transactionSubOrder.orderCustomResponse.orderID)?.brandPriceFirstStage !== '-1' && (
+                                    <div className="flex justify-between items-center py-2">
+                                        <span style={{ fontSize: 13 }} className="font-semibold">Stage 2</span>
+                                        <div className="flex items-center justify-end">
+                                            {__handleGetStageBrandPrice(transactionSubOrder.orderCustomResponse.orderID)?.brandPriceSecondStage ? (
+                                                <span style={{ fontSize: 14 }} className="text-right">{__handleAddCommasToNumber(__handleGetStageBrandPrice(transactionSubOrder.orderCustomResponse.orderID)?.brandPriceSecondStage)} VND</span>
+                                            ) : (
+                                                <span style={{ fontSize: 14 }} className="text-right">Loading</span>
+                                            )}
+                                        </div>
+
+                                    </div>
+                                )}
+
                             </div>
-                            
+
                             <div className="w-1/2">
                                 <div className="flex justify-between items-center border-b py-2">
                                     <span style={{ fontSize: 13 }} className="font-semibold">Design price:</span>
@@ -2189,7 +2195,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                     <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
                                                         Rating:{" "}
                                                         <span className="text-sm text-gray-500 pb-2">
-                                                            {order.brand?.rating?.toFixed(2)}
+                                                            {order.brand?.rating?.toFixed(1)}
                                                         </span>{" "}
                                                         <span className="text-yellow-400 text-sm">★</span>
                                                     </p>
