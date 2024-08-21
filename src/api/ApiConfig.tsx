@@ -211,7 +211,8 @@ export const functionEndpoints = {
     sendNoti: '/send-notification'
   },
   payment: {
-    getPaymentByUserID: '/get-payment-by-user-id'
+    getPaymentByUserID: '/get-payment-by-user-id',
+    createPayment: '/create-payment'
   },
   chart: {
     orderStatusDetail: '/get-order-status-detail',

@@ -31,6 +31,7 @@ import { __getToken, __getUserLogined } from '../../../App';
 import { __handleSendNotification } from '../../../utils/NotificationUtils';
 import MaterialDetailTableComponent from '../Components/Table/MaterialDetailTableComponent';
 import ViewFinalCheckingProductsDialogComponent from '../Components/Dialog/ViewFinalCheckingProductsDialog/ViewFinalCheckingProductsDialogComponent';
+import RefunctionRequestDialogComponent from '../../../components/Dialog/RefunctionRequestDialog/RefunctionRequestDialogComponent';
 
 
 
@@ -100,6 +101,7 @@ const OrderDetailScreen: React.FC = () => {
     const [isOpenSuspendedDialog, setIsOpenSuspendedDialog] = useState<boolean>(false);
     const [isOpenFinalProductsDialog, setIsOpenFinalProductsDialog] = useState<boolean>(false);
     const [isOpenMaterialDetailDialog, setIsOpenMaterialDetailDialog] = useState<boolean>(false);
+    const [isOpenRefundRequestDialog, setIsOpenRefundRequestDialog] = useState<boolean>(false);
 
 
 
@@ -340,12 +342,12 @@ const OrderDetailScreen: React.FC = () => {
     /**
      * Handle cancel order click
      */
-    const _handleCancelOrder = async () => {
+    const _handleCancelOrder = async (status: any) => {
         setIsLoading(true);
         try {
             const bodyRequest = {
                 orderID: orderDetail?.orderID,
-                status: 'CANCEL'
+                status: status
             }
             console.log('bodyRequest: ', bodyRequest);
             const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest, __getToken());
@@ -586,7 +588,7 @@ const OrderDetailScreen: React.FC = () => {
 
                             <div className="flex mt-4">
                                 <div className="w-52 flex items-center">
-                                    <div className={style.orderDetail__orderStatus__tag} style={orderDetail?.orderStatus === 'CANCEL' ? { backgroundColor: redColor } : (orderDetail?.orderStatus === 'COMPLETED' || orderDetail?.orderStatus === 'DELIVERED') ? { backgroundColor: greenColor } : {}}>{orderDetail?.orderStatus}</div>
+                                    <div className={style.orderDetail__orderStatus__tag} style={orderDetail?.orderStatus === 'CANCEL' ? { backgroundColor: redColor } : (['COMPLETED', 'DELIVERED', 'RECEIVED'].includes(orderDetail?.orderStatus || '')) ? { backgroundColor: greenColor } : {}}>{orderDetail?.orderStatus}</div>
                                     {orderDetail?.orderStatus === 'CANCEL' && (
                                         <div className="ml-5">
                                             <a onClick={() => __handleGetCancelReasonDetail()} className="text-sm text-indigo-600 hover:text-indigo-800 transition duration-200 cursor-pointer">View reasons</a>
@@ -781,7 +783,7 @@ const OrderDetailScreen: React.FC = () => {
                                     </div>
                                 </div>
                                 {orderDetail?.paymentList && orderDetail?.paymentList.length === 0 &&
-                                    (orderDetail?.orderStatus !== 'DELIVERED' && orderDetail?.orderStatus !== 'COMPLETED') && (
+                                    (orderDetail?.orderStatus !== 'DELIVERED' && orderDetail?.orderStatus !== 'COMPLETED' && orderDetail?.orderStatus !== 'RECEIVED') && (
                                         <div className="flex justify-end mt-4">
                                             <button
                                                 onClick={() => __handleOpenConfirmCalcelDialog()}
@@ -853,7 +855,7 @@ const OrderDetailScreen: React.FC = () => {
                         </div>
                     )}
                     {/* Billing and Payment Information Section */}
-                    {orderDetail?.orderStatus === 'CANCEL' && (
+                    {orderDetail?.orderStatus === 'CANCEL' || orderDetail?.orderStatus === 'RECEIVED' && (
                         <div >
 
                             <div className="flex justify-end mt-4">
@@ -871,6 +873,34 @@ const OrderDetailScreen: React.FC = () => {
                                 >
                                     Reorder
                                 </button>
+
+                            </div>
+
+
+                        </div>
+                    )}
+
+                    {orderDetail?.orderStatus === 'DELIVERED' && (
+                        <div >
+
+                            <div className="flex justify-end mt-4">
+                                <button
+                                    onClick={() => setIsOpenRefundRequestDialog(true)}
+                                    className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200 mr-4"
+                                    style={{ backgroundColor: redColor }}
+
+                                >
+                                    Refund request
+                                </button>
+                                <button
+                                    onClick={() => _handleCancelOrder('RECEIVED')}
+                                    className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200"
+                                    style={{ backgroundColor: greenColor }}
+
+                                >
+                                    Recieved
+                                </button>
+
 
                             </div>
 
@@ -937,7 +967,7 @@ const OrderDetailScreen: React.FC = () => {
                 orderID={orderDetail?.orderID}
                 onClose={() => setIsOpenReportOrderCanceledDialog(false)}
                 isOpen={isOpenReportOrderCanceledDialog}
-                onClickReportAndCancel={_handleCancelOrder}
+                onClickReportAndCancel={() => _handleCancelOrder('CANCEL')}
             ></CustomerReportOrderDialogComponent>
 
             {
@@ -1133,6 +1163,14 @@ const OrderDetailScreen: React.FC = () => {
 
 
             </Dialog>
+
+            <RefunctionRequestDialogComponent
+                isOpen={isOpenRefundRequestDialog}
+                onClickReportAndCancel={() => _handleCancelOrder('REFUND_REQUEST')}
+                onClose={()=>setIsOpenRefundRequestDialog(false)}
+                order={orderDetail}
+                orderID={orderDetail?.orderID}
+            />
 
 
             <FooterComponent />

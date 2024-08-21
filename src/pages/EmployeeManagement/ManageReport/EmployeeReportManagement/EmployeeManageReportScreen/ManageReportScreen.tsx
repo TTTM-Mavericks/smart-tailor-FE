@@ -17,6 +17,7 @@ import Cookies from 'js-cookie';
 import { ArrowDropDown, MarkChatRead, Visibility } from '@mui/icons-material';
 import { __getToken } from '../../../../../App';
 import LoadingComponent from '../../../../../components/Loading/LoadingComponent';
+import CreateRefundInformationDialogComponent from '../../../../../components/Dialog/RefunctionRequestDialog/CreateRefundInformationDialogComponent';
 
 const getStatusColor = (status: string) => {
     switch (status) {
@@ -34,6 +35,8 @@ const getStatusColor = (status: string) => {
             return 'text-green-600';
         case 'DELIVERED':
             return 'text-indigo-600';
+        case 'REFUND_REQUEST':
+            return 'text-red-600';
         default:
             return 'text-gray-600';
     }
@@ -49,7 +52,7 @@ const OrderReport: React.FC<{
         <div className="flex justify-between">
             <div className="w-1/2">
                 <p className="text-gray-600 mb-2 text-sm">Type Of Report: {report.typeOfReport}</p>
-                <p className="text-gray-600 mb-2 text-sm">Customer: {report.orderResponse.buyerName}</p>
+                <p className="text-gray-600 mb-2 text-sm">Created by: {report.userResponse?.fullName} ({report.userResponse?.userID})</p>
                 <p className="text-gray-600 mb-2 text-sm">Date: {report.createDate}</p>
                 <p className="text-gray-700 mt-2 text-sm">Content: {report.content}</p>
                 <p className="text-gray-600 mt-2 text-sm">
@@ -71,9 +74,9 @@ const OrderReport: React.FC<{
             </div>
             <div className="w-1/2">
                 <p className="text-gray-600 mb-2 text-sm">Order ID: {report.orderResponse.orderID}</p>
-                <p className="text-gray-600 mb-2 text-sm">
+                {/* <p className="text-gray-600 mb-2 text-sm">
                     Order Status: <span className={`mb-2 ${getStatusColor(report.orderResponse.orderStatus)} font-bold`}>{report.orderResponse.orderStatus}</span>
-                </p>
+                </p> */}
                 <p className="text-gray-600 mb-2 text-sm">Total Quantity: {report.orderResponse.quantity}</p>
                 <p className="text-gray-600 mb-2 text-sm">
                     Address: {report.orderResponse.address}, {report.orderResponse.ward}, {report.orderResponse.district},{' '}
@@ -113,6 +116,7 @@ function isReportImageListArray(reportImageList: ReportImageList | ReportImageLi
 
 const ReportModal: React.FC<{ report: Report; onClose: () => void; onMarkResolved: (reportID: string) => void }> = ({ report, onClose, onMarkResolved }) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [isOpenCreateRefunđialog, setIsOpenCreateRefunđialog] = useState<boolean>(false);
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -142,6 +146,10 @@ const ReportModal: React.FC<{ report: Report; onClose: () => void; onMarkResolve
             );
         }
     };
+
+    const __handleOpenCreateRefunđialog = () => {
+
+    }
 
     return (
         <motion.div
@@ -178,7 +186,7 @@ const ReportModal: React.FC<{ report: Report; onClose: () => void; onMarkResolve
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     {[
-                        { icon: FaUser, label: 'Customer', value: report.orderResponse.buyerName },
+                        { icon: FaUser, label: 'Customer', value: report.userResponse?.fullName + " (" + (report.userResponse?.userID) + ")" },
                         { icon: FaCalendar, label: 'Date', value: report.lastModifiedDate },
                         {
                             icon: FaExclamationCircle,
@@ -237,23 +245,27 @@ const ReportModal: React.FC<{ report: Report; onClose: () => void; onMarkResolve
                     </div>
                 )}
 
-                {/* <div className="flex justify-end space-x-4">
+                {report.typeOfReport === 'REFUND_REQUEST' && (
 
-                    <button
-                        onClick={() => onMarkResolved(report.reportID)}
-                        className={`px-6 py-3 rounded-lg text-white transition duration-150 focus:outline-none focus:ring-2 ${report.reportStatus
-                            ? 'bg-green-500 hover:bg-green-600 focus:ring-green-400 cursor-not-allowed'
-                            : 'bg-indigo-500 hover:bg-indigo-600 focus:ring-indigo-400'
-                            }`}
-                        disabled={report.reportStatus}
-                    >
-                        {report.reportStatus ? 'Already Resolved' : 'Mark as Resolved'}
-                    </button>
-                </div> */}
+                    <div className="flex justify-end space-x-4">
+                        <button
+                            onClick={() => setIsOpenCreateRefunđialog(true)}
+                            className={`text-sm px-2 py-2 rounded-sm text-white transition duration-150 focus:outline-none focus:ring-2 ${report.reportStatus
+                                ? 'bg-green-500 hover:bg-green-600 focus:ring-green-400'
+                                : 'bg-indigo-500 hover:bg-indigo-600 focus:ring-indigo-400'
+                                }`}
+                        >
+                            Create refund payment
+                        </button>
+                        <CreateRefundInformationDialogComponent isOpen={isOpenCreateRefunđialog} onClose={() => setIsOpenCreateRefunđialog(false)} order={report.orderResponse} report={report}></CreateRefundInformationDialogComponent>
+                    </div>
+                )}
             </motion.div>
         </motion.div>
     );
 };
+
+
 
 /**
  * 
@@ -709,6 +721,8 @@ const EmployeeManageReport: React.FC = () => {
                                     <option value="CANCEL">Cancel</option>
                                     <option value="COMPLETED">Completed</option>
                                     <option value="DELIVERED">Delivered</option>
+                                    <option value="REFUND_REQUEST">Refund request</option>
+
                                 </select>
                             </div>
                         )}
