@@ -16,6 +16,8 @@ import { Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormContro
 import { primaryColor, redColor, whiteColor } from '../../../root/ColorSystem';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
 import styles from './BrandUploadInforStyle.module.scss'
+import { Toast } from 'react-toastify/dist/components';
+import { __getToken } from '../../../App';
 const UploadBrandInforForm = () => {
     const { id } = useParams<{ id: string }>();
     // ---------------UseState Variables---------------//
@@ -151,7 +153,9 @@ const UploadBrandInforForm = () => {
         const BRANDFROMSIGNUPPARSE: UserInterface = JSON.parse(getBrandFromSingUp);
         const brandID = BRANDFROMSIGNUPPARSE.userID;
         const brandEmail = BRANDFROMSIGNUPPARSE.email;
-        brandFromSignUp = { brandID, brandEmail }
+        const brandPhoneNumber = BRANDFROMSIGNUPPARSE.phoneNumber;
+        const brandFullName = BRANDFROMSIGNUPPARSE.fullName;
+        brandFromSignUp = { brandID, brandEmail, brandPhoneNumber, brandFullName }
         console.log(brandFromSignUp);
 
         console.log('Brand ID:', brandID);
@@ -177,6 +181,23 @@ const UploadBrandInforForm = () => {
         }
     };
 
+    // Get Phone When Phone Null
+    const getPhone = () => {
+        if (!brandAuth || brandAuth.phoneNumber === null || brandAuth.phoneNumber === undefined || brandAuth.phoneNumber === '') {
+            return brandFromSignUp.brandPhoneNumber;
+        } else {
+            return brandAuth.phoneNumber;
+        }
+    };
+
+    // Get Phone When Phone Null
+    const getFullName = () => {
+        if (!brandAuth || brandAuth.fullName === null || brandAuth.fullName === undefined || brandAuth.fullName === '') {
+            return brandFromSignUp.brandFullName;
+        } else {
+            return brandAuth.fullName;
+        }
+    };
     /**
     * Get the image to user for review
     */
@@ -232,13 +253,23 @@ const UploadBrandInforForm = () => {
    * @param e 
    * Make a change in the code
    */
+    const MAX_IMAGES = 5;
+
     const _handleChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFiles = Array.from(e.target.files || []);
-        setFiles(prevFiles => [...prevFiles, ...selectedFiles]);
 
-        const newPreviewUrls = selectedFiles.map(file => URL.createObjectURL(file));
-        setPreviewUrls(prevUrls => [...prevUrls, ...newPreviewUrls]);
+        // Check if adding the new files would exceed the maximum
+        if (files.length + selectedFiles.length > MAX_IMAGES) {
+            // Display an error message or handle the situation in another way
+            console.error('Maximum number of images reached.');
+            toast.error("The upload image maximum is 5 image")
+            return;
+        }
 
+        setFiles((prevFiles) => [...prevFiles, ...selectedFiles]);
+
+        const newPreviewUrls = selectedFiles.map((file) => URL.createObjectURL(file));
+        setPreviewUrls((prevUrls) => [...prevUrls, ...newPreviewUrls]);
     };
 
     /**
@@ -524,25 +555,7 @@ const UploadBrandInforForm = () => {
                 return;
             }
 
-
-            let uploadedImages: BrandImages[] = [];
             let avatarUrl = '';
-            if (files && files.length > 0) {
-                try {
-                    uploadedImages = await _handleUploadToCloudinary(files);
-                    console.log("Uploaded images:", uploadedImages);
-                } catch (error) {
-                    console.error('Error uploading images:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Image Upload Failed',
-                        text: 'There was an error uploading your images. Please try again.',
-                    });
-                    setIsLoading(false);
-                    return;
-                }
-            }
-
             if (avatarFile) {
                 try {
                     avatarUrl = await uploadAvatarToCloudinary(avatarFile);
@@ -559,32 +572,55 @@ const UploadBrandInforForm = () => {
             }
 
             const updatedFormData = {
-                ...formData,
-                brandImages: uploadedImages
+                email: getEmail(),
+                fullName: getFullName(),
+                phoneNumber: getPhone(),
+                gender: true,
+                dateOfBirth: "22-08-2019",
+                address: formData.address,
+                province: formData.province,
+                district: formData.district,
+                ward: formData.ward,
+                imageUrl: avatarUrl
             };
 
             console.log("Submitting form data:", updatedFormData);
+
             try {
-                const response = await axios.post(
-                    `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.uploadBrandInfor + '/' + getID()}`,
-                    updatedFormData
+                // First, update the profile
+                const profileUpdateResponse = await axios.put(
+                    `${baseURL + versionEndpoints.v1 + featuresEndpoints.customer + functionEndpoints.customer.updateProfile + '/' + getID()}`,
+                    updatedFormData, {
+                    headers: {
+                        'Authorization': `Bearer ${__getToken()}`
+                    }
+                }
                 );
 
-                console.log('Profile uploaded successfully:', response.data);
+                console.log('Profile updated successfully:', profileUpdateResponse.data);
 
-                if (response.status === 200) {
-                    setIsLoading(false);
+                // If profile update is successful, then upload the brand information
+                if (profileUpdateResponse.status === 200) {
+                    const brandUploadResponse = await axios.post(
+                        `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.uploadBrandInfor + '/' + getID()}`,
+                        formData
+                    );
+
+                    console.log('Brand profile uploaded successfully:', brandUploadResponse.data);
+
+                    if (brandUploadResponse.status === 200) {
+                        setIsLoading(false);
+                    }
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Upload Brand Information Success!',
+                        text: 'Brand profile uploaded successfully',
+                    });
+                    handleDialogClose();
+                    setActiveStep(2);
+                    window.location.href = `/brand/waiting_process_information`;
                 }
-
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Upload Brand Information Success!',
-                    text: 'Brand profile uploaded successfully',
-                });
-                handleDialogClose();
-                setActiveStep(2);
-                window.location.href = `/brand/waiting_process_information`;
-
             } catch (error) {
                 setIsLoading(false);
                 handleDialogClose();
@@ -601,7 +637,6 @@ const UploadBrandInforForm = () => {
             alert('You must agree to the policy before submitting.');
         }
     };
-
     // ---------------Fetch Account Name on Account Number Change---------------//
     useEffect(() => {
         if (formData.accountNumber && selectedBank) {
@@ -900,32 +935,61 @@ const UploadBrandInforForm = () => {
                     )}
 
                     <div className="flex items-center space-x-4">
-                        {avatarPreview && (
-                            <div className="w-20 h-20 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out">
-                                <img
-                                    src={avatarPreview}
-                                    alt="Avatar preview"
-                                    className="w-full h-full object-cover"
-                                />
+                        {/* Upload Avartar */}
+                        <div className="flex items-center justify-center h-full">
+                            <div className="p-4 rounded-lg shadow-lg w-56">
+                                <div className="flex justify-center mb-4">
+                                    {avatarPreview ? (
+                                        <div className="w-20 h-20 rounded-full overflow-hidden">
+                                            <img src={avatarPreview} alt="Avatar preview" className="w-full h-full object-cover" />
+                                        </div>
+                                    ) : (
+                                        <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                className="h-8 w-8 text-gray-400"
+                                                viewBox="0 0 20 20"
+                                                fill="currentColor"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                                                    clipRule="evenodd"
+                                                />
+                                            </svg>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="flex justify-center">
+                                    <label
+                                        htmlFor="avatar-upload"
+                                        className="block bg-blue-500 text-white px-4 py-2 rounded-md cursor-pointer hover:bg-blue-600 transition-colors duration-300"
+                                    >
+                                        <input
+                                            type="file"
+                                            id="avatar-upload"
+                                            onChange={handleAvatarChange}
+                                            accept="image/*"
+                                            className="hidden"
+                                        />
+                                        Upload Avatar
+                                    </label>
+                                </div>
                             </div>
-                        )}
-                        <input
-                            type="file"
-                            onChange={handleAvatarChange}
-                            accept="image/*"
-                            className="hidden"
-                            id="avatar-upload"
-                        />
-                        <label
-                            for="avatar-upload"
-                            className="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        >
-                            {avatarFile ? 'Change Avatar' : 'Upload Avatar'}
-                        </label>
-                        <div className="w-2/3 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
+                        </div>
+
+                        {/* Upload Multiple Image */}
+                        <div className="w-full grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4 h-full">
                             {previewUrls.map((url, index) => (
-                                <div key={url} className="relative aspect-square rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-                                    <img src={url} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
+                                <div
+                                    key={url}
+                                    className="relative aspect-square rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow"
+                                >
+                                    <img
+                                        src={url}
+                                        alt={`Preview ${index + 1}`}
+                                        className="w-full h-full object-cover"
+                                    />
                                     <button
                                         onClick={() => {
                                             const newFiles = files.filter((_, i) => i !== index);
@@ -936,12 +1000,24 @@ const UploadBrandInforForm = () => {
                                         className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 transition-colors"
                                         aria-label="Remove image"
                                     >
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="h-4 w-4"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M6 18L18 6M6 6l12 12"
+                                            />
                                         </svg>
                                     </button>
                                 </div>
                             ))}
+
                             <div
                                 onClick={() => fileInputRef.current?.click()}
                                 className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors"
@@ -953,9 +1029,21 @@ const UploadBrandInforForm = () => {
                                     onChange={_handleChanges}
                                     accept="image/*"
                                     multiple
+                                    max="5"
                                 />
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-8 w-8 text-gray-400 mb-2"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M12 4v16m8-8H4"
+                                    />
                                 </svg>
                                 <span className="text-sm text-gray-500">Add Image</span>
                             </div>

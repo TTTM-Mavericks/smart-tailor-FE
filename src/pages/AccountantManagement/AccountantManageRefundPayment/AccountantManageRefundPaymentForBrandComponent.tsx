@@ -6,7 +6,7 @@ import { greenColor, primaryColor, redColor, secondaryColor, whiteColor } from '
 import style from './AccountantManageRefundPaymentForBrandComponentStyle.module.scss'
 import { OrderDetailInterface, PaymentInterface } from '../../../models/OrderModel';
 import { fontWeight, Stack } from '@mui/system';
-import { FaAngleDown, FaCalendar, FaCalendarAlt, FaCalendarDay, FaClipboardCheck, FaCreditCard, FaDraftingCompass, FaExclamationCircle, FaMoneyBillWave, FaReceipt, FaUser } from "react-icons/fa";
+import { FaAngleDown, FaCalendar, FaCalendarAlt, FaCalendarDay, FaClipboardCheck, FaCreditCard, FaDraftingCompass, FaExclamationCircle, FaFileAlt, FaMoneyBillWave, FaReceipt, FaUser } from "react-icons/fa";
 import { FaAngleUp } from "react-icons/fa";
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import { toast } from 'react-toastify';
@@ -904,7 +904,7 @@ const AccountantManageRefundPaymentForBrandComponent: React.FC = () => {
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
                                                     <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                        <FaReceipt className="inline-block mr-1" />
+                                                        <FaFileAlt className="inline-block mr-1" />
                                                         Order ID:{" "}
                                                         <span className="text-sm text-gray-500 pb-2">
                                                             {orderDetail?.orderID}
@@ -933,8 +933,8 @@ const AccountantManageRefundPaymentForBrandComponent: React.FC = () => {
                                                             alignItems: "center",
                                                         }}
                                                     >
-                                                        <p style={{ fontWeight: "500" }} className="text-sm text-black">
-                                                            <span className="text-sm text-gray-500 pb-2">Order status:</span>{" "}
+                                                        <p style={{ fontWeight: "bolder" }} className="text-sm text-black">
+                                                            Order Status:{" "}
                                                         </p>
                                                         <Stack direction="row" spacing={1} padding={1}>
                                                             <Chip
@@ -969,7 +969,7 @@ const AccountantManageRefundPaymentForBrandComponent: React.FC = () => {
                                                             alignItems: "center",
                                                         }}
                                                     >
-                                                        {/* <p style={{ fontWeight: "500" }} className="text-sm text-black">
+                                                        <p style={{ fontWeight: "bolder" }} className="text-sm text-black">
                                                             Payment status:{" "}
                                                         </p>
                                                         <Stack direction="row" spacing={5} padding={1}>
@@ -985,7 +985,7 @@ const AccountantManageRefundPaymentForBrandComponent: React.FC = () => {
                                                                         : false
                                                                 )}
                                                             />
-                                                        </Stack> */}
+                                                        </Stack>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1031,16 +1031,13 @@ const AccountantManageRefundPaymentForBrandComponent: React.FC = () => {
                                                             style={{ position: 'relative' }}
                                                         >
                                                             <div>
-                                                                <p className="text-sm text-gray-500 pb-2">
-                                                                    <FaCreditCard className="inline-block mr-1" />
+                                                                <p className="text-sm text-black-500 pb-2" style={{ fontWeight: "bolder" }}>
                                                                     ID: <span>{payment.paymentID}</span>
                                                                 </p>
-                                                                <p className="text-sm text-gray-500 pb-2">
-                                                                    <FaMoneyBillWave className="inline-block mr-1" />
+                                                                <p className="text-sm text-black-500 pb-2" style={{ fontWeight: "bolder" }}>
                                                                     Amount: <span>{__handleAddCommasToNumber(payment.payOSResponse?.data?.amount)} VND</span>
                                                                 </p>
-                                                                <p className="text-sm text-gray-500 pb-2">
-                                                                    <FaCalendarDay className="inline-block mr-1" />
+                                                                <p className="text-sm text-black-500 pb-2" style={{ fontWeight: "bolder" }}>
                                                                     Created at: <span>{payment.payOSResponse?.data?.createdAt}</span>
                                                                 </p>
                                                             </div>

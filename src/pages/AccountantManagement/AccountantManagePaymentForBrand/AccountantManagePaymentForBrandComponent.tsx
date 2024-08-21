@@ -2023,32 +2023,34 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                     ) : (
                         <div>
                             {fulldataOrderResposne?.filter(applyFilters).map((orderDetail) => (
-                                // {fulldataOrderResposne?.map((orderDetail) => (
                                 <div className="bg-white rounded-xl shadow-md p-4 md:p-6 mb-4 md:mb-8 transform transition-all hover:shadow-lg">
                                     <div className="flex flex-col md:flex-row items-start md:items-center mb-4 md:mb-6" >
                                         <div className="mb-4 md:mb-0 w-max">
-                                            <div>
-                                                <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                    <FaFileAlt className="inline-block mr-1" />
-                                                    Order ID:{" "}
-                                                    <span className="text-sm text-gray-500 pb-2">
-                                                        {orderDetail?.orderID}
-                                                    </span>
-                                                </p>
-                                                <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                    <FaTag className="inline-block mr-1" />
-                                                    Design ID:{" "}
-                                                    <span className="text-sm text-gray-500 pb-2">
-                                                        {orderDetail.designResponse?.designID}
-                                                    </span>
-                                                </p>
-                                                <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                    <FaCalendarAlt className="inline-block mr-1" />
-                                                    Create date:{" "}
-                                                    <span className="text-sm text-gray-500 pb-2">
-                                                        {orderDetail?.expectedStartDate}
-                                                    </span>
-                                                </p>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                        <FaFileAlt className="inline-block mr-1" />
+                                                        Order ID:{" "}
+                                                        <span className="text-sm text-gray-500 pb-2">
+                                                            {orderDetail?.orderID}
+                                                        </span>
+                                                    </p>
+                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                        <FaTag className="inline-block mr-1" />
+                                                        Design ID:{" "}
+                                                        <span className="text-sm text-gray-500 pb-2">
+                                                            {orderDetail.designResponse?.designID}
+                                                        </span>
+                                                    </p>
+                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                        <FaCalendarAlt className="inline-block mr-1" />
+                                                        Create date:{" "}
+                                                        <span className="text-sm text-gray-500 pb-2">
+                                                            {orderDetail?.expectedStartDate}
+                                                        </span>
+                                                    </p>
+                                                </div>
                                                 <div className='ml-32' style={{ marginTop: -10 }}>
                                                     <div
                                                         style={{
@@ -2057,8 +2059,8 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                             alignItems: "center",
                                                         }}
                                                     >
-                                                        <p style={{ fontWeight: "500" }} className="text-sm text-black">
-                                                            <span className="text-sm text-gray-500 pb-2">Status:</span>{" "}
+                                                        <p style={{ fontWeight: "bolder" }} className="text-sm text-black">
+                                                            Status:{" "}
                                                         </p>
                                                         <Stack direction="row" spacing={1} padding={1}>
                                                             <Chip
@@ -2067,7 +2069,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                                         orderDetail?.orderStatus === "Delivered"
                                                                         ? "at " + orderDetail?.expectedProductCompletionDate
                                                                         : ""
-                                                                    } `}
+                                                                    }`}
                                                                 variant="filled"
                                                                 style={{
                                                                     backgroundColor:
@@ -2093,8 +2095,8 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                             alignItems: "center",
                                                         }}
                                                     >
-                                                        <p style={{ fontWeight: "500" }} className="text-sm text-black">
-                                                            <span className="text-sm text-gray-500 pb-2">Payment status:</span>{" "}
+                                                        <p style={{ fontWeight: "bolder" }} className="text-sm text-black">
+                                                            Payment status:{" "}
                                                         </p>
                                                         <Stack direction="row" spacing={5} padding={1}>
                                                             <Chip
@@ -2114,6 +2116,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                 </div>
                                             </div>
                                         </div>
+
 
                                     </div>
                                     <button
@@ -2146,22 +2149,19 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                     style={{ position: "relative" }}
                                                 >
                                                     <div>
-                                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                            <FaHashtag className="inline-block mr-1" />
+                                                        <p style={{ fontWeight: "bolder" }} className="text-sm text-black pb-2">
                                                             Sub ID:{" "}
                                                             <span className="text-sm text-gray-500 pb-2">
                                                                 {order.orderID}
                                                             </span>
                                                         </p>
-                                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                            <FaTag className="inline-block mr-1" />
+                                                        <p style={{ fontWeight: "bolder" }} className="text-sm text-black pb-2">
                                                             Type:{" "}
                                                             <span className="text-sm text-blue-700 pb-2">
                                                                 {order.orderType}
                                                             </span>
                                                         </p>
-                                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                            <FaBuilding className="inline-block mr-1" />
+                                                        <p style={{ fontWeight: "bolder" }} className="text-sm text-black pb-2">
                                                             Brand ID:{" "}
                                                             <span className="text-sm text-gray-500 pb-2">
                                                                 {order.brand?.brandID}
@@ -2171,7 +2171,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                             style={{ fontWeight: "500" }}
                                                             className="text-sm text-black flex content-center items-center"
                                                         >
-                                                            <span className="text-sm text-gray-500 pb-2">Brand:</span>
+                                                            <p style={{ fontWeight: "bolder" }} className="text-sm text-black pb-2" >Brand:</p>
                                                             <p
                                                                 style={{ fontWeight: "500" }}
                                                                 className="text-sm text-black flex content-center items-center"
@@ -2198,45 +2198,47 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                             </p>
                                                         </p>
                                                         <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                            <span className="text-sm text-gray-500 pb-2">Rating:</span>{" "}
+                                                            <span className="text-sm text-black-500 pb-2" style={{ fontWeight: "bold" }}>Rating:</span>{" "}
                                                             <span className="text-sm text-gray-500 pb-2">
                                                                 {order.brand?.rating?.toFixed(1)}
                                                             </span>{" "}
                                                             <span className="text-yellow-400 text-sm">★</span>
                                                         </p>
-                                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-4">
+                                                        <p style={{ fontWeight: "bolder" }} className="text-sm text-black pb-4">
                                                             Details:
                                                             {order.detailList?.map((detail) => (
                                                                 <div className="grid grid-cols-4 gap-1 pt-0">
-                                                                    <span style={{ fontWeight: "bolder" }}> Size: </span>{detail?.size?.sizeName}: <span style={{ fontWeight: "bolder" }}>Quantity: </span> {detail.quantity}
+                                                                    <p className="text-sm text-black-500 pb-2" style={{ fontWeight: "bold" }}>
+                                                                        Size: {detail.size?.sizeName}
+                                                                    </p>
+                                                                    <p className="text-sm text-black-500 pb-2" style={{ fontWeight: "bold" }}>
+                                                                        Quantity: {detail.quantity}
+                                                                    </p>
                                                                 </div>
                                                             ))}
                                                         </p>
                                                     </div>
                                                     <div>
-                                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                            <FaCreditCard className="inline-block mr-1" />
+                                                        <p style={{ fontWeight: "bolder" }} className="text-sm text-black pb-2">
                                                             Payment ID:{" "}
                                                             <span className="text-sm text-gray-500 pb-2">
                                                                 {order?.paymentList && order?.paymentList?.length > 0 ? order?.paymentList[0]?.paymentID : 'NaN'}
                                                             </span>
                                                         </p>
-                                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                            <FaDollarSign className="inline-block mr-1" />
+                                                        <p style={{ fontWeight: "bolder" }} className="text-sm text-black pb-2">
                                                             Total price:{" "}
                                                             <span className="text-sm text-gray-500 pb-2">
                                                                 {__handleAddCommasToNumber(order.totalPrice)} VND
                                                             </span>
                                                         </p>
-                                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                            <FaClock className="inline-block mr-1" />
+                                                        <p style={{ fontWeight: "bolder" }} className="text-sm text-black pb-2">
                                                             Expected start at:{" "}
                                                             <span className={`${__handleGetDateTimeColor(order.expectedStartDate)} text-sm pb-2`}>
                                                                 {order.expectedStartDate}
                                                             </span>
                                                         </p>
-                                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                            <span className="text-sm text-gray-500 pb-2">Status:</span>
+                                                        <p style={{ fontWeight: "bolder" }} className="text-sm text-black pb-2">
+                                                            <span className="text-sm text-black-500 pb-2">Status:</span>
                                                             <button
                                                                 className="py-1 px-3 rounded-full ml-2"
                                                                 style={{
@@ -2258,8 +2260,8 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                                 {orderDetail?.orderStatus}
                                                             </button>
                                                         </p>
-                                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
-                                                            <span className="text-sm text-gray-500 pb-2">Payment status:</span>
+                                                        <p style={{ fontWeight: "bolder" }} className="text-sm text-black pb-2">
+                                                            <span className="text-sm text-black-500 pb-2">Payment status:</span>
                                                             <button
                                                                 className="py-1 px-3 rounded-full ml-2"
                                                                 style={__handlegetStatusBackgroundBoolean(

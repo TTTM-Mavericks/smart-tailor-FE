@@ -460,15 +460,21 @@ const BrandOrderFields: React.FC<{
                             </p>
                             <p className="text-sm text-gray-600 mb-2">
                                 <FaBox className="inline-block mr-1" />
-                                <span style={{ fontWeight: "bolder" }}>Order Status:</span>
+                                <span style={{ fontWeight: "bolder" }}>Order Status: </span>
                                 <span className={`mb-2 ${getStatusColor(order.orderStatus)} font-bold`}>{order.orderStatus}</span>
                             </p>
                             <div className="mt-4">
                                 {order.detailList.map((detail, index) => (
-                                    <p key={index} className="text-sm text-gray-600">
-                                        <FaBox className="inline-block mr-1" />
-                                        <span style={{ fontWeight: "bolder" }}> Size: </span>{detail.size.sizeName}: <span style={{ fontWeight: "bolder" }}>Quantity: </span> {detail.quantity}
-                                    </p>
+                                    <>
+                                        <p key={index} className="text-sm text-gray-600">
+                                            <FaBox className="inline-block mr-1" />
+                                            <span style={{ fontWeight: "bolder" }}> Size: </span>{detail.size.sizeName}
+                                        </p>
+                                        <p key={index} className="text-sm text-gray-600">
+                                            <FaBox className="inline-block mr-1" />
+                                            <span style={{ fontWeight: "bolder" }}> Quantity: </span>{detail.quantity}
+                                        </p>
+                                    </>
                                 ))}
                             </div>
                             {order.totalPrice && (

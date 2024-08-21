@@ -349,7 +349,7 @@ const EmployeeOrderFields: React.FC<{
                             </p>
                             <p className="text-gray-600 mb-2 text-sm">
                                 <FaBox className="inline-block mr-1" />
-                                <span style={{ fontWeight: "bolder" }}>Order Status:</span> <span className={`mb-2 ${getStatusColor(order.orderStatus)} font-bold`}>{order.orderStatus}</span>
+                                <span style={{ fontWeight: "bolder" }}>Order Status: </span> <span className={`mb-2 ${getStatusColor(order.orderStatus)} font-bold`}>{order.orderStatus}</span>
                             </p>
                             <div className="mt-4">
                                 {order.detailList.map((detail, index) => (
