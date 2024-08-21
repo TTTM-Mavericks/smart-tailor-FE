@@ -11,10 +11,13 @@ import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import Rating from '@mui/material/Rating';
 import { motion, useInView } from 'framer-motion';
-import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../api/ApiConfig';
+import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../api/ApiConfig';
 import { IconButton } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
 import { DesignDetailInterface, DesignInterface } from '../../models/DesignModel';
+import { __getToken } from '../../App';
+import { toast } from 'react-toastify';
+import LoadingComponent from '../../components/Loading/LoadingComponent';
 
 const HomeScreen = () => {
 
@@ -50,6 +53,8 @@ const HomeScreen = () => {
 
     const contactRef = useRef(null);
     const isContactInvisible = useInView(contactRef, { once: true })
+
+    const [isLoading, setIsloading] = useState<boolean>(false);
     // ---------------Usable Variable---------------//
     // ---------------UseEffect---------------//
     useEffect(() => {
@@ -225,12 +230,32 @@ const HomeScreen = () => {
         );
     };
 
+    const __handleClonseDesign = async (designId: any) => {
+        setIsloading(true);
+        try {
+            const response = await api.post(`${versionEndpoints.v1 + '/' + featuresEndpoints.design + functionEndpoints.design.createClonseDesignByOldDesignId}/${designId}`, null, __getToken());
+            if (response.status === 200) {
+                window.location.href = `/design/${response.data.designID}`
+
+            } else {
+                toast.error(`${response.message}`, { autoClose: 4000 })
+                setIsloading(false);
+
+            }
+        } catch (error) {
+            console.error('Error checking verification status:', error);
+            setIsloading(false);
+            toast.error(`${error}`, { autoClose: 4000 })
+        }
+    }
+
 
     return (
         <div>
             {/* Header */}
             <HeaderComponent></HeaderComponent>
 
+            <LoadingComponent isLoading={isLoading}></LoadingComponent>
             {/* Slider */}
             <div className="relative overflow-hidden bg-white mt-0">
                 <div className="sm:pt-24 lg:pb-20">
@@ -345,21 +370,21 @@ const HomeScreen = () => {
 
                         <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-6xl">
                             <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
-                                {filteredDesigns.slice(0, 12).map((item: any) => (
+                                {filteredDesigns.slice(0, 12).map((item) => (
                                     <div key={item.designID} className="relative group">
                                         <img
                                             src={item.imageUrl}
-                                            alt={item.imageAlt}
+                                            alt={item.imageUrl}
                                             className="w-full h-full object-cover rounded-lg shadow-lg transform transition-transform group-hover:scale-105"
                                         />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-gray-400 via-transparent to-transparent opacity-70 rounded-lg"></div>
+                                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-gray-400 via-transparent opacity-70 rounded-lg"></div>
                                         <div className="absolute bottom-4 left-4">
                                             <h3 className="text-2xl font-bold text-white" style={{ marginBottom: "10%" }}>
                                                 {item.titleDesign}
                                             </h3>
                                             <a
-                                                href="/design_create"
-                                                className="text-indigo-400 underline"
+                                                onClick={() => __handleClonseDesign(item.designID)}
+                                                className="text-indigo-400 underline cursor-pointer"
                                                 style={{
                                                     textDecoration: "none",
                                                     backgroundColor: primaryColor,
@@ -459,14 +484,14 @@ const HomeScreen = () => {
                     animate={isTestimonialsVisible ? { opacity: 1, y: 0, transition: { duration: 0.5 } } : {}}
                 >
                     {/* <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8"> */}
-                        {/* <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl text-center animate-slideIn">
+                    {/* <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl text-center animate-slideIn">
                             {t(codeLanguage + '000179')}
                         </p>
                         <p className="mt-6 text-lg leading-8 text-gray-600 text-center">
                             {t(codeLanguage + '000180')}
                         </p> */}
-                        {/* <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-8"> */}
-                            {/* {designData.slice(0, 8).map((product: any) => {
+                    {/* <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-8"> */}
+                    {/* {designData.slice(0, 8).map((product: any) => {
                                 const basePrices = getBasePricesForDesign(designData, product.designID);
                                 const totalBasePrice = sumBasePrices(basePrices);
                                 return (
@@ -511,10 +536,10 @@ const HomeScreen = () => {
                                     </div>
                                 );
                             })} */}
-                            {/* {designData.slice(0, 8).map((product, index) => (
+                    {/* {designData.slice(0, 8).map((product, index) => (
                                 <ProductCard key={product.designID} product={product} isFeatured={index === 1} />
                             ))} */}
-                        {/* </div> */}
+                    {/* </div> */}
                     {/* </div> */}
                 </motion.div>
             </div>

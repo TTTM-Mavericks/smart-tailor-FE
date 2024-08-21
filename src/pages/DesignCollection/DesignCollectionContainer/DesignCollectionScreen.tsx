@@ -12,10 +12,11 @@ import { primaryColor } from '../../../root/ColorSystem';
 import Select from 'react-select';
 import FooterComponent from '../../../components/Footer/FooterComponent';
 import HeaderComponent from '../../../components/Header/HeaderComponent';
+import { __getToken } from '../../../App';
 
-const CardDesignComponent: React.FC<{ design: DesignInterface }> = ({ design }) => {
+const CardDesignComponent: React.FC<{ design: DesignInterface, onclickRe?: () => void }> = ({ design, onclickRe }) => {
     return (
-        <div key={design.designID} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2" style={{ width: 200, height: 250 }}>
+        <div key={design.designID} onClick={onclickRe} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2" style={{ width: 200, height: 250 }}>
             <div className="bg-white shadow-md rounded-lg overflow-hidden" style={{ width: 200, height: 250 }}>
                 <img src={design.imageUrl} alt={design.titleDesign} className="w-full h-32 sm:h-48 object-cover" />
                 <div className="p-4">
@@ -101,9 +102,12 @@ const DesignCollectionScreen = () => {
     const __handleFetchDesignListByUserId = async () => {
         setIsloading(true);
         try {
-            const response = await api.get(`${versionEndpoints.v1 + '/' + featuresEndpoints.design + functionEndpoints.design.getAllDesignByUserID}/${userAuth?.userID}`);
+            const response = await api.get(`${versionEndpoints.v1 + '/' + featuresEndpoints.design + functionEndpoints.design.getAllDesignByUserID}/${userAuth?.userID}`, null, __getToken());
             if (response.status === 200) {
-                setDesignList(response.data)
+                const result = response.data.filter((item: any) => item.publicStatus !== false)
+                console.log(result);
+                setDesignList(result)
+
                 setIsloading(false);
             } else {
                 toast.error(`${response.message}`, { autoClose: 4000 })
@@ -342,7 +346,7 @@ const DesignCollectionScreen = () => {
                     <div className="relative mt-5 w-full" >
                         <div className={`flex space-x-4 overflow-x-auto ${styles.scroll__container}`} ref={scrollContainerRef}>
                             {designList?.filter(applyFilters).map((design, index) => (
-                                <CardDesignComponent key={design.designID} design={design} />
+                                <CardDesignComponent key={design.designID} design={design} onclickRe={()=> window.location.href = `/design/${design.designID}`} />
                             ))}
                         </div>
                         {!isEnd && (

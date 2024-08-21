@@ -765,7 +765,7 @@ const BrandManageTransactionComponent: React.FC = () => {
                 </div>
             </div>
             {/* Dialog */}
-            {
+            {/* {
                 currentPaymentData && (
                     <PaymentInformationDialogComponent
                         data={currentPaymentData}
@@ -773,7 +773,7 @@ const BrandManageTransactionComponent: React.FC = () => {
                         isOpen={isOpenPaymentInforDialog}
                     />
                 )
-            }
+            } */}
         </div >
     );
 };
