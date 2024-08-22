@@ -369,7 +369,7 @@ const OrderDetailScreen: React.FC = () => {
     /**
      * Handle cancel order click
      */
-    const _handleCancelOrder = async (status: any) => {
+    const _handleChangeOrderStatus = async (status: any) => {
         setIsLoading(true);
         try {
             const bodyRequest = {
@@ -397,7 +397,7 @@ const OrderDetailScreen: React.FC = () => {
 
                 setTimeout(() => {
                     window.location.reload();
-                }, 2000);
+                }, 4000);
             }
             else {
                 console.log('detail error: ', response.message);
@@ -930,7 +930,7 @@ const OrderDetailScreen: React.FC = () => {
                                     Refund request
                                 </button>
                                 <button
-                                    onClick={() => _handleCancelOrder('RECEIVED')}
+                                    onClick={() => _handleChangeOrderStatus('RECEIVED')}
                                     className="px-4 py-2 text-white rounded-md hover:bg-red-700 transition duration-200"
                                     style={{ backgroundColor: greenColor }}
 
@@ -1046,11 +1046,11 @@ const OrderDetailScreen: React.FC = () => {
                 orderID={orderDetail?.orderID}
                 onClose={() => setIsOpenReportOrderCanceledDialog(false)}
                 isOpen={isOpenReportOrderCanceledDialog}
-                onClickReportAndCancel={() => _handleCancelOrder('CANCEL')}
+                onClickReportAndCancel={() => _handleChangeOrderStatus('CANCEL')}
             ></CustomerReportOrderDialogComponent>
 
             {
-                orderDetail?.orderStatus === 'DELIVERED' && !orderDetail?.rating && (
+                orderDetail?.orderStatus === 'RECEIVED' && !orderDetail?.rating && (
 
                     <Dialog open={isOpenRatingDialog} onClose={() => setIsOpenRatingDialog(false)}>
                         <DialogTitle>
@@ -1157,7 +1157,7 @@ const OrderDetailScreen: React.FC = () => {
                     <button
                         type="submit"
                         className="px-5 py-2.5 text-sm font-medium text-white"
-                        onClick={_handleCancelOrder}
+                        onClick={() => _handleChangeOrderStatus('CANCEL')}
                         style={{
                             borderRadius: 4,
                             color: whiteColor,
@@ -1195,7 +1195,7 @@ const OrderDetailScreen: React.FC = () => {
                     <button
                         type="submit"
                         className="px-5 py-2.5 text-sm font-medium text-white"
-                        onClick={_handleCancelOrder}
+                        onClick={() => _handleChangeOrderStatus('CANCEL')}
                         style={{
                             borderRadius: 4,
                             color: whiteColor,
@@ -1208,7 +1208,7 @@ const OrderDetailScreen: React.FC = () => {
                     <button
                         type="submit"
                         className="px-5 py-2.5 text-sm font-medium text-white"
-                        onClick={() => setIsOpenSuspendedDialog(false)}
+                        onClick={() => _handleChangeOrderStatus('SUSPENDED')}
                         style={{
                             borderRadius: 4,
                             color: whiteColor,
@@ -1248,7 +1248,7 @@ const OrderDetailScreen: React.FC = () => {
 
             <RefunctionRequestDialogComponent
                 isOpen={isOpenRefundRequestDialog}
-                onClickReportAndCancel={() => _handleCancelOrder('REFUND_REQUEST')}
+                onClickReportAndCancel={() => _handleChangeOrderStatus('REFUND_REQUEST')}
                 onClose={() => setIsOpenRefundRequestDialog(false)}
                 order={orderDetail}
                 orderID={orderDetail?.orderID}

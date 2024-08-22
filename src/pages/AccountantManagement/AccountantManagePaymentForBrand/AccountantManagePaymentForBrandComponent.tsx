@@ -659,7 +659,11 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
                                                                     ? secondaryColor
                                                                     : subOrder.orderDetail?.orderStatus === "PROCESSING"
                                                                         ? secondaryColor
-                                                                        : redColor,
+                                                                        : orderDetail?.orderStatus === "RECEIVED"
+                                                                            ? greenColor
+                                                                            : orderDetail?.orderStatus === "REFUND_REQUEST"
+                                                                                ? redColor
+                                                                                : redColor,
                                                     opacity: 1,
                                                     color: whiteColor,
                                                     fontSize: 11,
@@ -1243,9 +1247,9 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                                                 const stageBrandPrice = __handleGetStageBrandPrice(transactionSubOrder.orderCustomResponse.orderID);
 
                                                 // Extract and parse the prices, ensuring they default to 0 if undefined or null
-                                                const brandPriceDeposit = Math.round(parseInt(stageBrandPrice?.brandPriceDeposit || '0', 10)/1000)*1000;
-                                                const brandPriceFirstStage = Math.round(parseInt(stageBrandPrice?.brandPriceFirstStage || '0', 10)/1000)*1000;
-                                                const brandPriceSecondStage = Math.round(parseInt(stageBrandPrice?.brandPriceSecondStage || '0', 10)/1000)*1000;
+                                                const brandPriceDeposit = Math.round(parseInt(stageBrandPrice?.brandPriceDeposit || '0', 10) / 1000) * 1000;
+                                                const brandPriceFirstStage = Math.round(parseInt(stageBrandPrice?.brandPriceFirstStage || '0', 10) / 1000) * 1000;
+                                                const brandPriceSecondStage = Math.round(parseInt(stageBrandPrice?.brandPriceSecondStage || '0', 10) / 1000) * 1000;
 
                                                 // Sum the parsed prices
                                                 const totalPrice = brandPriceDeposit + brandPriceFirstStage + brandPriceSecondStage;
@@ -2137,7 +2141,11 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                                                     ? secondaryColor
                                                                                     : orderDetail?.orderStatus === "PROCESSING"
                                                                                         ? secondaryColor
-                                                                                        : redColor,
+                                                                                        : orderDetail?.orderStatus === "RECEIVED"
+                                                                                            ? greenColor
+                                                                                            : orderDetail?.orderStatus === "REFUND_REQUEST"
+                                                                                                ? redColor
+                                                                                                : redColor,
                                                                     opacity: 1,
                                                                     color: whiteColor,
                                                                 }}

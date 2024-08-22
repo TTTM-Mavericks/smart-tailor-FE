@@ -7,6 +7,7 @@ import AccountantDashboards from '../AccountantDashboard/AccountantDashboardScre
 import AccountantManagePaymentForBrandComponent from '../AccountantManagePaymentForBrand/AccountantManagePaymentForBrandComponent';
 import AccountantDashboard from '../AccountantDashboard/AccountantDashboardScreen';
 import AccountantManageRefundPaymentForBrandComponent from '../AccountantManageRefundPayment/AccountantManageRefundPaymentForBrandComponent';
+import AccountantManageFinedPaymentComponent from '../AccountantManageFinedPayment/AccountantManageFinedPaymentComponent';
 
 // Define the type for popperOpen
 type PopperOpenState = Record<string, boolean>;
@@ -98,6 +99,12 @@ const DashboardAccountantScreens: React.FC = () => {
                 return (
                     <AccountantManageRefundPaymentForBrandComponent />
                 );
+
+            case 'accountant_manage_fined_payment':
+                return (
+                    <AccountantManageFinedPaymentComponent />
+                );
+
             default:
                 return (
                     <AccountantManagePaymentForBrandComponent />

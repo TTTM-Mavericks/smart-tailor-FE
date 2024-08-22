@@ -261,73 +261,7 @@ const DesignCollectionScreen = () => {
                             </div>
                         </div>
                     </div> */}
-                    <div className="mb-6 mt-6">
-                        <label htmlFor="filterSelect" className="block mb-2 text-lg font-semibold text-gray-700">Select Filters</label>
-                        <Select
-                            isMulti
-                            name="filters"
-                            options={filterOptions}
-                            className="basic-multi-select"
-                            classNamePrefix="select"
-                            value={filterOptions.filter(option => selectedFilters.includes(option.value))}
-                            onChange={(selectedOptions: any) => {
-                                setSelectedFilters(selectedOptions.map((option: any) => option.value));
-                            }}
-                        />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                        {selectedFilters.includes('Date') && (
-                            <div className="filter-item">
-                                <label htmlFor="dateFilter" className="block mb-2 text-sm font-medium text-gray-700">Date</label>
-                                <input
-                                    type="date"
-                                    id="dateFilter"
-                                    name="createDate"
-                                    value={filters.createDate}
-                                    onChange={handleFilterChange}
-                                    className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
-                                />
-                            </div>
-                        )}
-
-                        {selectedFilters.includes('Design ID') && (
-                            <div className="filter-item">
-                                <label htmlFor="designIDFilter" className="block mb-2 text-sm font-medium text-gray-700">Order ID</label>
-                                <input
-                                    type="text"
-                                    id="designIDFilter"
-                                    name="designID"
-                                    value={filters.designID}
-                                    onChange={handleFilterChange}
-                                    placeholder="Enter Order ID"
-                                    className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
-                                />
-                            </div>
-                        )}
-
-                        {/* {selectedFilters.includes('Order Status') && (
-                            <div className="filter-item">
-                                <label htmlFor="statusFilter" className="block mb-2 text-sm font-medium text-gray-700">Order Status</label>
-                                <select
-                                    id="statusFilter"
-                                    name="status"
-                                    value={filters.status}
-                                    onChange={handleFilterChange}
-                                    className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
-                                >
-                                    <option value="">All Order Statuses</option>
-                                    <option value="NOT_VERIFY">Not Verify</option>
-                                    <option value="PENDING">Pending</option>
-                                    <option value="DEPOSIT">Deposit</option>
-                                    <option value="PROCESSING">Processing</option>
-                                    <option value="CANCEL">Cancel</option>
-                                    <option value="COMPLETED">Completed</option>
-                                    <option value="DELIVERED">Delivered</option>
-                                </select>
-                            </div>
-                        )} */}
-                    </div>
+                    {/*  */}
 
                     <div className="flex space-x-4 mt-5">
                         {tabs.map(tab => (
