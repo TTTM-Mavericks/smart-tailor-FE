@@ -22,7 +22,7 @@ import {
 import { ArrowUpward } from '@mui/icons-material';
 import { cancelColor, cancelColorText, completeColor, completeColorText, deliveredColor, deliveredColorText, deposisColor, deposisColorText, greenColor, pendingColor, pendingColorText, primaryColor, processingColor, processingColorText, redColor, secondaryColor, whiteColor } from '../../../root/ColorSystem';
 import style from './AccountantManagePaymentForBrandComponentStyle.module.scss'
-import { OrderDetailInterface, PaymentInterface } from '../../../models/OrderModel';
+import { DesignMaterialDetailResponse, OrderDetailInterface, PaymentInterface } from '../../../models/OrderModel';
 import { Stack } from '@mui/system';
 import { FaAngleDown, FaBuilding, FaClock, FaCreditCard, FaDollarSign, FaHashtag } from "react-icons/fa";
 import { FaAngleUp } from "react-icons/fa";
@@ -903,6 +903,7 @@ interface OrderPriceDetailInterface {
     customerSecondStage: string;
     customerShippingFee: string | number | undefined;
     brandDetailPriceResponseList: BrandDetailPriceResponseInterface[];
+    designMaterialDetailResponseList: DesignMaterialDetailResponse[]
 }
 
 const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onClose, onDownloadPDF, parentOrderDetai }) => {
@@ -1047,7 +1048,7 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                                         <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Category</TableCell>
                                         <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Unit</TableCell>
                                         <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Quantity</TableCell>
-                                        <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Price (VND)</TableCell>
+                                        {/* <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Price (VND)</TableCell> */}
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -1061,7 +1062,50 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                                             <TableCell align="left">{item.categoryName}</TableCell>
                                             <TableCell align="left">{item.unit}</TableCell>
                                             <TableCell align="left">{__handleGetQuantityMaterial(item.materialID)?.quantity}</TableCell>
-                                            <TableCell align="left">{__handleAddCommasToNumber(item.brandPrice)}</TableCell>
+                                            {/* <TableCell align="left">{__handleAddCommasToNumber(item.brandPrice)}</TableCell> */}
+                                        </TableRow>
+                                    )) : (
+                                        <div>
+                                            <TableRow
+
+                                                sx={{ '&:nth-of-type(odd)': { backgroundColor: '#f5f5f5' } }}
+                                            >
+                                                Data Loading
+                                            </TableRow>
+                                        </div>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Box >
+                    <Typography variant="body2" align="left">Part of design detail</Typography>
+
+                    <Box sx={{ width: '100%', overflow: 'hidden', boxShadow: 3, borderRadius: 2, marginTop: 2, marginBottom: 2 }}>
+                        <TableContainer component={Paper} elevation={0}>
+                            <Table sx={{ minWidth: 650 }}>
+                                <TableHead>
+                                    <TableRow sx={{ backgroundColor: primaryColor }}>
+                                        <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Part name</TableCell>
+                                        <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Min square (m²)</TableCell>
+                                        <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Max square (m²)</TableCell>
+                                        <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Min material price / m² (VND)</TableCell>
+                                        <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Max material price / m² (VND)</TableCell>
+                                        {/* <TableCell align="left" sx={{ color: 'white', fontWeight: 'bold' }}>Price (VND)</TableCell> */}
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {referencePrice?.designMaterialDetailResponseList ? referencePrice?.designMaterialDetailResponseList?.map((item, index) => (
+                                        <TableRow
+                                            key={index}
+                                            sx={{ '&:nth-of-type(odd)': { backgroundColor: '#f5f5f5' } }}
+                                        >
+                                            <TableCell align="left">{item.detailName}</TableCell>
+                                            <TableCell align="left">{item.minMeterSquare}</TableCell>
+                                            <TableCell align="left">{item.maxMeterSquare}</TableCell>
+                                            <TableCell align="left">{__handleAddCommasToNumber(item.minPriceMaterial)}</TableCell>
+                                            <TableCell align="left">{__handleAddCommasToNumber(item.maxPriceMaterial)}</TableCell>
+
+                                            {/* <TableCell align="left">{__handleAddCommasToNumber(item.brandPrice)}</TableCell> */}
                                         </TableRow>
                                     )) : (
                                         <div>
@@ -1094,6 +1138,8 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                             </Grid>
                         </Box>
                     </Box >
+
+
                     <Typography variant="body2" align="left">Design detail</Typography>
                     <Box sx={{ width: '100%', overflow: 'hidden', boxShadow: 3, borderRadius: 2, marginTop: 2, marginBottom: 3 }}>
                         <TableContainer component={Paper} elevation={0}>
@@ -1184,12 +1230,6 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
 
                             <div className="w-1/2">
                                 <div className="flex justify-between items-center border-b py-2">
-                                    <span style={{ fontSize: 13 }} className="font-semibold">Design price:</span>
-                                    <div className="flex items-center justify-end">
-                                        <span style={{ fontSize: 14 }} className="text-right">{__handleAddCommasToNumber(__handleGetTotalMaterialPrice() * transactionSubOrder?.orderCustomResponse?.quantity)} VND</span>
-                                    </div>
-                                </div>
-                                <div className="flex justify-between items-center border-b py-2">
                                     <span style={{ fontSize: 13 }} className="font-semibold">Labor price:</span>
                                     <div className="flex items-center justify-end">
                                         <span style={{ fontSize: 14 }} className="text-right">{__handleAddCommasToNumber(transactionSubOrder?.brandLaborQuantity)} VND</span>
@@ -1198,7 +1238,23 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                                 <div className="flex justify-between items-center py-2">
                                     <span style={{ fontSize: 13 }} className="font-semibold">Total price:</span>
                                     <div className="flex items-center justify-end">
-                                        <span style={{ fontSize: 14 }} className="text-right">{__handleAddCommasToNumber(transaction.paymentList[0]?.paymentAmount)} VND</span>
+                                        <span style={{ fontSize: 14 }} className="text-right">
+                                            {(() => {
+                                                const stageBrandPrice = __handleGetStageBrandPrice(transactionSubOrder.orderCustomResponse.orderID);
+
+                                                // Extract and parse the prices, ensuring they default to 0 if undefined or null
+                                                const brandPriceDeposit = Math.round(parseInt(stageBrandPrice?.brandPriceDeposit || '0', 10)/1000)*1000;
+                                                const brandPriceFirstStage = Math.round(parseInt(stageBrandPrice?.brandPriceFirstStage || '0', 10)/1000)*1000;
+                                                const brandPriceSecondStage = Math.round(parseInt(stageBrandPrice?.brandPriceSecondStage || '0', 10)/1000)*1000;
+
+                                                // Sum the parsed prices
+                                                const totalPrice = brandPriceDeposit + brandPriceFirstStage + brandPriceSecondStage;
+
+                                                // Format the total price with commas and return it
+                                                return `${__handleAddCommasToNumber(totalPrice)} VND`;
+                                            })()}
+                                        </span>
+
                                     </div>
                                 </div>
                             </div>
@@ -2237,7 +2293,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                                 {order.expectedStartDate}
                                                             </span>
                                                         </p>
-                                                        <p style={{ fontWeight: "bolder" }} className="text-sm text-black pb-2">
+                                                        {/* <p style={{ fontWeight: "bolder" }} className="text-sm text-black pb-2">
                                                             <span className="text-sm text-black-500 pb-2">Status:</span>
                                                             <button
                                                                 className="py-1 px-3 rounded-full ml-2"
@@ -2259,7 +2315,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                             >
                                                                 {orderDetail?.orderStatus}
                                                             </button>
-                                                        </p>
+                                                        </p> */}
                                                         <p style={{ fontWeight: "bolder" }} className="text-sm text-black pb-2">
                                                             <span className="text-sm text-black-500 pb-2">Payment status:</span>
                                                             <button

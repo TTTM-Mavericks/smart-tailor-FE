@@ -758,7 +758,7 @@ const OrderDetailScreen: React.FC = () => {
 
 
 
-                    {orderDetail?.orderStatus !== 'CANCEL' && orderDetail?.orderStatus !== 'NOT_VERIFY' && orderDetail?.orderStatus !== 'PENDING' && (
+                    {orderDetail?.orderStatus !== 'CANCEL' && orderDetail?.orderStatus !== 'NOT_VERIFY' && (
                         <div className="mt-0 border-t pt-4 flex">
                             <div className={`w-full md:w-2/5 mt-6 md:mt-0 ${orderDetail?.paymentList && orderDetail?.paymentList?.length <= 0 && 'ml-auto'}`}>
                                 <div className="flex flex-col space-y-4">
@@ -945,7 +945,7 @@ const OrderDetailScreen: React.FC = () => {
                         </div>
                     )}
 
-                    {['NOT_VERIFY', 'PENDING'].includes(orderDetail?.orderStatus || '') && (
+                    {['NOT_VERIFY'].includes(orderDetail?.orderStatus || '') && (
                         <div className="mt-0 border-t pt-4 flex">
                             <div className={`w-full md:w-2/5 mt-6 md:mt-0`}>
                                 <div className="flex flex-col space-y-4">

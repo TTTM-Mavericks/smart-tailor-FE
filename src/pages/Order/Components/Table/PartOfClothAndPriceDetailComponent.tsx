@@ -37,13 +37,13 @@ const designMaterialColumns: ColumnData[] = [
     },
     {
         width: 100,
-        label: 'Min Meter Square',
+        label: 'Min Square (m²)',
         dataKey: 'minMeterSquare',
         numeric: true,
     },
     {
         width: 100,
-        label: 'Max Meter Square',
+        label: 'Max Square (m²)',
         dataKey: 'maxMeterSquare',
         numeric: true,
     },
