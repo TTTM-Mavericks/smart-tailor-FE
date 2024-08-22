@@ -29,5 +29,6 @@ export interface ExpertTailoringEdit {
 
 export interface AddExpertTailoring {
     expertTailoringName: string,
-    sizeImageUrl: string
+    sizeImageUrl: string,
+    modelImageUrl: string
 }

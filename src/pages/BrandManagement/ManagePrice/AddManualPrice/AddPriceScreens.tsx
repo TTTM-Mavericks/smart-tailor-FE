@@ -55,7 +55,11 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
             })
             .then((responseData) => {
                 if (responseData && Array.isArray(responseData.data)) {
-                    setPrices(responseData.data);
+                    // Sort the prices array based on the minimum quantity
+                    const sortedPrices = responseData.data.sort((a: any, b: any) =>
+                        a.laborQuantityMinQuantity - b.laborQuantityMinQuantity
+                    );
+                    setPrices(sortedPrices);
                     console.log("Data received:", responseData);
                 } else {
                     console.error('Invalid data format:', responseData);
@@ -63,6 +67,11 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
             })
             .catch(error => console.error('Error fetching data:', error));
     }, []);
+
+    // Function to format number with commas
+    const formatNumber = (num: number) => {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
 
     const handlePriceChange = (laborQuantityID: string, event: React.ChangeEvent<HTMLInputElement>) => {
         const newPrices = prices.map(price =>
@@ -147,15 +156,19 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
                     <thead>
                         <tr>
                             <th className="border-b py-2 font-semibold" style={{ paddingLeft: "30px" }}>Quantity</th>
-                            <th className="border-b py-2 font-semibold" style={{ paddingLeft: "20px" }}>Base Price</th>
-                            <th className="border-b py-2 font-semibold" style={{ paddingLeft: "90px" }}>Brand Price</th>
+                            <th className="border-b py-2 font-semibold" style={{ paddingLeft: "20px" }}>Base Price (VND)</th>
+                            <th className="border-b py-2 font-semibold" style={{ paddingLeft: "90px" }}>Brand Price (VND)</th>
                         </tr>
                     </thead>
                     <tbody>
                         {prices.map((price, index) => (
                             <tr key={price.laborQuantityID} className="odd:bg-gray-50">
-                                <td className="border-b py-2 px-4">{price.laborQuantityMinQuantity} - {price.laborQuantityMaxQuantity}</td>
-                                <td className="border-b py-2 px-4">{price.laborQuantityMinPrice} - {price.laborQuantityMaxPrice}</td>
+                                <td className="border-b py-2 px-4">
+                                    {price.laborQuantityMinQuantity} - {price.laborQuantityMaxQuantity}
+                                </td>
+                                <td className="border-b py-2 px-4">
+                                    {formatNumber(price.laborQuantityMinPrice)} - {formatNumber(price.laborQuantityMaxPrice)}
+                                </td>
                                 <td className="border-b py-2 px-4">
                                     <input
                                         type="number"
