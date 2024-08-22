@@ -766,7 +766,6 @@ function CustomDesignScreen() {
    */
   const __handleGetMaterialInformation = async (item: PartOfDesignInterface[]) => {
     const successImaUrl = await __handleGetElementAsBase64('canvas3DElement')
-    console.log(successImaUrl);
     const bodyRequest: Design = {
       userID: userAuth?.userID || '',
       expertTailoringID: typeOfModelID,
@@ -778,7 +777,6 @@ function CustomDesignScreen() {
       minWeight: 0.2,
       maxWeight: 0.4
     };
-    console.log(bodyRequest);
     setMainDesign(bodyRequest);
     return bodyRequest
   }
@@ -807,6 +805,8 @@ function CustomDesignScreen() {
     if (!isLickSaveButton) {
       setIsLoadingPage(true);
     }
+
+    console.log('mainDesign: ', mainDesign);
     try {
       const response = await api.put(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.updateDesign}/${id}`, mainDesign, __getToken());
       if (response.status === 200) {

@@ -194,7 +194,7 @@ const OrderDetailScreen: React.FC = () => {
 
 
     useEffect(() => {
-        if (orderDetail?.orderStatus === 'DELIVERED') {
+        if (orderDetail?.orderStatus === 'RECEIVED') {
             setIsOpenRatingDialog(true);
         }
 
@@ -532,9 +532,13 @@ const OrderDetailScreen: React.FC = () => {
             }
             else {
                 console.log('detail order: ', response.message);
+                setIsLoading(false);
+
             }
         } catch (error) {
             console.log('error: ', error);
+            setIsLoading(false);
+
         }
     }
 
@@ -554,7 +558,34 @@ const OrderDetailScreen: React.FC = () => {
 
                     <div className="border-b pb-4 mb-6">
                         <p className="text-sm text-gray-700 flex">
-                            <span style={{ fontWeight: "bolder" }}>{orderDetail?.orderID}</span>
+                            <div className='flex items-center'>
+                                <p style={{ fontWeight: "bolder" }}>{orderDetail?.orderID}</p>
+                                <div className="flex items-center ml-5">
+                                    {orderDetail?.rating && orderDetail?.rating > 0 && (
+                                        <>
+                                            {/* Loop to create full stars */}
+                                            {Array.from({ length: Math.floor(orderDetail.rating) }).map((_, index) => (
+                                                <span key={index} className="text-yellow-500 text-xl">★</span> // Full star
+                                            ))}
+
+                                            {/* Check for half star */}
+                                            {orderDetail.rating % 1 !== 0 && (
+                                                <span className="text-yellow-500 text-xl">★</span> // Half star
+                                            )}
+
+                                            {/* Loop to create empty stars */}
+                                            {Array.from({ length: 5 - Math.ceil(orderDetail.rating) }).map((_, index) => (
+                                                <span key={index} className="text-gray-300 text-xl">★</span> // Empty star
+                                            ))}
+
+                                            {/* Display the rating number */}
+                                            <span className="ml-2 font-bold">{orderDetail.rating}/5</span>
+                                        </>
+                                    )}
+                                </div>
+
+
+                            </div>
                             <span className="ml-auto text-sm text-gray-700 cursor-pointer" onClick={() => __handleOpenReportDialog()}>Report</span>
                         </p>
                     </div>

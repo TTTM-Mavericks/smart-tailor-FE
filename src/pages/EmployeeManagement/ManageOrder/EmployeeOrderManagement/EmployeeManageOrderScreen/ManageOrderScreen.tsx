@@ -491,18 +491,21 @@ const EmployeeOrderFields: React.FC<{
                         </button>
                     )}
 
-                    {order.orderStatus === 'FINAL_CHECKING' && (
+                    {order.orderStatus === 'FINAL_CHECKING' || order.orderStatus === 'REFUND_REQUEST' && (
                         <>
-                            <button
-                                onClick={() => setIsOpenFinalCheckingOrderDialog(true)}
-                                className="mb-2 bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 mr-4"
-                                style={{
-                                    borderRadius: 4,
-                                    backgroundColor: primaryColor
-                                }}
-                            >
-                                Upload final products
-                            </button>
+                            {order.orderStatus !== 'REFUND_REQUEST' && (
+
+                                <button
+                                    onClick={() => setIsOpenFinalCheckingOrderDialog(true)}
+                                    className="mb-2 bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 mr-4"
+                                    style={{
+                                        borderRadius: 4,
+                                        backgroundColor: primaryColor
+                                    }}
+                                >
+                                    Upload final products
+                                </button>
+                            )}
 
                             <FinalCheckingProductsDialogComponent onClose={() => setIsOpenFinalCheckingOrderDialog(false)} isOpen={isOpenFinalCheckingOrderDialog} order={order} orderID={order.orderID}></FinalCheckingProductsDialogComponent>
 

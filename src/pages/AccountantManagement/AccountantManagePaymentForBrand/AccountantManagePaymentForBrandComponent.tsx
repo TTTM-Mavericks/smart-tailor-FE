@@ -28,7 +28,7 @@ import { FaAngleDown, FaBuilding, FaClock, FaCreditCard, FaDollarSign, FaHashtag
 import { FaAngleUp } from "react-icons/fa";
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import { toast } from 'react-toastify';
-import { PaymentOrderInterface } from '../../../models/PaymentModel';
+import { PaymentOrderInterface, PayOSResponseInterface } from '../../../models/PaymentModel';
 import LoadingComponent from '../../../components/Loading/LoadingComponent';
 import Cookies from 'js-cookie';
 import { UserInterface } from '../../../models/UserModel';
@@ -195,6 +195,7 @@ interface Payment {
     orderID: string;
     paymentURl: string | null;
     payOSResponse: PayOSResponse | null;
+    payOSData?: PayOSResponseInterface;
     createDate: string;
 }
 
@@ -710,7 +711,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
                                         <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
                                             Total price:{" "}
                                             <span className="text-sm text-gray-500 pb-2">
-                                                {__handleAddCommasToNumber(subOrder.totalPrice)} VND
+                                                {__handleAddCommasToNumber(subOrder.paymentList[0].payOSData.amount)} VND
                                             </span>
                                         </p>
                                         <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
