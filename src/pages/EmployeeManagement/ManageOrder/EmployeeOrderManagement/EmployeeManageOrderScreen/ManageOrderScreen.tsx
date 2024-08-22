@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaChevronLeft, FaChevronRight, FaTimes, FaImage, FaFileAlt, FaBox, FaCalendarAlt, FaMapMarkerAlt, FaEye } from 'react-icons/fa';
+import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaChevronLeft, FaChevronRight, FaTimes, FaImage, FaFileAlt, FaBox, FaCalendarAlt, FaMapMarkerAlt, FaEye, FaDollarSign } from 'react-icons/fa';
 import { ArrowDropDown, BrandingWatermark, Cancel, Verified, ViewAgenda, ViewAgendaOutlined, Visibility } from '@mui/icons-material';
 import axios from 'axios';
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
@@ -351,18 +351,18 @@ const EmployeeOrderFields: React.FC<{
                                 <FaBox className="inline-block mr-1" />
                                 <span style={{ fontWeight: "bolder" }}>Order Status: </span> <span className={`mb-2 ${getStatusColor(order.orderStatus)} font-bold`}>{order.orderStatus}</span>
                             </p>
-                            <div className="mt-4">
+                            <div className="mt-2">
                                 {order.detailList.map((detail, index) => (
                                     <p key={index} className="text-gray-600 text-sm">
-                                        {/* <FaBox className="inline-block mr-1" /> */}
-                                        <span style={{ fontWeight: "bolder" }}> Size: </span>{detail.size.sizeName}: <span style={{ fontWeight: "bolder" }}>Quantity: </span> {detail.quantity}
+                                        <FaBox className="inline-block mr-1" />
+                                        <span style={{ fontWeight: "bolder" }}> Size: </span>{detail.size.sizeName} <span style={{ fontWeight: "bolder" }}>Quantity: </span> {detail.quantity}
                                     </p>
                                 ))}
                             </div>
                             {order.totalPrice > 0 && (
-                                <p className="text-gray-700 mt-4 text-sm">
-                                    {/* <FaBox className="inline-block mr-1" /> */}
-                                    Price: {__handleAddCommasToNumber(order.totalPrice)} VND
+                                <p className="text-gray-700 mt-2 text-sm">
+                                    <FaDollarSign className="inline-block mr-1" />
+                                    <span style={{ fontWeight: "bolder" }}>Price: </span>{__handleAddCommasToNumber(order.totalPrice)} VND
                                 </p>
                             )}
                         </div>
