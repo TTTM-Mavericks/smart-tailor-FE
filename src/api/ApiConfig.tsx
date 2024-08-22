@@ -212,7 +212,8 @@ export const functionEndpoints = {
   },
   payment: {
     getPaymentByUserID: '/get-payment-by-user-id',
-    createPayment: '/create-payment'
+    createPayment: '/create-payment',
+    getAllPayment: '/get-all-payment'
   },
   chart: {
     orderStatusDetail: '/get-order-status-detail',

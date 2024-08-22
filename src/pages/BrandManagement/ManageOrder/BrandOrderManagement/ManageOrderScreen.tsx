@@ -5,7 +5,7 @@ import axios from 'axios';
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import { BrandOrder, BrandOrderTable, ImageList } from '../../../../models/BrandManageOrderModel';
 import { motion } from 'framer-motion'
-import { Box, Dialog, DialogContent, DialogTitle, IconButton, Tooltip, useTheme } from '@mui/material';
+import { Box, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Tooltip, useTheme } from '@mui/material';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -24,8 +24,10 @@ import { EstimatedStageInterface } from '../../../Order/OrderDetail/OrderDetailS
 import Select from 'react-select';
 import { DataGrid, GridColDef, GridRenderCellParams, GridToolbar } from '@mui/x-data-grid';
 import { tokens } from '../../../../theme';
-import { __getToken } from '../../../../App';
+import { __getToken, __getUserLogined } from '../../../../App';
 import MaterialDetailTableComponent from '../../../Order/Components/Table/MaterialDetailTableComponent';
+import { clothTag } from '../../../../assets';
+import html2canvas from 'html2canvas';
 
 /**
  * 
@@ -218,6 +220,8 @@ const BrandOrderFields: React.FC<{
     const [isOpenReportOrderCanceledDialog, setIsOpenReportOrderCanceledDialog] = useState<boolean>(false);
     const [timeline, setTimeLine] = useState<EstimatedStageInterface>();
     const [selectedOrderMaterial, setSelectedOrderMaterial] = useState<any>();
+    const [selectedClothTagByOrderMaterial, setSelectedClothTagByOrderMaterial] = useState<any>();
+
 
 
 
@@ -430,6 +434,19 @@ const BrandOrderFields: React.FC<{
         setUseAuth(userParse);
     }, []);
 
+
+    const __handleDownloadClothTag = () => {
+        const clothTagElement = document.getElementById('clothTagToDownload');
+        if (clothTagElement) {
+            html2canvas(clothTagElement).then((canvas: any) => {
+                const link = document.createElement('a');
+                link.download = `ClothTag-${order?.orderID}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+    };
+
     return (
         <div className="bg-white mb-8 shadow-lg rounded-lg transition duration-300 ease-in-out transform hover:shadow-xl">
             <LoadingComponent isLoading={isLoading}></LoadingComponent>
@@ -499,6 +516,12 @@ const BrandOrderFields: React.FC<{
                     <p style={{ fontWeight: "500", color: secondaryColor, cursor: 'pointer' }} onClick={() => setSelectedOrderMaterial(order.orderID)}>
                         View material
                     </p>
+                    <p style={{ fontWeight: "500", color: secondaryColor, cursor: 'pointer', height: 'fit-content' }} onClick={() => setSelectedClothTagByOrderMaterial(order.orderID)}>
+                        Download cloth tags
+                        <p className={` ml-5 inline-flex items-center rounded-md bg-yellow-50 px-2 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10`}>
+                            <p>Mandatory</p>
+                        </p>
+                    </p>
                     {selectedOrderMaterial === order.orderID && (
 
                         <Dialog open={true} aria-labelledby="popup-dialog-title" maxWidth="lg" fullWidth onClose={() => setSelectedOrderMaterial(null)}>
@@ -517,6 +540,92 @@ const BrandOrderFields: React.FC<{
                                     <MaterialDetailTableComponent materialDetailData={designDetails?.materialDetail}></MaterialDetailTableComponent>
                                 </div>
                             </DialogContent>
+
+
+                        </Dialog>
+                    )}
+
+                    {selectedClothTagByOrderMaterial === order.orderID && (
+                        <Dialog open={true} aria-labelledby="popup-dialog-title" maxWidth="md" fullWidth onClose={() => setSelectedClothTagByOrderMaterial(null)}>
+                            <DialogTitle id="popup-dialog-title">
+                                <div >
+
+                                    <span>Cloth Tags</span>
+                                    <div className={`ml-2 inline-flex items-center rounded-md bg-yellow-50 px-2 py-2 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10`}>
+                                        <span>
+                                            Mandatory! Brand must attached this tag to each cloth before delivery to system.
+                                        </span>
+                                    </div>
+                                </div>
+                                <IoMdCloseCircleOutline
+                                    cursor="pointer"
+                                    size={20}
+                                    color={redColor}
+                                    onClick={() => setSelectedClothTagByOrderMaterial(null)}
+                                    style={{ position: 'absolute', right: 20, top: 20 }}
+                                />
+                            </DialogTitle>
+                            <DialogContent >
+                                <div className='flex items-center justify-center'>
+                                    <div
+                                        id="clothTagToDownload"
+                                        className="relative w-1/2"
+                                        style={{
+                                            width: 150,
+                                            height: 350,
+                                            margin: '0 auto',
+                                            marginLeft: 100,
+                                            transform: 'rotate(270deg)', // Rotate 90 degrees
+                                        }}
+                                    >
+                                        <img
+                                            src={clothTag}
+                                            style={{
+                                                width: '100%',
+                                                height: '100%'
+                                            }}
+                                            alt=""
+                                        />
+                                        <div
+                                            className="absolute"
+                                            style={{
+                                                top: '50%',
+                                                left: '50%',
+                                                transform: 'translate(-50%, -50%) rotate(90deg)',
+                                                width: 400,
+                                                textAlign: 'center',
+                                                marginTop: 25
+                                            }}
+                                        >
+                                            <p
+                                                style={{
+                                                    fontSize: 12,
+                                                    fontWeight: 'bold',
+                                                }}
+                                            >
+                                                [SMT]-{order?.orderID}-{__getUserLogined().userID}
+                                            </p>
+                                        </div>
+                                    </div>
+
+
+                                    <div className="p-4 w-1/2">
+                                        <span className="block mb-2" style={{ fontSize: 14 }}>* The brand is obligated to attach cloth tags to each garment you create.</span>
+                                        <span className="block mb-2" style={{ fontSize: 14 }}>* Cloth tags will contain the orderID and brandID.</span>
+                                        <span className="block mb-2" style={{ fontSize: 14 }}>* Cloth tags will be used to resolve product complaints.</span>
+                                        <span className="block mb-2" style={{ fontSize: 14 }}>* Products or batches without cloth tags will be considered invalid, and the shipment will be canceled.</span>
+                                    </div>
+
+                                </div>
+                            </DialogContent>
+                            <DialogActions>
+                                <button
+                                    className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4 mb-2"
+                                    onClick={__handleDownloadClothTag}
+                                >
+                                    Download
+                                </button>
+                            </DialogActions>
 
 
                         </Dialog>
