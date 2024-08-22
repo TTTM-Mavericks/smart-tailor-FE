@@ -320,7 +320,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
 
         // set background color
         doc.setFillColor(244, 245, 239); // White color
-        doc.rect(0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height, 'F');
+        // doc.rect(0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height, 'D');
 
         const imgData = "https://res.cloudinary.com/dby2saqmn/image/upload/v1723989709/ncoktpbtvzzhjqktopjz.png";
         const imgWidth = 40;
@@ -334,11 +334,6 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
 
         const textOffset = 10;
         const tableStartY = Math.max(imgHeight + textOffset, 50);
-
-        const setBackground = () => {
-            doc.setFillColor(244, 245, 239); // Set background color
-            doc.rect(0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height, 'F');
-        };
 
         autoTable(doc, {
             startY: tableStartY,
@@ -560,6 +555,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
 
         doc.save('Transaction_Invoice.pdf')
     };
+
 
     const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
     const [selectedTransactions, setSelectedTransactions] = useState(null);
