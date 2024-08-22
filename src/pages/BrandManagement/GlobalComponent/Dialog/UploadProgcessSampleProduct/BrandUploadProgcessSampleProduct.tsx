@@ -116,12 +116,12 @@ const BrandUploadProgcessSampleProduct: React.FC<Props> = ({ orderDetail, isOpen
                         message: `Brand ${brandID} added a sample product - Sub order: ${orderID}`
                     }
                     console.log(bodyRequest);
-                    __handleSendNotification(bodyRequest);
+                    await __handleSendNotification(bodyRequest);
                     setIsloading(false)
                     // setTimeout(() => {
                     //     window.location.reload()
                     // }, 2000)
-                    onClose();
+                    // onClose();
                 }
                 else {
                     console.log('detail error: ', response.message);

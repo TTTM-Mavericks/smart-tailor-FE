@@ -509,12 +509,12 @@ const BrandOrderFields: React.FC<{
                         <FaCalendarAlt className="inline-block mr-1" />
                         <span style={{ fontWeight: "bolder" }}>Expected Start Date:</span> {order.expectedStartDate}
                     </p>
-                    <p style={{ fontWeight: "500", color: secondaryColor, cursor: 'pointer' }} onClick={() => setSelectedOrderMaterial(order.orderID)}>
+                    <p style={{ fontWeight: "500", color: secondaryColor, cursor: 'pointer', fontSize: 15 }} onClick={() => setSelectedOrderMaterial(order.orderID)}>
                         View material
                     </p>
-                    <p style={{ fontWeight: "500", color: secondaryColor, cursor: 'pointer', height: 'fit-content' }} onClick={() => setSelectedClothTagByOrderMaterial(order.orderID)}>
+                    <p style={{ fontWeight: "500", color: secondaryColor, cursor: 'pointer', height: 'fit-content', fontSize: 15 }} onClick={() => setSelectedClothTagByOrderMaterial(order.orderID)}>
                         Download cloth tags
-                        <p className={` ml-5 inline-flex items-center rounded-md bg-yellow-50 px-2 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10`}>
+                        <p className={` ml-2 inline-flex items-center rounded-md bg-yellow-50 px-2 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10`}>
                             <p>Mandatory</p>
                         </p>
                     </p>
@@ -787,7 +787,6 @@ const BrandOrderFields: React.FC<{
                                 <div className="flex justify-between text-sm">
                                     {progressSteps?.map((step, index) => {
                                         // const isCompleted = index < step.indexOf(order.orderStatus) + 1;
-                                        // const isCurrent = index === progressSteps.indexOf(step.status) + 1;
                                         const isClickable = !step.status;
                                         return (
                                             <p key={index} className={`text-center `}>
