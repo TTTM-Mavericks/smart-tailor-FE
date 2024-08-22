@@ -177,7 +177,8 @@ export const functionEndpoints = {
     getAllBrand: '/get-all-brand',
     getAllAccountant: '/get-all-accountant',
     getAllEmployee: '/get-all-employee',
-    getAllManager: '/get-all-manager'
+    getAllManager: '/get-all-manager',
+    updateUser: '/update-user'
   },
   systemImage: {
     getAllSystemIamge: '/get-all-system-image',

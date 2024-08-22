@@ -572,24 +572,21 @@ const UploadBrandInforForm = () => {
             }
 
             const updatedFormData = {
-                email: getEmail(),
-                fullName: getFullName(),
                 phoneNumber: getPhone(),
-                gender: true,
-                dateOfBirth: "22-08-2019",
-                address: formData.address,
-                province: formData.province,
-                district: formData.district,
-                ward: formData.ward,
+                fullName: getFullName(),
                 imageUrl: avatarUrl
             };
+
+            console.log(updatedFormData.phoneNumber);
+            console.log(updatedFormData.fullName);
+            console.log(updatedFormData.imageUrl);
 
             console.log("Submitting form data:", updatedFormData);
 
             try {
                 // First, update the profile
                 const profileUpdateResponse = await axios.put(
-                    `${baseURL + versionEndpoints.v1 + featuresEndpoints.customer + functionEndpoints.customer.updateProfile + '/' + getID()}`,
+                    `${baseURL + versionEndpoints.v1 + featuresEndpoints.user + functionEndpoints.user.updateUser + '/' + getID()}`,
                     updatedFormData, {
                     headers: {
                         'Authorization': `Bearer ${__getToken()}`
@@ -601,9 +598,33 @@ const UploadBrandInforForm = () => {
 
                 // If profile update is successful, then upload the brand information
                 if (profileUpdateResponse.status === 200) {
+                    let uploadedImages: BrandImages[] = [];
+
+                    if (files && files.length > 0) {
+                        try {
+                            uploadedImages = await _handleUploadToCloudinary(files);
+                            console.log("Uploaded images:", uploadedImages);
+                        } catch (error) {
+                            console.error('Error uploading images:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Image Upload Failed',
+                                text: 'There was an error uploading your images. Please try again.',
+                            });
+                            setIsLoading(false);
+                            return;
+                        }
+                    }
+
+                    const updatedFormDatas = {
+                        ...formData,
+                        brandImages: uploadedImages
+                    };
+
+                    console.log("Submitting form data:", updatedFormDatas);
                     const brandUploadResponse = await axios.post(
                         `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.uploadBrandInfor + '/' + getID()}`,
-                        formData
+                        updatedFormDatas
                     );
 
                     console.log('Brand profile uploaded successfully:', brandUploadResponse.data);

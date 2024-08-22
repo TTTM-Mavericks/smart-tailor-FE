@@ -270,7 +270,12 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
 
     // Download PDF Function
     const _handleOpenPDF = (pdfData: PDFData) => {
-        const { transaction, transactionSubOrder, totalMaterialPrice } = pdfData;
+        const { transaction, transactionSubOrder, totalMaterialPrice, referencePrice } = pdfData;
+
+        const __handleGetStageBrandPrice = (subOrderID: any) => {
+            const result = referencePrice?.brandDetailPriceResponseList.find((item) => item.subOrderID === subOrderID);
+            if (result) return result;
+        }
 
         const __handleGetTotalMaterialPrice = () => {
             if (!transactionSubOrder) {
@@ -300,12 +305,22 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
             return sum;
         };
 
+        const stageBrandPrice = __handleGetStageBrandPrice(transactionSubOrder?.orderCustomResponse.orderID);
+
+        // Extract and parse the prices, ensuring they default to 0 if undefined or null
+        const brandPriceDeposit = Math.round(parseInt(stageBrandPrice?.brandPriceDeposit || '0', 10) / 1000) * 1000;
+        const brandPriceFirstStage = Math.round(parseInt(stageBrandPrice?.brandPriceFirstStage || '0', 10) / 1000) * 1000;
+        const brandPriceSecondStage = Math.round(parseInt(stageBrandPrice?.brandPriceSecondStage || '0', 10) / 1000) * 1000;
+
+        // Sum the parsed prices
+        const totalPrice = brandPriceDeposit + brandPriceFirstStage + brandPriceSecondStage;
+
         if (!transaction) return;
         const doc = new jsPDF();
 
         // set background color
         doc.setFillColor(244, 245, 239); // White color
-        doc.rect(0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height, 'F');
+        // doc.rect(0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height, 'D');
 
         const imgData = "https://res.cloudinary.com/dby2saqmn/image/upload/v1723989709/ncoktpbtvzzhjqktopjz.png";
         const imgWidth = 40;
@@ -324,14 +339,6 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
             startY: tableStartY,
             body: [
                 [
-                    {
-                        content: `Invoice No. ${transaction.paymentList[0].paymentID}` + `\n${transaction.orderType}`,
-                        styles: {
-                            halign: 'left',
-                            valign: "middle",
-                            fontSize: 10
-                        }
-                    },
                     {
                         content: `SMART TAILOR, Inc` + `\nLot E2a-7, Street D1, High-Tech Park` + `\nLong Thanh My Ward City` + `\nThu Duc` + `\nHo Chi Minh City.` + `\nViet Nam`,
                         styles: {
@@ -361,7 +368,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
         // Add Material detail
         doc.setFontSize(12);
         autoTable(doc, {
-            head: [['HS code', 'Name', 'Category', 'Unit', 'Quantity', 'Brand Price (VND)']],
+            head: [['HS code', 'Name', 'Category', 'Unit', 'Quantity']],
 
             body: transactionSubOrder?.brandMaterialResponseList?.map((item: MaterialReportInterface) => {
                 return [
@@ -369,26 +376,43 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
                     item.materialName,
                     item.categoryName,
                     item.unit,
-                    __handleGetQuantityMaterial(item.materialID)?.quantity || 'N/A',
-                    __handleAddCommasToNumber(item.brandPrice)
+                    __handleGetQuantityMaterial(item.materialID)?.quantity || 'N/A'
                 ];
             }) || [],
             theme: 'striped',
             headStyles: { fillColor: primaryColor, textColor: whiteColor },
         });
 
-        // autoTable(doc, {
-        //     head: [['Design Total', 'Brand Labor', 'Total']],
-        //     body: transactionSubOrder ? [
-        //         [
-        //             __handleAddCommasToNumber(__handleGetTotalMaterialPrice() * transactionSubOrder?.orderCustomResponse?.quantity),
-        //             __handleAddCommasToNumber(transactionSubOrder?.brandLaborQuantity),
-        //             __handleAddCommasToNumber(transaction.paymentList[0]?.paymentAmount)
-        //         ]
-        //     ] : [],
-        //     theme: 'striped',
-        //     headStyles: { fillColor: primaryColor, textColor: whiteColor },
-        // });
+        autoTable(doc, {
+            body: [
+                [
+                    {
+                        content: `___________________________________________________________________________________________`,
+                        styles: {
+                            halign: 'left',
+                            overflow: 'linebreak'
+                        }
+                    }
+                ]
+            ], theme: 'plain'
+        })
+
+        doc.setFontSize(12);
+        autoTable(doc, {
+            head: [['Part name', 'Min square (m²)', 'Max square (m²)', 'Min material price / m² (VND)', 'Max material price / m² (VND)']],
+
+            body: referencePrice?.designMaterialDetailResponseList?.map((item: any) => {
+                return [
+                    item.detailName,
+                    item.minMeterSquare,
+                    item.maxMeterSquare,
+                    __handleAddCommasToNumber(item.minPriceMaterial) || 'N/A',
+                    __handleAddCommasToNumber(item.maxPriceMaterial) || 'N/A'
+                ];
+            }) || [],
+            theme: 'striped',
+            headStyles: { fillColor: primaryColor, textColor: whiteColor },
+        });
 
         autoTable(doc, {
             body: [
@@ -415,6 +439,55 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
             ]),
             theme: 'striped',
             headStyles: { fillColor: primaryColor, textColor: whiteColor },
+        });
+
+        autoTable(doc, {
+            body: [
+                [
+                    {
+                        content: `___________________________________________________________________________________________`,
+                        styles: {
+                            halign: 'left',
+                            overflow: 'linebreak'
+                        }
+                    }
+                ]
+            ], theme: 'plain'
+        })
+
+        autoTable(doc, {
+            // startY: doc.lastAutoTable.finalY + 10,
+            body: [
+                [
+                    {
+                        content: 'Payment Information',
+                        styles: {
+                            halign: 'left',
+                            fontSize: 14,
+                            fontStyle: 'bold'
+                        }
+                    }
+                ],
+                [
+                    {
+                        content: `Deposit: ${__handleAddCommasToNumber(__handleGetStageBrandPrice(transactionSubOrder?.orderCustomResponse.orderID)?.brandPriceDeposit) || 'N/A'}`,
+                        styles: { fontSize: 10 }
+                    }
+                ],
+                [
+                    {
+                        content: `Labor Price: ${__handleAddCommasToNumber(transactionSubOrder?.brandLaborQuantity) || 'N/A'}`,
+                        styles: { fontSize: 10 }
+                    }
+                ],
+                [
+                    {
+                        content: `Total: ${__handleAddCommasToNumber(totalPrice) || 'N/A'}`,
+                        styles: { fontSize: 10 }
+                    }
+                ],
+            ],
+            theme: 'plain'
         });
 
         autoTable(doc, {
@@ -482,6 +555,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
 
         doc.save('Transaction_Invoice.pdf')
     };
+
 
     const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
     const [selectedTransactions, setSelectedTransactions] = useState(null);
@@ -871,6 +945,7 @@ interface PDFData {
     transaction: any;
     transactionSubOrder: TransactionSubOrderInterface | undefined;
     totalMaterialPrice: number;
+    referencePrice: OrderPriceDetailInterface | undefined
 }
 
 interface MaterialReportInterface {
@@ -950,6 +1025,7 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
         const pdfData: PDFData = {
             transaction,
             transactionSubOrder,
+            referencePrice,
             totalMaterialPrice: __handleGetTotalMaterialPrice()
         };
         onDownloadPDF(pdfData);
@@ -1036,7 +1112,7 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                             </InvoiceDetails>
                         </Grid>
                         <Grid item xs={6}>
-                            <Typography variant="body1" align="right">Invoice No. {transaction.paymentList[0].paymentID}</Typography>
+                            {/* <Typography variant="body1" align="right">Invoice No. {transaction.paymentList[0].paymentID}</Typography> */}
 
                             <Typography variant="body1" align="right">{transaction.expectedStartDate}</Typography>
                         </Grid>
@@ -1124,26 +1200,7 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                                 </TableBody>
                             </Table>
                         </TableContainer>
-
-                        <Box sx={{ padding: 2, backgroundColor: '#f0f0f0' }}>
-                            <Grid container spacing={2}>
-                                <Grid item xs={12}>
-                                    <Typography variant="h6" align="right" sx={{ fontWeight: 'bold' }}>
-                                        <p className="text-sm text-gray-600">
-                                            Total: <span className="text-gray-800 font-semibold ml-1">
-                                                {new Intl.NumberFormat('en-US', {
-                                                    style: 'currency',
-                                                    currency: 'VND'
-                                                }).format(__handleGetTotalMaterialPrice())}
-                                            </span>
-                                        </p>
-                                    </Typography>
-                                </Grid>
-                            </Grid>
-                        </Box>
                     </Box >
-
-
                     <Typography variant="body2" align="left">Design detail</Typography>
                     <Box sx={{ width: '100%', overflow: 'hidden', boxShadow: 3, borderRadius: 2, marginTop: 2, marginBottom: 3 }}>
                         <TableContainer component={Paper} elevation={0}>
@@ -1171,22 +1228,6 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                                 </TableBody>
                             </Table>
                         </TableContainer>
-                        <Box sx={{ padding: 2, backgroundColor: '#f0f0f0' }}>
-                            <Grid container spacing={2}>
-                                <Grid item xs={12}>
-                                    <Typography variant="h6" align="right" sx={{ fontWeight: 'bold' }}>
-                                        <p className="text-sm text-gray-600">
-                                            Total: <span className="text-gray-800 font-semibold ml-1">
-                                                {new Intl.NumberFormat('en-US', {
-                                                    style: 'currency',
-                                                    currency: 'VND'
-                                                }).format(transaction.totalPrice)}
-                                            </span>
-                                        </p>
-                                    </Typography>
-                                </Grid>
-                            </Grid>
-                        </Box>
                     </Box>
 
                     {transactionSubOrder && (
@@ -1265,65 +1306,6 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                         </div>
                     )}
 
-
-                    {/* <ThankYou variant="h6" align="center">
-                        Thank you!
-                    </ThankYou> */}
-
-                    {/* <PaymentInfo>
-                        <h2 className="text-lg font-semibold text-gray-800 mb-5">PAYMENT INFORMATION</h2>
-                        <div className="flex h-full items-center">
-                            <div className="space-y-4 h-full" style={{ width: 450 }}>
-                                <div className="flex w-3/4 items-center space-x-2">
-                                    <img style={{ borderRadius: 90 }} src={bankImg} alt="Bank Logo" className="w-8 h-8" />
-                                    <div>
-                                        <div className="text-sm font-medium">{transaction.paymentList[0]?.paymentRecipientBankCode}</div>
-                                    </div>
-                                </div>
-
-                                <div className="mt-4">
-                                    <div className="flex justify-between items-center border-b py-2">
-                                        <span style={{ fontSize: 13 }} className="font-semibold">Account Holder:</span>
-                                        <div className="flex items-center justify-end">
-                                            <span style={{ fontSize: 14 }} className="text-right">{transaction.paymentList[0]?.paymentRecipientName || 'N/A'}</span>
-                                            <button className="ml-2 bg-gray-100 text-sm font-medium py-1 px-2 rounded">Copy</button>
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-between items-center border-b py-2">
-                                        <span style={{ fontSize: 13 }} className="font-semibold">Account Number:</span>
-                                        <div className="flex items-center justify-end">
-                                            <span style={{ fontSize: 14 }} className="text-right">{transaction.paymentList[0]?.paymentRecipientBankNumber || 'N/A'}</span>
-                                            <button className="ml-2 bg-gray-100 text-sm font-medium py-1 px-2 rounded">Copy</button>
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-between items-center border-b py-2">
-                                        <span style={{ fontSize: 13 }} className="font-semibold">Amount:</span>
-                                        <div className="flex items-center justify-end">
-                                            <span style={{ fontSize: 14 }} className="text-right">{__handleAddCommasToNumber(transaction.paymentList[0]?.paymentAmount)} VND</span>
-                                            <button className="ml-2 bg-gray-100 text-sm font-medium py-1 px-2 rounded">Copy</button>
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-between items-center py-2">
-                                        <span style={{ fontSize: 13 }} className="font-semibold">Description:</span>
-                                        <div className="flex items-center justify-end">
-                                            <span style={{ fontSize: 14 }} className="text-right">{transaction.paymentList[0]?.paymentType || 'N/A'}</span>
-                                            <button className="ml-2 bg-gray-100 text-sm font-medium py-1 px-2 rounded">Copy</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="relative flex justify-center items-center mr-auto" style={{ width: 200, height: 200, marginLeft: 100 }}>
-                                <QRCode value={transaction.paymentList[0]?.payOSResponse.data.checkoutUrl || ''} />
-                                <div
-                                    className="absolute flex items-center justify-center w-20 h-20 rounded-full transform transition-transform duration-300 hover:scale-110 cursor-pointer"
-                                    style={{ backgroundColor: primaryColor, color: whiteColor, fontWeight: 500, opacity: 0.9 }}
-                                    onClick={() => __handleMoveToPayOSPaymentDetail()}
-                                >
-                                    <p>Click</p>
-                                </div>
-                            </div>
-                        </div>
-                    </PaymentInfo> */}
                 </DialogContent>
             </ScrollFreeDialogContent >
             <DialogActions>
@@ -1705,7 +1687,13 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
 
     // Download PDF Function
     const _handleOpenPDF = (pdfData: PDFData) => {
-        const { transaction, transactionSubOrder, totalMaterialPrice } = pdfData;
+        const { transaction, transactionSubOrder, totalMaterialPrice, referencePrice } = pdfData;
+
+        const __handleGetStageBrandPrice = (subOrderID: any) => {
+            const result = referencePrice?.brandDetailPriceResponseList.find((item) => item.subOrderID === subOrderID);
+            if (result) return result;
+        }
+
         const __handleGetTotalMaterialPrice = () => {
             if (!transactionSubOrder) {
                 console.log("No transactionSubOrder available");
@@ -1733,12 +1721,23 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
             console.log("Total Material Price:", sum);
             return sum;
         };
+
+        const stageBrandPrice = __handleGetStageBrandPrice(transactionSubOrder?.orderCustomResponse.orderID);
+
+        // Extract and parse the prices, ensuring they default to 0 if undefined or null
+        const brandPriceDeposit = Math.round(parseInt(stageBrandPrice?.brandPriceDeposit || '0', 10) / 1000) * 1000;
+        const brandPriceFirstStage = Math.round(parseInt(stageBrandPrice?.brandPriceFirstStage || '0', 10) / 1000) * 1000;
+        const brandPriceSecondStage = Math.round(parseInt(stageBrandPrice?.brandPriceSecondStage || '0', 10) / 1000) * 1000;
+
+        // Sum the parsed prices
+        const totalPrice = brandPriceDeposit + brandPriceFirstStage + brandPriceSecondStage;
+
         if (!transaction) return;
         const doc = new jsPDF();
 
         // set background color
         doc.setFillColor(244, 245, 239); // White color
-        doc.rect(0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height, 'F');
+        // doc.rect(0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height, 'D');
 
         const imgData = "https://res.cloudinary.com/dby2saqmn/image/upload/v1723989709/ncoktpbtvzzhjqktopjz.png";
         const imgWidth = 40;
@@ -1757,14 +1756,6 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
             startY: tableStartY,
             body: [
                 [
-                    {
-                        content: `Invoice No. ${transaction.paymentList[0].paymentID}` + `\n${transaction.orderType}`,
-                        styles: {
-                            halign: 'left',
-                            valign: "middle",
-                            fontSize: 10
-                        }
-                    },
                     {
                         content: `SMART TAILOR, Inc` + `\nLot E2a-7, Street D1, High-Tech Park` + `\nLong Thanh My Ward City` + `\nThu Duc` + `\nHo Chi Minh City.` + `\nViet Nam`,
                         styles: {
@@ -1794,33 +1785,51 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
         // Add Material detail
         doc.setFontSize(12);
         autoTable(doc, {
-            head: [['HS code', 'Name', 'Category', 'Unit', 'Quantity', 'Brand Price (VND)']],
+            head: [['HS code', 'Name', 'Category', 'Unit', 'Quantity']],
+
             body: transactionSubOrder?.brandMaterialResponseList?.map((item: MaterialReportInterface) => {
                 return [
                     item.hsCode,
                     item.materialName,
                     item.categoryName,
                     item.unit,
-                    __handleGetQuantityMaterial(item.materialID)?.quantity || 'N/A',
-                    __handleAddCommasToNumber(item.brandPrice)
+                    __handleGetQuantityMaterial(item.materialID)?.quantity || 'N/A'
                 ];
             }) || [],
             theme: 'striped',
             headStyles: { fillColor: primaryColor, textColor: whiteColor },
         });
 
-        // autoTable(doc, {
-        //     head: [['Design Total', 'Brand Labor', 'Total']],
-        //     body: transactionSubOrder ? [
-        //         [
-        //             __handleAddCommasToNumber(__handleGetTotalMaterialPrice() * transactionSubOrder?.orderCustomResponse?.quantity),
-        //             __handleAddCommasToNumber(transactionSubOrder?.brandLaborQuantity),
-        //             __handleAddCommasToNumber(transaction.paymentList[0]?.paymentAmount)
-        //         ]
-        //     ] : [],
-        //     theme: 'striped',
-        //     headStyles: { fillColor: primaryColor, textColor: whiteColor },
-        // });
+        autoTable(doc, {
+            body: [
+                [
+                    {
+                        content: `___________________________________________________________________________________________`,
+                        styles: {
+                            halign: 'left',
+                            overflow: 'linebreak'
+                        }
+                    }
+                ]
+            ], theme: 'plain'
+        })
+
+        doc.setFontSize(12);
+        autoTable(doc, {
+            head: [['Part name', 'Min square (m²)', 'Max square (m²)', 'Min material price / m² (VND)', 'Max material price / m² (VND)']],
+
+            body: referencePrice?.designMaterialDetailResponseList?.map((item: any) => {
+                return [
+                    item.detailName,
+                    item.minMeterSquare,
+                    item.maxMeterSquare,
+                    __handleAddCommasToNumber(item.minPriceMaterial) || 'N/A',
+                    __handleAddCommasToNumber(item.maxPriceMaterial) || 'N/A'
+                ];
+            }) || [],
+            theme: 'striped',
+            headStyles: { fillColor: primaryColor, textColor: whiteColor },
+        });
 
         autoTable(doc, {
             body: [
@@ -1847,6 +1856,55 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
             ]),
             theme: 'striped',
             headStyles: { fillColor: primaryColor, textColor: whiteColor },
+        });
+
+        autoTable(doc, {
+            body: [
+                [
+                    {
+                        content: `___________________________________________________________________________________________`,
+                        styles: {
+                            halign: 'left',
+                            overflow: 'linebreak'
+                        }
+                    }
+                ]
+            ], theme: 'plain'
+        })
+
+        autoTable(doc, {
+            // startY: doc.lastAutoTable.finalY + 10,
+            body: [
+                [
+                    {
+                        content: 'Payment Information',
+                        styles: {
+                            halign: 'left',
+                            fontSize: 14,
+                            fontStyle: 'bold'
+                        }
+                    }
+                ],
+                [
+                    {
+                        content: `Deposit: ${__handleAddCommasToNumber(__handleGetStageBrandPrice(transactionSubOrder?.orderCustomResponse.orderID)?.brandPriceDeposit) || 'N/A'}`,
+                        styles: { fontSize: 10 }
+                    }
+                ],
+                [
+                    {
+                        content: `Labor Price: ${__handleAddCommasToNumber(transactionSubOrder?.brandLaborQuantity) || 'N/A'}`,
+                        styles: { fontSize: 10 }
+                    }
+                ],
+                [
+                    {
+                        content: `Total: ${__handleAddCommasToNumber(totalPrice) || 'N/A'}`,
+                        styles: { fontSize: 10 }
+                    }
+                ],
+            ],
+            theme: 'plain'
         });
 
         autoTable(doc, {

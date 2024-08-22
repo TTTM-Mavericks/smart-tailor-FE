@@ -198,57 +198,92 @@ const SampleCard: React.FC<{ item: SampleModelInterface; onAccept: () => void; o
                 ].map((detail, index) => (
                     <div key={index} className="bg-gray-50 p-3 rounded-lg">
                         <p className="text-gray-600 flex items-center mb-1">
-                            <detail.icon className="mr-2 text-indigo-600" />
-                            {detail.label}
+                            <detail.icon className="mr-2 text-indigo-500" size={16} />
+                            <span className="text-sm font-semibold">{detail.label}:</span>
                         </p>
-                        <p className="text-gray-800 font-medium text-sm">{detail.value}</p>
+                        <p className="text-sm font-bold text-gray-800">{detail.value}</p>
                     </div>
                 ))}
             </div>
-            {!item.status && (
-                <div className="flex justify-center items-center space-x-4 mt-6">
-                    <button
-                        onClick={onAccept}
-                        disabled={isDisabled}
-                        className={`flex items-center justify-center space-x-2 px-4 py-2 rounded-lg font-semibold ${isDisabled
-                            ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                            : 'bg-green-500 hover:bg-green-600 text-white'
-                            }`}
-                    >
-                        <FaClipboardCheck
-                            className={`${isDisabled ? 'text-gray-500' : 'text-white'
-                                }`}
-                        />
-                        <span
-                            className={`${isDisabled ? 'text-gray-600' : 'text-white'
-                                }`}
-                        >
-                            Accept
-                        </span>
-                    </button>
 
-                    <button
-                        onClick={onReject}
-                        disabled={isDisabled}
-                        className={`flex items-center justify-center space-x-2 px-4 py-2 rounded-lg font-semibold ${isDisabled
-                            ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                            : 'bg-red-500 hover:bg-red-600 text-white'
-                            }`}
-                    >
-                        <FaTimes
-                            className={`${isDisabled ? 'text-gray-500' : 'text-white'
-                                }`}
+            <div className="mb-6">
+                <h4 className="text-lg font-semibold text-gray-700 mb-2">Description</h4>
+                <p className="text-gray-600">
+                    {item.description}
+                </p>
+            </div>
+
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0 md:space-x-4">
+                {item.imageUrl && (
+                    <div className="flex-1">
+                        <h4 className="text-md font-semibold text-gray-700 mb-2">Sample Image</h4>
+                        <img
+                            src={item.imageUrl}
+                            alt="Sample"
+                            className="object-cover rounded-lg shadow-md"
+                            style={{ width: 400, height: 450, margin: '0 auto' }}
                         />
-                        <span
-                            className={`${isDisabled ? 'text-gray-600' : 'text-white'
+                    </div>
+                )}
+
+                {item.video && (
+                    <div className="flex-1">
+                        <h4 className="text-md font-semibold text-gray-700 mb-2">Sample Video</h4>
+                        <video
+                            src={item.video}
+                            controls
+                            className="w-full h-64 object-cover rounded-lg shadow-md"
+                            style={{ width: 400, height: 450, margin: '0 auto' }}
+                        />
+                    </div>
+                )}
+            </div>
+            {
+                !item.status && (
+                    <div className="flex justify-center items-center space-x-4 mt-6">
+                        <button
+                            onClick={onAccept}
+                            disabled={isDisabled}
+                            className={`flex items-center justify-center space-x-2 px-4 py-2 rounded-lg font-semibold ${isDisabled
+                                ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                                : 'bg-green-500 hover:bg-green-600 text-white'
                                 }`}
                         >
-                            Reject
-                        </span>
-                    </button>
-                </div>
-            )}
-        </div>
+                            <FaClipboardCheck
+                                className={`${isDisabled ? 'text-gray-500' : 'text-white'
+                                    }`}
+                            />
+                            <span
+                                className={`${isDisabled ? 'text-gray-600' : 'text-white'
+                                    }`}
+                            >
+                                Accept
+                            </span>
+                        </button>
+
+                        <button
+                            onClick={onReject}
+                            disabled={isDisabled}
+                            className={`flex items-center justify-center space-x-2 px-4 py-2 rounded-lg font-semibold ${isDisabled
+                                ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                                : 'bg-red-500 hover:bg-red-600 text-white'
+                                }`}
+                        >
+                            <FaTimes
+                                className={`${isDisabled ? 'text-gray-500' : 'text-white'
+                                    }`}
+                            />
+                            <span
+                                className={`${isDisabled ? 'text-gray-600' : 'text-white'
+                                    }`}
+                            >
+                                Reject
+                            </span>
+                        </button>
+                    </div>
+                )
+            }
+        </div >
 
     );
 };

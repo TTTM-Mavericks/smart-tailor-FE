@@ -1031,14 +1031,14 @@ const AccountantManageRefundPaymentForBrandComponent: React.FC = () => {
                                                             className="ml-0 md:ml-6 mt-4 md:mt-0 flex-grow"
                                                             style={{ position: 'relative' }}
                                                         >
-                                                            <p className="text-sm text-gray-500 pb-2">
-                                                                ID: <span>{payment.paymentID}</span>
+                                                            <p className="text-sm text-black-500 pb-2">
+                                                                <span style={{ fontWeight: "bolder" }}>ID:</span>  <span>{payment.paymentID}</span>
                                                             </p>
-                                                            <p className="text-sm text-gray-500 pb-2">
-                                                                Amount: <span>{__handleAddCommasToNumber(payment.payOSData?.amount)} VND</span>
+                                                            <p className="text-sm text-black-500 pb-2">
+                                                                <span style={{ fontWeight: "bolder" }}>Amount:</span> <span>{__handleAddCommasToNumber(payment.payOSData?.amount)} VND</span>
                                                             </p>
-                                                            <p className="text-sm text-gray-500 pb-2">
-                                                                Created at: <span>{payment.payOSData?.createDate}</span>
+                                                            <p className="text-sm text-black-500 pb-2">
+                                                                <span style={{ fontWeight: "bolder" }}>Created at: </span><span>{payment.payOSData?.createDate}</span>
                                                             </p>
 
                                                             <p

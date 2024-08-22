@@ -93,7 +93,7 @@ export default function VerifyEmailScreen() {
                             setUserSession(userParse);
                             if (userParse?.roleName === 'BRAND') {
                                 setTimeout(() => {
-                                    navigate(`/brand/updateProfile/${userParse.userID}`);
+                                    navigate(`/auth/signin`);
                                 }, 5000)
                             }
                         }

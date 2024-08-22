@@ -233,11 +233,6 @@ const PaymentInformationDialogComponent: React.FC<OrderPolicyDialogProps> = ({ i
         setPaymentData(data);
     }, [data]);
 
-    useEffect(() => {
-        console.log("Received data:", data);
-        setPaymentData(data);
-    }, [data]);
-
     const __handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setIsChecked(event.target.checked);
     };
@@ -460,24 +455,6 @@ const PaymentInformationDialogComponent: React.FC<OrderPolicyDialogProps> = ({ i
             ],
             theme: "plain"
         });
-
-        // // Add footer
-        // autoTable(doc, {
-        //     startY: doc.internal.pageSize.height - 20,
-        //     body: [
-        //         [
-        //             {
-        //                 content: `Lot E2a - 7, Street D1, High - Tech Park, Long Thanh My Ward City, Thu Duc, Ho Chi Minh City, Viet Nam`,
-        //                 styles: {
-        //                     halign: 'center',
-        //                     valign: "middle",
-        //                     fontSize: 10
-        //                 }
-        //             }
-        //         ]
-        //     ],
-        //     theme: 'plain',
-        // });
 
         // Save the PDF
         doc.save('Refund_Invoice.pdf');
