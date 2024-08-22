@@ -121,7 +121,7 @@ const RefundTransactionHistoryScreen: React.FC = () => {
             if (response.status === 200) {
                 console.log(response.data);
                 const dataResp = response.data.filter((item: any) =>
-                    item.paymentList.length !== 0 &&
+                    item.paymentList && item.paymentList.length !== 0 &&
                     item.paymentList.some((payment: any) => payment.paymentType === 'ORDER_REFUND')
                 );
                 setOrderDetailList(dataResp);

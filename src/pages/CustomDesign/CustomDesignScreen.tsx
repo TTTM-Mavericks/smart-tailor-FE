@@ -35,6 +35,7 @@ import { Cloud, UploadCloud } from 'react-feather';
 import { __handleDownloadElementAsPng, __handleGetElementAsBase64 } from '../../utils/CanvasUtils';
 import { useSnapshot } from 'valtio';
 import { __getToken } from '../../App';
+import ComingSoonDialog from '../../components/Dialog/CommingSoonDialog/ComingSoonDialog';
 
 
 interface ItemMask {
@@ -153,6 +154,8 @@ function CustomDesignScreen() {
   const [selectedItemMask, setSelectedItemMask] = useState<ItemMaskInterface>();
   const [itemSize, setItemSize] = useState<{ width?: number, height?: number }>();
   const [isFullStepActive, setIsFullStepActive] = useState<boolean>(false);
+  const [isOpenComingSoonDialog, setIsOpenComingSoonDialog] = useState<boolean>(false);
+
 
 
 
@@ -701,7 +704,11 @@ function CustomDesignScreen() {
   }
 
   const __handleOpenMaterialDialog = () => {
-    setIsOpenMaterialDiaglog(true);
+    if (typeOfModel === 'shirtModel') {
+      setIsOpenMaterialDiaglog(true);
+    } else {
+      setIsOpenComingSoonDialog(true);
+    }
   }
 
   const __handleCloseMaterialDialog = () => {
@@ -785,11 +792,15 @@ function CustomDesignScreen() {
    * 
    */
   const __handleSaveDesign = () => {
-    if (partOfClothData) {
+    if (typeOfModel === 'shirtModel') {
+      if (partOfClothData) {
 
-      __handleGetMaterialInformation(partOfClothData).then((value) => {
-        __handleUpdateDesign(true, value);
-      })
+        __handleGetMaterialInformation(partOfClothData).then((value) => {
+          __handleUpdateDesign(true, value);
+        })
+      }
+    } else {
+      setIsOpenComingSoonDialog(true);
     }
   }
 
@@ -1307,6 +1318,8 @@ function CustomDesignScreen() {
         </DialogContent>
 
       </Dialog>
+
+      <ComingSoonDialog isOpen={isOpenComingSoonDialog} onClose={() => setIsOpenComingSoonDialog(false)} onClickClose={() => window.location.reload()} />
 
       {/* Editor tools */}
       <div className={styles.customDesign__container__itemEditor}>
