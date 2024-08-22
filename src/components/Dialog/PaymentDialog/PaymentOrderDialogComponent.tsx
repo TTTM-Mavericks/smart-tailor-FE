@@ -58,7 +58,7 @@ const PaymentOrderDialogComponent: React.FC<CancelOrderPolicyDialogProps> = ({ i
     // ---------------FunctionHandler---------------//
     const __handleMoveToPayOSPaymentDetail = () => {
         if (paymentInfor) {
-            window.open(paymentInfor?.payOSData?.checkoutUrl, '_blank');
+            window.location.href = paymentInfor?.payOSData?.checkoutUrl || ''
         }
     }
 

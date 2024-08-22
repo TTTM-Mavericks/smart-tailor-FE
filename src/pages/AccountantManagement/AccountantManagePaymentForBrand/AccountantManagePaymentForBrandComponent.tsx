@@ -1243,9 +1243,9 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                                                 const stageBrandPrice = __handleGetStageBrandPrice(transactionSubOrder.orderCustomResponse.orderID);
 
                                                 // Extract and parse the prices, ensuring they default to 0 if undefined or null
-                                                const brandPriceDeposit = parseInt(stageBrandPrice?.brandPriceDeposit || '0', 10);
-                                                const brandPriceFirstStage = parseInt(stageBrandPrice?.brandPriceFirstStage || '0', 10);
-                                                const brandPriceSecondStage = parseInt(stageBrandPrice?.brandPriceSecondStage || '0', 10);
+                                                const brandPriceDeposit = Math.round(parseInt(stageBrandPrice?.brandPriceDeposit || '0', 10)/1000)*1000;
+                                                const brandPriceFirstStage = Math.round(parseInt(stageBrandPrice?.brandPriceFirstStage || '0', 10)/1000)*1000;
+                                                const brandPriceSecondStage = Math.round(parseInt(stageBrandPrice?.brandPriceSecondStage || '0', 10)/1000)*1000;
 
                                                 // Sum the parsed prices
                                                 const totalPrice = brandPriceDeposit + brandPriceFirstStage + brandPriceSecondStage;
