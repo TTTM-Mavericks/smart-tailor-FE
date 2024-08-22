@@ -17,7 +17,7 @@ interface EditPricePopUpScreenFormProps {
         laborQuantityMaxQuantity: number,
         laborQuantityMinPrice: number,
         laborQuantityMaxPrice: number,
-        laborCostPerQuantity: number
+        brandLaborCostPerQuantity: number
     };
     editClose: () => void;
     updateCostBrand: (updatedCategory: LaborQuantity) => void;
@@ -26,7 +26,7 @@ interface EditPricePopUpScreenFormProps {
 const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, editClose, updateCostBrand }) => {
     const [formData, setFormData] = React.useState({
         laborQuantityID: fid.laborQuantityID,
-        brandLaborCostPerQuantity: fid.laborCostPerQuantity
+        brandLaborCostPerQuantity: fid.brandLaborCostPerQuantity
     });
 
     const _handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
