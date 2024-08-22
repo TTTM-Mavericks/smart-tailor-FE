@@ -132,7 +132,7 @@ const ManagePrice: React.FC = () => {
         laborQuantityMaxQuantity: number,
         laborQuantityMinPrice: number,
         laborQuantityMaxPrice: number,
-        laborCostPerQuantity: number
+        brandLaborCostPerQuantity: number
     ) => {
         // Handle edit action
         const LaborQuantityDataToEdit: LaborQuantity = {
@@ -141,7 +141,7 @@ const ManagePrice: React.FC = () => {
             laborQuantityMaxQuantity: laborQuantityMaxQuantity,
             laborQuantityMinPrice: laborQuantityMinPrice,
             laborQuantityMaxPrice: laborQuantityMaxPrice,
-            laborCostPerQuantity: laborCostPerQuantity
+            brandLaborCostPerQuantity: brandLaborCostPerQuantity
         }
         setFormId(LaborQuantityDataToEdit);
         _handleEditOpen();
