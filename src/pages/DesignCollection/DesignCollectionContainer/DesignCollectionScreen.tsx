@@ -226,7 +226,7 @@ const DesignCollectionScreen = () => {
                                 Refund History
                             </a>
                             <a href="/transaction_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
-                                Trandsactions
+                                Transactions
                             </a>
                             <a href="/collection" className="px-4 py-3 font-semibold text-orange-900 bg-white border border-orange-100 rounded-lg hover:bg-orange-50">
                                 Collection
@@ -280,7 +280,7 @@ const DesignCollectionScreen = () => {
                     <div className="relative mt-5 w-full" >
                         <div className={`flex space-x-4 overflow-x-auto ${styles.scroll__container}`} ref={scrollContainerRef}>
                             {designList?.filter(applyFilters).map((design, index) => (
-                                <CardDesignComponent key={design.designID} design={design} onclickRe={()=> window.location.href = `/design/${design.designID}`} />
+                                <CardDesignComponent key={design.designID} design={design} onclickRe={() => window.location.href = `/design/${design.designID}`} />
                             ))}
                         </div>
                         {!isEnd && (

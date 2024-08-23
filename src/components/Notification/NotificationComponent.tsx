@@ -222,7 +222,7 @@ const NotificationComponent: React.FC = () => {
                                 Refund History
                             </a>
                             <a href="/transaction_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
-                                Trandsactions
+                                Transactions
                             </a>
                             <a href="/collection" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
                                 Collection
@@ -306,10 +306,10 @@ const NotificationComponent: React.FC = () => {
                                                 <p className="text-sm inline-flex items-center text-green-600 bg-green-100 px-2 py-1 rounded-full">
                                                     {generateNotificationMessage(notification)}
                                                 </p>
-                                                <p className=" text-sm text-gray-500" style={{fontSize: 12}}>
+                                                <p className=" text-sm text-gray-500" style={{ fontSize: 12 }}>
                                                     Message: {notification.message}
                                                 </p>
-                                                <p className=" text-sm text-gray-500" style={{fontSize: 12}}>
+                                                <p className=" text-sm text-gray-500" style={{ fontSize: 12 }}>
                                                     Created at: {notification.createDate}
                                                 </p>
                                             </CardContent>

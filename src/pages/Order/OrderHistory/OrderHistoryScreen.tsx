@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Chip, IconButton } from '@mui/material';
+import { Chip, Dialog, DialogContent, Divider, Grid, IconButton, Typography } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
-import { greenColor, primaryColor, redColor, secondaryColor, whiteColor } from '../../../root/ColorSystem';
+import { greenColor, primaryColor, redColor, secondaryColor, whiteColor, yellowColor } from '../../../root/ColorSystem';
 import style from './OrderHistoryStyles.module.scss'
 import { OrderDetailInterface, PaymentInterface } from '../../../models/OrderModel';
 import PaymentInformationDialogComponent from '../Components/Dialog/PaymentInformationDialog/PaymentInformationDialogComponent';
@@ -114,7 +114,7 @@ const OrderHistory: React.FC = () => {
             if (response.status === 200) {
                 console.log(response.data);
                 const dataResp = response.data.filter((item: OrderDetailInterface) =>
-                    item.orderType === 'PARENT_ORDER'                     
+                    item.orderType === 'PARENT_ORDER'
                 );
                 setOrderDetailList(dataResp);
                 setIsLoading(false)
@@ -278,6 +278,12 @@ const OrderHistory: React.FC = () => {
         setGoToPage(currentPage.toString());
     }, [currentPage]);
 
+
+    const getStatusColor = (status: boolean) => {
+        return status ? greenColor : yellowColor;
+    };
+
+
     return (
         <div>
             <HeaderComponent />
@@ -303,7 +309,7 @@ const OrderHistory: React.FC = () => {
                                 Refund History
                             </a>
                             <a href="/transaction_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
-                                Trandsactions
+                                Transactions
                             </a>
                             <a href="/collection" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
                                 Collection
@@ -417,9 +423,10 @@ const OrderHistory: React.FC = () => {
                                                             orderDetail?.orderStatus === 'PENDING' ? secondaryColor
                                                                 : orderDetail?.orderStatus === 'DELIVERED' ? greenColor
                                                                     : orderDetail?.orderStatus === 'COMPLETED' ? greenColor
-                                                                        : orderDetail?.orderStatus === 'DEPOSIT' ? secondaryColor
-                                                                            : orderDetail?.orderStatus === 'PROCESSING' ? secondaryColor
-                                                                                : redColor,
+                                                                        : orderDetail?.orderStatus === 'RECEIVED' ? greenColor
+                                                                            : orderDetail?.orderStatus === 'DEPOSIT' ? secondaryColor
+                                                                                : orderDetail?.orderStatus === 'PROCESSING' ? secondaryColor
+                                                                                    : secondaryColor,
                                                         opacity: 1,
                                                         color: whiteColor
                                                     }
@@ -614,14 +621,81 @@ const OrderHistory: React.FC = () => {
                 </div>
             </div>
 
+
             {/* Dialog */}
-            {/* {currentPaymentData && (
-                <PaymentInformationDialogComponent
-                    data={currentPaymentData}
-                    onClose={__handleClosePaymentInformationDialog}
-                    isOpen={isOpenPaymentInforDialog}
-                />
-            )} */}
+            {currentPaymentData && (
+
+                <Dialog open={isOpenPaymentInforDialog} onClose={__handleClosePaymentInformationDialog}>
+                    <DialogContent >
+                        {currentPaymentData ? (
+                            <div style={{ padding: 2 }} >
+                                <Grid container spacing={2}>
+                                    <Grid item xs={12}>
+                                        <Typography variant="h6" gutterBottom>
+                                            Sender Information
+                                        </Typography>
+                                        <Divider />
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <Typography variant="body2" style={{ fontSize: 14 }}><strong>Name:</strong> {currentPaymentData.paymentSenderName}</Typography>
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <Typography variant="body2" style={{ fontSize: 14 }}><strong>Bank Code:</strong> {currentPaymentData.paymentSenderBankCode}</Typography>
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <Typography variant="body2" style={{ fontSize: 14 }}><strong>Bank Number:</strong> {currentPaymentData.paymentSenderBankNumber}</Typography>
+                                    </Grid>
+
+                                    <Grid item xs={12}>
+                                        <Typography variant="h6" gutterBottom>
+                                            Recipient Information
+                                        </Typography>
+                                        <Divider />
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <Typography variant="body2" style={{ fontSize: 14 }}><strong>Name:</strong> Smart Tailor</Typography>
+                                    </Grid>
+
+                                    <Grid item xs={12}>
+                                        <Typography variant="h6" gutterBottom>
+                                            Payment Details
+                                        </Typography>
+                                        <Divider />
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <Typography variant="body2" style={{ fontSize: 14 }}><strong>Amount:</strong> {__handleAddCommasToNumber(currentPaymentData.paymentAmount)} VND</Typography>
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <Typography variant="body2" style={{ fontSize: 14 }}><strong>Method:</strong> {currentPaymentData.paymentMethod || ' Banking'}</Typography>
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <Typography variant="body2" style={{ fontSize: 14 }}>
+                                            <strong>Status:</strong>
+                                            <div
+                                                style={{
+                                                    backgroundColor: getStatusColor(currentPaymentData.paymentStatus),
+                                                    color: whiteColor,
+                                                    borderRadius: 1,
+                                                    padding: '2px 4px',
+                                                    marginLeft: '8px',
+                                                    display: 'inline-block'
+                                                }}
+                                            >
+                                                {currentPaymentData.paymentStatus ? 'Completed' : 'Pending'}
+                                            </div>
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <Typography variant="body2" style={{ fontSize: 14 }}><strong>Type:</strong> {currentPaymentData.paymentType}</Typography>
+                                    </Grid>
+                                </Grid>
+                            </div>
+                        ) : (
+                            <Typography variant="body1">No payment data available</Typography>
+                        )}
+                    </DialogContent>
+                </Dialog>
+            )}
             <FooterComponent />
         </div>
 
