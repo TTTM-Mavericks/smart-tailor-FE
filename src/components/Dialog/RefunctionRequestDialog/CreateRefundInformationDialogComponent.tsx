@@ -21,7 +21,7 @@ const CreateRefundInformationDialogComponent: React.FC<CreateRefundInformationDi
         paymentSenderID: __getUserLogined().userID,
         paymentSenderName: __getUserLogined().fullName,
         paymentSenderBankCode: "OCB",
-        paymentSenderBankNumber: "",
+        paymentSenderBankNumber: "0335 5679 97",
         paymentRecipientID: report?.userResponse?.userID || "",
         paymentRecipientName: report?.userResponse?.fullName || "",
         paymentRecipientBankCode: "",
@@ -122,10 +122,10 @@ const CreateRefundInformationDialogComponent: React.FC<CreateRefundInformationDi
                     <div>
                         <h2 className="text-lg font-semibold mb-4">Payment Sender Details</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {renderTextField("Sender ID", "paymentSenderID")}
-                            {renderTextField("Sender Name", "paymentSenderName")}
-                            {renderTextField("Sender Bank Code", "paymentSenderBankCode")}
-                            {renderTextField("Sender Bank Number", "paymentSenderBankNumber")}
+                            {renderTextField("Sender ID", "paymentSenderID", "text", true)}
+                            {renderTextField("Sender Name", "paymentSenderName", "text", true)}
+                            {renderTextField("Sender Bank Code", "paymentSenderBankCode", "text", true)}
+                            {renderTextField("Sender Bank Number", "paymentSenderBankNumber", "text", true)}
                         </div>
                     </div>
 
@@ -133,8 +133,8 @@ const CreateRefundInformationDialogComponent: React.FC<CreateRefundInformationDi
                     <div>
                         <h2 className="text-lg font-semibold mb-4">Payment Information</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {renderTextField("Payment Method", "paymentMethod")}
-                            {renderTextField("Payment Type", "paymentType")}
+                            {renderTextField("Payment Method", "paymentMethod", "text", true)}
+                            {renderTextField("Payment Type", "paymentType", "text", true)}
                         </div>
                     </div>
                 </div>

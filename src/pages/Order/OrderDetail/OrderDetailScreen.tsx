@@ -1286,6 +1286,30 @@ const OrderDetailScreen: React.FC = () => {
             />
 
 
+            {orderDetail?.orderStatus === 'DEPOSIT' && !orderDetail.paymentList && (
+                <Dialog open={true}>
+                    <DialogTitle>Payment service error</DialogTitle>
+                    <DialogContent>
+                        Sorry, somthing wrong with payment service! You can reorder!
+                    </DialogContent>
+                    <DialogActions>
+                        <button
+                            type="submit"
+                            className="px-5 py-2.5 text-sm font-medium text-white"
+                            onClick={() => window.history.back()}
+                            style={{
+                                borderRadius: 4,
+                                color: whiteColor,
+                                backgroundColor: greenColor,
+                            }}
+                        >
+                            Reorder
+                        </button>
+                    </DialogActions>
+                </Dialog>
+            )}
+
+
             <FooterComponent />
 
         </div >

@@ -736,9 +736,11 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
                                                                         ? secondaryColor
                                                                         : orderDetail?.orderStatus === "RECEIVED"
                                                                             ? greenColor
-                                                                            : orderDetail?.orderStatus === "REFUND_REQUEST"
-                                                                                ? redColor
-                                                                                : redColor,
+                                                                            : orderDetail?.orderStatus === "COMPLETED"
+                                                                                ? greenColor
+                                                                                : orderDetail?.orderStatus === "REFUND_REQUEST"
+                                                                                    ? redColor
+                                                                                    : redColor,
                                                     opacity: 1,
                                                     color: whiteColor,
                                                     fontSize: 11,
@@ -1234,16 +1236,18 @@ const TransactionModals: React.FC<TransactionModalsProps> = ({ transaction, onCl
                     {transactionSubOrder && (
                         <div className="space-y-4 h-full flex items-center justify-center content-center" >
                             <div className="w-1/3 mr-auto mt-4">
-                                <div className="flex justify-between items-center border-b py-2">
-                                    <span style={{ fontSize: 13 }} className="font-semibold">Deposit</span>
-                                    <div className="flex items-center justify-end">
-                                        {__handleGetStageBrandPrice(transactionSubOrder.orderCustomResponse.orderID)?.brandPriceDeposit ? (
-                                            <span style={{ fontSize: 14 }} className="text-right">{__handleAddCommasToNumber(__handleGetStageBrandPrice(transactionSubOrder.orderCustomResponse.orderID)?.brandPriceDeposit)} VND</span>
-                                        ) : (
-                                            <span style={{ fontSize: 14 }} className="text-right">Loading</span>
-                                        )}
+                                {__handleGetStageBrandPrice(transactionSubOrder.orderCustomResponse.orderID)?.brandPriceDeposit !== '-1' && (
+                                    <div className="flex justify-between items-center border-b py-2">
+                                        <span style={{ fontSize: 13 }} className="font-semibold">Deposit</span>
+                                        <div className="flex items-center justify-end">
+                                            {__handleGetStageBrandPrice(transactionSubOrder.orderCustomResponse.orderID)?.brandPriceDeposit ? (
+                                                <span style={{ fontSize: 14 }} className="text-right">{__handleAddCommasToNumber(__handleGetStageBrandPrice(transactionSubOrder.orderCustomResponse.orderID)?.brandPriceDeposit)} VND</span>
+                                            ) : (
+                                                <span style={{ fontSize: 14 }} className="text-right">Loading</span>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
+                                )}
 
                                 {__handleGetStageBrandPrice(transactionSubOrder.orderCustomResponse.orderID)?.brandPriceFirstStage !== '-1' && (
                                     <div className="flex justify-between items-center border-b py-2">
@@ -2202,9 +2206,11 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                                                         ? secondaryColor
                                                                                         : orderDetail?.orderStatus === "RECEIVED"
                                                                                             ? greenColor
-                                                                                            : orderDetail?.orderStatus === "REFUND_REQUEST"
-                                                                                                ? redColor
-                                                                                                : redColor,
+                                                                                            : orderDetail?.orderStatus === "COMPLETED"
+                                                                                                ? greenColor
+                                                                                                : orderDetail?.orderStatus === "REFUND_REQUEST"
+                                                                                                    ? redColor
+                                                                                                    : redColor,
                                                                     opacity: 1,
                                                                     color: whiteColor,
                                                                 }}

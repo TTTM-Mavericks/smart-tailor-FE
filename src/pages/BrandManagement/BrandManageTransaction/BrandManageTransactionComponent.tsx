@@ -693,6 +693,14 @@ const BrandManageTransactionComponent: React.FC = () => {
                                             Create date: <span className="text-sm text-gray-500 pb-2">{transaction?.createDate}</span>
                                         </p>
 
+                                        {transaction.paymentType === 'FINED' && (
+                                            <div className={` w-80 inline-flex items-center rounded-md bg-yellow-50 px-2 py-2 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10`}>
+                                                <span style={{fontSize: 13}}>
+                                                    You must pay this invoice within 3 days of its creation. Otherwise we will process it based on the regulations you have approved.
+                                                </span>
+                                            </div>
+                                        )}
+
                                     </div>
                                 ) : (
                                     <div className="w-full md:w-1/2">

@@ -13,6 +13,7 @@ import {
 import { baseURL, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
 import axios from 'axios';
 import { __getToken } from '../../../App';
+import { __handleAddCommasToNumber } from '../../../utils/NumbericUtils';
 
 const AccountantDashboard: React.FC = () => {
     // Loading And Error
@@ -143,7 +144,7 @@ const AccountantDashboard: React.FC = () => {
                         </div>
                         <div className="p-4 text-right">
                             <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Payment Growth</p>
-                            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{paymentGrowthPercentage.currentData}</h4>
+                            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{__handleAddCommasToNumber(paymentGrowthPercentage.currentData)}</h4>
                         </div>
                         <div className="border-t border-blue-gray-50 p-4">
                             <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
@@ -162,7 +163,7 @@ const AccountantDashboard: React.FC = () => {
                         </div>
                         <div className="p-4 text-right">
                             <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Income Growth</p>
-                            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{incomeGrowthPercentage.currentData}</h4>
+                            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{__handleAddCommasToNumber(incomeGrowthPercentage.currentData)}</h4>
                         </div>
                         <div className="border-t border-blue-gray-50 p-4">
                             <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
@@ -181,7 +182,7 @@ const AccountantDashboard: React.FC = () => {
                         </div>
                         <div className="p-4 text-right">
                             <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Refund Growth</p>
-                            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{refundGrowthPercentage.currentData}</h4>
+                            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{__handleAddCommasToNumber(refundGrowthPercentage.currentData)}</h4>
                         </div>
                         <div className="border-t border-blue-gray-50 p-4">
                             <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">

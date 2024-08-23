@@ -1093,7 +1093,7 @@ const UploadBrandInforForm = () => {
                             <button
                                 type="button"
                                 onClick={validateTaxCode}
-                                className="p-4 text-white rounded bg-orange-600 hover:bg-orange-700 text-white font-bold transition-colors duration-300"
+                                className="p-4 text-white rounded bg-orange-600 hover:bg-orange-700  font-bold transition-colors duration-300"
                             >
                                 Validate Tax Code
                             </button>
@@ -1293,7 +1293,7 @@ const UploadBrandInforForm = () => {
                             </div>
                         </div>
                     </div>
-                    <button type="submit" className="w-full p-4 text-white rounded bg-orange-600 hover:bg-orange-700 text-white font-bold transition-colors duration-300">Upload Information</button>
+                    <button type="submit" className="w-full p-4 rounded bg-orange-600 hover:bg-orange-700 text-white font-bold transition-colors duration-300">Upload Information</button>
                 </form>
             </div >
             {isDialogOpen && (
