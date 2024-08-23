@@ -119,20 +119,44 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
                     'success'
                 );
             } else {
-                closeCard();
-                Swal.fire(
-                    'Add Failed!',
-                    'Please check the information!',
-                    'error'
-                );
+                throw new Error('Unexpected response status');
             }
         } catch (err: any) {
+            console.error('Error:', err);
             closeCard();
-            Swal.fire(
-                'Add Failed!',
-                'Please check the information!',
-                'error'
-            );
+
+            let errorMessage = 'An error occurred. Please try again.';
+
+            if (err.response && err.response.data && err.response.data.errors) {
+                const errors = err.response.data.errors;
+                if (errors.length > 0) {
+                    errorMessage = errors.map((error: any) => {
+                        let msg = '';
+                        if (error.errorMessage) {
+                            msg = error.errorMessage.map((m: string) => {
+                                if (m.includes("Brand Labor Cost must be between Min Price and Max Price")) {
+                                    return "Brand Labor Cost must be between Min Price and Max Price";
+                                } else if (m.includes("Brand Labor Quantity is existed")) {
+                                    return "Brand Labor Quantity is existed";
+                                }
+                                return m;
+                            }).join('<br>');
+                        }
+                        if (error.errorData) {
+                            msg += `<br>Error Data:<br>`;
+                            msg += `Labor Quantity ID: ${error.errorData.laborQuantityID}<br>`;
+                            msg += `Brand Labor Cost Per Quantity: ${error.errorData.brandLaborCostPerQuantity}`;
+                        }
+                        return msg;
+                    }).join('<br><br>');
+                }
+            }
+
+            Swal.fire({
+                title: 'Add Failed!',
+                html: errorMessage,
+                icon: 'error'
+            });
         }
     };
 

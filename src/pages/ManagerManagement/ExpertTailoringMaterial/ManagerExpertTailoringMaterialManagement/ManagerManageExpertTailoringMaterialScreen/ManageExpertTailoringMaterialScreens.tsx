@@ -336,7 +336,7 @@ const ManageExpertTailoringMaterial: React.FC = () => {
                         aria-controls={open ? 'basic-menu' : undefined}
                         aria-haspopup="true"
                         aria-expanded={open ? 'true' : undefined}
-                        onClick={_handleClick}
+                        onClick={_handleAddOpen}
                         endIcon={<Add />}
                         variant="contained"
                         color="primary"
@@ -344,62 +344,25 @@ const ManageExpertTailoringMaterial: React.FC = () => {
                     >
                         {t(codeLanguage + '000048')}
                     </Button>
-                    <Menu
-                        id="basic-menu"
-                        anchorEl={anchorEl}
-                        open={open}
-                        onClose={_handleClose}
-                        MenuListProps={{
-                            'aria-labelledby': 'basic-button',
-                        }}
+                    <Modal
+                        open={addOpenOrClose}
+                        aria-labelledby="modal-modal-title"
+                        aria-describedby="modal-modal-description"
                     >
-                        <MenuItem >
-                            <div onClick={_handleAddOpen}>{t(codeLanguage + '000049')}</div>
-                            <Modal
-                                open={addOpenOrClose}
-                                aria-labelledby="modal-modal-title"
-                                aria-describedby="modal-modal-description"
-                            >
-                                <Box sx={{
-                                    backgroundColor: colors.primary[100], position: 'absolute',
-                                    top: '50%',
-                                    left: '50%',
-                                    transform: 'translate(-50%, -50%)',
-                                    width: "50%",
-                                    bgcolor: 'background.paper',
-                                    boxShadow: 24,
-                                    p: 4,
-                                    borderRadius: "20px"
-                                }}>
-                                    <AddEachExpertTailoringWithHand closeCard={_handleAddClose} addNewExpertTailoringMaterial={_handleAddExpertTailoring} />
-                                </Box>
-                            </Modal>
-                        </MenuItem>
-
-                        <MenuItem>
-                            <div onClick={_handleAddMultipleOpen}>{t(codeLanguage + '000050')}</div>
-                            <Modal
-                                open={addMultiple}
-                                aria-labelledby="modal-modal-title"
-                                aria-describedby="modal-modal-description"
-                            >
-                                <Box sx={{
-                                    position: 'absolute',
-                                    top: '50%',
-                                    left: '50%',
-                                    transform: 'translate(-50%, -50%)',
-                                    width: "70%",
-                                    bgcolor: colors.primary[100],
-                                    boxShadow: 24,
-                                    p: 4,
-                                    borderRadius: "20px"
-                                }}>
-                                    <AddMultipleExpertTailoringMaterialComponentWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddExpertTailoring} />
-                                </Box>
-                            </Modal>
-
-                        </MenuItem>
-                    </Menu>
+                        <Box sx={{
+                            backgroundColor: colors.primary[100], position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            width: "50%",
+                            bgcolor: 'background.paper',
+                            boxShadow: 24,
+                            p: 4,
+                            borderRadius: "20px"
+                        }}>
+                            <AddEachExpertTailoringWithHand closeCard={_handleAddClose} addNewExpertTailoringMaterial={_handleAddExpertTailoring} />
+                        </Box>
+                    </Modal>
                 </div>
                 <Box
                     sx={{
@@ -440,7 +403,7 @@ const ManageExpertTailoringMaterial: React.FC = () => {
                     </Box>
                 </Modal> */}
             </Box>
-        </Box>
+        </Box >
     );
 };
 

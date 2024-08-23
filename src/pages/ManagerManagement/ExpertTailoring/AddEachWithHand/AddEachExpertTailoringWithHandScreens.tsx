@@ -223,20 +223,19 @@ const AddEachExpertTailoringWithHand: React.FC<AddExpertTailoringWithHandsFormPr
     };
 
     return (
-        <div>
+        <div className="h-50">
             <div className="relative w-full p-8 bg-white rounded-xl z-10">
                 <div className="text-center relative">
                     <Typography variant="h6" align="center" gutterBottom>
                         Add New Expert Tailoring
                     </Typography>
-                    <p className="mt-1 text-xs text-gray-400">Add a new expert tailoring below</p>
                     <IconButton
                         aria-label="close"
                         onClick={closeCard}
                         sx={{
                             position: 'absolute',
                             right: 16,
-                            top: 16,
+                            top: -26,
                             color: '#EC6208',
                             transition: 'all 0.2s',
                             '&:hover': {
@@ -270,7 +269,7 @@ const AddEachExpertTailoringWithHand: React.FC<AddExpertTailoringWithHandsFormPr
                     <div className="grid grid-cols-1 space-y-1">
                         <label className="text-xs font-bold text-gray-500 tracking-wide">Size Image</label>
                         <div className="flex items-center justify-center w-full">
-                            <label className="flex flex-col rounded-lg border-4 border-dashed w-full h-60 p-10 group text-center">
+                            <label className="flex flex-col rounded-lg border-4 border-dashed w-full h-40 p-10 group text-center">
                                 <div className="relative h-full w-full text-center flex flex-col items-center justify-center">
                                     {sizeImagePreview ? (
                                         <img className="absolute inset-0 h-full w-full object-cover" src={sizeImagePreview} alt="Size Image Preview" />
@@ -301,7 +300,7 @@ const AddEachExpertTailoringWithHand: React.FC<AddExpertTailoringWithHandsFormPr
                     <div className="grid grid-cols-1 space-y-1">
                         <label className="text-xs font-bold text-gray-500 tracking-wide">Model Image</label>
                         <div className="flex items-center justify-center w-full">
-                            <label className="flex flex-col rounded-lg border-4 border-dashed w-full h-60 p-10 group text-center">
+                            <label className="flex flex-col rounded-lg border-4 border-dashed w-full h-40 p-10 group text-center">
                                 <div className="relative h-full w-full text-center flex flex-col items-center justify-center">
                                     {modelImagePreview ? (
                                         <img className="absolute inset-0 h-full w-full object-cover" src={modelImagePreview} alt="Model Image Preview" />
@@ -335,12 +334,19 @@ const AddEachExpertTailoringWithHand: React.FC<AddExpertTailoringWithHandsFormPr
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4 }}>
                         <Button
                             type="submit"
-                            className="my-4 flex justify-center bg-blue-500 text-gray-100 p-3 rounded-full tracking-wide font-semibold focus:outline-none focus:shadow-outline hover:bg-blue-600 shadow-lg cursor-pointer transition ease-in duration-300"
-                            sx={{ backgroundColor: primaryColor, color: 'white', width: '15%' }}
+                            sx={{
+                                backgroundColor: primaryColor,
+                                color: 'white',
+                                width: '15%',
+                                '&:hover': {
+                                    backgroundColor: primaryColor,
+                                },
+                            }}
                         >
                             Upload
                         </Button>
                     </Box>
+
                 </form>
                 <ToastContainer />
             </div>

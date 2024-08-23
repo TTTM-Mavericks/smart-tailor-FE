@@ -74,8 +74,8 @@ const WaitingProcessComponent: React.FC = () => {
 
     const steps = [
         { label: 'Application received', completed: true },
-        { label: 'Review completed', completed: statusBrandInformation !== 'PENDING' },
-        { label: 'Decision made', completed: statusBrandInformation === 'ACCEPT' || statusBrandInformation === 'REJECT' }
+        // { label: 'Review completed', completed: statusBrandInformation !== 'PENDING' },
+        // { label: 'Decision made', completed: statusBrandInformation === 'ACCEPT' || statusBrandInformation === 'REJECT' }
     ];
 
     return (

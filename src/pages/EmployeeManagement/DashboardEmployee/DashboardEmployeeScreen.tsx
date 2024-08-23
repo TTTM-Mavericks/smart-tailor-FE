@@ -12,7 +12,7 @@ import NotificationEmployeeComponent from '../GlobalComponent/Notification/Notif
 
 const DashboardEmployeeScreens = () => {
     const [menuOpen, setMenuOpen] = useState(false);
-    const [activeMenu, setActiveMenu] = useState('employee_manage_customer');
+    const [activeMenu, setActiveMenu] = useState('employee_manage_order');
     const [showScrollButton, setShowScrollButton] = React.useState<boolean>(false);
     const [popperOpen, setPopperOpen] = useState<Record<string, boolean>>({});
 
@@ -105,7 +105,7 @@ const DashboardEmployeeScreens = () => {
     return (
         <div className="flex">
             <Sidebar menuOpen={menuOpen} toggleMenu={toggleMenu} activeMenu={activeMenu} handleMenuClick={handleMenuClick} />
-            <div  className="flex flex-col w-full">
+            <div className="flex flex-col w-full">
                 <Navbar toggleMenu={toggleMenu} menu={activeMenu} popperOpen={popperOpen} togglePopper={togglePopper} />
                 <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
                     {renderComponent()}

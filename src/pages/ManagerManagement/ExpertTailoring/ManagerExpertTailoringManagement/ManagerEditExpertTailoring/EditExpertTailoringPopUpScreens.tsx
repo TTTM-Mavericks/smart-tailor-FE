@@ -6,7 +6,7 @@ import axios from 'axios';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { ExpertTailoringEdit } from "../../../../../models/ManagerExpertTailoringModel";
 import { ToastContainer, toast } from "react-toastify";
-import { primaryColor, redColor } from "../../../../../root/ColorSystem";
+import { primaryColor } from "../../../../../root/ColorSystem";
 import { CancelOutlined } from "@mui/icons-material";
 import { __getToken } from "../../../../../App";
 
@@ -15,51 +15,32 @@ interface EditExpertTailoringPopUpScreenFormProps {
         expertTailoringID: string,
         expertTailoringName: string,
         sizeImageUrl: string,
+        modelImageUrl: string
     };
     editClose: () => void;
     updateExpertTailoring: (updatedExpertTailoring: ExpertTailoringEdit) => void;
 }
 
 const EditExpertTailoringPopUpScreens: React.FC<EditExpertTailoringPopUpScreenFormProps> = ({ fid, editClose, updateExpertTailoring }) => {
-    const fileInputRef = React.useRef<HTMLInputElement>(null);
-    const [files, setFiles] = React.useState<FileList | null>(null);
-    const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
-    const [modelFiles, setModelFiles] = React.useState<FileList | null>(null);
-    const [modelPreviewUrl, setModelPreviewUrl] = React.useState<string | null>(null);
-
     const [formData, setFormData] = React.useState({
         expertTailoringName: fid.expertTailoringName,
         sizeImageUrl: fid.sizeImageUrl,
-        modelImageUrl: "", // Added this for the new model image
+        modelImageUrl: fid.modelImageUrl,
     });
 
     const [categoryData, setCategoryData] = React.useState<string[]>([]);
+    const [sizeImageBase64, setSizeImageBase64] = React.useState<string | null>(null);
+    const [modelImageBase64, setModelImageBase64] = React.useState<string | null>(null);
 
-    // Get language in local storage
     const selectedLanguage = localStorage.getItem('language');
-    const codeLanguage = selectedLanguage?.toUpperCase();
-
-    // Using i18n
     const { t, i18n } = useTranslation();
+
     React.useEffect(() => {
         if (selectedLanguage !== null) {
             i18n.changeLanguage(selectedLanguage);
         }
     }, [selectedLanguage, i18n]);
 
-    // Get the image to user for review
-    React.useEffect(() => {
-        return () => {
-            if (previewUrl) {
-                URL.revokeObjectURL(previewUrl);
-            }
-            if (modelPreviewUrl) {
-                URL.revokeObjectURL(modelPreviewUrl);
-            }
-        };
-    }, [previewUrl, modelPreviewUrl]);
-
-    // Get all category names for dropdown
     React.useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.getAllCategory}`;
         axios.get(apiUrl, {
@@ -84,74 +65,21 @@ const EditExpertTailoringPopUpScreens: React.FC<EditExpertTailoringPopUpScreenFo
             .catch(error => console.error('Error fetching data:', error));
     }, []);
 
-    // Handle image changes for sizeImageUrl
-    const _handleImagesChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const selectedFiles = e.target.files;
-        if (selectedFiles && selectedFiles.length > 0) {
-            const file = selectedFiles[0];
+    const _handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, setBase64: React.Dispatch<React.SetStateAction<string | null>>) => {
+        const file = e.target.files?.[0];
+        if (file) {
             if (!file.type.startsWith('image/')) {
                 toast.error('Only image file types are allowed.');
                 return;
             }
-            const url = URL.createObjectURL(file);
-            setFiles(selectedFiles);
-            setPreviewUrl(url);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setBase64(reader.result as string);
+            };
+            reader.readAsDataURL(file);
         }
     };
 
-    // Handle image changes for modelImageUrl
-    const _handleModelImagesChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const selectedFiles = e.target.files;
-        if (selectedFiles && selectedFiles.length > 0) {
-            const file = selectedFiles[0];
-            if (!file.type.startsWith('image/')) {
-                toast.error('Only image file types are allowed.');
-                return;
-            }
-            const url = URL.createObjectURL(file);
-            setModelFiles(selectedFiles);
-            setModelPreviewUrl(url);
-        }
-    };
-
-    // Upload images to Cloudinary
-    const _handleUploadToCloudinary = async (files: FileList): Promise<string[]> => {
-        const cloudName = 'dby2saqmn';
-        const presetKey = 'whear-app';
-        const folderName = 'test';
-
-        const formData = new FormData();
-        formData.append('upload_preset', presetKey);
-        formData.append('folder', folderName);
-
-        const uploadedUrls: string[] = [];
-
-        for (const file of Array.from(files)) {
-            formData.append('file', file);
-
-            try {
-                const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-                    method: 'POST',
-                    body: formData,
-                });
-
-                const responseData = await response.json();
-
-                if (responseData.secure_url) {
-                    const imageUrl = responseData.secure_url;
-                    uploadedUrls.push(imageUrl);
-                } else {
-                    console.error('Error uploading image to Cloudinary. Response:', responseData);
-                }
-            } catch (error) {
-                console.error('Error uploading images to Cloudinary:', error);
-            }
-        }
-
-        return uploadedUrls;
-    };
-
-    // Track changes in each field
     const _handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
         const { name, value } = e.target;
         setFormData(prevFormData => ({
@@ -160,24 +88,13 @@ const EditExpertTailoringPopUpScreens: React.FC<EditExpertTailoringPopUpScreenFo
         }));
     };
 
-    // Update data in the database
     const _handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        let sizeImageUrls: string[] = [];
-        let modelImageUrls: string[] = [];
-
-        if (files && files.length > 0) {
-            sizeImageUrls = await _handleUploadToCloudinary(files);
-        }
-
-        if (modelFiles && modelFiles.length > 0) {
-            modelImageUrls = await _handleUploadToCloudinary(modelFiles);
-        }
 
         const updatedExpertTailoring = {
             ...formData,
-            sizeImageUrl: sizeImageUrls.length > 0 ? sizeImageUrls[0] : formData.sizeImageUrl,
-            modelImageUrl: modelImageUrls.length > 0 ? modelImageUrls[0] : formData.modelImageUrl, // Include model image URL
+            sizeImageUrl: sizeImageBase64 || formData.sizeImageUrl,
+            modelImageUrl: modelImageBase64 || formData.modelImageUrl,
         };
 
         try {
@@ -241,17 +158,6 @@ const EditExpertTailoringPopUpScreens: React.FC<EditExpertTailoringPopUpScreenFo
                     </div>
                     <form className="mt-6 space-y-2" action="#" method="POST" onSubmit={_handleSubmit}>
                         <div className="grid grid-cols-1 gap-3">
-                            {/* <div>
-                                <InputLabel htmlFor="expertTailoringName">{t("Expert Tailoring Name")}</InputLabel>
-                                <input
-                                    type="text"
-                                    id="expertTailoringName"
-                                    name="expertTailoringName"
-                                    value={formData.expertTailoringName}
-                                    onChange={_handleChange}
-                                    className="block w-full px-4 py-3 rounded-lg border border-gray-300"
-                                />
-                            </div> */}
                             <div className="grid grid-cols-1 space-y-1">
                                 <FormControl fullWidth>
                                     <InputLabel id="expertTailoring-select-label">Expert Tailoring Name</InputLabel>
@@ -277,11 +183,11 @@ const EditExpertTailoringPopUpScreens: React.FC<EditExpertTailoringPopUpScreenFo
                                     type="file"
                                     id="sizeImageUrl"
                                     name="sizeImageUrl"
-                                    onChange={_handleImagesChanges}
+                                    onChange={(e) => _handleImageChange(e, setSizeImageBase64)}
                                     className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                                 />
-                                {previewUrl && (
-                                    <img src={previewUrl} alt="Size Image Preview" className="mt-2 w-full h-auto object-contain" />
+                                {sizeImageBase64 && (
+                                    <img src={sizeImageBase64} alt="Size Image Preview" className="mt-2 w-full h-auto object-contain" />
                                 )}
                             </div>
                             <div>
@@ -290,26 +196,28 @@ const EditExpertTailoringPopUpScreens: React.FC<EditExpertTailoringPopUpScreenFo
                                     type="file"
                                     id="modelImageUrl"
                                     name="modelImageUrl"
-                                    onChange={_handleModelImagesChanges}
+                                    onChange={(e) => _handleImageChange(e, setModelImageBase64)}
                                     className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                                 />
-                                {modelPreviewUrl && (
-                                    <img src={modelPreviewUrl} alt="Model Image Preview" className="mt-2 w-full h-auto object-contain" />
+                                {modelImageBase64 && (
+                                    <img src={modelImageBase64} alt="Model Image Preview" className="mt-2 w-full h-auto object-contain" />
                                 )}
                             </div>
                         </div>
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            style={{
-                                marginTop: '1rem',
-                                backgroundColor: primaryColor,
-                                textTransform: 'none',
-                                fontWeight: 'bold',
-                            }}
-                        >
-                            {t("Update")}
-                        </Button>
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4 }}>
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                style={{
+                                    marginTop: '1rem',
+                                    backgroundColor: primaryColor,
+                                    textTransform: 'none',
+                                    fontWeight: 'bold',
+                                }}
+                            >
+                                {t("Update")}
+                            </Button>
+                        </Box>
                     </form>
                 </div>
             </div>
