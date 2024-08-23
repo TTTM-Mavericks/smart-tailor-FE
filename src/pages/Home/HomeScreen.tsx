@@ -324,11 +324,11 @@ const HomeScreen = () => {
                                             </div>
 
                                             <div className="w-full flex-shrink-0">
-                                                <img src="https://res.cloudinary.com/dby2saqmn/image/upload/v1722569476/home-dashboard/iueajdqiaznsh94tgnxf.png" alt="Clothing Design" className="w-full h-full object-contain" />
+                                                <img src="https://res.cloudinary.com/dby2saqmn/image/upload/v1724394641/dpaw2jvrgx5vucehbgkp.jpg" alt="Clothing Design" className="w-full h-full object-contain" />
                                             </div>
 
                                             <div className="w-full flex-shrink-0">
-                                                <img src="https://res.cloudinary.com/dby2saqmn/image/upload/v1722569476/home-dashboard/iueajdqiaznsh94tgnxf.png" alt="Clothing Design" className="w-full h-full object-contain" />
+                                                <img src="https://res.cloudinary.com/dby2saqmn/image/upload/v1724394641/letdiemx6tzllluum9p5.jpg" alt="Clothing Design" className="w-full h-full object-contain" />
                                             </div>
                                         </div>
                                     </div>
