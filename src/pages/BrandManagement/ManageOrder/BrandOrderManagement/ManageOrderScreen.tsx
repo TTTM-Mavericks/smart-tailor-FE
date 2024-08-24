@@ -545,7 +545,6 @@ const BrandOrderFields: React.FC<{
                         <Dialog open={true} aria-labelledby="popup-dialog-title" maxWidth="md" fullWidth onClose={() => setSelectedClothTagByOrderMaterial(null)}>
                             <DialogTitle id="popup-dialog-title">
                                 <div >
-
                                     <span>Cloth Tags</span>
                                     <div className={`ml-2 inline-flex items-center rounded-md bg-yellow-50 px-2 py-2 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10`}>
                                         <span>

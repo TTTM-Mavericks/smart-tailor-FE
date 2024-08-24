@@ -33,6 +33,7 @@ import MaterialDetailTableComponent from '../Components/Table/MaterialDetailTabl
 import ViewFinalCheckingProductsDialogComponent from '../Components/Dialog/ViewFinalCheckingProductsDialog/ViewFinalCheckingProductsDialogComponent';
 import RefunctionRequestDialogComponent from '../../../components/Dialog/RefunctionRequestDialog/RefunctionRequestDialogComponent';
 import PartOfClothAndPriceDetailTableComponent from '../Components/Table/PartOfClothAndPriceDetailComponent';
+import StatusInfoDialog from '../../../components/Dialog/StatusInformationDialog/StatusInformationDialog';
 
 
 
@@ -64,6 +65,63 @@ interface OrderPriceDetailInterface {
     customerCommissionFee: string;
 }
 
+
+const StatusDetailData = [
+    {
+        label: 'NOT_VERIFY',
+        description: 'Verify the order details.',
+        value: 'NOT_VERIFY',
+        color: secondaryColor,
+    },
+    {
+        label: 'PENDING',
+        description: 'Order is pending approval.',
+        value: 'PENDING',
+        color: secondaryColor,
+    },
+    {
+        label: 'DEPOSIT',
+        description: 'Deposit has been made.',
+        value: 'DEPOSIT',
+        color: secondaryColor,
+    },
+    {
+        label: 'PROCESSING',
+        description: 'Order is being processed.',
+        value: 'PROCESSING',
+        color: secondaryColor,
+    },
+    {
+        label: 'COMPLETED',
+        description: 'Order has been completed.',
+        value: 'COMPLETED',
+        color: greenColor,
+    },
+    {
+        label: 'DELIVERED',
+        description: 'Order has been delivered.',
+        value: 'DELIVERED',
+        color: greenColor,
+    },
+    {
+        label: 'RECEIVED',
+        description: 'Order has been received by the customer.',
+        value: 'RECEIVED',
+        color: greenColor,
+    },
+    {
+        label: 'CANCEL',
+        description: 'Order has been received by the customer.',
+        value: 'CANCEL',
+        color: redColor,
+    },
+    {
+        label: 'REFUND_REQUEST',
+        description: 'Order has been created a refund.',
+        value: 'REFUND_REQUEST',
+        color: redColor,
+    },
+];
 
 
 
@@ -105,6 +163,8 @@ const OrderDetailScreen: React.FC = () => {
     const [isOpenMaterialDetailDialog, setIsOpenMaterialDetailDialog] = useState<boolean>(false);
     const [isOpenRefundRequestDialog, setIsOpenRefundRequestDialog] = useState<boolean>(false);
     const [totalPrices, setTotalPrices] = useState<{ min: number, max: number }>({ min: 0, max: 0 });
+    const [isOpenStatusInformation, setIsOpenStatusInformation] = useState<boolean>(false);
+
 
 
 
@@ -666,6 +726,10 @@ const OrderDetailScreen: React.FC = () => {
                                 {isOpenFinalProductsDialog && (
                                     <ViewFinalCheckingProductsDialogComponent order={orderDetail} onClose={() => setIsOpenFinalProductsDialog(false)} ></ViewFinalCheckingProductsDialogComponent>
                                 )}
+                            </div>
+
+                            <div className="flex items-center mt-5">
+                                <a onClick={() => setIsOpenStatusInformation(true)} className="cursor-pointer text-sm text-indigo-600 hover:text-indigo-800 transition duration-200">Status detail</a>
                             </div>
                         </div>
 
@@ -1286,28 +1350,32 @@ const OrderDetailScreen: React.FC = () => {
             />
 
 
-            {orderDetail?.orderStatus === 'DEPOSIT' && !orderDetail.paymentList && (
-                <Dialog open={true}>
-                    <DialogTitle>Payment service error</DialogTitle>
-                    <DialogContent>
-                        Sorry, somthing wrong with payment service! You can reorder!
-                    </DialogContent>
-                    <DialogActions>
-                        <button
-                            type="submit"
-                            className="px-5 py-2.5 text-sm font-medium text-white"
-                            onClick={() => window.history.back()}
-                            style={{
-                                borderRadius: 4,
-                                color: whiteColor,
-                                backgroundColor: greenColor,
-                            }}
-                        >
-                            Reorder
-                        </button>
-                    </DialogActions>
-                </Dialog>
-            )}
+            {
+                orderDetail?.orderStatus === 'DEPOSIT' && !orderDetail.paymentList && (
+                    <Dialog open={true}>
+                        <DialogTitle>Payment service error</DialogTitle>
+                        <DialogContent>
+                            Sorry, somthing wrong with payment service! You can reorder!
+                        </DialogContent>
+                        <DialogActions>
+                            <button
+                                type="submit"
+                                className="px-5 py-2.5 text-sm font-medium text-white"
+                                onClick={() => window.history.back()}
+                                style={{
+                                    borderRadius: 4,
+                                    color: whiteColor,
+                                    backgroundColor: greenColor,
+                                }}
+                            >
+                                Reorder
+                            </button>
+                        </DialogActions>
+                    </Dialog>
+                )
+            }
+
+            <StatusInfoDialog open={isOpenStatusInformation} onClose={() => setIsOpenStatusInformation(false)} steps={StatusDetailData}></StatusInfoDialog>
 
 
             <FooterComponent />
