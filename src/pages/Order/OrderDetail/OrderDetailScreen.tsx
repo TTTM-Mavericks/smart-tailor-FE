@@ -1351,7 +1351,7 @@ const OrderDetailScreen: React.FC = () => {
 
 
             {
-                orderDetail?.orderStatus === 'DEPOSIT' && !orderDetail.paymentList && (
+                orderDetail?.orderStatus === 'DEPOSIT' && orderDetail.paymentList && orderDetail?.paymentList.length === 0 && (
                     <Dialog open={true}>
                         <DialogTitle>Payment service error</DialogTitle>
                         <DialogContent>

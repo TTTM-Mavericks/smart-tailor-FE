@@ -148,7 +148,8 @@ const HomeScreen = () => {
             })
             .then((responseData) => {
                 if (responseData && Array.isArray(responseData.data)) {
-                    setDesignData(responseData.data);
+                    const result = responseData.data.filter((item: any) => item.publicStatus === false)
+                    setDesignData(result);
                     console.log("Data received:", responseData);
                 } else {
                     console.error('Invalid data format:', responseData);
@@ -370,7 +371,7 @@ const HomeScreen = () => {
 
                         <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-6xl">
                             <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
-                                {filteredDesigns.slice(0, 12).map((item) => (
+                                {filteredDesigns.slice(0, 8).map((item) => (
                                     <div key={item.designID} className="relative group">
                                         <img
                                             src={item.imageUrl}
@@ -379,7 +380,7 @@ const HomeScreen = () => {
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-gray-400 via-transparent opacity-70 rounded-lg"></div>
                                         <div className="absolute bottom-4 left-4">
-                                            <h3 className="text-2xl font-bold text-white" style={{ marginBottom: "10%" }}>
+                                            <h3 className="text-md font-bold text-white" style={{ marginBottom: "10%" }}>
                                                 {item.titleDesign}
                                             </h3>
                                             <a
@@ -389,7 +390,8 @@ const HomeScreen = () => {
                                                     textDecoration: "none",
                                                     backgroundColor: primaryColor,
                                                     color: "white",
-                                                    padding: "5px"
+                                                    padding: "5px",
+                                                    borderRadius: '4px'
                                                 }}
                                             >
                                                 Design Now

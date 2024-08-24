@@ -844,7 +844,11 @@ const UploadBrandInforForm = () => {
                     console.log("Submitting form data:", updatedFormDatas);
                     const brandUploadResponse = await axios.post(
                         `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.uploadBrandInfor + '/' + getID()}`,
-                        updatedFormDatas
+                        updatedFormDatas, {
+                        headers: {
+                            'Authorization': `Bearer ${__getToken()}`
+                        }
+                    }
                     );
 
                     console.log('Brand profile uploaded successfully:', brandUploadResponse.data);
