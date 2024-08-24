@@ -17,7 +17,7 @@ import BrandManageTransactionComponent from '../../BrandManageTransaction/BrandM
 const DashboardManageMaterialScreen = () => {
     const [menuOpen, setMenuOpen] = useState(false);
 
-    const [activeMenu, setActiveMenu] = useState('manage_notification');
+    const [activeMenu, setActiveMenu] = useState('manage_material');
     const [showScrollButton, setShowScrollButton] = useState<boolean>(false);
     const [popperOpen, setPopperOpen] = useState<Record<string, boolean>>({});
 

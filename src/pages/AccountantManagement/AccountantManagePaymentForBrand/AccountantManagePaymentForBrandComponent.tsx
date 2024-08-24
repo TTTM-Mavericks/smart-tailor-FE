@@ -1679,8 +1679,6 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
-    console.log("tottal full " + JSON.stringify(fulldataOrderResposne));
-
 
     const __handleGetQuantityMaterial = (materialID: string) => {
         const designResponse = fulldataOrderResposne?.find((item: any) => {
@@ -1978,6 +1976,44 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
         doc.save('Transaction_Invoice.pdf')
     };
 
+    const __handleGetAllTotalPaymentSubOrder = (orderDetail: any) => {
+        // Get the sub-orders for the given orderDetail
+        const subOrders = orderChild[orderDetail.orderID];
+
+        // Initialize the total amounts
+        let totalAmount = 0;
+        let totalPaidAmount = 0;
+        let remainAmount = 0
+        // Iterate over each sub-order
+        subOrders?.forEach((order) => {
+            // Add the total price of the order to the totalAmount
+            totalAmount += order.totalPrice || 0;
+
+            // Check if the order has a payment list and iterate over it
+            if (order.paymentList && Array.isArray(order.paymentList)) {
+                order.paymentList.forEach((payment) => {
+                    // If the payment status is true, add the payment amount to totalPaidAmount
+                    if (payment.paymentStatus) {
+                        totalPaidAmount += payment.paymentAmount || 0;
+                    }
+                });
+            }
+        });
+
+        // Example usage of the totals
+        console.log(`Paid Amount: ${totalPaidAmount}/${totalAmount}`);
+        remainAmount = totalAmount - totalPaidAmount;
+
+        // You can return these values if needed
+        return { totalAmount, totalPaidAmount, remainAmount };
+    };
+
+
+
+    // const __handleGetAllTotalPaymentPaidSubOrder = (item: any) => {
+
+    // }
+
     return (
         <div>
             <LoadingComponent isLoading={isLoading}></LoadingComponent>
@@ -2145,7 +2181,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                         </div>
                     ) : (
                         <div>
-                            {fulldataOrderResposne?.filter(applyFilters).map((orderDetail) => (
+                            {fulldataOrderResposne?.filter(applyFilters).map((orderDetail: AccountantOrderInterface) => (
                                 <div className="bg-white rounded-xl shadow-md p-4 md:p-6 mb-4 md:mb-8 transform transition-all hover:shadow-lg">
                                     <div className="flex flex-col md:flex-row items-start md:items-center mb-4 md:mb-6" >
                                         <div className="mb-4 md:mb-0 w-max">
@@ -2173,6 +2209,23 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                             {orderDetail?.expectedStartDate}
                                                         </span>
                                                     </p>
+                                                    <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                        <FaDollarSign className="inline-block mr-1" />
+                                                        Paid:{" "}
+                                                        <span className="text-md text-black-500 pb-2" style={{ fontWeight: 'bold' }}>
+                                                            {__handleAddCommasToNumber(__handleGetAllTotalPaymentSubOrder(orderDetail).totalPaidAmount) || 0 + ' / ' + __handleAddCommasToNumber(__handleGetAllTotalPaymentSubOrder(orderDetail).totalAmount)} VND
+                                                        </span>
+                                                    </p>
+                                                    {__handleGetAllTotalPaymentSubOrder(orderDetail).remainAmount > 0 && (
+
+                                                        <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                                            <FaDollarSign className="inline-block mr-1" />
+                                                            Remain:{" "}
+                                                            <span className="text-md text-black-500 pb-2" style={{ fontWeight: 'bold', color: redColor }}>
+                                                                {__handleAddCommasToNumber(__handleGetAllTotalPaymentSubOrder(orderDetail).remainAmount || 0)} VND
+                                                            </span>
+                                                        </p>
+                                                    )}
                                                 </div>
                                                 <div className='ml-32' style={{ marginTop: -10 }}>
                                                     <div
