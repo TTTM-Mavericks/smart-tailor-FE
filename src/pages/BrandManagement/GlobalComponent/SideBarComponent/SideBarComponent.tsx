@@ -230,6 +230,44 @@ const Sidebar: React.FC<SidebarProps> = ({ menuOpen, toggleMenu, activeMenu, han
                             <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">Manage Price</p>
                         </div>
                     </li>
+                    <li>
+                        <div
+                            onClick={() => handleMenuClick('manage_expert_tailoring')}
+                            className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'manage_expert_tailoring' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                                aria-hidden="true"
+                                className="w-5 h-5 text-inherit"
+                            >
+                                <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2" fill="none" />
+                            </svg>
+                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">
+                                Manage Expert Tailoring
+                            </p>
+                        </div>
+                    </li>
+                    {/* <li>
+                        <div
+                            onClick={() => handleMenuClick('manage_property')}
+                            className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'manage_property' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                                aria-hidden="true"
+                                className="w-5 h-5 text-inherit"
+                            >
+                                <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2" fill="none" />
+                            </svg>
+                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">
+                                Manage Property
+                            </p>
+                        </div>
+                    </li> */}
                 </ul>
             </div>
         </aside>

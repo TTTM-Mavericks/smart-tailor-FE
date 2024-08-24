@@ -78,7 +78,9 @@ export const functionEndpoints = {
     rejectBrand: '/reject-brand',
     getBrandByID: '/get-brand',
     getBrandInformationByBrandID: '/get-brand-information-by-brand-id',
-    getAllBrandInformation: '/get-all-brand-information'
+    getAllBrandInformation: '/get-all-brand-information',
+    addExpertTailoringForBrand: '/add-expert-tailoring-for-brand',
+    getAllExpertTailoringByBrandID: '/get-all-expert-tailoring-by-brand-id'
   },
   customer: {
     updateProfile: '/update-customer-profile'
@@ -235,6 +237,13 @@ export const functionEndpoints = {
     getTotalRefundForEachMonth: '/get-total-refund-of-each-month',
     getTotalIncomeForEachMonth: '/get-total-income-of-each-month',
 
+  },
+  brandProperties: {
+    getAll: '/get-all-brand-properties',
+    getBrandByProductiveByBrandID: '/get-brand-productivity-by-brand-id',
+    getBrandPropertyByBrandID: '/get-brand-property',
+    updateBrandProperty: '/update-brand-property',
+    addNewBrandProperty: '/add-new-brand-property'
   }
 }
 
