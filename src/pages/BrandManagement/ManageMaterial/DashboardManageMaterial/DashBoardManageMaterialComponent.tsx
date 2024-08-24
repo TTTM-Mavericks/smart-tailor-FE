@@ -13,6 +13,11 @@ import BrandProductivityInputDialog from '../../GlobalComponent/Dialog/BrandProd
 import { IconButton } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
 import BrandManageTransactionComponent from '../../BrandManageTransaction/BrandManageTransactionComponent';
+import ExpertTailoringBrandManagerComponent from '../../BrandProperty/ManageExpertailoring/BrandManageExpertTailoringComponent';
+import BrandManagePropertyComponent from '../../BrandProperty/ManageProperties/ManagePropertiesComponent';
+import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
+import axios from 'axios';
+import { __getToken } from '../../../../App';
 
 const DashboardManageMaterialScreen = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -31,22 +36,36 @@ const DashboardManageMaterialScreen = () => {
 
     useEffect(() => {
         if (!checkPerformed.current) {
-            const isFirstLogin = localStorage.getItem('brandFirstLogin');
-            const dialogShown = sessionStorage.getItem('productivityDialogShown');
             const userAuthData = JSON.parse(localStorage.getItem('userAuth') || '{}');
             setUserAuth(userAuthData);
 
-            if (isFirstLogin === 'true' && dialogShown !== 'true') {
-                setShowProductivityDialog(true);
-                sessionStorage.setItem('productivityDialogShown', 'true');
-            }
+            const checkBrandProductivity = async () => {
+                try {
+                    const response = await axios.get(
+                        `${baseURL}${versionEndpoints.v1}${featuresEndpoints.brandPropertise}${functionEndpoints.brandProperties.getBrandByProductiveByBrandID}/${userAuthData.userID}`
+                        , {
+                            headers: {
+                                Authorization: `Bearer ${__getToken()}`
+                            }
+                        });
+
+                    if (response.data.data === null) {
+                        setShowProductivityDialog(true);
+                    } else {
+                        setShowProductivityDialog(false);
+                    }
+                } catch (error) {
+                    console.error('Error fetching brand productivity data:', error);
+                }
+            };
+
+            checkBrandProductivity();
             checkPerformed.current = true;
         }
     }, []);
 
     const handleCloseProductivityDialog = () => {
         setShowProductivityDialog(false);
-        sessionStorage.setItem('productivityDialogShown', 'false');
     };
 
     const toggleMenu = () => {
@@ -127,6 +146,13 @@ const DashboardManageMaterialScreen = () => {
                 return <OrderRequestScreen />;
             case 'manage_brand_trandsactions':
                 return <BrandManageTransactionComponent />;
+            case 'manage_expert_tailoring':
+                return (
+                    <div>
+                        <BrandManagePropertyComponent />
+                        <ExpertTailoringBrandManagerComponent />
+                    </div>
+                );
             default:
                 return <ManageMaterialComponent />;
         }

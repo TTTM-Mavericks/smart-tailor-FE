@@ -6,6 +6,7 @@ import style from './BrandProductivityInputDialogStyle.module.scss';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { primaryColor } from '../../../../../root/ColorSystem';
 import { toast } from 'react-toastify';
+import { __getToken } from '../../../../../App';
 
 type Props = {
     isOpen: boolean;
@@ -55,7 +56,7 @@ const BrandProductivityInputDialog: React.FC<Props> = ({ isOpen, onClose, brandI
                 brandPropertyStatus: true,
             }
 
-            const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.brandPropertise + functionEndpoints.brandPropertise.addNewBrandPropertise}`, bodyRequest);
+            const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.brandPropertise + functionEndpoints.brandPropertise.addNewBrandPropertise}`, bodyRequest, __getToken());
             if (response.status === 200) {
                 localStorage.setItem('brandFirstLogin', 'false');
                 toast.success(`${response.message}`, { autoClose: 4000 });
