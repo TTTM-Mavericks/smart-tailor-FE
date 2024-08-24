@@ -711,7 +711,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ transaction, onClos
                                         <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
                                             Total price:{" "}
                                             <span className="text-sm text-gray-500 pb-2">
-                                                {__handleAddCommasToNumber(subOrder.paymentList[0].payOSData.amount)} VND
+                                                {__handleAddCommasToNumber(subOrder.totalPrice)} VND
                                             </span>
                                         </p>
                                         <p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
@@ -1983,7 +1983,8 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
         // Initialize the total amounts
         let totalAmount = 0;
         let totalPaidAmount = 0;
-        let remainAmount = 0
+        let remainAmount = 0;
+
         // Iterate over each sub-order
         subOrders?.forEach((order) => {
             // Add the total price of the order to the totalAmount
@@ -1991,22 +1992,24 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
 
             // Check if the order has a payment list and iterate over it
             if (order.paymentList && Array.isArray(order.paymentList)) {
-                order.paymentList.forEach((payment) => {
-                    // If the payment status is true, add the payment amount to totalPaidAmount
-                    if (payment.paymentStatus) {
-                        totalPaidAmount += payment.paymentAmount || 0;
-                    }
-                });
+                // If any payment in the payment list has paymentStatus true, consider this order as paid
+                const isPaid = order.paymentList.some(payment => payment.paymentStatus);
+                if (isPaid) {
+                    totalPaidAmount += order.totalPrice || 0;
+                }
             }
         });
 
+        // Calculate remaining amount
+        remainAmount = totalAmount - totalPaidAmount;
+
         // Example usage of the totals
         console.log(`Paid Amount: ${totalPaidAmount}/${totalAmount}`);
-        remainAmount = totalAmount - totalPaidAmount;
 
         // You can return these values if needed
         return { totalAmount, totalPaidAmount, remainAmount };
     };
+
 
 
 
@@ -2409,7 +2412,7 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                         </p>
                                                         <p style={{ fontWeight: "bolder" }} className="text-sm text-black pb-2">
                                                             Total price:{" "}
-                                                            <span className="text-sm text-gray-500 pb-2">
+                                                            <span className="text-sm text-gray-500 pb-2" style={{ color: redColor }}>
                                                                 {__handleAddCommasToNumber(order.totalPrice)} VND
                                                             </span>
                                                         </p>
