@@ -40,35 +40,49 @@ const AdminConfiguration = () => {
         }
     };
 
-    const validateValue = (value: string, unit: string) => {
-        // Regex to check for special characters (excluding spaces and common punctuation)
+    const validateValue = (value: string, unit: string, propertyName: string) => {
+        // List of fields to check for positive numbers only
+        const positiveNumberFields = [
+            "MAX_SHIPPING_WEIGHT", "CANCELLATION_TIME", "RATE_AHEAD_SCHEDULE",
+            "PIXEL_RATIO_REAL_FROM_WEB", "DEPOSIT_PERCENT", "BRAND_PRODUCTIVITY",
+            "EMAIL_VERIFICATION_TIME", "ORDER_FEE_PERCENTAGE", "RATING_REDUCTION_BEFORE_START",
+            "BRAND_COST", "PRICE_VARIATION_PERCENTAGE_FOR_MATERIAL", "TIME_BEFORE_ACCOUNT_DELETION",
+            "RATE_LATE_SCHEDULE", "FEE_CANCEL_IN_DURATION", "DIVIDE_NUMBER",
+            "PIXEL_TO_CENTIMETER", "RATING_REDUCTION_AFTER_START", "MATCHING_TIME"
+        ];
+
+        // If the property is in the list, check for positive number only
+        if (positiveNumberFields.includes(propertyName)) {
+            // Check if the value is a positive number
+            const numValue = Number(value);
+            return !isNaN(numValue) && numValue > 0 && /^\d*\.?\d+$/.test(value);
+        }
+
+        // For other fields, keep the existing validation
         const specialCharRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>?]/;
 
-        // Check for special characters
         if (specialCharRegex.test(value)) {
             return false;
         }
 
-        // Check for negative numbers
         if (value.startsWith('-')) {
             return false;
         }
 
-        // Existing unit-specific validations
-        if (unit === "number" || unit === "integer") {
-            return /^\d+$/.test(value) || value === "";
-        }
-        if (unit === "float") {
-            return /^\d*\.?\d+$/.test(value) || value === "";
+        if (unit === "string") {
+            return isNaN(Number(value));
         }
 
-        // If no specific validation, return true
+        if (unit === "number" || unit === "integer" || unit === "float") {
+            return !isNaN(Number(value)) && value !== "";
+        }
+
         return true;
     };
 
     const handleInputChange = (index: number, value: string) => {
         const property = properties[index];
-        const isValid = validateValue(value, property.propertyUnit);
+        const isValid = validateValue(value, property.propertyUnit, property.propertyName);
 
         if (isValid) {
             setErrors(prevErrors => prevErrors.filter((_, i) => i !== index));
@@ -80,7 +94,7 @@ const AdminConfiguration = () => {
         } else {
             setErrors(prevErrors => {
                 const newErrors = [...prevErrors];
-                newErrors[index] = `Invalid value for ${property.propertyName}. No special characters or negative numbers allowed.`;
+                newErrors[index] = `Invalid value for ${property.propertyName}. Must be a positive number.`;
                 return newErrors;
             });
         }
