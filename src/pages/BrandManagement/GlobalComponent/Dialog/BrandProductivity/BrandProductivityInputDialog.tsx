@@ -74,7 +74,7 @@ const BrandProductivityInputDialog: React.FC<Props> = ({ isOpen, onClose, brandI
     return (
         <Dialog open={isOpen} onClose={onClose} aria-labelledby="dialog-title" maxWidth="sm" fullWidth>
             <DialogTitle id="dialog-title">
-                Productivity
+                Productivity Average
                 <IoMdCloseCircleOutline
                     cursor="pointer"
                     size={20}

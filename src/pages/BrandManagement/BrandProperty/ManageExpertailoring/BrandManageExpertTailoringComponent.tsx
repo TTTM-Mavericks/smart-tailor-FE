@@ -149,12 +149,12 @@ const ExpertTailoringBrandManagerComponent: React.FC = () => {
 
     return (
         <div>
-            <div className="max-w-7xl mx-auto">
+            <div>
                 <div className="bg-white rounded-lg shadow-xl overflow-hidden mt-5">
                     <div className="px-4 py-5 sm:p-6">
                         <div className="flex items-center mb-8">
                             <FaCog className="text-3xl text-blue-600 mr-4" style={{ color: "#E96208" }} />
-                            <h2 className="text-3xl font-bold text-gray-800">Brand Expert Tailoring Manager</h2>
+                            <h4 className="font-bold text-gray-800">Brand Expert Tailoring Manager</h4>
                         </div>
                         {message && (
                             <div className="mb-4 p-4 bg-blue-100 text-blue-700 rounded-md">

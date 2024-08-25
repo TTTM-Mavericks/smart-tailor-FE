@@ -81,10 +81,23 @@ const BrandManagePropertyComponent = () => {
     };
 
     const handleInputChange = (value: string) => {
-        setBrandProperty(prevState => ({
-            ...prevState,
-            brandPropertyValue: value
-        }));
+        // Convert the input to a number
+        const numValue = parseFloat(value);
+
+        // Check if the input is a valid number and non-negative
+        if (!isNaN(numValue) && numValue >= 1) {
+            setBrandProperty(prevState => ({
+                ...prevState,
+                brandPropertyValue: value
+            }));
+        } else if (value === '') {
+            // Allow empty input
+            setBrandProperty(prevState => ({
+                ...prevState,
+                brandPropertyValue: ''
+            }));
+        }
+        // If the input is invalid (negative or not a number), we don't update the state
     };
 
     const handleSave = async () => {
@@ -123,18 +136,18 @@ const BrandManagePropertyComponent = () => {
     };
 
     return (
-        <div>
+        <div >
             <ToastContainer />
-            <div className="flex items-center mb-8">
-                <FaCog className="text-4xl text-orange-500 mr-4" />
-                <h2 className="text-3xl font-bold text-gray-800">Brand Productivity Configuration</h2>
+            <div className="flex items-center mb-8 px-4 py-5 sm:p-6">
+                <FaCog className="text-3xl text-orange-500 mr-4" />
+                <h4 className="font-bold text-gray-800">Brand Productivity Configuration</h4>
             </div>
-            <div className="bg-white rounded-lg shadow-lg p-6 transition duration-300 ease-in-out transform">
+            <div className="bg-white rounded-lg shadow-lg p-6 transition duration-300 ease-in-out transform -mt-12">
                 <div className="mb-6">
                     <div className="flex justify-between items-center mb-2">
-                        <label className="text-lg font-semibold text-gray-700">
+                        <p className="font-semibold text-gray-700" style={{ fontSize: "small" }}>
                             {brandProperty.systemProperty.propertyName}
-                        </label>
+                        </p>
                         <Tooltip title="View Description" arrow>
                             <span
                                 onClick={handleDescriptionClick}
@@ -146,7 +159,9 @@ const BrandManagePropertyComponent = () => {
                     </div>
                     <div className="flex items-center">
                         <input
-                            type="text"
+                            type="number"
+                            min="0"
+                            step="any"
                             className="flex-grow p-3 border-2 border-gray-300 rounded-l-md focus:outline-none focus:border-orange-500 transition-colors duration-200"
                             value={brandProperty.brandPropertyValue}
                             onChange={(e) => handleInputChange(e.target.value)}

@@ -552,28 +552,69 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                 )
             }
 
-            {
-                excelData.length > 0 && (
-                    <div style={{ overflowX: 'auto', width: '100%' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                            <thead>
-                                <tr style={{ backgroundColor: colors.primary[100] }}>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Category Name</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Material Name</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>HS CODE</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Unit</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Base Price</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {excelData.map((data, index) => (
+            {excelData.length > 0 && (
+                <div style={{ overflowX: 'auto', width: '100%' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        <thead>
+                            <tr style={{ backgroundColor: colors.primary[100] }}>
+                                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Category Name</th>
+                                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Material Name</th>
+                                <th style={{ border: '1px solid #ddd', padding: '8px' }}>HS CODE</th>
+                                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Unit</th>
+                                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Base Price</th>
+                                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {excelData.map((data, index) => {
+                                const isCategoryValid = data.Category_Name && typeof data.Category_Name !== 'number';
+                                const isMaterialValid = data.Material_Name && typeof data.Material_Name !== 'number';
+                                const isHSCodeValid = !isNaN(data.HS_Code);
+                                const isUnitValid = typeof data.Unit === 'string';
+                                const isBasePriceValid = data.Base_Price !== null && !isNaN(data.Base_Price) && data.Base_Price >= 0;
+
+                                return (
                                     <tr key={index}>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Category_Name ? colors.primary[200] : 'red' }} >{data.Category_Name || 'Null Category Name'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Material_Name ? colors.primary[200] : 'red' }}>{data.Material_Name || 'Null Material Name'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.HS_Code ? colors.primary[200] : 'red' }}>{data.HS_Code || 'Null Hs Code'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Unit ? colors.primary[200] : 'red' }}>{data.Unit || 'Null Unit'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Base_Price ? colors.primary[200] : 'red' }}>{data.Base_Price || 'Null Base Price'}</td>
+                                        <td style={{
+                                            border: '1px solid #ddd',
+                                            padding: '8px',
+                                            color: isCategoryValid ? colors.primary[200] : 'red'
+                                        }}>
+                                            {data.Category_Name}
+                                            {!isCategoryValid && <div style={{ color: 'red' }}>(Invalid Category Name)</div>}
+                                        </td>
+                                        <td style={{
+                                            border: '1px solid #ddd',
+                                            padding: '8px',
+                                            color: isMaterialValid ? colors.primary[200] : 'red'
+                                        }}>
+                                            {data.Material_Name}
+                                            {!isMaterialValid && <div style={{ color: 'red' }}>(Invalid Material Name)</div>}
+                                        </td>
+                                        <td style={{
+                                            border: '1px solid #ddd',
+                                            padding: '8px',
+                                            color: isHSCodeValid ? colors.primary[200] : 'red'
+                                        }}>
+                                            {data.HS_Code}
+                                            {!isHSCodeValid && <div style={{ color: 'red' }}>(HS Code must be a number)</div>}
+                                        </td>
+                                        <td style={{
+                                            border: '1px solid #ddd',
+                                            padding: '8px',
+                                            color: isUnitValid ? colors.primary[200] : 'red'
+                                        }}>
+                                            {data.Unit}
+                                            {!isUnitValid && <div style={{ color: 'red' }}>(Unit must be a string)</div>}
+                                        </td>
+                                        <td style={{
+                                            border: '1px solid #ddd',
+                                            padding: '8px',
+                                            color: isBasePriceValid ? colors.primary[200] : 'red'
+                                        }}>
+                                            {data.Base_Price}
+                                            {!isBasePriceValid && <div style={{ color: 'red' }}>(Invalid Base Price)</div>}
+                                        </td>
                                         <td style={{ border: '1px solid #ddd', padding: '8px' }}>
                                             <div style={{ display: "flex" }}>
                                                 <EditIcon style={{ color: "blue", cursor: "pointer" }} onClick={() => confirmEdit(index)} />
@@ -581,12 +622,12 @@ const AddMultipleComponentWithExcel: React.FC<AddMaterialWithMultipleExcelFormPr
                                             </div>
                                         </td>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )
-            }
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+            )}
 
             <Modal
                 open={editOpen}

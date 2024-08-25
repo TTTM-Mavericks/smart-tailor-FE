@@ -606,31 +606,56 @@ If the brand does not have a material for this entry, the field may be left blan
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Unit</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Base Price</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Brand Price</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {excelData.map((data, index) => (
-                                    <tr key={data.id}>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Category_Name ? colors.primary[200] : 'red' }}>{data.Category_Name || 'Null Category Name'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Material_Name ? colors.primary[200] : 'red' }}>{data.Material_Name || 'Null Material Name'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.HS_Code ? colors.primary[200] : 'red' }}>{data.HS_Code || 'Null'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Unit ? colors.primary[200] : 'red' }}>{data.Unit || 'Null Unit'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Base_Price ? colors.primary[200] : 'red' }}>{data.Base_Price || 'Null Base Price'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Brand_Price ? colors.primary[200] : 'red' }}>{data.Brand_Price || 'Null Price'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>
-                                            <div style={{ display: "flex" }}>
-                                                <EditIcon style={{ color: "blue", cursor: "pointer" }} onClick={() => confirmEdit(index)} />
-                                                <DeleteIcon style={{ color: "red", cursor: "pointer" }} onClick={() => confirmDelete(index)} />
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
+                                {excelData.map((data, index) => {
+                                    const getBrandPriceError = () => {
+                                        if (data.Brand_Price == null) return 'Null';
+                                        if (isNaN(data.Brand_Price)) return 'Not a number';
+                                        if (data.Brand_Price < 0) return 'Negative value';
+                                        return null;
+                                    };
+                                    const getBasePriceError = () => {
+                                        if (data.Base_Price == null) return 'Null';
+                                        if (isNaN(data.Base_Price)) return 'Not a number';
+                                        if (data.Base_Price < 0) return 'Negative value';
+                                        return null;
+                                    };
+                                    const brandPriceError = getBrandPriceError();
+                                    const basePriceError = getBasePriceError();
+                                    const hsCodeError = isNaN(Number(data.HS_Code)) ? 'Not a number' : null;
+                                    const unitError = typeof data.Unit !== 'string' ? 'Not a string' : null;
+
+                                    return (
+                                        <tr key={data.id}>
+                                            <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Category_Name ? colors.primary[200] : 'red' }}>
+                                                {data.Category_Name || 'Null Category Name'}
+                                            </td>
+                                            <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Material_Name ? colors.primary[200] : 'red' }}>
+                                                {data.Material_Name || 'Null Material Name'}
+                                            </td>
+                                            <td style={{ border: '1px solid #ddd', padding: '8px', color: hsCodeError ? 'red' : colors.primary[200] }}>
+                                                {hsCodeError ? `${data.HS_Code} (${hsCodeError})` : data.HS_Code}
+                                            </td>
+                                            <td style={{ border: '1px solid #ddd', padding: '8px', color: unitError ? 'red' : colors.primary[200] }}>
+                                                {unitError ? `${data.Unit} (${unitError})` : data.Unit}
+                                            </td>
+                                            <td style={{ border: '1px solid #ddd', padding: '8px', color: basePriceError ? 'red' : colors.primary[200] }}>
+                                                {basePriceError ? `${data.Base_Price} (${basePriceError})` : data.Base_Price}
+                                            </td>
+                                            <td style={{ border: '1px solid #ddd', padding: '8px', color: brandPriceError ? 'red' : colors.primary[200] }}>
+                                                {brandPriceError ? `${data.Brand_Price} (${brandPriceError})` : data.Brand_Price}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>
                 )
             }
+
             <Modal
                 open={editOpen}
                 aria-labelledby="modal-modal-title"
