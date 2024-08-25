@@ -28,6 +28,7 @@ const AdminConfiguration = () => {
         fetchPropertiesDetails();
     }, []);
 
+
     const fetchPropertiesDetails = async () => {
         try {
             const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.systemPropertise + functionEndpoints.systemPropertise.getAllSystemPropertise}`);
@@ -39,32 +40,69 @@ const AdminConfiguration = () => {
         }
     };
 
-    const validateValue = (value: string, unit: string) => {
-        // Example validation logic: assuming unit could be "number", "integer", "float"
-        if (unit === "number" || unit === "integer") {
-            return !isNaN(Number(value)) || value === "";
+    const validateValue = (value: string, unit: string, propertyName: string) => {
+        // List of fields to check for positive numbers only
+        const positiveNumberFields = [
+            "MAX_SHIPPING_WEIGHT", "CANCELLATION_TIME", "RATE_AHEAD_SCHEDULE",
+            "PIXEL_RATIO_REAL_FROM_WEB", "DEPOSIT_PERCENT", "BRAND_PRODUCTIVITY",
+            "EMAIL_VERIFICATION_TIME", "ORDER_FEE_PERCENTAGE", "RATING_REDUCTION_BEFORE_START",
+            "BRAND_COST", "PRICE_VARIATION_PERCENTAGE_FOR_MATERIAL", "TIME_BEFORE_ACCOUNT_DELETION",
+            "RATE_LATE_SCHEDULE", "FEE_CANCEL_IN_DURATION", "DIVIDE_NUMBER",
+            "PIXEL_TO_CENTIMETER", "RATING_REDUCTION_AFTER_START", "MATCHING_TIME"
+        ];
+
+        // If the property is in the list, check for positive number only
+        if (positiveNumberFields.includes(propertyName)) {
+            // Check if the value is a positive number
+            const numValue = Number(value);
+            return !isNaN(numValue) && numValue > 0 && /^\d*\.?\d+$/.test(value);
         }
-        if (unit === "float") {
-            return !isNaN(parseFloat(value)) || value === "";
+
+        // For other fields, keep the existing validation
+        const specialCharRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>?]/;
+
+        if (specialCharRegex.test(value)) {
+            return false;
         }
-        // Add more validations based on your needs
+
+        if (value.startsWith('-')) {
+            return false;
+        }
+
+        if (unit === "string") {
+            return isNaN(Number(value));
+        }
+
+        if (unit === "number" || unit === "integer" || unit === "float") {
+            return !isNaN(Number(value)) && value !== "";
+        }
+
         return true;
     };
 
     const handleInputChange = (index: number, value: string) => {
         const property = properties[index];
-        const isValid = validateValue(value, property.propertyUnit);
+        const isValid = validateValue(value, property.propertyUnit, property.propertyName);
 
         if (isValid) {
-            setErrors(prevErrors => prevErrors.filter((_, i) => i !== index)); // Remove error for this property
+            setErrors(prevErrors => prevErrors.filter((_, i) => i !== index));
             setProperties(prevState =>
                 prevState.map((property, i) =>
                     i === index ? { ...property, propertyValue: value } : property
                 )
             );
         } else {
-            setErrors(prevErrors => [...prevErrors, `Invalid value for ${property.propertyName}`]); // Add error
+            setErrors(prevErrors => {
+                const newErrors = [...prevErrors];
+                newErrors[index] = `Invalid value for ${property.propertyName}. Must be a positive number.`;
+                return newErrors;
+            });
         }
+    };
+
+    const validateDialogInput = (value: string) => {
+        const specialCharRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>?]/;
+        return !specialCharRegex.test(value) && !value.startsWith('-');
     };
 
     const handleSave = async () => {
@@ -122,10 +160,15 @@ const AdminConfiguration = () => {
 
     const handleDialogChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
-        setNewProperty(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
+        if (validateDialogInput(value)) {
+            setNewProperty(prevState => ({
+                ...prevState,
+                [name]: value
+            }));
+        } else {
+            // You might want to show an error message here
+            toast.error('Invalid input. No special characters or negative numbers allowed.', { autoClose: 2000 });
+        }
     };
 
     return (

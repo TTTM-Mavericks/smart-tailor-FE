@@ -35,10 +35,23 @@ const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, e
 
     const _handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData(prevState => ({
-            ...prevState,
-            [name]: Number(value)
-        }));
+        const numValue = parseFloat(value);
+
+        if (!isNaN(numValue) && numValue >= 0) {
+            setFormData(prevState => ({
+                ...prevState,
+                [name]: numValue
+            }));
+        }
+    };
+
+    const validateInputs = (): boolean => {
+        return (
+            formData.laborQuantityMinQuantity >= 0 &&
+            formData.laborQuantityMaxQuantity >= 0 &&
+            formData.laborQuantityMinPrice >= 0 &&
+            formData.laborQuantityMaxPrice >= 0
+        );
     };
 
     const selectedLanguage = localStorage.getItem('language');
@@ -126,6 +139,7 @@ const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, e
                         variant="outlined"
                         type="number"
                         size="small"
+                        inputProps={{ min: "0", step: "1" }}
                         sx={{ minWidth: "100%" }}
                         value={formData.laborQuantityMinQuantity}
                         onChange={_handleChange}
@@ -138,6 +152,7 @@ const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, e
                         label="Max Quantity"
                         variant="outlined"
                         type="number"
+                        inputProps={{ min: "0", step: "1" }}
                         size="small"
                         sx={{ minWidth: "100%" }}
                         value={formData.laborQuantityMaxQuantity}
@@ -150,6 +165,7 @@ const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, e
                         id="laborQuantityMinPrice"
                         label="Min Price"
                         variant="outlined"
+                        inputProps={{ min: "0", step: "1" }}
                         type="number"
                         size="small"
                         sx={{ minWidth: "100%" }}
@@ -164,6 +180,7 @@ const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, e
                         label="Max Price"
                         variant="outlined"
                         type="number"
+                        inputProps={{ min: "0", step: "1" }}
                         size="small"
                         sx={{ minWidth: "100%" }}
                         value={formData.laborQuantityMaxPrice}

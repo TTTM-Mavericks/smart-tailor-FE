@@ -31,11 +31,22 @@ const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, e
 
     const _handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
-    }
+        const numericValue = parseFloat(value);
+
+        if (!isNaN(numericValue) && numericValue > 0) {
+            setFormData(prevState => ({
+                ...prevState,
+                [name]: numericValue
+            }));
+        } else if (value === '') {
+            // Allow empty input for user convenience
+            setFormData(prevState => ({
+                ...prevState,
+                [name]: ''
+            }));
+        }
+        // If the input is invalid (negative, zero, or not a number), we don't update the state
+    };
 
     const userAuthData = localStorage.getItem('userAuth') as string;
 
@@ -58,6 +69,14 @@ const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, e
 
     console.log("formData" + formData.laborQuantityID);
     const _handleSubmit = async () => {
+        if (formData.brandLaborCostPerQuantity <= 0) {
+            Swal.fire(
+                'Invalid Input',
+                'Brand Labor Cost Per Quantity must be a positive number',
+                'error'
+            );
+            return;
+        }
         try {
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_labor_quantity + functionEndpoints.brandLaborQuantity.updateBrandLaborQuantity + `/${userID}`}`;
             const response = await axios.put(apiUrl, {
@@ -156,6 +175,8 @@ const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, e
                 fullWidth
                 value={formData.brandLaborCostPerQuantity}
                 onChange={_handleChange}
+                type="number"
+                inputProps={{ min: "0.01", step: "0.01" }}
                 sx={{ mb: 4 }}
             />
 
