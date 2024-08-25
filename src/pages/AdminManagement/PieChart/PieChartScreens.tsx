@@ -113,13 +113,9 @@ const PieChart = () => {
                 arcLinkLabelsTextColor={colors.primary[200]}
                 arcLinkLabelsThickness={2}
                 arcLinkLabelsColor={{ from: "color" }}
-                enableArcLabels={false}
                 arcLabelsRadiusOffset={0.4}
-                arcLabelsSkipAngle={7}
-                arcLabelsTextColor={{
-                    from: "color",
-                    modifiers: [["darker", 2]],
-                }}
+                arcLabelsSkipAngle={10}
+                arcLabelsTextColor="black"
                 defs={[
                     {
                         id: "dots",

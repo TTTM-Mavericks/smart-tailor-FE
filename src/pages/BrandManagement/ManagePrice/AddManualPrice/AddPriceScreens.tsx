@@ -74,6 +74,11 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
     };
 
     const handlePriceChange = (laborQuantityID: string, event: React.ChangeEvent<HTMLInputElement>) => {
+        const inputValue = event.target.value;
+        const numericValue = parseFloat(inputValue);
+        if (isNaN(numericValue) || numericValue <= 0) {
+            return;
+        }
         const newPrices = prices.map(price =>
             price.laborQuantityID === laborQuantityID
                 ? { ...price, brandLaborCostPerQuantity: parseFloat(event.target.value) }

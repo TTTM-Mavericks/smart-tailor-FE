@@ -606,7 +606,7 @@ If the brand does not have a material for this entry, the field may be left blan
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Unit</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Base Price</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Brand Price</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Action</th>
+                                    {/* <th style={{ border: '1px solid #ddd', padding: '8px' }}>Action</th> */}
                                 </tr>
                             </thead>
                             <tbody>
@@ -618,12 +618,12 @@ If the brand does not have a material for this entry, the field may be left blan
                                         <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Unit ? colors.primary[200] : 'red' }}>{data.Unit || 'Null Unit'}</td>
                                         <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Base_Price ? colors.primary[200] : 'red' }}>{data.Base_Price || 'Null Base Price'}</td>
                                         <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Brand_Price ? colors.primary[200] : 'red' }}>{data.Brand_Price || 'Null Price'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>
+                                        {/* <td style={{ border: '1px solid #ddd', padding: '8px' }}>
                                             <div style={{ display: "flex" }}>
                                                 <EditIcon style={{ color: "blue", cursor: "pointer" }} onClick={() => confirmEdit(index)} />
                                                 <DeleteIcon style={{ color: "red", cursor: "pointer" }} onClick={() => confirmDelete(index)} />
                                             </div>
-                                        </td>
+                                        </td> */}
                                     </tr>
                                 ))}
                             </tbody>

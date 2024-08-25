@@ -28,6 +28,7 @@ const AdminConfiguration = () => {
         fetchPropertiesDetails();
     }, []);
 
+
     const fetchPropertiesDetails = async () => {
         try {
             const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.systemPropertise + functionEndpoints.systemPropertise.getAllSystemPropertise}`);
@@ -40,14 +41,28 @@ const AdminConfiguration = () => {
     };
 
     const validateValue = (value: string, unit: string) => {
-        // Example validation logic: assuming unit could be "number", "integer", "float"
+        // Regex to check for special characters (excluding spaces and common punctuation)
+        const specialCharRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>?]/;
+
+        // Check for special characters
+        if (specialCharRegex.test(value)) {
+            return false;
+        }
+
+        // Check for negative numbers
+        if (value.startsWith('-')) {
+            return false;
+        }
+
+        // Existing unit-specific validations
         if (unit === "number" || unit === "integer") {
-            return !isNaN(Number(value)) || value === "";
+            return /^\d+$/.test(value) || value === "";
         }
         if (unit === "float") {
-            return !isNaN(parseFloat(value)) || value === "";
+            return /^\d*\.?\d+$/.test(value) || value === "";
         }
-        // Add more validations based on your needs
+
+        // If no specific validation, return true
         return true;
     };
 
@@ -56,15 +71,24 @@ const AdminConfiguration = () => {
         const isValid = validateValue(value, property.propertyUnit);
 
         if (isValid) {
-            setErrors(prevErrors => prevErrors.filter((_, i) => i !== index)); // Remove error for this property
+            setErrors(prevErrors => prevErrors.filter((_, i) => i !== index));
             setProperties(prevState =>
                 prevState.map((property, i) =>
                     i === index ? { ...property, propertyValue: value } : property
                 )
             );
         } else {
-            setErrors(prevErrors => [...prevErrors, `Invalid value for ${property.propertyName}`]); // Add error
+            setErrors(prevErrors => {
+                const newErrors = [...prevErrors];
+                newErrors[index] = `Invalid value for ${property.propertyName}. No special characters or negative numbers allowed.`;
+                return newErrors;
+            });
         }
+    };
+
+    const validateDialogInput = (value: string) => {
+        const specialCharRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>?]/;
+        return !specialCharRegex.test(value) && !value.startsWith('-');
     };
 
     const handleSave = async () => {
@@ -122,10 +146,15 @@ const AdminConfiguration = () => {
 
     const handleDialogChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
-        setNewProperty(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
+        if (validateDialogInput(value)) {
+            setNewProperty(prevState => ({
+                ...prevState,
+                [name]: value
+            }));
+        } else {
+            // You might want to show an error message here
+            toast.error('Invalid input. No special characters or negative numbers allowed.', { autoClose: 2000 });
+        }
     };
 
     return (
