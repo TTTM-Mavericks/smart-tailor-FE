@@ -360,7 +360,7 @@ export default function HeaderComponent() {
     setProposalOpen(!proposalOpen);
   };
 
-  const truncateMessage = (message: string, maxLength: number = 30): string => {
+  const truncateMessage = (message: string, maxLength: number = 50): string => {
     return message.length > maxLength ? `${message.slice(0, maxLength)}...` : message;
   };
 
@@ -472,7 +472,7 @@ export default function HeaderComponent() {
                   <Card
                     key={notification.notificationID}
                     className="shadow-lg rounded-lg transition-shadow duration-300 hover:shadow-xl"
-                    style={{ backgroundColor: !notification.status ? '#FAFAFA' : whiteColor }}
+                    style={{ backgroundColor: !notification.status ?  whiteColor : whiteColor }}
                     onClick={() => __handleMaskNotiRead(notification)}
 
                   >

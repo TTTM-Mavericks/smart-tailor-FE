@@ -405,6 +405,10 @@ const OrderHistory: React.FC = () => {
                                     <h2 className="text-1xl md:text-1xl font-bold text-gray-800 pb-2">{t(codeLanguage + '000193')} </h2>
                                     <p className="text-sm text-gray-500 pb-2"> {orderDetail?.orderID}</p>
                                     <p className="text-sm text-gray-500 pb-2">{t(codeLanguage + '000200')}: {orderDetail?.expectedStartDate}</p>
+                                    {orderDetail.detailList && orderDetail.detailList?.length > 0 && orderDetail.detailList.map((item) => (
+                                        <p className="text-sm text-gray-500 pb-2">Size {item.size?.sizeName}: {item?.quantity}</p>
+
+                                    ))}
                                     <div style={{
                                         display: 'flex',
                                         alignContent: 'center',
@@ -426,7 +430,9 @@ const OrderHistory: React.FC = () => {
                                                                         : orderDetail?.orderStatus === 'RECEIVED' ? greenColor
                                                                             : orderDetail?.orderStatus === 'DEPOSIT' ? secondaryColor
                                                                                 : orderDetail?.orderStatus === 'PROCESSING' ? secondaryColor
-                                                                                    : secondaryColor,
+                                                                                    : orderDetail?.orderStatus === 'CANCEL' ? redColor
+                                                                                        : orderDetail?.orderStatus === 'REFUND_REQUEST' ? redColor
+                                                                                            : secondaryColor,
                                                         opacity: 1,
                                                         color: whiteColor
                                                     }
@@ -434,6 +440,8 @@ const OrderHistory: React.FC = () => {
                                         </Stack>
                                         {/* <p className="text-sm text-gray-500"></p> */}
                                     </div>
+
+
                                 </div>
                                 <div className="text-right">
                                     <div className="mt-2">
@@ -442,7 +450,10 @@ const OrderHistory: React.FC = () => {
                                             <button className={`${style.orderHistory__reOrder__button} ml-2 md:ml-4 px-3 py-2 md:px-4 md:py-2`} >ReOrder</button>
                                         )}
                                     </div>
-                                    <p className='ml-2 md:ml-4 px-3 py-2 md:px-4 md:py-2' style={{ position: 'absolute', top: 50, right: 0, fontWeight: 'bold' }}>{__handleAddCommasToNumber(orderDetail?.totalPrice)} VND</p>
+                                    {orderDetail?.totalPrice && orderDetail?.totalPrice > 0 && (
+
+                                        <p className='ml-2 md:ml-4 px-3 py-2 md:px-4 md:py-2' style={{ position: 'absolute', top: 50, right: 0, fontWeight: 'bold' }}>{__handleAddCommasToNumber(orderDetail?.totalPrice)} VND</p>
+                                    )}
 
                                 </div>
                             </div>
@@ -459,11 +470,14 @@ const OrderHistory: React.FC = () => {
 
                             </button>
 
-                            {isExtendTransaction[orderDetail?.orderID || '1'] && (
-                                <div className='mt-10'></div>
-                            )}
+                            {
+                                isExtendTransaction[orderDetail?.orderID || '1'] && (
+                                    <div className='mt-10'></div>
+                                )
+                            }
 
-                            {isExtendTransaction[orderDetail?.orderID || '1'] &&
+                            {
+                                isExtendTransaction[orderDetail?.orderID || '1'] &&
                                 orderDetail?.paymentList?.map((payment, itemIndex) => {
                                     if (payment.paymentType !== 'ORDER_REFUND') {
                                         return (
@@ -623,81 +637,83 @@ const OrderHistory: React.FC = () => {
 
 
             {/* Dialog */}
-            {currentPaymentData && (
+            {
+                currentPaymentData && (
 
-                <Dialog open={isOpenPaymentInforDialog} onClose={__handleClosePaymentInformationDialog}>
-                    <DialogContent >
-                        {currentPaymentData ? (
-                            <div style={{ padding: 2 }} >
-                                <Grid container spacing={2}>
-                                    <Grid item xs={12}>
-                                        <Typography variant="h6" gutterBottom>
-                                            Sender Information
-                                        </Typography>
-                                        <Divider />
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="body2" style={{ fontSize: 14 }}><strong>Name:</strong> {currentPaymentData.paymentSenderName}</Typography>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="body2" style={{ fontSize: 14 }}><strong>Bank Code:</strong> {currentPaymentData.paymentSenderBankCode}</Typography>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="body2" style={{ fontSize: 14 }}><strong>Bank Number:</strong> {currentPaymentData.paymentSenderBankNumber}</Typography>
-                                    </Grid>
+                    <Dialog open={isOpenPaymentInforDialog} onClose={__handleClosePaymentInformationDialog}>
+                        <DialogContent >
+                            {currentPaymentData ? (
+                                <div style={{ padding: 2 }} >
+                                    <Grid container spacing={2}>
+                                        <Grid item xs={12}>
+                                            <Typography variant="h6" gutterBottom>
+                                                Sender Information
+                                            </Typography>
+                                            <Divider />
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Typography variant="body2" style={{ fontSize: 14 }}><strong>Name:</strong> {currentPaymentData.paymentSenderName}</Typography>
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Typography variant="body2" style={{ fontSize: 14 }}><strong>Bank Code:</strong> {currentPaymentData.paymentSenderBankCode}</Typography>
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Typography variant="body2" style={{ fontSize: 14 }}><strong>Bank Number:</strong> {currentPaymentData.paymentSenderBankNumber}</Typography>
+                                        </Grid>
 
-                                    <Grid item xs={12}>
-                                        <Typography variant="h6" gutterBottom>
-                                            Recipient Information
-                                        </Typography>
-                                        <Divider />
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="body2" style={{ fontSize: 14 }}><strong>Name:</strong> Smart Tailor</Typography>
-                                    </Grid>
+                                        <Grid item xs={12}>
+                                            <Typography variant="h6" gutterBottom>
+                                                Recipient Information
+                                            </Typography>
+                                            <Divider />
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Typography variant="body2" style={{ fontSize: 14 }}><strong>Name:</strong> Smart Tailor</Typography>
+                                        </Grid>
 
-                                    <Grid item xs={12}>
-                                        <Typography variant="h6" gutterBottom>
-                                            Payment Details
-                                        </Typography>
-                                        <Divider />
+                                        <Grid item xs={12}>
+                                            <Typography variant="h6" gutterBottom>
+                                                Payment Details
+                                            </Typography>
+                                            <Divider />
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Typography variant="body2" style={{ fontSize: 14 }}><strong>Amount:</strong> {__handleAddCommasToNumber(currentPaymentData.paymentAmount)} VND</Typography>
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Typography variant="body2" style={{ fontSize: 14 }}><strong>Method:</strong> {currentPaymentData.paymentMethod || ' Banking'}</Typography>
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Typography variant="body2" style={{ fontSize: 14 }}>
+                                                <strong>Status:</strong>
+                                                <div
+                                                    style={{
+                                                        backgroundColor: getStatusColor(currentPaymentData.paymentStatus),
+                                                        color: whiteColor,
+                                                        borderRadius: 1,
+                                                        padding: '2px 4px',
+                                                        marginLeft: '8px',
+                                                        display: 'inline-block'
+                                                    }}
+                                                >
+                                                    {currentPaymentData.paymentStatus ? 'Completed' : 'Pending'}
+                                                </div>
+                                            </Typography>
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Typography variant="body2" style={{ fontSize: 14 }}><strong>Type:</strong> {currentPaymentData.paymentType}</Typography>
+                                        </Grid>
                                     </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="body2" style={{ fontSize: 14 }}><strong>Amount:</strong> {__handleAddCommasToNumber(currentPaymentData.paymentAmount)} VND</Typography>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="body2" style={{ fontSize: 14 }}><strong>Method:</strong> {currentPaymentData.paymentMethod || ' Banking'}</Typography>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="body2" style={{ fontSize: 14 }}>
-                                            <strong>Status:</strong>
-                                            <div
-                                                style={{
-                                                    backgroundColor: getStatusColor(currentPaymentData.paymentStatus),
-                                                    color: whiteColor,
-                                                    borderRadius: 1,
-                                                    padding: '2px 4px',
-                                                    marginLeft: '8px',
-                                                    display: 'inline-block'
-                                                }}
-                                            >
-                                                {currentPaymentData.paymentStatus ? 'Completed' : 'Pending'}
-                                            </div>
-                                        </Typography>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="body2" style={{ fontSize: 14 }}><strong>Type:</strong> {currentPaymentData.paymentType}</Typography>
-                                    </Grid>
-                                </Grid>
-                            </div>
-                        ) : (
-                            <Typography variant="body1">No payment data available</Typography>
-                        )}
-                    </DialogContent>
-                </Dialog>
-            )}
+                                </div>
+                            ) : (
+                                <Typography variant="body1">No payment data available</Typography>
+                            )}
+                        </DialogContent>
+                    </Dialog>
+                )
+            }
             <FooterComponent />
-        </div>
+        </div >
 
     );
 };

@@ -52,6 +52,47 @@ const getStatusColor = (status: string) => {
     }
 };
 
+const getBackgroundColor = (status: string) => {
+    switch (status) {
+        case 'NOT_VERIFY': return 'bg-gray-300 px-2 py-1 rounded-full';
+        case 'PENDING': return 'bg-blue-300 px-2 py-1 rounded-full';
+        case 'DEPOSIT': return 'bg-blue-300 px-2 py-1 rounded-full';
+        case 'PROCESSING': return 'bg-orange-300 px-2 py-1 rounded-full';
+        case 'CANCEL': return 'bg-red-300 px-2 py-1 rounded-full';
+        case 'COMPLETED': return 'bg-green-300 px-2 py-1 rounded-full';
+        case 'DELIVERED': return 'bg-indigo-300 px-2 py-1 rounded-full';
+        case 'START_PRODUCING': return 'bg-pink-300 px-2 py-1 rounded-full';
+        case 'CHECKING_SAMPLE_DATA': return 'bg-orange-300 px-2 py-1 rounded-full';
+
+        default: return 'bg-gray-300 px-2 py-1 rounded-full';
+    }
+};
+
+/**
+ * 
+ * @param status 
+ * @returns 
+ * Take The Status of all state
+ * With Each status have each color
+ */
+const getBackgroundColor1 = (status: string) => {
+    switch (status) {
+        case 'NOT_VERIFY': return 'bg-gray-300 px-2 py-1 rounded-full';
+        case 'PENDING': return 'bg-yellow-300 px-2 py-1 rounded-full';
+        case 'DEPOSIT': return 'bg-blue-300 px-2 py-1 rounded-full';
+        case 'PROCESSING': return 'bg-orange-300 px-2 py-1 rounded-full';
+        case 'CANCEL': return 'bg-red-300 px-2 py-1 rounded-full';
+        case 'COMPLETED': return 'bg-green-300 px-2 py-1 rounded-full';
+        case 'DELIVERED': return 'bg-indigo-300 px-2 py-1 rounded-full';
+        case 'RECEIVED': return 'bg-green-100 px-2 py-1 rounded-full';
+        case 'REFUND_REQUEST': return 'bg-red-300 px-2 py-1 rounded-full';
+
+
+        default: return 'bg-gray-300 px-2 py-1 rounded-full';
+    }
+};
+
+
 /**
  * Progress Step
  */
@@ -478,7 +519,7 @@ const BrandOrderFields: React.FC<{
                             <p className="text-sm text-gray-600 mb-2">
                                 <FaBox className="inline-block mr-1" />
                                 <span style={{ fontWeight: "bolder" }}>Order Status: </span>
-                                <span className={`mb-2 ${getStatusColor(order.orderStatus)} font-bold`}>{order.orderStatus}</span>
+                                <span className={`mb-2 ${getStatusColor(order.orderStatus)} ${getBackgroundColor(order.orderStatus)} font-bold`}>{order.orderStatus}</span>
                             </p>
                             <div>
                                 {order.detailList.map((detail, index) => (

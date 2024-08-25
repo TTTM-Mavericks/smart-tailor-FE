@@ -190,7 +190,7 @@ const NotificationEmployeeComponent: React.FC = () => {
             <LoadingComponent isLoading={isLoading}></LoadingComponent>
             {/* <ToastContainer></ToastContainer> */}
             <div >
-                <div style={{ width: '100%' }}>
+                <div style={{ width: '1000px' }}>
                     {messages.length > 0 ? (
                         <div>
                             <span className="text-gray-500 text-sm">New notifications</span>
@@ -199,26 +199,39 @@ const NotificationEmployeeComponent: React.FC = () => {
                                     <Card
                                         key={index}
                                         className="shadow-lg rounded-lg transition-shadow duration-300 hover:shadow-xl"
-                                        style={{ backgroundColor: !notification.status ? '#FAFAFA' : whiteColor }}
+                                        style={{ backgroundColor: !notification.status ?  whiteColor : whiteColor }}
                                         onClick={() => __handleMaskNotiRead(notification)}
                                     >
                                         <CardContent>
                                             <div className="flex items-center justify-between mb-4">
-                                                <span className="font-semibold text-indigo-700 text-sm">
+                                                <span
+                                                    className={`font-semibold text-sm px-2 py-1 rounded-full ${notification.type === 'FINAL_CHECKING'
+                                                        ? 'text-green-600 bg-green-100'
+                                                        : notification.type === 'REPORT'
+                                                            ? 'text-blue-600 bg-blue-100'
+                                                            : notification.type === 'SAMPLE PRODUCT'
+                                                                ? 'text-yellow-600 bg-yellow-100'
+                                                                : notification.type === 'ORDER'
+                                                                    ? 'text-red-600 bg-red-100'
+                                                                    : 'text-indigo-700 bg-gray-200'
+                                                        }`}
+                                                >
                                                     {notification.type || 'SYSTEM'}: {notification.targetID}
                                                 </span>
-                                                <span className="font-semibold text-indigo-700 text-sm" style={{ fontSize: 10, color: notification.status ? greenColor : primaryColor }}>
+                                                <span
+                                                    className="font-semibold text-sm ml-auto"
+                                                    style={{
+                                                        fontSize: 10,
+                                                        color: notification.status ? greenColor : primaryColor,
+                                                    }}
+                                                >
                                                     {notification.status ? 'Read' : 'Not read'}
                                                 </span>
-
                                             </div>
                                             <Typography variant="body2" className="inline-flex items-center text-green-600 bg-green-100 px-2 py-1 rounded-full">
                                                 {generateNotificationMessage(notification)}
                                             </Typography>
-                                            <Typography variant="body2" className="text-gray-700 mb-4 pt-1" >
-                                                ID: {notification.targetID}
-                                            </Typography>
-                                            <Typography variant="body2" className="text-gray-700 mb-4 pt-1" >
+                                            <Typography variant="body2" className="text-gray-700 mb-4 pt-1">
                                                 Message: {notification.message}
                                             </Typography>
                                             <Typography variant="caption" className="text-gray-500">
@@ -228,13 +241,11 @@ const NotificationEmployeeComponent: React.FC = () => {
                                     </Card>
                                 ))}
                             </div>
-
                         </div>
                     ) : (
-                        <div>
-                            {/* <span className="text-gray-500 text-sm text-center justify-center content-center">Do not have any notification</span> */}
-                        </div>
+                        <></>
                     )}
+
                     {notificationList.length > 0 ? (
                         <div className="mt-10">
                             <span className="text-gray-500 text-sm">Old notifications</span>
@@ -243,25 +254,41 @@ const NotificationEmployeeComponent: React.FC = () => {
                                     <Card
                                         key={notification.notificationID}
                                         className="shadow-lg rounded-lg transition-shadow duration-300 hover:shadow-xl"
-                                        style={{ backgroundColor: !notification.status ? '#FAFAFA' : whiteColor }}
+                                        style={{ backgroundColor: !notification.status ?  whiteColor : whiteColor }}
                                         onClick={() => __handleMaskNotiRead(notification)}
                                     >
                                         <CardContent>
                                             <div className="flex items-center justify-between mb-4">
-                                                <span className="font-semibold text-indigo-700 text-sm">
+                                                <span
+                                                    className={`font-semibold text-sm px-2 py-1 rounded-full ${notification.type === 'FINAL_CHECKING'
+                                                        ? 'text-green-600 bg-green-100'
+                                                        : notification.type === 'REPORT'
+                                                            ? 'text-blue-600 bg-blue-100'
+                                                            : notification.type === 'SAMPLE PRODUCT'
+                                                                ? 'text-yellow-600 bg-yellow-100'
+                                                                : notification.type === 'ORDER'
+                                                                    ? 'text-red-600 bg-red-100'
+                                                                    : notification.type === 'REQUEST ACCEPT'
+                                                                        ? 'text-blue-600 bg-blue-100'
+                                                                        : 'text-indigo-700 bg-gray-200'
+                                                        }`}
+                                                >
                                                     {notification.type || 'SYSTEM'}: {notification.targetID}
                                                 </span>
-                                                <span className="font-semibold text-indigo-700 text-sm" style={{ fontSize: 10, color: notification.status ? greenColor : primaryColor }}>
+                                                <span
+                                                    className="font-semibold text-sm ml-auto"
+                                                    style={{
+                                                        fontSize: 10,
+                                                        color: notification.status ? greenColor : primaryColor,
+                                                    }}
+                                                >
                                                     {notification.status ? 'Read' : 'Not read'}
                                                 </span>
                                             </div>
                                             <Typography variant="body2" className="inline-flex items-center text-green-600 bg-green-100 px-2 py-1 rounded-full">
                                                 {generateNotificationMessage(notification)}
                                             </Typography>
-                                            <Typography variant="body2" className="text-gray-700 mb-4 pt-1" >
-                                                ID: {notification.targetID}
-                                            </Typography>
-                                            <Typography variant="body2" className="text-gray-700 mb-4 pt-1" >
+                                            <Typography variant="body2" className="text-gray-700 mb-4 pt-1">
                                                 Message: {notification.message}
                                             </Typography>
                                             <Typography variant="caption" className="text-gray-500">
@@ -280,11 +307,9 @@ const NotificationEmployeeComponent: React.FC = () => {
                         </div>
                     ) : (
                         <div>
-                            <span className="text-gray-500 text-sm text-center justify-center content-center">Do not have any notification</span>
+                            {/* <span className="text-gray-500 text-sm text-center justify-center content-center">Do not have any notification</span> */}
                         </div>
                     )}
-
-
                 </div>
 
                 {showScrollButton && (
