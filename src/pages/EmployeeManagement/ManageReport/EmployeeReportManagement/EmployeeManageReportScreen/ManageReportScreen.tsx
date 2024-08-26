@@ -19,26 +19,42 @@ import { __getToken } from '../../../../../App';
 import LoadingComponent from '../../../../../components/Loading/LoadingComponent';
 import CreateRefundInformationDialogComponent from '../../../../../components/Dialog/RefunctionRequestDialog/CreateRefundInformationDialogComponent';
 
+/**
+ * 
+ * @param status 
+ * @returns 
+ * Take The Status of all state
+ * With Each status have each color
+ */
 const getStatusColor = (status: string) => {
     switch (status) {
-        case 'NOT_VERIFY':
-            return 'text-gray-600';
-        case 'PENDING':
-            return 'text-yellow-600';
-        case 'DEPOSIT':
-            return 'text-blue-600';
-        case 'PROCESSING':
-            return 'text-orange-600';
-        case 'CANCEL':
-            return 'text-red-600';
-        case 'COMPLETED':
-            return 'text-green-600';
-        case 'DELIVERED':
-            return 'text-indigo-600';
-        case 'REFUND_REQUEST':
-            return 'text-red-600';
-        default:
-            return 'text-gray-600';
+        case 'NOT_VERIFY': return 'text-gray-600';
+        case 'REPORT_ORDER': return 'text-blue-600';
+        case 'DEPOSIT': return 'text-blue-600';
+        case 'REFUND_REQUEST': return 'text-orange-600';
+        case 'CANCEL_ORDER': return 'text-red-600';
+        case 'COMPLETED': return 'text-green-600';
+        case 'DELIVERED': return 'text-indigo-600';
+        case 'START_PRODUCING': return 'text-pink-600';
+        case 'CHECKING_SAMPLE_DATA': return 'text-orange-600';
+
+        default: return 'text-gray-600';
+    }
+};
+
+const getBackgroundColor = (status: string) => {
+    switch (status) {
+        case 'NOT_VERIFY': return 'bg-gray-300 px-2 py-1 rounded-full';
+        case 'REPORT_ORDER': return 'bg-blue-300 px-2 py-1 rounded-full';
+        case 'DEPOSIT': return 'bg-blue-300 px-2 py-1 rounded-full';
+        case 'REFUND_REQUEST': return 'bg-orange-300 px-2 py-1 rounded-full';
+        case 'CANCEL_ORDER': return 'bg-red-300 px-2 py-1 rounded-full';
+        case 'COMPLETED': return 'bg-green-300 px-2 py-1 rounded-full';
+        case 'DELIVERED': return 'bg-indigo-300 px-2 py-1 rounded-full';
+        case 'START_PRODUCING': return 'bg-pink-300 px-2 py-1 rounded-full';
+        case 'CHECKING_SAMPLE_DATA': return 'bg-orange-300 px-2 py-1 rounded-full';
+
+        default: return 'bg-gray-300 px-2 py-1 rounded-full';
     }
 };
 
@@ -54,11 +70,14 @@ const OrderReport: React.FC<{
         </h3>
         <div className="flex justify-between">
             <div className="w-1/2">
-                <p className="text-gray-600 mb-2 text-sm">
+                <p className="flex text-gray-600 mb-2 text-sm">
                     <span style={{ fontWeight: "bolder" }}>
                         <FaClipboardCheck className="inline-block mr-2" />
                         Type Of Report:
-                    </span> {report.typeOfReport}
+                    </span> 
+                    <p className={`${getStatusColor(report.typeOfReport)} ${getBackgroundColor(report.typeOfReport)}`}>
+                    {report.typeOfReport}
+                    </p>
                 </p>
                 <p className="text-gray-600 mb-2 text-sm">
                     <span style={{ fontWeight: "bolder" }}>
