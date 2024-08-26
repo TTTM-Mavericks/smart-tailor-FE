@@ -9,7 +9,6 @@ import { LaborQuantity } from "../../../../../models/LaborQuantityModel";
 import { CancelOutlined } from "@mui/icons-material";
 import { primaryColor, redColor } from "../../../../../root/ColorSystem";
 import { __getToken } from "../../../../../App";
-import Cookies from "js-cookie";
 
 interface EditPricePopUpScreenFormProps {
     fid: {
@@ -49,22 +48,11 @@ const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, e
         // If the input is invalid (negative, zero, or not a number), we don't update the state
     };
 
-    let userAuth;
-    const userAuthData = sessionStorage.getItem('userRegister');
-    const userAuthLocalStorage = Cookies.get('userAuth');
+    const userAuthData = localStorage.getItem('userAuth') as string;
 
-    if (userAuthData) {
-        userAuth = JSON.parse(userAuthData);
-    } else if (userAuthLocalStorage) {
-        userAuth = JSON.parse(userAuthLocalStorage);
-    } else {
-        // Handle the case where neither session storage nor local storage contains user data
-        console.error('User authentication data not found');
-        // You might want to redirect to a login page or handle this case appropriately
-    }
+    const userAuth = JSON.parse(userAuthData);
 
-    // Only destructure if userAuth is defined
-    const { userID, email, fullName, language, phoneNumber, roleName, imageUrl } = userAuth || {};
+    const { userID, email, fullName, language, phoneNumber, roleName, imageUrl } = userAuth;
 
     const LABORQUANTITYID = fid.laborQuantityID
     // Get language in local storage

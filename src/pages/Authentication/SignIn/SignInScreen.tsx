@@ -116,8 +116,6 @@ function SignInScreen() {
         return '/manager';
       case 'ACCOUNTANT':
         return '/accountant';
-      case 'BRAND':
-        return '/brand';
       default:
         return '/';
     }
@@ -139,8 +137,8 @@ function SignInScreen() {
         const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.auth + functionEndpoints.auth.signin}`, requestData);
         if (response.status === 200) {
           const { user, access_token, refresh_token } = response.data;
-          console.log(response.data.user);
 
+          localStorage.setItem('userAuth', JSON.stringify(user));
           Cookies.set('token', access_token);
           Cookies.set('refreshToken', refresh_token);
           Cookies.set('userAuth', JSON.stringify(user));
@@ -148,7 +146,15 @@ function SignInScreen() {
           const redirectUrl = roleBasedRedirect(user.roleName);
           console.log('User role:', user.roleName); // Debugging line
           console.log('Redirect URL:', redirectUrl); // Debugging line
-          // document.cookie = `userAuth=${JSON.stringify(user)}; path=/;`;
+
+          if (!localStorage.getItem('brandFirstLogin')) {
+            localStorage.setItem('brandFirstLogin', 'true');
+          }
+
+          if (localStorage.getItem('brandFirstLogin') === 'false') {
+            window.location.href = '/brand';
+            return;
+          }
 
           // Check if user role is 'BRAND'
           if (user.roleName === 'BRAND') {
@@ -164,8 +170,13 @@ function SignInScreen() {
                 window.location.href = `/brand/updateProfile/${user.userID}`;
               } else if (brandStatus === 'PENDING') {
                 window.location.href = '/brand/waiting_process_information';
+              } else if (localStorage.getItem('brandFirstLogin') === 'false') {
+                window.location.href = '/brand';
               } else {
-                navigate(redirectUrl);
+                localStorage.setItem('brandFirstLogin', 'true');
+                setTimeout(() => {
+                  window.location.href = '/brand';
+                }, 100);
               }
             } catch (error) {
               console.error('Error fetching brand data:', error);

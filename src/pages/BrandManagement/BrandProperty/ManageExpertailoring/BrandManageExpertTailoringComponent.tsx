@@ -143,6 +143,10 @@ const ExpertTailoringBrandManagerComponent: React.FC = () => {
 
     console.log('Filtered expert tailorings:', filteredExpertTailorings);
 
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
+
     return (
         <div>
             <div>

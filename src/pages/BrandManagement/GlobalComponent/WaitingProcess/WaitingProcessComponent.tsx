@@ -14,6 +14,7 @@ const WaitingProcessComponent: React.FC = () => {
 
     useEffect(() => {
         const BRANDROLECHECK = Cookies.get('userAuth');
+        const getBrandFromSingUp = sessionStorage.getItem('userRegister');
 
         if (BRANDROLECHECK) {
             try {
@@ -24,6 +25,16 @@ const WaitingProcessComponent: React.FC = () => {
                 });
             } catch (error) {
                 console.error('Error parsing userAuth cookie:', error);
+            }
+        } else if (getBrandFromSingUp) {
+            try {
+                const parsedSignUp: UserInterface = JSON.parse(getBrandFromSingUp);
+                setBrandInfo({
+                    userID: parsedSignUp.userID,
+                    email: parsedSignUp.email
+                });
+            } catch (error) {
+                console.error('Error parsing userRegister from sessionStorage:', error);
             }
         } else {
             console.error('No user data found');
@@ -40,13 +51,8 @@ const WaitingProcessComponent: React.FC = () => {
         try {
             const response = await axios.get(`${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.getBrandByID}/${brandInfo.userID}`);
             const brandStatus = response.data.data.brandStatus;
-            const brandAuth = response.data.data.user
-            sessionStorage.setItem('userRegister', JSON.stringify(response.data.data.user));
             setStatusBrandInformation(brandStatus);
             if (brandStatus === "ACCEPT") {
-                sessionStorage.setItem('userRegister', JSON.stringify(response.data.data.user));
-                Cookies.set('brandAuth', JSON.stringify(response.data.data.user));
-                // Cookies.set('userAuth', JSON.stringify(response.data.data.user));
                 window.location.href = "/brand";
             }
         } catch (error) {
@@ -67,7 +73,9 @@ const WaitingProcessComponent: React.FC = () => {
     };
 
     const steps = [
-        { label: 'Application received', completed: true }
+        { label: 'Application received', completed: true },
+        // { label: 'Review completed', completed: statusBrandInformation !== 'PENDING' },
+        // { label: 'Decision made', completed: statusBrandInformation === 'ACCEPT' || statusBrandInformation === 'REJECT' }
     ];
 
     return (

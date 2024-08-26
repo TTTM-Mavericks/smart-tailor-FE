@@ -18,7 +18,6 @@ import ImageMasonry from '../../../../components/ImageMasonry/ImageMasonryCopone
 import LoadingComponent from '../../../../components/Loading/LoadingComponent';
 import { signUpBackground, systemLogo, usaFlag, vietnamFlag } from '../../../../assets';
 import { primaryColor } from '../../../../root/ColorSystem';
-import Cookies from 'js-cookie';
 
 
 
@@ -147,10 +146,9 @@ export default function BrandSignUpScreen() {
         roleName: 'BRAND'
       }
 
-      const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.brandSignUp}`, requestData);
+      const response = await api.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.brandSignUp}`, requestData);
       if (response.status === 200) {
         sessionStorage.setItem('userRegister', JSON.stringify(response.data.user));
-        Cookies.set('userAuth', JSON.stringify(response.data.user));
         navigate(`/auth/verify/${email}`);
         setIsloading(false);
       } else {
