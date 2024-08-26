@@ -433,7 +433,7 @@ const EmployeeOrderFields: React.FC<{
                         <FaCalendarAlt className="inline-block mr-1" />
                         <span style={{ fontWeight: "bolder" }}>Date: </span>{order.createDate}
                     </p>
-                    <p className="text-gray-600 mb-2 text-sm">
+                    <p className="text-gray-600 mb-2 text-sm mr-20">
                         <FaMapMarkerAlt className="inline-block mr-1" />
                         <span style={{ fontWeight: "bolder" }}>Address:</span> {order.address}, {order.ward}, {order.district}, {order.province}
                     </p>

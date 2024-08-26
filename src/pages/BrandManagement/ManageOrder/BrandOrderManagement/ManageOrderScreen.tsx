@@ -514,7 +514,11 @@ const BrandOrderFields: React.FC<{
                         <div className="ml-4 mt-10">
                             <p className="text-sm text-gray-600 mb-2">
                                 <FaFileAlt className="inline-block mr-1" />
-                                <span style={{ fontWeight: "bolder" }}>Order ID:</span> {order.orderID}
+                                <span style={{ fontWeight: "bolder" }}>Sub order ID:</span> {order.orderID}
+                            </p>
+                            <p className="text-sm text-gray-600 mb-2">
+                                <FaFileAlt className="inline-block mr-1" />
+                                <span style={{ fontWeight: "bolder" }}>Parent ID:</span> {order.parentOrderID}
                             </p>
                             <p className="text-sm text-gray-600 mb-2">
                                 <FaBox className="inline-block mr-1" />
