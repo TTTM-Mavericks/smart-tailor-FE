@@ -7,6 +7,7 @@ import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from 
 import { LaborQuantity } from '../../../../models/LaborQuantityModel';
 import { CancelOutlined } from '@mui/icons-material';
 import { __getToken } from '../../../../App';
+import Cookies from 'js-cookie';
 
 interface AddPriceWithHandsFormProps {
     closeCard: () => void;
@@ -17,9 +18,22 @@ interface AddPriceWithHandsFormProps {
 const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNewLaborQuantity }) => {
 
     // ---------------UseState Variable---------------//
-    const userAuthData = localStorage.getItem('userAuth') as string;
-    const userAuth = JSON.parse(userAuthData);
-    const { userID, email, fullName, language, phoneNumber, roleName, imageUrl } = userAuth;
+    let userAuth;
+    const userAuthDataSession = sessionStorage.getItem('userRegister');
+    const userAuthDataLocal = Cookies.get('userAuth');
+
+    if (userAuthDataSession) {
+        userAuth = JSON.parse(userAuthDataSession);
+    } else if (userAuthDataLocal) {
+        userAuth = JSON.parse(userAuthDataLocal);
+    } else {
+        // Handle the case where neither session storage nor local storage contains user data
+        console.error('User authentication data not found');
+        // You might want to redirect to a login page or handle this case appropriately
+    }
+
+    // Only destructure if userAuth is defined
+    const { userID, email, fullName, language, phoneNumber, roleName, imageUrl } = userAuth || {};
 
     // ---------------Usable Variable---------------//
     const selectedLanguage = localStorage.getItem('language');
