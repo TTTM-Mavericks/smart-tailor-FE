@@ -18,6 +18,7 @@ import BrandManagePropertyComponent from '../../BrandProperty/ManageProperties/M
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import axios from 'axios';
 import { __getToken } from '../../../../App';
+import Cookies from 'js-cookie';
 
 const DashboardManageMaterialScreen = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -36,18 +37,41 @@ const DashboardManageMaterialScreen = () => {
 
     useEffect(() => {
         if (!checkPerformed.current) {
-            const userAuthData = JSON.parse(localStorage.getItem('userAuth') || '{}');
-            setUserAuth(userAuthData);
+            let authData;
+            const userAuthCookie = Cookies.get('userAuth');
+            const brandAuthCookie = Cookies.get('brandAuth');
+
+            if (userAuthCookie) {
+                try {
+                    authData = JSON.parse(userAuthCookie);
+                } catch (error) {
+                    console.error("Error parsing userAuth cookie:", error);
+                }
+            } else if (brandAuthCookie) {
+                try {
+                    authData = JSON.parse(brandAuthCookie);
+                } catch (error) {
+                    console.error("Error parsing brandAuth cookie:", error);
+                }
+            }
+
+            if (!authData) {
+                console.error("No valid auth data found in cookies");
+                return; // Exit early if no auth data is available
+            }
+
+            setUserAuth(authData);
 
             const checkBrandProductivity = async () => {
                 try {
                     const response = await axios.get(
-                        `${baseURL}${versionEndpoints.v1}${featuresEndpoints.brandPropertise}${functionEndpoints.brandProperties.getBrandByProductiveByBrandID}/${userAuthData.userID}`
-                        , {
+                        `${baseURL}${versionEndpoints.v1}${featuresEndpoints.brandPropertise}${functionEndpoints.brandProperties.getBrandByProductiveByBrandID}/${authData.userID || authData.id}`,
+                        {
                             headers: {
                                 Authorization: `Bearer ${__getToken()}`
                             }
-                        });
+                        }
+                    );
 
                     if (response.data.data === null) {
                         setShowProductivityDialog(true);
@@ -177,7 +201,7 @@ const DashboardManageMaterialScreen = () => {
                     <BrandProductivityInputDialog
                         isOpen={showProductivityDialog}
                         onClose={handleCloseProductivityDialog}
-                        brandID={userAuth?.userID}
+                        brandID={userAuth?.userID || userAuth?.id}
                     />
                 )}
                 <main className="p-6 flex-grow ml-0 xl:ml-[20%]">
