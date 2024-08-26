@@ -1330,9 +1330,9 @@ const EmployeeManageOrder: React.FC = () => {
             .then((responseData) => {
                 if (responseData && Array.isArray(responseData.data)) {
                     const subOrders = responseData.data.filter((order: any) => order.orderType === FILTERED_ORDER_TYPE);
-                    const filteredPendingOrders = subOrders.filter((order: any) => order.orderStatus === 'PROCESSING');
+                    const filteredPendingOrders = subOrders.filter((order: any) => order.orderStatus === 'PROCESSING' || order.orderStatus === 'PREPARING' || order.orderStatus === 'DEPOSIT');
                     const filteredCanceledOrders = subOrders.filter((order: any) => order.orderStatus === 'CANCEL');
-                    const filteredCompletedOrders = subOrders.filter((order: any) => order.orderStatus === 'COMPLETED');
+                    const filteredCompletedOrders = subOrders.filter((order: any) => order.orderStatus === 'COMPLETED' || order.orderStatus === 'DELIVERED' || order.orderStatus === 'RECEIVED' );
                     const filteredCheckingSampleDataOrders = subOrders.filter((order: any) => order.orderStatus === 'NOT_VERIFY');
                     setPendingCount(filteredPendingOrders.length);
                     setCanceledCount(filteredCanceledOrders.length);

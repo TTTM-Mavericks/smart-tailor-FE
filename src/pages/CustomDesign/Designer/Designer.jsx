@@ -11,7 +11,7 @@ import styles from './Designer.module.scss'
 import state from "../../../store";
 import { ColorPicker, FilePicker, Tab } from "../../../components";
 
-const Designer = () => {
+const Designer = ({ onclickFn }) => {
   const snap = useSnapshot(state);
   const [file, setFile] = useState('');
   const [prompt, setPrompt] = useState('')
@@ -98,7 +98,7 @@ const Designer = () => {
     //   const data = await response.json();
     //   const result = __urlToBase64(data.image.data[0].url, (base64) => base64);
     // 
-      
+
     //   // handleDecals(type, `data:image/png;base64,${result}`)
     // } catch (error) {
     //   alert(error)
@@ -158,6 +158,9 @@ const Designer = () => {
 
               </Tab>
             ))}
+            <button onClick={onclickFn} style={{ position: 'absolute', right: 10, border: `1px solid gray`, fontSize: 12 }} className=' py-1 px-2 rounded inline-flex items-center flex justify-center'>
+              View 3D
+            </button>
           </motion.div>
         </>
       )}

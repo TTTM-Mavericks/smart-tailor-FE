@@ -1,0 +1,25 @@
+@import '../../../index.module.scss';
+
+.customDesign__container {
+    width: 100%;
+    height: 150vh;
+    background-color: $whiteColor;
+
+
+    &__canvas {
+        overflow: hidden;
+        position: relative;
+        width: 100%;
+        height: 100%;
+        // float: right;
+        transition-property: all;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 300ms;
+        transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
+        border-bottom: 1px solid #EAEAEA;
+
+    }
+
+   
+}
+
