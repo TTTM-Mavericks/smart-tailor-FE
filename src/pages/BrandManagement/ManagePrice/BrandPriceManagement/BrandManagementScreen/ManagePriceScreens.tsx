@@ -13,6 +13,7 @@ import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from 
 import { LaborQuantity } from "../../../../../models/LaborQuantityModel";
 import { greenColor } from "../../../../../root/ColorSystem";
 import { __getToken } from "../../../../../App";
+import Cookies from "js-cookie";
 
 // Make Style of popup
 const style = {
@@ -33,15 +34,25 @@ const ManagePrice: React.FC = () => {
     const colors = tokens(theme.palette.mode);
     const [data, setData] = React.useState<LaborQuantity[]>([]);
 
-    const userAuthData = localStorage.getItem('userAuth') as string;
-
-    const userAuth = JSON.parse(userAuthData);
-
-    const { userID, email, fullName, language, phoneNumber, roleName, imageUrl } = userAuth;
-
     // set formid to pass it to component edit Material
     const [formId, setFormId] = React.useState<LaborQuantity | null>(null);
 
+    let userAuth;
+    const userAuthData = sessionStorage.getItem('userRegister');
+    const userAuthCookie = Cookies.get('userAuth');
+
+    if (userAuthData) {
+        userAuth = JSON.parse(userAuthData);
+    } else if (userAuthCookie) {
+        userAuth = JSON.parse(userAuthCookie);
+    } else {
+        // Handle the case where neither session storage nor cookie contains user data
+        console.error('User authentication data not found');
+        // You might want to redirect to a login page or handle this case appropriately
+    }
+
+    // Only destructure if userAuth is defined
+    const { userID, email, fullName, language, phoneNumber, roleName, imageUrl } = userAuth || {};
     // Open Edit PopUp when clicking on the edit icon
     const [editopen, setEditOpen] = React.useState<boolean>(false);
     const _handleEditOpen = () => setEditOpen(true);
