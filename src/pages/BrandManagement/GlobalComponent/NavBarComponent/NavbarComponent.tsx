@@ -31,9 +31,6 @@ const Navbar: React.FC<NavbarProps> = ({ toggleMenu, menu, popperOpen, togglePop
             if (response.status === 200) {
                 Cookies.remove('token');
                 Cookies.remove('refreshToken');
-                Cookies.remove('userAuth');
-                Cookies.remove('brandAuth');
-                sessionStorage.clear()
                 window.location.href = '/auth/signin';
             } else {
                 const message = response.data?.message || 'Failed to logout';
@@ -52,44 +49,22 @@ const Navbar: React.FC<NavbarProps> = ({ toggleMenu, menu, popperOpen, togglePop
         window.location.href = '/customer';
     }
 
-    const [brandLogined, setBrandLogined] = useState<any>(null);
+    const [userLogined, setUserLogined] = useState<UserInterface>();
 
     useEffect(() => {
+        console.log('header: ', userLogined);
         const checkLoginStatus = () => {
-            let userAuth;
-            const userAuthDataSession = sessionStorage.getItem('userRegister');
-            const userAuthCookie = Cookies.get('userAuth');
-
-            if (userAuthDataSession) {
-                try {
-                    userAuth = JSON.parse(userAuthDataSession);
-                } catch (error) {
-                    console.error("Error parsing userAuth from sessionStorage:", error);
-                }
-            } else if (userAuthCookie) {
-                try {
-                    userAuth = JSON.parse(userAuthCookie);
-                } catch (error) {
-                    console.error("Error parsing userAuth from cookie:", error);
-                }
-            }
-
-            if (userAuth) {
-                setBrandLogined(userAuth);
+            const userSession = Cookies.get('userAuth');
+            if (userSession) {
+                const userParse: UserInterface = JSON.parse(userSession);
+                setUserLogined(userParse)
             } else {
-                console.error("No user auth data found in sessionStorage or cookie");
-                setBrandLogined(null);
+                console.error("Can not");
             }
         };
 
         checkLoginStatus();
     }, []);
-
-    // Log the parsed brandLogined for debugging
-    useEffect(() => {
-        console.log('Parsed brandLogined:', brandLogined);
-    }, [brandLogined]);
-
     return (
         <div className="p-4 xl:ml-80">
             <nav className="block w-full max-w-full bg-transparent text-white shadow-none rounded-xl transition-all px-0 py-1">
@@ -154,15 +129,9 @@ const Navbar: React.FC<NavbarProps> = ({ toggleMenu, menu, popperOpen, togglePop
                             onClick={() => togglePopper('user')}
                         >
                             <span className="flex items-center">
-                                <span className="text-gray-900 font-semibold mr-2">
-                                    {brandLogined && (typeof brandLogined === 'object' ?
-                                        (brandLogined.name || brandLogined.fullName || 'Brand') :
-                                        'Brand')}
-                                </span>
+                                <span className="text-gray-900 font-semibold mr-2">{userLogined?.fullName}</span>
                                 <img
-                                    src={brandLogined && typeof brandLogined === 'object' ?
-                                        (brandLogined.imageUrl || brandLogined.logo || '/default-image.png') :
-                                        '/default-image.png'}
+                                    src={userLogined?.imageUrl}
                                     className="h-10 w-10 rounded-full border-2 border-[#f84525]"
                                     alt="profile"
                                 />
@@ -189,13 +158,9 @@ const Navbar: React.FC<NavbarProps> = ({ toggleMenu, menu, popperOpen, togglePop
                     <div
                         className="popover absolute right-0 mt-2 w-48 p-6 rounded-md shadow-md shadow-black/5 bg-white z-50"
                     >
-                        <h3 className="text-lg font-semibold mb-4">
-                            {brandLogined && (typeof brandLogined === 'object' ?
-                                (brandLogined.name || brandLogined.fullName || 'Brand') :
-                                'Brand')}
-                        </h3>
+                        <h3 className="text-lg font-semibold mb-4">{userLogined?.fullName}</h3>
                         <ul>
-                            <li className="py-1" onClick={_handleProfile} style={{ cursor: "pointer" }}>Brand Profile</li>
+                            <li className="py-1" onClick={_handleProfile} style={{ cursor: "pointer" }}>Profile</li>
                             <li className="py-1">Settings</li>
                             <li className="py-1" onClick={__handleLogout} style={{ cursor: "pointer" }}>Logout</li>
                         </ul>

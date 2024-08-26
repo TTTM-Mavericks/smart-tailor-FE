@@ -813,8 +813,8 @@ const UploadBrandInforForm = () => {
             }
 
             const updatedFormData = {
-                phoneNumber: '0816468777',
-                fullName: 'BRAND',
+                phoneNumber: getPhone(),
+                fullName: getFullName(),
                 imageUrl: avatarBase64 // Use the base64 string directly
             };
 
@@ -854,6 +854,8 @@ const UploadBrandInforForm = () => {
                     console.log('Brand profile uploaded successfully:', brandUploadResponse.data);
 
                     if (brandUploadResponse.status === 200) {
+                        setTimeout(() => {
+                        }, 100000000); // 2000 seconds = 2000000 milliseconds
                         setIsLoading(false);
                     }
 
