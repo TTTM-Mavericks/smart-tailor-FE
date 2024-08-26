@@ -34,6 +34,7 @@ import ViewFinalCheckingProductsDialogComponent from '../Components/Dialog/ViewF
 import RefunctionRequestDialogComponent from '../../../components/Dialog/RefunctionRequestDialog/RefunctionRequestDialogComponent';
 import PartOfClothAndPriceDetailTableComponent from '../Components/Table/PartOfClothAndPriceDetailComponent';
 import StatusInfoDialog from '../../../components/Dialog/StatusInformationDialog/StatusInformationDialog';
+import ThreeDModelDialog from '../../../components/Dialog/3DModelDialog/3DModelDialog';
 
 
 
@@ -164,6 +165,8 @@ const OrderDetailScreen: React.FC = () => {
     const [isOpenRefundRequestDialog, setIsOpenRefundRequestDialog] = useState<boolean>(false);
     const [totalPrices, setTotalPrices] = useState<{ min: number, max: number }>({ min: 0, max: 0 });
     const [isOpenStatusInformation, setIsOpenStatusInformation] = useState<boolean>(false);
+    const [isOpen3DDaialog, setIsOpen3DDaialog] = useState<boolean>(false);
+
 
 
 
@@ -655,7 +658,8 @@ const OrderDetailScreen: React.FC = () => {
                             <img
                                 src={orderDetail?.designResponse.imageUrl}
                                 alt={orderDetail?.designResponse.imageUrl}
-                                className="w-40 h-52 object-cover rounded-md shadow-md mb-4 md:mb-0"
+                                className="w-40 h-52 object-cover rounded-md shadow-md mb-4 md:mb-0 cursor-pointer"
+                                onClick={() => setIsOpen3DDaialog(true)}
                             />
                             {/* <button onClick={() => navigate(`/design/${orderDetail?.designResponse.designID}`)} className="text-indigo-600 hover:text-indigo-800 transition duration-200 mt-2">Edit design</button> */}
                         </div>
@@ -680,7 +684,7 @@ const OrderDetailScreen: React.FC = () => {
                                 <span style={{ fontWeight: "normal" }}>{orderDetail?.quantity}</span>
                             </p>
 
-                            <div className="text-sm text-gray-600 mb-1 mt-3 w-1/2">
+                            <div className="text-sm text-gray-600 mb-1 mt-3 w-2/3">
                                 {orderDetail?.detailList?.map((item, index) => (
                                     <div key={index} className="grid grid-cols-2 gap-0 mb-2">
                                         <div className="font-semibold text-gray-600">
@@ -733,20 +737,20 @@ const OrderDetailScreen: React.FC = () => {
                             </div>
                         </div>
 
-                        {orderDetail?.orderStatus !== 'DELIVERED' && (
-                            <div className="flex flex-col md:flex-row md:ml-6 w-1/3">
-                                <div className="md:w-1/2 mt-4 md:mt-0" style={{ margin: '0 auto' }}>
-                                    <p className="font-medium text-gray-600">Buyer</p>
-                                    <p className="text-sm text-gray-600">{selectedAddress ? selectedAddress.fullName : orderDetail?.buyerName}</p>
-                                    <p className="text-sm text-gray-600">{selectedAddress ? selectedAddress.phoneNumber : orderDetail?.phone}</p>
+                        <div className="flex flex-col md:flex-row md:ml-6 w-2/3">
+                            <div className="md:w-1/2 mt-4 md:mt-0" style={{ margin: '0 auto' }}>
+                                <p className="font-medium text-gray-600">Buyer</p>
+                                <p className="text-sm text-gray-600">{selectedAddress ? selectedAddress.fullName : orderDetail?.buyerName}</p>
+                                <p className="text-sm text-gray-600">{selectedAddress ? selectedAddress.phoneNumber : orderDetail?.phone}</p>
+                                {orderDetail?.orderStatus !== 'DELIVERED' && (
                                     <button onClick={() => __handleOpenChangeAddressDialog(true)} className="text-indigo-600 hover:text-indigo-800 transition duration-200">Edit</button>
-                                </div>
-                                <div className="md:w-1/2 md:mt-0 ">
-                                    <p className="font-medium text-gray-600">{t(codeLanguage + '000194')}</p>
-                                    <p className="text-sm text-gray-600 whitespace-pre-line">{selectedAddress ? selectedAddress.address : orderDetail?.address}, {selectedAddress ? selectedAddress.ward : orderDetail?.ward}, {selectedAddress ? selectedAddress.district : orderDetail?.district}, {selectedAddress ? selectedAddress.province : orderDetail?.province}</p>
-                                </div>
+                                )}
                             </div>
-                        )}
+                            <div className="md:w-1/2 md:mt-0 ">
+                                <p className="font-medium text-gray-600">{t(codeLanguage + '000194')}</p>
+                                <p className="text-sm text-gray-600 whitespace-pre-line">{selectedAddress ? selectedAddress.address : orderDetail?.address}, {selectedAddress ? selectedAddress.ward : orderDetail?.ward}, {selectedAddress ? selectedAddress.district : orderDetail?.district}, {selectedAddress ? selectedAddress.province : orderDetail?.province}</p>
+                            </div>
+                        </div>
 
                     </div>
 
@@ -1376,7 +1380,7 @@ const OrderDetailScreen: React.FC = () => {
             }
 
             <StatusInfoDialog open={isOpenStatusInformation} onClose={() => setIsOpenStatusInformation(false)} steps={StatusDetailData}></StatusInfoDialog>
-
+            <ThreeDModelDialog designID={orderDetail?.designResponse.designID} isOpen={isOpen3DDaialog} onClose={() => setIsOpen3DDaialog(false)}></ThreeDModelDialog>
 
             <FooterComponent />
 

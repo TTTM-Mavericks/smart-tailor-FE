@@ -36,6 +36,7 @@ import { __handleDownloadElementAsPng, __handleGetElementAsBase64 } from '../../
 import { useSnapshot } from 'valtio';
 import { __getToken } from '../../App';
 import ComingSoonDialog from '../../components/Dialog/CommingSoonDialog/ComingSoonDialog';
+import ThreeDModelDialog from '../../components/Dialog/3DModelDialog/3DModelDialog';
 
 
 interface ItemMask {
@@ -155,6 +156,8 @@ function CustomDesignScreen() {
   const [itemSize, setItemSize] = useState<{ width?: number, height?: number }>();
   const [isFullStepActive, setIsFullStepActive] = useState<boolean>(false);
   const [isOpenComingSoonDialog, setIsOpenComingSoonDialog] = useState<boolean>(false);
+  const [isOpen3DDaialog, setIsOpen3DDaialog] = useState<boolean>(false);
+
 
 
 
@@ -1291,10 +1294,13 @@ function CustomDesignScreen() {
           )}
         </div>
       </div>
-      <Designer />
+      <Designer onclickFn={() => setIsOpen3DDaialog(true)} />
 
       {/* Canvas 3d display area */}
-      <main id='canvas3DElement' className={styles.customDesign__container__canvas}>
+
+      <ThreeDModelDialog designID={id} isOpen={isOpen3DDaialog} onClose={() => setIsOpen3DDaialog(false)}></ThreeDModelDialog>
+      <main id='canvas3DElement' className={`${styles.customDesign__container__canvas}`} >
+
         {!changeUploadPartOfDesignTool ? (
           <CanvasModel typeOfModel={typeOfModel} isDefault={false} is3D={true} />
         ) : (

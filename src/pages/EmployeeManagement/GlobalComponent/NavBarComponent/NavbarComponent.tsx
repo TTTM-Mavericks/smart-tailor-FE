@@ -114,11 +114,11 @@ const Navbar: React.FC<NavbarProps> = ({ toggleMenu, menu, popperOpen, togglePop
                     <div
                         className="popover absolute right-0 mt-2 w-72 p-6 rounded-md shadow-md shadow-black/5 bg-white z-50"
                     >
-                        <h3 className="text-lg font-semibold mb-4">Notification</h3>
+                        {/* <h3 className="text-lg font-semibold mb-4">Notification</h3>
                         <ul>
                             <li className="py-1">Notification 1</li>
                             <li className="py-1">Notification 2</li>
-                        </ul>
+                        </ul> */}
                     </div>
                 )}
                 {popperOpen.user && (
