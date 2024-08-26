@@ -108,6 +108,8 @@ const BrandManagePropertyComponent = () => {
                 brandPropertyValue: brandProperty.brandPropertyValue,
                 brandPropertyStatus: brandProperty.brandPropertyStatus
             };
+            console.log(JSON.stringify(payload) + "bebe payload");
+
             const response = await axios.put(
                 `${baseURL}${versionEndpoints.v1}${featuresEndpoints.brandPropertise}${functionEndpoints.brandProperties.updateBrandProperty}`,
                 payload,
