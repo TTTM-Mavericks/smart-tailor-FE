@@ -305,7 +305,7 @@ const AdminManagePrice: React.FC = () => {
             >
                 <div className="container" style={{ display: "flex" }}>
                     <h1 style={{ fontWeight: "bolder", fontSize: "20px", marginLeft: "10px" }}>
-                        Manage Material Table
+                        Manage labor quantity
                     </h1>
                     <div style={{ marginLeft: "20%" }}>
                         <Button

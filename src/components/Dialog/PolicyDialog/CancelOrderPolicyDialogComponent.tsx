@@ -63,8 +63,8 @@ const CancelOrderPolicyDialogComponent: React.FC<CancelOrderPolicyDialogProps> =
                 </Typography>
                 <Typography variant="body1" className={styles.orderPolicyDialog__content__section}>
                     <strong>Order Cancellation Period</strong><br />
-                    <li>Customers can cancel their order within X hours from the time the order is created.</li>
-                    <li>After X hours, the order will be considered non-cancellable without incurring compensation costs.</li>
+                    <li>Customers can cancel their order within 2 hours from the time the order is created.</li>
+                    <li>After 2 hours, the order will be considered non-cancellable without incurring compensation costs.</li>
                 </Typography>
                 <Typography variant="body1" className={styles.orderPolicyDialog__content__section}>
                     <strong>Order Cancellation Procedure</strong><br />
@@ -73,7 +73,7 @@ const CancelOrderPolicyDialogComponent: React.FC<CancelOrderPolicyDialogProps> =
                 </Typography>
                 <Typography variant="body1" className={styles.orderPolicyDialog__content__section}>
                     <strong>Compensation Costs</strong><br />
-                    <li>If the cancellation request is submitted after the allowed period (X hours from the brand confirmation), customers will incur compensation costs.</li>
+                    <li>If the cancellation request is submitted after the allowed period (2 hours from the brand confirmation), customers will incur compensation costs.</li>
                     <li>Compensation costs include expenses incurred for fulfilling the order up to the time the cancellation request is received.</li>
                     <li>Specifically, compensation costs may include:</li>
                     <ul>
@@ -95,7 +95,7 @@ const CancelOrderPolicyDialogComponent: React.FC<CancelOrderPolicyDialogProps> =
                 </Typography>
                 <Typography variant="body1" className={styles.orderPolicyDialog__content__section}>
                     <strong>Contact</strong><br />
-                    <li>For any questions and support requests related to the order cancellation policy, please contact our customer service via email: zzz@zzzz.com or phone: 0123-456-789.</li>
+                    <li>For any questions and support requests related to the order cancellation policy, please contact our customer service via email: support@smarttailor.com or phone: 0123-456-789.</li>
                 </Typography>
                 <Typography variant="body1" className={styles.orderPolicyDialog__content__section}>
                     <strong>Policy Changes</strong><br />
