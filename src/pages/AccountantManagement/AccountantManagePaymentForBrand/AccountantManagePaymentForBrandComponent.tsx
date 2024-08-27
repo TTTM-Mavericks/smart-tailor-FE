@@ -2473,20 +2473,24 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                             className={` px-5 text-sm font-medium`}
                                                         >
                                                             <p className='mb-32 cursor-pointer' onClick={() => handleViewTransaction(order)}>View transaction</p>
-                                                            <button
-                                                                type="submit"
-                                                                className="px-5 py-2 text-sm font-medium text-white"
-                                                                style={{
-                                                                    borderRadius: 4,
-                                                                    color: whiteColor,
-                                                                    marginBottom: 10,
-                                                                    backgroundColor: primaryColor,
-                                                                    textDecoration: "none",
-                                                                }}
-                                                                onClick={() => __handleOpenPaymentForBrandialog(order.orderID)}
-                                                            >
-                                                                <span className="font-medium text-white">Payment</span>
-                                                            </button>
+                                                            {order?.paymentList && !order?.paymentList[0].paymentStatus && (
+
+                                                                <button
+                                                                    type="submit"
+                                                                    className="px-5 py-2 text-sm font-medium text-white"
+                                                                    style={{
+                                                                        borderRadius: 4,
+                                                                        color: whiteColor,
+                                                                        marginBottom: 10,
+                                                                        backgroundColor: primaryColor,
+                                                                        textDecoration: "none",
+                                                                    }}
+                                                                    onClick={() => __handleOpenPaymentForBrandialog(order.orderID)}
+                                                                >
+                                                                    <span className="font-medium text-white">Payment</span>
+                                                                </button>
+                                                            )}
+
                                                         </p>
                                                     </div>
 

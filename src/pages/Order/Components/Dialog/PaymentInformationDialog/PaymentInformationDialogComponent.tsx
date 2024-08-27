@@ -472,7 +472,7 @@ const PaymentInformationDialogComponent: React.FC<OrderPolicyDialogProps> = ({ i
                     <Grid container spacing={2}>
                         <Grid item xs={6}>
                             <InvoiceDetails>
-                                <Typography variant="body2" style={{ display: "flex" }}>Brand: <p
+                                <Typography variant="body2" style={{ display: "flex items-c" }}>Customer: <p
                                     style={{ fontWeight: "500", marginTop: "-4px" }}
                                     className="text-sm text-black flex content-center items-center"
                                 >
@@ -481,18 +481,18 @@ const PaymentInformationDialogComponent: React.FC<OrderPolicyDialogProps> = ({ i
                                             paymentData?.order.rating
                                         )} text-sm text-gray-500`}
                                     >
-                                        {" "}
+                                        {"  "}
                                         {paymentData?.order.designResponse?.user?.fullName}
                                     </p>
                                 </p></Typography>
-                                <Typography variant="body2"><p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
+                                {/* <Typography variant="body2"><p style={{ fontWeight: "500" }} className="text-sm text-black pb-2">
                                     Brand Rating:{" "}
                                     <span className="text-sm text-gray-500 pb-2">
                                         {paymentData?.order.rating}
                                     </span>{" "}
                                     <span className="text-yellow-400 text-sm">★</span>
-                                </p></Typography>
-                                <Typography variant="body2">{paymentData?.order.address}</Typography>
+                                </p></Typography> */}
+                                {/* <Typography variant="body2">{paymentData?.order.address}</Typography> */}
                             </InvoiceDetails>
                         </Grid>
                         <Grid item xs={6}>
