@@ -180,11 +180,11 @@ const LongSkirt = ({ isDefault }) => {
                 {deCalData && deCalData.map((decalGroup) =>
                     decalGroup.items.map((item) => (
                         <>
-                            {/* <meshBasicMaterial
-                                // attach="material"
+                            <meshBasicMaterial
+                                attach="material"
                                 map={item.texture}
-                                // depthWrite={true}
-                            /> */}
+                                depthWrite={true}
+                            />
                         </>
                     ))
                 )}

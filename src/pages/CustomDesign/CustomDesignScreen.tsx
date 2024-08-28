@@ -20,7 +20,7 @@ import { IoMdUndo, IoMdRedo } from "react-icons/io";
 import { TbHomeHeart } from "react-icons/tb";
 import ProductDialogComponent from './Components/Dialog/ProductDialogComponent';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../api/ApiConfig';
-import { DesignInterface, ItemMaskInterface, MaterialInterface, PartOfDesignInterface, PartOfHoodieDesignData, PartOfShirtDesignData } from '../../models/DesignModel';
+import { DesignInterface, ItemMaskInterface, MaterialInterface, PartOfDesignInterface, PartOfHoodieDesignData, PartOfLongSkirtData, PartOfShirtDesignData } from '../../models/DesignModel';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Skeleton, Slider, Tooltip } from '@mui/material';
 import ItemEditorToolsComponent from './Components/ItemEditorTools/ItemEditorToolsComponent';
 import MaterialDetailComponent from './Components/MaterialDetail/MaterialDetailComponent';
@@ -276,6 +276,11 @@ function CustomDesignScreen() {
     if (typeOfModel === 'hoodieModel') {
       setPartOfClothData(PartOfHoodieDesignData);
       setSelectedPartOfCloth(PartOfHoodieDesignData[0]);
+    }
+
+    if (typeOfModel === 'longSkirtModel') {
+      setPartOfClothData(PartOfLongSkirtData);
+      setSelectedPartOfCloth(PartOfLongSkirtData[0]);
     }
   }, [typeOfModel]);
 

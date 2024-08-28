@@ -103,7 +103,7 @@ const CreateRefundInformationDialogComponent: React.FC<CreateRefundInformationDi
                         <h2 className="text-lg font-semibold mb-4">Order Details</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {renderTextField("Order ID", "orderID", "text", true)}
-                            {renderTextField("Payment Amount", "paymentAmount", "number", true)}
+                            {renderTextField("Payment Amount", "paymentAmount", "number")}
                         </div>
                     </div>
 
