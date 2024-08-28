@@ -2341,6 +2341,12 @@ const AccountantManagePaymentForBrandComponent: React.FC = () => {
                                                             </span>
                                                         </p>
                                                         <p style={{ fontWeight: "bolder" }} className="text-sm text-black pb-2">
+                                                            PayOS ID:{" "}
+                                                            <span className="text-sm text-gray-500 pb-2">
+                                                                {order?.paymentList ? order?.paymentList[0]?.payOSData?.orderCode : 'NaN'}
+                                                            </span>
+                                                        </p>
+                                                        <p style={{ fontWeight: "bolder" }} className="text-sm text-black pb-2">
                                                             Type:{" "}
                                                             <span className="text-sm text-blue-700 pb-2">
                                                                 {order.orderType}
