@@ -276,7 +276,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                     setErrorCheckGet(error.response.data.errors);
                     toast.error(errorMessage);
                 } else {
-                    toast.error('Unknown Error');
+                    toast.error(errorMessage);
                 }
             } else {
                 toast.error('Error uploading data');
