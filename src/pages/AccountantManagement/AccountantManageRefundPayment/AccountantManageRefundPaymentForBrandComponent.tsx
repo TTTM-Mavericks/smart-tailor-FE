@@ -1035,6 +1035,12 @@ const AccountantManageRefundPaymentForBrandComponent: React.FC = () => {
                                                                 <span style={{ fontWeight: "bolder" }}>ID:</span>  <span>{payment.paymentID}</span>
                                                             </p>
                                                             <p className="text-sm text-black-500 pb-2">
+                                                                <span style={{ fontWeight: "bolder" }}>
+                                                                    PayOS ID:{" "}
+                                                                </span>
+                                                                <span>{payment ? payment?.payOSData?.orderCode : 'NaN'}</span>
+                                                            </p>
+                                                            <p className="text-sm text-black-500 pb-2">
                                                                 <span style={{ fontWeight: "bolder" }}>Amount:</span> <span>{__handleAddCommasToNumber(payment.payOSData?.amount)} VND</span>
                                                             </p>
                                                             <p className="text-sm text-black-500 pb-2">

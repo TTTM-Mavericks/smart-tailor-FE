@@ -396,8 +396,8 @@ const UploadBrandInforForm = () => {
                 },
                 {
                     headers: {
-                        'x-client-id': 'bf5a160c-557e-4fb9-b3df-1423a83e45e4',
-                        'x-api-key': '1818c2ca-cdf4-40cc-80c1-213a7f22ed2f',
+                        'x-client-id': '4ffaab50-ab89-471a-a3fa-fc425dde5c84',
+                        'x-api-key': '82f07f5c-bd51-4562-9275-4e25b1dc9c61',
                     },
                 }
             );
