@@ -535,7 +535,7 @@ const BrandOrderFields: React.FC<{
                                     </>
                                 ))}
                             </div>
-                            {order.totalPrice && (
+                           {order.totalPrice > 0 && order.orderStatus !== 'PENDING' && (
                                 <p className="text-gray-700 mt-2 text-sm">
                                     <FaDollarSign className="inline-block mr-1" />
                                     <span style={{ fontWeight: "bolder" }}>Price:</span> {__handleAddCommasToNumber(order.totalPrice)} VND

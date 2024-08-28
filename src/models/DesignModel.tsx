@@ -222,7 +222,46 @@ export const PartOfHoodieDesignData = [
   },
   {
     partOfDesignName: "SLEEVE_CLOTH_PART",
-    imageUrl: "/src/assets/clothes/shirt-sleeve.png",
+    imageUrl: "/src/assets/clothes/seleeve_hoodie.png",
+    successImageUrl: "",
+    materialID: "",
+    width: 15,
+    height: 20,
+    itemMask: []
+  }
+]
+
+export const PartOfLongSkirtData = [
+  {
+    partOfDesignName: "LOGO_PART",
+    imageUrl: "/src/assets/clothes/shirt-front-design.png",
+    successImageUrl: "",
+    materialID: "",
+    width: 60,
+    height: 80,
+    itemMask: []
+  },
+  {
+    partOfDesignName: "FRONT_CLOTH_PART",
+    imageUrl: "/src/assets/clothes/shirt-front-design.png",
+    successImageUrl: "",
+    materialID: "",
+    width: 60,
+    height: 80,
+    itemMask: []
+  },
+  {
+    partOfDesignName: "BACK_CLOTH_PART",
+    imageUrl: "/src/assets/clothes/shirt-back-design.png",
+    successImageUrl: "",
+    materialID: "",
+    width: 60,
+    height: 80,
+    itemMask: []
+  },
+  {
+    partOfDesignName: "SLEEVE_CLOTH_PART",
+    imageUrl: "/src/assets/clothes/long_shirt.png",
     successImageUrl: "",
     materialID: "",
     width: 15,
