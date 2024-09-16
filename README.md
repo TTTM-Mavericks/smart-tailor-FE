@@ -1,4 +1,5 @@
 # Smart Tailor
+![Smart Tailor report](https://drive.google.com/file/d/1K3d-bUzx4dqQYvF0h3QjRF8zQvHnZbzY/view?usp=sharing)
 
 **Product Background**
 Smart Tailor is an intermediary platform designed to streamline the process of ordering custom-tailored clothes. By connecting customers with various brands, the platform ensures a seamless and personalised shopping experience. Smart Tailor caters to both individual customers seeking bespoke garments and brands looking to expand their reach and offer custom tailoring services.
