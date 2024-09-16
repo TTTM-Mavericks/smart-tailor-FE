@@ -45,6 +45,7 @@ import ReportHistorySreen from './pages/Order/ReportHistory/ReportHistorySreen';
 import AboutUs from './pages/AboutUs/test';
 import NotificationComponent from './components/Notification/NotificationComponent';
 import AllTransactionHistoryComponent from './pages/Order/AllTransactionHistory/AllTransactionHistoryComponent';
+import ManageInvoiceScreen from './pages/AdminManagement/ManageInvoice/ManageInvoiceScreens';
 
 
 
@@ -65,7 +66,7 @@ const tokenIsValid = (token) => {
 const isAuthenticated = (requiredRole) => {
   const token = Cookies.get('token');
   console.log('token: ', token);
-  const userAuth = localStorage.getItem('userAuth');
+  const userAuth = Cookies.get('userAuth');
   if (userAuth) {
     const userParse = JSON.parse(userAuth);
     return userParse.roleName === requiredRole
@@ -110,7 +111,7 @@ export const __getToken = () => {
 }
 
 export const __getUserLogined = () => {
-  const userAuth = localStorage.getItem('userAuth');
+  const userAuth = Cookies.get('userAuth');
   if (userAuth) {
     return JSON.parse(userAuth);
   } else return;
@@ -140,17 +141,17 @@ function App() {
           <Route path='/design_create' element={<CreateDesignComponent></CreateDesignComponent>} />
 
           {/* Admin dashboard route */}
-          <Route path='/admin' element={<DashboardAdminScreens></DashboardAdminScreens>} />
+          <Route path='/admin' element={<PrivateRoute element={<DashboardAdminScreens></DashboardAdminScreens>} requiredRole="ADMIN" />} />
 
           {/* Employee dashboard route */}
-          <Route path='/employee' element={<DashboardEmployeeScreens></DashboardEmployeeScreens>} />
+          <Route path='/employee' element={<PrivateRoute element={<DashboardEmployeeScreens></DashboardEmployeeScreens>} requiredRole="EMPLOYEE" />} />
           <Route path="/row-details" element={<DashboardEmployeeOrderDetailScreen></DashboardEmployeeOrderDetailScreen>} />
 
           {/* Brand Dashboard Route */}
-          <Route path='/brand' element={<DashboardManageMaterialScreen></DashboardManageMaterialScreen>} />
+          <Route path='/brand' element={<PrivateRoute element={<DashboardManageMaterialScreen></DashboardManageMaterialScreen>} requiredRole="BRAND" />} />
           <Route path='/brand/signup' element={<BrandSignUpScreen></BrandSignUpScreen>} />
           <Route path='/brand/updateProfile/:id' element={<UploadBrandInforForm></UploadBrandInforForm>} />
-          <Route path='/brand/manage_order_request/:id' element={<OrderRequestScreen></OrderRequestScreen>} />
+          <Route path='/brand/manage_order_request/:id' element={<PrivateRoute element={<OrderRequestScreen></OrderRequestScreen>} requiredRole="BRAND" />} />
           <Route path='/brand/waiting_process_information' element={<WaitingProcessComponent></WaitingProcessComponent>} />
 
           {/* Detail Product Route */}
@@ -185,6 +186,7 @@ function App() {
           <Route path='/test' element={<ToogleComponent></ToogleComponent>} />
           <Route path='/bs' element={<AboutUs />} />
           <Route path='/notification' element={<NotificationComponent></NotificationComponent>} />
+          <Route path='/invoice' element={<ManageInvoiceScreen></ManageInvoiceScreen>} />
         </Routes>
       </BrowserRouter>
     </div>

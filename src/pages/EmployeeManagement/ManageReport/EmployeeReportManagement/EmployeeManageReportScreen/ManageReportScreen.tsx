@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import './ManageReportStyles.module.scss'
 import { motion } from 'framer-motion';
-import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaTimes, FaChevronLeft, FaChevronRight, FaFileAlt, FaCalendarAlt, FaMapMarkerAlt, FaEye, FaCheck } from 'react-icons/fa';
 import { Report, ReportImageList, ReportTable } from '../../../../../models/EmployeeManageReportModel';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import axios from 'axios';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
-import { greenColor, redColor, secondaryColor } from '../../../../../root/ColorSystem';
+import { cancelColor, cancelColorText, completeColor, completeColorText, deliveredColor, deliveredColorText, deposisColor, deposisColorText, greenColor, pendingColor, pendingColorText, processingColor, processingColorText, redColor, secondaryColor, whiteColor } from '../../../../../root/ColorSystem';
 import Select from 'react-select';
 import { Box, IconButton, Tooltip, useTheme } from '@mui/material';
 import { tokens } from '../../../../../theme';
@@ -16,25 +16,45 @@ import { UserInterface } from '../../../../../models/UserModel';
 import Cookies from 'js-cookie';
 import { ArrowDropDown, MarkChatRead, Visibility } from '@mui/icons-material';
 import { __getToken } from '../../../../../App';
+import LoadingComponent from '../../../../../components/Loading/LoadingComponent';
+import CreateRefundInformationDialogComponent from '../../../../../components/Dialog/RefunctionRequestDialog/CreateRefundInformationDialogComponent';
 
+/**
+ * 
+ * @param status 
+ * @returns 
+ * Take The Status of all state
+ * With Each status have each color
+ */
 const getStatusColor = (status: string) => {
     switch (status) {
-        case 'NOT_VERIFY':
-            return 'text-gray-600';
-        case 'PENDING':
-            return 'text-yellow-600';
-        case 'DEPOSIT':
-            return 'text-blue-600';
-        case 'PROCESSING':
-            return 'text-orange-600';
-        case 'CANCEL':
-            return 'text-red-600';
-        case 'COMPLETED':
-            return 'text-green-600';
-        case 'DELIVERED':
-            return 'text-indigo-600';
-        default:
-            return 'text-gray-600';
+        case 'NOT_VERIFY': return 'text-gray-600';
+        case 'REPORT_ORDER': return 'text-blue-600';
+        case 'DEPOSIT': return 'text-blue-600';
+        case 'REFUND_REQUEST': return 'text-orange-600';
+        case 'CANCEL_ORDER': return 'text-red-600';
+        case 'COMPLETED': return 'text-green-600';
+        case 'DELIVERED': return 'text-indigo-600';
+        case 'START_PRODUCING': return 'text-pink-600';
+        case 'CHECKING_SAMPLE_DATA': return 'text-orange-600';
+
+        default: return 'text-gray-600';
+    }
+};
+
+const getBackgroundColor = (status: string) => {
+    switch (status) {
+        case 'NOT_VERIFY': return 'bg-gray-300 px-2 py-1 rounded-full';
+        case 'REPORT_ORDER': return 'bg-blue-300 px-2 py-1 rounded-full';
+        case 'DEPOSIT': return 'bg-blue-300 px-2 py-1 rounded-full';
+        case 'REFUND_REQUEST': return 'bg-orange-300 px-2 py-1 rounded-full';
+        case 'CANCEL_ORDER': return 'bg-red-300 px-2 py-1 rounded-full';
+        case 'COMPLETED': return 'bg-green-300 px-2 py-1 rounded-full';
+        case 'DELIVERED': return 'bg-indigo-300 px-2 py-1 rounded-full';
+        case 'START_PRODUCING': return 'bg-pink-300 px-2 py-1 rounded-full';
+        case 'CHECKING_SAMPLE_DATA': return 'bg-orange-300 px-2 py-1 rounded-full';
+
+        default: return 'bg-gray-300 px-2 py-1 rounded-full';
     }
 };
 
@@ -44,62 +64,100 @@ const OrderReport: React.FC<{
     onMarkResolved: (reportID: string) => void;
 }> = ({ report, onViewDetails, onMarkResolved }) => (
     <div className="bg-white mb-8 shadow-lg rounded-lg p-6 transition duration-300 ease-in-out transform hover:shadow-xl">
-        <h3 className="font-semibold mb-3 text-indigo-700 text-sm">Report ID: {report.reportID}</h3>
+        <h3 className="font-semibold mb-3 text-indigo-700 text-sm">
+            <FaFileAlt className="inline-block mr-2" />
+            Report ID: {report.reportID}
+        </h3>
         <div className="flex justify-between">
             <div className="w-1/2">
-                <p className="text-gray-600 mb-2 text-sm">Type Of Report: {report.typeOfReport}</p>
-                <p className="text-gray-600 mb-2 text-sm">Customer: {report.orderResponse.buyerName}</p>
-                <p className="text-gray-600 mb-2 text-sm">Date: {report.createDate}</p>
-                <p className="text-gray-700 mt-2 text-sm">Content: {report.content}</p>
+                <p className="flex text-gray-600 mb-2 text-sm">
+                    <span style={{ fontWeight: "bolder" }}>
+                        <FaClipboardCheck className="inline-block mr-2" />
+                        Type Of Report:
+                    </span> 
+                    <p className={`${getStatusColor(report.typeOfReport)} ${getBackgroundColor(report.typeOfReport)}`}>
+                    {report.typeOfReport}
+                    </p>
+                </p>
+                <p className="text-gray-600 mb-2 text-sm">
+                    <span style={{ fontWeight: "bolder" }}>
+                        <FaUser className="inline-block mr-2" />
+                        Created by:
+                    </span> {report.userResponse?.fullName} ({report.userResponse?.userID})
+                </p>
+                <p className="text-gray-600 mb-2 text-sm">
+                    <span style={{ fontWeight: "bolder" }}>
+                        <FaCalendarAlt className="inline-block mr-2" />
+                        Date:
+                    </span> {report.createDate}
+                </p>
+                <p className="text-gray-700 mt-2 text-sm">
+                    <span style={{ fontWeight: "bolder" }}>
+                        <FaFileAlt className="inline-block mr-2" />
+                        Content:
+                    </span> {report.content}
+                </p>
                 <p className="text-gray-600 mt-2 text-sm">
-                    Status Report:{' '}
-                    <span
-                        className={`ml-2 font-semibold px-2 py-1 rounded-full ${report.reportStatus ? 'bg-green-200 text-green-800' : 'bg-yellow-200 text-yellow-800'
-                            }`}
-                    >
+                    <span style={{ fontWeight: "bolder" }}>
+                        <FaClipboardCheck className="inline-block mr-2" />
+                        Status Report:
+                    </span>
+                    <span className={`ml-2 font-semibold px-2 py-1 rounded-full ${report.reportStatus ? 'bg-green-200 text-green-800' : 'bg-yellow-200 text-yellow-800'}`}>
                         {report.reportStatus ? 'Read' : 'Unread'}
                     </span>
                 </p>
                 <div className="mt-4">
                     {report.orderResponse.detailList.map((detail, index) => (
                         <p key={index} className="text-gray-600 text-sm">
-                            Size {detail.size.sizeName}: Quantity {detail.quantity}
+                            <span style={{ fontWeight: "bolder" }}>
+                                Size
+                            </span> {detail.size.sizeName}: <span style={{ fontWeight: "bolder" }}>Quantity: </span> {detail.quantity}
                         </p>
                     ))}
                 </div>
             </div>
             <div className="w-1/2">
-                <p className="text-gray-600 mb-2 text-sm">Order ID: {report.orderResponse.orderID}</p>
                 <p className="text-gray-600 mb-2 text-sm">
-                    Order Status: <span className={`mb-2 ${getStatusColor(report.orderResponse.orderStatus)} font-bold`}>{report.orderResponse.orderStatus}</span>
+                    <span style={{ fontWeight: "bolder" }}>
+                        <FaClipboardCheck className="inline-block mr-2" />
+                        Order ID:
+                    </span> {report.orderResponse.orderID}
                 </p>
-                <p className="text-gray-600 mb-2 text-sm">Total Quantity: {report.orderResponse.quantity}</p>
                 <p className="text-gray-600 mb-2 text-sm">
-                    Address: {report.orderResponse.address}, {report.orderResponse.ward}, {report.orderResponse.district},{' '}
-                    {report.orderResponse.province}
+                    <span style={{ fontWeight: "bolder" }}>
+                        <FaClipboardCheck className="inline-block mr-2" />
+                        Total Quantity:
+                    </span> {report.orderResponse.quantity}
                 </p>
-
+                <p className="text-gray-600 mb-2 text-sm">
+                    <span style={{ fontWeight: "bolder" }}>
+                        <FaMapMarkerAlt className="inline-block mr-2" />
+                        Address:
+                    </span> {report.orderResponse.address}, {report.orderResponse.ward}, {report.orderResponse.district}, {report.orderResponse.province}
+                </p>
             </div>
         </div>
         <div className="mt-6 flex justify-end">
             <button
                 onClick={() => onViewDetails(report)}
-                className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4"
+                className="bg-indigo-500 text-sm text-white px-4 py-2 hover:bg-indigo-600 transition duration-300 mr-4 flex items-center"
                 style={{
                     borderRadius: 4,
                     backgroundColor: secondaryColor
                 }}
             >
+                <FaEye className="mr-2" />
                 View Details
             </button>
             <button
                 onClick={() => onMarkResolved(report.reportID)}
-                className="bg-green-500 text-white text-sm px-4 py-2 rounded-full hover:bg-green-600 transition duration-300"
+                className="bg-green-500 text-white text-sm px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 flex items-center"
                 style={{
                     borderRadius: 4,
                     backgroundColor: greenColor
                 }}
             >
+                <FaCheck className="mr-2" />
                 Mark as Resolved
             </button>
         </div>
@@ -112,6 +170,7 @@ function isReportImageListArray(reportImageList: ReportImageList | ReportImageLi
 
 const ReportModal: React.FC<{ report: Report; onClose: () => void; onMarkResolved: (reportID: string) => void }> = ({ report, onClose, onMarkResolved }) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [isOpenCreateRefunđialog, setIsOpenCreateRefunđialog] = useState<boolean>(false);
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -141,6 +200,10 @@ const ReportModal: React.FC<{ report: Report; onClose: () => void; onMarkResolve
             );
         }
     };
+
+    const __handleOpenCreateRefunđialog = () => {
+
+    }
 
     return (
         <motion.div
@@ -177,7 +240,7 @@ const ReportModal: React.FC<{ report: Report; onClose: () => void; onMarkResolve
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     {[
-                        { icon: FaUser, label: 'Customer', value: report.orderResponse.buyerName },
+                        { icon: FaUser, label: 'Customer', value: report.userResponse?.fullName + " (" + (report.userResponse?.userID) + ")" },
                         { icon: FaCalendar, label: 'Date', value: report.lastModifiedDate },
                         {
                             icon: FaExclamationCircle,
@@ -236,23 +299,27 @@ const ReportModal: React.FC<{ report: Report; onClose: () => void; onMarkResolve
                     </div>
                 )}
 
-                {/* <div className="flex justify-end space-x-4">
+                {report.typeOfReport === 'REFUND_REQUEST' && (
 
-                    <button
-                        onClick={() => onMarkResolved(report.reportID)}
-                        className={`px-6 py-3 rounded-lg text-white transition duration-150 focus:outline-none focus:ring-2 ${report.reportStatus
-                            ? 'bg-green-500 hover:bg-green-600 focus:ring-green-400 cursor-not-allowed'
-                            : 'bg-indigo-500 hover:bg-indigo-600 focus:ring-indigo-400'
-                            }`}
-                        disabled={report.reportStatus}
-                    >
-                        {report.reportStatus ? 'Already Resolved' : 'Mark as Resolved'}
-                    </button>
-                </div> */}
+                    <div className="flex justify-end space-x-4">
+                        <button
+                            onClick={() => setIsOpenCreateRefunđialog(true)}
+                            className={`text-sm px-2 py-2 rounded-sm text-white transition duration-150 focus:outline-none focus:ring-2 ${report.reportStatus
+                                ? 'bg-green-500 hover:bg-green-600 focus:ring-green-400'
+                                : 'bg-indigo-500 hover:bg-indigo-600 focus:ring-indigo-400'
+                                }`}
+                        >
+                            Create refund payment
+                        </button>
+                        <CreateRefundInformationDialogComponent isOpen={isOpenCreateRefunđialog} onClose={() => setIsOpenCreateRefunđialog(false)} order={report.orderResponse} report={report}></CreateRefundInformationDialogComponent>
+                    </div>
+                )}
             </motion.div>
         </motion.div>
     );
 };
+
+
 
 /**
  * 
@@ -293,17 +360,59 @@ const ReportTables: React.FC<ReportTableProps> = ({ reports, onViewDetails, onUp
     const columns: GridColDef[] = [
         { field: 'reportID', headerName: 'Report ID', width: 150 },
         { field: 'buyerName', headerName: 'Customer', width: 150, renderCell: (params) => params.row.orderResponse.buyerName },
-        { field: 'address', headerName: 'Address', width: 200, renderCell: (params) => params.row.orderResponse.address },
+        { field: 'address', headerName: 'Address', width: 140, renderCell: (params) => params.row.orderResponse.address },
+        { field: 'province', headerName: 'Province', width: 140, renderCell: (params) => params.row.orderResponse.province },
         { field: 'phone', headerName: 'Phone', width: 120, renderCell: (params) => params.row.orderResponse.phone },
-        { field: 'expectedStartDate', headerName: 'Date', width: 150, renderCell: (params) => params.row.orderResponse.expectedStartDate },
+        { field: 'expectedStartDate', headerName: 'Date', width: 200, renderCell: (params) => params.row.createDate },
         {
             field: 'orderStatus',
             headerName: 'Order Status',
-            width: 150,
-            renderCell: (params: GridRenderCellParams) => (
-                <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(params.row.orderResponse.orderStatus)}`}>
-                    {params.row.orderResponse.orderStatus}
-                </span>
+            width: 100,
+            renderCell: (params) => (
+                <Box
+                    sx={{
+                        backgroundColor:
+                            params.value === "PENDING"
+                                ? pendingColor
+                                : params.value === "DELIVERED"
+                                    ? deliveredColor
+                                    : params.value === "DEPOSIT"
+                                        ? deposisColor
+                                        : params.value === "PROCESSING"
+                                            ? processingColor
+                                            : params.value === "COMPLETED"
+                                                ? completeColor
+                                                : cancelColor,
+                        color: params.value === "PENDING"
+                            ? pendingColorText
+                            : params.value === "DELIVERED"
+                                ? deliveredColorText
+                                : params.value === "DEPOSIT"
+                                    ? deposisColorText
+                                    : params.value === "PROCESSING"
+                                        ? processingColorText
+                                        : params.value === "COMPLETED"
+                                            ? completeColorText
+                                            : cancelColorText,
+                        borderRadius: '16px',
+                        padding: '1px 5px',
+                        fontSize: '0.75rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        height: "50%",
+                        marginTop: "10%"
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                        }}
+                    />
+                    {params.row.orderResponse.orderStatus === null ? "NULL" : params.row.orderResponse.orderStatus}
+                </Box>
             )
         },
         {
@@ -427,7 +536,11 @@ const EmployeeManageReport: React.FC = () => {
         { value: 'Report ID', label: 'Report ID' },
         { value: 'Order Status', label: 'Order Status' },
     ];
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+
+
     useEffect(() => {
+        setIsLoading(true);
         const apiUrl = `${baseURL}${versionEndpoints.v1}${featuresEndpoints.report}${functionEndpoints.report.getAllReport}`;
         axios.get(apiUrl, {
             headers: {
@@ -445,8 +558,12 @@ const EmployeeManageReport: React.FC = () => {
                     setReports(responseData.data);
                     setFilteredReports(responseData.data); // Set filteredReports here
                     console.log("Data received:", responseData);
+                    setIsLoading(false);
+
                 } else {
                     console.error('Invalid data format:', responseData);
+                    setIsLoading(false);
+
                 }
             })
             .catch(error => console.error('Error fetching data:', error));
@@ -560,11 +677,12 @@ const EmployeeManageReport: React.FC = () => {
 
     return (
         <div className='-mt-8'>
+            <LoadingComponent isLoading={isLoading}></LoadingComponent>
             <div style={{ width: "100%" }}>
                 <div className="flex flex-col">
                     <div className="mb-6">
                         <div className="flex mt-5">
-                            <div className="w-7/10" style={{ width: "80%" }}>
+                            <div className="w-7/10" style={{ width: "60%" }}>
                                 <Select
                                     isMulti
                                     name="filters"
@@ -657,6 +775,8 @@ const EmployeeManageReport: React.FC = () => {
                                     <option value="CANCEL">Cancel</option>
                                     <option value="COMPLETED">Completed</option>
                                     <option value="DELIVERED">Delivered</option>
+                                    <option value="REFUND_REQUEST">Refund request</option>
+
                                 </select>
                             </div>
                         )}
@@ -664,85 +784,92 @@ const EmployeeManageReport: React.FC = () => {
 
                 </div>
             </div>
+            {filteredReports.length > 0 ? (
 
-            <div>
-                {isTableView ? (
-                    <ReportTables
-                        reports={filteredReports}
-                        onViewDetails={handleViewDetails}
-                        onUpdatedOrderPending={handleMarkResolved}
-                    />
-                ) :
-                    (<div>
-                        {filteredReports.slice(indexOfFirstReport, indexOfLastReport).map(report => (
-                            <OrderReport
-                                key={report.reportID}
-                                report={report}
-                                onViewDetails={handleViewDetails}
-                                onMarkResolved={handleMarkResolved}
-                            />
-                        ))}
-                        <div className="mt-8 flex flex-wrap items-center justify-center space-x-4">
-                            <select
-                                value={itemsPerPage}
-                                onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-                                className="border rounded-md px-3 py-2 text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:border-orange-500"
-                            >
-                                <option value={5}>5/page</option>
-                                <option value={10}>10/page</option>
-                                <option value={20}>20/page</option>
-                                <option value={50}>50/page</option>
-                            </select>
 
-                            <button
-                                onClick={() => paginate(currentPage - 1)}
-                                disabled={currentPage === 1}
-                                className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
-                            >
-                                &lt;
-                            </button>
-
-                            {renderPageNumbers().map((number, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => typeof number === 'number' && paginate(number)}
-                                    className={`px-3 py-2 rounded-md ${number === currentPage
-                                        ? 'bg-orange-500 text-white'
-                                        : 'text-gray-700 hover:bg-gray-100'
-                                        } ${number === '...' ? 'cursor-default' : ''}`}
-                                >
-                                    {number}
-                                </button>
-                            ))}
-
-                            <button
-                                onClick={() => paginate(currentPage + 1)}
-                                disabled={currentPage === totalPages}
-                                className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
-                            >
-                                &gt;
-                            </button>
-
-                            <div className="flex items-center space-x-2 mt-4 sm:mt-0">
-                                <span className="text-gray-600">Go to</span>
-                                <input
-                                    type="text"
-                                    className="border border-gray-300 rounded-md w-16 px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                    value={goToPage}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoToPage(e.target.value)}
-                                    onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                                        if (e.key === 'Enter') {
-                                            const page = Math.max(1, Math.min(parseInt(goToPage), totalPages));
-                                            if (!isNaN(page)) {
-                                                paginate(page);
-                                            }
-                                        }
-                                    }}
+                <div>
+                    {isTableView ? (
+                        <ReportTables
+                            reports={filteredReports}
+                            onViewDetails={handleViewDetails}
+                            onUpdatedOrderPending={handleMarkResolved}
+                        />
+                    ) :
+                        (<div>
+                            {filteredReports.slice(indexOfFirstReport, indexOfLastReport).map(report => (
+                                <OrderReport
+                                    key={report.reportID}
+                                    report={report}
+                                    onViewDetails={handleViewDetails}
+                                    onMarkResolved={handleMarkResolved}
                                 />
+                            ))}
+                            <div className="mt-8 flex flex-wrap items-center justify-center space-x-4">
+                                <select
+                                    value={itemsPerPage}
+                                    onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                                    className="border rounded-md px-3 py-2 text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:border-orange-500"
+                                >
+                                    <option value={5}>5/page</option>
+                                    <option value={10}>10/page</option>
+                                    <option value={20}>20/page</option>
+                                    <option value={50}>50/page</option>
+                                </select>
+
+                                <button
+                                    onClick={() => paginate(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                    className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                                >
+                                    &lt;
+                                </button>
+
+                                {renderPageNumbers().map((number, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => typeof number === 'number' && paginate(number)}
+                                        className={`px-3 py-2 rounded-md ${number === currentPage
+                                            ? 'bg-orange-500 text-white'
+                                            : 'text-gray-700 hover:bg-gray-100'
+                                            } ${number === '...' ? 'cursor-default' : ''}`}
+                                    >
+                                        {number}
+                                    </button>
+                                ))}
+
+                                <button
+                                    onClick={() => paginate(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                    className="px-3 py-2 border rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                                >
+                                    &gt;
+                                </button>
+
+                                <div className="flex items-center space-x-2 mt-4 sm:mt-0">
+                                    <span className="text-gray-600">Go to</span>
+                                    <input
+                                        type="text"
+                                        className="border border-gray-300 rounded-md w-16 px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                        value={goToPage}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoToPage(e.target.value)}
+                                        onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                                            if (e.key === 'Enter') {
+                                                const page = Math.max(1, Math.min(parseInt(goToPage), totalPages));
+                                                if (!isNaN(page)) {
+                                                    paginate(page);
+                                                }
+                                            }
+                                        }}
+                                    />
+                                </div>
                             </div>
-                        </div>
-                    </div>)}
-            </div>
+                        </div>)}
+                </div>
+            ) : (
+                <div>
+                    <span className="text-gray-600">Do not have any report.</span>
+                </div>
+            )}
             {isModalOpen && selectedReport && (
                 <ReportModal
                     report={selectedReport}

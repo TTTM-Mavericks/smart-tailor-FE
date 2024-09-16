@@ -1,22 +1,52 @@
 import { ResponsivePie } from "@nivo/pie";
 import { tokens } from "../../../theme";
-import { FormControl, InputLabel, Select, MenuItem, Box, useTheme } from '@mui/material';
+import { FormControl, InputLabel, Select, MenuItem, Box, useTheme, Typography } from '@mui/material';
 import { mockPieData as pieChartData } from "./PieDataTest";
 import { useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
+import axios from "axios";
+import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from "../../../api/ApiConfig";
+import { __getToken } from "../../../App";
 
 const PieChart = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [option, setOption] = useState("month");
-    const color = theme.palette
+    const color = theme.palette;
 
-    const filteredData = option === "month" ? pieChartData : [];
-    console.log("filter data" + filteredData + option);
+    const [totalUserDetails, setTotalUserDetail] = useState([]);
+
+    useEffect(() => {
+        const fetchTotalUserDetail = async () => {
+            try {
+                const response = await axios.get(
+                    `${baseURL + versionEndpoints.v1 + '/user' + functionEndpoints.chart.calculateTotalOfUser}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${__getToken()}`,
+                        }
+                    }
+                );
+                setTotalUserDetail(response.data.data || []);
+            } catch (error) {
+                console.error('Error fetching order status details:', error);
+            } finally {
+                console.error('Error fetching order status details');
+
+            }
+        };
+        fetchTotalUserDetail();
+    }, []);
+
+    const pieChartData = totalUserDetails.map((item: any) => ({
+        id: item.first,
+        value: parseInt(item.second, 10),
+    }));
+
 
     const _handleChange = (e: any) => {
-        setOption(e.target.value)
-    }
+        setOption(e.target.value);
+    };
 
     // Get language in local storage
     const selectedLanguage = localStorage.getItem('language');
@@ -29,35 +59,14 @@ const PieChart = () => {
             i18n.changeLanguage(selectedLanguage);
         }
     }, [selectedLanguage, i18n]);
+
     return (
         <>
-            <Box sx={{ display: 'flex', justifyContent: 'right', alignItems: 'right', margin: '2%' }}>
-                <FormControl variant="outlined" sx={{ minWidth: 200, backgroundColor: color.background.paper, borderRadius: 1 }}>
-                    <InputLabel sx={{ color: color.text.primary }}>Filter by Category</InputLabel>
-                    <Select
-                        value={option}
-                        onChange={_handleChange}
-                        label="Filter by Category"
-                        sx={{
-                            '& .MuiOutlinedInput-notchedOutline': {
-                                borderColor: color.grey[300],
-                            },
-                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                borderColor: color.primary.main,
-                            },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                borderColor: color.primary.main,
-                            },
-                        }}
-                    >
-                        <MenuItem value="month"> {t(`${codeLanguage}000041`)}</MenuItem>
-                        <MenuItem value="week">{t(`${codeLanguage}000042`)}</MenuItem>
-                        <MenuItem value="year">{t(`${codeLanguage}000043`)}</MenuItem>
-                    </Select>
-                </FormControl>
-            </Box>
+            <Typography style={{ marginTop: "2%", marginLeft: "2%" }}>
+                <h1>Total User Appear In Smart Tailor</h1>
+            </Typography>
             <ResponsivePie
-                data={filteredData}
+                data={pieChartData}
                 theme={{
                     axis: {
                         domain: {
@@ -104,13 +113,9 @@ const PieChart = () => {
                 arcLinkLabelsTextColor={colors.primary[200]}
                 arcLinkLabelsThickness={2}
                 arcLinkLabelsColor={{ from: "color" }}
-                enableArcLabels={false}
                 arcLabelsRadiusOffset={0.4}
-                arcLabelsSkipAngle={7}
-                arcLabelsTextColor={{
-                    from: "color",
-                    modifiers: [["darker", 2]],
-                }}
+                arcLabelsSkipAngle={10}
+                arcLabelsTextColor="black"
                 defs={[
                     {
                         id: "dots",
@@ -138,7 +143,7 @@ const PieChart = () => {
                         justify: false,
                         translateX: 0,
                         translateY: 56,
-                        itemsSpacing: 0,
+                        itemsSpacing: 90,
                         itemWidth: 100,
                         itemHeight: 18,
                         itemTextColor: colors.primary[200],

@@ -8,6 +8,7 @@ import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from 
 import { Sizes } from "../../../../../models/AdminManageSizeModel";
 import { CancelOutlined } from "@mui/icons-material";
 import { primaryColor, redColor } from "../../../../../root/ColorSystem";
+import { __getToken } from "../../../../../App";
 
 interface EditSizePopUpScreenFormProps {
     fid: {
@@ -29,12 +30,14 @@ const EditSizePopUpScreens: React.FC<EditSizePopUpScreenFormProps> = ({ fid, edi
 
     const _handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
-    }
-
+        // Only allow alphabetic characters
+        if (name === 'sizeName' && /^[A-Za-z]*$/.test(value)) {
+            setFormData(prevState => ({
+                ...prevState,
+                [name]: value
+            }));
+        }
+    };
     // Get language in local storage
     const selectedLanguage = localStorage.getItem('language');
     const codeLanguage = selectedLanguage?.toUpperCase();
@@ -48,10 +51,24 @@ const EditSizePopUpScreens: React.FC<EditSizePopUpScreenFormProps> = ({ fid, edi
     }, [selectedLanguage, i18n]);
 
     const _handleSubmit = async () => {
+        if (!/^[A-Za-z]+$/.test(formData.sizeName)) {
+            Swal.fire(
+                'Invalid Input',
+                'Size name must contain only alphabetic characters',
+                'error'
+            );
+            editClose()
+
+            return;
+        }
         try {
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.size + functionEndpoints.size.updateSize + `/${sizeID}`}`;
             const response = await axios.put(apiUrl, {
                 ...formData
+            }, {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`
+                }
             });
 
             console.log("formData" + formData);
@@ -127,7 +144,20 @@ const EditSizePopUpScreens: React.FC<EditSizePopUpScreenFormProps> = ({ fid, edi
             <Box height={50} />
             <Grid container spacing={4}>
                 <Grid item xs={12}>
-                    <TextField name="sizeName" id="sizeName" label="Size Name" variant="outlined" size="small" sx={{ minWidth: "100%" }} value={formData.sizeName} onChange={_handleChange} />
+                    <TextField
+                        name="sizeName"
+                        id="sizeName"
+                        label="Size Name"
+                        variant="outlined"
+                        size="small"
+                        sx={{ minWidth: "100%" }}
+                        value={formData.sizeName}
+                        onChange={_handleChange}
+                        inputProps={{
+                            pattern: "[A-Za-z]*",
+                            title: "Only alphabetic characters are allowed"
+                        }}
+                    />
                 </Grid>
             </Grid>
             <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginTop: "3rem" }}>

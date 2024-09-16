@@ -19,6 +19,7 @@ export interface PaymentInterface {
     paymentType: string;
     createDate: string; // LocalDateTime
     lastModifiedDate: string; // LocalDateTime
+
 }
 
 export interface OrderInterface {
@@ -49,6 +50,15 @@ export interface OrderInterface {
     payment?: PaymentInterface[];
     designResponse?: DesignInterface;
 
+
+}
+
+export interface DesignMaterialDetailResponse {
+    detailName: string;
+    minMeterSquare: string | null;
+    maxMeterSquare: string | null;
+    minPriceMaterial: string;
+    maxPriceMaterial: string;
 }
 
 export interface OrderDetailInterface {
@@ -77,7 +87,8 @@ export interface OrderDetailInterface {
     brand?: BrandInterface,
     orderImageList: any,
     employeeID?: any,
-    rating?: number
+    rating?: number,
+    designMaterialDetailResponseList?: DesignMaterialDetailResponse[];
 }
 
 export interface OrderRequestDetailInterface {

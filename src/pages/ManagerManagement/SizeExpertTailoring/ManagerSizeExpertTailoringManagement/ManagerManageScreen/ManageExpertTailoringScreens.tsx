@@ -17,6 +17,7 @@ import { AddExpertTailoring, ExpertTailoring } from "../../../../../models/Manag
 import { ExpertTailoringEdit } from "../../../../../models/ManagerExpertTailoringModel";
 import { AddSizeExpertTailoring, SizeExpertTailoring, SizeExpertTailoringEdit } from "../../../../../models/ManagerSizeExpertTailoringModel";
 import { greenColor } from "../../../../../root/ColorSystem";
+import { __getToken } from "../../../../../App";
 
 // Make Style of popup
 const style = {
@@ -92,7 +93,11 @@ const ManageSizeExpertTailoring: React.FC = () => {
     React.useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.sizeExpertTailoring + functionEndpoints.sizeExpertTailoring.getAllSizeExpertTailoring}`;
 
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');
@@ -125,18 +130,13 @@ const ManageSizeExpertTailoring: React.FC = () => {
         expertTailoringID: string,
         expertTailoringName: string,
         sizeName: string,
-        minFabric: number,
-        maxFabric: number,
-        unit: string
+        ratio: number
     ) => {
-        // Handle edit action
         const ExpertTailoringDataToEdit: SizeExpertTailoringEdit = {
             expertTailoringID: expertTailoringID,
             expertTailoringName: expertTailoringName,
             sizeName: sizeName,
-            minFabric: minFabric,
-            maxFabric: maxFabric,
-            unit: unit
+            ratio: ratio
         }
         setFormId(ExpertTailoringDataToEdit);
         _handleEditOpen();
@@ -237,10 +237,10 @@ const ManageSizeExpertTailoring: React.FC = () => {
             sortable: false,
             renderCell: (params) => (
                 <Box>
-                    <IconButton onClick={() => _handleEditClick(params.row.expertTailoringID, params.row.expertTailoringName, params.row.sizeName, params.row.minFabric, params.row.maxFabric, params.row.unit)}>
+                    <IconButton onClick={() => _handleEditClick(params.row.expertTailoringID, params.row.expertTailoringName, params.row.sizeName, params.row.ratio)}>
                         <EditIcon htmlColor="#E96208" />
                     </IconButton>
-                    {params.row.status ? (
+                    {/* {params.row.status ? (
                         <IconButton onClick={() => _hanldeConfirmDelete(params.row.expertTailoringID)}>
                             <DeleteIcon htmlColor={colors.primary[300]} />
                         </IconButton>
@@ -248,13 +248,13 @@ const ManageSizeExpertTailoring: React.FC = () => {
                         <IconButton onClick={() => _hanldeConfirmDelete(params.row.expertTailoringID)}>
                             <UndoOutlined htmlColor="green" />
                         </IconButton>
-                    )}
+                    )} */}
                 </Box>
             )
         }
     ];
 
-    const getRowId = (row: any) => `${row.expertTailoringID}-${row.expertTailoringName}-${row.sizeImageUrl}`;
+    const getRowId = (row: any) => `${row.expertTailoringID}-${row.expertTailoringName}-${row.sizeID}-${row.sizeName}-${row.ratio}`;
 
     return (
         <Box m="20px" style={{ marginTop: "-5%" }}>
@@ -302,7 +302,7 @@ const ManageSizeExpertTailoring: React.FC = () => {
                         aria-controls={open ? 'basic-menu' : undefined}
                         aria-haspopup="true"
                         aria-expanded={open ? 'true' : undefined}
-                        onClick={_handleClick}
+                        onClick={_handleAddOpen}
                         endIcon={<Add />}
                         variant="contained"
                         color="primary"
@@ -310,62 +310,25 @@ const ManageSizeExpertTailoring: React.FC = () => {
                     >
                         {t(codeLanguage + '000048')}
                     </Button>
-                    <Menu
-                        id="basic-menu"
-                        anchorEl={anchorEl}
-                        open={open}
-                        onClose={_handleClose}
-                        MenuListProps={{
-                            'aria-labelledby': 'basic-button',
-                        }}
+                    <Modal
+                        open={addOpenOrClose}
+                        aria-labelledby="modal-modal-title"
+                        aria-describedby="modal-modal-description"
                     >
-                        <MenuItem >
-                            <div onClick={_handleAddOpen}>{t(codeLanguage + '000049')}</div>
-                            <Modal
-                                open={addOpenOrClose}
-                                aria-labelledby="modal-modal-title"
-                                aria-describedby="modal-modal-description"
-                            >
-                                <Box sx={{
-                                    backgroundColor: colors.primary[100], position: 'absolute',
-                                    top: '50%',
-                                    left: '50%',
-                                    transform: 'translate(-50%, -50%)',
-                                    width: "50%",
-                                    bgcolor: 'background.paper',
-                                    boxShadow: 24,
-                                    p: 4,
-                                    borderRadius: "20px"
-                                }}>
-                                    <AddEachExpertTailoringWithHand closeCard={_handleAddClose} addNewExpertTailoring={_handleAddSizeExpertTailoring} />
-                                </Box>
-                            </Modal>
-                        </MenuItem>
-
-                        <MenuItem>
-                            <div onClick={_handleAddMultipleOpen}>{t(codeLanguage + '000050')}</div>
-                            <Modal
-                                open={addMultiple}
-                                aria-labelledby="modal-modal-title"
-                                aria-describedby="modal-modal-description"
-                            >
-                                <Box sx={{
-                                    position: 'absolute',
-                                    top: '50%',
-                                    left: '50%',
-                                    transform: 'translate(-50%, -50%)',
-                                    width: "70%",
-                                    bgcolor: colors.primary[100],
-                                    boxShadow: 24,
-                                    p: 4,
-                                    borderRadius: "20px"
-                                }}>
-                                    <AddMultipleExpertTailoringComponentWithExcel closeMultipleCard={_handleAddMultipleClose} addNewMaterial={_handleAddSizeExpertTailoring} />
-                                </Box>
-                            </Modal>
-
-                        </MenuItem>
-                    </Menu>
+                        <Box sx={{
+                            backgroundColor: colors.primary[100], position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            width: "50%",
+                            bgcolor: 'background.paper',
+                            boxShadow: 24,
+                            p: 4,
+                            borderRadius: "20px"
+                        }}>
+                            <AddEachExpertTailoringWithHand closeCard={_handleAddClose} addNewExpertTailoring={_handleAddSizeExpertTailoring} />
+                        </Box>
+                    </Modal>
                 </div>
                 <Box
                     sx={{

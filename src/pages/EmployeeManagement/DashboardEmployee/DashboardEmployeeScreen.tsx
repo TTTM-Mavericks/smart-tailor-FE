@@ -12,7 +12,7 @@ import NotificationEmployeeComponent from '../GlobalComponent/Notification/Notif
 
 const DashboardEmployeeScreens = () => {
     const [menuOpen, setMenuOpen] = useState(false);
-    const [activeMenu, setActiveMenu] = useState('employee_manage_customer');
+    const [activeMenu, setActiveMenu] = useState('employee_manage_order');
     const [showScrollButton, setShowScrollButton] = React.useState<boolean>(false);
     const [popperOpen, setPopperOpen] = useState<Record<string, boolean>>({});
 

@@ -1,0 +1,322 @@
+229 {
+    "payment": {
+        "paymentID": "cU16os04C25186",
+        "paymentSenderID": null,
+        "paymentSenderName": "Accountant Smart Tailor",
+        "paymentSenderBankCode": "OCB",
+        "paymentSenderBankNumber": "0163100007285002",
+        "paymentRecipientID": null,
+        "paymentRecipientName": "",
+        "paymentRecipientBankCode": "",
+        "paymentRecipientBankNumber": "",
+        "paymentAmount": 10000,
+        "paymentMethod": "BANK_TRANSFER",
+        "paymentStatus": false,
+        "paymentType": "ORDER_REFUND",
+        "orderID": "TK156N515C1450",
+        "paymentURl": null,
+        "payOSResponse": null,
+        "payOSData": {
+            "payOSID": 3,
+            "orderCode": 694600,
+            "amount": 10000,
+            "status": "PENDING",
+            "checkoutUrl": "https://pay.payos.vn/web/c26c9344b0e640d6a2dabdf5acadd347",
+            "qrCode": "00020101021238620010A000000727013200069704480118CAS1631000072850020208QRIBFTTA53037045405100005802VN62300826CSF3OGH2QQ7 Refund Invoice63044667",
+            "createDate": "22-08-2024 16:04:51",
+            "lastModifiedDate": null
+        },
+        "createDate": "2024-08-22T16:04:51.550"
+    },
+    "order": {
+        "designResponse": {
+            "designID": "3p15VB51or1440",
+            "user": {
+                "userID": "B115nc30Jl5104",
+                "email": "tuhandsome111@gmail.com",
+                "fullName": "aSFas asfd",
+                "language": null,
+                "phoneNumber": null,
+                "provider": "GOOGLE",
+                "userStatus": "ACTIVE",
+                "roleName": "CUSTOMER",
+                "imageUrl": null,
+                "createDate": "22-08-2024 15:30:51",
+                "lastModifiedDate": null
+            },
+            "expertTailoring": {
+                "expertTailoringID": "P9152B29JI3300",
+                "expertTailoringName": "shirtModel",
+                "sizeImageUrl": "IMAGE URL",
+                "modelImageUrl": "https://res.cloudinary.com/dby2saqmn/image/upload/v1720536717/clothes/mplmusqeleocefrsqrzf.png",
+                "status": true,
+                "createDate": "22-08-2024 15:29:33",
+                "lastModifiedDate": null
+            },
+            "titleDesign": "test TitleDesign",
+            "publicStatus": false,
+            "minWeight": 0.2,
+            "maxWeight": 0.4,
+            "color": "#FFFFFF",
+            "partOfDesign": [
+                {
+                    "partOfDesignID": "AY152951X01426",
+                    "partOfDesignName": "SLEEVE_CLOTH_PART",
+                    "imageUrl": "/src/assets/clothes/shirt-sleeve.png",
+                    "successImageUrl": "",
+                    "realPartImageUrl": "",
+                    "width": 15,
+                    "height": 20,
+                    "material": {
+                        "materialID": "6h15VF29qU3300",
+                        "materialName": "Terrycloth Fabric",
+                        "categoryName": "Fabric",
+                        "hsCode": 58021000,
+                        "unit": "meter",
+                        "basePrice": 5000,
+                        "status": true,
+                        "createDate": "22-08-2024 15:29:33",
+                        "lastModifiedDate": null
+                    },
+                    "itemMasks": [],
+                    "createDate": "22-08-2024 15:51:14",
+                    "lastModifiedDate": null
+                },
+                {
+                    "partOfDesignID": "Gh15ai51ml1491",
+                    "partOfDesignName": "LOGO_PART",
+                    "imageUrl": "/src/assets/clothes/shirt-front-design.png",
+                    "successImageUrl": "",
+                    "realPartImageUrl": "",
+                    "width": 15,
+                    "height": 20,
+                    "material": {
+                        "materialID": "6h15VF29qU3300",
+                        "materialName": "Terrycloth Fabric",
+                        "categoryName": "Fabric",
+                        "hsCode": 58021000,
+                        "unit": "meter",
+                        "basePrice": 5000,
+                        "status": true,
+                        "createDate": "22-08-2024 15:29:33",
+                        "lastModifiedDate": null
+                    },
+                    "itemMasks": [
+                        {
+                            "itemMaskID": "i415Bs511z1449",
+                            "itemMaskName": "Happy Sad White",
+                            "typeOfItem": "ICON",
+                            "material": {
+                                "materialID": "FX15D029HQ3300",
+                                "materialName": "Rayon Thread",
+                                "categoryName": "Thread",
+                                "hsCode": 54033100,
+                                "unit": "meter",
+                                "basePrice": 4000,
+                                "status": true,
+                                "createDate": "22-08-2024 15:29:33",
+                                "lastModifiedDate": null
+                            },
+                            "isSystemItem": false,
+                            "positionX": 150,
+                            "positionY": 170,
+                            "scaleX": 230,
+                            "scaleY": 230,
+                            "indexZ": 1,
+                            "rotate": 0,
+                            "topLeftRadius": 0,
+                            "topRightRadius": 0,
+                            "bottomLeftRadius": 0,
+                            "bottomRightRadius": 0,
+                            "status": true,
+                            "printType": "EMBROIDER",
+                            "createDate": "22-08-2024 15:51:14",
+                            "lastModifiedDate": null
+                        }
+                    ],
+                    "createDate": "22-08-2024 15:51:14",
+                    "lastModifiedDate": "22-08-2024 15:51:14"
+                },
+                {
+                    "partOfDesignID": "jZ15nm51Na1412",
+                    "partOfDesignName": "FRONT_CLOTH_PART",
+                    "imageUrl": "/src/assets/clothes/shirt-front-design.png",
+                    "successImageUrl": "",
+                    "realPartImageUrl": "",
+                    "width": 15,
+                    "height": 20,
+                    "material": {
+                        "materialID": "6h15VF29qU3300",
+                        "materialName": "Terrycloth Fabric",
+                        "categoryName": "Fabric",
+                        "hsCode": 58021000,
+                        "unit": "meter",
+                        "basePrice": 5000,
+                        "status": true,
+                        "createDate": "22-08-2024 15:29:33",
+                        "lastModifiedDate": null
+                    },
+                    "itemMasks": [],
+                    "createDate": "22-08-2024 15:51:14",
+                    "lastModifiedDate": null
+                },
+                {
+                    "partOfDesignID": "vV15XX51c11407",
+                    "partOfDesignName": "BACK_CLOTH_PART",
+                    "imageUrl": "/src/assets/clothes/shirt-back-design.png",
+                    "successImageUrl": "",
+                    "realPartImageUrl": "",
+                    "width": 15,
+                    "height": 20,
+                    "material": {
+                        "materialID": "6h15VF29qU3300",
+                        "materialName": "Terrycloth Fabric",
+                        "categoryName": "Fabric",
+                        "hsCode": 58021000,
+                        "unit": "meter",
+                        "basePrice": 5000,
+                        "status": true,
+                        "createDate": "22-08-2024 15:29:33",
+                        "lastModifiedDate": null
+                    },
+                    "itemMasks": [],
+                    "createDate": "22-08-2024 15:51:14",
+                    "lastModifiedDate": null
+                }
+            ],
+            "materialDetail": [
+                {
+                    "materialResponse": {
+                        "materialID": "6h15VF29qU3300",
+                        "materialName": "Terrycloth Fabric",
+                        "categoryName": "Fabric",
+                        "hsCode": 58021000,
+                        "unit": "meter",
+                        "basePrice": 5000,
+                        "status": true,
+                        "createDate": "22-08-2024 15:29:33",
+                        "lastModifiedDate": null
+                    },
+                    "quantity": 4,
+                    "minPrice": 20000,
+                    "maxPrice": 20000
+                },
+                {
+                    "materialResponse": {
+                        "materialID": "FX15D029HQ3300",
+                        "materialName": "Rayon Thread",
+                        "categoryName": "Thread",
+                        "hsCode": 54033100,
+                        "unit": "meter",
+                        "basePrice": 4000,
+                        "status": true,
+                        "createDate": "22-08-2024 15:29:33",
+                        "lastModifiedDate": null
+                    },
+                    "quantity": 1,
+                    "minPrice": 4000,
+                    "maxPrice": 4000
+                }
+            ],
+            "createDate": "22-08-2024 15:51:14",
+            "lastModifiedDate": "22-08-2024 15:51:14"
+        },
+        "orderID": "TK156N515C1450",
+        "paymentStatus": true,
+        "quantity": 1,
+        "rating": null,
+        "orderStatus": "CANCEL",
+        "orderType": "PARENT_ORDER",
+        "address": "hochiminh",
+        "province": "Tỉnh Thái Nguyên",
+        "district": "Huyện Phú Lương",
+        "ward": "Xã Hợp Thành",
+        "labelID": null,
+        "phone": "0123456789",
+        "buyerName": "lol Tu",
+        "totalPrice": 8000,
+        "employeeID": "YE150F29Jt3300",
+        "expectedStartDate": "23-08-2024 15:51:14",
+        "expectedProductCompletionDate": "23-08-2024 15:51:45",
+        "estimatedDeliveryDate": null,
+        "productionStartDate": null,
+        "productionCompletionDate": null,
+        "createDate": "22-08-2024 15:51:14",
+        "lastModifiedDate": "22-08-2024 16:04:51",
+        "detailList": [
+            {
+                "designDetailId": "bA15qu51Ma1416",
+                "quantity": 1,
+                "size": {
+                    "sizeID": "13153R295A3300",
+                    "sizeName": "M",
+                    "status": true,
+                    "createDate": "22-08-2024 15:29:33",
+                    "lastModifiedDate": null
+                },
+                "detailStatus": false
+            }
+        ],
+        "subOrderList": [],
+        "paymentList": [
+            {
+                "paymentID": "cU16os04C25186",
+                "paymentSenderID": null,
+                "paymentSenderName": "Accountant Smart Tailor",
+                "paymentSenderBankCode": "OCB",
+                "paymentSenderBankNumber": "0163100007285002",
+                "paymentRecipientID": null,
+                "paymentRecipientName": "",
+                "paymentRecipientBankCode": "",
+                "paymentRecipientBankNumber": "",
+                "paymentAmount": 10000,
+                "paymentMethod": "BANK_TRANSFER",
+                "paymentStatus": false,
+                "paymentType": "ORDER_REFUND",
+                "orderID": "TK156N515C1450",
+                "paymentURl": null,
+                "payOSResponse": null,
+                "payOSData": {
+                    "payOSID": 3,
+                    "orderCode": 694600,
+                    "amount": 10000,
+                    "status": "PENDING",
+                    "checkoutUrl": "https://pay.payos.vn/web/c26c9344b0e640d6a2dabdf5acadd347",
+                    "qrCode": "00020101021238620010A000000727013200069704480118CAS1631000072850020208QRIBFTTA53037045405100005802VN62300826CSF3OGH2QQ7 Refund Invoice63044667",
+                    "createDate": "22-08-2024 16:04:51",
+                    "lastModifiedDate": null
+                },
+                "createDate": "2024-08-22T16:04:51.550"
+            },
+            {
+                "paymentID": "UH15Tv53pp0334",
+                "paymentSenderID": null,
+                "paymentSenderName": "aSFas asfd",
+                "paymentSenderBankCode": "",
+                "paymentSenderBankNumber": "",
+                "paymentRecipientID": null,
+                "paymentRecipientName": "SMART TAILOR",
+                "paymentRecipientBankCode": "OCB",
+                "paymentRecipientBankNumber": "0163100007285002",
+                "paymentAmount": 10000,
+                "paymentMethod": null,
+                "paymentStatus": true,
+                "paymentType": "DEPOSIT",
+                "orderID": "TK156N515C1450",
+                "paymentURl": null,
+                "payOSResponse": null,
+                "payOSData": {
+                    "payOSID": 2,
+                    "orderCode": 908800,
+                    "amount": 10000,
+                    "status": "PAID",
+                    "checkoutUrl": "https://pay.payos.vn/web/4787ccce373e40bbb506f52f6e73a946",
+                    "qrCode": "00020101021238620010A000000727013200069704480118CAS1631000072850020208QRIBFTTA53037045405100005802VN62290825CS5HM93T6E3 DEPOSIT ORDER6304D994",
+                    "createDate": "22-08-2024 15:53:03",
+                    "lastModifiedDate": "22-08-2024 15:58:00"
+                },
+                "createDate": "2024-08-22T15:53:03.130"
+            }
+        ]
+    }
+}

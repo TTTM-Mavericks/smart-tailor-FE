@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Chip, IconButton } from '@mui/material';
+import { Chip, Dialog, DialogContent, Divider, Grid, IconButton, Typography } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
-import { greenColor, primaryColor, redColor, secondaryColor, whiteColor } from '../../../root/ColorSystem';
+import { greenColor, primaryColor, redColor, secondaryColor, whiteColor, yellowColor } from '../../../root/ColorSystem';
 import style from './OrderHistoryStyles.module.scss'
 import { OrderDetailInterface, PaymentInterface } from '../../../models/OrderModel';
 import PaymentInformationDialogComponent from '../Components/Dialog/PaymentInformationDialog/PaymentInformationDialogComponent';
@@ -113,7 +113,10 @@ const OrderHistory: React.FC = () => {
             const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderByUserId}/${userID}`, null, __getToken());
             if (response.status === 200) {
                 console.log(response.data);
-                setOrderDetailList(response.data);
+                const dataResp = response.data.filter((item: OrderDetailInterface) =>
+                    item.orderType === 'PARENT_ORDER'
+                );
+                setOrderDetailList(dataResp);
                 setIsLoading(false)
             } else {
                 toast.error(`${response.message}`, { autoClose: 4000 });
@@ -262,6 +265,25 @@ const OrderHistory: React.FC = () => {
         </Listbox>
     );
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const [productsPerPage, setProductsPerPage] = useState(10);
+    const [goToPage, setGoToPage] = useState(currentPage.toString());
+    const indexOfLastProduct = currentPage * productsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    const currentProducts = orderDetailList.slice(indexOfFirstProduct, indexOfLastProduct);
+    const totalPages = Math.ceil(orderDetailList.length / productsPerPage);
+    const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+    useEffect(() => {
+        setGoToPage(currentPage.toString());
+    }, [currentPage]);
+
+
+    const getStatusColor = (status: boolean) => {
+        return status ? greenColor : yellowColor;
+    };
+
+
     return (
         <div>
             <HeaderComponent />
@@ -287,7 +309,7 @@ const OrderHistory: React.FC = () => {
                                 Refund History
                             </a>
                             <a href="/transaction_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
-                                Trandsactions
+                                Transactions
                             </a>
                             <a href="/collection" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
                                 Collection
@@ -372,7 +394,7 @@ const OrderHistory: React.FC = () => {
                         )}
                     </div>
 
-                    {orderDetailList?.length > 0 ? orderDetailList?.filter(applyFilters).map((orderDetail) => (
+                    {currentProducts?.length > 0 ? currentProducts?.filter(applyFilters).map((orderDetail) => (
                         <div className="bg-white rounded-xl shadow-md p-4 md:p-6 mb-4 md:mb-8 transform transition-all hover:shadow-lg">
                             <div className="flex flex-col md:flex-row items-start md:items-center mb-4 md:mb-6" >
                                 <div className="mb-4 md:mb-0 w-max">
@@ -383,6 +405,10 @@ const OrderHistory: React.FC = () => {
                                     <h2 className="text-1xl md:text-1xl font-bold text-gray-800 pb-2">{t(codeLanguage + '000193')} </h2>
                                     <p className="text-sm text-gray-500 pb-2"> {orderDetail?.orderID}</p>
                                     <p className="text-sm text-gray-500 pb-2">{t(codeLanguage + '000200')}: {orderDetail?.expectedStartDate}</p>
+                                    {orderDetail.detailList && orderDetail.detailList?.length > 0 && orderDetail.detailList.map((item) => (
+                                        <p className="text-sm text-gray-500 pb-2">Size {item.size?.sizeName}: {item?.quantity}</p>
+
+                                    ))}
                                     <div style={{
                                         display: 'flex',
                                         alignContent: 'center',
@@ -401,9 +427,12 @@ const OrderHistory: React.FC = () => {
                                                             orderDetail?.orderStatus === 'PENDING' ? secondaryColor
                                                                 : orderDetail?.orderStatus === 'DELIVERED' ? greenColor
                                                                     : orderDetail?.orderStatus === 'COMPLETED' ? greenColor
-                                                                        : orderDetail?.orderStatus === 'DEPOSIT' ? secondaryColor
-                                                                            : orderDetail?.orderStatus === 'PROCESSING' ? secondaryColor
-                                                                                : redColor,
+                                                                        : orderDetail?.orderStatus === 'RECEIVED' ? greenColor
+                                                                            : orderDetail?.orderStatus === 'DEPOSIT' ? secondaryColor
+                                                                                : orderDetail?.orderStatus === 'PROCESSING' ? secondaryColor
+                                                                                    : orderDetail?.orderStatus === 'CANCEL' ? redColor
+                                                                                        : orderDetail?.orderStatus === 'REFUND_REQUEST' ? redColor
+                                                                                            : secondaryColor,
                                                         opacity: 1,
                                                         color: whiteColor
                                                     }
@@ -411,6 +440,8 @@ const OrderHistory: React.FC = () => {
                                         </Stack>
                                         {/* <p className="text-sm text-gray-500"></p> */}
                                     </div>
+
+
                                 </div>
                                 <div className="text-right">
                                     <div className="mt-2">
@@ -419,7 +450,10 @@ const OrderHistory: React.FC = () => {
                                             <button className={`${style.orderHistory__reOrder__button} ml-2 md:ml-4 px-3 py-2 md:px-4 md:py-2`} >ReOrder</button>
                                         )}
                                     </div>
-                                    <p className='ml-2 md:ml-4 px-3 py-2 md:px-4 md:py-2' style={{ position: 'absolute', top: 50, right: 0, fontWeight: 'bold' }}>{__handleAddCommasToNumber(orderDetail?.totalPrice)} VND</p>
+                                    {orderDetail?.totalPrice && orderDetail?.totalPrice > 0 && (
+
+                                        <p className='ml-2 md:ml-4 px-3 py-2 md:px-4 md:py-2' style={{ position: 'absolute', top: 50, right: 0, fontWeight: 'bold' }}>{__handleAddCommasToNumber(orderDetail?.totalPrice)} VND</p>
+                                    )}
 
                                 </div>
                             </div>
@@ -436,11 +470,14 @@ const OrderHistory: React.FC = () => {
 
                             </button>
 
-                            {isExtendTransaction[orderDetail?.orderID || '1'] && (
-                                <div className='mt-10'></div>
-                            )}
+                            {
+                                isExtendTransaction[orderDetail?.orderID || '1'] && (
+                                    <div className='mt-10'></div>
+                                )
+                            }
 
-                            {isExtendTransaction[orderDetail?.orderID || '1'] &&
+                            {
+                                isExtendTransaction[orderDetail?.orderID || '1'] &&
                                 orderDetail?.paymentList?.map((payment, itemIndex) => {
                                     if (payment.paymentType !== 'ORDER_REFUND') {
                                         return (
@@ -464,10 +501,10 @@ const OrderHistory: React.FC = () => {
                                                         ID: <span>{payment.paymentID}</span>
                                                     </p>
                                                     <p className="text-sm text-gray-500 pb-2">
-                                                        Amount: <span>{__handleAddCommasToNumber(payment.payOSResponse?.data?.amount)} VND</span>
+                                                        Amount: <span>{__handleAddCommasToNumber(payment.payOSData?.amount)} VND</span>
                                                     </p>
                                                     <p className="text-sm text-gray-500 pb-2">
-                                                        Created at: <span>{payment.payOSResponse?.data?.createdAt}</span>
+                                                        Created at: <span>{payment.payOSData?.createDate}</span>
                                                     </p>
 
                                                     <p
@@ -508,6 +545,78 @@ const OrderHistory: React.FC = () => {
                         </div>
                     )}
 
+                    <div className="flex flex-wrap items-center justify-center space-x-2 mt-8">
+                        <select
+                            className="border border-gray-300 rounded-md px-3 py-2 bg-white text-gray-700 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                            value={productsPerPage}
+                            onChange={(e) => {
+                                setProductsPerPage(Number(e.target.value));
+                                paginate(1);
+                            }}
+                        >
+                            <option value="10">10 per page</option>
+                            <option value="20">20 per page</option>
+                            <option value="50">50 per page</option>
+                        </select>
+
+                        <div className="flex items-center space-x-1 mt-4 sm:mt-0">
+                            <button
+                                className={`px-3 py-2 rounded-md ${currentPage === 1
+                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                    : 'bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500'
+                                    }`}
+                                onClick={() => { if (currentPage > 1) paginate(currentPage - 1); }}
+                                disabled={currentPage === 1}
+                            >
+                                &laquo;
+                            </button>
+
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+                                <button
+                                    key={number}
+                                    onClick={() => paginate(number)}
+                                    className={`px-3 py-2 rounded-md ${currentPage === number
+                                        ? 'bg-orange-500 text-white'
+                                        : 'bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500'
+                                        }`}
+                                >
+                                    {number}
+                                </button>
+                            ))}
+
+                            <button
+                                className={`px-3 py-2 rounded-md ${currentPage === totalPages
+                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                    : 'bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500'
+                                    }`}
+                                onClick={() => {
+                                    if (currentPage < totalPages) paginate(currentPage + 1);
+                                }}
+                                disabled={currentPage === totalPages}
+                            >
+                                &raquo;
+                            </button>
+                        </div>
+
+                        <div className="flex items-center space-x-2 mt-4 sm:mt-0">
+                            <span className="text-gray-600">Go to</span>
+                            <input
+                                type="text"
+                                className="border border-gray-300 rounded-md w-16 px-3 py-2 text-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                value={goToPage}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoToPage(e.target.value)}
+                                onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                                    if (e.key === 'Enter') {
+                                        const page = Math.max(1, Math.min(parseInt(goToPage), totalPages));
+                                        if (!isNaN(page)) {
+                                            paginate(page);
+                                        }
+                                    }
+                                }}
+                            />
+                        </div>
+                    </div>
+
                     {showScrollButton && (
                         <IconButton
                             style={{
@@ -526,16 +635,85 @@ const OrderHistory: React.FC = () => {
                 </div>
             </div>
 
+
             {/* Dialog */}
-            {currentPaymentData && (
-                <PaymentInformationDialogComponent
-                    data={currentPaymentData}
-                    onClose={__handleClosePaymentInformationDialog}
-                    isOpen={isOpenPaymentInforDialog}
-                />
-            )}
+            {
+                currentPaymentData && (
+
+                    <Dialog open={isOpenPaymentInforDialog} onClose={__handleClosePaymentInformationDialog}>
+                        <DialogContent >
+                            {currentPaymentData ? (
+                                <div style={{ padding: 2 }} >
+                                    <Grid container spacing={2}>
+                                        <Grid item xs={12}>
+                                            <Typography variant="h6" gutterBottom>
+                                                Sender Information
+                                            </Typography>
+                                            <Divider />
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Typography variant="body2" style={{ fontSize: 14 }}><strong>Name:</strong> {currentPaymentData.paymentSenderName}</Typography>
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Typography variant="body2" style={{ fontSize: 14 }}><strong>Bank Code:</strong> {currentPaymentData.paymentSenderBankCode}</Typography>
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Typography variant="body2" style={{ fontSize: 14 }}><strong>Bank Number:</strong> {currentPaymentData.paymentSenderBankNumber}</Typography>
+                                        </Grid>
+
+                                        <Grid item xs={12}>
+                                            <Typography variant="h6" gutterBottom>
+                                                Recipient Information
+                                            </Typography>
+                                            <Divider />
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Typography variant="body2" style={{ fontSize: 14 }}><strong>Name:</strong> Smart Tailor</Typography>
+                                        </Grid>
+
+                                        <Grid item xs={12}>
+                                            <Typography variant="h6" gutterBottom>
+                                                Payment Details
+                                            </Typography>
+                                            <Divider />
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Typography variant="body2" style={{ fontSize: 14 }}><strong>Amount:</strong> {__handleAddCommasToNumber(currentPaymentData.paymentAmount)} VND</Typography>
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Typography variant="body2" style={{ fontSize: 14 }}><strong>Method:</strong> {currentPaymentData.paymentMethod || ' Banking'}</Typography>
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Typography variant="body2" style={{ fontSize: 14 }}>
+                                                <strong>Status:</strong>
+                                                <div
+                                                    style={{
+                                                        backgroundColor: getStatusColor(currentPaymentData.paymentStatus),
+                                                        color: whiteColor,
+                                                        borderRadius: 1,
+                                                        padding: '2px 4px',
+                                                        marginLeft: '8px',
+                                                        display: 'inline-block'
+                                                    }}
+                                                >
+                                                    {currentPaymentData.paymentStatus ? 'Completed' : 'Pending'}
+                                                </div>
+                                            </Typography>
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Typography variant="body2" style={{ fontSize: 14 }}><strong>Type:</strong> {currentPaymentData.paymentType}</Typography>
+                                        </Grid>
+                                    </Grid>
+                                </div>
+                            ) : (
+                                <Typography variant="body1">No payment data available</Typography>
+                            )}
+                        </DialogContent>
+                    </Dialog>
+                )
+            }
             <FooterComponent />
-        </div>
+        </div >
 
     );
 };

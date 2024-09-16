@@ -38,12 +38,12 @@ const columns: ColumnData[] = [
         dataKey: 'hsCode',
     },
     {
-        width: 200,
+        width: 120,
         label: 'Name',
         dataKey: 'materialName',
     },
     {
-        width: 120,
+        width: 50,
         label: 'Category',
         dataKey: 'category',
     },
@@ -59,14 +59,14 @@ const columns: ColumnData[] = [
         numeric: true,
     },
     {
-        width: 120,
-        label: 'Min price (VND)',
+        width: 150,
+        label: 'Min price (VND) / m²',
         dataKey: 'minPrice',
         numeric: true,
     },
     {
-        width: 120,
-        label: 'Max price (VND)',
+        width: 150,
+        label: 'Max price (VND) / m²',
         dataKey: 'maxPrice',
         numeric: true,
     },
@@ -187,7 +187,7 @@ const MaterialDetailTableComponent: React.FC<MaterialDetailTableProps> = ({ mate
 
 
     return (
-        <Paper style={{ height: 400, width: '90%', boxShadow: 'none', border: 'none', margin: '0 auto' }}>
+        <Paper style={{ height: 300, width: '90%', boxShadow: 'none', border: 'none', margin: '0 auto' }}>
             <TableVirtuoso
                 data={rows}
                 components={VirtuosoTableComponents}

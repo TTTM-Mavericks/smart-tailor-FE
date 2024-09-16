@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaChevronLeft, FaChevronRight, FaTimes, FaCheck } from 'react-icons/fa';
+import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaChevronLeft, FaChevronRight, FaTimes, FaCheck, FaFileAlt, FaBox, FaDollarSign, FaCalendarAlt } from 'react-icons/fa';
 import { ArrowDropDown, Cancel, Update, UpdateOutlined, Verified, ViewAgendaOutlined, Visibility } from '@mui/icons-material';
 import axios from 'axios';
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import { BrandOrder, BrandOrderTable, ImageList } from '../../../../models/BrandManageOrderModel';
 import { motion } from 'framer-motion'
-import { Box, Dialog, DialogContent, DialogTitle, IconButton, Tooltip, useTheme } from '@mui/material';
+import { Box, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Tooltip, useTheme } from '@mui/material';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { greenColor, primaryColor, redColor, secondaryColor, yellowColor } from '../../../../root/ColorSystem';
+import { cancelColor, cancelColorText, completeColor, completeColorText, deliveredColor, deliveredColorText, deposisColor, deposisColorText, greenColor, pendingColor, pendingColorText, primaryColor, processingColor, processingColorText, redColor, secondaryColor, whiteColor, yellowColor } from '../../../../root/ColorSystem';
 import PartOfDesignInformationDialogComponent from '../../BrandOrderManagement/PartOfDesignInformationDialogComponent';
 import LoadingComponent from '../../../../components/Loading/LoadingComponent';
 import Cookies from 'js-cookie';
@@ -24,7 +24,10 @@ import { EstimatedStageInterface } from '../../../Order/OrderDetail/OrderDetailS
 import Select from 'react-select';
 import { DataGrid, GridColDef, GridRenderCellParams, GridToolbar } from '@mui/x-data-grid';
 import { tokens } from '../../../../theme';
-import { __getToken } from '../../../../App';
+import { __getToken, __getUserLogined } from '../../../../App';
+import MaterialDetailTableComponent from '../../../Order/Components/Table/MaterialDetailTableComponent';
+import { clothTag } from '../../../../assets';
+import html2canvas from 'html2canvas';
 
 /**
  * 
@@ -36,15 +39,59 @@ import { __getToken } from '../../../../App';
 const getStatusColor = (status: string) => {
     switch (status) {
         case 'NOT_VERIFY': return 'text-gray-600';
-        case 'PENDING': return 'text-yellow-600';
+        case 'PENDING': return 'text-blue-600';
         case 'DEPOSIT': return 'text-blue-600';
         case 'PROCESSING': return 'text-orange-600';
         case 'CANCEL': return 'text-red-600';
         case 'COMPLETED': return 'text-green-600';
         case 'DELIVERED': return 'text-indigo-600';
+        case 'START_PRODUCING': return 'text-pink-600';
+        case 'CHECKING_SAMPLE_DATA': return 'text-orange-600';
+
         default: return 'text-gray-600';
     }
 };
+
+const getBackgroundColor = (status: string) => {
+    switch (status) {
+        case 'NOT_VERIFY': return 'bg-gray-300 px-2 py-1 rounded-full';
+        case 'PENDING': return 'bg-blue-300 px-2 py-1 rounded-full';
+        case 'DEPOSIT': return 'bg-blue-300 px-2 py-1 rounded-full';
+        case 'PROCESSING': return 'bg-orange-300 px-2 py-1 rounded-full';
+        case 'CANCEL': return 'bg-red-300 px-2 py-1 rounded-full';
+        case 'COMPLETED': return 'bg-green-300 px-2 py-1 rounded-full';
+        case 'DELIVERED': return 'bg-indigo-300 px-2 py-1 rounded-full';
+        case 'START_PRODUCING': return 'bg-pink-300 px-2 py-1 rounded-full';
+        case 'CHECKING_SAMPLE_DATA': return 'bg-orange-300 px-2 py-1 rounded-full';
+
+        default: return 'bg-gray-300 px-2 py-1 rounded-full';
+    }
+};
+
+/**
+ * 
+ * @param status 
+ * @returns 
+ * Take The Status of all state
+ * With Each status have each color
+ */
+const getBackgroundColor1 = (status: string) => {
+    switch (status) {
+        case 'NOT_VERIFY': return 'bg-gray-300 px-2 py-1 rounded-full';
+        case 'PENDING': return 'bg-yellow-300 px-2 py-1 rounded-full';
+        case 'DEPOSIT': return 'bg-blue-300 px-2 py-1 rounded-full';
+        case 'PROCESSING': return 'bg-orange-300 px-2 py-1 rounded-full';
+        case 'CANCEL': return 'bg-red-300 px-2 py-1 rounded-full';
+        case 'COMPLETED': return 'bg-green-300 px-2 py-1 rounded-full';
+        case 'DELIVERED': return 'bg-indigo-300 px-2 py-1 rounded-full';
+        case 'RECEIVED': return 'bg-green-100 px-2 py-1 rounded-full';
+        case 'REFUND_REQUEST': return 'bg-red-300 px-2 py-1 rounded-full';
+
+
+        default: return 'bg-gray-300 px-2 py-1 rounded-full';
+    }
+};
+
 
 /**
  * Progress Step
@@ -213,6 +260,10 @@ const BrandOrderFields: React.FC<{
     const [stageIdStart, setStageIdStart] = useState<string>();
     const [isOpenReportOrderCanceledDialog, setIsOpenReportOrderCanceledDialog] = useState<boolean>(false);
     const [timeline, setTimeLine] = useState<EstimatedStageInterface>();
+    const [selectedOrderMaterial, setSelectedOrderMaterial] = useState<any>();
+    const [selectedClothTagByOrderMaterial, setSelectedClothTagByOrderMaterial] = useState<any>();
+
+
 
 
     const customSortOrder = [
@@ -261,7 +312,7 @@ const BrandOrderFields: React.FC<{
 
     const __handleFetchTimeLine = async (parentId: any) => {
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderTimeLineByParentId}/${parentId}`, null, __getToken());
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderTimeLineBySubOrderId}/${parentId}`, null, __getToken());
             if (response.status === 200) {
                 setIsLoading(false);
                 setTimeLine(response.data);
@@ -281,7 +332,7 @@ const BrandOrderFields: React.FC<{
     const __handleOpenUpdateProcessDialog = (orderDetail: BrandOrder) => {
         setOpenOrderDetail(orderDetail);
         __handleLoadProgressStep(orderDetail.orderID);
-        __handleFetchTimeLine(orderDetail.parentOrderID);
+        __handleFetchTimeLine(orderDetail.orderID);
     };
 
     const __handleCloseUpdateProcessDialog = () => {
@@ -400,9 +451,11 @@ const BrandOrderFields: React.FC<{
             const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest, __getToken());
             if (response.status === 200) {
                 console.log('detail order: ', response.data);
-                toast.success(`${response.message}`, { autoClose: 4000 });
+                toast.success(`${response.message}`, { autoClose: 1000 });
                 setTimeout(() => {
                     window.location.reload();
+                    setIsLoading(false)
+
                 }, 2000);
             }
             else {
@@ -422,9 +475,23 @@ const BrandOrderFields: React.FC<{
         setUseAuth(userParse);
     }, []);
 
+
+    const __handleDownloadClothTag = () => {
+        const clothTagElement = document.getElementById('clothTagToDownload');
+        if (clothTagElement) {
+            html2canvas(clothTagElement).then((canvas: any) => {
+                const link = document.createElement('a');
+                link.download = `ClothTag-${order?.orderID}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+    };
+
     return (
-        <div className="bg-white mb-8 shadow-lg rounded-lg p-6 transition duration-300 ease-in-out transform hover:shadow-xl">
+        <div className="bg-white mb-8 shadow-lg rounded-lg transition duration-300 ease-in-out transform hover:shadow-xl">
             <LoadingComponent isLoading={isLoading}></LoadingComponent>
+
             <h3 className="text-sm font-semibold mb-3 text-indigo-700">Type order: {order.orderType}</h3>
             <div className="flex justify-between">
                 <div className="w-1/2">
@@ -445,103 +512,226 @@ const BrandOrderFields: React.FC<{
                             )}
                         </div>
                         <div className="ml-4 mt-10">
-                            <p className="text-sm text-gray-600 mb-2">Order ID: {order.orderID}</p>
                             <p className="text-sm text-gray-600 mb-2">
-                                Order Status: <span className={` mb-2 ${getStatusColor(order.orderStatus)} font-bold`}>{order.orderStatus}</span>
+                                <FaFileAlt className="inline-block mr-1" />
+                                <span style={{ fontWeight: "bolder" }}>Sub order ID:</span> {order.orderID}
                             </p>
-                            <div className="mt-4">
+                            <p className="text-sm text-gray-600 mb-2">
+                                <FaFileAlt className="inline-block mr-1" />
+                                <span style={{ fontWeight: "bolder" }}>Parent ID:</span> {order.parentOrderID}
+                            </p>
+                            <p className="text-sm text-gray-600 mb-2">
+                                <FaBox className="inline-block mr-1" />
+                                <span style={{ fontWeight: "bolder" }}>Order Status: </span>
+                                <span className={`mb-2 ${getStatusColor(order.orderStatus)} ${getBackgroundColor(order.orderStatus)} font-bold`}>{order.orderStatus}</span>
+                            </p>
+                            <div>
                                 {order.detailList.map((detail, index) => (
-                                    <p key={index} className="text-sm text-gray-600">
-                                        Size {detail.size.sizeName}: Quantity {detail.quantity}
-                                    </p>
+                                    <>
+                                        <p key={index} className="text-sm text-gray-600">
+                                            <FaBox className="inline-block mr-1" />
+                                            <span style={{ fontWeight: "bolder" }}>Size: </span>{detail.size.sizeName}  <span style={{ fontWeight: "bolder" }}> Quantity: </span>{detail.quantity}
+                                        </p>
+                                    </>
                                 ))}
                             </div>
-                            <p className="text-gray-700 mt-4 text-sm">Price: {__handleAddCommasToNumber(order.totalPrice)} VND</p>
+                           {order.totalPrice > 0 && order.orderStatus !== 'PENDING' && (
+                                <p className="text-gray-700 mt-2 text-sm">
+                                    <FaDollarSign className="inline-block mr-1" />
+                                    <span style={{ fontWeight: "bolder" }}>Price:</span> {__handleAddCommasToNumber(order.totalPrice)} VND
+                                </p>
+                            )}
                         </div>
                     </div>
                 </div>
-                <div className="w-1/2 mt-10 pl-28">
-                    <p className="text-gray-600 mb-2 text-sm">Customer: {order.buyerName}</p>
-                    <p className="text-gray-600 mb-2 text-sm">Date: {order.createDate}</p>
+                <div className="w-1/2 mt-10">
+                    {/* <p className="text-gray-600 mb-2 text-sm">Title Design: {order.titleDesign}</p> */}
                     <p className="text-gray-600 mb-2 text-sm">
-                        Address: {order.address}, {order.ward}, {order.district}, {order.province}
+                        <FaCalendarAlt className="inline-block mr-1" />
+                        <span style={{ fontWeight: "bolder" }}>Create Date:</span> {order.createDate}
                     </p>
+                    <p className="text-gray-600 mb-2 text-sm">
+                        <FaCalendarAlt className="inline-block mr-1" />
+                        <span style={{ fontWeight: "bolder" }}>Expected Start Date:</span> {order.expectedStartDate}
+                    </p>
+                    <p style={{ fontWeight: "500", color: secondaryColor, cursor: 'pointer', fontSize: 15 }} onClick={() => setSelectedOrderMaterial(order.orderID)}>
+                        View material
+                    </p>
+                    <p style={{ fontWeight: "500", color: secondaryColor, cursor: 'pointer', height: 'fit-content', fontSize: 15 }} onClick={() => setSelectedClothTagByOrderMaterial(order.orderID)}>
+                        Download cloth tags
+                        <p className={` ml-2 inline-flex items-center rounded-md bg-yellow-50 px-2 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10`}>
+                            <p>Mandatory</p>
+                        </p>
+                    </p>
+                    {selectedOrderMaterial === order.orderID && (
+
+                        <Dialog open={true} aria-labelledby="popup-dialog-title" maxWidth="lg" fullWidth onClose={() => setSelectedOrderMaterial(null)}>
+                            <DialogTitle id="popup-dialog-title">
+                                Material detail
+                                <IoMdCloseCircleOutline
+                                    cursor="pointer"
+                                    size={20}
+                                    color={redColor}
+                                    onClick={() => setSelectedOrderMaterial(null)}
+                                    style={{ position: 'absolute', right: 20, top: 20 }}
+                                />
+                            </DialogTitle>
+                            <DialogContent >
+                                <div>
+                                    <MaterialDetailTableComponent materialDetailData={designDetails?.materialDetail}></MaterialDetailTableComponent>
+                                </div>
+                            </DialogContent>
+
+
+                        </Dialog>
+                    )}
+
+                    {selectedClothTagByOrderMaterial === order.orderID && (
+                        <Dialog open={true} aria-labelledby="popup-dialog-title" maxWidth="md" fullWidth onClose={() => setSelectedClothTagByOrderMaterial(null)}>
+                            <DialogTitle id="popup-dialog-title">
+                                <div >
+                                    <span>Cloth Tags</span>
+                                    <div className={`ml-2 inline-flex items-center rounded-md bg-yellow-50 px-2 py-2 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10`}>
+                                        <span>
+                                            Mandatory! Brand must attached this tag to each cloth before delivery to system.
+                                        </span>
+                                    </div>
+                                </div>
+                                <IoMdCloseCircleOutline
+                                    cursor="pointer"
+                                    size={20}
+                                    color={redColor}
+                                    onClick={() => setSelectedClothTagByOrderMaterial(null)}
+                                    style={{ position: 'absolute', right: 20, top: 20 }}
+                                />
+                            </DialogTitle>
+                            <DialogContent >
+                                <div className='flex items-center justify-center'>
+                                    <div
+                                        id="clothTagToDownload"
+                                        className="relative w-1/2"
+                                        style={{
+                                            width: 150,
+                                            height: 350,
+                                            margin: '0 auto',
+                                            marginLeft: 100,
+                                            transform: 'rotate(270deg)', // Rotate 90 degrees
+                                        }}
+                                    >
+                                        <img
+                                            src={clothTag}
+                                            style={{
+                                                width: '100%',
+                                                height: '100%'
+                                            }}
+                                            alt=""
+                                        />
+                                        <div
+                                            className="absolute"
+                                            style={{
+                                                top: '50%',
+                                                left: '50%',
+                                                transform: 'translate(-50%, -50%) rotate(90deg)',
+                                                width: 400,
+                                                textAlign: 'center',
+                                                marginTop: 25
+                                            }}
+                                        >
+                                            <p
+                                                style={{
+                                                    fontSize: 12,
+                                                    fontWeight: 'bold',
+                                                }}
+                                            >
+                                                [SMT]-{order?.orderID}-{__getUserLogined().userID}
+                                            </p>
+                                        </div>
+                                    </div>
+
+
+                                    <div className="p-4 w-1/2">
+                                        <span className="block mb-2" style={{ fontSize: 14 }}>* The brand is obligated to attach cloth tags to each garment you create.</span>
+                                        <span className="block mb-2" style={{ fontSize: 14 }}>* Cloth tags will contain the orderID and brandID.</span>
+                                        <span className="block mb-2" style={{ fontSize: 14 }}>* Cloth tags will be used to resolve product complaints.</span>
+                                        <span className="block mb-2" style={{ fontSize: 14 }}>* Products or batches without cloth tags will be considered invalid, and the shipment will be canceled.</span>
+                                    </div>
+
+                                </div>
+                            </DialogContent>
+                            <DialogActions>
+                                <button
+                                    className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4 mb-2"
+                                    onClick={__handleDownloadClothTag}
+                                >
+                                    Download
+                                </button>
+                            </DialogActions>
+
+
+                        </Dialog>
+                    )}
                 </div>
             </div>
-            <div className="mt-4 flex items-center" onClick={() => setShowDesignDetails(!showDesignDetails)}>
-                <ArrowDropDown
-                    className="cursor-pointer mr-2"
-                />
-                <span style={{ fontWeight: "bold", fontSize: 14 }}>Show Design Details</span>
-            </div>
-            {showDesignDetails && (
-                <DesignDetails design={designDetails} />
-            )}
-            <div className="mt-6 flex justify-end">
-                {/* {order.orderStatus === 'CHECKING_SAMPLE_DATA' && (
-                    <>
+
+            <div className=''>
+                <div className="pb-5 flex items-center" onClick={() => setShowDesignDetails(!showDesignDetails)}>
+                    <span style={{ fontWeight: "bold", fontSize: 14, marginLeft: 10 }}>Show Design Details</span>
+                    <ArrowDropDown
+                        className="cursor-pointer mr-2"
+                    />
+                </div>
+                {showDesignDetails && (
+                    <DesignDetails design={designDetails} />
+                )}
+                <div className="-mt-16 flex justify-end" style={{ position: 'absolute', bottom: 0, right: 10 }}>
+
+                    {order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCEL' && (
+
                         <button
-                            onClick={() => __handleOpenInputSampleProductDialog(order.orderID)}
-                            className="text-sm bg-indigo-500 text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4"
+                            onClick={() => __handleOpenReportDialog()}
+                            className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4 mb-2"
                             style={{
                                 borderRadius: 4,
-                                backgroundColor: yellowColor
+                                backgroundColor: redColor
                             }}
                         >
-                            Update sampleData
+                            Cancel
                         </button>
-                        {selectedOrderID === order.orderID && (
-                            <BrandUpdateSampleProductDialog stageID={stageIdStart} isOpen={isDialogOpen} orderID={order.orderID} brandID={userAuth?.userID} onClose={__handleCloseInputSampleProductDialog}></BrandUpdateSampleProductDialog>
-                        )}
-                    </>
-                )} */}
+                    )}
 
-                {order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCEL' && (
+
+                    <CustomerReportOrderDialogComponent
+                        isCancelOrder={true}
+                        orderID={order?.orderID}
+                        onClose={() => setIsOpenReportOrderCanceledDialog(false)}
+                        isOpen={isOpenReportOrderCanceledDialog}
+                        onClickReportAndCancel={() => _handleCancelOrder(order)}
+                    ></CustomerReportOrderDialogComponent>
 
                     <button
-                        onClick={() => __handleOpenReportDialog()}
-                        className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4"
+                        onClick={() => onViewDetails(order, designDetails)}
+                        className="bg-indigo-500 text-sm text-white px-4 py-2 mb-2 hover:bg-indigo-600 transition duration-300 mr-4"
                         style={{
                             borderRadius: 4,
-                            backgroundColor: redColor
+                            backgroundColor: secondaryColor
                         }}
                     >
-                        Cancel
+                        View Details
                     </button>
-                )}
 
-
-                <CustomerReportOrderDialogComponent
-                    isCancelOrder={true}
-                    orderID={order?.orderID}
-                    onClose={() => setIsOpenReportOrderCanceledDialog(false)}
-                    isOpen={isOpenReportOrderCanceledDialog}
-                    onClickReportAndCancel={() => _handleCancelOrder(order)}
-                ></CustomerReportOrderDialogComponent>
-
-                <button
-                    onClick={() => onViewDetails(order, designDetails)}
-                    className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4"
-                    style={{
-                        borderRadius: 4,
-                        backgroundColor: secondaryColor
-                    }}
-                >
-                    View Details
-                </button>
-
-                {order.orderStatus !== 'CANCEL' && order.orderStatus !== 'COMPLETED' && (
-                    <button
-                        onClick={() => __handleOpenUpdateProcessDialog(order)}
-                        className="bg-green-500 text-sm text-white px-4 py-2  hover:bg-green-600 transition duration-300"
-                        style={{
-                            borderRadius: 4,
-                            backgroundColor: greenColor
-                        }}
-                    >
-                        Update process
-                    </button>
-                )}
+                    {order.orderStatus !== 'CANCEL' && order.orderStatus !== 'COMPLETED' && (
+                        <button
+                            onClick={() => __handleOpenUpdateProcessDialog(order)}
+                            className="bg-green-500 text-sm text-white px-4 py-2  hover:bg-green-600 transition duration-300 mb-2"
+                            style={{
+                                borderRadius: 4,
+                                backgroundColor: greenColor
+                            }}
+                        >
+                            Update process
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* Progress Bar */}
@@ -569,30 +759,40 @@ const BrandOrderFields: React.FC<{
                             <div className="pt-4 mb-20">
 
                                 <div className="flex justify-between text-sm mb-0 ml-0">
-                                    <p className='flex'>
-                                        <span>ET: </span>
-                                        <span className={`text-indigo-600 ml-1`}>
-                                            dd-mm-yyy 00:00:00
-                                        </span>
-                                    </p>
-                                    <p className='flex'>
-                                        <span>ET: </span>
-                                        <span className={`text-indigo-600 ml-1`}>
-                                            {timeline?.estimatedDateFinishFirstStage}
-                                        </span>
-                                    </p>
-                                    <p className='flex'>
-                                        <span>ET: </span>
-                                        <span className={`text-indigo-600 ml-1`}>
-                                            {timeline?.estimatedDateFinishSecondStage}
-                                        </span >
-                                    </p>
-                                    <p className='flex'>
-                                        <span>ET: </span>
-                                        <span className={`text-indigo-600 ml-1`}>
-                                            {timeline?.estimatedDateFinishCompleteStage}
-                                        </span>
-                                    </p>
+                                    {timeline?.estimatedDateStartDepositStage && (
+                                        <p className='flex'>
+                                            <span>ET: </span>
+                                            <span className={`text-indigo-600 ml-1`}>
+                                                {timeline?.estimatedDateStartDepositStage}
+                                            </span>
+                                        </p>
+                                    )}
+                                    {timeline?.estimatedDateFinishFirstStage && (
+                                        <p className='flex'>
+                                            <span>ET: </span>
+                                            <span className={`text-indigo-600 ml-1`}>
+                                                {timeline?.estimatedDateFinishFirstStage}
+                                            </span>
+                                        </p>
+                                    )}
+                                    {timeline?.estimatedDateFinishSecondStage && (
+
+                                        <p className='flex'>
+                                            <span>ET: </span>
+                                            <span className={`text-indigo-600 ml-1`}>
+                                                {timeline?.estimatedDateFinishSecondStage}
+                                            </span >
+                                        </p>
+                                    )}
+                                    {timeline?.estimatedDateFinishCompleteStage && (
+
+                                        <p className='flex'>
+                                            <span>ET: </span>
+                                            <span className={`text-indigo-600 ml-1`}>
+                                                {timeline?.estimatedDateFinishCompleteStage}
+                                            </span>
+                                        </p>
+                                    )}
 
 
                                 </div>
@@ -609,7 +809,7 @@ const BrandOrderFields: React.FC<{
                                                         color: !step.status ? '#CBCBCB' : secondaryColor
                                                     }}
                                                 >
-                                                    {step.currentQuantity} / {order.quantity}
+                                                    {step.currentQuantity} / {order.quantity} products
                                                 </p>
                                                 {selectedStep?.orderID === order.orderID && selectedStep.step === step.stage && (
                                                     <BrandUploadProgcessSampleProduct
@@ -617,6 +817,7 @@ const BrandOrderFields: React.FC<{
                                                         orderID={selectedStep?.orderID}
                                                         isOpen={true}
                                                         onClose={__handleCloseUpLoadProcessSampleProductDialog}
+                                                        orderDetail={order}
                                                     >
                                                     </BrandUploadProgcessSampleProduct>
                                                 )}
@@ -630,7 +831,6 @@ const BrandOrderFields: React.FC<{
                                 <div className="flex justify-between text-sm">
                                     {progressSteps?.map((step, index) => {
                                         // const isCompleted = index < step.indexOf(order.orderStatus) + 1;
-                                        // const isCurrent = index === progressSteps.indexOf(step.status) + 1;
                                         const isClickable = !step.status;
                                         return (
                                             <p key={index} className={`text-center `}>
@@ -652,6 +852,7 @@ const BrandOrderFields: React.FC<{
                                                         orderID={selectedStep?.orderID}
                                                         isOpen={true}
                                                         onClose={__handleCloseUpLoadProcessSampleProductDialog}
+                                                        orderDetail={order}
                                                     >
                                                     </BrandUploadProgcessSampleProduct>
                                                 )}
@@ -1006,7 +1207,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
     }
     const __handleFetchTimeLine = async (parentId: any) => {
         try {
-            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderTimeLineByParentId}/${parentId}`, null, __getToken());
+            const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.getOrderTimeLineBySubOrderId}/${parentId}`, null, __getToken());
             if (response.status === 200) {
                 setIsLoading(false);
                 setTimeLine(response.data);
@@ -1025,7 +1226,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
     const __handleOpenUpdateProcessDialog = (orderDetail: BrandOrderTable) => {
         setOpenOrderDetail(orderDetail);
         __handleLoadProgressStep(orderDetail.orderID);
-        __handleFetchTimeLine(orderDetail.parentOrderID);
+        __handleFetchTimeLine(orderDetail.orderID);
     };
 
     const getStatusColor = (status: string) => {
@@ -1043,18 +1244,66 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
 
     const columns: GridColDef[] = [
         { field: 'orderID', headerName: 'Order ID', width: 150 },
-        { field: 'buyerName', headerName: 'Customer', width: 150 },
-        { field: 'address', headerName: 'Address', width: 150 },
-        { field: 'phone', headerName: 'phone', width: 150 },
-        { field: 'expectedStartDate', headerName: 'Date', width: 200 },
+        { field: 'quantity', headerName: 'Quantity', width: 100 },
+        {
+            field: 'totalPrice', headerName: 'Total Price (VND)', width: 140,
+            renderCell: (params) => (
+                <span>
+                    {params.value.toLocaleString()}
+                </span>
+            ),
+        },
+        { field: 'createDate', headerName: 'Create Date', width: 200 },
+        { field: 'expectedStartDate', headerName: 'Expected Start Date', width: 200 },
         {
             field: 'orderStatus',
             headerName: 'Status',
-            width: 150,
-            renderCell: (params: GridRenderCellParams) => (
-                <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(params.value)}`}>
+            width: 100,
+            renderCell: (params) => (
+                <Box
+                    sx={{
+                        backgroundColor:
+                            params.value === "PENDING"
+                                ? pendingColor
+                                : params.value === "DELIVERED"
+                                    ? deliveredColor
+                                    : params.value === "DEPOSIT"
+                                        ? deposisColor
+                                        : params.value === "PROCESSING"
+                                            ? processingColor
+                                            : params.value === "COMPLETED"
+                                                ? completeColor
+                                                : cancelColor,
+                        color: params.value === "PENDING"
+                            ? pendingColorText
+                            : params.value === "DELIVERED"
+                                ? deliveredColorText
+                                : params.value === "DEPOSIT"
+                                    ? deposisColorText
+                                    : params.value === "PROCESSING"
+                                        ? processingColorText
+                                        : params.value === "COMPLETED"
+                                            ? completeColorText
+                                            : cancelColorText,
+                        borderRadius: '16px',
+                        padding: '1px 5px',
+                        fontSize: '0.75rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        height: "50%",
+                        marginTop: "10%"
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                        }}
+                    />
                     {params.value}
-                </span>
+                </Box>
             )
         },
         {
@@ -1226,6 +1475,13 @@ const BrandManageOrder: React.FC = () => {
         { value: 'Order ID', label: 'Order ID' },
         { value: 'Order Status', label: 'Order Status' }
     ];
+
+    const [pendingCount, setPendingCount] = useState<number>(0);
+    const [canceledCount, setCanceledCount] = useState<number>(0);
+    const [completedCount, setCompletedCount] = useState<number>(0);
+    const [checkingSampleDataCount, setCheckingSampleDataCount] = useState<number>(0);
+
+
     useEffect(() => {
         setIsLoading(true);
         const userStorage = Cookies.get('userAuth');
@@ -1247,12 +1503,20 @@ const BrandManageOrder: React.FC = () => {
                 }
                 return response.data;
             })
-            .then((responseData) => {
+            .then((responseData: any) => {
                 if (responseData && Array.isArray(responseData.data)) {
                     const subOrders = responseData.data.filter((order: any) => order.orderType === FILTERED_ORDER_TYPE);
-                    setOrder(subOrders);
+                    const filteredPendingOrders = subOrders.filter((order: any) => order.orderStatus === 'PENDING');
+                    const filteredCanceledOrders = subOrders.filter((order: any) => order.orderStatus === 'START_PRODUCING');
+                    const filteredCompletedOrders = subOrders.filter((order: any) => order.orderStatus === 'COMPLETED');
+                    const filteredCheckingSampleDataOrders = subOrders.filter((order: any) => order.orderStatus === 'CHECKING_SAMPLE_DATA');
                     setFilteredOrders(subOrders);
-                    console.log("Data received:", subOrders);
+                    setOrder(subOrders);
+                    setPendingCount(filteredPendingOrders.length);
+                    setCanceledCount(filteredCanceledOrders.length);
+                    setCompletedCount(filteredCompletedOrders.length);
+                    setCheckingSampleDataCount(filteredCheckingSampleDataOrders.length);
+
                 } else {
                     console.error('Invalid data format:', responseData);
                 }
@@ -1376,7 +1640,62 @@ const BrandManageOrder: React.FC = () => {
     };
 
     return (
-        <div className='-mt-8'>
+        <div className='-mt-8' style={{ width: '95%', margin: '0 auto' }}>
+            <div className="mt-12">
+                <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
+                    <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+                        <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-blue-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                                <path d="M19.14 12.936c.046-.306.071-.618.071-.936s-.025-.63-.071-.936l2.037-1.582a.646.646 0 00.154-.809l-1.928-3.338a.646.646 0 00-.785-.293l-2.4.964a7.826 7.826 0 00-1.617-.936l-.364-2.558A.645.645 0 0013.629 3h-3.258a.645.645 0 00-.635.538l-.364 2.558a7.82 7.82 0 00-1.617.936l-2.4-.964a.646.646 0 00-.785.293L2.642 9.673a.646.646 0 00.154.809l2.037 1.582a7.43 7.43 0 000 1.872l-2.037 1.582a.646.646 0 00-.154.809l1.928 3.338c.169.293.537.42.785.293l2.4-.964c.506.375 1.05.689 1.617.936l.364 2.558a.645.645 0 00.635.538h3.258a.645.645 0 00.635-.538l.364-2.558a7.82 7.82 0 001.617-.936l2.4.964c.248.127.616 0 .785-.293l1.928-3.338a.646.646 0 00-.154-.809l-2.037-1.582zM12 15.3A3.3 3.3 0 1112 8.7a3.3 3.3 0 010 6.6z" />
+                            </svg>
+                        </div>
+                        <div className="p-4 text-right">
+                            <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600" style={{ color: secondaryColor, fontWeight: 'bold' }}>PENDING</p>
+                            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{pendingCount}</h4>
+                        </div>
+
+                    </div>
+                    <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+                        <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-pink-600 to-pink-400 text-white shadow-pink-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15V7l6 5-6 5z" />
+                            </svg>
+
+                        </div>
+                        <div className="p-4 text-right">
+                            <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600" style={{ color: redColor, fontWeight: 'bold' }}>START</p>
+                            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{canceledCount}</h4>
+                        </div>
+
+                    </div>
+                    <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+                        <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-green-600 to-green-400 text-white shadow-green-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.59 14.59l-4.24-4.24 1.41-1.41L10.41 14l7.42-7.42 1.41 1.41-8.83 8.83z" />
+                            </svg>
+
+                        </div>
+                        <div className="p-4 text-right">
+                            <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600" style={{ color: greenColor, fontWeight: 'bold' }}>COMPLETED</p>
+                            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{completedCount}</h4>
+                        </div>
+
+                    </div>
+                    <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+                        <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-orange-600 to-orange-400 text-white shadow-orange-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                                <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-.75 5.5c0-.414.336-.75.75-.75s.75.336.75.75v6c0 .414-.336.75-.75.75h-.008c-.414 0-.742-.336-.742-.75V7.5zm.75 11c-.552 0-1-.448-1-1s.448-1 1-1 1 .448 1 1-.448 1-1 1z" />
+                            </svg>
+
+                        </div>
+                        <div className="p-4 text-right">
+                            <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600" style={{ color: primaryColor, fontWeight: 'bold' }}>CHECKING</p>
+                            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{checkingSampleDataCount}</h4>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
             {isLoading ? (
                 <div className="flex justify-center items-center h-screen">
                     <LoadingComponent isLoading={isLoading} />
@@ -1385,9 +1704,9 @@ const BrandManageOrder: React.FC = () => {
                 <>
                     <div style={{ width: "100%" }}>
                         <div className="flex flex-col">
-                            <div className="mb-6">
-                                <div className="flex mt-5">
-                                    <div className="w-7/10" style={{ width: "80%" }}>
+                            <div className="mb-2">
+                                <div className="flex mt-0">
+                                    <div className="w-5/10" style={{ width: "60%" }}>
                                         <Select
                                             isMulti
                                             name="filters"
@@ -1402,16 +1721,16 @@ const BrandManageOrder: React.FC = () => {
                                     </div>
                                     <div className="flex border border-gray-300 rounded-md overflow-hidden" style={{ marginLeft: "auto" }}>
                                         <button
-                                            className={`px-4 py-2 ${!isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'}`}
+                                            className={`px-2 py-1 ${!isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700 '} text-sm`}
                                             onClick={() => setIsTableView(false)}
                                         >
-                                            Card mode
+                                            List mode
                                         </button>
                                         <button
-                                            className={`px-4 py-2 ${isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'}`}
+                                            className={`px-2 py-1 ${isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'} text-sm`}
                                             onClick={() => setIsTableView(true)}
                                         >
-                                            List mode
+                                            Table mode
                                         </button>
                                     </div>
                                 </div>

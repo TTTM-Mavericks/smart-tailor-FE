@@ -8,6 +8,7 @@ import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from 
 import { CancelOutlined } from "@mui/icons-material";
 import { primaryColor, redColor } from "../../../../../root/ColorSystem";
 import { border, borderColor } from "@mui/system";
+import { __getToken } from "../../../../../App";
 
 interface EditMaterialPopUpScreenFormProps {
     fid: {
@@ -62,11 +63,17 @@ const EditMaterialPopUpScreens: React.FC<EditMaterialPopUpScreenFormProps> = ({ 
      */
     const _handleSubmit = async () => {
         try {
+            console.log('Form Data:', formData);
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.updateMaterial + `/${MATERIALID}`}`;
 
             const response = await axios.put(apiUrl, {
                 ...formData
+            }, {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`
+                }
             });
+
 
             if (!response.data) {
                 throw new Error('Error updating material');
@@ -75,27 +82,31 @@ const EditMaterialPopUpScreens: React.FC<EditMaterialPopUpScreenFormProps> = ({ 
             if (response.data.status === 200) {
                 updateMaterial({ ...formData, materialID: MATERIALID });
                 Swal.fire(
-                    `${t(codeLanguage + '000069')}`,
-                    `${t(codeLanguage + '000070')}`,
+                    `Update Material Success`,
+                    `Edit Sucess Material`,
                     'success'
                 );
+                editClose()
             }
             if (response.data.status === 400) {
                 Swal.fire(
-                    `${t(codeLanguage + '000071')}`,
-                    `${t(codeLanguage + '000072')}`,
+                    `Update Material Fail`,
+                    `Edit Fail Material`,
                     'error'
                 );
+                editClose()
+
             }
             sessionStorage.setItem("obj", JSON.stringify(formData));
             editClose(); // Close the edit modal after successful update
         } catch (error) {
             console.error('Update Error:', error);
             Swal.fire(
-                `${t(codeLanguage + '000071')}`,
-                `${t(codeLanguage + '000072')}`,
+                `Update Material Fail`,
+                `Edit Fail Material`,
                 'error'
             );
+            editClose()
         }
     };
 

@@ -4,7 +4,7 @@ export interface LaborQuantity {
     laborQuantityMaxQuantity: number;
     laborQuantityMinPrice: number;
     laborQuantityMaxPrice: number;
-    laborCostPerQuantity: number;
+    brandLaborCostPerQuantity: number;
 }
 
 export interface EditLaborQuantity {
@@ -12,5 +12,5 @@ export interface EditLaborQuantity {
     laborQuantityMaxQuantity: number;
     laborQuantityMinPrice: number;
     laborQuantityMaxPrice: number;
-    laborCostPerQuantity: number;
+    brandLaborCostPerQuantity: number;
 }

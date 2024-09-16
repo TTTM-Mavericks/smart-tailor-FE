@@ -8,6 +8,8 @@ import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from 
 import { LaborQuantity } from "../../../../../models/LaborQuantityModel";
 import { CancelOutlined } from "@mui/icons-material";
 import { primaryColor, redColor } from "../../../../../root/ColorSystem";
+import { __getToken } from "../../../../../App";
+import Cookies from "js-cookie";
 
 interface EditPricePopUpScreenFormProps {
     fid: {
@@ -16,7 +18,7 @@ interface EditPricePopUpScreenFormProps {
         laborQuantityMaxQuantity: number,
         laborQuantityMinPrice: number,
         laborQuantityMaxPrice: number,
-        laborCostPerQuantity: number
+        brandLaborCostPerQuantity: number
     };
     editClose: () => void;
     updateCostBrand: (updatedCategory: LaborQuantity) => void;
@@ -25,22 +27,44 @@ interface EditPricePopUpScreenFormProps {
 const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, editClose, updateCostBrand }) => {
     const [formData, setFormData] = React.useState({
         laborQuantityID: fid.laborQuantityID,
-        brandLaborCostPerQuantity: fid.laborCostPerQuantity
+        brandLaborCostPerQuantity: fid.brandLaborCostPerQuantity
     });
 
     const _handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
+        const numericValue = parseFloat(value);
+
+        if (!isNaN(numericValue) && numericValue > 0) {
+            setFormData(prevState => ({
+                ...prevState,
+                [name]: numericValue
+            }));
+        } else if (value === '') {
+            // Allow empty input for user convenience
+            setFormData(prevState => ({
+                ...prevState,
+                [name]: ''
+            }));
+        }
+        // If the input is invalid (negative, zero, or not a number), we don't update the state
+    };
+
+    let userAuth;
+    const userAuthData = sessionStorage.getItem('userRegister');
+    const userAuthLocalStorage = Cookies.get('userAuth');
+
+    if (userAuthData) {
+        userAuth = JSON.parse(userAuthData);
+    } else if (userAuthLocalStorage) {
+        userAuth = JSON.parse(userAuthLocalStorage);
+    } else {
+        // Handle the case where neither session storage nor local storage contains user data
+        console.error('User authentication data not found');
+        // You might want to redirect to a login page or handle this case appropriately
     }
 
-    const userAuthData = localStorage.getItem('userAuth') as string;
-
-    const userAuth = JSON.parse(userAuthData);
-
-    const { userID, email, fullName, language, phoneNumber, roleName, imageUrl } = userAuth;
+    // Only destructure if userAuth is defined
+    const { userID, email, fullName, language, phoneNumber, roleName, imageUrl } = userAuth || {};
 
     const LABORQUANTITYID = fid.laborQuantityID
     // Get language in local storage
@@ -57,10 +81,22 @@ const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, e
 
     console.log("formData" + formData.laborQuantityID);
     const _handleSubmit = async () => {
+        if (formData.brandLaborCostPerQuantity <= 0) {
+            Swal.fire(
+                'Invalid Input',
+                'Brand Labor Cost Per Quantity must be a positive number',
+                'error'
+            );
+            return;
+        }
         try {
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_labor_quantity + functionEndpoints.brandLaborQuantity.updateBrandLaborQuantity + `/${userID}`}`;
             const response = await axios.put(apiUrl, {
                 ...formData
+            }, {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`
+                }
             });
 
             if (!response.data) {
@@ -151,6 +187,8 @@ const EditPricePopUpScreens: React.FC<EditPricePopUpScreenFormProps> = ({ fid, e
                 fullWidth
                 value={formData.brandLaborCostPerQuantity}
                 onChange={_handleChange}
+                type="number"
+                inputProps={{ min: "0.01", step: "0.01" }}
                 sx={{ mb: 4 }}
             />
 

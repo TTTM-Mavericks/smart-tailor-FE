@@ -20,9 +20,7 @@ export interface DuplicateCheckResponse {
 export interface SizeExpertTailoring {
     expertTailoringName: string,
     sizeName: string,
-    minFabric: number,
-    maxFabric: number,
-    unit: string,
+    ratio: number,
     status: boolean,
     createDate: string,
     lastModifiedDate: string
@@ -32,15 +30,11 @@ export interface SizeExpertTailoringEdit {
     expertTailoringID: string,
     expertTailoringName: string,
     sizeName: string,
-    minFabric: number,
-    maxFabric: number,
-    unit: string
+    ratio: number,
 }
 
 export interface AddSizeExpertTailoring {
     expertTailoringName: string,
     sizeName: string,
-    minFabric: number,
-    maxFabric: number,
-    unit: string
+    ratio: number,
 }

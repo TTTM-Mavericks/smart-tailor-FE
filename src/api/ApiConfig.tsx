@@ -39,7 +39,7 @@ export const featuresEndpoints = {
   brandPropertise: '/brand-property',
   SampleProduct: '/sample-product-data',
   notification: '/notification',
-  payment: '/payment'
+  payment: '/payment',
 
 }
 export const functionEndpoints = {
@@ -60,12 +60,13 @@ export const functionEndpoints = {
     getDesignByID: '/get-design-by-id',
     getAllDesign: '/get-all-design',
     updateDesign: '/update-design',
-    getAllDesignByUserID: '/get-all-design-by-user-id'
+    getAllDesignByUserID: '/get-all-design-by-user-id',
+    createClonseDesignByOldDesignId: '/create-clone-design-from-base-design'
   },
   designDetail: {
     addNewDesignDetail: '/add-new-design-detail',
     getAllInforOrderDetail: '/get-all-design-detail-by-order-id',
-    getTotalPriceByParentOrderId:'/calculate-total-price-by-parent-order-id'
+    getTotalPriceByParentOrderId: '/calculate-total-price-by-parent-order-id'
   },
   brand: {
     addExcel: '/add-new-brand-material-by-excel-file',
@@ -77,7 +78,9 @@ export const functionEndpoints = {
     rejectBrand: '/reject-brand',
     getBrandByID: '/get-brand',
     getBrandInformationByBrandID: '/get-brand-information-by-brand-id',
-    getAllBrandInformation: '/get-all-brand-information'
+    getAllBrandInformation: '/get-all-brand-information',
+    addExpertTailoringForBrand: '/add-expert-tailoring-for-brand',
+    getAllExpertTailoringByBrandID: '/get-all-expert-tailoring-by-brand-id'
   },
   customer: {
     updateProfile: '/update-customer-profile'
@@ -146,7 +149,10 @@ export const functionEndpoints = {
     getOrderTimeLineByParentId: '/order-time-line-by-parent-order-id',
     getFullOrderAccountant: '/get-full-of-order',
     ratingOrder: '/rating-order',
-    getBrandTransactions: '/get-full-of-order-by-brand-id'
+    getBrandTransactions: '/get-full-of-order-by-brand-id',
+    getOrderTimeLineBySubOrderId: '/order-time-line-by-sub-order-id',
+    getSubOrderInvoiceBySubOrderId: '/get-sub-order-invoice-by-sub-order-id'
+
   },
   sizeExpertTailoring: {
     getAllSizeExpertTailoringByExperId: '/get-all-size-by-expert-tailoring-id',
@@ -173,7 +179,8 @@ export const functionEndpoints = {
     getAllBrand: '/get-all-brand',
     getAllAccountant: '/get-all-accountant',
     getAllEmployee: '/get-all-employee',
-    getAllManager: '/get-all-manager'
+    getAllManager: '/get-all-manager',
+    updateUser: '/update-user'
   },
   systemImage: {
     getAllSystemIamge: '/get-all-system-image',
@@ -188,7 +195,9 @@ export const functionEndpoints = {
 
   },
   systemPropertise: {
-    getAllSystemPropertise: '/get-all-system-properties'
+    getAllSystemPropertise: '/get-all-system-properties',
+    updateSystemPropertise: '/update-system-property',
+    addSystemPropertise: '/add-new-system-property'
   },
   brandPropertise: {
     addNewBrandPropertise: '/add-new-brand-property'
@@ -205,7 +214,36 @@ export const functionEndpoints = {
     sendNoti: '/send-notification'
   },
   payment: {
-    getPaymentByUserID: '/get-payment-by-user-id'
+    getPaymentByUserID: '/get-payment-by-user-id',
+    createPayment: '/create-payment',
+    getAllPayment: '/get-all-payment'
+  },
+  chart: {
+    orderStatusDetail: '/get-order-status-detail',
+    calculateOrderGrowthPercentageMonth: '/calculate-order-growth-percentage-for-current-and-previous-month',
+    getTotalForEachMonth: '/get-total-payment-of-each-month',
+    getTotalForEachBrand: '/get-order-detail-of-each-brand',
+    calculatePaymentGrowthPercentageMonth: '/calculate-payment-growth-percentage-for-current-and-previous-week',
+    calculateUserGrowthPercentageMonth: '/calculate-user-growth-percentage-for-current-and-previous-month',
+    calculateCustomerGrowthPercentageMonth: '/calculate-new-customer-growth-percentage-for-current-and-previous-week',
+    calculateNewUserGrowthPercentageByRoleName: '/calculate-new-user-growth-percentage-for-current-and-previous-day-by-role-name',
+    calculateCustomerGrowthPercentageWeek: '/calculate-new-customer-growth-percentage-for-current-and-previous-week',
+    calculateUserGrowthPercentageWeek: '/calculate-user-growth-percentage-for-current-and-previous-week',
+    calculateTotalOfUser: '/calculate-total-of-user',
+    calculatePaymentGrowthPercentageWeek: '/calculate-payment-growth-percentage-for-current-and-previous-week',
+    calculateIncomeGrowthPercentageWeek: '/calculate-income-growth-percentage-for-current-and-previous-week',
+    calculateRefundGrowthPercentageMonth: '/calculate-refund-growth-percentage-for-current-and-previous-month',
+    getTotalPaymentForEachMonth: "/get-total-payment-of-each-month",
+    getTotalRefundForEachMonth: '/get-total-refund-of-each-month',
+    getTotalIncomeForEachMonth: '/get-total-income-of-each-month',
+
+  },
+  brandProperties: {
+    getAll: '/get-all-brand-properties',
+    getBrandByProductiveByBrandID: '/get-brand-productivity-by-brand-id',
+    getBrandPropertyByBrandID: '/get-brand-property',
+    updateBrandProperty: '/update-brand-property',
+    addNewBrandProperty: '/add-new-brand-property'
   }
 }
 

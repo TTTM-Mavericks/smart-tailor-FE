@@ -136,17 +136,17 @@ const LineChart = () => {
                 axisTop={null}
                 axisRight={null}
                 axisBottom={{
-                    tickSize: 0,
-                    tickPadding: 10,
+                    tickSize: 5,
+                    tickPadding: 5,
                     tickRotation: 0,
-                    tickValues: [1.1, 2.1, 3.5, 5.5]
+                    legendOffset: 36,
+                    truncateTickAt: 0
                 }}
                 axisLeft={{
                     tickValues: 5,
                     tickSize: 3,
                     tickPadding: 5,
                     tickRotation: 0,
-                    legend: 'count',
                     legendOffset: -40,
                     legendPosition: "middle",
                 }}

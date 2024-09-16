@@ -15,10 +15,18 @@ export interface PayOSResponseDataInterface {
 }
 
 export interface PayOSResponseInterface {
-    code: string;
-    desc: string;
-    data: PayOSResponseDataInterface;
-    signature: string;
+    code?: string;
+    desc?: string;
+    data?: PayOSResponseDataInterface;
+    signature?: string;
+    amount?: number;
+    checkoutUrl?:string;
+    orderCode?: any;
+    payOSID?: any;
+    qrCode?: any;
+    status?: string;
+    createDate?: string;
+
 }
 
 export interface PaymentOrderInterface {
@@ -36,7 +44,8 @@ export interface PaymentOrderInterface {
     paymentStatus: boolean;
     paymentType: string;
     orderID: string;
-    payOSResponse: PayOSResponseInterface;
+    payOSResponse?: PayOSResponseInterface;
+    payOSData?: PayOSResponseInterface;
     paymentURl?: string,
     createDate?: string
 }

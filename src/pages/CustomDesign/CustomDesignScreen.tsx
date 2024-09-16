@@ -20,7 +20,7 @@ import { IoMdUndo, IoMdRedo } from "react-icons/io";
 import { TbHomeHeart } from "react-icons/tb";
 import ProductDialogComponent from './Components/Dialog/ProductDialogComponent';
 import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../api/ApiConfig';
-import { DesignInterface, ItemMaskInterface, MaterialInterface, PartOfDesignInterface, PartOfHoodieDesignData, PartOfShirtDesignData } from '../../models/DesignModel';
+import { DesignInterface, ItemMaskInterface, MaterialInterface, PartOfDesignInterface, PartOfHoodieDesignData, PartOfLongSkirtData, PartOfShirtDesignData } from '../../models/DesignModel';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Skeleton, Slider, Tooltip } from '@mui/material';
 import ItemEditorToolsComponent from './Components/ItemEditorTools/ItemEditorToolsComponent';
 import MaterialDetailComponent from './Components/MaterialDetail/MaterialDetailComponent';
@@ -34,6 +34,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Cloud, UploadCloud } from 'react-feather';
 import { __handleDownloadElementAsPng, __handleGetElementAsBase64 } from '../../utils/CanvasUtils';
 import { useSnapshot } from 'valtio';
+import { __getToken } from '../../App';
+import ComingSoonDialog from '../../components/Dialog/CommingSoonDialog/ComingSoonDialog';
+import ThreeDModelDialog from '../../components/Dialog/3DModelDialog/3DModelDialog';
 
 
 interface ItemMask {
@@ -152,6 +155,10 @@ function CustomDesignScreen() {
   const [selectedItemMask, setSelectedItemMask] = useState<ItemMaskInterface>();
   const [itemSize, setItemSize] = useState<{ width?: number, height?: number }>();
   const [isFullStepActive, setIsFullStepActive] = useState<boolean>(false);
+  const [isOpenComingSoonDialog, setIsOpenComingSoonDialog] = useState<boolean>(false);
+  const [isOpen3DDaialog, setIsOpen3DDaialog] = useState<boolean>(false);
+
+
 
 
 
@@ -167,7 +174,7 @@ function CustomDesignScreen() {
     setPartOfClothData(updatePart);
     const result = updatePart?.find((item: PartOfDesignInterface) => item.partOfDesignID === selectedPartOfCloth?.partOfDesignID);
     if (result) {
-      console.log('selectedPartOfCloth change: ', result.itemMasks);
+      console.log('-----------------------------------------');
       setSelectedStamp(result.itemMasks)
     }
     state.modelData = updatePart
@@ -269,6 +276,11 @@ function CustomDesignScreen() {
     if (typeOfModel === 'hoodieModel') {
       setPartOfClothData(PartOfHoodieDesignData);
       setSelectedPartOfCloth(PartOfHoodieDesignData[0]);
+    }
+
+    if (typeOfModel === 'longSkirtModel') {
+      setPartOfClothData(PartOfLongSkirtData);
+      setSelectedPartOfCloth(PartOfLongSkirtData[0]);
     }
   }, [typeOfModel]);
 
@@ -426,8 +438,16 @@ function CustomDesignScreen() {
     setPartOfClothData(partOfClothData);
   }
 
-  const __handleRemoveStamp = (itemId: string) => {
-    setSelectedStamp((prev) => prev?.filter((stamp: ItemMaskInterface) => stamp.itemMaskID !== itemId));
+  const __handleRemoveStamp = async (itemId: string) => {
+
+    const result = partOfClothData?.find((item: PartOfDesignInterface) => item.partOfDesignName === selectedPartOfCloth?.partOfDesignName);
+    if (result) {
+      console.log('selectedPartOfCloth change: ', result.itemMasks);
+      const itemMasks = result.itemMasks?.filter((stamp: ItemMaskInterface) => stamp.itemMaskID !== itemId)
+      if (itemMasks) setSelectedStamp(itemMasks)
+    }
+
+    // await setSelectedStamp((prev) => prev?.filter((stamp: ItemMaskInterface) => stamp.itemMaskID !== itemId));
   };
 
   const __handleSaveStateToUndoStack = () => {
@@ -651,6 +671,10 @@ function CustomDesignScreen() {
       result.zIndex = 1;
 
       // setSelectedPartOfCloth(selectedPartOfCloth);
+      // const result = partOfClothData?.find((item: PartOfDesignInterface) => item.partOfDesignName === selectedPartOfCloth?.partOfDesignName);
+      // if (result) {
+
+      // }
 
       setSelectedStamp((prevSelectedStamp = []) => {
         const existingItemIndex = prevSelectedStamp.findIndex(
@@ -688,7 +712,11 @@ function CustomDesignScreen() {
   }
 
   const __handleOpenMaterialDialog = () => {
-    setIsOpenMaterialDiaglog(true);
+    if (typeOfModel === 'shirtModel') {
+      setIsOpenMaterialDiaglog(true);
+    } else {
+      setIsOpenComingSoonDialog(true);
+    }
   }
 
   const __handleCloseMaterialDialog = () => {
@@ -753,7 +781,6 @@ function CustomDesignScreen() {
    */
   const __handleGetMaterialInformation = async (item: PartOfDesignInterface[]) => {
     const successImaUrl = await __handleGetElementAsBase64('canvas3DElement')
-    console.log(successImaUrl);
     const bodyRequest: Design = {
       userID: userAuth?.userID || '',
       expertTailoringID: typeOfModelID,
@@ -765,7 +792,6 @@ function CustomDesignScreen() {
       minWeight: 0.2,
       maxWeight: 0.4
     };
-    console.log(bodyRequest);
     setMainDesign(bodyRequest);
     return bodyRequest
   }
@@ -774,11 +800,15 @@ function CustomDesignScreen() {
    * 
    */
   const __handleSaveDesign = () => {
-    if (partOfClothData) {
+    if (typeOfModel === 'shirtModel') {
+      if (partOfClothData) {
 
-      __handleGetMaterialInformation(partOfClothData).then((value) => {
-        __handleUpdateDesign(true, value);
-      })
+        __handleGetMaterialInformation(partOfClothData).then((value) => {
+          __handleUpdateDesign(true, value);
+        })
+      }
+    } else {
+      setIsOpenComingSoonDialog(true);
     }
   }
 
@@ -794,8 +824,10 @@ function CustomDesignScreen() {
     if (!isLickSaveButton) {
       setIsLoadingPage(true);
     }
+
+    console.log('mainDesign: ', mainDesign);
     try {
-      const response = await api.put(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.updateDesign}/${id}`, mainDesign);
+      const response = await api.put(`${versionEndpoints.v1 + `/` + featuresEndpoints.design + functionEndpoints.design.updateDesign}/${id}`, mainDesign, __getToken());
       if (response.status === 200) {
         // toast.success(`${response.message}`, { autoClose: 4000 });
 
@@ -885,8 +917,8 @@ function CustomDesignScreen() {
       {/* Header */}
       <div className={styles.customDesign__container__header}>
         <div className={styles.customDesign__container__header__logo}>
-          <img src={systemLogo}></img>
-          <div >
+          <img src={systemLogo} onClick={() => window.location.href = '/'}></img>
+          <div onClick={() => window.location.href = '/'} >
             <h3>{t(codeLanguage + '000001')}</h3>
           </div>
           <UploadCloud size={20} style={{ marginTop: 5, marginLeft: 15 }} color={isSaved ? greenColor : blackColor}> </UploadCloud>
@@ -1267,10 +1299,13 @@ function CustomDesignScreen() {
           )}
         </div>
       </div>
-      <Designer />
+      <Designer onclickFn={() => setIsOpen3DDaialog(true)} />
 
       {/* Canvas 3d display area */}
-      <main id='canvas3DElement' className={styles.customDesign__container__canvas}>
+
+      <ThreeDModelDialog designID={id} isOpen={isOpen3DDaialog} onClose={() => setIsOpen3DDaialog(false)}></ThreeDModelDialog>
+      <main id='canvas3DElement' className={`${styles.customDesign__container__canvas}`} >
+
         {!changeUploadPartOfDesignTool ? (
           <CanvasModel typeOfModel={typeOfModel} isDefault={false} is3D={true} />
         ) : (
@@ -1294,6 +1329,8 @@ function CustomDesignScreen() {
         </DialogContent>
 
       </Dialog>
+
+      <ComingSoonDialog isOpen={isOpenComingSoonDialog} onClose={() => setIsOpenComingSoonDialog(false)} onClickClose={() => window.location.reload()} />
 
       {/* Editor tools */}
       <div className={styles.customDesign__container__itemEditor}>

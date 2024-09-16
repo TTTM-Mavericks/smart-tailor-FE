@@ -1,50 +1,84 @@
 import { useState, useEffect } from "react";
 import { useTheme } from "@mui/material";
 import { tokens } from "../../../theme";
-import { useTranslation } from 'react-i18next';
+import { baseURL, functionEndpoints, versionEndpoints } from "../../../api/ApiConfig";
+import axios from "axios";
+import { __getToken } from "../../../App";
+
+interface GrowthCardProps {
+    title: string;
+    value: number;
+    color: string;
+    icon: React.ReactNode;
+}
 
 const CardInformationDetailComponent = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
-    const [emailData, setEmailData] = useState({
-        emailsSent: "",
-        increase: ""
-    });
+    // Loading And Error
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+
+    // Growth states
+    const [userGrowthPercentage, setUserGrowthPercentage] = useState<any>([]);
+    const [customerGrowthPercentage, setCustomerGrowthPercentage] = useState<any>([]);
+    const [newBrandGrowthPercentage, setNewBrandGrowthPercentage] = useState<any>([]);
+    const [newEmployeeGrowthPercentage, setNewEmployeeGrowthPercentage] = useState<any>([]);
+
+    // Fetch functions
+    const fetchGrowthPercentage = async (endpoint: string, setter: React.Dispatch<React.SetStateAction<number>>) => {
+        try {
+            const response = await axios.get(
+                `${baseURL + versionEndpoints.v1 + endpoint}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${__getToken()}`,
+                    },
+                }
+            );
+            setter(response.data.data);
+        } catch (error) {
+            console.error('Error fetching growth percentage:', error);
+            setError('Failed to load growth percentage');
+        }
+    };
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-
-                const data = {
-                    emailsSent: "123456789",
-                    increase: "-25%"
-                };
-
-                setEmailData(data);
-            } catch (error) {
-                console.error("Error fetching data: ", error);
-            }
-        };
-
-        fetchData();
+        fetchGrowthPercentage('/user' + functionEndpoints.chart.calculateUserGrowthPercentageWeek, setUserGrowthPercentage);
+        fetchGrowthPercentage('/user' + functionEndpoints.chart.calculateCustomerGrowthPercentageWeek, setCustomerGrowthPercentage);
+        fetchGrowthPercentage('/user' + functionEndpoints.chart.calculateNewUserGrowthPercentageByRoleName + '/brand', setNewBrandGrowthPercentage);
+        fetchGrowthPercentage('/user' + functionEndpoints.chart.calculateNewUserGrowthPercentageByRoleName + '/employee', setNewEmployeeGrowthPercentage);
     }, []);
 
-    // Get language in local storage
-    const selectedLanguage = localStorage.getItem('language');
-    const codeLanguage = selectedLanguage?.toUpperCase();
+    console.log("userGrowthPercentage" + JSON.stringify(userGrowthPercentage));
+    console.log("customerGrowthPercentage" + JSON.stringify(customerGrowthPercentage));
+    console.log("newBrandGrowthPercentagenew" + JSON.stringify(newBrandGrowthPercentage));
+    console.log("newEmployeeGrowthPercentage" + JSON.stringify(newEmployeeGrowthPercentage));
 
-    // Using i18n
-    const { t, i18n } = useTranslation();
-    useEffect(() => {
-        if (selectedLanguage !== null) {
-            i18n.changeLanguage(selectedLanguage);
-        }
-    }, [selectedLanguage, i18n]);
 
+    // const GrowthCard: React.FC<GrowthCardProps> = ({ title, value, color, icon }) => {
+    //     const isPositive = value >= 0;
+    //     const textColor = isPositive ? 'text-green-500' : 'text-red-500';
+    //     const arrowIcon = isPositive ? '↑' : '↓';
+
+    //     return (
+    //         <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+    //             <div className={`bg-clip-border mx-4 rounded-xl overflow-hidden ${color} text-white shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center`}>
+    //                 {icon}
+    //             </div>
+    //             <div className="p-4 text-right">
+    //                 <p className="block antialiased font-sans text-sm leading-normal font-medium text-blue-gray-600 uppercase tracking-wider pb-1">{title}</p>
+    //                 <h4 className={`block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug ${textColor}`}>
+    //                     {arrowIcon} {Math.abs(Math.round(value))}%
+    //                 </h4>
+    //             </div>
+    //         </div>
+    //     );
+    // };
 
     return (
-        <div className="mt-12">
+        <div>
             <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
                 <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
                     <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-blue-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
@@ -55,12 +89,15 @@ const CardInformationDetailComponent = () => {
                         </svg>
                     </div>
                     <div className="p-4 text-right">
-                        <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Today's Money</p>
-                        <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">$53k</h4>
+                        <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Brand Growth</p>
+                        <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{newBrandGrowthPercentage.currentData}</h4>
                     </div>
                     <div className="border-t border-blue-gray-50 p-4">
                         <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
-                            <strong className="text-green-500">+55%</strong>&nbsp;than last week
+                            <strong className={newBrandGrowthPercentage.growthPercentage >= 0 ? "text-green-500" : "text-red-500"}>
+                                {newBrandGrowthPercentage.growthPercentage >= 0 ? '+' : '-'}{Math.abs(newBrandGrowthPercentage.growthPercentage)}%
+                            </strong>
+                            &nbsp;than last day
                         </p>
                     </div>
                 </div>
@@ -71,12 +108,15 @@ const CardInformationDetailComponent = () => {
                         </svg>
                     </div>
                     <div className="p-4 text-right">
-                        <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Today's Users</p>
-                        <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">2,300</h4>
+                        <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">User Growth</p>
+                        <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{userGrowthPercentage.currentData}</h4>
                     </div>
                     <div className="border-t border-blue-gray-50 p-4">
                         <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
-                            <strong className="text-green-500">+3%</strong>&nbsp;than last month
+                            <strong className={userGrowthPercentage.growthPercentage >= 0 ? "text-green-500" : "text-red-500"}>
+                                {userGrowthPercentage.growthPercentage >= 0 ? '+' : '-'}{Math.abs(userGrowthPercentage.growthPercentage)}%
+                            </strong>
+                            &nbsp;than last week
                         </p>
                     </div>
                 </div>
@@ -87,12 +127,15 @@ const CardInformationDetailComponent = () => {
                         </svg>
                     </div>
                     <div className="p-4 text-right">
-                        <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">New Clients</p>
-                        <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">3,462</h4>
+                        <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Customer Growth</p>
+                        <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{customerGrowthPercentage.currentData}</h4>
                     </div>
                     <div className="border-t border-blue-gray-50 p-4">
                         <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
-                            <strong className="text-red-500">-2%</strong>&nbsp;than yesterday
+                            <strong className={customerGrowthPercentage.growthPercentage >= 0 ? "text-green-500" : "text-red-500"}>
+                                {customerGrowthPercentage.growthPercentage >= 0 ? '+' : '-'}{Math.abs(customerGrowthPercentage.growthPercentage)}%
+                            </strong>
+                            &nbsp;than last week
                         </p>
                     </div>
                 </div>
@@ -103,12 +146,15 @@ const CardInformationDetailComponent = () => {
                         </svg>
                     </div>
                     <div className="p-4 text-right">
-                        <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Sales</p>
-                        <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">$103,430</h4>
+                        <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Employee Growth</p>
+                        <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{newEmployeeGrowthPercentage.currentData}</h4>
                     </div>
                     <div className="border-t border-blue-gray-50 p-4">
                         <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
-                            <strong className="text-green-500">+5%</strong>&nbsp;than yesterday
+                            <strong className={newEmployeeGrowthPercentage.growthPercentage >= 0 ? "text-green-500" : "text-red-500"}>
+                                {newEmployeeGrowthPercentage.growthPercentage >= 0 ? '+' : '-'}{Math.abs(newEmployeeGrowthPercentage.growthPercentage)}%
+                            </strong>
+                            &nbsp;than last day
                         </p>
                     </div>
                 </div>

@@ -16,14 +16,14 @@ interface ImgUrls {
 
 const imgUrls: ImgUrls = {
     VI: {
-        shirtModel: 'https://res.cloudinary.com/dby2saqmn/image/upload/v1719998297/size_information/hbeui6ygrw1zghzaavxr.png',
+        shirtModel: 'https://res.cloudinary.com/dby2saqmn/image/upload/v1724058179/size_information/gjp82yqlly5jgky9omdf.png',
         hoodieModel: 'https://res.cloudinary.com/dby2saqmn/image/upload/v1719998297/size_information/prybb94laz4koe6s67y1.png',
         skirtFullModel: 'https://res.cloudinary.com/dby2saqmn/image/upload/v1719998297/size_information/xr0pmswji1xpibssvonv.png',
         womenSkirtTopModel: 'https://res.cloudinary.com/dby2saqmn/image/upload/v1719998296/size_information/dibuxkyu7su4ezv02o3e.png',
         womenSkirtBottomModel: 'https://res.cloudinary.com/dby2saqmn/image/upload/v1719998296/size_information/ia3krurp9evzddpnhwib.png',
     },
     EN: {
-        shirtModel: 'https://res.cloudinary.com/dby2saqmn/image/upload/v1719998297/size_information/hulgh4mfk5ite9u1cviu.png',
+        shirtModel: 'https://res.cloudinary.com/dby2saqmn/image/upload/v1724058179/size_information/uzvqp41gfzxygeep7vug.png',
         hoodieModel: 'https://res.cloudinary.com/dby2saqmn/image/upload/v1719998296/size_information/zouh4qojex6ogtn7qcfb.png',
         skirtFullModel: 'https://res.cloudinary.com/dby2saqmn/image/upload/v1719998296/size_information/psgdap7shuubxjqvquzi.png',
         womenSkirtTopModel: 'https://res.cloudinary.com/dby2saqmn/image/upload/v1719998296/size_information/ctw8vo8hlcg0w6vbpxob.png',
@@ -54,16 +54,16 @@ const SizeDialogComponent: React.FC<SizeDialogProps> = ({ data, isOpen, onClose 
 
     // ---------------Usable Variable---------------//
     const { t, i18n } = useTranslation();
-        // Get language in local storage
-        const selectedLanguage = localStorage.getItem('language');
-    
-        // Using i18n
-        useEffect(() => {
-            if (selectedLanguage !== null) {
-                i18n.changeLanguage(selectedLanguage);
-                setCodeLanguage(selectedLanguage.toUpperCase());
-            }
-        }, [selectedLanguage, i18n]);
+    // Get language in local storage
+    const selectedLanguage = localStorage.getItem('language');
+
+    // Using i18n
+    useEffect(() => {
+        if (selectedLanguage !== null) {
+            i18n.changeLanguage(selectedLanguage);
+            setCodeLanguage(selectedLanguage.toUpperCase());
+        }
+    }, [selectedLanguage, i18n]);
 
     // ---------------UseEffect---------------//
     // React.useEffect(() => {
@@ -105,7 +105,7 @@ const SizeDialogComponent: React.FC<SizeDialogProps> = ({ data, isOpen, onClose 
                         style={{ position: 'absolute', right: 20 }}
                     />
                 </DialogTitle>
-                <DialogContent  style={{ marginTop: '10px' }}>
+                <DialogContent style={{ marginTop: '10px' }}>
                     <img className={`${style.dialog__content__img}`} src={sizeImgUrl}>
                     </img>
                 </DialogContent>

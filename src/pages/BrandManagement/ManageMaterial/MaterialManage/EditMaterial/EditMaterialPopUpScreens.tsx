@@ -11,6 +11,7 @@ import { UserInterface } from "../../../../../models/UserModel";
 import { CancelOutlined } from "@mui/icons-material";
 import { primaryColor, redColor } from "../../../../../root/ColorSystem";
 import { borderColor, width } from "@mui/system";
+import { __getToken } from "../../../../../App";
 
 interface EditMaterialPopUpScreenFormProps {
     fid: {
@@ -87,10 +88,21 @@ const EditMaterialPopUpScreens: React.FC<EditMaterialPopUpScreenFormProps> = ({ 
      */
     const _handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
+        if (name === 'brandPrice') {
+            const numericValue = parseFloat(value);
+            if (!isNaN(numericValue) && numericValue > 0) {
+                setFormData(prevState => ({
+                    ...prevState,
+                    [name]: numericValue
+                }));
+            }
+            // If the input is invalid (negative, zero, or not a number), we don't update the state
+        } else {
+            setFormData(prevState => ({
+                ...prevState,
+                [name]: value
+            }));
+        }
     }
 
     // Get language in local storage
@@ -105,29 +117,44 @@ const EditMaterialPopUpScreens: React.FC<EditMaterialPopUpScreenFormProps> = ({ 
         }
     }, [selectedLanguage, i18n]);
 
-    const _handleSubmit = () => {
-
-        axios.put(`${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_material + functionEndpoints.brand.updateBrandMaterial}`, {
-            ...formData, brandID: getID()
-        })
-
-            .then((response) => {
-                console.log('Response:', response);
-                // updateMaterial({ ...formData, brandID: getID() });
-                Swal.fire(
-                    `Edit Success!`,
-                    `The Brand Price Updated Success`,
-                    'success'
-                );
-            })
-            .catch((error: any) => {
-                console.error('Update Error:', error);
-                Swal.fire(
-                    `Edit Fail!`,
-                    `The Brand Price Updated Fail`,
-                    'error'
-                );
-            });
+    const _handleSubmit = async () => {
+        if (formData.brandPrice <= 0) {
+            Swal.fire(
+                'Invalid Input',
+                'Brand Price must be a positive number',
+                'error'
+            );
+            return;
+        }
+        try {
+            const response = await axios.put(
+                `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_material + functionEndpoints.brand.updateBrandMaterial}`,
+                {
+                    ...formData,
+                    brandID: getID()
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${__getToken()}`,
+                    }
+                }
+            );
+            console.log('Response:', response);
+            Swal.fire(
+                `Edit Success!`,
+                `The Brand Price Updated Success`,
+                'success'
+            );
+            editClose()
+        } catch (error) {
+            console.error('Update Error:', error);
+            Swal.fire(
+                `Edit Fail!`,
+                `The Brand Price Update Failed`,
+                'error'
+            );
+            editClose()
+        }
     };
 
     return (
@@ -221,6 +248,7 @@ const EditMaterialPopUpScreens: React.FC<EditMaterialPopUpScreenFormProps> = ({ 
                 </Grid>
                 <Grid item xs={6}>
                     <TextField
+                        type="number"
                         name="brandPrice"
                         id="brandPrice"
                         label="Brand Price"

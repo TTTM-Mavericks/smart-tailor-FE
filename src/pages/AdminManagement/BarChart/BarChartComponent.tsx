@@ -6,7 +6,7 @@ const BarChartComponent = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     return (
-        <Card style={{ height: "100vh", margin: "2%", width: "50%" }}>
+        <Card style={{ height: "100vh", margin: "2%" }}>
             <Box height="80vh">
                 <BarChart />
             </Box>

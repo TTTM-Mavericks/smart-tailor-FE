@@ -7,6 +7,7 @@ import { AddSize } from '../../../../models/AdminManageSizeModel';
 import { AddCircleOutline, CancelOutlined, RemoveCircleOutline } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
 import { primaryColor } from '../../../../root/ColorSystem';
+import { __getToken } from '../../../../App';
 
 interface AddSizeManualProps {
     closeCard: () => void;
@@ -29,11 +30,14 @@ const AddSizeManual: React.FC<AddSizeManualProps> = ({ closeCard, addNewSizes })
      */
     const _handleSizeChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
-        setSizes(prevSizes => {
-            const newSizes = [...prevSizes];
-            newSizes[index] = { ...newSizes[index], sizeName: value };
-            return newSizes;
-        });
+        // Only allow alphabetic characters
+        if (/^[A-Za-z]*$/.test(value)) {
+            setSizes(prevSizes => {
+                const newSizes = [...prevSizes];
+                newSizes[index] = { ...newSizes[index], sizeName: value.toUpperCase() };
+                return newSizes;
+            });
+        }
     };
 
     /**
@@ -62,13 +66,42 @@ const AddSizeManual: React.FC<AddSizeManualProps> = ({ closeCard, addNewSizes })
                 'Please add at least one size.',
                 'warning'
             );
+            closeCard();
+            return;
+        }
+
+        // Check if all sizes are valid
+        const invalidSizes = sizes.filter(size => !/^[A-Za-z]+$/.test(size.sizeName));
+        if (invalidSizes.length > 0) {
+            Swal.fire(
+                'Invalid Input',
+                'Size names must contain only alphabetic characters',
+                'error'
+            );
+            closeCard();
+            return;
+        }
+
+        // Check for duplicate sizes
+        const uniqueSizes = new Set(sizes.map(size => size.sizeName));
+        if (uniqueSizes.size !== sizes.length) {
+            Swal.fire(
+                'Duplicate Sizes',
+                'Please ensure all size names are unique',
+                'error'
+            );
+            closeCard();
             return;
         }
 
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.size + functionEndpoints.size.addNewSize}`;
 
         try {
-            const response = await axios.post(apiUrl, { sizeRequestList: sizes });
+            const response = await axios.post(apiUrl, { sizeRequestList: sizes }, {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`
+                }
+            });
 
             if (response.data.status === 200) {
                 closeCard();
@@ -122,6 +155,9 @@ const AddSizeManual: React.FC<AddSizeManualProps> = ({ closeCard, addNewSizes })
                                 onChange={(event) => _handleSizeChange(index, event)}
                                 placeholder="Enter size (e.g., S, M, L)"
                                 className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                                pattern="[A-Za-z]*"
+                                title="Only alphabetic characters are allowed"
+                                maxLength={3}
                             />
                         </div>
                         <button

@@ -51,7 +51,6 @@ const Navbar: React.FC<NavbarProps> = ({ toggleMenu, menu, popperOpen, togglePop
                                 </li>
                             </ol>
                         </nav>
-                        <h6 className="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-gray-900">home</h6>
                     </div>
                     <div className="flex items-center">
                         <div className="mr-auto md:mr-4 md:w-56">
@@ -115,11 +114,11 @@ const Navbar: React.FC<NavbarProps> = ({ toggleMenu, menu, popperOpen, togglePop
                     <div
                         className="popover absolute right-0 mt-2 w-72 p-6 rounded-md shadow-md shadow-black/5 bg-white z-50"
                     >
-                        <h3 className="text-lg font-semibold mb-4">Notification</h3>
+                        {/* <h3 className="text-lg font-semibold mb-4">Notification</h3>
                         <ul>
                             <li className="py-1">Notification 1</li>
                             <li className="py-1">Notification 2</li>
-                        </ul>
+                        </ul> */}
                     </div>
                 )}
                 {popperOpen.user && (

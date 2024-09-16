@@ -118,10 +118,12 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
     const [allMaterialCategory, setAllMaterialCategory] = useState<MaterialCategoryInterface[]>();
     const [fabricMaterialList, setFabricMaterialList] = useState<MaterialInterface[]>();
     const [heatInkMaterial, setHeatInkMaterial] = useState<MaterialInterface[]>();
+    const [manualInkMaterial, setManualInkMaterial] = useState<MaterialInterface[]>();
     const [embroiderMaterial, setEmbroiderMaterial] = useState<MaterialInterface[]>();
     const [activeStep, setActiveStep] = useState<number>(0);
     const [isFullStepActive, setIsFullStepActive] = useState<boolean>(false);
     const [currentStep, setCurrentStep] = useState<{ index: any, part: PartOfDesignInterface }>();
+    const [printTypeChange, setPrintTypeChange] = useState<string>('');
 
     // ---------------Usable Variable---------------//
     const { t, i18n } = useTranslation();
@@ -149,7 +151,6 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
     }, [])
 
     React.useEffect(() => {
-        console.log(selectedItemMask, ' - ', selectedPartOfDesign);
     }, [selectedItemMask, selectedPartOfDesign]);
 
     useEffect(() => {
@@ -175,33 +176,93 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
     }, [partOfDesigndata]);
 
     useEffect(() => {
-        if (!heatInkMaterial?.map((item) => item.materialName.includes(inputValueMaterialItem))) return;
-        setData((prevData) => {
-            if (!prevData) return prevData;
-            return prevData.map((partItem: PartOfDesignInterface) => {
-                if (partItem.partOfDesignID === selectedPartOfDesign?.partOfDesignID) {
-                    const itemData = partItem.itemMasks?.map((itemMask: ItemMaskInterface) => {
-                        if (itemMask.itemMaskID === selectedItemMask?.itemMask.itemMaskID) {
-                            return {
-                                ...itemMask,
-                                itemMaterial: {
-                                    itemMaterialID: printTypeMaterial?.find((item) => item.itemId === selectedItemMask?.itemMask.itemMaskID)?.material
-                                },
-                                materialID: printTypeMaterial?.find((item) => item.itemId === selectedItemMask?.itemMask.itemMaskID)?.material
-                            };
-                        }
-                        return itemMask;
-                    });
-                    setItemMaskData(itemData);
-                    return {
-                        ...partItem,
-                        itemMasks: itemData,
-                    };
+        if (heatInkMaterial?.map((item) => item.materialName.includes(inputValueMaterialItem))) {
+            setData((prevData) => {
+                if (!prevData) return prevData;
+                return prevData.map((partItem: PartOfDesignInterface) => {
+                    if (partItem.partOfDesignID === selectedPartOfDesign?.partOfDesignID) {
+                        const itemData = partItem.itemMasks?.map((itemMask: ItemMaskInterface) => {
+                            if (itemMask.itemMaskID === selectedItemMask?.itemMask.itemMaskID) {
+                                return {
+                                    ...itemMask,
+                                    itemMaterial: {
+                                        itemMaterialID: printTypeMaterial?.find((item) => item.itemId === selectedItemMask?.itemMask.itemMaskID)?.material
+                                    },
+                                    materialID: printTypeMaterial?.find((item) => item.itemId === selectedItemMask?.itemMask.itemMaskID)?.material
+                                };
+                            }
+                            return itemMask;
+                        });
+                        setItemMaskData(itemData);
+                        return {
+                            ...partItem,
+                            itemMasks: itemData,
+                        };
 
-                }
-                return partItem;
+                    }
+                    return partItem;
+                });
             });
-        });
+        };
+
+        if (manualInkMaterial?.map((item) => item.materialName.includes(inputValueMaterialItem))) {
+            setData((prevData) => {
+                if (!prevData) return prevData;
+                return prevData.map((partItem: PartOfDesignInterface) => {
+                    if (partItem.partOfDesignID === selectedPartOfDesign?.partOfDesignID) {
+                        const itemData = partItem.itemMasks?.map((itemMask: ItemMaskInterface) => {
+                            if (itemMask.itemMaskID === selectedItemMask?.itemMask.itemMaskID) {
+                                return {
+                                    ...itemMask,
+                                    itemMaterial: {
+                                        itemMaterialID: printTypeMaterial?.find((item) => item.itemId === selectedItemMask?.itemMask.itemMaskID)?.material
+                                    },
+                                    materialID: printTypeMaterial?.find((item) => item.itemId === selectedItemMask?.itemMask.itemMaskID)?.material
+                                };
+                            }
+                            return itemMask;
+                        });
+                        setItemMaskData(itemData);
+                        return {
+                            ...partItem,
+                            itemMasks: itemData,
+                        };
+
+                    }
+                    return partItem;
+                });
+            });
+        };
+
+        if (embroiderMaterial?.map((item) => item.materialName.includes(inputValueMaterialItem))) {
+            setData((prevData) => {
+                if (!prevData) return prevData;
+                return prevData.map((partItem: PartOfDesignInterface) => {
+                    if (partItem.partOfDesignID === selectedPartOfDesign?.partOfDesignID) {
+                        const itemData = partItem.itemMasks?.map((itemMask: ItemMaskInterface) => {
+                            if (itemMask.itemMaskID === selectedItemMask?.itemMask.itemMaskID) {
+                                return {
+                                    ...itemMask,
+                                    itemMaterial: {
+                                        itemMaterialID: printTypeMaterial?.find((item) => item.itemId === selectedItemMask?.itemMask.itemMaskID)?.material
+                                    },
+                                    materialID: printTypeMaterial?.find((item) => item.itemId === selectedItemMask?.itemMask.itemMaskID)?.material
+                                };
+                            }
+                            return itemMask;
+                        });
+                        setItemMaskData(itemData);
+                        return {
+                            ...partItem,
+                            itemMasks: itemData,
+                        };
+
+                    }
+                    return partItem;
+                });
+            });
+        };
+
     }, [inputValueMaterialItem, materialItem, selectedItemMask, selectedPartOfDesign]);
 
     useEffect(() => {
@@ -261,26 +322,6 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                         setFabricMaterialList(materials);
                     }
                 }
-
-                const inkItemResult = allMaterialCategory.find((item) =>
-                    item.categoryName === "Ink"
-                );
-                if (inkItemResult) {
-                    const materials = await __handleFetchMaterialByCategory(inkItemResult.categoryID);
-                    if (materials) {
-                        setHeatInkMaterial(materials);
-                    }
-                }
-
-                const threadItemResult = allMaterialCategory.find((item) =>
-                    item.categoryName === "Thread"
-                );
-                if (threadItemResult) {
-                    const materials = await __handleFetchMaterialByCategory(threadItemResult.categoryID);
-                    if (materials) {
-                        setHeatInkMaterial(materials);
-                    }
-                }
             }
         };
 
@@ -288,8 +329,54 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
     }, [allMaterialCategory]);
 
     useEffect(() => {
+        const fetchFabricMaterials = async () => {
+            if (allMaterialCategory) {
+                if (printTypeChange === 'MANUAL_PRINT') {
 
-    }, [embroiderMaterial])
+                    const inkItemResult = allMaterialCategory.find((item) =>
+                        item.categoryName === "Manual Printing"
+                    );
+                    if (inkItemResult) {
+                        const materials = await __handleFetchMaterialByCategory(inkItemResult.categoryID);
+                        console.log('Manual Printing: ', materials);
+
+                        if (materials) {
+                            setManualInkMaterial(materials);
+                        }
+                    }
+                }
+
+                if (printTypeChange === 'HEAT_PRINT') {
+
+                    const inkItemResult = allMaterialCategory.find((item) =>
+                        item.categoryName === "Heat Printing"
+                    );
+                    if (inkItemResult) {
+                        const materials = await __handleFetchMaterialByCategory(inkItemResult.categoryID);
+                        console.log('Heat Printing: ', materials);
+
+                        if (materials) {
+                            setEmbroiderMaterial(materials);
+                        }
+                    }
+                }
+
+                if (printTypeChange === 'EMBROIDER') {
+                    const threadItemResult = allMaterialCategory.find((item) =>
+                        item.categoryName === "Thread"
+                    );
+                    if (threadItemResult) {
+                        const materials = await __handleFetchMaterialByCategory(threadItemResult.categoryID);
+                        if (materials) {
+                            setHeatInkMaterial(materials);
+                        }
+                    }
+                }
+            }
+        }
+        fetchFabricMaterials();
+
+    }, [printTypeChange])
 
 
     // ---------------FunctionHandler---------------//
@@ -303,6 +390,7 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
         try {
             const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.getListMaterialByCategoryAndExpert}?expertTailoringID=${expertID}&categoryID=${categoryID}`);
             if (response.status === 200) {
+                console.log(response.data);
                 return response.data;
             } else {
             }
@@ -331,11 +419,17 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
     * @param {Function} setState - The state setter function for the selected values.
     * @param {any} value - The value of the checkbox that was changed.
     */
-    const __handleCheckboxChange = (
+    const __handleCheckboxChange = async (
         item: ItemMaskInterface,
         value: any,
         part: PartOfDesignInterface | undefined
     ) => {
+
+        console.log('----------------------------------: ', value);
+
+
+
+        setPrintTypeChange(value);
         setData((prevData) => {
             if (!prevData) return prevData;
 
@@ -356,9 +450,13 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                 }
                 return partItem;
             });
+
+
         });
         const prinTypeMaterialData = { itemId: item.itemMaskID, partName: part?.partOfDesignName, type: value, material: materialItem }
+        console.log('prinTypeMaterialData: ', prinTypeMaterialData);
         __handleUpdatePrintTypeMaterial(prinTypeMaterialData);
+
     };
 
     /**
@@ -703,6 +801,7 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                                 <span style={{ fontSize: 12, fontWeight: '500' }}>Print type</span>
                                 <a onClick={() => __handleApplyAllMaterialForItemMask()} style={{ fontSize: 11, fontWeight: '500', float: 'right', color: secondaryColor, paddingLeft: 120, cursor: 'pointer' }}>Apply all items</a>
                             </div>
+
                             {printType.map((type, index) => (
                                 <div key={index} className={`${style.materialDetail__content__itemMask} `}>
                                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: 10, marginTop: 10 }}>
@@ -713,7 +812,12 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                                             type="checkbox"
                                             style={{ fontSize: 11, marginTop: 10, marginBottom: 10 }}
                                             checked={printTypeMaterial.find((item) => item.itemId === selectedItemMask.itemMask.itemMaskID)?.type === type.value}
-                                            onChange={() => __handleCheckboxChange(selectedItemMask.itemMask, type.value, selectedPartOfDesign)}
+                                            onChange={() => {
+                                                __handleCheckboxChange(selectedItemMask.itemMask, type.value, selectedPartOfDesign)
+                                                setPrintTypeChange(type.value)
+                                            }
+                                            }
+
                                         />
                                         <div style={{ width: 100, fontSize: 14 }}>
                                             <label
@@ -726,39 +830,113 @@ const MaterialDetailComponent: React.FC<materialDetailProps> = ({ partOfDesignda
                                         </div>
 
                                         <div>
-                                            <Autocomplete
-                                                id="tags-outlined"
-                                                options={heatInkMaterial || []}
-                                                getOptionLabel={(option) => {
-                                                    // Check if the option is not null or undefined
-                                                    if (option && typeof option === 'object' && 'materialName' in option) {
-                                                        return `${option.materialName} (${__handleAddCommasToNumber(option.minPrice)} - ${__handleAddCommasToNumber(option.maxPrice)} VND) `;
-                                                    }
-                                                    return ''; // Return an empty string if the option is not valid
-                                                }}
-                                                filterSelectedOptions
-                                                value={heatInkMaterial?.find((item) => item.materialID === printTypeMaterial.find((inkItem) => inkItem.itemId === selectedItemMask.itemMask.itemMaskID)?.material) || null}
-                                                onChange={(event, newValue) => {
-                                                    newValue && setMaterialItem(newValue.materialID);
-                                                }}
-                                                inputValue={inputValueMaterialItem}
-                                                onInputChange={(event, newValue) => {
-                                                    setInputValueMaterialItem(newValue);
-                                                }}
-                                                style={{ display: printTypeMaterial.find((item) => item.itemId === selectedItemMask.itemMask.itemMaskID)?.type !== type.value ? 'none' : 'block' }}
-                                                renderInput={(params) => (
-                                                    <CustomTextField
-                                                        {...params}
-                                                        variant="outlined"
-                                                        label="Material"
-                                                        size='small'
-                                                        InputLabelProps={{ size: 'small' }}
-                                                        disabled={printTypeMaterial.find((item) => item.itemId === selectedItemMask.itemMask.itemMaskID)?.type !== type.value}
-                                                    />
-                                                )}
-                                                PaperComponent={({ children }) => <CustomPaper>{children}</CustomPaper>}
-                                                PopperComponent={CustomPopper}
-                                            />
+                                            {printTypeChange === 'EMBROIDER' && (
+                                                <Autocomplete
+                                                    id="tags-outlined"
+                                                    options={heatInkMaterial || []}
+                                                    getOptionLabel={(option) => {
+                                                        // Check if the option is not null or undefined
+                                                        if (option && typeof option === 'object' && 'materialName' in option) {
+                                                            return `${option.materialName} (${__handleAddCommasToNumber(option.minPrice)} - ${__handleAddCommasToNumber(option.maxPrice)} VND) `;
+                                                        }
+                                                        return ''; // Return an empty string if the option is not valid
+                                                    }}
+                                                    filterSelectedOptions
+                                                    value={heatInkMaterial?.find((item) => item.materialID === printTypeMaterial.find((inkItem) => inkItem.itemId === selectedItemMask.itemMask.itemMaskID)?.material) || null}
+                                                    onChange={(event, newValue) => {
+                                                        newValue && setMaterialItem(newValue.materialID);
+                                                    }}
+                                                    inputValue={inputValueMaterialItem}
+                                                    onInputChange={(event, newValue) => {
+                                                        setInputValueMaterialItem(newValue);
+                                                    }}
+                                                    style={{ display: printTypeMaterial.find((item) => item.itemId === selectedItemMask.itemMask.itemMaskID)?.type !== type.value ? 'none' : 'block' }}
+                                                    renderInput={(params) => (
+                                                        <CustomTextField
+                                                            {...params}
+                                                            variant="outlined"
+                                                            label="Material"
+                                                            size='small'
+                                                            InputLabelProps={{ size: 'small' }}
+                                                            disabled={printTypeMaterial.find((item) => item.itemId === selectedItemMask.itemMask.itemMaskID)?.type !== type.value}
+                                                        />
+                                                    )}
+                                                    PaperComponent={({ children }) => <CustomPaper>{children}</CustomPaper>}
+                                                    PopperComponent={CustomPopper}
+                                                />
+                                            )}
+
+                                            {printTypeChange === 'MANUAL_PRINT' && (
+                                                <Autocomplete
+                                                    id="tags-outlined"
+                                                    options={manualInkMaterial || []}
+                                                    getOptionLabel={(option) => {
+                                                        // Check if the option is not null or undefined
+                                                        if (option && typeof option === 'object' && 'materialName' in option) {
+                                                            return `${option.materialName} (${__handleAddCommasToNumber(option.minPrice)} - ${__handleAddCommasToNumber(option.maxPrice)} VND) `;
+                                                        }
+                                                        return ''; // Return an empty string if the option is not valid
+                                                    }}
+                                                    filterSelectedOptions
+                                                    value={manualInkMaterial?.find((item) => item.materialID === printTypeMaterial.find((inkItem) => inkItem.itemId === selectedItemMask.itemMask.itemMaskID)?.material) || null}
+                                                    onChange={(event, newValue) => {
+                                                        newValue && setMaterialItem(newValue.materialID);
+                                                    }}
+                                                    inputValue={inputValueMaterialItem}
+                                                    onInputChange={(event, newValue) => {
+                                                        setInputValueMaterialItem(newValue);
+                                                    }}
+                                                    style={{ display: printTypeMaterial.find((item) => item.itemId === selectedItemMask.itemMask.itemMaskID)?.type !== type.value ? 'none' : 'block' }}
+                                                    renderInput={(params) => (
+                                                        <CustomTextField
+                                                            {...params}
+                                                            variant="outlined"
+                                                            label="Material"
+                                                            size='small'
+                                                            InputLabelProps={{ size: 'small' }}
+                                                            disabled={printTypeMaterial.find((item) => item.itemId === selectedItemMask.itemMask.itemMaskID)?.type !== type.value}
+                                                        />
+                                                    )}
+                                                    PaperComponent={({ children }) => <CustomPaper>{children}</CustomPaper>}
+                                                    PopperComponent={CustomPopper}
+                                                />
+                                            )}
+
+                                            {printTypeChange === 'HEAT_PRINT' && (
+                                                <Autocomplete
+                                                    id="tags-outlined"
+                                                    options={embroiderMaterial || []}
+                                                    getOptionLabel={(option) => {
+                                                        // Check if the option is not null or undefined
+                                                        if (option && typeof option === 'object' && 'materialName' in option) {
+                                                            return `${option.materialName} (${__handleAddCommasToNumber(option.minPrice)} - ${__handleAddCommasToNumber(option.maxPrice)} VND) `;
+                                                        }
+                                                        return ''; // Return an empty string if the option is not valid
+                                                    }}
+                                                    filterSelectedOptions
+                                                    value={embroiderMaterial?.find((item) => item.materialID === printTypeMaterial.find((inkItem) => inkItem.itemId === selectedItemMask.itemMask.itemMaskID)?.material) || null}
+                                                    onChange={(event, newValue) => {
+                                                        newValue && setMaterialItem(newValue.materialID);
+                                                    }}
+                                                    inputValue={inputValueMaterialItem}
+                                                    onInputChange={(event, newValue) => {
+                                                        setInputValueMaterialItem(newValue);
+                                                    }}
+                                                    style={{ display: printTypeMaterial.find((item) => item.itemId === selectedItemMask.itemMask.itemMaskID)?.type !== type.value ? 'none' : 'block' }}
+                                                    renderInput={(params) => (
+                                                        <CustomTextField
+                                                            {...params}
+                                                            variant="outlined"
+                                                            label="Material"
+                                                            size='small'
+                                                            InputLabelProps={{ size: 'small' }}
+                                                            disabled={printTypeMaterial.find((item) => item.itemId === selectedItemMask.itemMask.itemMaskID)?.type !== type.value}
+                                                        />
+                                                    )}
+                                                    PaperComponent={({ children }) => <CustomPaper>{children}</CustomPaper>}
+                                                    PopperComponent={CustomPopper}
+                                                />
+                                            )}
 
                                         </div>
                                     </div>

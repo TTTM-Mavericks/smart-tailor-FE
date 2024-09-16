@@ -19,7 +19,9 @@ export interface ExpertTailoringMaterial {
     materialName: string,
     expertTailoringName: string,
     createDate: string,
-    lastModifiedDate: string
+    lastModifiedDate: string,
+    categoryID: string,
+    materialID: string
 }
 
 export interface ExpertTailoringMaterialEdit {

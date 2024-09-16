@@ -80,6 +80,8 @@ export interface MaterialDetailInterface {
   minPrice?: number;
   maxPrice?: number;
   quantity?: number;
+  basePrice?: number,
+  brandPrice?: number,
 }
 
 export interface DesignDetailInterface {
@@ -192,48 +194,80 @@ export const PartOfShirtDesignData: PartOfDesignInterface[] = [
 
 export const PartOfHoodieDesignData = [
   {
-    partOfDesignID: '1',
-    designID: '1',
-    partOfDesignName: LOGO_PART,
-    createDate: '',
-    lastModifiedDate: '',
-    imgUrl: shirtFrontDesign,
-    successImageUrl: '',
-    itemMasks: [],
-    rotate: 0
+    partOfDesignName: "LOGO_PART",
+    imageUrl: "/src/assets/clothes/shirt-front-design.png",
+    successImageUrl: "",
+    materialID: "",
+    width: 60,
+    height: 80,
+    itemMask: []
+  },
+  {
+    partOfDesignName: "FRONT_CLOTH_PART",
+    imageUrl: "/src/assets/clothes/shirt-front-design.png",
+    successImageUrl: "",
+    materialID: "",
+    width: 60,
+    height: 80,
+    itemMask: []
+  },
+  {
+    partOfDesignName: "BACK_CLOTH_PART",
+    imageUrl: "/src/assets/clothes/shirt-back-design.png",
+    successImageUrl: "",
+    materialID: "",
+    width: 60,
+    height: 80,
+    itemMask: []
+  },
+  {
+    partOfDesignName: "SLEEVE_CLOTH_PART",
+    imageUrl: "/src/assets/clothes/seleeve_hoodie.png",
+    successImageUrl: "",
+    materialID: "",
+    width: 15,
+    height: 20,
+    itemMask: []
+  }
+]
 
+export const PartOfLongSkirtData = [
+  {
+    partOfDesignName: "LOGO_PART",
+    imageUrl: "/src/assets/clothes/shirt-front-design.png",
+    successImageUrl: "",
+    materialID: "",
+    width: 60,
+    height: 80,
+    itemMask: []
   },
   {
-    partOfDesignID: '2',
-    designID: '1',
-    partOfDesignName: FRONT_CLOTH_PART,
-    createDate: '',
-    lastModifiedDate: '',
-    imgUrl: shirtFrontDesign,
-    itemMasks: [],
-    rotate: 0
+    partOfDesignName: "FRONT_CLOTH_PART",
+    imageUrl: "/src/assets/clothes/shirt-front-design.png",
+    successImageUrl: "",
+    materialID: "",
+    width: 60,
+    height: 80,
+    itemMask: []
   },
   {
-    partOfDesignID: '3',
-    designID: '1',
-    partOfDesignName: BACK_CLOTH_PART,
-    createDate: '',
-    lastModifiedDate: '',
-    imgUrl: shirtFrontDesign,
-    itemMasks: [],
-    rotate: 0
+    partOfDesignName: "BACK_CLOTH_PART",
+    imageUrl: "/src/assets/clothes/shirt-back-design.png",
+    successImageUrl: "",
+    materialID: "",
+    width: 60,
+    height: 80,
+    itemMask: []
   },
   {
-    partOfDesignID: '4',
-    designID: '1',
-    partOfDesignName: SLEEVE_CLOTH_PART,
-    createDate: '',
-    lastModifiedDate: '',
-    imgUrl: shirtFrontDesign,
-    itemMasks: [],
-    rotate: 0
-  },
-
+    partOfDesignName: "SLEEVE_CLOTH_PART",
+    imageUrl: "/src/assets/clothes/long_shirt.png",
+    successImageUrl: "",
+    materialID: "",
+    width: 15,
+    height: 20,
+    itemMask: []
+  }
 ]
 
 

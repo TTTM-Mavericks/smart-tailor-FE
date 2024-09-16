@@ -72,7 +72,7 @@ const ManageInvoiceScreen: React.FC = () => {
         doc.setFillColor(244, 245, 239); // White color
         doc.rect(0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height, 'F');
 
-        const imgData = "../../../assets/system/smart-tailor_logo.png";
+        const imgData = "http://localhost:3000/src/assets/system/smart-tailor_logo.png";
         const imgWidth = 40;
         const imgHeight = 40;
         doc.addImage(imgData, 'PNG', 15, 10, imgWidth, imgHeight);
@@ -291,7 +291,7 @@ const ManageInvoiceScreen: React.FC = () => {
     ];
 
     const getRowId = (row: any) => {
-        return row.registrarId;
+        return row.id;
     };
 
     // Get language in local storage

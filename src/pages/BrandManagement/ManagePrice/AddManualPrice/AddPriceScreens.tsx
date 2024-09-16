@@ -1,21 +1,13 @@
 import React, { ChangeEvent, useState, useEffect } from 'react';
-import {
-    Box,
-    Button,
-    IconButton,
-    TextField,
-    Grid,
-    Typography
-} from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
+import { IconButton } from '@mui/material';
 import Swal from 'sweetalert2';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
-import { Category } from '../../../../models/AdminCategoryExcelModel';
 import { LaborQuantity } from '../../../../models/LaborQuantityModel';
-import { BrandLaborQuantity } from '../../../../models/BrandLaborQuantityModel';
 import { CancelOutlined } from '@mui/icons-material';
+import { __getToken } from '../../../../App';
+import Cookies from 'js-cookie';
 
 interface AddPriceWithHandsFormProps {
     closeCard: () => void;
@@ -26,20 +18,24 @@ interface AddPriceWithHandsFormProps {
 const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNewLaborQuantity }) => {
 
     // ---------------UseState Variable---------------//
-    const [formData, setFormData] = useState({
-        categoryName: 'Vải',
-    });
+    let userAuth;
+    const userAuthDataSession = sessionStorage.getItem('userRegister');
+    const userAuthDataLocal = Cookies.get('userAuth');
 
-    const userAuthData = localStorage.getItem('userAuth') as string;
+    if (userAuthDataSession) {
+        userAuth = JSON.parse(userAuthDataSession);
+    } else if (userAuthDataLocal) {
+        userAuth = JSON.parse(userAuthDataLocal);
+    } else {
+        // Handle the case where neither session storage nor local storage contains user data
+        console.error('User authentication data not found');
+        // You might want to redirect to a login page or handle this case appropriately
+    }
 
-    const userAuth = JSON.parse(userAuthData);
-
-    const { userID, email, fullName, language, phoneNumber, roleName, imageUrl } = userAuth;
-
+    // Only destructure if userAuth is defined
+    const { userID, email, fullName, language, phoneNumber, roleName, imageUrl } = userAuth || {};
 
     // ---------------Usable Variable---------------//
-
-    // Get language in local storage
     const selectedLanguage = localStorage.getItem('language');
     const codeLanguage = selectedLanguage?.toUpperCase();
 
@@ -55,69 +51,16 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
 
     // ---------------FunctionHandler---------------//
 
-    /**
-     * 
-     * @param e 
-     * Tracking the changing in each fields
-     */
-    const _handleFormChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setFormData(prevFormData => ({
-            ...prevFormData,
-            [name]: value,
-        }));
-    };
-
-
-    /**
-     * Submit the add manual with validate fields
-     * When success show success popup
-     * When fail then show fail popup
-     */
-    const _handleSubmit = async () => {
-        try {
-            console.log('Form Data:', JSON.stringify(formData));
-
-            const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.addNewCategory + `?categoryName=${formData.categoryName}`}`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            console.log('Response:', response.data);
-
-            if (response.data.status === 200) {
-                addNewLaborQuantity(response.data);
-                Swal.fire(
-                    'Add Success!',
-                    'User has been updated!',
-                    'success'
-                );
-
-            } else {
-                Swal.fire(
-                    'Add User fail!',
-                    'Please check information!',
-                    'error'
-                );
-            }
-        } catch (err: any) {
-            console.error('Error:', err);
-            Swal.fire(
-                'Add fail!',
-                `${err.message || 'Unknown error'} `,
-                'error'
-            );
-        }
-    };
-
-
     const [prices, setPrices] = useState<LaborQuantity[]>([]);
 
     useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.labor_quantity + functionEndpoints.laborQantity.getAllLaborQuantity}`;
 
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');
@@ -126,7 +69,11 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
             })
             .then((responseData) => {
                 if (responseData && Array.isArray(responseData.data)) {
-                    setPrices(responseData.data);
+                    // Sort the prices array based on the minimum quantity
+                    const sortedPrices = responseData.data.sort((a: any, b: any) =>
+                        a.laborQuantityMinQuantity - b.laborQuantityMinQuantity
+                    );
+                    setPrices(sortedPrices);
                     console.log("Data received:", responseData);
                 } else {
                     console.error('Invalid data format:', responseData);
@@ -135,9 +82,22 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
             .catch(error => console.error('Error fetching data:', error));
     }, []);
 
-    const handlePriceChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
-        const newPrices = prices.slice();
-        newPrices[index].brandLaborCostPerQuantity = parseFloat(event.target.value);
+    // Function to format number with commas
+    const formatNumber = (num: number) => {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+
+    const handlePriceChange = (laborQuantityID: string, event: React.ChangeEvent<HTMLInputElement>) => {
+        const inputValue = event.target.value;
+        const numericValue = parseFloat(inputValue);
+        if (isNaN(numericValue) || numericValue <= 0) {
+            return;
+        }
+        const newPrices = prices.map(price =>
+            price.laborQuantityID === laborQuantityID
+                ? { ...price, brandLaborCostPerQuantity: parseFloat(event.target.value) }
+                : price
+        );
         setPrices(newPrices);
     };
 
@@ -146,46 +106,76 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
         console.log('Prices:', prices);
 
         const formData = {
-            brandLaborQuantity: prices.map(price => ({
-                laborQuantityID: price.laborQuantityID,
-                brandLaborCostPerQuantity: price.brandLaborCostPerQuantity
-            }))
+            brandID: userID,
+            brandLaborQuantity: prices
+                .filter((price: any) => price.brandLaborCostPerQuantity !== undefined && price.brandLaborCostPerQuantity !== null)
+                .map((price: any) => ({
+                    laborQuantityID: price.laborQuantityID,
+                    brandLaborCostPerQuantity: price.brandLaborCostPerQuantity
+                }))
         };
 
         try {
             console.log('Form Data:', JSON.stringify(formData));
 
-            const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_labor_quantity + functionEndpoints.brandLaborQuantity.addNewBrandLaborQuantity + `/${userID}`}`, formData, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
+            const response = await axios.post(
+                `${baseURL}${versionEndpoints.v1}${featuresEndpoints.brand_labor_quantity}${functionEndpoints.brandLaborQuantity.addNewBrandLaborQuantity}`,
+                formData,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${__getToken()}`
+                    },
+                }
+            );
 
-            console.log('Response:', response.data.data);
+            console.log('Response:', response.data);
 
             if (response.data.status === 200) {
-                // addNewLaborQuantity(formData);
-                closeCard()
+                closeCard();
                 Swal.fire(
                     'Add Success!',
                     'Labor quantity has been added!',
                     'success'
                 );
             } else {
-                closeCard()
-                Swal.fire(
-                    'Add Failed!',
-                    'Please check the information!',
-                    'error'
-                );
+                throw new Error('Unexpected response status');
             }
         } catch (err: any) {
-            closeCard()
-            Swal.fire(
-                'Add Failed!',
-                'Please check the information!',
-                'error'
-            );
+            console.error('Error:', err);
+            closeCard();
+
+            let errorMessage = 'An error occurred. Please try again.';
+
+            if (err.response && err.response.data && err.response.data.errors) {
+                const errors = err.response.data.errors;
+                if (errors.length > 0) {
+                    errorMessage = errors.map((error: any) => {
+                        let msg = '';
+                        if (error.errorMessage) {
+                            msg = error.errorMessage.map((m: string) => {
+                                if (m.includes("Brand Labor Cost must be between Min Price and Max Price")) {
+                                    return "Brand Labor Cost must be between Min Price and Max Price";
+                                } else if (m.includes("Brand Labor Quantity is existed")) {
+                                    return "Brand Labor Quantity is existed";
+                                }
+                                return m;
+                            }).join('<br>');
+                        }
+                        if (error.errorData) {
+                            msg += `<br>Error Data:<br>`;
+                            msg += `Labor Quantity ID: ${error.errorData.laborQuantityID}<br>`;
+                            msg += `Brand Labor Cost Per Quantity: ${error.errorData.brandLaborCostPerQuantity}`;
+                        }
+                        return msg;
+                    }).join('<br><br>');
+                }
+            }
+
+            Swal.fire({
+                title: 'Add Failed!',
+                html: errorMessage,
+                icon: 'error'
+            });
         }
     };
 
@@ -209,20 +199,24 @@ const AddPriceManual: React.FC<AddPriceWithHandsFormProps> = ({ closeCard, addNe
                     <thead>
                         <tr>
                             <th className="border-b py-2 font-semibold" style={{ paddingLeft: "30px" }}>Quantity</th>
-                            <th className="border-b py-2 font-semibold" style={{ paddingLeft: "20px" }}>Base Price</th>
-                            <th className="border-b py-2 font-semibold" style={{ paddingLeft: "90px" }}>Brand Price</th>
+                            <th className="border-b py-2 font-semibold" style={{ paddingLeft: "20px" }}>Base Price (VND)</th>
+                            <th className="border-b py-2 font-semibold" style={{ paddingLeft: "90px" }}>Brand Price (VND)</th>
                         </tr>
                     </thead>
                     <tbody>
                         {prices.map((price, index) => (
                             <tr key={price.laborQuantityID} className="odd:bg-gray-50">
-                                <td className="border-b py-2 px-4">{price.laborQuantityMinQuantity} - {price.laborQuantityMaxQuantity}</td>
-                                <td className="border-b py-2 px-4">{price.laborQuantityMinPrice} - {price.laborQuantityMaxPrice}</td>
+                                <td className="border-b py-2 px-4">
+                                    {price.laborQuantityMinQuantity} - {price.laborQuantityMaxQuantity}
+                                </td>
+                                <td className="border-b py-2 px-4">
+                                    {formatNumber(price.laborQuantityMinPrice)} - {formatNumber(price.laborQuantityMaxPrice)}
+                                </td>
                                 <td className="border-b py-2 px-4">
                                     <input
                                         type="number"
                                         value={price.brandLaborCostPerQuantity || ''}
-                                        onChange={(event) => handlePriceChange(index, event)}
+                                        onChange={(event) => handlePriceChange(price.laborQuantityID, event)}
                                         placeholder="Enter brand price"
                                         className="w-full border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     />

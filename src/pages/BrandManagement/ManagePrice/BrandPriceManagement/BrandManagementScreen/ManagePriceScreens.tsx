@@ -12,6 +12,8 @@ import axios from "axios";
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { LaborQuantity } from "../../../../../models/LaborQuantityModel";
 import { greenColor } from "../../../../../root/ColorSystem";
+import { __getToken } from "../../../../../App";
+import Cookies from "js-cookie";
 
 // Make Style of popup
 const style = {
@@ -32,15 +34,25 @@ const ManagePrice: React.FC = () => {
     const colors = tokens(theme.palette.mode);
     const [data, setData] = React.useState<LaborQuantity[]>([]);
 
-    const userAuthData = localStorage.getItem('userAuth') as string;
-
-    const userAuth = JSON.parse(userAuthData);
-
-    const { userID, email, fullName, language, phoneNumber, roleName, imageUrl } = userAuth;
-
     // set formid to pass it to component edit Material
     const [formId, setFormId] = React.useState<LaborQuantity | null>(null);
 
+    let userAuth;
+    const userAuthData = sessionStorage.getItem('userRegister');
+    const userAuthCookie = Cookies.get('userAuth');
+
+    if (userAuthData) {
+        userAuth = JSON.parse(userAuthData);
+    } else if (userAuthCookie) {
+        userAuth = JSON.parse(userAuthCookie);
+    } else {
+        // Handle the case where neither session storage nor cookie contains user data
+        console.error('User authentication data not found');
+        // You might want to redirect to a login page or handle this case appropriately
+    }
+
+    // Only destructure if userAuth is defined
+    const { userID, email, fullName, language, phoneNumber, roleName, imageUrl } = userAuth || {};
     // Open Edit PopUp when clicking on the edit icon
     const [editopen, setEditOpen] = React.useState<boolean>(false);
     const _handleEditOpen = () => setEditOpen(true);
@@ -93,7 +105,11 @@ const ManagePrice: React.FC = () => {
 
     React.useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_labor_quantity + functionEndpoints.laborQantity.getAllLaborQuantityByBrandID + `/${userID}`}`;
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');
@@ -127,7 +143,7 @@ const ManagePrice: React.FC = () => {
         laborQuantityMaxQuantity: number,
         laborQuantityMinPrice: number,
         laborQuantityMaxPrice: number,
-        laborCostPerQuantity: number
+        brandLaborCostPerQuantity: number
     ) => {
         // Handle edit action
         const LaborQuantityDataToEdit: LaborQuantity = {
@@ -136,7 +152,7 @@ const ManagePrice: React.FC = () => {
             laborQuantityMaxQuantity: laborQuantityMaxQuantity,
             laborQuantityMinPrice: laborQuantityMinPrice,
             laborQuantityMaxPrice: laborQuantityMaxPrice,
-            laborCostPerQuantity: laborCostPerQuantity
+            brandLaborCostPerQuantity: brandLaborCostPerQuantity
         }
         setFormId(LaborQuantityDataToEdit);
         _handleEditOpen();
@@ -205,26 +221,51 @@ const ManagePrice: React.FC = () => {
         {
             field: "laborQuantityMinQuantity",
             headerName: "Min Quantity",
+            renderCell: (params) => (
+                <span>
+                    {params.value.toLocaleString()}
+                </span>
+            ),
             flex: 1,
         },
         {
             field: "laborQuantityMaxQuantity",
             headerName: "Max Quantity",
+            renderCell: (params) => (
+                <span>
+                    {params.value.toLocaleString()}
+                </span>
+            ),
             flex: 1,
         },
         {
             field: "laborQuantityMinPrice",
             headerName: "Min Price",
+            renderCell: (params) => (
+                <span>
+                    {params.value.toLocaleString()}
+                </span>
+            ),
             flex: 1,
         },
         {
             field: "laborQuantityMaxPrice",
             headerName: "Max Price",
+            renderCell: (params) => (
+                <span>
+                    {params.value.toLocaleString()}
+                </span>
+            ),
             flex: 1,
         },
         {
             field: "laborCostPerQuantity",
             headerName: "Brand Price",
+            renderCell: (params) => (
+                <span>
+                    {params.value.toLocaleString()}
+                </span>
+            ),
             flex: 1,
         },
         {
@@ -252,7 +293,6 @@ const ManagePrice: React.FC = () => {
                             width: '6px',
                             height: '6px',
                             borderRadius: '50%',
-                            backgroundColor: params.value === 'Active' ? '#f44336' : '#4caf50',
                         }}
                     />
                     {params.row.status ? 'INACTIVE' : 'ACTIVE'}

@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom';
 import { NotificationInterface } from '../../../../models/NotificationModel';
 import Cookies from 'js-cookie';
 import { UserInterface } from '../../../../models/UserModel';
-import api, { featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
+import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import { toast } from 'react-toastify';
+import { __getToken } from '../../../../App';
+import axios from 'axios';
 
 interface SidebarProps {
     menuOpen: boolean;
@@ -27,7 +29,7 @@ const Sidebar: React.FC<SidebarProps> = ({ menuOpen, toggleMenu, activeMenu, han
     useEffect(() => {
         const fetchNotifications = async () => {
             try {
-                const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.notification + functionEndpoints.notification.getNotiByUserId}/${userParse.userID}`);
+                const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.notification + functionEndpoints.notification.getNotiByUserId}/${userParse.userID}`, null, __getToken());
                 if (response.status === 200) {
                     const sortedData = response.data.sort((a: NotificationInterface, b: NotificationInterface) => {
                         return new Date(b.createDate).getTime() - new Date(a.createDate).getTime();
@@ -78,6 +80,30 @@ const Sidebar: React.FC<SidebarProps> = ({ menuOpen, toggleMenu, activeMenu, han
             websocket.close();
         };
     }, [websocketUrl]);
+
+    // Get All Order With Status NOT_VERIFY
+    const apiUrl = `${baseURL}${versionEndpoints.v1}${featuresEndpoints.order}${functionEndpoints.order.getAllOrder}`;
+
+    const [notVerifiedCount, setNotVerifiedCount] = useState(0);
+
+    useEffect(() => {
+        async function fetchOrderCount() {
+            const count = await getNotVerifiedOrdersCount();
+            setNotVerifiedCount(count);
+        }
+        fetchOrderCount();
+    }, []);
+
+    async function getNotVerifiedOrdersCount() {
+        try {
+            const response = await axios.get(apiUrl);
+            return response.data.data.filter((order: any) => order.orderStatus === 'NOT_VERIFY').length;
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+            return 0;
+        }
+    }
+
     return (
         <aside className={`bg-gradient-to-br from-gray-800 to-gray-900 ${menuOpen ? 'translate-x-0' : '-translate-x-80'} fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0`}>
             <div className="relative border-b border-white/20">
@@ -122,19 +148,33 @@ const Sidebar: React.FC<SidebarProps> = ({ menuOpen, toggleMenu, activeMenu, han
                         </div>
                     </li>
                     <li>
+                        <div
+                            onClick={() => handleMenuClick('employee_manage_order')}
+                            className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'employee_manage_order'
+                                ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]'
+                                : 'text-white hover:bg-white/10 active:bg-white/30'
+                                } w-full flex items-center gap-4 px-4 capitalize`}
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                                aria-hidden="true"
+                                className="w-5 h-5 text-inherit"
+                            >
+                                <path d="M2.25 2.25a.75.75 0 000 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 00-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 000-1.5H5.378A2.25 2.25 0 017.5 15h11.218a.75.75 0 00.674-.421 60.358 60.358 0 002.96-7.228.75.75 0 00-.525-.965A60.864 60.864 0 005.68 4.509l-.232-.867A1.875 1.875 0 003.636 2.25H2.25zM3.75 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM16.5 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" />
+                            </svg>
+                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">
+                                Manage Order ({notVerifiedCount})
+                            </p>
+                        </div>
+                    </li>
+                    <li>
                         <div onClick={() => handleMenuClick('employee_manage_report')} className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'employee_manage_report' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}>
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
                                 <path fillRule="evenodd" d="M2.25 2.25a.75.75 0 000 1.5H3v10.5a3 3 0 003 3h1.21l-1.172 3.513a.75.75 0 001.424.474l.329-.987h8.418l.33.987a.75.75 0 001.422-.474l-1.17-3.513H18a3 3 0 003-3V3.75h.75a.75.75 0 000-1.5H2.25zm6.04 16.5l.5-1.5h6.42l.5 1.5H8.29zm7.46-12a.75.75 0 00-1.5 0v6a.75.75 0 001.5 0v-6zm-3 2.25a.75.75 0 00-1.5 0v3.75a.75.75 0 001.5 0V9zm-3 2.25a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5z" clipRule="evenodd" />
                             </svg>
                             <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">Manage Report</p>
-                        </div>
-                    </li>
-                    <li>
-                        <div onClick={() => handleMenuClick('employee_manage_order')} className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'employee_manage_order' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}>
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
-                                <path d="M2.25 2.25a.75.75 0 000 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 00-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 000-1.5H5.378A2.25 2.25 0 017.5 15h11.218a.75.75 0 00.674-.421 60.358 60.358 0 002.96-7.228.75.75 0 00-.525-.965A60.864 60.864 0 005.68 4.509l-.232-.867A1.875 1.875 0 003.636 2.25H2.25zM3.75 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM16.5 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" />
-                            </svg>
-                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">Manage Order</p>
                         </div>
                     </li>
                     {/* <li>

@@ -20,7 +20,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import LoadingComponent from '../../../components/Loading/LoadingComponent';
 import { __handleAddCommasToNumber, __handleRoundToThreeDecimalPlaces } from '../../../utils/NumbericUtils';
 import { __handleSendNotification } from '../../../utils/NotificationUtils';
-import { __getUserLogined } from '../../../App';
+import { __getToken, __getUserLogined } from '../../../App';
 import { UserInterface } from '../../../models/UserModel';
 
 
@@ -266,7 +266,7 @@ const OrderProductScreen = () => {
                 buyerName: selectedAddress.fullName,
             }
             console.log('bodyRequest: ', bodyRequest);
-            const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.designDetail + functionEndpoints.designDetail.addNewDesignDetail}`, bodyRequest);
+            const response = await api.post(`${versionEndpoints.v1 + featuresEndpoints.designDetail + functionEndpoints.designDetail.addNewDesignDetail}`, bodyRequest, __getToken());
             if (response.status === 200) {
                 // await __handleCreateOrder();
                 toast.success(`${response.message}`, { autoClose: 4000 });
@@ -280,7 +280,7 @@ const OrderProductScreen = () => {
                     action: "CREATE",
                     type: "ORDER",
                     targetID: response.data.orderID,
-                    message: ""
+                    message: `Customer ${user.userID} created an order, let's check it.`
                 }
                 console.log(bodyRequest);
                 __handleSendNotification(bodyRequest);

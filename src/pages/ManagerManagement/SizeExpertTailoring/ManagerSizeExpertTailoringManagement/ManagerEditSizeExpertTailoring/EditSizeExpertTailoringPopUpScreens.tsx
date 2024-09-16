@@ -9,12 +9,14 @@ import { ExpertTailoringEdit } from "../../../../../models/ManagerExpertTailorin
 import { ToastContainer, toast } from "react-toastify";
 import { CancelOutlined } from "@mui/icons-material";
 import { greenColor, primaryColor, redColor } from "../../../../../root/ColorSystem";
+import { __getToken } from "../../../../../App";
 
 interface EditExpertTailoringPopUpScreenFormProps {
     fid: {
         expertTailoringID: string,
         expertTailoringName: string,
-        sizeImageUrl: string,
+        sizeName: string,
+        ratio: number
     };
     editClose: () => void;
     updateExpertTailoring: (updatedExpertTailoring: ExpertTailoringEdit) => void;
@@ -27,11 +29,41 @@ const EditExpertTailoringPopUpScreens: React.FC<EditExpertTailoringPopUpScreenFo
 
     const [formData, setFormData] = React.useState({
         expertTailoringName: fid.expertTailoringName,
-        sizeImageUrl: fid.sizeImageUrl,
+        sizeName: fid.sizeName,
+        ratio: fid.ratio
     });
 
     const [categoryData, setCategoryData] = React.useState<string[]>([])
+    const [sizeName, setSizeNameData] = React.useState<string[]>([])
 
+    /**
+        * Get all Size name to dropdown
+        */
+    React.useEffect(() => {
+        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.size + functionEndpoints.size.getAllSize}`;
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`
+            }
+        })
+            .then(response => {
+                if (response.status !== 200) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.data;
+            })
+            .then((responseData) => {
+                if (responseData && Array.isArray(responseData.data)) {
+                    // Extract only the categoryName values from the objects
+                    const sizeNames = responseData.data.map((size: any) => size.sizeName);
+                    setSizeNameData(sizeNames);
+                    console.log("Data received:", sizeNames);
+                } else {
+                    console.error('Invalid data format:', responseData);
+                }
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    }, []);
 
     // Get language in local storage
     const selectedLanguage = localStorage.getItem('language');
@@ -165,40 +197,24 @@ const EditExpertTailoringPopUpScreens: React.FC<EditExpertTailoringPopUpScreenFo
   */
     const _handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        let sizeImageUrls: string[] = [];
-
-        if (files && files.length > 0) {
-            sizeImageUrls = await _handleUploadToCloudinary(files);
-        }
-
-        const addNewExpertTailorings = {
-            ...formData,
-            sizeImageUrl: sizeImageUrls.length > 0 ? sizeImageUrls[0] : formData.sizeImageUrl,
+        const updatedExpertTailoring = {
+            expertTailoringName: "shirtModel",
+            sizeName: "L",
+            ratio: 1.4,
         };
 
-
-        // Make API call to update the profile using PUT method
         try {
-            // const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0YW1tdHNlMTYxMDg3QGZwdC5lZHUudm4iLCJpYXQiOjE3MTgyODUyMTMsImV4cCI6MTcxODM3MTYxM30.UUpy2s9SwYGF_TyIru6VASQ-ZzGTOqx7mkWkcSR2__0'; // Replace with the actual bearer token
             const response = await axios.put(
-                `${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.updateExpertTailoring + `/${fid.expertTailoringID}`}`,
-                addNewExpertTailorings,
-                // {
-                //     headers: {
-                //         'Authorization': `Bearer ${token}`
-                //     }
-                // }
-
+                `${baseURL + versionEndpoints.v1 + featuresEndpoints.sizeExpertTailoring + functionEndpoints.sizeExpertTailoring.updateSizeExpertTailoring}`,
+                updatedExpertTailoring
             );
-            console.log("res:" + response);
 
             if (response.status === 200) {
                 Swal.fire({
                     icon: 'success',
                     title: 'Updated Expert Tailoring Success!',
-                    text: 'Expert tailoring have been Updated!',
+                    text: 'Expert tailoring has been Updated!',
                 });
-                updateExpertTailoring({ ...addNewExpertTailorings, expertTailoringID: fid.expertTailoringID })
                 editClose()
             } else {
                 throw new Error('Update failed');
@@ -207,14 +223,14 @@ const EditExpertTailoringPopUpScreens: React.FC<EditExpertTailoringPopUpScreenFo
             Swal.fire({
                 icon: 'error',
                 title: 'Updated Expert Tailoring Failed!',
-                text: 'Expert tailoring have been Updated!',
+                text: 'Expert tailoring update failed!',
             });
             editClose()
         }
     };
 
     return (
-        <Box style={{ height: '500px', overflowY: 'auto' }}>
+        <Box style={{ height: '400px', overflowY: 'auto' }}>
             <div>
                 <div className="relative w-full p-8 bg-white rounded-xl z-10">
                     <div className="text-center relative">
@@ -260,41 +276,37 @@ const EditExpertTailoringPopUpScreens: React.FC<EditExpertTailoringPopUpScreenFo
                                 </Select>
                             </FormControl>
                         </div>
-                        <div className="grid grid-cols-1 space-y-1">
-                            <label className="text-xs font-bold text-gray-500 tracking-wide">Attach Document</label>
-                            <div className="flex items-center justify-center w-full">
-                                <label className="flex flex-col rounded-lg border-4 border-dashed w-full h-60 p-10 group text-center">
-                                    <div className="relative h-full w-full text-center flex flex-col items-center justify-center">
-                                        {previewUrl ? (
-                                            <img className="absolute inset-0 h-full w-full object-cover" src={previewUrl} alt="Profile Preview" />
-                                        ) : formData.sizeImageUrl ? (
-                                            <img className="absolute inset-0 h-full w-full object-cover" src={formData.sizeImageUrl} alt="Profile" />
-                                        ) : (
-                                            <div className="relative z-10 flex flex-col items-center justify-center">
-                                                <p className="pointer-none text-gray-500">
-                                                    <span className="text-xs">Drag and drop</span> files here <br /> or{' '}
-                                                    <a href="#" onClick={() => fileInputRef.current?.click()} className="text-blue-600 hover:underline">
-                                                        select a file
-                                                    </a>{' '}
-                                                    from your computer
-                                                </p>
-                                            </div>
-                                        )}
-                                    </div>
-                                    <input
-                                        ref={fileInputRef}
-                                        type="file"
-                                        className="hidden"
-                                        onChange={_handleImagesChanges}
-                                        accept="image/*"
-                                    />
-                                    <ToastContainer />
-                                </label>
-                            </div>
+                        <div>
+                            <FormControl fullWidth>
+                                <InputLabel id="size-select-label">Size Name</InputLabel>
+                                <Select
+                                    labelId="size-select-label"
+                                    id="size-select"
+                                    name="sizeName"
+                                    value={formData.sizeName}
+                                    onChange={_handleChange}
+                                    label="Size Name"
+                                >
+                                    {sizeName.map((size, index) => (
+                                        <MenuItem key={index} value={size}>
+                                            {size}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
                         </div>
-                        <p className="text-xs text-gray-300">
-                            <span style={{ color: 'red', fontWeight: "bolder" }}>File type: Images</span>
-                        </p>
+                        <div>
+                            <TextField
+                                fullWidth
+                                label="Ratio"
+                                variant="outlined"
+                                size="small"
+                                name="ratio"
+                                type="number"
+                                value={formData.ratio}
+                                onChange={_handleChange}
+                            />
+                        </div>
                     </form>
                 </div>
             </div>

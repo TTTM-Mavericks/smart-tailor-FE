@@ -6,7 +6,9 @@ import api, { versionEndpoints, featuresEndpoints, functionEndpoints } from '../
 import { toast } from 'react-toastify';
 import { SampleModelInterface } from '../../../../../models/OrderModel';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
-import { __getToken } from '../../../../../App';
+import { __getToken, __getUserLogined } from '../../../../../App';
+import { UserInterface } from '../../../../../models/UserModel';
+import { __handleSendNotification } from '../../../../../utils/NotificationUtils';
 
 type Props = {
     isOpen: boolean;
@@ -19,6 +21,7 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID }) =
     const [sampleProductData, setSampleProductData] = useState<SampleModelInterface[]>([]);
     const [activeTab, setActiveTab] = useState(0);
     const [groupedData, setGroupedData] = useState<{ [key: string]: SampleModelInterface[] }>({});
+    const [isDisabled, setIsDisabled] = useState<{ [key: string]: boolean }>({});
 
     useEffect(() => {
         if (!isOpen) return;
@@ -26,7 +29,6 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID }) =
     }, [isOpen]);
 
     useEffect(() => {
-        // Group the data by stage whenever sampleProductData changes
         const grouped = sampleProductData.reduce((acc: any, item) => {
             const stage = item.stage || 'Unknown';
             if (!acc[stage]) acc[stage] = [];
@@ -40,7 +42,6 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID }) =
         try {
             const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.SampleProduct + functionEndpoints.SampleProduct.getSamplePriductByParentOrderID}/${orderID}`);
             if (response.status === 200) {
-                console.log(response.data);
                 setSampleProductData(response.data);
             } else {
                 console.log(response.message);
@@ -52,7 +53,6 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID }) =
     };
 
     const __handleSchangeStatusOfSampleProduct = async (childID: any, itemSample: SampleModelInterface) => {
-        console.log('itemSample', itemSample);
         try {
             const bodyRequest = {
                 orderStageID: itemSample.orderStageID,
@@ -64,27 +64,17 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID }) =
                 status: true,
             };
 
-            console.log('bodyRequest: ', bodyRequest);
-
             const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.SampleProduct + functionEndpoints.SampleProduct.updateSampleProductStatus}/${itemSample.sampleModelID}`, bodyRequest, __getToken());
             if (response.status === 200) {
-                console.log('detail order: ', response.data);
-                console.log(response.message);
+                setIsDisabled((prevState) => ({
+                    ...prevState,
+                    [itemSample.sampleModelID]: true,
+                }));
                 await __handelUpdateOrderState(childID, itemSample);
-                // setGroupedData((prevGroupedData) => {
-                //     const updatedGroup = prevGroupedData[childID].map((sample) =>
-                //         sample.sampleModelID === itemSample.sampleModelID ? { ...sample, status: true } : sample
-                //     );
-                //     return { ...prevGroupedData, [childID]: updatedGroup };
-                // });
-
-            }
-            else {
-                console.log('detail error: ', response.message);
+            } else {
                 toast.error(`${response.message}`, { autoClose: 4000 });
             }
         } catch (error) {
-            console.log(error);
             toast.error(`${error}`, { autoClose: 4000 });
         }
     };
@@ -93,19 +83,25 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID }) =
         try {
             const bodyRequest = {
                 orderID: orderParentID,
-                status: itemData.stage
+                status: itemData.stage,
             };
-            console.log('bodyRequest 2: ', bodyRequest);
             const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest, __getToken());
             if (response.status === 200) {
-                console.log('detail order: ', response.data);
                 toast.success(`${response.message}`, { autoClose: 4000 });
+                const user: UserInterface = __getUserLogined();
+                const notificationRequest = {
+                    senderID: user.userID,
+                    recipientID: itemData.brandID,
+                    action: "UPDATE",
+                    type: "ORDER",
+                    targetID: itemData.orderID,
+                    message: `Accept the sample and change status to ${itemData.stage}`,
+                };
+                __handleSendNotification(notificationRequest);
             } else {
-                console.log('detail error: ', response.message);
                 toast.error(`${response.message}`, { autoClose: 4000 });
             }
         } catch (error) {
-            console.log('error: ', error);
             toast.error(`${error}`, { autoClose: 4000 });
         }
     };
@@ -160,7 +156,13 @@ const ViewSampleUpdateDialog: React.FC<Props> = ({ isOpen, onClose, orderID }) =
                             {Object.entries(groupedData).map(([stage, items], index) => (
                                 <TabPanel key={stage} value={activeTab} index={index}>
                                     {items.map((item) => (
-                                        <SampleCard key={item.sampleModelID} item={item} onAccept={() => __handleSchangeStatusOfSampleProduct(item.orderID, item)} onReject={onClose} />
+                                        <SampleCard
+                                            key={item.sampleModelID}
+                                            item={item}
+                                            onAccept={() => __handleSchangeStatusOfSampleProduct(item.orderID, item)}
+                                            onReject={onClose}
+                                            isDisabled={isDisabled[item.sampleModelID]}
+                                        />
                                     ))}
                                 </TabPanel>
                             ))}
@@ -182,7 +184,7 @@ const TabPanel: React.FC<{ children: React.ReactNode; value: number; index: numb
     );
 };
 
-const SampleCard: React.FC<{ item: SampleModelInterface; onAccept: (item: SampleModelInterface) => void; onReject?: () => void }> = ({ item, onAccept, onReject }) => {
+const SampleCard: React.FC<{ item: SampleModelInterface; onAccept: () => void; onReject?: () => void; isDisabled: boolean }> = ({ item, onAccept, onReject, isDisabled }) => {
     return (
         <div className="bg-white rounded-lg shadow-md p-6 mb-10">
             <h3 className="text-sm font-semibold text-indigo-700 mb-4">Sample Model ID: {item.sampleModelID}</h3>
@@ -236,27 +238,53 @@ const SampleCard: React.FC<{ item: SampleModelInterface; onAccept: (item: Sample
                     </div>
                 )}
             </div>
+            {
+                !item.status && (
+                    <div className="flex justify-center items-center space-x-4 mt-6">
+                        <button
+                            onClick={onAccept}
+                            disabled={isDisabled}
+                            className={`flex items-center justify-center space-x-2 px-4 py-2 rounded-lg font-semibold ${isDisabled
+                                ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                                : 'bg-green-500 hover:bg-green-600 text-white'
+                                }`}
+                        >
+                            <FaClipboardCheck
+                                className={`${isDisabled ? 'text-gray-500' : 'text-white'
+                                    }`}
+                            />
+                            <span
+                                className={`${isDisabled ? 'text-gray-600' : 'text-white'
+                                    }`}
+                            >
+                                Accept
+                            </span>
+                        </button>
 
-            {!item.status && (
-                <div className="flex justify-center items-center space-x-4 mt-6">
-                    <button
-                        onClick={() => onAccept(item)}
-                        className="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-lg flex items-center justify-center space-x-2"
-                    >
-                        <FaClipboardCheck />
-                        <span>Accept</span>
-                    </button>
+                        <button
+                            onClick={onReject}
+                            disabled={isDisabled}
+                            className={`flex items-center justify-center space-x-2 px-4 py-2 rounded-lg font-semibold ${isDisabled
+                                ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                                : 'bg-red-500 hover:bg-red-600 text-white'
+                                }`}
+                        >
+                            <FaTimes
+                                className={`${isDisabled ? 'text-gray-500' : 'text-white'
+                                    }`}
+                            />
+                            <span
+                                className={`${isDisabled ? 'text-gray-600' : 'text-white'
+                                    }`}
+                            >
+                                Reject
+                            </span>
+                        </button>
+                    </div>
+                )
+            }
+        </div >
 
-                    <button
-                        onClick={onReject}
-                        className="bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-lg flex items-center justify-center space-x-2"
-                    >
-                        <FaTimes />
-                        <span>Reject</span>
-                    </button>
-                </div>
-            )}
-        </div>
     );
 };
 
