@@ -16,6 +16,7 @@ import { EditLaborQuantity, LaborQuantity } from "../../../../../models/LaborQua
 import EditPricePopUpScreens from "../AdminEditPrice/EditPricePopUpScreens";
 import { margin } from "@mui/system";
 import { greenColor } from "../../../../../root/ColorSystem";
+import { __getToken } from "../../../../../App";
 
 // Make Style of popup
 const style = {
@@ -92,7 +93,11 @@ const AdminManagePrice: React.FC = () => {
     React.useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.labor_quantity + functionEndpoints.laborQantity.getAllLaborQuantity}`;
 
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');
@@ -203,21 +208,41 @@ const AdminManagePrice: React.FC = () => {
         {
             field: "laborQuantityMinQuantity",
             headerName: "Min Quantity",
+            renderCell: (params) => (
+                <span>
+                    {params.value.toLocaleString()}
+                </span>
+            ),
             flex: 1,
         },
         {
             field: "laborQuantityMaxQuantity",
             headerName: "Max Quantity",
+            renderCell: (params) => (
+                <span>
+                    {params.value.toLocaleString()}
+                </span>
+            ),
             flex: 1,
         },
         {
             field: "laborQuantityMinPrice",
             headerName: "Min Price",
+            renderCell: (params) => (
+                <span>
+                    {params.value.toLocaleString()}
+                </span>
+            ),
             flex: 1,
         },
         {
             field: "laborQuantityMaxPrice",
             headerName: "Max Price",
+            renderCell: (params) => (
+                <span>
+                    {params.value.toLocaleString()}
+                </span>
+            ),
             flex: 1,
         },
         {
@@ -280,7 +305,7 @@ const AdminManagePrice: React.FC = () => {
             >
                 <div className="container" style={{ display: "flex" }}>
                     <h1 style={{ fontWeight: "bolder", fontSize: "20px", marginLeft: "10px" }}>
-                        Manage Material Table
+                        Manage labor quantity
                     </h1>
                     <div style={{ marginLeft: "20%" }}>
                         <Button

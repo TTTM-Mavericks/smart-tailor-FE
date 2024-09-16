@@ -13,6 +13,8 @@ import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from 
 import { ExpertTailoring } from "../../../../../models/ManagerExpertTailoringModel";
 import { ExpertTailoringEdit } from "../../../../../models/ManagerExpertTailoringModel";
 import { useNavigate } from "react-router-dom";
+import { Employee } from "../../../../../models/EmployeeModel";
+import { __getToken } from "../../../../../App";
 
 // Make Style of popup
 const style = {
@@ -36,7 +38,7 @@ interface FeedbackModalProps {
 const ManageEmployee: React.FC = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [data, setData] = React.useState<ExpertTailoring[]>([]);
+    const [data, setData] = React.useState<Employee[]>([]);
 
     // set formid to pass it to component edit Material
     const [formId, setFormId] = React.useState<ExpertTailoringEdit | null>(null);
@@ -60,9 +62,13 @@ const ManageEmployee: React.FC = () => {
     }, [selectedLanguage, i18n]);
 
     React.useEffect(() => {
-        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.getAllExpertTailoring}`;
+        const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.user + functionEndpoints.user.getAllEmployee}`;
 
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');
@@ -109,9 +115,13 @@ const ManageEmployee: React.FC = () => {
     //DELETE OR UPDATE
     const _handleDeleteClick = async (expertTailoringID: string) => {
         try {
-            const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.updateStatusExpertTailoring}`;
+            const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.user + functionEndpoints.user.getAllEmployee}`;
 
-            const response = await axios.put(apiUrl + `/${expertTailoringID}`)
+            const response = await axios.put((apiUrl + `/${expertTailoringID}`), {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`
+                }
+            })
 
             if (!response.data) {
                 throw new Error('Error deleting material');
@@ -208,20 +218,66 @@ const ManageEmployee: React.FC = () => {
 
     const columns: GridColDef[] = [
         {
-            field: "expertTailoringName",
-            headerName: "Employee Name",
-            flex: 1,
+            field: "userID",
+            headerName: "User ID",
+            width: 150
         },
         {
-            field: "sizeImageUrl",
-            headerName: "Size Image Url",
-            flex: 1,
+            field: "email",
+            headerName: "Email",
+            width: 260
         },
         {
-            field: "status",
-            headerName: "Status",
+            field: "fullName",
+            headerName: "Full Name",
             headerAlign: "left",
             align: "left",
+            width: 200
+        },
+        {
+            field: "phoneNumber",
+            headerName: "Phone Number",
+            headerAlign: "left",
+            align: "left",
+            width: 140
+        },
+        {
+            field: "createDate",
+            headerName: "Create Date",
+            headerAlign: "left",
+            align: "left",
+            width: 200
+        },
+        {
+            field: "userStatus",
+            headerName: "User Status",
+            headerAlign: "left",
+            align: "left",
+            renderCell: (params) => (
+                <Box
+                    sx={{
+                        backgroundColor: params.value === true ? '#ffebee' : '#e8f5e9',
+                        color: params.value === true ? '#f44336' : '#4caf50',
+                        borderRadius: '16px',
+                        padding: '1px 5px',
+                        fontSize: '0.75rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        height: "50%",
+                        marginTop: "10%"
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                        }}
+                    />
+                    {params.value === true ? 'INACTIVE' : 'ACTIVE'}
+                </Box>
+            )
         },
         {
             field: "actions",
@@ -230,10 +286,10 @@ const ManageEmployee: React.FC = () => {
             sortable: false,
             renderCell: (params) => (
                 <Box>
-                    <IconButton onClick={() => _handleEditClick(params.row.expertTailoringID, params.row.expertTailoringName, params.row.sizeImageUrl)}>
+                    {/* <IconButton onClick={() => _handleEditClick(params.row.userID, params.row.email, params.row.fullName)}>
                         <EditIcon />
-                    </IconButton>
-                    <IconButton onClick={() => _hanldeConfirmDelete(params.row.expertTailoringID)}>
+                    </IconButton> */}
+                    <IconButton onClick={() => _hanldeConfirmDelete(params.row.userID)}>
                         <DeleteIcon htmlColor={colors.primary[300]} />
                     </IconButton>
                 </Box>
@@ -241,7 +297,7 @@ const ManageEmployee: React.FC = () => {
         }
     ];
 
-    const getRowId = (row: any) => `${row.expertTailoringID}-${row.expertTailoringName}-${row.sizeImageUrl}`;
+    const getRowId = (row: any) => `${row.userID}-${row.email}-${row.fullName}`;
 
 
     return (
@@ -297,7 +353,6 @@ const ManageEmployee: React.FC = () => {
                     slots={{ toolbar: GridToolbar }}
                     disableRowSelectionOnClick
                     getRowId={getRowId}
-                    onRowClick={_handleFeedbackClick}
                 />
 
                 {/* Open Model Information */}

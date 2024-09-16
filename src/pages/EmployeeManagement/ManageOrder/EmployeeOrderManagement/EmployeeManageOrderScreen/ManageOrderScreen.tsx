@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa';
+import { FaUser, FaCalendar, FaClipboardCheck, FaExclamationCircle, FaChevronLeft, FaChevronRight, FaTimes, FaImage, FaFileAlt, FaBox, FaCalendarAlt, FaMapMarkerAlt, FaEye, FaDollarSign } from 'react-icons/fa';
 import { ArrowDropDown, BrandingWatermark, Cancel, Verified, ViewAgenda, ViewAgendaOutlined, Visibility } from '@mui/icons-material';
 import axios from 'axios';
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
@@ -8,7 +8,7 @@ import { motion } from 'framer-motion'
 import { toast } from 'react-toastify';
 import LoadingComponent from '../../../../../components/Loading/LoadingComponent';
 import PartOfDesignInformationDialogComponent from '../../../../BrandManagement/BrandOrderManagement/PartOfDesignInformationDialogComponent';
-import { blackColor, greenColor, primaryColor, redColor, secondaryColor, yellowColor } from '../../../../../root/ColorSystem';
+import { blackColor, cancelColor, cancelColorText, completeColor, completeColorText, deliveredColor, deliveredColorText, deposisColor, deposisColorText, greenColor, pendingColor, pendingColorText, primaryColor, processingColor, processingColorText, redColor, secondaryColor, whiteColor, yellowColor } from '../../../../../root/ColorSystem';
 import { __handleAddCommasToNumber } from '../../../../../utils/NumbericUtils';
 import { UserInterface } from '../../../../../models/UserModel';
 import Cookies from 'js-cookie';
@@ -18,7 +18,7 @@ import { IoMdCloseCircleOutline } from 'react-icons/io';
 import { __handlegetRatingStyle, __handlegetStatusBackgroundBoolean } from '../../../../../utils/ElementUtils';
 import style from './EmployeeManageOrderStyle.module.scss'
 import { OrderDetailInterface } from '../../../../../models/OrderModel';
-import { Box, CircularProgress, IconButton, Tooltip, useTheme } from '@mui/material';
+import { Box, CircularProgress, Dialog, DialogContent, DialogTitle, IconButton, Tooltip, useTheme } from '@mui/material';
 import { CustomerReportOrderDialogComponent } from '../../../../../components';
 import Select from 'react-select';
 import { width } from '@mui/system';
@@ -26,6 +26,9 @@ import { DataGrid, GridColDef, GridRenderCellParams, GridToolbar } from '@mui/x-
 import { tokens } from '../../../../../theme';
 import { __handleGetDateTimeColor, __isNearCurrentDate } from '../../../../../utils/DateUtils';
 import { __getToken } from '../../../../../App';
+import FinalCheckingProductsDialogComponent from '../../../../../components/Dialog/FinalCheckingProductsDialog/FinalCheckingProductsDialogComponent';
+import MaterialDetailTableComponent from '../../../../Order/Components/Table/MaterialDetailTableComponent';
+
 
 
 /**
@@ -44,6 +47,66 @@ const getStatusColor = (status: string) => {
         case 'CANCEL': return 'text-red-600';
         case 'COMPLETED': return 'text-green-600';
         case 'DELIVERED': return 'text-indigo-600';
+        case 'RECEIVED': return 'text-green-400';
+        case 'REFUND_REQUEST': return 'text-red-600';
+
+
+        default: return 'text-gray-600';
+    }
+};
+
+/**
+ * 
+ * @param status 
+ * @returns 
+ * Take The Status of all state
+ * With Each status have each color
+ */
+const getBackgroundColor = (status: string) => {
+    switch (status) {
+        case 'NOT_VERIFY': return 'bg-gray-300 px-2 py-1 rounded-full';
+        case 'PENDING': return 'bg-yellow-300 px-2 py-1 rounded-full';
+        case 'DEPOSIT': return 'bg-blue-300 px-2 py-1 rounded-full';
+        case 'PROCESSING': return 'bg-orange-300 px-2 py-1 rounded-full';
+        case 'CANCEL': return 'bg-red-300 px-2 py-1 rounded-full';
+        case 'COMPLETED': return 'bg-green-300 px-2 py-1 rounded-full';
+        case 'DELIVERED': return 'bg-indigo-300 px-2 py-1 rounded-full';
+        case 'RECEIVED': return 'bg-green-100 px-2 py-1 rounded-full';
+        case 'REFUND_REQUEST': return 'bg-red-300 px-2 py-1 rounded-full';
+
+
+        default: return 'bg-gray-300 px-2 py-1 rounded-full';
+    }
+};
+
+const getBackgroundColorBrandStatus = (status: string) => {
+    switch (status) {
+        case 'NOT_VERIFY': return 'bg-gray-300 px-2 py-1 rounded-full';
+        case 'PENDING': return 'bg-blue-300 px-2 py-1 rounded-full';
+        case 'DEPOSIT': return 'bg-blue-300 px-2 py-1 rounded-full';
+        case 'PROCESSING': return 'bg-orange-300 px-2 py-1 rounded-full';
+        case 'CANCEL': return 'bg-red-300 px-2 py-1 rounded-full';
+        case 'COMPLETED': return 'bg-green-300 px-2 py-1 rounded-full';
+        case 'DELIVERED': return 'bg-indigo-300 px-2 py-1 rounded-full';
+        case 'START_PRODUCING': return 'bg-pink-300 px-2 py-1 rounded-full';
+        case 'CHECKING_SAMPLE_DATA': return 'bg-orange-300 px-2 py-1 rounded-full';
+
+        default: return 'bg-gray-300 px-2 py-1 rounded-full';
+    }
+};
+
+const getStatusColorBrandStatus = (status: string) => {
+    switch (status) {
+        case 'NOT_VERIFY': return 'text-gray-600';
+        case 'PENDING': return 'text-blue-600';
+        case 'DEPOSIT': return 'text-blue-600';
+        case 'PROCESSING': return 'text-orange-600';
+        case 'CANCEL': return 'text-red-600';
+        case 'COMPLETED': return 'text-green-600';
+        case 'DELIVERED': return 'text-indigo-600';
+        case 'START_PRODUCING': return 'text-pink-600';
+        case 'CHECKING_SAMPLE_DATA': return 'text-orange-600';
+
         default: return 'text-gray-600';
     }
 };
@@ -186,6 +249,8 @@ const EmployeeOrderFields: React.FC<{
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedOrderID, setSelectedOrderID] = useState<string | null>(null);
     const [isOpenReportOrderCanceledDialog, setIsOpenReportOrderCanceledDialog] = useState<boolean>(false);
+    const [isOpenFinalCheckingOrderDialog, setIsOpenFinalCheckingOrderDialog] = useState<boolean>(false);
+    const [selectedOrderMaterial, setSelectedOrderMaterial] = useState<any>();
 
 
 
@@ -223,12 +288,12 @@ const EmployeeOrderFields: React.FC<{
         setSelectedOrderID(null);
     };
 
-    const __handleUpdateOrderDelivery = async (orderId: any) => {
+    const __handleUpdateOrderDelivery = async (orderId: any, type: string) => {
         setIsLoading(true)
         try {
             const bodyRequest = {
                 orderID: orderId,
-                status: 'DELIVERED'
+                status: type
             }
             console.log('bodyRequest: ', bodyRequest);
             const response = await api.put(`${versionEndpoints.v1 + featuresEndpoints.order + functionEndpoints.order.changeOrderStatus}`, bodyRequest, __getToken());
@@ -282,7 +347,7 @@ const EmployeeOrderFields: React.FC<{
         }
     };
 
-    const __handleRejectOrder = async(orderDetail: any) => {
+    const __handleRejectOrder = async (orderDetail: any) => {
         setIsLoading(true)
         try {
             const bodyRequest = {
@@ -309,7 +374,7 @@ const EmployeeOrderFields: React.FC<{
     }
 
     return (
-        <div className="bg-white mb-8 shadow-lg rounded-lg p-6 transition duration-300 ease-in-out transform hover:shadow-xl">
+        <div className="bg-white mb-8 shadow-lg rounded-lg transition duration-300 ease-in-out transform hover:shadow-xl">
             <LoadingComponent isLoading={isLoading}></LoadingComponent>
             <h3 className="text-sm font-semibold mb-3 text-indigo-700">Type order: {order.orderType}</h3>
             <div className="flex justify-between">
@@ -327,132 +392,235 @@ const EmployeeOrderFields: React.FC<{
                                     />
                                 </div>
                             ) : (
-                                <p style={{ fontSize: "13px" }}>No image available</p>
+                                <p style={{ fontSize: "13px" }}>
+                                    <FaImage className="inline-block mr-1" />
+                                    No image available
+                                </p>
                             )}
                         </div>
                         <div className="ml-4 mt-10">
-                            <p className="text-gray-600 mb-2 text-sm">Order ID: {order.orderID}</p>
                             <p className="text-gray-600 mb-2 text-sm">
-                                Order Status: <span className={`mb-2 ${getStatusColor(order.orderStatus)} font-bold`}>{order.orderStatus}</span>
+                                <FaFileAlt className="inline-block mr-1" />
+                                <span style={{ fontWeight: "bolder" }}>Order ID:</span> {order.orderID}
                             </p>
-                            <div className="mt-4">
+                            <p className="text-gray-600 mb-2 text-sm">
+                                <FaBox className="inline-block mr-1" />
+                                <span style={{ fontWeight: "bolder" }}>Order Status: </span> <span className={`mb-2 ${getStatusColor(order.orderStatus)} ${getBackgroundColor(order.orderStatus)} font-bold`}>{order.orderStatus}</span>
+                            </p>
+                            <div className="mt-2">
                                 {order.detailList.map((detail, index) => (
                                     <p key={index} className="text-gray-600 text-sm">
-                                        Size {detail.size.sizeName}: Quantity {detail.quantity}
+                                        <FaBox className="inline-block mr-1" />
+                                        <span style={{ fontWeight: "bolder" }}> Size: </span>{detail.size.sizeName} <span style={{ fontWeight: "bolder" }}>Quantity: </span> {detail.quantity}
                                     </p>
                                 ))}
                             </div>
-                            <p className="text-gray-700 mt-4 text-sm">Price: {__handleAddCommasToNumber(order.totalPrice)} VND</p>
+                            {order.totalPrice > 0 && order.orderStatus !== 'PENDING' && (
+                                <p className="text-gray-700 mt-2 text-sm">
+                                    <FaDollarSign className="inline-block mr-1" />
+                                    <span style={{ fontWeight: "bolder" }}>Price: </span>{__handleAddCommasToNumber(order.totalPrice)} VND
+                                </p>
+                            )}
                         </div>
                     </div>
                 </div>
-                <div className="w-1/2 mt-10 pl-28">
-                    <p className="text-gray-600 mb-2 text-sm">Customer: {order.buyerName}</p>
-                    <p className="text-gray-600 mb-2 text-sm">Date: {order.createDate}</p>
+                <div className="w-1/2 mt-10">
                     <p className="text-gray-600 mb-2 text-sm">
-                        Address: {order.address}, {order.ward}, {order.district}, {order.province}
+                        <FaUser className="inline-block mr-1" />
+                        <span style={{ fontWeight: "bolder" }}>Customer: </span>{order.buyerName}
                     </p>
+                    <p className="text-gray-600 mb-2 text-sm">
+                        <FaCalendarAlt className="inline-block mr-1" />
+                        <span style={{ fontWeight: "bolder" }}>Date: </span>{order.createDate}
+                    </p>
+                    <p className="text-gray-600 mb-2 text-sm mr-20">
+                        <FaMapMarkerAlt className="inline-block mr-1" />
+                        <span style={{ fontWeight: "bolder" }}>Address:</span> {order.address}, {order.ward}, {order.district}, {order.province}
+                    </p>
+                    <p style={{ fontWeight: "500", color: secondaryColor, cursor: 'pointer' }} onClick={() => setSelectedOrderMaterial(order.orderID)}>
+                        {/* <FaEye className="inline-block mr-1" /> */}
+                        View material
+                    </p>
+
+                    {selectedOrderMaterial === order.orderID && (
+                        <Dialog open={true} aria-labelledby="popup-dialog-title" maxWidth="lg" fullWidth onClose={() => setSelectedOrderMaterial(null)}>
+                            <DialogTitle id="popup-dialog-title">
+                                Material detail
+                                <IoMdCloseCircleOutline
+                                    cursor="pointer"
+                                    size={20}
+                                    color={redColor}
+                                    onClick={() => setSelectedOrderMaterial(null)}
+                                    style={{ position: 'absolute', right: 20, top: 20 }}
+                                />
+                            </DialogTitle>
+                            <DialogContent>
+                                <div>
+                                    <MaterialDetailTableComponent materialDetailData={designDetails?.materialDetail}></MaterialDetailTableComponent>
+                                </div>
+                            </DialogContent>
+                        </Dialog>
+                    )}
                 </div>
             </div>
-            <div className="mt-4 flex items-center" onClick={() => setShowDesignDetails(!showDesignDetails)}>
-                <ArrowDropDown
-                    className="cursor-pointer mr-2"
-                />
-                <span style={{ fontSize: 14, fontWeight: "bold" }}>Show Design Details</span>
-            </div>
-            {showDesignDetails && (
-                <DesignDetails design={designDetails} />
-            )}
-            <div className="mt-6 flex justify-end">
 
-                {order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCEL' && order.orderStatus !== 'NOT_VERIFY' && (
+            <div style={{ position: 'relative' }}>
+                <div className="mt-0 flex items-center pb-5" onClick={() => setShowDesignDetails(!showDesignDetails)}>
+                    <span style={{ fontSize: 14, fontWeight: "bold", marginLeft: 20 }}>Show Design Details</span>
+                    <ArrowDropDown
+                        className="cursor-pointer mr-2"
+                    />
+                </div>
+                {showDesignDetails && (
+                    <DesignDetails design={designDetails} />
+                )}
+                <div className="mt-6 flex justify-end mb-2" style={{ position: 'absolute', bottom: 0, right: 10 }}>
+
+                    {order.orderStatus !== 'COMPLETED' && order.orderStatus !== 'CANCEL' && order.orderStatus !== 'NOT_VERIFY' && (
+
+                        <button
+                            onClick={() => __handleOpenReportDialog()}
+                            className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4 mb-2"
+                            style={{
+                                borderRadius: 4,
+                                backgroundColor: redColor
+                            }}
+                        >
+                            Cancel
+                        </button>
+                    )}
+
+                    <CustomerReportOrderDialogComponent
+                        isCancelOrder={true}
+                        orderID={order?.orderID}
+                        onClose={() => setIsOpenReportOrderCanceledDialog(false)}
+                        isOpen={isOpenReportOrderCanceledDialog}
+                        onClickReportAndCancel={() => _handleCancelOrder(order)}
+                    ></CustomerReportOrderDialogComponent>
 
                     <button
-                        onClick={() => __handleOpenReportDialog()}
-                        className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4"
+                        onClick={() => __handleOpenInputSampleProductDialog(order.orderID)}
+                        className="mb-2 bg-indigo-500 text-sm text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"
                         style={{
                             borderRadius: 4,
-                            backgroundColor: redColor
+                            backgroundColor: yellowColor
                         }}
                     >
-                        Cancel
+                        View sample data
                     </button>
-                )}
-
-
-
-                <CustomerReportOrderDialogComponent
-                    isCancelOrder={true}
-                    orderID={order?.orderID}
-                    onClose={() => setIsOpenReportOrderCanceledDialog(false)}
-                    isOpen={isOpenReportOrderCanceledDialog}
-                    onClickReportAndCancel={() => _handleCancelOrder(order)}
-                ></CustomerReportOrderDialogComponent>
-
-                <button
-                    onClick={() => __handleOpenInputSampleProductDialog(order.orderID)}
-                    className="bg-indigo-500 text-sm text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"
-                    style={{
-                        borderRadius: 4,
-                        backgroundColor: yellowColor
-                    }}
-                >
-                    View sample data
-                </button>
-                <ViewSampleUpdateDialog isOpen={isDialogOpen} orderID={order.orderID} brandID={userAuth?.userID} onClose={__handleCloseInputSampleProductDialog}></ViewSampleUpdateDialog>
-
-                <button
-                    onClick={() => onViewDetails(order, designDetails)}
-                    className="bg-indigo-500 text-sm text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"
-                    style={{
-                        borderRadius: 4,
-                        backgroundColor: secondaryColor
-                    }}
-                >
-                    View details
-                </button>
-
-                {order.orderStatus === 'NOT_VERIFY' && (
-                    <button
-                        onClick={() => __handleRejectOrder(order.orderID)}
-                        className="bg-indigo-500 text-sm text-white px-4 py-2  hover:bg-indigo-600 transition duration-300 mr-4"
-                        style={{
-                            borderRadius: 4,
-                            backgroundColor: redColor
-                        }}
-                    >
-                        Reject order
-                    </button>
-                )}
-                
-                {order.orderStatus === 'NOT_VERIFY' && (
-                    <button
-                        onClick={() => onUpdatedOrderPending(order.orderID)}
-                        className="bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 mr-4"
-                        style={{
-                            borderRadius: 4,
-                            backgroundColor: greenColor
-                        }}
-                    >
-                        Verify order
-                    </button>
-                )}
-
-                
-
-                {order.orderStatus === 'COMPLETED' && (
+                    <ViewSampleUpdateDialog isOpen={isDialogOpen} orderID={order.orderID} brandID={userAuth?.userID} onClose={__handleCloseInputSampleProductDialog}></ViewSampleUpdateDialog>
 
                     <button
-                        onClick={() => __handleUpdateOrderDelivery(order.orderID)}
-                        className="bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300"
+                        onClick={() => onViewDetails(order, designDetails)}
+                        className="mb-2 bg-indigo-500 text-sm text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"
                         style={{
                             borderRadius: 4,
-                            backgroundColor: greenColor
+                            backgroundColor: secondaryColor
                         }}
                     >
-                        Delivery
+                        View details
                     </button>
-                )}
+
+                    {order.orderStatus === 'NOT_VERIFY' && (
+                        <button
+                            onClick={() => __handleRejectOrder(order.orderID)}
+                            className="mb-2 bg-indigo-500 text-sm text-white px-4 py-2 rounded-full hover:bg-indigo-600 transition duration-300 mr-4"
+                            style={{
+                                borderRadius: 4,
+                                backgroundColor: redColor
+                            }}
+                        >
+                            Reject order
+                        </button>
+                    )}
+
+                    {order.orderStatus === 'NOT_VERIFY' && (
+                        <button
+                            onClick={() => onUpdatedOrderPending(order.orderID)}
+                            className="bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 mr-4 mb-2"
+                            style={{
+                                borderRadius: 4,
+                                backgroundColor: greenColor
+                            }}
+                        >
+                            Verify order
+                        </button>
+                    )}
+
+                    {order.orderStatus === 'REFUND_REQUEST' && (
+                        <>
+                            <button
+                                onClick={() => setIsOpenFinalCheckingOrderDialog(true)}
+                                className="mb-2 bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 mr-4"
+                                style={{
+                                    borderRadius: 4,
+                                    backgroundColor: primaryColor
+                                }}
+                            >
+                                Upload final products
+                            </button>
+
+
+                            <FinalCheckingProductsDialogComponent onClose={() => setIsOpenFinalCheckingOrderDialog(false)} isOpen={isOpenFinalCheckingOrderDialog} order={order} orderID={order.orderID}></FinalCheckingProductsDialogComponent>
+
+                            <button
+                                onClick={() => __handleUpdateOrderDelivery(order.orderID, 'DELIVERED')}
+                                className="mb-2 bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 mr-4"
+                                style={{
+                                    borderRadius: 4,
+                                    backgroundColor: greenColor
+                                }}
+                            >
+                                Delivery
+                            </button>
+                        </>
+                    )}
+
+                    {order.orderStatus === 'FINAL_CHECKING' && (
+                        <>
+
+
+                            <button
+                                onClick={() => setIsOpenFinalCheckingOrderDialog(true)}
+                                className="mb-2 bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 mr-4"
+                                style={{
+                                    borderRadius: 4,
+                                    backgroundColor: primaryColor
+                                }}
+                            >
+                                Upload final products
+                            </button>
+
+
+                            <FinalCheckingProductsDialogComponent onClose={() => setIsOpenFinalCheckingOrderDialog(false)} isOpen={isOpenFinalCheckingOrderDialog} order={order} orderID={order.orderID}></FinalCheckingProductsDialogComponent>
+
+                            <button
+                                onClick={() => __handleUpdateOrderDelivery(order.orderID, 'DELIVERED')}
+                                className="mb-2 bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 mr-4"
+                                style={{
+                                    borderRadius: 4,
+                                    backgroundColor: greenColor
+                                }}
+                            >
+                                Delivery
+                            </button>
+                        </>
+                    )}
+
+                    {order.orderStatus === 'COMPLETED' && (
+
+                        <button
+                            onClick={() => __handleUpdateOrderDelivery(order.orderID, 'FINAL_CHECKING')}
+                            className="mb-2 bg-green-500 text-sm text-white px-4 py-2 rounded-full hover:bg-green-600 transition duration-300 mr-4"
+                            style={{
+                                borderRadius: 4,
+                                backgroundColor: redColor
+                            }}
+                        >
+                            Final check
+                        </button>
+                    )}
+                </div>
             </div>
         </div>
     );
@@ -480,9 +648,6 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
     const [isOpenReportOrderDialog, setIsOpenReportOrderDialog] = useState<boolean>(false);
     const [isOpenReportOrderCanceledDialog, setIsOpenReportOrderCanceledDialog] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
-
-
-
 
     useEffect(() => {
         __handleFetchOrderDetails(order.orderID);
@@ -632,7 +797,7 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
                                 icon: FaExclamationCircle,
                                 label: 'Order Status',
                                 value: order.orderStatus,
-                                customClass: getStatusColor(order.orderStatus)
+                                customClass: `${getStatusColor(order.orderStatus)}`
                             }
                         ].map((item, index) => (
                             <div key={index} className="bg-gray-50 p-3 rounded-lg">
@@ -746,7 +911,7 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
                                     </span>
                                 </p>
                                 <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2">
-                                    Rating: <span className="text-sm text-gray-500 pb-2">{order.brand?.rating}</span>
+                                    Rating: <span className="text-sm text-gray-500 pb-2">{order.brand?.rating?.toFixed(2)}</span>
                                 </p>
 
                                 <p style={{ fontWeight: '500' }} className="text-sm text-black pb-0">
@@ -772,7 +937,7 @@ const EmployeeOrderModal: React.FC<{ order: EmployeeOrder; onClose: () => void; 
                                 </p>
                                 <p style={{ fontWeight: '500' }} className="text-sm text-black pb-2 flex content-center items-center">
                                     Status:
-                                    <button className={`py-1 px-3 rounded-full ml-2 text-white`} style={{ backgroundColor: getStatusColorOfSubOrder(order.orderStatus) }}>
+                                    <button className={`py-1 px-3 rounded-full ml-2 ${getStatusColorBrandStatus(order.orderStatus)} ${getBackgroundColorBrandStatus(order.orderStatus)}`} style={{ }}>
                                         {order.orderStatus}
                                     </button>
                                 </p>
@@ -931,16 +1096,58 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onViewDetails, onUpdate
         { field: 'orderID', headerName: 'Order ID', width: 150 },
         { field: 'buyerName', headerName: 'Customer', width: 150 },
         { field: 'address', headerName: 'Address', width: 150 },
+        { field: 'province', headerName: 'Province', width: 150 },
         { field: 'phone', headerName: 'phone', width: 150 },
         { field: 'expectedStartDate', headerName: 'Date', width: 200 },
         {
             field: 'orderStatus',
             headerName: 'Status',
-            width: 150,
-            renderCell: (params: GridRenderCellParams) => (
-                <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(params.value)}`}>
+            width: 100,
+            renderCell: (params) => (
+                <Box
+                    sx={{
+                        backgroundColor:
+                            params.value === "PENDING"
+                                ? pendingColor
+                                : params.value === "DELIVERED"
+                                    ? deliveredColor
+                                    : params.value === "DEPOSIT"
+                                        ? deposisColor
+                                        : params.value === "PROCESSING"
+                                            ? processingColor
+                                            : params.value === "COMPLETED"
+                                                ? completeColor
+                                                : cancelColor,
+                        color: params.value === "PENDING"
+                            ? pendingColorText
+                            : params.value === "DELIVERED"
+                                ? deliveredColorText
+                                : params.value === "DEPOSIT"
+                                    ? deposisColorText
+                                    : params.value === "PROCESSING"
+                                        ? processingColorText
+                                        : params.value === "COMPLETED"
+                                            ? completeColorText
+                                            : cancelColorText,
+                        borderRadius: '16px',
+                        padding: '1px 5px',
+                        fontSize: '0.75rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        height: "50%",
+                        marginTop: "10%"
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                        }}
+                    />
                     {params.value}
-                </span>
+                </Box>
             )
         },
         {
@@ -1099,6 +1306,13 @@ const EmployeeManageOrder: React.FC = () => {
         { value: 'Order ID', label: 'Order ID' },
         { value: 'Order Status', label: 'Order Status' }
     ];
+
+    const [pendingCount, setPendingCount] = useState<number>(0);
+    const [canceledCount, setCanceledCount] = useState<number>(0);
+    const [completedCount, setCompletedCount] = useState<number>(0);
+    const [checkingSampleDataCount, setCheckingSampleDataCount] = useState<number>(0);
+
+
     useEffect(() => {
         const apiUrl = `${baseURL}${versionEndpoints.v1}${featuresEndpoints.order}${functionEndpoints.order.getAllOrder}`;
         setIsLoading(true);
@@ -1116,6 +1330,14 @@ const EmployeeManageOrder: React.FC = () => {
             .then((responseData) => {
                 if (responseData && Array.isArray(responseData.data)) {
                     const subOrders = responseData.data.filter((order: any) => order.orderType === FILTERED_ORDER_TYPE);
+                    const filteredPendingOrders = subOrders.filter((order: any) => order.orderStatus === 'PROCESSING' || order.orderStatus === 'PREPARING' || order.orderStatus === 'DEPOSIT');
+                    const filteredCanceledOrders = subOrders.filter((order: any) => order.orderStatus === 'CANCEL');
+                    const filteredCompletedOrders = subOrders.filter((order: any) => order.orderStatus === 'COMPLETED' || order.orderStatus === 'DELIVERED' || order.orderStatus === 'RECEIVED' );
+                    const filteredCheckingSampleDataOrders = subOrders.filter((order: any) => order.orderStatus === 'NOT_VERIFY');
+                    setPendingCount(filteredPendingOrders.length);
+                    setCanceledCount(filteredCanceledOrders.length);
+                    setCompletedCount(filteredCompletedOrders.length);
+                    setCheckingSampleDataCount(filteredCheckingSampleDataOrders.length);
                     setOrder(subOrders);
                     setFilteredOrders(subOrders); // Add this line
                     console.log("Data received:", subOrders);
@@ -1283,9 +1505,63 @@ const EmployeeManageOrder: React.FC = () => {
                 <>
                     <div style={{ width: "100%" }}>
                         <div className="flex flex-col">
-                            <div className="mb-6">
-                                <div className="flex mt-5">
-                                    <div className="w-7/10" style={{ width: "80%" }}>
+                            <div className="mt-12">
+                                <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
+                                    <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+                                        <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-blue-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                                                <path d="M19.14 12.936c.046-.306.071-.618.071-.936s-.025-.63-.071-.936l2.037-1.582a.646.646 0 00.154-.809l-1.928-3.338a.646.646 0 00-.785-.293l-2.4.964a7.826 7.826 0 00-1.617-.936l-.364-2.558A.645.645 0 0013.629 3h-3.258a.645.645 0 00-.635.538l-.364 2.558a7.82 7.82 0 00-1.617.936l-2.4-.964a.646.646 0 00-.785.293L2.642 9.673a.646.646 0 00.154.809l2.037 1.582a7.43 7.43 0 000 1.872l-2.037 1.582a.646.646 0 00-.154.809l1.928 3.338c.169.293.537.42.785.293l2.4-.964c.506.375 1.05.689 1.617.936l.364 2.558a.645.645 0 00.635.538h3.258a.645.645 0 00.635-.538l.364-2.558a7.82 7.82 0 001.617-.936l2.4.964c.248.127.616 0 .785-.293l1.928-3.338a.646.646 0 00-.154-.809l-2.037-1.582zM12 15.3A3.3 3.3 0 1112 8.7a3.3 3.3 0 010 6.6z" />
+                                            </svg>
+                                        </div>
+                                        <div className="p-4 text-right">
+                                            <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600" style={{ color: secondaryColor, fontWeight: 'bold' }}>PROCESSING</p>
+                                            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{pendingCount}</h4>
+                                        </div>
+
+                                    </div>
+                                    <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+                                        <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-pink-600 to-pink-400 text-white shadow-pink-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                                                <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.95 6.05a.75.75 0 010 1.06L13.06 12l3.89 3.89a.75.75 0 11-1.06 1.06L12 13.06l-3.89 3.89a.75.75 0 11-1.06-1.06L10.94 12 7.05 8.11a.75.75 0 011.06-1.06L12 10.94l3.89-3.89a.75.75 0 011.06 0z" />
+                                            </svg>
+
+                                        </div>
+                                        <div className="p-4 text-right">
+                                            <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600" style={{ color: redColor, fontWeight: 'bold' }}>CANCEL</p>
+                                            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{canceledCount}</h4>
+                                        </div>
+
+                                    </div>
+                                    <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+                                        <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-green-600 to-green-400 text-white shadow-green-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.59 14.59l-4.24-4.24 1.41-1.41L10.41 14l7.42-7.42 1.41 1.41-8.83 8.83z" />
+                                            </svg>
+                                        </div>
+                                        <div className="p-4 text-right">
+                                            <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600" style={{ color: greenColor, fontWeight: 'bold' }}>COMPLETED</p>
+                                            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{completedCount}</h4>
+                                        </div>
+
+                                    </div>
+                                    <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+                                        <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-orange-600 to-orange-400 text-white shadow-orange-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.59 14.59l-4.24-4.24 1.41-1.41L10.41 14l7.42-7.42 1.41 1.41-8.83 8.83z" />
+                                            </svg>
+                                        </div>
+                                        <div className="p-4 text-right">
+                                            <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600" style={{ color: primaryColor, fontWeight: 'bold' }}>NOT VERIFY</p>
+                                            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{checkingSampleDataCount}</h4>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mb-0">
+                                <div className="flex mt-0">
+                                    <div className="w-7/10" style={{ width: "60%" }}>
                                         <Select
                                             isMulti
                                             name="filters"
@@ -1300,16 +1576,16 @@ const EmployeeManageOrder: React.FC = () => {
                                     </div>
                                     <div className="flex border border-gray-300 rounded-md overflow-hidden" style={{ marginLeft: "auto" }}>
                                         <button
-                                            className={`px-4 py-2 ${!isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'}`}
+                                            className={`px-2 py-1 text-sm ${!isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'}`}
                                             onClick={() => setIsTableView(false)}
                                         >
-                                            Card mode
+                                            List mode
                                         </button>
                                         <button
-                                            className={`px-4 py-2 ${isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'}`}
+                                            className={`px-2 py-1 text-sm ${isTableView ? 'bg-orange-600 text-white' : 'bg-white text-gray-700'}`}
                                             onClick={() => setIsTableView(true)}
                                         >
-                                            List mode
+                                            Table mode
                                         </button>
                                     </div>
                                 </div>

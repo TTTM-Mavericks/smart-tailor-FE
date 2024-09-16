@@ -1,5 +1,5 @@
 import { NotificationInterface } from "../models/NotificationModel";
-import { blackColor, greenColor, primaryColor, redColor, whiteColor, yellowColor } from "../root/ColorSystem";
+import { blackColor, greenColor, primaryColor, redColor, secondaryColor, whiteColor, yellowColor } from "../root/ColorSystem";
 
 export const __handlegetRatingStyle = (rating: any) => {
     if (rating < 0) {
@@ -18,7 +18,7 @@ export const __handlegetRatingStyle = (rating: any) => {
 export const __handlegetStatusBackgroundBoolean = (value: any) => {
     if (value) {
         return { backgroundColor: greenColor, color: whiteColor, fontSize: 12, paddingTop: -5, paddingBottom: -5 }
-    } else return { backgroundColor: primaryColor, color: whiteColor, fontSize: 12, paddingTop: -5, paddingBottom: -5 }
+    } else return { backgroundColor: secondaryColor, color: whiteColor, fontSize: 12, paddingTop: -5, paddingBottom: -5 }
 };
 
 const capitalizeFirstLetter = (string: string): string => {

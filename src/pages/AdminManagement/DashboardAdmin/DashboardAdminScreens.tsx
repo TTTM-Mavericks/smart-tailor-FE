@@ -110,26 +110,23 @@ const DashboardAdminScreens = () => {
                 return <AdminManagePrice />;
             case 'admin_faq':
                 return <DashboardFAQScreens />;
-            case 'geography_chart':
-                return <GeographyChartComponent />;
-            case 'line_chart':
-                return <LineChartComponent />;
-            case 'bar_chart':
-                return <BarChartComponent />;
-            case 'pie_chart':
-                return <PieChartComponent />;
+            // case 'geography_chart':
+            //     return <GeographyChartComponent />;
+            // case 'line_chart':
+            //     return <LineChartComponent />;
+            // case 'bar_chart':
+            //     return <BarChartComponent />;
+            // case 'pie_chart':
+            //     return <PieChartComponent />;
             case 'system_configuration':
                 return <AdminConfiguration />;
             default:
                 return (
                     <>
                         <CardInformationDetailComponent />
-                        <GeographyChartComponent />
-                        <div style={{ display: "flex" }}>
-                            <BarChartComponent />
-                            <PieChartComponent />
-                        </div>
-                        <LineChartComponent />
+                        {/* <GeographyChartComponent /> */}
+                        <PieChartComponent />
+                        {/* <BarChartComponent /> */}
                     </>
                 );
         }

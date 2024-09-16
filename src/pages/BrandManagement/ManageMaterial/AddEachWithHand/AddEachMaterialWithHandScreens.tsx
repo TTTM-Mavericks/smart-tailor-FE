@@ -22,6 +22,7 @@ import { AddMaterial } from '../../../../models/BrandMaterialExcelModel';
 import Swal from 'sweetalert2';
 import { UserInterface } from '../../../../models/UserModel';
 import Cookies from 'js-cookie';
+import { __getToken } from '../../../../App';
 
 const brandName = "LA LA LISA BRAND";
 
@@ -177,8 +178,13 @@ const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
 
     useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_material + functionEndpoints.material.getAllBrandMaterialByBrandID + `/${getID()}`}`;
+
         axios
-            .get(apiUrl)
+            .get(apiUrl, {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`
+                }
+            })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');
@@ -197,6 +203,7 @@ const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
             .catch(error => console.error('Error fetching data:', error));
     }, []);
 
+
     console.log(formData);
 
     console.log(getID());
@@ -208,7 +215,7 @@ const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
                 { ...formData, brandID: getID() },
                 {
                     headers: {
-                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${__getToken()}`
                     },
                 }
             );

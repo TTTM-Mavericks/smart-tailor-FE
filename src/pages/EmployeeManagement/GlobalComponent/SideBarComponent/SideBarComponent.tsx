@@ -1,5 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { NotificationInterface } from '../../../../models/NotificationModel';
+import Cookies from 'js-cookie';
+import { UserInterface } from '../../../../models/UserModel';
+import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
+import { toast } from 'react-toastify';
+import { __getToken } from '../../../../App';
+import axios from 'axios';
 
 interface SidebarProps {
     menuOpen: boolean;
@@ -9,6 +16,94 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ menuOpen, toggleMenu, activeMenu, handleMenuClick }) => {
+    const [notificationList, setNotificationList] = useState<NotificationInterface[]>([]);
+    const [notiNumber, setNotiNumber] = useState<number>(0);
+    const [messages, setMessages] = useState<NotificationInterface[]>([]);
+
+    const userStorage = Cookies.get('userAuth');
+    if (!userStorage) return;
+    const userParse: UserInterface = JSON.parse(userStorage);
+    const websocketUrl = `ws://localhost:6969/websocket?userid=${userParse.userID}`;
+
+    // 1. First useEffect to fetch notifications and set notiNumber
+    useEffect(() => {
+        const fetchNotifications = async () => {
+            try {
+                const response = await api.get(`${versionEndpoints.v1 + featuresEndpoints.notification + functionEndpoints.notification.getNotiByUserId}/${userParse.userID}`, null, __getToken());
+                if (response.status === 200) {
+                    const sortedData = response.data.sort((a: NotificationInterface, b: NotificationInterface) => {
+                        return new Date(b.createDate).getTime() - new Date(a.createDate).getTime();
+                    });
+                    setNotificationList(sortedData);
+                    console.log(response.data);
+                    const filterStatusNoti = response.data.filter((noti: NotificationInterface) => noti.status === false);
+                    setNotiNumber(filterStatusNoti.length);
+                } else {
+
+                }
+            } catch (error) {
+                toast.error(`${error}`, { autoClose: 4000 });
+                console.log('error: ', error);
+            }
+        };
+
+        fetchNotifications();
+    }, [userParse.userID]);
+
+    // 2. Second useEffect to handle WebSocket connection after notiNumber is set
+    useEffect(() => {
+        const originalTitle = document.title;
+        const websocket = new WebSocket(websocketUrl);
+
+        websocket.onopen = () => {
+            console.log('WebSocket connection opened');
+        };
+
+        websocket.onmessage = (event) => {
+            console.log('Message received:', event.data);
+            const data: NotificationInterface = JSON.parse(event.data);
+            console.log(data);
+            setMessages(prevMessages => [...prevMessages, data]);
+            setNotiNumber(prevNotiNumber => prevNotiNumber + 1); // Ensure state is updated correctly
+            document.title = `New message | ${originalTitle}`;
+        };
+
+        websocket.onclose = () => {
+            console.log('WebSocket connection closed');
+        };
+
+        websocket.onerror = (error) => {
+            console.error('WebSocket error:', error);
+        };
+
+        return () => {
+            websocket.close();
+        };
+    }, [websocketUrl]);
+
+    // Get All Order With Status NOT_VERIFY
+    const apiUrl = `${baseURL}${versionEndpoints.v1}${featuresEndpoints.order}${functionEndpoints.order.getAllOrder}`;
+
+    const [notVerifiedCount, setNotVerifiedCount] = useState(0);
+
+    useEffect(() => {
+        async function fetchOrderCount() {
+            const count = await getNotVerifiedOrdersCount();
+            setNotVerifiedCount(count);
+        }
+        fetchOrderCount();
+    }, []);
+
+    async function getNotVerifiedOrdersCount() {
+        try {
+            const response = await axios.get(apiUrl);
+            return response.data.data.filter((order: any) => order.orderStatus === 'NOT_VERIFY').length;
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+            return 0;
+        }
+    }
+
     return (
         <aside className={`bg-gradient-to-br from-gray-800 to-gray-900 ${menuOpen ? 'translate-x-0' : '-translate-x-80'} fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0`}>
             <div className="relative border-b border-white/20">
@@ -44,19 +139,42 @@ const Sidebar: React.FC<SidebarProps> = ({ menuOpen, toggleMenu, activeMenu, han
                         </div>
                     </li> */}
                     <li>
+                        <div onClick={() => handleMenuClick('employee_manage_notification')} className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'employee_manage_notification' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
+                                <path d="M5.85 3.5a.75.75 0 00-1.117-1 9.719 9.719 0 00-2.348 4.876.75.75 0 001.479.248A8.219 8.219 0 015.85 3.5zM19.267 2.5a.75.75 0 10-1.118 1 8.22 8.22 0 011.987 4.124.75.75 0 001.48-.248A9.72 9.72 0 0019.266 2.5z" />
+                                <path fillRule="evenodd" d="M12 2.25A6.75 6.75 0 005.25 9v.75a8.217 8.217 0 01-2.119 5.52.75.75 0 00.298 1.206c1.544.57 3.16.99 4.831 1.243a3.75 3.75 0 107.48 0 24.583 24.583 0 004.83-1.244.75.75 0 00.298-1.205 8.217 8.217 0 01-2.118-5.52V9A6.75 6.75 0 0012 2.25zM9.75 18c0-.034 0-.067.002-.1a25.05 25.05 0 004.496 0l.002.1a2.25 2.25 0 11-4.5 0z" clipRule="evenodd" />
+                            </svg>
+                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">Manage Notification ({notiNumber})</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div
+                            onClick={() => handleMenuClick('employee_manage_order')}
+                            className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'employee_manage_order'
+                                ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]'
+                                : 'text-white hover:bg-white/10 active:bg-white/30'
+                                } w-full flex items-center gap-4 px-4 capitalize`}
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                                aria-hidden="true"
+                                className="w-5 h-5 text-inherit"
+                            >
+                                <path d="M2.25 2.25a.75.75 0 000 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 00-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 000-1.5H5.378A2.25 2.25 0 017.5 15h11.218a.75.75 0 00.674-.421 60.358 60.358 0 002.96-7.228.75.75 0 00-.525-.965A60.864 60.864 0 005.68 4.509l-.232-.867A1.875 1.875 0 003.636 2.25H2.25zM3.75 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM16.5 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" />
+                            </svg>
+                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">
+                                Manage Order ({notVerifiedCount})
+                            </p>
+                        </div>
+                    </li>
+                    <li>
                         <div onClick={() => handleMenuClick('employee_manage_report')} className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'employee_manage_report' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}>
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
                                 <path fillRule="evenodd" d="M2.25 2.25a.75.75 0 000 1.5H3v10.5a3 3 0 003 3h1.21l-1.172 3.513a.75.75 0 001.424.474l.329-.987h8.418l.33.987a.75.75 0 001.422-.474l-1.17-3.513H18a3 3 0 003-3V3.75h.75a.75.75 0 000-1.5H2.25zm6.04 16.5l.5-1.5h6.42l.5 1.5H8.29zm7.46-12a.75.75 0 00-1.5 0v6a.75.75 0 001.5 0v-6zm-3 2.25a.75.75 0 00-1.5 0v3.75a.75.75 0 001.5 0V9zm-3 2.25a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5z" clipRule="evenodd" />
                             </svg>
                             <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">Manage Report</p>
-                        </div>
-                    </li>
-                    <li>
-                        <div onClick={() => handleMenuClick('employee_manage_order')} className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'employee_manage_order' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}>
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
-                                <path d="M2.25 2.25a.75.75 0 000 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 00-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 000-1.5H5.378A2.25 2.25 0 017.5 15h11.218a.75.75 0 00.674-.421 60.358 60.358 0 002.96-7.228.75.75 0 00-.525-.965A60.864 60.864 0 005.68 4.509l-.232-.867A1.875 1.875 0 003.636 2.25H2.25zM3.75 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM16.5 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" />
-                            </svg>
-                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">Manage Order</p>
                         </div>
                     </li>
                     {/* <li>
@@ -68,15 +186,7 @@ const Sidebar: React.FC<SidebarProps> = ({ menuOpen, toggleMenu, activeMenu, han
                             <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">Manage Transaction</p>
                         </div>
                     </li> */}
-                    <li>
-                        <div onClick={() => handleMenuClick('employee_manage_notification')} className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'employee_manage_notification' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}>
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-5 h-5 text-inherit">
-                                <path d="M5.85 3.5a.75.75 0 00-1.117-1 9.719 9.719 0 00-2.348 4.876.75.75 0 001.479.248A8.219 8.219 0 015.85 3.5zM19.267 2.5a.75.75 0 10-1.118 1 8.22 8.22 0 011.987 4.124.75.75 0 001.48-.248A9.72 9.72 0 0019.266 2.5z" />
-                                <path fillRule="evenodd" d="M12 2.25A6.75 6.75 0 005.25 9v.75a8.217 8.217 0 01-2.119 5.52.75.75 0 00.298 1.206c1.544.57 3.16.99 4.831 1.243a3.75 3.75 0 107.48 0 24.583 24.583 0 004.83-1.244.75.75 0 00.298-1.205 8.217 8.217 0 01-2.118-5.52V9A6.75 6.75 0 0012 2.25zM9.75 18c0-.034 0-.067.002-.1a25.05 25.05 0 004.496 0l.002.1a2.25 2.25 0 11-4.5 0z" clipRule="evenodd" />
-                            </svg>
-                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">Manage Notification</p>
-                        </div>
-                    </li>
+
                     {/* Profile setting menu item is commented out
                     <li>
                         <div onClick={() => handleMenuClick('employee_profile')} className={`middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg ${activeMenu === 'employee_profile' ? 'bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85]' : 'text-white hover:bg-white/10 active:bg-white/30'} w-full flex items-center gap-4 px-4 capitalize`}>

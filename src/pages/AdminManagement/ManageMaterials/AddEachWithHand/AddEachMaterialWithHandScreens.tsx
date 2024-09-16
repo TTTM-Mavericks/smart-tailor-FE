@@ -21,6 +21,7 @@ import axios from 'axios';
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
 import { CancelOutlined } from '@mui/icons-material';
 import { width } from '@mui/system';
+import { __getToken } from '../../../../App';
 
 interface AddMaterialWithHandsFormProps {
     closeCard: () => void;
@@ -63,7 +64,12 @@ const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
      */
     useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.getAllCategory}`;
-        axios.get(apiUrl)
+
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');
@@ -82,6 +88,7 @@ const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
             })
             .catch(error => console.error('Error fetching data:', error));
     }, []);
+
 
     // ---------------FunctionHandler---------------//
 
@@ -108,7 +115,7 @@ const AddEachMaterialWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
         try {
             const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.material + functionEndpoints.material.addNewMaterial}`, formData, {
                 headers: {
-                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${__getToken()}`
                 },
             });
 

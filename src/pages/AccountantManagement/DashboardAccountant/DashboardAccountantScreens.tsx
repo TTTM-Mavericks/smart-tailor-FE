@@ -5,14 +5,16 @@ import { IconButton } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
 import AccountantDashboards from '../AccountantDashboard/AccountantDashboardScreen';
 import AccountantManagePaymentForBrandComponent from '../AccountantManagePaymentForBrand/AccountantManagePaymentForBrandComponent';
+import AccountantDashboard from '../AccountantDashboard/AccountantDashboardScreen';
 import AccountantManageRefundPaymentForBrandComponent from '../AccountantManageRefundPayment/AccountantManageRefundPaymentForBrandComponent';
+import AccountantManageFinedPaymentComponent from '../AccountantManageFinedPayment/AccountantManageFinedPaymentComponent';
 
 // Define the type for popperOpen
 type PopperOpenState = Record<string, boolean>;
 
 const DashboardAccountantScreens: React.FC = () => {
     const [menuOpen, setMenuOpen] = useState(false);
-    const [activeMenu, setActiveMenu] = useState('accountant_dashboard');
+    const [activeMenu, setActiveMenu] = useState('accountant_dash');
     const [showScrollButton, setShowScrollButton] = useState(false);
     const [popperOpen, setPopperOpen] = useState<PopperOpenState>({ // Initialize with type
         notification: false,
@@ -89,10 +91,20 @@ const DashboardAccountantScreens: React.FC = () => {
                 return (
                     <AccountantManagePaymentForBrandComponent />
                 );
+            case 'accountant_dash':
+                return (
+                    <AccountantDashboard />
+                );
             case 'accountant_manage_refund_payment':
                 return (
                     <AccountantManageRefundPaymentForBrandComponent />
                 );
+
+            case 'accountant_manage_fined_payment':
+                return (
+                    <AccountantManageFinedPaymentComponent />
+                );
+
             default:
                 return (
                     <AccountantManagePaymentForBrandComponent />

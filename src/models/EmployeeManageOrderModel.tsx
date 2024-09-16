@@ -1,3 +1,5 @@
+import { DesignInterface } from "./DesignModel";
+
 export interface EmployeeOrder {
     orderID: string,
     parentOrderID: string,
@@ -20,6 +22,7 @@ export interface EmployeeOrder {
     paymentList: string,
     createDate: string,
     orderImageList: ImageList[]
+    designResponse?: DesignInterface;
 }
 
 export interface DetailList {

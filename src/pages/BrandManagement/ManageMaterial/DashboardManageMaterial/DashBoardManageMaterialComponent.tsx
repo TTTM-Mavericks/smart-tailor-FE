@@ -13,11 +13,17 @@ import BrandProductivityInputDialog from '../../GlobalComponent/Dialog/BrandProd
 import { IconButton } from '@mui/material';
 import { ArrowUpward } from '@mui/icons-material';
 import BrandManageTransactionComponent from '../../BrandManageTransaction/BrandManageTransactionComponent';
+import ExpertTailoringBrandManagerComponent from '../../BrandProperty/ManageExpertailoring/BrandManageExpertTailoringComponent';
+import BrandManagePropertyComponent from '../../BrandProperty/ManageProperties/ManagePropertiesComponent';
+import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
+import axios from 'axios';
+import { __getToken } from '../../../../App';
+import Cookies from 'js-cookie';
 
 const DashboardManageMaterialScreen = () => {
     const [menuOpen, setMenuOpen] = useState(false);
 
-    const [activeMenu, setActiveMenu] = useState('manage_notification');
+    const [activeMenu, setActiveMenu] = useState('manage_material');
     const [showScrollButton, setShowScrollButton] = useState<boolean>(false);
     const [popperOpen, setPopperOpen] = useState<Record<string, boolean>>({});
 
@@ -31,22 +37,59 @@ const DashboardManageMaterialScreen = () => {
 
     useEffect(() => {
         if (!checkPerformed.current) {
-            const isFirstLogin = localStorage.getItem('brandFirstLogin');
-            const dialogShown = sessionStorage.getItem('productivityDialogShown');
-            const userAuthData = JSON.parse(localStorage.getItem('userAuth') || '{}');
-            setUserAuth(userAuthData);
+            let authData;
+            const userAuthCookie = Cookies.get('userAuth');
+            const brandAuthCookie = Cookies.get('brandAuth');
 
-            if (isFirstLogin === 'true' && dialogShown !== 'true') {
-                setShowProductivityDialog(true);
-                sessionStorage.setItem('productivityDialogShown', 'true');
+            if (userAuthCookie) {
+                try {
+                    authData = JSON.parse(userAuthCookie);
+                } catch (error) {
+                    console.error("Error parsing userAuth cookie:", error);
+                }
+            } else if (brandAuthCookie) {
+                try {
+                    authData = JSON.parse(brandAuthCookie);
+                } catch (error) {
+                    console.error("Error parsing brandAuth cookie:", error);
+                }
             }
+
+            if (!authData) {
+                console.error("No valid auth data found in cookies");
+                return; // Exit early if no auth data is available
+            }
+
+            setUserAuth(authData);
+
+            const checkBrandProductivity = async () => {
+                try {
+                    const response = await axios.get(
+                        `${baseURL}${versionEndpoints.v1}${featuresEndpoints.brandPropertise}${functionEndpoints.brandProperties.getBrandByProductiveByBrandID}/${authData.userID || authData.id}`,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${__getToken()}`
+                            }
+                        }
+                    );
+
+                    if (response.data.data === null) {
+                        setShowProductivityDialog(true);
+                    } else {
+                        setShowProductivityDialog(false);
+                    }
+                } catch (error) {
+                    console.error('Error fetching brand productivity data:', error);
+                }
+            };
+
+            checkBrandProductivity();
             checkPerformed.current = true;
         }
     }, []);
 
     const handleCloseProductivityDialog = () => {
         setShowProductivityDialog(false);
-        sessionStorage.setItem('productivityDialogShown', 'false');
     };
 
     const toggleMenu = () => {
@@ -127,6 +170,13 @@ const DashboardManageMaterialScreen = () => {
                 return <OrderRequestScreen />;
             case 'manage_brand_trandsactions':
                 return <BrandManageTransactionComponent />;
+            case 'manage_expert_tailoring':
+                return (
+                    <div>
+                        <BrandManagePropertyComponent />
+                        <ExpertTailoringBrandManagerComponent />
+                    </div>
+                );
             default:
                 return <ManageMaterialComponent />;
         }
@@ -151,7 +201,7 @@ const DashboardManageMaterialScreen = () => {
                     <BrandProductivityInputDialog
                         isOpen={showProductivityDialog}
                         onClose={handleCloseProductivityDialog}
-                        brandID={userAuth?.userID}
+                        brandID={userAuth?.userID || userAuth?.id}
                     />
                 )}
                 <main className="p-6 flex-grow ml-0 xl:ml-[20%]">

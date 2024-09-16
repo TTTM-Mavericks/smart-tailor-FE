@@ -19,6 +19,7 @@ import Swal from 'sweetalert2';
 import Cookies from 'js-cookie';
 import { UserInterface } from '../../../../../models/UserModel';
 import { greenColor, redColor } from '../../../../../root/ColorSystem';
+import { __getToken } from '../../../../../App';
 
 // const BRANDNAME = localStorage.getItem('brandName')
 
@@ -185,7 +186,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                         const workbook = XLSX.read(data, { type: 'array' });
                         const sheetName = workbook.SheetNames[0];
                         const sheet = workbook.Sheets[sheetName];
-                        const jsonData = XLSX.utils.sheet_to_json<ExcelData>(sheet, { range: 1 });
+                        const jsonData = XLSX.utils.sheet_to_json<ExcelData>(sheet, { range: 2 });
 
                         // Update error property for duplicate entries
                         const updatedData = jsonData.map(item => {
@@ -244,13 +245,17 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
 
         try {
             // const token = Cookies.get('token');
-            const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_material + functionEndpoints.brand.addExcel}`, formData,
-                // {
-                //     headers: {
-                //         'Authorization': `Bearer ${token}`
-                //     }
-                // }
+            const response = await axios.post(
+                `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand_material + functionEndpoints.brand.addExcel}`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${__getToken()}`,
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
             );
+
 
             // Handle successful response
             if (response.data.status === 200) {
@@ -271,7 +276,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                     setErrorCheckGet(error.response.data.errors);
                     toast.error(errorMessage);
                 } else {
-                    toast.error('Unknown Error');
+                    toast.error(errorMessage);
                 }
             } else {
                 toast.error('Error uploading data');
@@ -324,11 +329,19 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
         ];
 
         // Insert a custom header row above the defined columns
-        worksheet.insertRow(1, ['BRAND MATERIAL ERRORS']);
+        worksheet.insertRow(1, ['BRAND PRICE MATERIAL ERRORS']);
+        worksheet.insertRow(2, [`
+            Explanation:
+• Category_Name: Only values from the predefined list of categories in the Smart Tailor application are allowed.
+• Base_Price: Only positive integer values are allowed, and the currency unit is VND.
+• HS_Code: Only positive integer values are allowed.
+• Brand_Price: Only positive integer values are allowed, and the currency unit is VND.Brand_Price must be between 92.0 % and 108.0 % of Base_Price.
+If the brand does not have a material for this entry, the field may be left blank.'`]);
 
         // Merge cells for the custom header row
         worksheet.mergeCells('A1:F1');
-        worksheet.autoFilter = 'A2:F2';  // Apply filter to the actual header row
+        worksheet.mergeCells('A2:F2');
+        worksheet.autoFilter = 'A3:F3';  // Apply filter to the actual header row
 
         // Set styles for the custom header row
         const customHeaderRow = worksheet.getRow(1);
@@ -343,8 +356,15 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
             };
         });
 
+        // Custom row 2
+        const customHeaderRow2 = worksheet.getRow(2);
+        customHeaderRow2.height = 120;
+        customHeaderRow2.eachCell(cell => {
+            cell.alignment = { wrapText: true, vertical: 'top' };  // Enable text wrapping for row 2
+        });
+
         // Set styles for column header row
-        worksheet.getRow(2).eachCell(cell => {
+        worksheet.getRow(3).eachCell(cell => {
             cell.font = { bold: true };
             cell.alignment = { vertical: 'middle', horizontal: 'center' };
             cell.fill = {
@@ -391,13 +411,13 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
 
         // Add only error rows to the worksheet
         excelData.forEach((rowData, rowIndex) => {
-            if (errorRows.has(rowIndex + 4)) {  // Check if this row is in the errorRows set
+            if (errorRows.has(rowIndex + 5)) {  // Check if this row is in the errorRows set
                 const row = worksheet.addRow(rowData);
 
                 // Apply error formatting to cells with errors
                 worksheet.columns.forEach((column, colIndex) => {
                     const cell = row.getCell(colIndex + 1);
-                    const errorKey = `${rowIndex + 4}-${column.key}`;  // Adjust rowIndex to match error messages
+                    const errorKey = `${rowIndex + 5}-${column.key}`;  // Adjust rowIndex to match error messages
 
                     // Handle null values
                     if (cell.value === null) {
@@ -405,7 +425,7 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                         cell.font = { color: { argb: 'FF808080' } };  // Gray color for NULL values
                     }
 
-                    if (existingBrandMaterialRows.has(rowIndex + 4)) {
+                    if (existingBrandMaterialRows.has(rowIndex + 5)) {
                         cell.fill = {
                             type: 'pattern',
                             pattern: 'solid',
@@ -468,7 +488,10 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
         axios({
             url: url,
             method: 'GET',
-            responseType: 'blob', // Important to handle binary data
+            responseType: 'blob',
+            headers: {
+                Authorization: `Bearer ${__getToken()}`,  // Add the Bearer token here
+            }
         })
             .then(response => {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -583,31 +606,56 @@ const AddMultipleMaterialWithExcel: React.FC<AddMaterialWithMultipleExcelFormPro
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Unit</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Base Price</th>
                                     <th style={{ border: '1px solid #ddd', padding: '8px' }}>Brand Price</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {excelData.map((data, index) => (
-                                    <tr key={data.id}>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Category_Name ? colors.primary[200] : 'red' }}>{data.Category_Name || 'Null Category Name'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Material_Name ? colors.primary[200] : 'red' }}>{data.Material_Name || 'Null Material Name'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.HS_Code ? colors.primary[200] : 'red' }}>{data.HS_Code || 'Null'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Unit ? colors.primary[200] : 'red' }}>{data.Unit || 'Null Unit'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Base_Price ? colors.primary[200] : 'red' }}>{data.Base_Price || 'Null Base Price'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Brand_Price ? colors.primary[200] : 'red' }}>{data.Brand_Price || 'Null Price'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>
-                                            <div style={{ display: "flex" }}>
-                                                <EditIcon style={{ color: "blue", cursor: "pointer" }} onClick={() => confirmEdit(index)} />
-                                                <DeleteIcon style={{ color: "red", cursor: "pointer" }} onClick={() => confirmDelete(index)} />
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
+                                {excelData.map((data, index) => {
+                                    const getBrandPriceError = () => {
+                                        if (data.Brand_Price == null) return 'Null';
+                                        if (isNaN(data.Brand_Price)) return 'Not a number';
+                                        if (data.Brand_Price < 0) return 'Negative value';
+                                        return null;
+                                    };
+                                    const getBasePriceError = () => {
+                                        if (data.Base_Price == null) return 'Null';
+                                        if (isNaN(data.Base_Price)) return 'Not a number';
+                                        if (data.Base_Price < 0) return 'Negative value';
+                                        return null;
+                                    };
+                                    const brandPriceError = getBrandPriceError();
+                                    const basePriceError = getBasePriceError();
+                                    const hsCodeError = isNaN(Number(data.HS_Code)) ? 'Not a number' : null;
+                                    const unitError = typeof data.Unit !== 'string' ? 'Not a string' : null;
+
+                                    return (
+                                        <tr key={data.id}>
+                                            <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Category_Name ? colors.primary[200] : 'red' }}>
+                                                {data.Category_Name || 'Null Category Name'}
+                                            </td>
+                                            <td style={{ border: '1px solid #ddd', padding: '8px', color: data.Material_Name ? colors.primary[200] : 'red' }}>
+                                                {data.Material_Name || 'Null Material Name'}
+                                            </td>
+                                            <td style={{ border: '1px solid #ddd', padding: '8px', color: hsCodeError ? 'red' : colors.primary[200] }}>
+                                                {hsCodeError ? `${data.HS_Code} (${hsCodeError})` : data.HS_Code}
+                                            </td>
+                                            <td style={{ border: '1px solid #ddd', padding: '8px', color: unitError ? 'red' : colors.primary[200] }}>
+                                                {unitError ? `${data.Unit} (${unitError})` : data.Unit}
+                                            </td>
+                                            <td style={{ border: '1px solid #ddd', padding: '8px', color: basePriceError ? 'red' : colors.primary[200] }}>
+                                                {basePriceError ? `${data.Base_Price} (${basePriceError})` : data.Base_Price}
+                                            </td>
+                                            <td style={{ border: '1px solid #ddd', padding: '8px', color: brandPriceError ? 'red' : colors.primary[200] }}>
+                                                {brandPriceError ? `${data.Brand_Price} (${brandPriceError})` : data.Brand_Price}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>
                 )
             }
+
             <Modal
                 open={editOpen}
                 aria-labelledby="modal-modal-title"

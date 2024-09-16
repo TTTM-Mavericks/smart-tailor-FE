@@ -8,10 +8,11 @@ import EmployeeManageOrder from '../ManageOrder/EmployeeOrderManagement/Employee
 import EmployeeManageTransaction from '../ManageTransaction/EmployeeTransactionManagement/EmployeeManageTransactionScreen/ManageTransactionScreen';
 import ManageNotificationScreens from '../ManageNotification/ManageNotificationScreens';
 import EmployeeProfileSetup from '../EmployeeProfile/EmployeeProfileComponent';
+import NotificationEmployeeComponent from '../GlobalComponent/Notification/NotificationEmployeeComponent';
 
 const DashboardEmployeeScreens = () => {
     const [menuOpen, setMenuOpen] = useState(false);
-    const [activeMenu, setActiveMenu] = useState('employee_manage_customer');
+    const [activeMenu, setActiveMenu] = useState('employee_manage_order');
     const [showScrollButton, setShowScrollButton] = React.useState<boolean>(false);
     const [popperOpen, setPopperOpen] = useState<Record<string, boolean>>({});
 
@@ -91,7 +92,7 @@ const DashboardEmployeeScreens = () => {
             case 'employee_manage_transaction':
                 return <EmployeeManageTransaction />;
             case 'employee_manage_notification':
-                return <ManageNotificationScreens />;
+                return <NotificationEmployeeComponent />;
             case 'employee_profile':
                 return <EmployeeProfileSetup />;
             default:

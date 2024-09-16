@@ -4,6 +4,9 @@ import { tokens } from "../../../theme";
 import { mockBarData as barChartData } from "./DataTestBarChart";
 import { useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
+import { baseURL, functionEndpoints, versionEndpoints } from '../../../api/ApiConfig';
+import axios from 'axios';
+import { __getToken } from '../../../App';
 
 const BarChart = () => {
     const theme = useTheme();
@@ -31,9 +34,33 @@ const BarChart = () => {
         }
     }, [selectedLanguage, i18n]);
 
+    const [orderBrand, setOrderBrand] = useState<any>([]);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchOrderGrowthPercentage = async () => {
+            try {
+                const response = await axios.get(
+                    `${baseURL + versionEndpoints.v1 + '/order' + functionEndpoints.chart.getTotalForEachBrand}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${__getToken()}`,
+                        },
+                    }
+                );
+                setOrderBrand(response.data.data);
+            } catch (error) {
+                console.error('Error fetching order growth percentage:', error);
+                setError('Failed to load order growth percentage');
+            }
+        };
+
+        fetchOrderGrowthPercentage();
+    }, []);
+
     return (
         <>
-            <Box sx={{ display: 'flex', justifyContent: 'right', alignItems: 'right', margin: '2%' }}>
+            {/* <Box sx={{ display: 'flex', justifyContent: 'right', alignItems: 'right', margin: '2%' }}>
                 <FormControl variant="outlined" sx={{ minWidth: 200, backgroundColor: color.background.paper, borderRadius: 1 }}>
                     <InputLabel sx={{ color: color.text.primary }}>Filter by Category</InputLabel>
                     <Select
@@ -57,10 +84,10 @@ const BarChart = () => {
                         <MenuItem value="year">{t(`${codeLanguage}000043`)}</MenuItem>
                     </Select>
                 </FormControl>
-            </Box>
+            </Box> */}
 
             <ResponsiveBar
-                data={filteredData}
+                data={orderBrand}
                 theme={{
                     axis: {
                         domain: {
@@ -94,8 +121,8 @@ const BarChart = () => {
                         },
                     },
                 }}
-                keys={["hot dog", "burger", "sandwich", "kebab", "fries", "donut"]}
-                indexBy="brand"
+                keys={["second"]}
+                indexBy="first"
                 margin={{ top: 50, right: 30, bottom: 50, left: 60 }}
                 padding={0.3}
                 valueScale={{ type: "linear" }}
@@ -131,7 +158,6 @@ const BarChart = () => {
                     tickSize: 5,
                     tickPadding: 5,
                     tickRotation: 0,
-                    legend: "country",
                     legendPosition: "middle",
                     legendOffset: 32,
                 }}
@@ -139,7 +165,6 @@ const BarChart = () => {
                     tickSize: 5,
                     tickPadding: 5,
                     tickRotation: 0,
-                    legend: "food",
                     legendPosition: "middle",
                     legendOffset: -40,
                 }}

@@ -143,14 +143,14 @@ const ManageNotificationScreens = () => {
 
     return (
         <div style={{ padding: '20px' }}>
-            <Button
+            {/* <Button
                 variant="contained"
                 color="primary"
                 onClick={handleMarkAllRead}
                 style={{ marginBottom: '20px' }}
             >
                 Mark All as Read
-            </Button>
+            </Button> */}
             <List>
                 {data.map((notification) => (
                     <ListItem key={notification.notiID} button>

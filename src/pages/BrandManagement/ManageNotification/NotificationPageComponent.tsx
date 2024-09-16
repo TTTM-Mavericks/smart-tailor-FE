@@ -119,7 +119,7 @@ const NotificationPage = () => {
     };
 
     return (
-        <div style={{ width: "50%", marginLeft: "20%" }}>
+        <div style={{ width: "100%" }}>
             {/* <h1 className="text-2xl font-bold mb-4">Thông báo</h1> */}
             {/* <div className="flex mb-4">
                 <button
@@ -160,7 +160,7 @@ const NotificationPage = () => {
                     View Previous Notification
                 </button>
             )} */}
-            <NotificationBrandComponent userId='a' />
+            <NotificationBrandComponent />
         </div>
     );
 };

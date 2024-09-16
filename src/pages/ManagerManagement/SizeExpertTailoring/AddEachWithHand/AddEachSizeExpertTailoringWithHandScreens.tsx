@@ -10,16 +10,15 @@ import {
     SelectChangeEvent,
     TextField,
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
 import Swal from 'sweetalert2';
 import { useTranslation } from 'react-i18next';
-import { AddExpertTailoring, ExpertTailoring } from '../../../../models/ManagerExpertTailoringModel';
 import axios from 'axios';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../api/ApiConfig';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { AddSizeExpertTailoring } from '../../../../models/ManagerSizeExpertTailoringModel';
 import { CancelOutlined } from '@mui/icons-material';
 import { primaryColor } from '../../../../root/ColorSystem';
+import { __getToken } from '../../../../App';
 
 interface AddSizeExpertTailoringWithHandsFormProps {
     closeCard: () => void;
@@ -37,9 +36,7 @@ const AddEachSizeExpertTailoringWithHand: React.FC<AddSizeExpertTailoringWithHan
     const [formData, setFormData] = useState({
         expertTailoringName: '',
         sizeName: '',
-        minFabric: 0,
-        maxFabric: 0,
-        unit: ''
+        ratio: 0,
     });
 
     const [categoryData, setCategoryData] = useState<string[]>([])
@@ -82,7 +79,11 @@ const AddEachSizeExpertTailoringWithHand: React.FC<AddSizeExpertTailoringWithHan
      */
     useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.getAllCategory}`;
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');
@@ -133,7 +134,11 @@ const AddEachSizeExpertTailoringWithHand: React.FC<AddSizeExpertTailoringWithHan
      */
     useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.size + functionEndpoints.size.getAllSize}`;
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');
@@ -242,18 +247,16 @@ const AddEachSizeExpertTailoringWithHand: React.FC<AddSizeExpertTailoringWithHan
             sizeImageUrls = await _handleUploadToCloudinary(files);
         }
 
-
         // Make API call to update the profile using PUT method
         try {
-            // const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0YW1tdHNlMTYxMDg3QGZwdC5lZHUudm4iLCJpYXQiOjE3MTgyODUyMTMsImV4cCI6MTcxODM3MTYxM30.UUpy2s9SwYGF_TyIru6VASQ-ZzGTOqx7mkWkcSR2__0'; // Replace with the actual bearer token
             const response = await axios.post(
                 `${baseURL + versionEndpoints.v1 + featuresEndpoints.sizeExpertTailoring + functionEndpoints.sizeExpertTailoring.addNewSizeExpertTailoring}`,
                 formData,
-                // {
-                //     headers: {
-                //         'Authorization': `Bearer ${token}`
-                //     }
-                // }
+                {
+                    headers: {
+                        Authorization: `Bearer ${__getToken()}`
+                    }
+                }
 
             );
             console.log("res:" + response);
@@ -347,42 +350,15 @@ const AddEachSizeExpertTailoringWithHand: React.FC<AddSizeExpertTailoringWithHan
                                 </Select>
                             </FormControl>
                         </div>
-
                         <div>
                             <TextField
                                 fullWidth
-                                label="Min Fabric"
+                                label="Ratio"
                                 variant="outlined"
                                 size="small"
-                                name="minFabric"
+                                name="ratio"
                                 type="number"
-                                value={formData.minFabric}
-                                onChange={_handleChange}
-                            />
-                        </div>
-
-                        <div>
-                            <TextField
-                                fullWidth
-                                label="Max Fabric"
-                                variant="outlined"
-                                size="small"
-                                name="maxFabric"
-                                type="number"
-                                value={formData.maxFabric}
-                                onChange={_handleChange}
-                            />
-                        </div>
-
-                        <div className="md:col-span-2">
-                            <TextField
-                                fullWidth
-                                label="Unit"
-                                variant="outlined"
-                                size="small"
-                                name="unit"
-                                type="text"
-                                value={formData.unit}
+                                value={formData.ratio}
                                 onChange={_handleChange}
                             />
                         </div>

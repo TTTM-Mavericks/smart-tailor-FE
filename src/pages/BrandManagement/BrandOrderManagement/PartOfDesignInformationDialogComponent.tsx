@@ -53,7 +53,7 @@ const PartOfDesignInformationDialogComponent: React.FC<PartDetailsDialogProps> =
                         ))}
                     </Grid>
                 </Grid>
-                <DialogActions>
+                {/* <DialogActions>
                     <button
                         type="submit"
                         className="px-5 py-2.5 text-sm font-medium text-white"
@@ -70,7 +70,7 @@ const PartOfDesignInformationDialogComponent: React.FC<PartDetailsDialogProps> =
                     >
                         Download Material
                     </button>
-                </DialogActions>
+                </DialogActions> */}
             </DialogContent>
         </Dialog>
     );
