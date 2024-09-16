@@ -42,6 +42,11 @@ const steps = [
         description: ``,
         value: 'DELIVERED'
     },
+    {
+        label: 'Received',
+        description: ``,
+        value: 'RECEIVED'
+    },
 ];
 type props = {
     status?: string
@@ -68,6 +73,8 @@ const VerticalLinearStepperComponent: React.FC<props> = ({ status }) => {
         if (status === 'PROCESSING') setActiveStep(3);
         if (status === 'COMPLETED') setActiveStep(4);
         if (status === 'DELIVERED') setActiveStep(5);
+        if (status === 'RECEIVED') setActiveStep(7);
+
 
     }, [status])
 
@@ -91,14 +98,6 @@ const VerticalLinearStepperComponent: React.FC<props> = ({ status }) => {
                     </Step>
                 ))}
             </Stepper>
-            {activeStep === steps.length && (
-                <Paper square elevation={0} sx={{ p: 3 }}>
-                    <Typography>All steps completed - you&apos;re finished</Typography>
-                    <Button onClick={handleReset} sx={{ mt: 1, mr: 1 }}>
-                        Reset
-                    </Button>
-                </Paper>
-            )}
         </div>
     );
 }

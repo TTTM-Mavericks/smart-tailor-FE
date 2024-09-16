@@ -8,6 +8,7 @@ import { Category } from "../../../../../models/AdminCategoryExcelModel";
 import api, { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { CancelOutlined } from "@mui/icons-material";
 import { primaryColor, redColor } from "../../../../../root/ColorSystem";
+import { __getToken } from "../../../../../App";
 
 interface EditCategoryPopUpScreenFormProps {
     fid: {
@@ -26,10 +27,13 @@ const EditMCategoryPopUpScreens: React.FC<EditCategoryPopUpScreenFormProps> = ({
 
     const _handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
+        // Only allow alphabetic characters and spaces
+        if (/^[A-Za-z\s]*$/.test(value)) {
+            setFormData(prevState => ({
+                ...prevState,
+                [name]: value.trim() // Trim to remove leading/trailing spaces
+            }));
+        }
     }
 
     // Get language in local storage
@@ -45,59 +49,49 @@ const EditMCategoryPopUpScreens: React.FC<EditCategoryPopUpScreenFormProps> = ({
     }, [selectedLanguage, i18n]);
 
     const _handleSubmit = async () => {
+        // Validate the category name
+        if (!/^[A-Za-z\s]+$/.test(formData.categoryName)) {
+            Swal.fire(
+                'Invalid Input',
+                'Category name must contain only alphabetic characters and spaces',
+                'error'
+            );
+            editClose();
+            return;
+        }
+
         try {
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.updateCategory}`;
             const response = await axios.put(apiUrl, {
                 ...formData
+            }, {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`
+                }
             });
 
-            console.log("formData" + formData);
-
-            if (!response.data) {
-                throw new Error('Error updating material');
-            }
-
             if (response.data.status === 200) {
-                editClose()
-
+                editClose();
                 updateCategory({ ...formData });
                 Swal.fire(
-                    `Updated Category Success!`,
-                    `Updated Category Success!`,
+                    'Updated Category Success!',
+                    'Category has been updated successfully!',
                     'success'
                 );
-            }
-
-            if (response.data.status === 409) {
-                editClose()
-
+            } else {
+                editClose();
                 Swal.fire(
-                    `Updated Category Fail!`,
-                    `Updated Category Fail!`,
+                    'Updated Category Fail!',
+                    'Please check the information and try again.',
                     'error'
                 );
             }
-
-            if (response.data.status === 400) {
-                editClose()
-
-                Swal.fire(
-                    `Updated Category Fail!`,
-                    `Updated Category Fail!`,
-                    'error'
-                );
-            }
-            sessionStorage.setItem("obj", JSON.stringify(formData));
-
-
-            editClose(); // Close the edit modal after successful update
         } catch (error) {
-            editClose()
-
+            editClose();
             console.error('Update Error:', error);
             Swal.fire(
-                `Updated Category Fail!`,
-                `Updated Category Fail!`,
+                'Updated Category Fail!',
+                'An error occurred while updating the category.',
                 'error'
             );
         }
@@ -150,6 +144,10 @@ const EditMCategoryPopUpScreens: React.FC<EditCategoryPopUpScreenFormProps> = ({
                             fullWidth
                             value={formData.categoryName}
                             onChange={_handleChange}
+                            inputProps={{
+                                pattern: "[A-Za-z\\s]*",
+                                title: "Only alphabetic characters and spaces are allowed"
+                            }}
                         />
                     </Grid>
                 </Grid>
@@ -195,7 +193,6 @@ const EditMCategoryPopUpScreens: React.FC<EditCategoryPopUpScreenFormProps> = ({
                 </Button>
             </Box>
         </Box>
-
     );
 }
 

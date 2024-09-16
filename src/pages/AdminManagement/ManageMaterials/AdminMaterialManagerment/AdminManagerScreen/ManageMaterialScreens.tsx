@@ -274,6 +274,11 @@ const ManageMaterials: React.FC = () => {
             headerName: "Base Price",
             headerAlign: "left",
             align: "left",
+            renderCell: (params) => (
+                <span>
+                    {params.value.toLocaleString()}
+                </span>
+            ),
         },
         {
             field: "unit",
@@ -292,8 +297,8 @@ const ManageMaterials: React.FC = () => {
             renderCell: (params) => (
                 <Box
                     sx={{
-                        backgroundColor: params.value === 'Active' ? '#ffebee' : '#e8f5e9',
-                        color: params.value === 'Active' ? '#f44336' : '#4caf50',
+                        backgroundColor: params.value === false ? '#ffebee' : '#e8f5e9',
+                        color: params.value === false ? '#f44336' : '#4caf50',
                         borderRadius: '16px',
                         padding: '1px 5px',
                         fontSize: '0.75rem',
@@ -310,7 +315,6 @@ const ManageMaterials: React.FC = () => {
                             width: '6px',
                             height: '6px',
                             borderRadius: '50%',
-                            backgroundColor: params.value === 'Active' ? '#f44336' : '#4caf50',
                         }}
                     />
                     {params.row.status ? 'ACTIVE' : 'INACTIVE'}

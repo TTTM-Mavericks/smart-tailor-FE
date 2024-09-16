@@ -17,6 +17,7 @@ import ExcelJS from 'exceljs';
 import { toast, ToastContainer } from 'react-toastify';
 import Swal from 'sweetalert2';
 import { greenColor, redColor } from '../../../../root/ColorSystem';
+import { __getToken } from '../../../../App';
 
 interface AddExpertTailoringWithMultipleExcelFormProps {
     closeMultipleCard: () => void;
@@ -182,11 +183,11 @@ const AddMultipleExpertTailoringComponentWithExcel: React.FC<AddExpertTailoringW
             // const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0YW1tdHNlMTYxMDg3QGZwdC5lZHUudm4iLCJpYXQiOjE3MTkwNTgwNDcsImV4cCI6MTcxOTE0NDQ0N30.Fg4vSWnTy71sWQfulQbhVzn3BuIaRQ5cI-dRKF7FSmo'; // Replace with the actual bearer token
             const response = await axios.post(`${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.addNewExpertTailoringByExcelFile}`, formData,
 
-                // {
-                //     headers: {
-                //         'Authorization': `Bearer ${token}`
-                //     }
-                // }
+                {
+                    headers: {
+                        Authorization: `Bearer ${__getToken()}`
+                    }
+                }
             );
 
             // Handle successful response
@@ -460,6 +461,9 @@ const AddMultipleExpertTailoringComponentWithExcel: React.FC<AddExpertTailoringW
             url: url,
             method: 'GET',
             responseType: 'blob', // Important to handle binary data
+            headers: {
+                'Authorization': `Bearer ${__getToken()}` // Replace with your token
+            }
         })
             .then(response => {
                 const url = window.URL.createObjectURL(new Blob([response.data]));

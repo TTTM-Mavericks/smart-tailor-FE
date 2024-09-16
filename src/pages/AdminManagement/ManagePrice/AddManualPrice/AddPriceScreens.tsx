@@ -7,6 +7,7 @@ import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from 
 import { EditLaborQuantity } from '../../../../models/LaborQuantityModel';
 import { AddCircleOutline, CancelOutlined, RemoveCircleOutline } from '@mui/icons-material';
 import { primaryColor } from '../../../../root/ColorSystem';
+import { __getToken } from '../../../../App';
 
 interface AddLaborQuantityWithHandsFormProps {
     closeCard: () => void;
@@ -21,11 +22,24 @@ const AddPriceManual: React.FC<AddLaborQuantityWithHandsFormProps> = ({ closeCar
 
     const handlePriceChange = (index: number, event: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
-        setPrices(prevPrices => {
-            const newPrices = [...prevPrices];
-            (newPrices[index] as any)[name] = value;
-            return newPrices;
-        });
+        const numValue = parseFloat(value);
+
+        if (!isNaN(numValue) && numValue >= 0) {
+            setPrices(prevPrices => {
+                const newPrices = [...prevPrices];
+                (newPrices[index] as any)[name] = numValue;
+                return newPrices;
+            });
+        }
+    };
+
+    const validatePrices = (): boolean => {
+        for (const price of prices) {
+            if (price.laborQuantityMinPrice < 0 || price.laborQuantityMaxPrice < 0) {
+                return false;
+            }
+        }
+        return true;
     };
 
     const addNewPriceRow = () => {
@@ -37,9 +51,22 @@ const AddPriceManual: React.FC<AddLaborQuantityWithHandsFormProps> = ({ closeCar
     };
 
     const handleSubmit = async () => {
+        if (!validatePrices()) {
+            Swal.fire(
+                'Invalid Input',
+                'All prices must be positive numbers.',
+                'error'
+            );
+            return;
+        }
+
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.labor_quantity + functionEndpoints.laborQantity.addNewLaborQuantity}`;
         try {
-            const response = await axios.post(apiUrl, { laborQuantityRequests: prices });
+            const response = await axios.post(apiUrl, { laborQuantityRequests: prices }, {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`
+                }
+            });
             if (response.data.status === 200) {
                 closeCard();
                 Swal.fire(
@@ -92,6 +119,7 @@ const AddPriceManual: React.FC<AddLaborQuantityWithHandsFormProps> = ({ closeCar
                                 <td className="border-b py-2 px-4">
                                     <input
                                         type="number"
+                                        min="0"
                                         name="laborQuantityMinQuantity"
                                         value={price.laborQuantityMinQuantity}
                                         onChange={(event) => handlePriceChange(index, event)}
@@ -102,6 +130,7 @@ const AddPriceManual: React.FC<AddLaborQuantityWithHandsFormProps> = ({ closeCar
                                 <td className="border-b py-2 px-4">
                                     <input
                                         type="number"
+                                        min="0"
                                         name="laborQuantityMaxQuantity"
                                         value={price.laborQuantityMaxQuantity}
                                         onChange={(event) => handlePriceChange(index, event)}
@@ -112,6 +141,7 @@ const AddPriceManual: React.FC<AddLaborQuantityWithHandsFormProps> = ({ closeCar
                                 <td className="border-b py-2 px-4">
                                     <input
                                         type="number"
+                                        min="0"
                                         name="laborQuantityMinPrice"
                                         value={price.laborQuantityMinPrice}
                                         onChange={(event) => handlePriceChange(index, event)}
@@ -122,6 +152,7 @@ const AddPriceManual: React.FC<AddLaborQuantityWithHandsFormProps> = ({ closeCar
                                 <td className="border-b py-2 px-4">
                                     <input
                                         type="number"
+                                        min="0"
                                         name="laborQuantityMaxPrice"
                                         value={price.laborQuantityMaxPrice}
                                         onChange={(event) => handlePriceChange(index, event)}

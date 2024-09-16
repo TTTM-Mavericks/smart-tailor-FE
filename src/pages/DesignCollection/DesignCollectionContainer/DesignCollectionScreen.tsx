@@ -12,10 +12,11 @@ import { primaryColor } from '../../../root/ColorSystem';
 import Select from 'react-select';
 import FooterComponent from '../../../components/Footer/FooterComponent';
 import HeaderComponent from '../../../components/Header/HeaderComponent';
+import { __getToken } from '../../../App';
 
-const CardDesignComponent: React.FC<{ design: DesignInterface }> = ({ design }) => {
+const CardDesignComponent: React.FC<{ design: DesignInterface, onclickRe?: () => void }> = ({ design, onclickRe }) => {
     return (
-        <div key={design.designID} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2" style={{ width: 200, height: 250 }}>
+        <div key={design.designID} onClick={onclickRe} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2" style={{ width: 200, height: 250 }}>
             <div className="bg-white shadow-md rounded-lg overflow-hidden" style={{ width: 200, height: 250 }}>
                 <img src={design.imageUrl} alt={design.titleDesign} className="w-full h-32 sm:h-48 object-cover" />
                 <div className="p-4">
@@ -38,7 +39,7 @@ const DesignCollectionScreen = () => {
     const [activeTab, setActiveTab] = useState('All');
     const [userAuth, setUserAuth] = useState<UserInterface>();
     const [isLoading, setIsloading] = useState<boolean>(false);
-    const [designList, setDesignList] = useState<DesignInterface[]>();
+    const [designList, setDesignList] = useState<DesignInterface[]>([]);
     const [isScrolled, setIsScrolled] = useState(false);
     const [isEnd, setIsEnd] = useState(false)
 
@@ -101,12 +102,17 @@ const DesignCollectionScreen = () => {
     const __handleFetchDesignListByUserId = async () => {
         setIsloading(true);
         try {
-            const response = await api.get(`${versionEndpoints.v1 + '/' + featuresEndpoints.design + functionEndpoints.design.getAllDesignByUserID}/${userAuth?.userID}`);
+            const response = await api.get(`${versionEndpoints.v1 + '/' + featuresEndpoints.design + functionEndpoints.design.getAllDesignByUserID}/${userAuth?.userID}`, null, __getToken());
             if (response.status === 200) {
-                setDesignList(response.data)
+                const result = response.data.filter((item: any) => item.publicStatus !== false)
+                console.log(result);
+                setDesignList(result)
+
                 setIsloading(false);
             } else {
                 toast.error(`${response.message}`, { autoClose: 4000 })
+                setIsloading(false);
+
             }
         } catch (error) {
             console.error('Error checking verification status:', error);
@@ -199,7 +205,6 @@ const DesignCollectionScreen = () => {
     return (
         <div>
             <HeaderComponent></HeaderComponent>
-            <ToastContainer></ToastContainer>
             <LoadingComponent isLoading={isLoading}></LoadingComponent>
             <div className={`${styles.designCollection__container}`}>
                 <aside className={`${styles.designCollection__container__menuBer}`}>
@@ -219,6 +224,9 @@ const DesignCollectionScreen = () => {
                             </a>
                             <a href="/refund_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
                                 Refund History
+                            </a>
+                            <a href="/transaction_history" className="px-4 py-3 font-semibold text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-100">
+                                Transactions
                             </a>
                             <a href="/collection" className="px-4 py-3 font-semibold text-orange-900 bg-white border border-orange-100 rounded-lg hover:bg-orange-50">
                                 Collection
@@ -253,73 +261,7 @@ const DesignCollectionScreen = () => {
                             </div>
                         </div>
                     </div> */}
-                    <div className="mb-6 mt-6">
-                        <label htmlFor="filterSelect" className="block mb-2 text-lg font-semibold text-gray-700">Select Filters</label>
-                        <Select
-                            isMulti
-                            name="filters"
-                            options={filterOptions}
-                            className="basic-multi-select"
-                            classNamePrefix="select"
-                            value={filterOptions.filter(option => selectedFilters.includes(option.value))}
-                            onChange={(selectedOptions: any) => {
-                                setSelectedFilters(selectedOptions.map((option: any) => option.value));
-                            }}
-                        />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                        {selectedFilters.includes('Date') && (
-                            <div className="filter-item">
-                                <label htmlFor="dateFilter" className="block mb-2 text-sm font-medium text-gray-700">Date</label>
-                                <input
-                                    type="date"
-                                    id="dateFilter"
-                                    name="createDate"
-                                    value={filters.createDate}
-                                    onChange={handleFilterChange}
-                                    className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
-                                />
-                            </div>
-                        )}
-
-                        {selectedFilters.includes('Design ID') && (
-                            <div className="filter-item">
-                                <label htmlFor="designIDFilter" className="block mb-2 text-sm font-medium text-gray-700">Order ID</label>
-                                <input
-                                    type="text"
-                                    id="designIDFilter"
-                                    name="designID"
-                                    value={filters.designID}
-                                    onChange={handleFilterChange}
-                                    placeholder="Enter Order ID"
-                                    className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
-                                />
-                            </div>
-                        )}
-
-                        {/* {selectedFilters.includes('Order Status') && (
-                            <div className="filter-item">
-                                <label htmlFor="statusFilter" className="block mb-2 text-sm font-medium text-gray-700">Order Status</label>
-                                <select
-                                    id="statusFilter"
-                                    name="status"
-                                    value={filters.status}
-                                    onChange={handleFilterChange}
-                                    className="bg-gray-50 border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 transition duration-150 ease-in-out"
-                                >
-                                    <option value="">All Order Statuses</option>
-                                    <option value="NOT_VERIFY">Not Verify</option>
-                                    <option value="PENDING">Pending</option>
-                                    <option value="DEPOSIT">Deposit</option>
-                                    <option value="PROCESSING">Processing</option>
-                                    <option value="CANCEL">Cancel</option>
-                                    <option value="COMPLETED">Completed</option>
-                                    <option value="DELIVERED">Delivered</option>
-                                </select>
-                            </div>
-                        )} */}
-                    </div>
+                    {/*  */}
 
                     <div className="flex space-x-4 mt-5">
                         {tabs.map(tab => (
@@ -338,7 +280,7 @@ const DesignCollectionScreen = () => {
                     <div className="relative mt-5 w-full" >
                         <div className={`flex space-x-4 overflow-x-auto ${styles.scroll__container}`} ref={scrollContainerRef}>
                             {designList?.filter(applyFilters).map((design, index) => (
-                                <CardDesignComponent key={design.designID} design={design} />
+                                <CardDesignComponent key={design.designID} design={design} onclickRe={() => window.location.href = `/design/${design.designID}`} />
                             ))}
                         </div>
                         {!isEnd && (

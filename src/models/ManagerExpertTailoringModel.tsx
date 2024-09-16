@@ -24,10 +24,12 @@ export interface ExpertTailoring {
 export interface ExpertTailoringEdit {
     expertTailoringID: string,
     expertTailoringName: string,
-    sizeImageUrl: string
+    sizeImageUrl: string,
+    modelImageUrl: string
 }
 
 export interface AddExpertTailoring {
     expertTailoringName: string,
-    sizeImageUrl: string
+    sizeImageUrl: string,
+    modelImageUrl: string
 }

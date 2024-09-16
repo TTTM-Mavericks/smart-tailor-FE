@@ -16,6 +16,7 @@ import { AddCategory } from '../../../../models/AdminCategoryExcelModel';
 import { borderRadius, display, height } from '@mui/system';
 import { AddCircleOutline, CancelOutlined, RemoveCircleOutline } from '@mui/icons-material';
 import { primaryColor } from '../../../../root/ColorSystem';
+import { __getToken } from '../../../../App';
 
 interface AddMaterialWithHandsFormProps {
     closeCard: () => void;
@@ -40,11 +41,14 @@ const AddEachCategoryWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
 
     const _handleFormChange = (index: number, event: ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
-        setFormData(prevFormData => {
-            const newFormDatas = [...prevFormData];
-            newFormDatas[index] = { categoryNames: value }; // Update to match AddCategory type
-            return newFormDatas;
-        });
+        // Only allow alphabetic characters and spaces
+        if (/^[A-Za-z\s]*$/.test(value)) {
+            setFormData(prevFormData => {
+                const newFormDatas = [...prevFormData];
+                newFormDatas[index] = { categoryNames: value.trim() }; // Trim to remove leading/trailing spaces
+                return newFormDatas;
+            });
+        }
     };
 
     const _handleAddCategory = () => {
@@ -62,12 +66,41 @@ const AddEachCategoryWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
                 'Please add at least one category.',
                 'warning'
             );
+            closeCard()
+            return;
+        }
+
+        // Check if all categories are valid
+        const invalidCategories = formData.filter(category => !/^[A-Za-z\s]+$/.test(category.categoryNames));
+        if (invalidCategories.length > 0) {
+            Swal.fire(
+                'Invalid Input',
+                'Category names must contain only alphabetic characters and spaces',
+                'error'
+            );
+            closeCard()
+            return;
+        }
+
+        // Check for duplicate categories
+        const uniqueCategories = new Set(formData.map(category => category.categoryNames.toLowerCase()));
+        if (uniqueCategories.size !== formData.length) {
+            Swal.fire(
+                'Duplicate Categories',
+                'Please ensure all category names are unique',
+                'error'
+            );
+            closeCard()
             return;
         }
 
         try {
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.addNewCategory}`;
-            const response = await axios.post(apiUrl, { categoryNames: formData.map(cat => cat.categoryNames) }); // Extract categoryNames
+            const response = await axios.post(apiUrl, { categoryNames: formData.map(cat => cat.categoryNames) }, {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`
+                }
+            }); // Extract categoryNames
 
             console.log('Response:', response.data);
 
@@ -117,6 +150,8 @@ const AddEachCategoryWithHand: React.FC<AddMaterialWithHandsFormProps> = ({ clos
                             value={category.categoryNames}
                             onChange={(e) => _handleFormChange(index, e)}
                             className="flex-grow p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                            pattern="[A-Za-z\s]*"
+                            title="Only alphabetic characters and spaces are allowed"
                         />
                         <button
                             onClick={() => _handleRemoveCategory(index)}

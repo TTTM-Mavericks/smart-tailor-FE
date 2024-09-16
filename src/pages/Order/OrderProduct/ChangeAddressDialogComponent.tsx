@@ -479,13 +479,13 @@ const ChangeAddressDialogComponent: React.FC<ChangeAddressDialogComponentProps> 
                                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                                         <div>
                                             <label htmlFor="full_name" className="block text-sm font-medium text-gray-700">
-                                                Your first name
+                                                Full name
                                             </label>
                                             <input
                                                 type="text"
                                                 id="full_name"
                                                 className="mt-1 block w-full px-3 py-2 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500"
-                                                placeholder="Your first name"
+                                                placeholder="Full name"
                                                 name="fullName"
                                                 value={profileData.fullName}
                                                 onChange={_handleChange}

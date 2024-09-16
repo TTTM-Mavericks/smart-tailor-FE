@@ -9,6 +9,7 @@ import axios from "axios";
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { Brand } from "../../../../../models/ManagerBrandModel";
 import { CancelOutlined, CheckCircleOutline, ArrowBack, ArrowForward } from "@mui/icons-material";
+import { __getToken } from "../../../../../App";
 
 const StyledDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialog-paper': {
@@ -111,7 +112,11 @@ const ManageBrand: React.FC = () => {
     React.useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.getAllBrandInformation}`;
 
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');
@@ -143,7 +148,11 @@ const ManageBrand: React.FC = () => {
     const handleRowClick = async (params: any) => {
         try {
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.getBrandByID}/${params.row.brandID}`;
-            const response = await axios.get(apiUrl);
+            const response = await axios.get(apiUrl, {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`
+                }
+            });
             if (response.status === 200) {
                 setSelectedBrand(response.data.data);
                 setOpenDialog(true);
@@ -161,7 +170,11 @@ const ManageBrand: React.FC = () => {
     const _handleAcceptBrand = async (brandID: string) => {
         try {
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.acceptBrand}`;
-            const response = await axios.get(apiUrl + `/${brandID}`)
+            const response = await axios.get((apiUrl + `/${brandID}`), {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`
+                }
+            })
             console.log("brandID" + brandID);
             if (!response.data) {
                 throw new Error('Error accepting brand');
@@ -176,7 +189,11 @@ const ManageBrand: React.FC = () => {
         try {
             const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.brand + functionEndpoints.brand.rejectBrand}`;
             console.log("brandid: " + brandID);
-            const response = await axios.get(apiUrl + `/${brandID}`)
+            const response = await axios.get((apiUrl + `/${brandID}`), {
+                headers: {
+                    Authorization: `Bearer ${__getToken()}`
+                }
+            })
             if (!response.data) {
                 throw new Error('Error rejecting brand');
             }
@@ -372,7 +389,6 @@ const ManageBrand: React.FC = () => {
                             width: '6px',
                             height: '6px',
                             borderRadius: '50%',
-                            backgroundColor: params.value === 'ACCEPT' ? '#4caf50' : '#f44336',
                         }}
                     />
                     {params.value}

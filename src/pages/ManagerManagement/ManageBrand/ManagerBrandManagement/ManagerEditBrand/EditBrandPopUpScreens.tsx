@@ -7,6 +7,7 @@ import axios from 'axios';
 import { baseURL, featuresEndpoints, functionEndpoints, versionEndpoints } from '../../../../../api/ApiConfig';
 import { ExpertTailoringEdit } from "../../../../../models/ManagerExpertTailoringModel";
 import { ToastContainer, toast } from "react-toastify";
+import { __getToken } from "../../../../../App";
 
 interface EditBrandPopUpScreenFormProps {
     fid: {
@@ -60,7 +61,11 @@ const EditBrandPopUpScreens: React.FC<EditBrandPopUpScreenFormProps> = ({ fid, e
      */
     React.useEffect(() => {
         const apiUrl = `${baseURL + versionEndpoints.v1 + featuresEndpoints.category + functionEndpoints.category.getAllCategory}`;
-        axios.get(apiUrl)
+        axios.get(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${__getToken()}`
+            }
+        })
             .then(response => {
                 if (response.status !== 200) {
                     throw new Error('Network response was not ok');
@@ -181,12 +186,11 @@ const EditBrandPopUpScreens: React.FC<EditBrandPopUpScreenFormProps> = ({ fid, e
             const response = await axios.put(
                 `${baseURL + versionEndpoints.v1 + featuresEndpoints.manager + functionEndpoints.manager.updateExpertTailoring + `/${fid.expertTailoringID}`}`,
                 addNewExpertTailorings,
-                // {
-                //     headers: {
-                //         'Authorization': `Bearer ${token}`
-                //     }
-                // }
-
+                {
+                    headers: {
+                        Authorization: `Bearer ${__getToken()}`
+                    }
+                }
             );
             console.log("res:" + response);
 
